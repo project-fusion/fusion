@@ -81,7 +81,7 @@
      disagree. Left out entirely the stroke falls to the SVG default of 1 and
      every slice is a hairline, which is what happened when the old hook was
      removed without putting anything in its place. */
-  stroke-width: var(--_donut-thickness);
+  stroke-width: var(--donut-chart-stroke);
 }
 
 /* The middle is the hole, and it is computed rather than guessed.
@@ -161,7 +161,7 @@
    * total four times the width of the ring. */
   container-type: inline-size;
   display: grid;
-  inline-size: calc(100% * (80 - var(--_donut-thickness, 16)) / 100);
+  inline-size: calc(100% * (80 - var(--donut-chart-stroke, 16)) / 100);
   place-items: center;
   text-align: center;
 }
@@ -420,7 +420,7 @@
  * radius, so the hole does not move.
  */
 [part="segment"][data-active] {
-  stroke-width: calc(var(--_donut-thickness) * 1.18);
+  stroke-width: calc(var(--donut-chart-stroke) * 1.18);
 }
 
 [part="segment"] {
@@ -519,14 +519,14 @@
  * **The box is no longer square.** The headless tier crops the view box to the
  * band it actually draws, from the top of the ring to the centre line plus the
  * half stroke the flat ends hang below it, so the ratio is the width over that
- * band. `--_donut-thickness` is already published on the plot, for the middle
+ * band. `--donut-chart-stroke` is already published on the plot, for the middle
  * to size itself against, and it is the only number here that moves.
  *
  * **The first slice starts at nine o'clock**, not twelve, because the whole is
  * now the top half and a reader reads it left to right. `rotate(180deg)` rather
  * than `-90deg`, and the same rule covers the track so the two cannot part. */
 :host([sweep="half"]) [part="plot"] svg {
-  aspect-ratio: 100 / calc(40 + var(--_donut-thickness, 16) / 2);
+  aspect-ratio: 100 / calc(40 + var(--donut-chart-stroke, 16) / 2);
 }
 
 :host([sweep="half"]) [part="track"],
@@ -557,8 +557,8 @@
    * height on the full ring too, where there is deliberately none. */
   block-size: calc(
     100% *
-    (40 - var(--_donut-thickness, 16)) /
-    (40 + var(--_donut-thickness, 16) / 2)
+    (40 - var(--donut-chart-stroke, 16)) /
+    (40 + var(--donut-chart-stroke, 16) / 2)
   );
 }
 

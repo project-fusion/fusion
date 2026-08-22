@@ -22,7 +22,10 @@
 [part="sample"],
 [part="swatch"] {
   background-image:
-    linear-gradient(var(--_color, transparent), var(--_color, transparent)),
+    linear-gradient(
+      var(--color-picker-swatch, transparent),
+      var(--color-picker-swatch, transparent)
+    ),
     conic-gradient(
       var(--helix-color-surface-sunken) 0 25%,
       var(--helix-color-surface) 0 50%,
@@ -42,7 +45,7 @@
  *
  * Three layers in one declaration, painted back to front: the hue underneath,
  * white sliding in from the left to take the saturation out, black rising from
- * the bottom to take the brightness out. The hue is `--_hue`, written by the
+ * the bottom to take the brightness out. The hue is `--color-picker-hue`, written by the
  * tier below, so the square repaints as the ramp moves.
  *
  * The hue is raw `hsl()` and takes no token. Every other color in this file is
@@ -53,7 +56,7 @@
   background-image:
     linear-gradient(to top, hsl(0 0% 0%), transparent),
     linear-gradient(to right, hsl(0 0% 100%), transparent),
-    linear-gradient(hsl(var(--_hue) 100% 50%), hsl(var(--_hue) 100% 50%));
+    linear-gradient(hsl(var(--color-picker-hue) 100% 50%), hsl(var(--color-picker-hue) 100% 50%));
   border-radius: var(--color-picker-grid-radii, var(--helix-radii-sm));
   cursor: crosshair;
   position: relative;
@@ -68,8 +71,8 @@
   border-radius: var(--helix-radii-full);
   box-shadow: var(--helix-shadow-sm);
   inline-size: var(--helix-size-icon-sm);
-  inset-block-start: calc(100% - var(--_brightness, 100%));
-  inset-inline-start: var(--_saturation, 100%);
+  inset-block-start: calc(100% - var(--color-picker-brightness, 100%));
+  inset-inline-start: var(--color-picker-saturation, 100%);
   pointer-events: none;
   position: absolute;
   translate: -50% -50%;
@@ -215,7 +218,7 @@
    background happens to match. */
 [part="channel"][data-channel="alpha"] {
   --slider-track-image:
-    linear-gradient(to right, transparent, hsl(var(--_hue) 100% 50%)),
+    linear-gradient(to right, transparent, hsl(var(--color-picker-hue) 100% 50%)),
     conic-gradient(
       var(--helix-color-surface-sunken) 0 25%,
       var(--helix-color-surface) 0 50%,

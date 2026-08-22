@@ -52,10 +52,10 @@
   /* The video's ratio once it is known, and sixteen by nine until then. Not
      `auto`: that takes the element's intrinsic ratio, and a video carrying a
      poster reports the poster's, so the box took the still's shape and the
-     clip letterboxed inside it. The element writes `--_video-ratio` from
+     clip letterboxed inside it. The element writes `--video-intrinsic-ratio` from
      `videoWidth` and `videoHeight`, which is the only source that is always
      the video. */
-  aspect-ratio: var(--video-aspect-ratio, var(--_video-ratio, 16 / 9));
+  aspect-ratio: var(--video-aspect-ratio, var(--video-intrinsic-ratio, 16 / 9));
   /* Dark, and not a token that turns over with the theme. `surface-inverse` is
      near-white in dark mode, so the well behind an unloaded video came out white
      on a black page and the bar's light ink vanished into it. A video sits in a
@@ -277,7 +277,7 @@
 }
 
 [part="scrubber"] {
-  --_video-at: var(--_video-progress, 0);
+  --_video-at: var(--video-progress, 0);
   --_video-fill: var(--video-accent-color, var(--helix-color-primary));
 
   flex: 1 1 auto;
@@ -288,7 +288,7 @@
    bars on one row compete, and only one of them is about what is being
    watched. */
 [part="volume"] {
-  --_video-at: var(--_video-level, 1);
+  --_video-at: var(--video-level, 1);
   --_video-fill: currentColor;
 }
 

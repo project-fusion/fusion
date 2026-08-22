@@ -22,7 +22,7 @@
 }
 
 [part="start"] {
-  flex: 0 0 var(--_splitter-position, 50%);
+  flex: 0 0 var(--splitter-position, 50%);
   /* Both, because a flex item's floor is its content and a pane holding
      anything scrollable would otherwise refuse to go below it: the divider
      would stop at a width nobody asked for and nothing would say why. */
@@ -224,8 +224,8 @@
  * against the host instead, the corner's layer is read in the host's context and
  * beats every separator in the nest.
  *
- * It needs two numbers and has both: `--_splitter-position` is this splitter's
- * own divider, and `--_splitter-corner-at` is the nested one's, which the child
+ * It needs two numbers and has both: `--splitter-position` is this splitter's
+ * own divider, and `--splitter-corner-at` is the nested one's, which the child
  * announces. Each is a percentage of the host on its own axis, and the nested
  * splitter fills its pane, so its position is an offset along this divider too.
  *
@@ -241,8 +241,8 @@
      `row-resize` would each name half of what it does. */
   cursor: move;
   inline-size: var(--splitter-corner, var(--helix-space-md));
-  inset-block-start: var(--_splitter-corner-at);
-  inset-inline-start: var(--_splitter-position);
+  inset-block-start: var(--splitter-corner-at);
+  inset-inline-start: var(--splitter-position);
   margin-block-start: calc(var(--splitter-corner, var(--helix-space-md)) / -2);
   margin-inline-start: calc(var(--splitter-corner, var(--helix-space-md)) / -2);
   position: absolute;
@@ -255,8 +255,8 @@
    inline offset and the crossing is a distance down it, and the other way round
    for a vertical one. */
 :host([orientation="vertical"]) [part="corner"] {
-  inset-block-start: var(--_splitter-position);
-  inset-inline-start: var(--_splitter-corner-at);
+  inset-block-start: var(--splitter-position);
+  inset-inline-start: var(--splitter-corner-at);
 }
 
 /* **The handle draws nothing, and the cursor is the whole affordance.** A mark

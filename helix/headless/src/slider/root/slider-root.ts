@@ -66,6 +66,16 @@ import { property } from 'lit/decorators.js'
  * @csspart marker - One mark.
  * @csspart marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart output - The current value, shown beside it.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --slider-fraction - The value as a fraction of the range, 0 to 1.
+ * @cssproperty --slider-from - Where the filled span starts, as a percentage of the track.
+ * @cssproperty --slider-marker-at - Where one marker sits, as a percentage of the track.
+ * @cssproperty --slider-to - Where the filled span ends, as a percentage of the track.
  */
 @customElement('helix-base-slider')
 export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -275,7 +285,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
    * read the seeded midpoint and stayed there.
    *
    * Measured on a slider from 0 to 1: after dragging to either end, the host's
-   * `value` was `1`, the control's was `1`, and `--_slider-fraction` was still
+   * `value` was `1`, the control's was `1`, and `--slider-fraction` was still
    * `0.5`. Off by half a track, and stable, which is what made it look like a
    * drawing bug rather than a timing one.
    *
@@ -367,7 +377,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
         part="control"
         data-thumb=${which}
         type="range"
-        style="--_slider-from: ${this.along(start)}; --_slider-to: ${this.along(end)}"
+        style="--slider-from: ${this.along(start)}; --slider-to: ${this.along(end)}"
         min=${this.min}
         max=${this.max}
         step=${this.step}
@@ -384,7 +394,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
       part="field"
       data-markers=${this.markerValues.length > 0 ? '' : nothing}
       data-range=${this.range ? '' : nothing}
-      style="--_slider-fraction: ${this.fraction}; --_slider-from: ${this.along(start)}; --_slider-to: ${this.along(end)}"
+      style="--slider-fraction: ${this.fraction}; --slider-from: ${this.along(start)}; --slider-to: ${this.along(end)}"
     >
       ${this.range ? thumb('start', start) : nothing}
       ${this.range ? thumb('end', end) : nothing}
@@ -395,7 +405,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
               part="control"
               id="control"
               type="range"
-              style="--_slider-fraction: ${this.fraction}"
+              style="--slider-fraction: ${this.fraction}"
               min=${this.min}
               max=${this.max}
               step=${this.step}
@@ -414,7 +424,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
                 (at) =>
                   html`<span
                     part="marker"
-                    style="--_marker-at: ${((at - this.min) / (this.max - this.min)) * 100}%"
+                    style="--slider-marker-at: ${((at - this.min) / (this.max - this.min)) * 100}%"
                     >${
                       this.markerLabels ? html`<span part="marker-label">${at}</span>` : nothing
                     }</span

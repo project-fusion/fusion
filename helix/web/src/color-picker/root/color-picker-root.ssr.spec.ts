@@ -12,9 +12,9 @@ describe('color server output', () => {
     // `#3366ff` is rgb(51, 102, 255): hue 225, saturation 80, brightness 100.
     // Seeding the model in `updated` would ship a red square under a blue that
     // is already the value, because `updated` never runs here.
-    expect(partTag(markup, 'grid')).toContain('--_hue: 225')
-    expect(partTag(markup, 'grid')).toContain('--_saturation: 80%')
-    expect(partTag(markup, 'grid')).toContain('--_brightness: 100%')
+    expect(partTag(markup, 'grid')).toContain('--color-picker-hue: 225')
+    expect(partTag(markup, 'grid')).toContain('--color-picker-saturation: 80%')
+    expect(partTag(markup, 'grid')).toContain('--color-picker-brightness: 100%')
   })
 
   test('both axes ship as real inputs, named', () => {

@@ -58,7 +58,7 @@
    * and one declaration covers both because the mark is what does the work. */
   padding-inline-start: calc(
     var(--helix-space-xs) +
-    (var(--_tree-level, 1) - 1) *
+    (var(--tree-level, 1) - 1) *
     var(--tree-indent, calc(var(--_tree-chevron) + var(--helix-space-2xs)))
   );
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
@@ -94,7 +94,7 @@
 [part="row"]:not(:has([part="toggle"])) {
   padding-inline-start: calc(
     var(--helix-space-xs) +
-    (var(--_tree-level, 1) - 1) *
+    (var(--tree-level, 1) - 1) *
     var(--tree-indent, calc(var(--_tree-chevron) + var(--helix-space-2xs))) +
     var(--_tree-reserve, calc(var(--_tree-chevron) + var(--helix-space-2xs)))
   );

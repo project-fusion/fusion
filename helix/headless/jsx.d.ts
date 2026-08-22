@@ -5456,7 +5456,7 @@ state for stylesheets, which is what it has always been for. */
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixBaseMegamenuHelixOpenElementEvent) => void;
-  /** Fired before it closes, and cancelable. */
+  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "onhelix-close"?: (e: HelixBaseMegamenuHelixCloseElementEvent) => void;
 };
 
@@ -5552,7 +5552,7 @@ state for stylesheets, which is what it has always been for. */
   "prop:defaultOpen"?: HelixBaseMegamenu["defaultOpen"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixBaseMegamenuHelixOpenElementEvent) => void;
-  /** Fired before it closes, and cancelable. */
+  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "on:helix-close"?: (e: HelixBaseMegamenuHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -10521,7 +10521,7 @@ reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   dismissLabel?: HelixBaseToastItem["dismissLabel"];
 
-  /** Fired when it asks to go, whether by the control or by its timer. */
+  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "onhelix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
 };
 
@@ -10568,7 +10568,7 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   "prop:dismissLabel"?: HelixBaseToastItem["dismissLabel"];
-  /** Fired when it asks to go, whether by the control or by its timer. */
+  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "on:helix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -11344,7 +11344,7 @@ state for stylesheets, which is what it has always been for. */
   "onhelix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
   "onhelix-open"?: (e: HelixBaseTreeItemHelixOpenElementEvent) => void;
-  /** Fired before a branch closes, and cancelable. */
+  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "onhelix-close"?: (e: HelixBaseTreeItemHelixCloseElementEvent) => void;
 };
 
@@ -11419,7 +11419,7 @@ state for stylesheets, which is what it has always been for. */
   "on:helix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
   "on:helix-open"?: (e: HelixBaseTreeItemHelixOpenElementEvent) => void;
-  /** Fired before a branch closes, and cancelable. */
+  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "on:helix-close"?: (e: HelixBaseTreeItemHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -11950,7 +11950,7 @@ regardless, because a reader who stopped it is deciding what to do next. */
   onplay?: (e: HelixBaseVideoElementEvent) => void;
   /** Relayed for the same reason. */
   onpause?: (e: HelixBaseVideoElementEvent) => void;
-  /** Relayed for the same reason. */
+  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   onended?: (e: HelixBaseVideoElementEvent) => void;
 };
 
@@ -12138,7 +12138,7 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "on:play"?: (e: HelixBaseVideoElementEvent) => void;
   /** Relayed for the same reason. */
   "on:pause"?: (e: HelixBaseVideoElementEvent) => void;
-  /** Relayed for the same reason. */
+  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "on:ended"?: (e: HelixBaseVideoElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -12732,6 +12732,13 @@ export type CustomElements = {
    * the column beside it that nothing plotted at all. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
+   * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -12753,7 +12760,7 @@ export type CustomElements = {
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
-   * - `tooltip-value`: A column's value inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-bar-chart": Partial<
     HelixBaseBarChartProps & BaseProps<HelixBaseBarChart> & BaseEvents
@@ -13891,6 +13898,12 @@ export type CustomElements = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -13900,7 +13913,7 @@ export type CustomElements = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The color picker inside it.
+   * - `picker`: The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-color-input": Partial<
     HelixBaseColorInputProps & BaseProps<HelixBaseColorInput> & BaseEvents
@@ -14082,6 +14095,15 @@ export type CustomElements = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
+   * - `--color-picker-hue`: The chosen hue, 0 to 360, unitless. (default: `undefined`)
+   * - `--color-picker-saturation`: The chosen saturation, 0 to 100, as a percentage. (default: `undefined`)
+   * - `--color-picker-swatch`: A colour to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -14101,7 +14123,7 @@ export type CustomElements = {
    * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
-   * - `swatch`: One preset.
+   * - `swatch`: One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-color-picker": Partial<
     HelixBaseColorPickerProps & BaseProps<HelixBaseColorPicker> & BaseEvents
@@ -15055,6 +15077,12 @@ export type CustomElements = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--date-picker-column-count`: How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -15069,7 +15097,7 @@ export type CustomElements = {
    * - `weekday`: A column header naming a day of the week.
    * - `week`: One row of days.
    * - `cell`: One column of a row, which is what a range paints.
-   * - `day`: The shape inside a cell, which is what a single date paints.
+   * - `day`: The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-date-picker": Partial<
     HelixBaseDatePickerProps & BaseProps<HelixBaseDatePicker> & BaseEvents
@@ -15336,7 +15364,13 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Goes in the middle of the ring. A total, usually.
+   * - `(default)`: Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--donut-chart-stroke`: How thick the ring is drawn, derived from `hole`. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -17052,7 +17086,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -17073,6 +17107,12 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--megamenu-top`: Where the panel starts, measured from the bar above it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -17411,6 +17451,15 @@ export type CustomElements = {
    * same property `Progress` carries, for the same reason: a percentage is a
    * fair summary of a task and a poor one of a quantity.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--meter-along`: Where a bound sits on the arc, as a length along it. (default: `undefined`)
+   * - `--meter-at`: Where a bound sits on a linear track, as a percentage. (default: `undefined`)
+   * - `--meter-fraction`: The value as a fraction of the range, 0 to 1. (default: `undefined`)
+   * - `--meter-sweep`: How much of the circle the arc covers, as a path length. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -17419,7 +17468,7 @@ export type CustomElements = {
    * - `groove`: The unfilled circle, in `ring` and `arc`.
    * - `indicator`: The part of it the value fills.
    * - `tick`: A mark at `low` or at `high`.
-   * - `value`: The reading, under `show-value`.
+   * - `value`: The reading, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-meter": Partial<
     HelixBaseMeterProps & BaseProps<HelixBaseMeter> & BaseEvents
@@ -18566,6 +18615,12 @@ export type CustomElements = {
    * report progress.
    * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--progress-fraction`: The value as a fraction of the range, 0 to 1. Absent while indeterminate. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -18573,7 +18628,7 @@ export type CustomElements = {
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
-   * - `value`: The reading beside the bar, under `show-value`.
+   * - `value`: The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-progress": Partial<
     HelixBaseProgressProps & BaseProps<HelixBaseProgress> & BaseEvents
@@ -19081,6 +19136,15 @@ export type CustomElements = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--rating-full`: How many marks are wholly filled. (default: `undefined`)
+   * - `--rating-part`: How much of the next mark is filled, 0 to 1. (default: `undefined`)
+   * - `--rating-step`: The width of one step, as a fraction of a mark. (default: `undefined`)
+   * - `--rating-steps`: How many steps one mark is divided into. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -19090,7 +19154,7 @@ export type CustomElements = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`.
+   * - `value`: The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-rating": Partial<
     HelixBaseRatingProps & BaseProps<HelixBaseRating> & BaseEvents
@@ -19597,6 +19661,15 @@ export type CustomElements = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--slider-fraction`: The value as a fraction of the range, 0 to 1. (default: `undefined`)
+   * - `--slider-from`: Where the filled span starts, as a percentage of the track. (default: `undefined`)
+   * - `--slider-marker-at`: Where one marker sits, as a percentage of the track. (default: `undefined`)
+   * - `--slider-to`: Where the filled span ends, as a percentage of the track. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -19606,7 +19679,7 @@ export type CustomElements = {
    * - `markers`: The row of marks along the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `output`: The current value, shown beside it.
+   * - `output`: The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-slider": Partial<
     HelixBaseSliderProps & BaseProps<HelixBaseSlider> & BaseEvents
@@ -19711,6 +19784,13 @@ export type CustomElements = {
    * and a string is what survives React's hydration where an array property
    * does not.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--chart-terminus-x`: Where the last point sits horizontally, as a percentage. (default: `undefined`)
+   * - `--chart-terminus-y`: Where the last point sits vertically, as a percentage. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -19721,7 +19801,7 @@ export type CustomElements = {
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
    * - `wash-end`: The far stop of the area's gradient.
-   * - `wash-start`: The stop of the area's gradient that meets the line.
+   * - `wash-start`: The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-sparkline": Partial<
     HelixBaseSparklineProps & BaseProps<HelixBaseSparkline> & BaseEvents
@@ -20051,6 +20131,13 @@ export type CustomElements = {
    * anything about the other's state.
    * - `uncross(by: HelixBaseSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--splitter-corner-at`: Where a nested splitter crosses this one, as a percentage. (default: `undefined`)
+   * - `--splitter-position`: Where the divider sits, as a percentage of the box. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -20058,7 +20145,7 @@ export type CustomElements = {
    * - `start`: The box holding the first pane.
    * - `end`: The box holding the second.
    * - `separator`: The divider itself.
-   * - `corner`: The handle where two dividers cross, added on the client.
+   * - `corner`: The handle where two dividers cross, added on the client. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-splitter": Partial<
     HelixBaseSplitterProps & BaseProps<HelixBaseSplitter> & BaseEvents
@@ -20619,7 +20706,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--table-columns`: Track list for the columns. (default: `undefined`)
+   * - `--table-columns`: Track list for the columns. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. (default: `undefined`)
+   * - `--table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -21674,7 +21762,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -21697,6 +21785,12 @@ export type CustomElements = {
    * true whether or not the item hid itself first.
    * - `pause() => void`: Stops the clock, leaving whatever is left of it.
    * - `resume() => void`: Starts it again from where it stopped.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toast-duration`: How long this message stays, in milliseconds, for a progress hint. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22467,7 +22561,7 @@ export type CustomElements = {
    *
    * - `helix-select`: Fired when the item is chosen.
    * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable.
+   * - `helix-close`: Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -22503,6 +22597,12 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tree-level`: How deep this row sits, counting from zero, for the indent. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22999,7 +23099,7 @@ export type CustomElements = {
    * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason.
+   * - `ended`: Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -23023,6 +23123,14 @@ export type CustomElements = {
    * - `pause() => void`: Stops, leaving the frame up.
    * - `toggle() => void`: Toggles playback, which is what every key and the button both come to.
    * - `seek(seconds: number) => void`: Moves to a point in seconds, clamped to what exists.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--video-intrinsic-ratio`: The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. (default: `undefined`)
+   * - `--video-level`: The current volume, 0 to 1. (default: `undefined`)
+   * - `--video-progress`: How far playback has reached, as a fraction of the duration. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -23701,6 +23809,13 @@ export type CustomElementsSolidJs = {
    * the column beside it that nothing plotted at all. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
+   * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -23722,7 +23837,7 @@ export type CustomElementsSolidJs = {
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
-   * - `tooltip-value`: A column's value inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-bar-chart": Partial<
     HelixBaseBarChartProps &
@@ -24899,6 +25014,12 @@ export type CustomElementsSolidJs = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -24908,7 +25029,7 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The color picker inside it.
+   * - `picker`: The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-color-input": Partial<
     HelixBaseColorInputProps &
@@ -25093,6 +25214,15 @@ export type CustomElementsSolidJs = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
+   * - `--color-picker-hue`: The chosen hue, 0 to 360, unitless. (default: `undefined`)
+   * - `--color-picker-saturation`: The chosen saturation, 0 to 100, as a percentage. (default: `undefined`)
+   * - `--color-picker-swatch`: A colour to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -25112,7 +25242,7 @@ export type CustomElementsSolidJs = {
    * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
-   * - `swatch`: One preset.
+   * - `swatch`: One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-color-picker": Partial<
     HelixBaseColorPickerProps &
@@ -26081,6 +26211,12 @@ export type CustomElementsSolidJs = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--date-picker-column-count`: How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -26095,7 +26231,7 @@ export type CustomElementsSolidJs = {
    * - `weekday`: A column header naming a day of the week.
    * - `week`: One row of days.
    * - `cell`: One column of a row, which is what a range paints.
-   * - `day`: The shape inside a cell, which is what a single date paints.
+   * - `day`: The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-date-picker": Partial<
     HelixBaseDatePickerProps &
@@ -26371,7 +26507,13 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Goes in the middle of the ring. A total, usually.
+   * - `(default)`: Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--donut-chart-stroke`: How thick the ring is drawn, derived from `hole`. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -28138,7 +28280,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -28159,6 +28301,12 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--megamenu-top`: Where the panel starts, measured from the bar above it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -28506,6 +28654,15 @@ export type CustomElementsSolidJs = {
    * same property `Progress` carries, for the same reason: a percentage is a
    * fair summary of a task and a poor one of a quantity.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--meter-along`: Where a bound sits on the arc, as a length along it. (default: `undefined`)
+   * - `--meter-at`: Where a bound sits on a linear track, as a percentage. (default: `undefined`)
+   * - `--meter-fraction`: The value as a fraction of the range, 0 to 1. (default: `undefined`)
+   * - `--meter-sweep`: How much of the circle the arc covers, as a path length. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -28514,7 +28671,7 @@ export type CustomElementsSolidJs = {
    * - `groove`: The unfilled circle, in `ring` and `arc`.
    * - `indicator`: The part of it the value fills.
    * - `tick`: A mark at `low` or at `high`.
-   * - `value`: The reading, under `show-value`.
+   * - `value`: The reading, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-meter": Partial<
     HelixBaseMeterProps &
@@ -29690,6 +29847,12 @@ export type CustomElementsSolidJs = {
    * report progress.
    * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--progress-fraction`: The value as a fraction of the range, 0 to 1. Absent while indeterminate. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -29697,7 +29860,7 @@ export type CustomElementsSolidJs = {
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
-   * - `value`: The reading beside the bar, under `show-value`.
+   * - `value`: The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-progress": Partial<
     HelixBaseProgressProps &
@@ -30220,6 +30383,15 @@ export type CustomElementsSolidJs = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--rating-full`: How many marks are wholly filled. (default: `undefined`)
+   * - `--rating-part`: How much of the next mark is filled, 0 to 1. (default: `undefined`)
+   * - `--rating-step`: The width of one step, as a fraction of a mark. (default: `undefined`)
+   * - `--rating-steps`: How many steps one mark is divided into. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -30229,7 +30401,7 @@ export type CustomElementsSolidJs = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`.
+   * - `value`: The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-rating": Partial<
     HelixBaseRatingProps &
@@ -30748,6 +30920,15 @@ export type CustomElementsSolidJs = {
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--slider-fraction`: The value as a fraction of the range, 0 to 1. (default: `undefined`)
+   * - `--slider-from`: Where the filled span starts, as a percentage of the track. (default: `undefined`)
+   * - `--slider-marker-at`: Where one marker sits, as a percentage of the track. (default: `undefined`)
+   * - `--slider-to`: Where the filled span ends, as a percentage of the track. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -30757,7 +30938,7 @@ export type CustomElementsSolidJs = {
    * - `markers`: The row of marks along the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `output`: The current value, shown beside it.
+   * - `output`: The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-slider": Partial<
     HelixBaseSliderProps &
@@ -30865,6 +31046,13 @@ export type CustomElementsSolidJs = {
    * and a string is what survives React's hydration where an array property
    * does not.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--chart-terminus-x`: Where the last point sits horizontally, as a percentage. (default: `undefined`)
+   * - `--chart-terminus-y`: Where the last point sits vertically, as a percentage. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -30875,7 +31063,7 @@ export type CustomElementsSolidJs = {
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
    * - `wash-end`: The far stop of the area's gradient.
-   * - `wash-start`: The stop of the area's gradient that meets the line.
+   * - `wash-start`: The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-sparkline": Partial<
     HelixBaseSparklineProps &
@@ -31214,6 +31402,13 @@ export type CustomElementsSolidJs = {
    * anything about the other's state.
    * - `uncross(by: HelixBaseSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
    *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--splitter-corner-at`: Where a nested splitter crosses this one, as a percentage. (default: `undefined`)
+   * - `--splitter-position`: Where the divider sits, as a percentage of the box. (default: `undefined`)
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -31221,7 +31416,7 @@ export type CustomElementsSolidJs = {
    * - `start`: The box holding the first pane.
    * - `end`: The box holding the second.
    * - `separator`: The divider itself.
-   * - `corner`: The handle where two dividers cross, added on the client.
+   * - `corner`: The handle where two dividers cross, added on the client. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-splitter": Partial<
     HelixBaseSplitterProps &
@@ -31806,7 +32001,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--table-columns`: Track list for the columns. (default: `undefined`)
+   * - `--table-columns`: Track list for the columns. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. (default: `undefined`)
+   * - `--table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -32894,7 +33090,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -32917,6 +33113,12 @@ export type CustomElementsSolidJs = {
    * true whether or not the item hid itself first.
    * - `pause() => void`: Stops the clock, leaving whatever is left of it.
    * - `resume() => void`: Starts it again from where it stopped.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toast-duration`: How long this message stays, in milliseconds, for a progress hint. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -33711,7 +33913,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-select`: Fired when the item is chosen.
    * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable.
+   * - `helix-close`: Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -33747,6 +33949,12 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tree-level`: How deep this row sits, counting from zero, for the indent. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -34257,7 +34465,7 @@ export type CustomElementsSolidJs = {
    * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason.
+   * - `ended`: Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -34281,6 +34489,14 @@ export type CustomElementsSolidJs = {
    * - `pause() => void`: Stops, leaving the frame up.
    * - `toggle() => void`: Toggles playback, which is what every key and the button both come to.
    * - `seek(seconds: number) => void`: Moves to a point in seconds, clamped to what exists.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--video-intrinsic-ratio`: The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. (default: `undefined`)
+   * - `--video-level`: The current volume, 0 to 1. (default: `undefined`)
+   * - `--video-progress`: How far playback has reached, as a fraction of the duration. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -34383,8 +34599,74 @@ export type CustomElementsSolidJs = {
 };
 
 export type CustomCssProperties = {
-  /** Track list for the columns. */
+  /** The colour of a single-series axis, taken from that series. */
+  "--bar-chart-axis"?: string;
+  /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
+  "--bar-chart-secondary"?: string;
+  /** The chosen colour, to paint over the transparency check. */
+  "--color-input-swatch"?: string;
+  /** The chosen brightness, 0 to 100, as a percentage. */
+  "--color-picker-brightness"?: string;
+  /** The chosen hue, 0 to 360, unitless. */
+  "--color-picker-hue"?: string;
+  /** The chosen saturation, 0 to 100, as a percentage. */
+  "--color-picker-saturation"?: string;
+  /** A colour to paint: the current one on the sample, a preset's on each preset. */
+  "--color-picker-swatch"?: string;
+  /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
+  "--date-picker-column-count"?: string;
+  /** How thick the ring is drawn, derived from `hole`. */
+  "--donut-chart-stroke"?: string;
+  /** Where the panel starts, measured from the bar above it. */
+  "--megamenu-top"?: string;
+  /** Where a bound sits on the arc, as a length along it. */
+  "--meter-along"?: string;
+  /** Where a bound sits on a linear track, as a percentage. */
+  "--meter-at"?: string;
+  /** The value as a fraction of the range, 0 to 1. */
+  "--meter-fraction"?: string;
+  /** How much of the circle the arc covers, as a path length. */
+  "--meter-sweep"?: string;
+  /** The value as a fraction of the range, 0 to 1. Absent while indeterminate. */
+  "--progress-fraction"?: string;
+  /** How many marks are wholly filled. */
+  "--rating-full"?: string;
+  /** How much of the next mark is filled, 0 to 1. */
+  "--rating-part"?: string;
+  /** The width of one step, as a fraction of a mark. */
+  "--rating-step"?: string;
+  /** How many steps one mark is divided into. */
+  "--rating-steps"?: string;
+  /** The value as a fraction of the range, 0 to 1. */
+  "--slider-fraction"?: string;
+  /** Where the filled span starts, as a percentage of the track. */
+  "--slider-from"?: string;
+  /** Where one marker sits, as a percentage of the track. */
+  "--slider-marker-at"?: string;
+  /** Where the filled span ends, as a percentage of the track. */
+  "--slider-to"?: string;
+  /** Where the last point sits horizontally, as a percentage. */
+  "--chart-terminus-x"?: string;
+  /** Where the last point sits vertically, as a percentage. */
+  "--chart-terminus-y"?: string;
+  /** Where a nested splitter crosses this one, as a percentage. */
+  "--splitter-corner-at"?: string;
+  /** Where the divider sits, as a percentage of the box. */
+  "--splitter-position"?: string;
+  /** Track list for the columns. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "--table-columns"?: string;
+  /** The column track list, built from the columns the consumer declared. */
+  "--table-template"?: string;
+  /** How long this message stays, in milliseconds, for a progress hint. */
+  "--toast-duration"?: string;
+  /** How deep this row sits, counting from zero, for the indent. */
+  "--tree-level"?: string;
+  /** The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. */
+  "--video-intrinsic-ratio"?: string;
+  /** The current volume, 0 to 1. */
+  "--video-level"?: string;
+  /** How far playback has reached, as a fraction of the duration. */
+  "--video-progress"?: string;
 };
 
 declare module "react" {

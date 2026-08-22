@@ -265,7 +265,7 @@ slot[name="icon"]::slotted(*) {
  * The same color as the severity mark where there is one, so the two things
  * drawn on a message read as one idea rather than two. */
 [part="timer"] {
-  animation: helix-toast-drain var(--_toast-duration, 0ms) linear forwards;
+  animation: helix-toast-drain var(--toast-duration, 0ms) linear forwards;
   background-color: var(--_toast-severity, var(--helix-color-foreground-muted));
   block-size: var(--helix-space-2xs);
   /* Along the top edge and edge to edge, so it reads as the message's own
@@ -411,6 +411,6 @@ slot[name="icon"]::slotted(*) {
   }
 
   [part="timer"] {
-    animation: helix-toast-drain var(--_toast-duration, 0ms) linear forwards;
+    animation: helix-toast-drain var(--toast-duration, 0ms) linear forwards;
   }
 }

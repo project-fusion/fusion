@@ -60,6 +60,16 @@ import { property, state } from 'lit/decorators.js'
  * @csspart mark - One mark, in either layer.
  * @csspart option - One place a reader can press, which is one step.
  * @csspart value - The score written out, under `show-value`.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --rating-full - How many marks are wholly filled.
+ * @cssproperty --rating-part - How much of the next mark is filled, 0 to 1.
+ * @cssproperty --rating-step - The width of one step, as a fraction of a mark.
+ * @cssproperty --rating-steps - How many steps one mark is divided into.
  */
 @customElement('helix-base-rating')
 export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -385,7 +395,7 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
       role=${this.readOnly ? 'img' : 'radiogroup'}
       aria-label=${this.readOnly ? said : this.label || nothing}
       data-slotted=${this.markSource ? '' : nothing}
-      style=${`--_rating-full: ${Math.floor(showing)}; --_rating-part: ${showing - Math.floor(showing)}; --_rating-steps: ${this.steps.length}`}
+      style=${`--rating-full: ${Math.floor(showing)}; --rating-part: ${showing - Math.floor(showing)}; --rating-steps: ${this.steps.length}`}
       @pointercancel=${this.handleDragCancel}
       @pointerdown=${this.handleDragStart}
       @pointermove=${this.handleDragMove}
@@ -419,7 +429,7 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
                 aria-checked=${this.score === score ? 'true' : 'false'}
                 aria-label=${`${score} out of ${this.max}`}
                 data-score=${String(score)}
-                style=${`--_rating-step: ${index + 1}`}
+                style=${`--rating-step: ${index + 1}`}
                 ?disabled=${this.isDisabled}
                 tabindex=${
                   this.score === score || (this.score === 0 && score === first) ? '0' : '-1'

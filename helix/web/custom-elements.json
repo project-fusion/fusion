@@ -3480,6 +3480,22 @@
             {
               "description": "Space between the drawing and its labels.",
               "name": "--bar-chart-gap"
+            },
+            {
+              "description": "The colour of a single-series axis, taken from that series.",
+              "name": "--bar-chart-axis",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138.",
+              "name": "--bar-chart-secondary",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
             }
           ],
           "members": [
@@ -4299,7 +4315,7 @@
               }
             },
             {
-              "description": "A column's value inside the tooltip.",
+              "description": "A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "tooltip-value",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
@@ -9968,6 +9984,14 @@
             {
               "description": "Width of the panel, and so of the square.",
               "name": "--color-input-panel-size"
+            },
+            {
+              "description": "The chosen colour, to paint over the transparency check.",
+              "name": "--color-input-swatch",
+              "inheritedFrom": {
+                "name": "HelixBaseColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
             }
           ],
           "members": [
@@ -11344,7 +11368,7 @@
               }
             },
             {
-              "description": "The color picker inside it.",
+              "description": "The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "picker",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -11476,6 +11500,38 @@
             {
               "description": "Corner radius of the square.",
               "name": "--color-picker-grid-radii"
+            },
+            {
+              "description": "The chosen brightness, 0 to 100, as a percentage.",
+              "name": "--color-picker-brightness",
+              "inheritedFrom": {
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The chosen hue, 0 to 360, unitless.",
+              "name": "--color-picker-hue",
+              "inheritedFrom": {
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The chosen saturation, 0 to 100, as a percentage.",
+              "name": "--color-picker-saturation",
+              "inheritedFrom": {
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "A colour to paint: the current one on the sample, a preset's on each preset.",
+              "name": "--color-picker-swatch",
+              "inheritedFrom": {
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
             }
           ],
           "members": [
@@ -12530,7 +12586,7 @@
               }
             },
             {
-              "description": "One preset.",
+              "description": "One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "swatch",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -17666,6 +17722,14 @@
             {
               "description": "Band behind the days in a range.",
               "name": "--date-picker-range-color"
+            },
+            {
+              "description": "How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.",
+              "name": "--date-picker-column-count",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
             }
           ],
           "members": [
@@ -18944,7 +19008,7 @@
               }
             },
             {
-              "description": "The shape inside a cell, which is what a single date paints.",
+              "description": "The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "day",
               "inheritedFrom": {
                 "name": "HelixBaseDatePicker",
@@ -19979,6 +20043,14 @@
             {
               "description": "Colour of the ring under the slices.",
               "name": "--donut-chart-track-color"
+            },
+            {
+              "description": "How thick the ring is drawn, derived from `hole`.",
+              "name": "--donut-chart-stroke",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
             }
           ],
           "members": [
@@ -20431,7 +20503,7 @@
           ],
           "slots": [
             {
-              "description": "Goes in the middle of the ring. A total, usually.",
+              "description": "Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "",
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
@@ -31585,6 +31657,14 @@
             {
               "description": "How wide the band's contents may get, centred in it.",
               "name": "--megamenu-full-size"
+            },
+            {
+              "description": "Where the panel starts, measured from the bar above it.",
+              "name": "--megamenu-top",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
             }
           ],
           "members": [
@@ -32318,7 +32398,7 @@
               "type": {
                 "text": "HelixCloseEvent"
               },
-              "description": "Fired before it closes, and cancelable.",
+              "description": "Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "helix-close",
               "reactProp": "onhelix-close",
               "inheritedFrom": {
@@ -33941,6 +34021,38 @@
             {
               "description": "The groove behind the fill.",
               "name": "--meter-track-color"
+            },
+            {
+              "description": "Where a bound sits on the arc, as a length along it.",
+              "name": "--meter-along",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "description": "Where a bound sits on a linear track, as a percentage.",
+              "name": "--meter-at",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "description": "The value as a fraction of the range, 0 to 1.",
+              "name": "--meter-fraction",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "description": "How much of the circle the arc covers, as a path length.",
+              "name": "--meter-sweep",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
             }
           ],
           "cssParts": [
@@ -41296,6 +41408,14 @@
             {
               "description": "Thickness of its stroke.",
               "name": "--progress-ring-width"
+            },
+            {
+              "description": "The value as a fraction of the range, 0 to 1. Absent while indeterminate.",
+              "name": "--progress-fraction",
+              "inheritedFrom": {
+                "name": "HelixBaseProgress",
+                "module": "src/progress/root/progress-root.ts"
+              }
             }
           ],
           "members": [
@@ -41547,7 +41667,7 @@
               }
             },
             {
-              "description": "The reading beside the bar, under `show-value`.",
+              "description": "The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "value",
               "inheritedFrom": {
                 "name": "HelixBaseProgress",
@@ -43770,6 +43890,38 @@
             {
               "description": "And of an unfilled one.",
               "name": "--rating-empty-color"
+            },
+            {
+              "description": "How many marks are wholly filled.",
+              "name": "--rating-full",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "description": "How much of the next mark is filled, 0 to 1.",
+              "name": "--rating-part",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "description": "The width of one step, as a fraction of a mark.",
+              "name": "--rating-step",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "description": "How many steps one mark is divided into.",
+              "name": "--rating-steps",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
             }
           ],
           "slots": [
@@ -44990,7 +45142,7 @@
               }
             },
             {
-              "description": "The score written out, under `show-value`.",
+              "description": "The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "value",
               "inheritedFrom": {
                 "name": "HelixBaseRating",
@@ -49040,6 +49192,38 @@
             {
               "description": "How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row.",
               "name": "--slider-length"
+            },
+            {
+              "description": "The value as a fraction of the range, 0 to 1.",
+              "name": "--slider-fraction",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "description": "Where the filled span starts, as a percentage of the track.",
+              "name": "--slider-from",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "description": "Where one marker sits, as a percentage of the track.",
+              "name": "--slider-marker-at",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "description": "Where the filled span ends, as a percentage of the track.",
+              "name": "--slider-to",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
             }
           ],
           "members": [
@@ -49684,7 +49868,7 @@
                 "text": "number"
               },
               "privacy": "private",
-              "description": "How far along the track the thumb sits, as a fraction.\n\nArithmetic rather than a measurement, because the browser already knows\nwhere it drew the handle and measuring it would be a guess at that.\n\n**Sanitized here, not read back off the control.** This asked the input for\nits value, on the reasoning that a range clamps and snaps whatever it is\ngiven, so the control is the truth about where the thumb is. The reasoning\nis right and the timing is not: `fraction` is evaluated inside `render()`,\nand the `style` binding carrying it is committed *before* the `.value`\nbinding below it, so it read the value this very render was about to\nreplace. The fill was a render behind the thumb, and on the first pass it\nread the seeded midpoint and stayed there.\n\nMeasured on a slider from 0 to 1: after dragging to either end, the host's\n`value` was `1`, the control's was `1`, and `--_slider-fraction` was still\n`0.5`. Off by half a track, and stable, which is what made it look like a\ndrawing bug rather than a timing one.\n\nSo the same two operations a range performs are done here: snap to the step\nfrom `min`, then clamp to the bounds. Nothing is read from the tree, so\nthere is no order for this to be on the wrong side of.",
+              "description": "How far along the track the thumb sits, as a fraction.\n\nArithmetic rather than a measurement, because the browser already knows\nwhere it drew the handle and measuring it would be a guess at that.\n\n**Sanitized here, not read back off the control.** This asked the input for\nits value, on the reasoning that a range clamps and snaps whatever it is\ngiven, so the control is the truth about where the thumb is. The reasoning\nis right and the timing is not: `fraction` is evaluated inside `render()`,\nand the `style` binding carrying it is committed *before* the `.value`\nbinding below it, so it read the value this very render was about to\nreplace. The fill was a render behind the thumb, and on the first pass it\nread the seeded midpoint and stayed there.\n\nMeasured on a slider from 0 to 1: after dragging to either end, the host's\n`value` was `1`, the control's was `1`, and `--slider-fraction` was still\n`0.5`. Off by half a track, and stable, which is what made it look like a\ndrawing bug rather than a timing one.\n\nSo the same two operations a range performs are done here: snap to the step\nfrom `min`, then clamp to the bounds. Nothing is read from the tree, so\nthere is no order for this to be on the wrong side of.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
@@ -50222,7 +50406,7 @@
               }
             },
             {
-              "description": "The current value, shown beside it.",
+              "description": "The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "output",
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
@@ -50354,6 +50538,22 @@
             {
               "description": "Thickness of the line, overriding `weight`.",
               "name": "--sparkline-width"
+            },
+            {
+              "description": "Where the last point sits horizontally, as a percentage.",
+              "name": "--chart-terminus-x",
+              "inheritedFrom": {
+                "name": "HelixBaseSparkline",
+                "module": "src/sparkline/root/sparkline-root.ts"
+              }
+            },
+            {
+              "description": "Where the last point sits vertically, as a percentage.",
+              "name": "--chart-terminus-y",
+              "inheritedFrom": {
+                "name": "HelixBaseSparkline",
+                "module": "src/sparkline/root/sparkline-root.ts"
+              }
             }
           ],
           "members": [
@@ -50722,7 +50922,7 @@
               }
             },
             {
-              "description": "The stop of the area's gradient that meets the line.",
+              "description": "The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "wash-start",
               "inheritedFrom": {
                 "name": "HelixBaseSparkline",
@@ -51793,6 +51993,22 @@
             {
               "description": "How wide the draggable box is.",
               "name": "--splitter-target"
+            },
+            {
+              "description": "Where a nested splitter crosses this one, as a percentage.",
+              "name": "--splitter-corner-at",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "description": "Where the divider sits, as a percentage of the box.",
+              "name": "--splitter-position",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
             }
           ],
           "cssParts": [
@@ -55741,6 +55957,14 @@
             {
               "description": "Track list for the columns.",
               "name": "--table-columns",
+              "inheritedFrom": {
+                "name": "HelixBaseTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "description": "The column track list, built from the columns the consumer declared.",
+              "name": "--table-template",
               "inheritedFrom": {
                 "name": "HelixBaseTable",
                 "module": "src/table/root/table-root.ts"
@@ -62740,6 +62964,14 @@
             {
               "description": "Space between the message's edge and its contents.",
               "name": "--toast-item-inset"
+            },
+            {
+              "description": "How long this message stays, in milliseconds, for a progress hint.",
+              "name": "--toast-duration",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
             }
           ],
           "members": [
@@ -63272,7 +63504,7 @@
               "type": {
                 "text": "HelixDismissEvent"
               },
-              "description": "Fired when it asks to go, whether by the control or by its timer.",
+              "description": "Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "helix-dismiss",
               "reactProp": "onhelix-dismiss",
               "inheritedFrom": {
@@ -67554,6 +67786,14 @@
             {
               "description": "Least height of a row, so rows with and without an icon match.",
               "name": "--tree-row-size"
+            },
+            {
+              "description": "How deep this row sits, counting from zero, for the indent.",
+              "name": "--tree-level",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
             }
           ],
           "cssParts": [
@@ -68072,7 +68312,7 @@
               "type": {
                 "text": "HelixCloseEvent"
               },
-              "description": "Fired before a branch closes, and cancelable.",
+              "description": "Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "helix-close",
               "reactProp": "onhelix-close",
               "inheritedFrom": {
@@ -70611,6 +70851,30 @@
             {
               "description": "Width of the mark that starts it.",
               "name": "--video-start-size"
+            },
+            {
+              "description": "The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it.",
+              "name": "--video-intrinsic-ratio",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The current volume, 0 to 1.",
+              "name": "--video-level",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "How far playback has reached, as a fraction of the duration.",
+              "name": "--video-progress",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
             }
           ],
           "members": [
@@ -72384,7 +72648,7 @@
               "type": {
                 "text": "Event"
               },
-              "description": "Relayed for the same reason.",
+              "description": "Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
               "name": "ended",
               "reactProp": "onended",
               "inheritedFrom": {

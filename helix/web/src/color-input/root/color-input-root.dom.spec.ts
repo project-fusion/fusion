@@ -122,7 +122,7 @@ describe('input color', () => {
       const picker = part(host, 'picker') as HTMLElement & { updateComplete: Promise<unknown> }
       await picker.updateComplete
       expect(picker.shadowRoot?.querySelector('[part="grid"]')?.getAttribute('style')).toContain(
-        `--_hue: ${hue}`,
+        `--color-picker-hue: ${hue}`,
       )
     }
   })
@@ -140,7 +140,7 @@ describe('input color', () => {
       const picker = part(host, 'picker') as HTMLElement & { updateComplete: Promise<unknown> }
       await picker.updateComplete
       const style = picker.shadowRoot?.querySelector('[part="grid"]')?.getAttribute('style') ?? ''
-      seen.push(/--_hue: (\d+)/.exec(style)?.[1] ?? '?')
+      seen.push(/--color-picker-hue: (\d+)/.exec(style)?.[1] ?? '?')
     }
     // Never back to red once it has left it.
     expect(seen).toEqual(['0', '0', '0', '240', '240', '240', '120'])

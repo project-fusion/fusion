@@ -3360,7 +3360,7 @@ number in two languages, drifting the first time either moved. This sets
 export type HelixMegamenuVueEvents = {
   /** Fired before it opens, and cancelable. */
   "helix-open": HelixMegamenuHelixOpenElementEvent;
-  /** Fired before it closes, and cancelable. */
+  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-close": HelixMegamenuHelixCloseElementEvent;
 };
 
@@ -6286,7 +6286,7 @@ attribute nobody can use. */
 };
 
 export type HelixToastItemVueEvents = {
-  /** Fired when it asks to go, whether by the control or by its timer. */
+  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-dismiss": HelixToastItemHelixDismissElementEvent;
 };
 
@@ -6735,7 +6735,7 @@ export type HelixTreeItemVueEvents = {
   "helix-select": HelixTreeItemHelixSelectElementEvent;
   /** Fired before a branch opens, and cancelable. */
   "helix-open": HelixTreeItemHelixOpenElementEvent;
-  /** Fired before a branch closes, and cancelable. */
+  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-close": HelixTreeItemHelixCloseElementEvent;
 };
 
@@ -7160,7 +7160,7 @@ export type HelixVideoVueEvents = {
   play: HelixVideoElementEvent;
   /** Relayed for the same reason. */
   pause: HelixVideoElementEvent;
-  /** Relayed for the same reason. */
+  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   ended: HelixVideoElementEvent;
 };
 
@@ -7224,6 +7224,10 @@ export type CustomCssProperties = {
   "--bar-chart-block-size"?: string;
   /** Space between the drawing and its labels. */
   "--bar-chart-gap"?: string;
+  /** The colour of a single-series axis, taken from that series. */
+  "--bar-chart-axis"?: string;
+  /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
+  "--bar-chart-secondary"?: string;
   /** Size of the quoted passage. */
   "--blockquote-size"?: string;
   /** Color of the chevron. */
@@ -7302,6 +7306,8 @@ export type CustomCssProperties = {
   "--color-input-swatch-radii"?: string;
   /** Width of the panel, and so of the square. */
   "--color-input-panel-size"?: string;
+  /** The chosen colour, to paint over the transparency check. */
+  "--color-input-swatch"?: string;
   /** Inset of the rows under the square, and the bottom. */
   "--color-picker-inset"?: string;
   /** Edge length of the chip that copies the value. */
@@ -7312,6 +7318,14 @@ export type CustomCssProperties = {
   "--color-picker-grid-ratio"?: string;
   /** Corner radius of the square. */
   "--color-picker-grid-radii"?: string;
+  /** The chosen brightness, 0 to 100, as a percentage. */
+  "--color-picker-brightness"?: string;
+  /** The chosen hue, 0 to 360, unitless. */
+  "--color-picker-hue"?: string;
+  /** The chosen saturation, 0 to 100, as a percentage. */
+  "--color-picker-saturation"?: string;
+  /** A colour to paint: the current one on the sample, a preset's on each preset. */
+  "--color-picker-swatch"?: string;
   /** Fill behind the field. */
   "--combobox-background-color"?: string;
   /** Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. */
@@ -7336,6 +7350,8 @@ export type CustomCssProperties = {
   "--date-picker-selected-color"?: string;
   /** Band behind the days in a range. */
   "--date-picker-range-color"?: string;
+  /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
+  "--date-picker-column-count"?: string;
   /** The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
   "--dialog-scrim"?: string;
   /** How big the mark above the title is. */
@@ -7360,6 +7376,8 @@ export type CustomCssProperties = {
   "--donut-chart-size"?: string;
   /** Colour of the ring under the slices. */
   "--donut-chart-track-color"?: string;
+  /** How thick the ring is drawn, derived from `hole`. */
+  "--donut-chart-stroke"?: string;
   /** The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
   "--drawer-scrim"?: string;
   /** Corner radius on the edges that face the page. */
@@ -7450,6 +7468,8 @@ export type CustomCssProperties = {
   "--megamenu-column-size"?: string;
   /** How wide the band's contents may get, centred in it. */
   "--megamenu-full-size"?: string;
+  /** Where the panel starts, measured from the bar above it. */
+  "--megamenu-top"?: string;
   /** Width of the leading column, for a row carrying more than a mark. */
   "--menu-item-start"?: string;
   /** Fill under the pointer. */
@@ -7472,6 +7492,14 @@ export type CustomCssProperties = {
   "--meter-tick-color"?: string;
   /** The groove behind the fill. */
   "--meter-track-color"?: string;
+  /** Where a bound sits on the arc, as a length along it. */
+  "--meter-along"?: string;
+  /** Where a bound sits on a linear track, as a percentage. */
+  "--meter-at"?: string;
+  /** The value as a fraction of the range, 0 to 1. */
+  "--meter-fraction"?: string;
+  /** How much of the circle the arc covers, as a path length. */
+  "--meter-sweep"?: string;
   /** Fill of the traveling marker. */
   "--navigation-indicator-color"?: string;
   /** Space between destinations. */
@@ -7514,6 +7542,8 @@ export type CustomCssProperties = {
   "--progress-ring-size"?: string;
   /** Thickness of its stroke. */
   "--progress-ring-width"?: string;
+  /** The value as a fraction of the range, 0 to 1. Absent while indeterminate. */
+  "--progress-fraction"?: string;
   /** How wide the square is. Defaults to `12rem`. */
   "--qr-code-size"?: string;
   /** The dark modules. Defaults to the page's ink. */
@@ -7556,6 +7586,14 @@ export type CustomCssProperties = {
   "--rating-color"?: string;
   /** And of an unfilled one. */
   "--rating-empty-color"?: string;
+  /** How many marks are wholly filled. */
+  "--rating-full"?: string;
+  /** How much of the next mark is filled, 0 to 1. */
+  "--rating-part"?: string;
+  /** The width of one step, as a fraction of a mark. */
+  "--rating-step"?: string;
+  /** How many steps one mark is divided into. */
+  "--rating-steps"?: string;
   /** Minimum height of the sandbox. */
   "--sandbox-min-block-size"?: string;
   /** The invisible width of a divider's drag target. */
@@ -7610,6 +7648,14 @@ export type CustomCssProperties = {
   "--slider-track-image"?: string;
   /** How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. */
   "--slider-length"?: string;
+  /** The value as a fraction of the range, 0 to 1. */
+  "--slider-fraction"?: string;
+  /** Where the filled span starts, as a percentage of the track. */
+  "--slider-from"?: string;
+  /** Where one marker sits, as a percentage of the track. */
+  "--slider-marker-at"?: string;
+  /** Where the filled span ends, as a percentage of the track. */
+  "--slider-to"?: string;
   /** A fill for the middle of a `ring` terminus, which is otherwise open. */
   "--chart-terminus-hole"?: string;
   /** Size of the mark on the last reading. */
@@ -7626,6 +7672,10 @@ export type CustomCssProperties = {
   "--sparkline-inline-size"?: string;
   /** Thickness of the line, overriding `weight`. */
   "--sparkline-width"?: string;
+  /** Where the last point sits horizontally, as a percentage. */
+  "--chart-terminus-x"?: string;
+  /** Where the last point sits vertically, as a percentage. */
+  "--chart-terminus-y"?: string;
   /** Edge length of the mark. */
   "--speed-dial-item-size"?: string;
   /** Space between the actions. */
@@ -7644,6 +7694,10 @@ export type CustomCssProperties = {
   "--splitter-hover-color"?: string;
   /** How wide the draggable box is. */
   "--splitter-target"?: string;
+  /** Where a nested splitter crosses this one, as a percentage. */
+  "--splitter-corner-at"?: string;
+  /** Where the divider sits, as a percentage of the box. */
+  "--splitter-position"?: string;
   /** Space between figures. */
   "--stat-group-gap"?: string;
   /** Size of the figure. */
@@ -7670,6 +7724,8 @@ export type CustomCssProperties = {
   "--switch-thumb-color"?: string;
   /** Track list for the columns. */
   "--table-columns"?: string;
+  /** The column track list, built from the columns the consumer declared. */
+  "--table-template"?: string;
   /** Fill behind the tag. */
   "--tag-background-color"?: string;
   /** Label color. */
@@ -7700,6 +7756,8 @@ export type CustomCssProperties = {
   "--timeline-gap"?: string;
   /** Space between the message's edge and its contents. */
   "--toast-item-inset"?: string;
+  /** How long this message stays, in milliseconds, for a progress hint. */
+  "--toast-duration"?: string;
   /** Distance from the edges of the window. */
   "--toast-inset"?: string;
   /** Space between one message and the next. */
@@ -7734,6 +7792,8 @@ export type CustomCssProperties = {
   "--tree-gap"?: string;
   /** Least height of a row, so rows with and without an icon match. */
   "--tree-row-size"?: string;
+  /** How deep this row sits, counting from zero, for the indent. */
+  "--tree-level"?: string;
   /** Set from `chevron-placement`; read by each item. */
   "--tree-chevron-order"?: string;
   /** Set from `chevron-placement`; the space before the chevron. */
@@ -7770,6 +7830,12 @@ export type CustomCssProperties = {
   "--video-accent-color"?: string;
   /** Width of the mark that starts it. */
   "--video-start-size"?: string;
+  /** The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. */
+  "--video-intrinsic-ratio"?: string;
+  /** The current volume, 0 to 1. */
+  "--video-level"?: string;
+  /** How far playback has reached, as a fraction of the duration. */
+  "--video-progress"?: string;
   /** How tall the scrolling box is. */
   "--virtual-list-block-size"?: string;
 };

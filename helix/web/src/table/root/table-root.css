@@ -13,7 +13,7 @@
    * declaration beats any stylesheet: a consumer setting the documented hook
    * was overruled by the component every render. The derived track list has its
    * own private name now, and the public one wins where it is set. */
-  grid-template-columns: var(--table-columns, var(--_table-template, minmax(0, 1fr)));
+  grid-template-columns: var(--table-columns, var(--table-template, minmax(0, 1fr)));
   inline-size: 100%;
 }
 

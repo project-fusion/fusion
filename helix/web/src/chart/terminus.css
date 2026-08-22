@@ -21,8 +21,8 @@
   background-color: currentColor;
   block-size: var(--chart-terminus-size, 5px);
   inline-size: var(--chart-terminus-size, 5px);
-  inset-block-start: var(--_chart-terminus-y);
-  inset-inline-start: var(--_chart-terminus-x);
+  inset-block-start: var(--chart-terminus-y);
+  inset-inline-start: var(--chart-terminus-x);
   position: absolute;
   /* Centred on the reading rather than hanging below and right of it. */
   translate: -50% -50%;

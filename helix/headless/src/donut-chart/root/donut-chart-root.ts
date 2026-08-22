@@ -105,6 +105,13 @@ const THICKNESS: Record<string, number> = {
  * @csspart track - The ring the slices are drawn on.
  *
  * @slot - Goes in the middle of the ring. A total, usually.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --donut-chart-stroke - How thick the ring is drawn, derived from `hole`.
  */
 @customElement('helix-base-donut-chart')
 export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
@@ -247,7 +254,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
       aria-hidden="true"
       id="helix-chart-plot"
       part="plot"
-      style="--_donut-thickness: ${this.thickness}"
+      style="--donut-chart-stroke: ${this.thickness}"
       title=${named || nothing}
     >
       <svg viewBox=${this.frame} xmlns="http://www.w3.org/2000/svg">

@@ -91,7 +91,7 @@
    leading edge: the other three are the field's own. */
 [part="preview"] {
   background-image:
-    linear-gradient(var(--_color, transparent), var(--_color, transparent)),
+    linear-gradient(var(--color-input-swatch, transparent), var(--color-input-swatch, transparent)),
     conic-gradient(
       var(--helix-color-surface-sunken) 0 25%,
       var(--helix-color-surface) 0 50%,

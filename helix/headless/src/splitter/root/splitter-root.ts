@@ -118,6 +118,14 @@ import { property, state } from 'lit/decorators.js'
  * @csspart end - The box holding the second.
  * @csspart separator - The divider itself.
  * @csspart corner - The handle where two dividers cross, added on the client.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --splitter-corner-at - Where a nested splitter crosses this one, as a percentage.
+ * @cssproperty --splitter-position - Where the divider sits, as a percentage of the box.
  */
 @customElement('helix-base-splitter')
 export class HelixBaseSplitter extends HelixElement {
@@ -894,7 +902,7 @@ export class HelixBaseSplitter extends HelixElement {
     return html`<div
         part="start"
         ?data-dragging=${this.dragging}
-        style="--_splitter-position: ${position}%"
+        style="--splitter-position: ${position}%"
       >
         <slot name="start"></slot>
       </div>
@@ -930,7 +938,7 @@ export class HelixBaseSplitter extends HelixElement {
           aria-valuemin="0"
           aria-valuenow=${Math.round(crossing.at)}
           data-cross=${index}
-          style="--_splitter-corner-at: ${crossing.at}%; --_splitter-position: ${position}%"
+          style="--splitter-corner-at: ${crossing.at}%; --splitter-position: ${position}%"
           @dblclick=${this.handleCornerDoubleClick}
           @keydown=${this.handleCornerKeydown}
           @pointercancel=${this.handleCornerUp}

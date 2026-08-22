@@ -64,7 +64,7 @@
   block-size: 100%;
   border-radius: inherit;
   inline-size: 100%;
-  scale: var(--_meter-fraction, 0) 1;
+  scale: var(--meter-fraction, 0) 1;
   transform-origin: left center;
   transition:
     background-color var(--helix-duration-normal) var(--helix-easing-standard),
@@ -123,7 +123,7 @@
   block-size: 100%;
   inline-size: var(--helix-border-thick);
   inset-block-start: 0;
-  inset-inline-start: var(--_meter-at, 0%);
+  inset-inline-start: var(--meter-at, 0%);
   position: absolute;
   /* Centered on the threshold rather than starting at it, so the mark says where
      the band begins rather than where it begins plus two pixels. */
@@ -209,13 +209,13 @@
 :host([shape="arc"]) [part="groove"],
 :host([shape="ring"]) [part="groove"] {
   stroke: var(--meter-track-color, var(--helix-color-surface-sunken));
-  stroke-dasharray: var(--_meter-sweep) 100;
+  stroke-dasharray: var(--meter-sweep) 100;
 }
 
 /* `scale: none` first, and it is the whole reason this drew nothing.
  *
- * The bar's indicator carries `scale: var(--_meter-fraction, 0) 1`, which is how
- * a bar fills. `--_meter-fraction` is never written in these shapes, so the
+ * The bar's indicator carries `scale: var(--meter-fraction, 0) 1`, which is how
+ * a bar fills. `--meter-fraction` is never written in these shapes, so the
  * fallback won and the circle was scaled to zero width: present, measurable,
  * correctly stroked, and one pixel wide. Everything read back right, which is
  * what made it hard to see. Progress carries the same line for the same reason,
@@ -224,7 +224,7 @@
 :host([shape="ring"]) [part="indicator"] {
   scale: none;
   stroke: var(--helix-color-foreground-muted);
-  stroke-dasharray: var(--_meter-along) 100;
+  stroke-dasharray: var(--meter-along) 100;
   stroke-linecap: round;
   transition: stroke-dasharray var(--helix-duration-normal) var(--helix-easing-standard);
 }
@@ -248,7 +248,7 @@
   position: static;
   stroke: var(--meter-tick-color, var(--helix-color-background));
   stroke-dasharray: 1 99;
-  stroke-dashoffset: calc(var(--_meter-along) * -1);
+  stroke-dashoffset: calc(var(--meter-along) * -1);
 }
 
 /* The bands color the arc the same way they color the bar, since the band is

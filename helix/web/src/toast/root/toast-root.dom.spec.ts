@@ -227,7 +227,7 @@ if (hasLayout()) {
       // the duration and the browser runs it.
       const found = await item('duration="4000"')
       const bar = part(found, 'timer') as HTMLElement
-      expect(bar.style.getPropertyValue('--_toast-duration')).toBe('4000ms')
+      expect(bar.style.getPropertyValue('--toast-duration')).toBe('4000ms')
       expect(getComputedStyle(bar).animationDuration).toBe('4s')
     })
 

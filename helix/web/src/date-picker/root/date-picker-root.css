@@ -37,7 +37,7 @@
   display: grid;
   gap: var(--helix-space-md);
   grid-template-columns: repeat(
-      var(--date-picker-columns, var(--_calendar-columns, 1)),
+      var(--date-picker-columns, var(--date-picker-column-count, 1)),
       max-content
     );
   justify-content: start;

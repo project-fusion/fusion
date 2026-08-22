@@ -55,9 +55,9 @@
 [part="fill"] {
   color: var(--rating-color, var(--helix-color-warning));
   inline-size: calc(
-    var(--_rating-full, 0) *
+    var(--rating-full, 0) *
     (var(--_rating-mark-size) + var(--_rating-mark-gap)) +
-    var(--_rating-part, 0) *
+    var(--rating-part, 0) *
     var(--_rating-mark-size)
   );
   inset-block: 0;
@@ -110,11 +110,11 @@
  * The two half-gaps hanging off the ends are deliberate: the alternative is
  * dead pixels between the marks, and a rating that ignores a press. */
 [part="option"] {
-  --_rating-pitch: calc((100% + var(--_rating-mark-gap)) / var(--_rating-steps, 1));
+  --_rating-pitch: calc((100% + var(--_rating-mark-gap)) / var(--rating-steps, 1));
 
   inline-size: var(--_rating-pitch);
   inset-inline-start: calc(
-    (var(--_rating-step, 1) - 1) *
+    (var(--rating-step, 1) - 1) *
     var(--_rating-pitch) -
     var(--_rating-mark-gap) /
     2

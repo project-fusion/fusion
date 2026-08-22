@@ -555,7 +555,7 @@
  * property reflects for. Without it the chart is exactly the two-part grid it
  * has always been.
  *
- * `--_bar-chart-axis` is written by the tier below, in characters, because the
+ * `--bar-chart-axis` is written by the tier below, in characters, because the
  * ticks are absolutely positioned: that is what puts each on the level it names
  * and also what stops any of them giving the column a width. The widest number
  * is known where the ticks are made and unknowable to a selector. */
@@ -622,7 +622,7 @@
 }
 
 :host(:not([direction="horizontal"])) [part="axis"] {
-  inline-size: var(--_bar-chart-axis, 3ch);
+  inline-size: var(--bar-chart-axis, 3ch);
 }
 
 :host([direction="horizontal"]) [part="axis"] {
@@ -656,5 +656,5 @@
    picking one of their colours would say the axis belongs to that one. The tier
    below writes the property only in the lone case. */
 [part="axis"][data-axis="secondary"] {
-  color: var(--_bar-chart-secondary, var(--helix-color-foreground-subtle));
+  color: var(--bar-chart-secondary, var(--helix-color-foreground-subtle));
 }

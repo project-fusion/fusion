@@ -49,7 +49,7 @@
   block-size: 100%;
   border-radius: inherit;
   inline-size: 100%;
-  scale: var(--_progress-fraction, 0) 1;
+  scale: var(--progress-fraction, 0) 1;
   transform-origin: left center;
   transition: scale var(--helix-duration-normal) var(--helix-easing-decelerate);
 }
@@ -258,7 +258,7 @@
 :host([shape="ring"]) [part="indicator"] {
   scale: none;
   stroke: var(--progress-color, var(--helix-color-primary));
-  stroke-dasharray: calc(var(--_progress-fraction) * 100) 100;
+  stroke-dasharray: calc(var(--progress-fraction) * 100) 100;
   stroke-linecap: round;
   transition: stroke-dasharray var(--helix-duration-normal) var(--helix-easing-decelerate);
 }

@@ -14,7 +14,7 @@ const banded = html`<helix-meter
 
 describe('meter server output', () => {
   test('the reading is drawn on the server, from numbers it already has', () => {
-    expect(partTag(ssr(banded), 'indicator')).toContain('--_meter-fraction: 0.94')
+    expect(partTag(ssr(banded), 'indicator')).toContain('--meter-fraction: 0.94')
   })
 
   test('and so is its band, rather than being colored on hydration', () => {

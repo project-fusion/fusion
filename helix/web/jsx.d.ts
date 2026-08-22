@@ -6421,7 +6421,7 @@ number in two languages, drifting the first time either moved. This sets
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
-  /** Fired before it closes, and cancelable. */
+  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "onhelix-close"?: (e: HelixMegamenuHelixCloseElementEvent) => void;
 };
 
@@ -6517,7 +6517,7 @@ number in two languages, drifting the first time either moved. This sets
   "prop:fullBelow"?: HelixMegamenu["fullBelow"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
-  /** Fired before it closes, and cancelable. */
+  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "on:helix-close"?: (e: HelixMegamenuHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -12102,7 +12102,7 @@ is showing. An attribute whose only legal value is the default is an
 attribute nobody can use. */
   open?: HelixToastItem["open"];
 
-  /** Fired when it asks to go, whether by the control or by its timer. */
+  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "onhelix-dismiss"?: (e: HelixToastItemHelixDismissElementEvent) => void;
 };
 
@@ -12149,7 +12149,7 @@ only one starting state that makes sense: a message that has been rendered
 is showing. An attribute whose only legal value is the default is an
 attribute nobody can use. */
   "prop:open"?: HelixToastItem["open"];
-  /** Fired when it asks to go, whether by the control or by its timer. */
+  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "on:helix-dismiss"?: (e: HelixToastItemHelixDismissElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -12917,7 +12917,7 @@ shadow root, which is not part of the tree React hydrates. */
   "onhelix-select"?: (e: HelixTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
   "onhelix-open"?: (e: HelixTreeItemHelixOpenElementEvent) => void;
-  /** Fired before a branch closes, and cancelable. */
+  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "onhelix-close"?: (e: HelixTreeItemHelixCloseElementEvent) => void;
 };
 
@@ -12992,7 +12992,7 @@ shadow root, which is not part of the tree React hydrates. */
   "on:helix-select"?: (e: HelixTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
   "on:helix-open"?: (e: HelixTreeItemHelixOpenElementEvent) => void;
-  /** Fired before a branch closes, and cancelable. */
+  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "on:helix-close"?: (e: HelixTreeItemHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -13612,7 +13612,7 @@ regardless, because a reader who stopped it is deciding what to do next. */
   onplay?: (e: HelixVideoElementEvent) => void;
   /** Relayed for the same reason. */
   onpause?: (e: HelixVideoElementEvent) => void;
-  /** Relayed for the same reason. */
+  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   onended?: (e: HelixVideoElementEvent) => void;
 };
 
@@ -13802,7 +13802,7 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "on:play"?: (e: HelixVideoElementEvent) => void;
   /** Relayed for the same reason. */
   "on:pause"?: (e: HelixVideoElementEvent) => void;
-  /** Relayed for the same reason. */
+  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "on:ended"?: (e: HelixVideoElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -14535,6 +14535,8 @@ export type CustomElements = {
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
+   * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
+   * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -14557,7 +14559,7 @@ export type CustomElements = {
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
-   * - `tooltip-value`: A column's value inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-bar-chart": Partial<
     HelixBarChartProps & BaseProps<HelixBarChart> & BaseEvents
@@ -15817,6 +15819,7 @@ export type CustomElements = {
    * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
    * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
    * - `--color-input-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
+   * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -15827,7 +15830,7 @@ export type CustomElements = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The color picker inside it.
+   * - `picker`: The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-color-input": Partial<
     HelixColorInputProps & BaseProps<HelixColorInput> & BaseEvents
@@ -16012,6 +16015,10 @@ export type CustomElements = {
    * - `--color-picker-swatch-size`: Edge length of one preset. (default: `undefined`)
    * - `--color-picker-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
    * - `--color-picker-grid-radii`: Corner radius of the square. (default: `undefined`)
+   * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
+   * - `--color-picker-hue`: The chosen hue, 0 to 360, unitless. (default: `undefined`)
+   * - `--color-picker-saturation`: The chosen saturation, 0 to 100, as a percentage. (default: `undefined`)
+   * - `--color-picker-swatch`: A colour to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16032,7 +16039,7 @@ export type CustomElements = {
    * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
-   * - `swatch`: One preset.
+   * - `swatch`: One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-color-picker": Partial<
     HelixColorPickerProps & BaseProps<HelixColorPicker> & BaseEvents
@@ -16924,6 +16931,7 @@ export type CustomElements = {
    * - `--date-picker-row-size`: Height of a week row. (default: `undefined`)
    * - `--date-picker-selected-color`: Fill behind a selected day. (default: `undefined`)
    * - `--date-picker-range-color`: Band behind the days in a range. (default: `undefined`)
+   * - `--date-picker-column-count`: How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16939,7 +16947,7 @@ export type CustomElements = {
    * - `weekday`: A column header naming a day of the week.
    * - `week`: One row of days.
    * - `cell`: One column of a row, which is what a range paints.
-   * - `day`: The shape inside a cell, which is what a single date paints.
+   * - `day`: The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-date-picker": Partial<
     HelixDatePickerProps & BaseProps<HelixDatePicker> & BaseEvents
@@ -17200,7 +17208,7 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Goes in the middle of the ring. A total, usually.
+   * - `(default)`: Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## CSS Custom Properties
    *
@@ -17208,6 +17216,7 @@ export type CustomElements = {
    *
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
    * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
+   * - `--donut-chart-stroke`: How thick the ring is drawn, derived from `hole`. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -18885,7 +18894,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -18916,6 +18925,7 @@ export type CustomElements = {
    * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
    * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
+   * - `--megamenu-top`: Where the panel starts, measured from the bar above it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -19260,6 +19270,10 @@ export type CustomElements = {
    * - `--meter-size`: How thick the bar is. (default: `undefined`)
    * - `--meter-tick-color`: The mark at a threshold. (default: `undefined`)
    * - `--meter-track-color`: The groove behind the fill. (default: `undefined`)
+   * - `--meter-along`: Where a bound sits on the arc, as a length along it. (default: `undefined`)
+   * - `--meter-at`: Where a bound sits on a linear track, as a percentage. (default: `undefined`)
+   * - `--meter-fraction`: The value as a fraction of the range, 0 to 1. (default: `undefined`)
+   * - `--meter-sweep`: How much of the circle the arc covers, as a path length. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -20259,6 +20273,7 @@ export type CustomElements = {
    * - `--progress-track-color`: Fill of the part that is not. (default: `undefined`)
    * - `--progress-ring-size`: Diameter of the ring appearance. (default: `undefined`)
    * - `--progress-ring-width`: Thickness of its stroke. (default: `undefined`)
+   * - `--progress-fraction`: The value as a fraction of the range, 0 to 1. Absent while indeterminate. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -20267,7 +20282,7 @@ export type CustomElements = {
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
-   * - `value`: The reading beside the bar, under `show-value`.
+   * - `value`: The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-progress": Partial<
     HelixProgressProps & BaseProps<HelixProgress> & BaseEvents
@@ -20806,6 +20821,10 @@ export type CustomElements = {
    * - `--rating-gap`: Space between marks. (default: `undefined`)
    * - `--rating-color`: The colour of a filled mark. (default: `undefined`)
    * - `--rating-empty-color`: And of an unfilled one. (default: `undefined`)
+   * - `--rating-full`: How many marks are wholly filled. (default: `undefined`)
+   * - `--rating-part`: How much of the next mark is filled, 0 to 1. (default: `undefined`)
+   * - `--rating-step`: The width of one step, as a fraction of a mark. (default: `undefined`)
+   * - `--rating-steps`: How many steps one mark is divided into. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -20816,7 +20835,7 @@ export type CustomElements = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`.
+   * - `value`: The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-rating": Partial<
     HelixRatingProps & BaseProps<HelixRating> & BaseEvents
@@ -21702,6 +21721,10 @@ export type CustomElements = {
    * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
    * - `--slider-track-image`: The whole track, for a slider whose color is the value. (default: `undefined`)
    * - `--slider-length`: How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. (default: `undefined`)
+   * - `--slider-fraction`: The value as a fraction of the range, 0 to 1. (default: `undefined`)
+   * - `--slider-from`: Where the filled span starts, as a percentage of the track. (default: `undefined`)
+   * - `--slider-marker-at`: Where one marker sits, as a percentage of the track. (default: `undefined`)
+   * - `--slider-to`: Where the filled span ends, as a percentage of the track. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -21712,7 +21735,7 @@ export type CustomElements = {
    * - `markers`: The row of marks along the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `output`: The current value, shown beside it.
+   * - `output`: The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-slider": Partial<
     HelixSliderProps & BaseProps<HelixSlider> & BaseEvents
@@ -21856,6 +21879,8 @@ export type CustomElements = {
    * - `--sparkline-color`: Colour of the line, the wash, the columns and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
    * - `--sparkline-width`: Thickness of the line, overriding `weight`. (default: `undefined`)
+   * - `--chart-terminus-x`: Where the last point sits horizontally, as a percentage. (default: `undefined`)
+   * - `--chart-terminus-y`: Where the last point sits vertically, as a percentage. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -21867,7 +21892,7 @@ export type CustomElements = {
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
    * - `wash-end`: The far stop of the area's gradient.
-   * - `wash-start`: The stop of the area's gradient that meets the line.
+   * - `wash-start`: The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-sparkline": Partial<
     HelixSparklineProps & BaseProps<HelixSparkline> & BaseEvents
@@ -22146,6 +22171,8 @@ export type CustomElements = {
    * - `--splitter-grip-length`: How far the grip runs along the divider. (default: `undefined`)
    * - `--splitter-hover-color`: The target under the pointer. (default: `undefined`)
    * - `--splitter-target`: How wide the draggable box is. (default: `undefined`)
+   * - `--splitter-corner-at`: Where a nested splitter crosses this one, as a percentage. (default: `undefined`)
+   * - `--splitter-position`: Where the divider sits, as a percentage of the box. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22645,6 +22672,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--table-columns`: Track list for the columns. (default: `undefined`)
+   * - `--table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -23699,7 +23727,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -23723,6 +23751,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
+   * - `--toast-duration`: How long this message stays, in milliseconds, for a progress hint. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -24375,7 +24404,7 @@ export type CustomElements = {
    *
    * - `helix-select`: Fired when the item is chosen.
    * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable.
+   * - `helix-close`: Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -24420,6 +24449,7 @@ export type CustomElements = {
    * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
    * - `--tree-gap`: Space between rows. (default: `undefined`)
    * - `--tree-row-size`: Least height of a row, so rows with and without an icon match. (default: `undefined`)
+   * - `--tree-level`: How deep this row sits, counting from zero, for the indent. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -24892,7 +24922,7 @@ export type CustomElements = {
    * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason.
+   * - `ended`: Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -24928,6 +24958,9 @@ export type CustomElements = {
    * - `--video-controls-color`: The ink on the bar. (default: `undefined`)
    * - `--video-accent-color`: The played part of the scrubber. (default: `undefined`)
    * - `--video-start-size`: Width of the mark that starts it. (default: `undefined`)
+   * - `--video-intrinsic-ratio`: The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. (default: `undefined`)
+   * - `--video-level`: The current volume, 0 to 1. (default: `undefined`)
+   * - `--video-progress`: How far playback has reached, as a fraction of the duration. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -25726,6 +25759,8 @@ export type CustomElementsSolidJs = {
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
+   * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
+   * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -25748,7 +25783,7 @@ export type CustomElementsSolidJs = {
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
-   * - `tooltip-value`: A column's value inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-bar-chart": Partial<
     HelixBarChartProps &
@@ -27045,6 +27080,7 @@ export type CustomElementsSolidJs = {
    * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
    * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
    * - `--color-input-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
+   * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -27055,7 +27091,7 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The color picker inside it.
+   * - `picker`: The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-color-input": Partial<
     HelixColorInputProps &
@@ -27243,6 +27279,10 @@ export type CustomElementsSolidJs = {
    * - `--color-picker-swatch-size`: Edge length of one preset. (default: `undefined`)
    * - `--color-picker-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
    * - `--color-picker-grid-radii`: Corner radius of the square. (default: `undefined`)
+   * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
+   * - `--color-picker-hue`: The chosen hue, 0 to 360, unitless. (default: `undefined`)
+   * - `--color-picker-saturation`: The chosen saturation, 0 to 100, as a percentage. (default: `undefined`)
+   * - `--color-picker-swatch`: A colour to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -27263,7 +27303,7 @@ export type CustomElementsSolidJs = {
    * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
-   * - `swatch`: One preset.
+   * - `swatch`: One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-color-picker": Partial<
     HelixColorPickerProps &
@@ -28170,6 +28210,7 @@ export type CustomElementsSolidJs = {
    * - `--date-picker-row-size`: Height of a week row. (default: `undefined`)
    * - `--date-picker-selected-color`: Fill behind a selected day. (default: `undefined`)
    * - `--date-picker-range-color`: Band behind the days in a range. (default: `undefined`)
+   * - `--date-picker-column-count`: How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -28185,7 +28226,7 @@ export type CustomElementsSolidJs = {
    * - `weekday`: A column header naming a day of the week.
    * - `week`: One row of days.
    * - `cell`: One column of a row, which is what a range paints.
-   * - `day`: The shape inside a cell, which is what a single date paints.
+   * - `day`: The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-date-picker": Partial<
     HelixDatePickerProps &
@@ -28455,7 +28496,7 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Goes in the middle of the ring. A total, usually.
+   * - `(default)`: Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## CSS Custom Properties
    *
@@ -28463,6 +28504,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
    * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
+   * - `--donut-chart-stroke`: How thick the ring is drawn, derived from `hole`. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -30198,7 +30240,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -30229,6 +30271,7 @@ export type CustomElementsSolidJs = {
    * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
    * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
+   * - `--megamenu-top`: Where the panel starts, measured from the bar above it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -30581,6 +30624,10 @@ export type CustomElementsSolidJs = {
    * - `--meter-size`: How thick the bar is. (default: `undefined`)
    * - `--meter-tick-color`: The mark at a threshold. (default: `undefined`)
    * - `--meter-track-color`: The groove behind the fill. (default: `undefined`)
+   * - `--meter-along`: Where a bound sits on the arc, as a length along it. (default: `undefined`)
+   * - `--meter-at`: Where a bound sits on a linear track, as a percentage. (default: `undefined`)
+   * - `--meter-fraction`: The value as a fraction of the range, 0 to 1. (default: `undefined`)
+   * - `--meter-sweep`: How much of the circle the arc covers, as a path length. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -31615,6 +31662,7 @@ export type CustomElementsSolidJs = {
    * - `--progress-track-color`: Fill of the part that is not. (default: `undefined`)
    * - `--progress-ring-size`: Diameter of the ring appearance. (default: `undefined`)
    * - `--progress-ring-width`: Thickness of its stroke. (default: `undefined`)
+   * - `--progress-fraction`: The value as a fraction of the range, 0 to 1. Absent while indeterminate. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -31623,7 +31671,7 @@ export type CustomElementsSolidJs = {
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
-   * - `value`: The reading beside the bar, under `show-value`.
+   * - `value`: The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-progress": Partial<
     HelixProgressProps &
@@ -32181,6 +32229,10 @@ export type CustomElementsSolidJs = {
    * - `--rating-gap`: Space between marks. (default: `undefined`)
    * - `--rating-color`: The colour of a filled mark. (default: `undefined`)
    * - `--rating-empty-color`: And of an unfilled one. (default: `undefined`)
+   * - `--rating-full`: How many marks are wholly filled. (default: `undefined`)
+   * - `--rating-part`: How much of the next mark is filled, 0 to 1. (default: `undefined`)
+   * - `--rating-step`: The width of one step, as a fraction of a mark. (default: `undefined`)
+   * - `--rating-steps`: How many steps one mark is divided into. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -32191,7 +32243,7 @@ export type CustomElementsSolidJs = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`.
+   * - `value`: The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-rating": Partial<
     HelixRatingProps &
@@ -33107,6 +33159,10 @@ export type CustomElementsSolidJs = {
    * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
    * - `--slider-track-image`: The whole track, for a slider whose color is the value. (default: `undefined`)
    * - `--slider-length`: How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. (default: `undefined`)
+   * - `--slider-fraction`: The value as a fraction of the range, 0 to 1. (default: `undefined`)
+   * - `--slider-from`: Where the filled span starts, as a percentage of the track. (default: `undefined`)
+   * - `--slider-marker-at`: Where one marker sits, as a percentage of the track. (default: `undefined`)
+   * - `--slider-to`: Where the filled span ends, as a percentage of the track. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -33117,7 +33173,7 @@ export type CustomElementsSolidJs = {
    * - `markers`: The row of marks along the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `output`: The current value, shown beside it.
+   * - `output`: The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-slider": Partial<
     HelixSliderProps &
@@ -33264,6 +33320,8 @@ export type CustomElementsSolidJs = {
    * - `--sparkline-color`: Colour of the line, the wash, the columns and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
    * - `--sparkline-width`: Thickness of the line, overriding `weight`. (default: `undefined`)
+   * - `--chart-terminus-x`: Where the last point sits horizontally, as a percentage. (default: `undefined`)
+   * - `--chart-terminus-y`: Where the last point sits vertically, as a percentage. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -33275,7 +33333,7 @@ export type CustomElementsSolidJs = {
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
    * - `wash-end`: The far stop of the area's gradient.
-   * - `wash-start`: The stop of the area's gradient that meets the line.
+   * - `wash-start`: The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-sparkline": Partial<
     HelixSparklineProps &
@@ -33563,6 +33621,8 @@ export type CustomElementsSolidJs = {
    * - `--splitter-grip-length`: How far the grip runs along the divider. (default: `undefined`)
    * - `--splitter-hover-color`: The target under the pointer. (default: `undefined`)
    * - `--splitter-target`: How wide the draggable box is. (default: `undefined`)
+   * - `--splitter-corner-at`: Where a nested splitter crosses this one, as a percentage. (default: `undefined`)
+   * - `--splitter-position`: Where the divider sits, as a percentage of the box. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -34086,6 +34146,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--table-columns`: Track list for the columns. (default: `undefined`)
+   * - `--table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -35175,7 +35236,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -35199,6 +35260,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
+   * - `--toast-duration`: How long this message stays, in milliseconds, for a progress hint. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -35876,7 +35938,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-select`: Fired when the item is chosen.
    * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable.
+   * - `helix-close`: Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -35921,6 +35983,7 @@ export type CustomElementsSolidJs = {
    * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
    * - `--tree-gap`: Space between rows. (default: `undefined`)
    * - `--tree-row-size`: Least height of a row, so rows with and without an icon match. (default: `undefined`)
+   * - `--tree-level`: How deep this row sits, counting from zero, for the indent. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -36412,7 +36475,7 @@ export type CustomElementsSolidJs = {
    * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason.
+   * - `ended`: Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    *
    * ## Slots
    *
@@ -36448,6 +36511,9 @@ export type CustomElementsSolidJs = {
    * - `--video-controls-color`: The ink on the bar. (default: `undefined`)
    * - `--video-accent-color`: The played part of the scrubber. (default: `undefined`)
    * - `--video-start-size`: Width of the mark that starts it. (default: `undefined`)
+   * - `--video-intrinsic-ratio`: The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. (default: `undefined`)
+   * - `--video-level`: The current volume, 0 to 1. (default: `undefined`)
+   * - `--video-progress`: How far playback has reached, as a fraction of the duration. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -36577,6 +36643,10 @@ export type CustomCssProperties = {
   "--bar-chart-block-size"?: string;
   /** Space between the drawing and its labels. */
   "--bar-chart-gap"?: string;
+  /** The colour of a single-series axis, taken from that series. */
+  "--bar-chart-axis"?: string;
+  /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
+  "--bar-chart-secondary"?: string;
   /** Size of the quoted passage. */
   "--blockquote-size"?: string;
   /** Color of the chevron. */
@@ -36655,6 +36725,8 @@ export type CustomCssProperties = {
   "--color-input-swatch-radii"?: string;
   /** Width of the panel, and so of the square. */
   "--color-input-panel-size"?: string;
+  /** The chosen colour, to paint over the transparency check. */
+  "--color-input-swatch"?: string;
   /** Inset of the rows under the square, and the bottom. */
   "--color-picker-inset"?: string;
   /** Edge length of the chip that copies the value. */
@@ -36665,6 +36737,14 @@ export type CustomCssProperties = {
   "--color-picker-grid-ratio"?: string;
   /** Corner radius of the square. */
   "--color-picker-grid-radii"?: string;
+  /** The chosen brightness, 0 to 100, as a percentage. */
+  "--color-picker-brightness"?: string;
+  /** The chosen hue, 0 to 360, unitless. */
+  "--color-picker-hue"?: string;
+  /** The chosen saturation, 0 to 100, as a percentage. */
+  "--color-picker-saturation"?: string;
+  /** A colour to paint: the current one on the sample, a preset's on each preset. */
+  "--color-picker-swatch"?: string;
   /** Fill behind the field. */
   "--combobox-background-color"?: string;
   /** Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. */
@@ -36689,6 +36769,8 @@ export type CustomCssProperties = {
   "--date-picker-selected-color"?: string;
   /** Band behind the days in a range. */
   "--date-picker-range-color"?: string;
+  /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
+  "--date-picker-column-count"?: string;
   /** The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
   "--dialog-scrim"?: string;
   /** How big the mark above the title is. */
@@ -36713,6 +36795,8 @@ export type CustomCssProperties = {
   "--donut-chart-size"?: string;
   /** Colour of the ring under the slices. */
   "--donut-chart-track-color"?: string;
+  /** How thick the ring is drawn, derived from `hole`. */
+  "--donut-chart-stroke"?: string;
   /** The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
   "--drawer-scrim"?: string;
   /** Corner radius on the edges that face the page. */
@@ -36803,6 +36887,8 @@ export type CustomCssProperties = {
   "--megamenu-column-size"?: string;
   /** How wide the band's contents may get, centred in it. */
   "--megamenu-full-size"?: string;
+  /** Where the panel starts, measured from the bar above it. */
+  "--megamenu-top"?: string;
   /** Width of the leading column, for a row carrying more than a mark. */
   "--menu-item-start"?: string;
   /** Fill under the pointer. */
@@ -36825,6 +36911,14 @@ export type CustomCssProperties = {
   "--meter-tick-color"?: string;
   /** The groove behind the fill. */
   "--meter-track-color"?: string;
+  /** Where a bound sits on the arc, as a length along it. */
+  "--meter-along"?: string;
+  /** Where a bound sits on a linear track, as a percentage. */
+  "--meter-at"?: string;
+  /** The value as a fraction of the range, 0 to 1. */
+  "--meter-fraction"?: string;
+  /** How much of the circle the arc covers, as a path length. */
+  "--meter-sweep"?: string;
   /** Fill of the traveling marker. */
   "--navigation-indicator-color"?: string;
   /** Space between destinations. */
@@ -36867,6 +36961,8 @@ export type CustomCssProperties = {
   "--progress-ring-size"?: string;
   /** Thickness of its stroke. */
   "--progress-ring-width"?: string;
+  /** The value as a fraction of the range, 0 to 1. Absent while indeterminate. */
+  "--progress-fraction"?: string;
   /** How wide the square is. Defaults to `12rem`. */
   "--qr-code-size"?: string;
   /** The dark modules. Defaults to the page's ink. */
@@ -36909,6 +37005,14 @@ export type CustomCssProperties = {
   "--rating-color"?: string;
   /** And of an unfilled one. */
   "--rating-empty-color"?: string;
+  /** How many marks are wholly filled. */
+  "--rating-full"?: string;
+  /** How much of the next mark is filled, 0 to 1. */
+  "--rating-part"?: string;
+  /** The width of one step, as a fraction of a mark. */
+  "--rating-step"?: string;
+  /** How many steps one mark is divided into. */
+  "--rating-steps"?: string;
   /** Minimum height of the sandbox. */
   "--sandbox-min-block-size"?: string;
   /** The invisible width of a divider's drag target. */
@@ -36963,6 +37067,14 @@ export type CustomCssProperties = {
   "--slider-track-image"?: string;
   /** How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. */
   "--slider-length"?: string;
+  /** The value as a fraction of the range, 0 to 1. */
+  "--slider-fraction"?: string;
+  /** Where the filled span starts, as a percentage of the track. */
+  "--slider-from"?: string;
+  /** Where one marker sits, as a percentage of the track. */
+  "--slider-marker-at"?: string;
+  /** Where the filled span ends, as a percentage of the track. */
+  "--slider-to"?: string;
   /** A fill for the middle of a `ring` terminus, which is otherwise open. */
   "--chart-terminus-hole"?: string;
   /** Size of the mark on the last reading. */
@@ -36979,6 +37091,10 @@ export type CustomCssProperties = {
   "--sparkline-inline-size"?: string;
   /** Thickness of the line, overriding `weight`. */
   "--sparkline-width"?: string;
+  /** Where the last point sits horizontally, as a percentage. */
+  "--chart-terminus-x"?: string;
+  /** Where the last point sits vertically, as a percentage. */
+  "--chart-terminus-y"?: string;
   /** Edge length of the mark. */
   "--speed-dial-item-size"?: string;
   /** Space between the actions. */
@@ -36997,6 +37113,10 @@ export type CustomCssProperties = {
   "--splitter-hover-color"?: string;
   /** How wide the draggable box is. */
   "--splitter-target"?: string;
+  /** Where a nested splitter crosses this one, as a percentage. */
+  "--splitter-corner-at"?: string;
+  /** Where the divider sits, as a percentage of the box. */
+  "--splitter-position"?: string;
   /** Space between figures. */
   "--stat-group-gap"?: string;
   /** Size of the figure. */
@@ -37023,6 +37143,8 @@ export type CustomCssProperties = {
   "--switch-thumb-color"?: string;
   /** Track list for the columns. */
   "--table-columns"?: string;
+  /** The column track list, built from the columns the consumer declared. */
+  "--table-template"?: string;
   /** Fill behind the tag. */
   "--tag-background-color"?: string;
   /** Label color. */
@@ -37053,6 +37175,8 @@ export type CustomCssProperties = {
   "--timeline-gap"?: string;
   /** Space between the message's edge and its contents. */
   "--toast-item-inset"?: string;
+  /** How long this message stays, in milliseconds, for a progress hint. */
+  "--toast-duration"?: string;
   /** Distance from the edges of the window. */
   "--toast-inset"?: string;
   /** Space between one message and the next. */
@@ -37087,6 +37211,8 @@ export type CustomCssProperties = {
   "--tree-gap"?: string;
   /** Least height of a row, so rows with and without an icon match. */
   "--tree-row-size"?: string;
+  /** How deep this row sits, counting from zero, for the indent. */
+  "--tree-level"?: string;
   /** Set from `chevron-placement`; read by each item. */
   "--tree-chevron-order"?: string;
   /** Set from `chevron-placement`; the space before the chevron. */
@@ -37123,6 +37249,12 @@ export type CustomCssProperties = {
   "--video-accent-color"?: string;
   /** Width of the mark that starts it. */
   "--video-start-size"?: string;
+  /** The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. */
+  "--video-intrinsic-ratio"?: string;
+  /** The current volume, 0 to 1. */
+  "--video-level"?: string;
+  /** How far playback has reached, as a fraction of the duration. */
+  "--video-progress"?: string;
   /** How tall the scrolling box is. */
   "--virtual-list-block-size"?: string;
 };

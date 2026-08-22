@@ -167,7 +167,7 @@
  * colour: the disc is still cut, and an opaque middle covers the cut. */
 :host([terminus="ring"]) [part="svg"] {
   mask-image: radial-gradient(
-    circle at var(--_chart-terminus-x) var(--_chart-terminus-y),
+    circle at var(--chart-terminus-x) var(--chart-terminus-y),
     #0000 calc(var(--_chart-terminus-inner) - 0.5px),
     #000 var(--_chart-terminus-inner)
   );

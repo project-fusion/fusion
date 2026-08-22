@@ -64,6 +64,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
  * @event {HelixOpenEvent} helix-open - Fired before a branch opens, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before a branch closes, and cancelable.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --tree-level - How deep this row sits, counting from zero, for the indent.
  */
 @customElement('helix-base-tree-item')
 export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
@@ -325,13 +332,13 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
                 aria-level=${level}
                 tabindex=${tabIndex}
                 data-selected=${this.selected ? '' : nothing}
-                style="--_tree-level: ${level}"
+                style="--tree-level: ${level}"
                 @click=${this.handleRowClick}
               >${this.renderRow()}</a>`
             : html`<div
                 part="row"
                 data-selected=${this.selected ? '' : nothing}
-                style="--_tree-level: ${level}"
+                style="--tree-level: ${level}"
                 @click=${this.handleRowClick}
               >${this.renderRow()}</div>`
         }

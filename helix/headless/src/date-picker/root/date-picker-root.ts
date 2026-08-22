@@ -146,6 +146,13 @@ const addMonths = (date: Date, months: number): Date => {
  * @csspart week - One row of days.
  * @csspart cell - One column of a row, which is what a range paints.
  * @csspart day - The shape inside a cell, which is what a single date paints.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --date-picker-column-count - How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.
  */
 @customElement('helix-base-date-picker')
 export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) {
@@ -704,7 +711,7 @@ export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) 
        fraction: only this element knows how many months there are, and a
        stylesheet cannot count children into a `repeat()`. Capped at two, and a
        consumer wanting more sets `--date-picker-columns`. */
-    return html`<div part="months" style="--_calendar-columns: ${Math.min(count, 2)}">
+    return html`<div part="months" style="--date-picker-column-count: ${Math.min(count, 2)}">
       ${Array.from({ length: count }, (_, index) =>
         this.renderMonth(addMonths(shown, index), index),
       )}

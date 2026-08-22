@@ -62,6 +62,13 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @csspart preview - The chip showing the color, inside the trigger.
  * @csspart surface - The floating panel.
  * @csspart picker - The color picker inside it.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --color-input-swatch - The chosen colour, to paint over the transparency check.
  */
 @customElement('helix-base-color-input')
 export class HelixBaseColorInput extends MixinControllerOpen(
@@ -399,7 +406,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
         >
           <span
             part="preview"
-            style="--_color: ${this.value === '' ? 'transparent' : this.painted}"
+            style="--color-input-swatch: ${this.value === '' ? 'transparent' : this.painted}"
           ></span>
           <slot name="trigger"></slot>
         </button>

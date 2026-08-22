@@ -184,6 +184,15 @@ const SKIP_SECONDS = 10
  * @event {Event} play - Relayed, because it does not cross a shadow boundary.
  * @event {Event} pause - Relayed for the same reason.
  * @event {Event} ended - Relayed for the same reason.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --video-intrinsic-ratio - The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it.
+ * @cssproperty --video-level - The current volume, 0 to 1.
+ * @cssproperty --video-progress - How far playback has reached, as a fraction of the duration.
  */
 @customElement('helix-base-video')
 export class HelixBaseVideo extends HelixElement {
@@ -608,7 +617,10 @@ export class HelixBaseVideo extends HelixElement {
      * Set once the metadata is in, which is the first moment the real ratio is
      * knowable at all. Until then the stylesheet's own default holds. */
     if (video.videoWidth > 0 && video.videoHeight > 0) {
-      this.style.setProperty('--_video-ratio', `${video.videoWidth} / ${video.videoHeight}`)
+      this.style.setProperty(
+        '--video-intrinsic-ratio',
+        `${video.videoWidth} / ${video.videoHeight}`,
+      )
     }
     /* Read once the video has its tracks, not from the slot. A `<track>` is
        only a caption once the platform has parsed it, and a consumer can add
@@ -1395,7 +1407,7 @@ export class HelixBaseVideo extends HelixElement {
         .value=${String(this.position)}
         aria-label="Seek"
         aria-valuetext=${`${clock(this.position)} of ${clock(this.duration)}`}
-        style=${`--_video-progress: ${done}`}
+        style=${`--video-progress: ${done}`}
         @input=${(event: Event) => this.seek(Number((event.target as HTMLInputElement).value))}
       />
       <span part="sound">
@@ -1422,7 +1434,7 @@ export class HelixBaseVideo extends HelixElement {
         .value=${String(this.silent ? 0 : this.loudness)}
         aria-label="Volume"
         aria-valuetext=${`${Math.round((this.silent ? 0 : this.loudness) * 100)} percent`}
-        style=${`--_video-level: ${this.silent ? 0 : this.loudness}`}
+        style=${`--video-level: ${this.silent ? 0 : this.loudness}`}
         @input=${(event: Event) => {
           const video = this.video
           if (video) {

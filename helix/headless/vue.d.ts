@@ -2887,7 +2887,7 @@ state for stylesheets, which is what it has always been for. */
 export type HelixBaseMegamenuVueEvents = {
   /** Fired before it opens, and cancelable. */
   "helix-open": HelixBaseMegamenuHelixOpenElementEvent;
-  /** Fired before it closes, and cancelable. */
+  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-close": HelixBaseMegamenuHelixCloseElementEvent;
 };
 
@@ -5511,7 +5511,7 @@ would catch. */
 };
 
 export type HelixBaseToastItemVueEvents = {
-  /** Fired when it asks to go, whether by the control or by its timer. */
+  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-dismiss": HelixBaseToastItemHelixDismissElementEvent;
 };
 
@@ -5970,7 +5970,7 @@ export type HelixBaseTreeItemVueEvents = {
   "helix-select": HelixBaseTreeItemHelixSelectElementEvent;
   /** Fired before a branch opens, and cancelable. */
   "helix-open": HelixBaseTreeItemHelixOpenElementEvent;
-  /** Fired before a branch closes, and cancelable. */
+  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-close": HelixBaseTreeItemHelixCloseElementEvent;
 };
 
@@ -6348,7 +6348,7 @@ export type HelixBaseVideoVueEvents = {
   play: HelixBaseVideoElementEvent;
   /** Relayed for the same reason. */
   pause: HelixBaseVideoElementEvent;
-  /** Relayed for the same reason. */
+  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   ended: HelixBaseVideoElementEvent;
 };
 
@@ -6364,8 +6364,74 @@ export type HelixBaseVirtualListVueProps = {
 export type HelixBaseVirtualListVueEvents = {};
 
 export type CustomCssProperties = {
-  /** Track list for the columns. */
+  /** The colour of a single-series axis, taken from that series. */
+  "--bar-chart-axis"?: string;
+  /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
+  "--bar-chart-secondary"?: string;
+  /** The chosen colour, to paint over the transparency check. */
+  "--color-input-swatch"?: string;
+  /** The chosen brightness, 0 to 100, as a percentage. */
+  "--color-picker-brightness"?: string;
+  /** The chosen hue, 0 to 360, unitless. */
+  "--color-picker-hue"?: string;
+  /** The chosen saturation, 0 to 100, as a percentage. */
+  "--color-picker-saturation"?: string;
+  /** A colour to paint: the current one on the sample, a preset's on each preset. */
+  "--color-picker-swatch"?: string;
+  /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
+  "--date-picker-column-count"?: string;
+  /** How thick the ring is drawn, derived from `hole`. */
+  "--donut-chart-stroke"?: string;
+  /** Where the panel starts, measured from the bar above it. */
+  "--megamenu-top"?: string;
+  /** Where a bound sits on the arc, as a length along it. */
+  "--meter-along"?: string;
+  /** Where a bound sits on a linear track, as a percentage. */
+  "--meter-at"?: string;
+  /** The value as a fraction of the range, 0 to 1. */
+  "--meter-fraction"?: string;
+  /** How much of the circle the arc covers, as a path length. */
+  "--meter-sweep"?: string;
+  /** The value as a fraction of the range, 0 to 1. Absent while indeterminate. */
+  "--progress-fraction"?: string;
+  /** How many marks are wholly filled. */
+  "--rating-full"?: string;
+  /** How much of the next mark is filled, 0 to 1. */
+  "--rating-part"?: string;
+  /** The width of one step, as a fraction of a mark. */
+  "--rating-step"?: string;
+  /** How many steps one mark is divided into. */
+  "--rating-steps"?: string;
+  /** The value as a fraction of the range, 0 to 1. */
+  "--slider-fraction"?: string;
+  /** Where the filled span starts, as a percentage of the track. */
+  "--slider-from"?: string;
+  /** Where one marker sits, as a percentage of the track. */
+  "--slider-marker-at"?: string;
+  /** Where the filled span ends, as a percentage of the track. */
+  "--slider-to"?: string;
+  /** Where the last point sits horizontally, as a percentage. */
+  "--chart-terminus-x"?: string;
+  /** Where the last point sits vertically, as a percentage. */
+  "--chart-terminus-y"?: string;
+  /** Where a nested splitter crosses this one, as a percentage. */
+  "--splitter-corner-at"?: string;
+  /** Where the divider sits, as a percentage of the box. */
+  "--splitter-position"?: string;
+  /** Track list for the columns. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "--table-columns"?: string;
+  /** The column track list, built from the columns the consumer declared. */
+  "--table-template"?: string;
+  /** How long this message stays, in milliseconds, for a progress hint. */
+  "--toast-duration"?: string;
+  /** How deep this row sits, counting from zero, for the indent. */
+  "--tree-level"?: string;
+  /** The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. */
+  "--video-intrinsic-ratio"?: string;
+  /** The current volume, 0 to 1. */
+  "--video-level"?: string;
+  /** How far playback has reached, as a fraction of the duration. */
+  "--video-progress"?: string;
 };
 
 // Vue SFC template type-checking (GlobalComponents) for non-Vue custom elements.

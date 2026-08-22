@@ -107,8 +107,8 @@ describe('meter bands', () => {
     const host = await meter('high="80" low="50" value="34"')
     const ticks = [...(host.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])]
     expect(ticks).toHaveLength(2)
-    expect((ticks[0] as HTMLElement).style.getPropertyValue('--_meter-at')).toBe('50%')
-    expect((ticks[1] as HTMLElement).style.getPropertyValue('--_meter-at')).toBe('80%')
+    expect((ticks[0] as HTMLElement).style.getPropertyValue('--meter-at')).toBe('50%')
+    expect((ticks[1] as HTMLElement).style.getPropertyValue('--meter-at')).toBe('80%')
   })
 
   test('one threshold is enough to band it', async () => {
@@ -125,7 +125,7 @@ describe('meter geometry', () => {
 
   test('a range with no width does not divide by zero', async () => {
     const host = await meter('max="0" min="0" value="0"')
-    expect(part(host, 'indicator')?.getAttribute('style')).toContain('--_meter-fraction: 0')
+    expect(part(host, 'indicator')?.getAttribute('style')).toContain('--meter-fraction: 0')
   })
 })
 
@@ -142,7 +142,7 @@ describe('meter beyond its range', () => {
 
   test('and the bar still stops at its end, because that is what an end is', async () => {
     const host = await meter('value="250"')
-    expect(part(host, 'indicator')?.getAttribute('style')).toContain('--_meter-fraction: 1')
+    expect(part(host, 'indicator')?.getAttribute('style')).toContain('--meter-fraction: 1')
   })
 
   test('the accessible reading carries it too', async () => {
@@ -224,13 +224,13 @@ describe('meter drawn round', () => {
     // `pathLength="100"` makes every number here a percentage, so nothing
     // computes a circumference, a radius or pi.
     const ring = await round('shape="ring" value="50"')
-    expect(part(ring, 'groove')?.getAttribute('style')).toContain('--_meter-sweep: 100')
-    expect(part(ring, 'indicator')?.getAttribute('style')).toContain('--_meter-along: 50')
+    expect(part(ring, 'groove')?.getAttribute('style')).toContain('--meter-sweep: 100')
+    expect(part(ring, 'indicator')?.getAttribute('style')).toContain('--meter-along: 50')
 
     const arc = await round('shape="arc" value="50"')
-    expect(part(arc, 'groove')?.getAttribute('style')).toContain('--_meter-sweep: 75')
+    expect(part(arc, 'groove')?.getAttribute('style')).toContain('--meter-sweep: 75')
     // Half the range is half the sweep, not half the circle.
-    expect(part(arc, 'indicator')?.getAttribute('style')).toContain('--_meter-along: 37.5')
+    expect(part(arc, 'indicator')?.getAttribute('style')).toContain('--meter-along: 37.5')
   })
 
   test('the ticks are segments of the same circle, placed by the same arithmetic', async () => {
@@ -239,8 +239,8 @@ describe('meter drawn round', () => {
     const host = await round('high="80" low="50" optimum="0" shape="arc" value="40"')
     const ticks = [...(host.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])]
     expect(ticks.map((one) => one.tagName.toLowerCase())).toEqual(['circle', 'circle'])
-    expect(ticks[0]?.getAttribute('style')).toContain('--_meter-along: 37.5')
-    expect(ticks[1]?.getAttribute('style')).toContain('--_meter-along: 60')
+    expect(ticks[0]?.getAttribute('style')).toContain('--meter-along: 37.5')
+    expect(ticks[1]?.getAttribute('style')).toContain('--meter-along: 60')
   })
 
   test('and the bands still resolve, because the shape changed and nothing else did', async () => {

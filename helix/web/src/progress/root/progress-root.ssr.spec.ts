@@ -15,14 +15,14 @@ describe('progress server output', () => {
        ships empty and fills on upgrade is a bar that animates from nothing on
        every page load, and says the wrong thing for as long as that takes. */
     expect(partTag(ssr(html`<helix-progress value="62"></helix-progress>`), 'indicator')).toContain(
-      '--_progress-fraction: 0.62',
+      '--progress-fraction: 0.62',
     )
   })
 
   test('a value past its own total is served finished rather than overflowing', () => {
     expect(
       partTag(ssr(html`<helix-progress value="140"></helix-progress>`), 'indicator'),
-    ).toContain('--_progress-fraction: 1')
+    ).toContain('--progress-fraction: 1')
   })
 
   test('the host carries only what the consumer wrote', () => {

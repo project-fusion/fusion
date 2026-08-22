@@ -41,6 +41,13 @@ import { property } from 'lit/decorators.js'
  * @csspart indicator - The part of it that is done.
  * @csspart groove - The unfilled circle, under the ring's own sweep.
  * @csspart value - The reading beside the bar, under `show-value`.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Absent while indeterminate.
  */
 @customElement('helix-base-progress')
 export class HelixBaseProgress extends HelixElement {
@@ -179,14 +186,14 @@ export class HelixBaseProgress extends HelixElement {
      * value. The drawing is a picture of what it already says. */
     const ring = html`<svg part="track" aria-hidden="true">
       <circle part="groove" />
-      <circle part="indicator" pathLength="100" style="--_progress-fraction: ${fraction}" />
+      <circle part="indicator" pathLength="100" style="--progress-fraction: ${fraction}" />
     </svg>`
 
     return html`${
       this.shape === 'ring'
         ? ring
         : html`<div part="track">
-            <div part="indicator" style="--_progress-fraction: ${fraction}"></div>
+            <div part="indicator" style="--progress-fraction: ${fraction}"></div>
           </div>`
     }
       ${

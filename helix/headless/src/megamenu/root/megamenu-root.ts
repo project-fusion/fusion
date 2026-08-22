@@ -80,6 +80,13 @@ let showing: HelixBaseMegamenu | undefined
  *
  * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  */
 @customElement('helix-base-megamenu')
 export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
@@ -219,7 +226,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     if (!this.banded) {
       return
     }
-    this.style.setProperty('--_megamenu-top', `${Math.round(this.bar())}px`)
+    this.style.setProperty('--megamenu-top', `${Math.round(this.bar())}px`)
   }
 
   /**

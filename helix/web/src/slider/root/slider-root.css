@@ -81,7 +81,7 @@
  *
  * **On the control, not on the host, and that is not a tidiness question.** A
  * custom property whose value contains `var()` is substituted where it is
- * *declared*, not where it is used: declared on `:host`, the `--_slider-fraction`
+ * *declared*, not where it is used: declared on `:host`, the `--slider-fraction`
  * inside it resolved against the host, where nothing sets it, so the fallback
  * won and both gradient stops landed at `0%`. Every slider painted its unfilled
  * color end to end and the fill was gone. The fraction is an inline style on
@@ -91,8 +91,8 @@
     --slider-track-image,
     linear-gradient(
       to right,
-      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
-      var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-fraction, 0) * 100%),
+      var(--_slider-track-color) calc(var(--slider-fraction, 0) * 100%)
     )
   );
 }
@@ -184,7 +184,7 @@
   --_slider-hole: calc(var(--_slider-thumb) / 2 + var(--helix-border-thin));
 
   mask-image: radial-gradient(
-    circle at calc(var(--_slider-fraction, 0) * 100%) 50%,
+    circle at calc(var(--slider-fraction, 0) * 100%) 50%,
     transparent var(--_slider-hole),
     currentColor var(--_slider-hole)
   );
@@ -198,12 +198,12 @@
   mask-composite: intersect;
   mask-image:
     radial-gradient(
-      circle at calc(var(--_slider-from, 0) * 100%) 50%,
+      circle at calc(var(--slider-from, 0) * 100%) 50%,
       transparent var(--_slider-hole),
       currentColor var(--_slider-hole)
     ),
     radial-gradient(
-      circle at calc(var(--_slider-to, 0) * 100%) 50%,
+      circle at calc(var(--slider-to, 0) * 100%) 50%,
       transparent var(--_slider-hole),
       currentColor var(--_slider-hole)
     );
@@ -213,7 +213,7 @@
    Measured from the foot, because that is where the minimum is. */
 :host([orientation="vertical"]) [part="markers"] {
   mask-image: radial-gradient(
-    circle at 50% calc(100% - var(--_slider-fraction, 0) * 100%),
+    circle at 50% calc(100% - var(--slider-fraction, 0) * 100%),
     transparent var(--_slider-hole),
     currentColor var(--_slider-hole)
   );
@@ -227,7 +227,7 @@
   inset-block-start: 0;
   /* Centered on its own position rather than starting at it, so the first and
      last marks sit on the ends instead of hanging off them. */
-  inset-inline-start: var(--_marker-at, 0%);
+  inset-inline-start: var(--slider-marker-at, 0%);
   position: absolute;
   translate: -50% 0;
 }
@@ -467,10 +467,10 @@
     --slider-track-image,
     linear-gradient(
       to right,
-      var(--_slider-track-color) calc(var(--_slider-from, 0) * 100%),
-      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-from, 0) * 100%),
-      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-to, 1) * 100%),
-      var(--_slider-track-color) calc(var(--_slider-to, 1) * 100%)
+      var(--_slider-track-color) calc(var(--slider-from, 0) * 100%),
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-from, 0) * 100%),
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-to, 1) * 100%),
+      var(--_slider-track-color) calc(var(--slider-to, 1) * 100%)
     )
   );
 }
@@ -541,8 +541,8 @@
     --slider-track-image,
     linear-gradient(
       to top,
-      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
-      var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-fraction, 0) * 100%),
+      var(--_slider-track-color) calc(var(--slider-fraction, 0) * 100%)
     )
   );
 }
@@ -553,7 +553,7 @@
 :host([orientation="vertical"]) [part="marker"] {
   block-size: var(--helix-border-thick);
   inline-size: var(--_slider-track);
-  inset-block-end: var(--_marker-at, 0%);
+  inset-block-end: var(--slider-marker-at, 0%);
   inset-block-start: auto;
   inset-inline-start: 0;
   translate: 0 50%;

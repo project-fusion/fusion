@@ -197,8 +197,8 @@ describe('sparkline', () => {
   test('the mark sits on the last value', async () => {
     const host = await spark('values="9 5 1"')
     // Last value is the smallest, so the bottom of the box.
-    expect(part(host, 'terminus')?.getAttribute('style')).toContain('--_chart-terminus-y: 100%')
-    expect(part(host, 'terminus')?.getAttribute('style')).toContain('--_chart-terminus-x: 100%')
+    expect(part(host, 'terminus')?.getAttribute('style')).toContain('--chart-terminus-y: 100%')
+    expect(part(host, 'terminus')?.getAttribute('style')).toContain('--chart-terminus-x: 100%')
   })
 })
 

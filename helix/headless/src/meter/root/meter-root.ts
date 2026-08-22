@@ -44,6 +44,16 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @csspart indicator - The part of it the value fills.
  * @csspart tick - A mark at `low` or at `high`.
  * @csspart value - The reading, under `show-value`.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --meter-along - Where a bound sits on the arc, as a length along it.
+ * @cssproperty --meter-at - Where a bound sits on a linear track, as a percentage.
+ * @cssproperty --meter-fraction - The value as a fraction of the range, 0 to 1.
+ * @cssproperty --meter-sweep - How much of the circle the arc covers, as a path length.
  */
 @customElement('helix-base-meter')
 export class HelixBaseMeter extends HelixElement {
@@ -296,7 +306,7 @@ export class HelixBaseMeter extends HelixElement {
     const sweep = this.shape === 'arc' ? 75 : 100
     const along = (value: number): number => ((value - min) / (max - min)) * sweep
     return html`<svg part="track" viewBox="0 0 100 100" aria-hidden="true">
-      <circle part="groove" pathLength="100" style="--_meter-sweep: ${sweep}" />
+      <circle part="groove" pathLength="100" style="--meter-sweep: ${sweep}" />
       ${
         /* `svg` and not `html`, which is the bug the sparkline records one
            file over. A nested Lit template is parsed on its own, so a
@@ -310,9 +320,9 @@ export class HelixBaseMeter extends HelixElement {
           ? svg`<circle
                 part="tick"
                 pathLength="100"
-                style="--_meter-along: ${along(bounds.low)}"
+                style="--meter-along: ${along(bounds.low)}"
               />
-              <circle part="tick" pathLength="100" style="--_meter-along: ${along(bounds.high)}" />`
+              <circle part="tick" pathLength="100" style="--meter-along: ${along(bounds.high)}" />`
           : nothing
       }
       <circle
@@ -320,7 +330,7 @@ export class HelixBaseMeter extends HelixElement {
         pathLength="100"
         data-band=${this.computedBand ?? nothing}
         data-beyond=${this.beyond ?? nothing}
-        style="--_meter-along: ${this.fraction * sweep}"
+        style="--meter-along: ${this.fraction * sweep}"
       />
     </svg>`
   }
@@ -335,15 +345,15 @@ export class HelixBaseMeter extends HelixElement {
         : html`<div part="track">
             ${
               bounds
-                ? html`<span part="tick" style="--_meter-at: ${at(bounds.low)}"></span>
-                    <span part="tick" style="--_meter-at: ${at(bounds.high)}"></span>`
+                ? html`<span part="tick" style="--meter-at: ${at(bounds.low)}"></span>
+                    <span part="tick" style="--meter-at: ${at(bounds.high)}"></span>`
                 : nothing
             }
             <div
               part="indicator"
               data-band=${this.computedBand ?? nothing}
               data-beyond=${this.beyond ?? nothing}
-              style="--_meter-fraction: ${this.fraction}"
+              style="--meter-fraction: ${this.fraction}"
             ></div>
           </div>`
     }

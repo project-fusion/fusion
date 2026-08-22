@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 const marksOf = (host: HTMLElement): string[] =>
   [...((part(host, 'markers') as HTMLElement | null)?.children ?? [])].map((mark) =>
-    (mark as HTMLElement).style.getPropertyValue('--_marker-at').trim(),
+    (mark as HTMLElement).style.getPropertyValue('--slider-marker-at').trim(),
   )
 
 describe('slider', () => {
@@ -81,8 +81,8 @@ describe('slider', () => {
       '<helix-slider label="A" max="200" min="0" default-value="50"></helix-slider>',
     )
     const control = part(host, 'control')
-    expect(control?.style.getPropertyValue('--_slider-fraction')).toBe('0.25')
-    expect(host.style.getPropertyValue('--_slider-fraction')).toBe('')
+    expect(control?.style.getPropertyValue('--slider-fraction')).toBe('0.25')
+    expect(host.style.getPropertyValue('--slider-fraction')).toBe('')
   })
 })
 
@@ -190,7 +190,7 @@ describe('slider bounds', () => {
     await host.updateComplete
 
     const fill = () =>
-      host.shadowRoot?.querySelector('input')?.style.getPropertyValue('--_slider-fraction')
+      host.shadowRoot?.querySelector('input')?.style.getPropertyValue('--slider-fraction')
 
     host.value = '1'
     await host.updateComplete
@@ -225,7 +225,7 @@ describe('slider bounds', () => {
     await host.updateComplete
     const control = host.shadowRoot?.querySelector('input') as HTMLInputElement
     // 1.03 snaps to 1.05 from a min of 0.2, sixteen and a bit steps along.
-    expect(control.style.getPropertyValue('--_slider-fraction')).toBe(
+    expect(control.style.getPropertyValue('--slider-fraction')).toBe(
       String((1.05 - 0.2) / (2.5 - 0.2)),
     )
   })

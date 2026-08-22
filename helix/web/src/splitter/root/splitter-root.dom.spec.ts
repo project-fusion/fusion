@@ -182,8 +182,8 @@ describe('splitter crossings', () => {
   test('it sits where the two dividers cross, on both their numbers', async () => {
     const [host] = await nested('default-position="30"', 'orientation="vertical" position="65"')
     const handle = corner(host) as HTMLElement
-    expect(handle.getAttribute('style')).toContain('--_splitter-position: 30%')
-    expect(handle.getAttribute('style')).toContain('--_splitter-corner-at: 65%')
+    expect(handle.getAttribute('style')).toContain('--splitter-position: 30%')
+    expect(handle.getAttribute('style')).toContain('--splitter-corner-at: 65%')
   })
 
   test('it follows the nested divider as that one moves', async () => {
@@ -195,7 +195,7 @@ describe('splitter crossings', () => {
     await within.updateComplete
     await host.updateComplete
     expect((corner(host) as HTMLElement).getAttribute('style')).toContain(
-      '--_splitter-corner-at: 55%',
+      '--splitter-corner-at: 55%',
     )
   })
 

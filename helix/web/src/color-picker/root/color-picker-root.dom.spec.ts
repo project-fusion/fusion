@@ -149,9 +149,9 @@ describe('color picker', () => {
   test('the square is painted from the hue and positioned from the two axes', async () => {
     const host = await picker('default-value="#00ff00"')
     const grid = part(host, 'grid')?.getAttribute('style')
-    expect(grid).toContain('--_hue: 120')
-    expect(grid).toContain('--_saturation: 100%')
-    expect(grid).toContain('--_brightness: 100%')
+    expect(grid).toContain('--color-picker-hue: 120')
+    expect(grid).toContain('--color-picker-saturation: 100%')
+    expect(grid).toContain('--color-picker-brightness: 100%')
   })
 
   test('alpha is offered only when it is asked for', async () => {
@@ -305,7 +305,7 @@ describe('color picker', () => {
        this element writes when it produces a value; what a reader typed is
        already a value and rewriting it under them would move the caret. */
     expect(host.value).toBe('rgb(0 255 0)')
-    expect(part(host, 'grid')?.getAttribute('style')).toContain('--_hue: 120')
+    expect(part(host, 'grid')?.getAttribute('style')).toContain('--color-picker-hue: 120')
   })
 
   test('and half-typed input does not throw the square around', async () => {
@@ -320,7 +320,7 @@ describe('color picker', () => {
       field.dispatchEvent(new Event('input', { bubbles: true }))
       await host.updateComplete
       const style = part(host, 'grid')?.getAttribute('style') ?? ''
-      seen.push(/--_hue: (\d+)/.exec(style)?.[1] ?? '?')
+      seen.push(/--color-picker-hue: (\d+)/.exec(style)?.[1] ?? '?')
     }
     expect(seen).toEqual(['0', '0', '0', '240', '240', '240', '120'])
     expect(host.value).toBe('#00ff00')

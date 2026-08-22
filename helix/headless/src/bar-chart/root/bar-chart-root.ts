@@ -65,6 +65,14 @@ const HEIGHT = 100
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
  * @csspart tooltip-value - A column's value inside the tooltip.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --bar-chart-axis - The colour of a single-series axis, taken from that series.
+ * @cssproperty --bar-chart-secondary - The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138.
  */
 @customElement('helix-base-bar-chart')
 export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
@@ -276,11 +284,11 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
        first and where it did nothing. The axis is the plot's sibling now that it
        is a column of the host grid, and a custom property inherits down and
        never sideways. Measured: both axes came out the neutral, which is the
-       same mistake `--_donut-thickness` made one component over. */
+       same mistake `--donut-chart-stroke` made one component over. */
     const lone = series.filter(own)
     const tint =
       lone.length === 1 && lone[0] !== undefined
-        ? `--_bar-chart-secondary: var(--helix-color-series-${seriesIndex(series.indexOf(lone[0]))})`
+        ? `--bar-chart-secondary: var(--helix-color-series-${seriesIndex(series.indexOf(lone[0]))})`
         : undefined
 
     return html`${
@@ -452,7 +460,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     widest: number,
     tint?: string,
   ): TemplateResult {
-    const sizing = sideways ? undefined : `--_bar-chart-axis: ${widest}ch`
+    const sizing = sideways ? undefined : `--bar-chart-axis: ${widest}ch`
     return html`<div
       aria-hidden="true"
       data-axis=${which}

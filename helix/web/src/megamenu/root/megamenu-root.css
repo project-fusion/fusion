@@ -269,7 +269,7 @@
   grid-auto-flow: row;
   grid-template-columns: repeat(auto-fit, minmax(var(--megamenu-column-size, 15rem), 1fr));
   inline-size: auto;
-  inset-block-start: var(--_megamenu-top, 100%);
+  inset-block-start: var(--megamenu-top, 100%);
   inset-inline: 0;
   max-inline-size: none;
   /* Less above than below, because the bar has already given some.
@@ -325,7 +325,7 @@
   grid-template-columns: 1fr;
   /* Down to the bottom of the screen, less the height it starts at and a margin
      to show it ends. */
-  max-block-size: calc(100dvh - var(--_megamenu-top, 0px) - var(--helix-space-xl));
+  max-block-size: calc(100dvh - var(--megamenu-top, 0px) - var(--helix-space-xl));
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-inline: var(--helix-space-md);

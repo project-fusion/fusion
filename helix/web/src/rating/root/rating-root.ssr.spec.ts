@@ -8,8 +8,8 @@ const shown = html`<helix-rating readonly value="4.2"></helix-rating>`
 
 describe('rating server output', () => {
   test('the score is drawn on the server, from a number it already has', () => {
-    expect(partTag(ssr(given), 'marks')).toContain('--_rating-full: 4')
-    expect(partTag(ssr(given), 'marks')).toContain('--_rating-part: 0.2')
+    expect(partTag(ssr(given), 'marks')).toContain('--rating-full: 4')
+    expect(partTag(ssr(given), 'marks')).toContain('--rating-part: 0.2')
   })
 
   test('the options ship with it, so the marks are pressable before hydration', () => {

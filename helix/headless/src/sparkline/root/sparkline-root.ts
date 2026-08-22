@@ -65,6 +65,14 @@ const readValues = (input: string): number[] =>
  * @csspart terminus - The mark on the last value.
  * @csspart wash-end - The far stop of the area's gradient.
  * @csspart wash-start - The stop of the area's gradient that meets the line.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --chart-terminus-x - Where the last point sits horizontally, as a percentage.
+ * @cssproperty --chart-terminus-y - Where the last point sits vertically, as a percentage.
  */
 @customElement('helix-base-sparkline')
 export class HelixBaseSparkline extends HelixElement {
@@ -269,7 +277,7 @@ export class HelixBaseSparkline extends HelixElement {
     const end =
       points.length < 2
         ? undefined
-        : `--_chart-terminus-x: 100%; --_chart-terminus-y: ${
+        : `--chart-terminus-x: 100%; --chart-terminus-y: ${
             (y(points[points.length - 1] as number) / BOX.height) * 100
           }%`
 

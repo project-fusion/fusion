@@ -480,7 +480,7 @@ it is measured against.
 | `tooltip-cell` | One column's name and value inside the tooltip. |
 | `tooltip-label` | The reading's own name inside the tooltip. |
 | `tooltip-name` | A column's name inside the tooltip. |
-| `tooltip-value` | A column's value inside the tooltip. |
+| `tooltip-value` | A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Custom properties
 
@@ -493,6 +493,8 @@ it is measured against.
 | `--bar-chart-bar-radius` | Corner radius at the far end of a column. |
 | `--bar-chart-block-size` | Height of the drawing. |
 | `--bar-chart-gap` | Space between the drawing and its labels. |
+| `--bar-chart-axis` | The colour of a single-series axis, taken from that series. |
+| `--bar-chart-secondary` | The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. |
 
 ## Blockquote
 
@@ -1194,7 +1196,7 @@ pads its own lower rows.
 | `trigger` | The control that opens the panel. |
 | `preview` | The chip showing the color, inside the trigger. |
 | `surface` | The floating panel. |
-| `picker` | The color picker inside it. |
+| `picker` | The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Custom properties
 
@@ -1204,6 +1206,7 @@ pads its own lower rows.
 | `--color-input-swatch-size` | Edge length of the block in `appearance="swatch"`. |
 | `--color-input-swatch-radii` | Corner radius of that block. |
 | `--color-input-panel-size` | Width of the panel, and so of the square. |
+| `--color-input-swatch` | The chosen colour, to paint over the transparency check. |
 
 ## Color Picker
 
@@ -1294,7 +1297,7 @@ brought its own card would be a card inside a card there.
 | `value` | The color as text, which can be typed or pasted. |
 | `format` | The control that changes the syntax the value is written in. |
 | `swatches` | The row of presets. |
-| `swatch` | One preset. |
+| `swatch` | One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Custom properties
 
@@ -1305,6 +1308,10 @@ brought its own card would be a card inside a card there.
 | `--color-picker-swatch-size` | Edge length of one preset. |
 | `--color-picker-grid-ratio` | Aspect ratio of the square. |
 | `--color-picker-grid-radii` | Corner radius of the square. |
+| `--color-picker-brightness` | The chosen brightness, 0 to 100, as a percentage. |
+| `--color-picker-hue` | The chosen hue, 0 to 360, unitless. |
+| `--color-picker-saturation` | The chosen saturation, 0 to 100, as a percentage. |
+| `--color-picker-swatch` | A colour to paint: the current one on the sample, a preset's on each preset. |
 
 ## Combobox
 
@@ -1706,7 +1713,7 @@ grid reads as a continuous run of dates.
 | `weekday` | A column header naming a day of the week. |
 | `week` | One row of days. |
 | `cell` | One column of a row, which is what a range paints. |
-| `day` | The shape inside a cell, which is what a single date paints. |
+| `day` | The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Custom properties
 
@@ -1718,6 +1725,7 @@ grid reads as a continuous run of dates.
 | `--date-picker-row-size` | Height of a week row. |
 | `--date-picker-selected-color` | Fill behind a selected day. |
 | `--date-picker-range-color` | Band behind the days in a range. |
+| `--date-picker-column-count` | How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. |
 
 ## Dialog
 
@@ -1873,7 +1881,7 @@ larger than the default.
 
 | Slot | Description |
 | --- | --- |
-| *(default)* | Goes in the middle of the ring. A total, usually. |
+| *(default)* | Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Parts
 
@@ -1897,6 +1905,7 @@ larger than the default.
 | --- | --- |
 | `--donut-chart-size` | Width and height of the ring. |
 | `--donut-chart-track-color` | Colour of the ring under the slices. |
+| `--donut-chart-stroke` | How thick the ring is drawn, derived from `hole`. |
 
 ## Drawer
 
@@ -2908,7 +2917,7 @@ Everything about what opens it and what closes it is the base class.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Slots
 
@@ -2933,6 +2942,7 @@ Everything about what opens it and what closes it is the base class.
 | `--megamenu-size` | How wide the panel may get. |
 | `--megamenu-column-size` | The narrowest a column goes before the grid wraps. |
 | `--megamenu-full-size` | How wide the band's contents may get, centred in it. |
+| `--megamenu-top` | Where the panel starts, measured from the bar above it. |
 
 ## Menu
 
@@ -3141,6 +3151,10 @@ reading are what say how far past.
 | `--meter-size` | How thick the bar is. |
 | `--meter-tick-color` | The mark at a threshold. |
 | `--meter-track-color` | The groove behind the fill. |
+| `--meter-along` | Where a bound sits on the arc, as a length along it. |
+| `--meter-at` | Where a bound sits on a linear track, as a percentage. |
+| `--meter-fraction` | The value as a fraction of the range, 0 to 1. |
+| `--meter-sweep` | How much of the circle the arc covers, as a path length. |
 
 ## Navigation
 
@@ -3736,7 +3750,7 @@ thing advancing.
 | `track` | The full length the work is measured against. |
 | `indicator` | The part of it that is done. |
 | `groove` | The unfilled circle, under the ring's own sweep. |
-| `value` | The reading beside the bar, under `show-value`. |
+| `value` | The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Custom properties
 
@@ -3747,6 +3761,7 @@ thing advancing.
 | `--progress-track-color` | Fill of the part that is not. |
 | `--progress-ring-size` | Diameter of the ring appearance. |
 | `--progress-ring-width` | Thickness of its stroke. |
+| `--progress-fraction` | The value as a fraction of the range, 0 to 1. Absent while indeterminate. |
 
 ## Qr Code
 
@@ -4041,7 +4056,7 @@ Everything about what the score is and how it is chosen is the base class.
 | `fill` | The filled marks, clipped to the score. |
 | `mark` | One mark, in either layer. |
 | `option` | One place a reader can press, which is one step. |
-| `value` | The score written out, under `show-value`. |
+| `value` | The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Custom properties
 
@@ -4052,6 +4067,10 @@ Everything about what the score is and how it is chosen is the base class.
 | `--rating-gap` | Space between marks. |
 | `--rating-color` | The colour of a filled mark. |
 | `--rating-empty-color` | And of an unfilled one. |
+| `--rating-full` | How many marks are wholly filled. |
+| `--rating-part` | How much of the next mark is filled, 0 to 1. |
+| `--rating-step` | The width of one step, as a fraction of a mark. |
+| `--rating-steps` | How many steps one mark is divided into. |
 
 ## Sandbox
 
@@ -4640,7 +4659,7 @@ the thumb being dragged.
 | `markers` | The row of marks along the track. |
 | `marker` | One mark. |
 | `marker-label` | The value a mark stands at, when `marker-labels` is set. |
-| `output` | The current value, shown beside it. |
+| `output` | The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Custom properties
 
@@ -4653,6 +4672,10 @@ the thumb being dragged.
 | `--slider-marker-color` | The ticks along the track. |
 | `--slider-track-image` | The whole track, for a slider whose color is the value. |
 | `--slider-length` | How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. |
+| `--slider-fraction` | The value as a fraction of the range, 0 to 1. |
+| `--slider-from` | Where the filled span starts, as a percentage of the track. |
+| `--slider-marker-at` | Where one marker sits, as a percentage of the track. |
+| `--slider-to` | Where the filled span ends, as a percentage of the track. |
 
 ## Sparkline
 
@@ -4703,7 +4726,7 @@ keeps it out of every other reason it might want to be bigger.
 | `svg` | The drawing. |
 | `terminus` | The mark on the last value. |
 | `wash-end` | The far stop of the area's gradient. |
-| `wash-start` | The stop of the area's gradient that meets the line. |
+| `wash-start` | The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Custom properties
 
@@ -4717,6 +4740,8 @@ keeps it out of every other reason it might want to be bigger.
 | `--sparkline-color` | Colour of the line, the wash, the columns and the mark. |
 | `--sparkline-inline-size` | Width of the drawing. |
 | `--sparkline-width` | Thickness of the line, overriding `weight`. |
+| `--chart-terminus-x` | Where the last point sits horizontally, as a percentage. |
+| `--chart-terminus-y` | Where the last point sits vertically, as a percentage. |
 
 ## Speed Dial
 
@@ -4923,6 +4948,8 @@ gesture.
 | `--splitter-grip-length` | How far the grip runs along the divider. |
 | `--splitter-hover-color` | The target under the pointer. |
 | `--splitter-target` | How wide the draggable box is. |
+| `--splitter-corner-at` | Where a nested splitter crosses this one, as a percentage. |
+| `--splitter-position` | Where the divider sits, as a percentage of the box. |
 
 ## Stat
 
@@ -5221,6 +5248,7 @@ decorating none of it.
 | Property | Description |
 | --- | --- |
 | `--table-columns` | Track list for the columns. |
+| `--table-template` | The column track list, built from the columns the consumer declared. |
 
 ### Cell — `helix-table-cell`
 
@@ -5931,7 +5959,7 @@ costs contrast for something the mark already says.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-dismiss` | `HelixDismissEvent` | Fired when it asks to go, whether by the control or by its timer. |
+| `helix-dismiss` | `HelixDismissEvent` | Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Slots
 
@@ -5958,6 +5986,7 @@ costs contrast for something the mark already says.
 | Property | Description |
 | --- | --- |
 | `--toast-item-inset` | Space between the message's edge and its contents. |
+| `--toast-duration` | How long this message stays, in milliseconds, for a progress hint. |
 
 ## Toggle
 
@@ -6407,7 +6436,7 @@ the row itself stays flat.
 | --- | --- | --- |
 | `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. |
 | `helix-open` | `HelixOpenEvent` | Fired before a branch opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before a branch closes, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Slots
 
@@ -6436,6 +6465,7 @@ the row itself stays flat.
 | `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
 | `--tree-gap` | Space between rows. |
 | `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
+| `--tree-level` | How deep this row sits, counting from zero, for the indent. |
 
 ## Trend
 
@@ -6545,7 +6575,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `helix-previous` | `HelixPreviousEvent` | Fired when they ask for the previous one. |
 | `play` | `Event` | Relayed, because it does not cross a shadow boundary. |
 | `pause` | `Event` | Relayed for the same reason. |
-| `ended` | `Event` | Relayed for the same reason. |
+| `ended` | `Event` | Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
 
 #### Slots
 
@@ -6602,6 +6632,9 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `--video-controls-color` | The ink on the bar. |
 | `--video-accent-color` | The played part of the scrubber. |
 | `--video-start-size` | Width of the mark that starts it. |
+| `--video-intrinsic-ratio` | The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. |
+| `--video-level` | The current volume, 0 to 1. |
+| `--video-progress` | How far playback has reached, as a fraction of the duration. |
 
 ## Video Playlist
 

@@ -82,8 +82,8 @@ describe('rating', () => {
     /* A share of the row would land in a gap: the row is marks and the spaces
        between them, and a score counts only marks. See the stylesheet. */
     const host = await rating('value="4.2"')
-    expect(fill(host)).toContain('--_rating-full: 4')
-    expect(fill(host)).toContain('--_rating-part: 0.2')
+    expect(fill(host)).toContain('--rating-full: 4')
+    expect(fill(host)).toContain('--rating-part: 0.2')
   })
 
   describe('read-only', () => {
@@ -105,7 +105,7 @@ describe('rating', () => {
 
     test('still draws the fraction it was given', async () => {
       const host = await rating('readonly value="4.2"')
-      expect(fill(host)).toContain('--_rating-part: 0.2')
+      expect(fill(host)).toContain('--rating-part: 0.2')
     })
 
     test('follows the data it seeds from, since nothing here can take it over', async () => {
@@ -121,8 +121,8 @@ describe('rating', () => {
       }
       element.defaultValue = '2.5'
       await element.updateComplete
-      expect(fill(host)).toContain('--_rating-full: 2')
-      expect(fill(host)).toContain('--_rating-part: 0.5')
+      expect(fill(host)).toContain('--rating-full: 2')
+      expect(fill(host)).toContain('--rating-part: 0.5')
     })
   })
 
@@ -267,7 +267,7 @@ if (hasLayout()) {
       expect(host.value).toBe('1')
 
       await send(host, 'pointermove', centre(host, 4))
-      expect(part(host, 'marks')?.getAttribute('style')).toContain('--_rating-full: 5')
+      expect(part(host, 'marks')?.getAttribute('style')).toContain('--rating-full: 5')
       expect(host.value).toBe('1')
 
       await send(host, 'pointerup', centre(host, 4))

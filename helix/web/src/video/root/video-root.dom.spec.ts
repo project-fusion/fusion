@@ -443,14 +443,14 @@ if (hasLayout()) {
          this asserted while never running. `auto` takes the element's intrinsic
          ratio, and a video carrying a poster reports the *poster's*, so the box
          took the still's shape and the clip letterboxed inside it. The element
-         writes `--_video-ratio` from `videoWidth` and `videoHeight` instead,
+         writes `--video-intrinsic-ratio` from `videoWidth` and `videoHeight` instead,
          which is the only source that is always the video. */
       const host = await player()
       const video = part(host, 'video') as HTMLVideoElement
       expect(getComputedStyle(video).aspectRatio).toBe('16 / 9')
 
       // And it follows the real one the moment the element knows it.
-      ;(host as HTMLElement).style.setProperty('--_video-ratio', '4 / 3')
+      ;(host as HTMLElement).style.setProperty('--video-intrinsic-ratio', '4 / 3')
       expect(getComputedStyle(video).aspectRatio).toBe('4 / 3')
     })
 

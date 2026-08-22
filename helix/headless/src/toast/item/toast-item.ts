@@ -71,6 +71,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart timer - The bar showing how long is left, where a duration was given.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --toast-duration - How long this message stays, in milliseconds, for a progress hint.
  */
 @customElement('helix-base-toast-item')
 export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
@@ -357,7 +364,7 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
         this.duration
           ? html`<div
               part="timer"
-              style=${`--_toast-duration: ${this.duration}ms`}
+              style=${`--toast-duration: ${this.duration}ms`}
               aria-hidden="true"
             ></div>`
           : nothing

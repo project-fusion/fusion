@@ -108,6 +108,16 @@ interface EyeDropperConstructor {
  * @csspart format - The control that changes the syntax the value is written in.
  * @csspart swatches - The row of presets.
  * @csspart swatch - One preset.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --color-picker-brightness - The chosen brightness, 0 to 100, as a percentage.
+ * @cssproperty --color-picker-hue - The chosen hue, 0 to 360, unitless.
+ * @cssproperty --color-picker-saturation - The chosen saturation, 0 to 100, as a percentage.
+ * @cssproperty --color-picker-swatch - A colour to paint: the current one on the sample, a preset's on each preset.
  */
 @customElement('helix-base-color-picker')
 export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement) {
@@ -467,7 +477,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
     const painted = toCss(color)
     return html`<div
         part="grid"
-        style="--_hue: ${color.hue}; --_saturation: ${color.saturation}%; --_brightness: ${color.brightness}%"
+        style="--color-picker-hue: ${color.hue}; --color-picker-saturation: ${color.saturation}%; --color-picker-brightness: ${color.brightness}%"
         @pointerdown=${this.handleGridPointer}
         @pointermove=${this.handleGridPointer}
       >
@@ -496,7 +506,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
         />
       </div>
 
-      <div part="controls" style="--_hue: ${color.hue}; --_color: ${painted}">
+      <div part="controls" style="--color-picker-hue: ${color.hue}; --color-picker-swatch: ${painted}">
         <button
           part="sample"
           type="button"
@@ -544,7 +554,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
                     type="button"
                     aria-label=${preset}
                     aria-pressed=${parsed !== null && toCss(parsed) === painted ? 'true' : 'false'}
-                    style="--_color: ${preset}"
+                    style="--color-picker-swatch: ${preset}"
                     ?disabled=${this.isDisabled}
                     @click=${() => this.handleSwatch(preset)}
                   ></button>`

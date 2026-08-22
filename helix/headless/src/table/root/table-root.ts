@@ -29,6 +29,13 @@ import type { HelixBaseTableColumn } from '../column/table-column.js'
  * @csspart table - The grid.
  *
  * @cssproperty --table-columns - Track list for the columns.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @cssproperty --table-template - The column track list, built from the columns the consumer declared.
  */
 @customElement('helix-base-table')
 export class HelixBaseTable extends MixinCollection(HelixElement) {
@@ -133,7 +140,7 @@ export class HelixBaseTable extends MixinCollection(HelixElement) {
       role="table"
       aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label || 'Table'}
-      style=${template ? `--_table-template: ${template}` : ''}
+      style=${template ? `--table-template: ${template}` : ''}
     >
       <div part="head" role="row"><slot name="columns"></slot></div>
       <slot
