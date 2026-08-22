@@ -2847,6 +2847,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderInitials",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark shown where no image loaded, behind a seam a tier can move.\n\nA consumer replaces it by slotting something; a tier above replaces it by\noverriding this, and those answer different people. Written inline it\nanswered only the first, and a styled tier wanting initials drawn its own\nway had to reimplement the whole template to reach three elements.",
+              "inheritedFrom": {
+                "name": "HelixBaseAvatar",
+                "module": "src/avatar/root/avatar-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -4709,6 +4724,21 @@
               "default": "''",
               "description": "What the link declares about where it goes. The consumer's decision.",
               "attribute": "rel",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderSeparator",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark between one crumb and the next.\n\nThe chevron is the slot's own fallback, so replacing it is a matter of\nfilling the slot and costs the consumer no way to opt out of the default.\nThe seam answers the other half: a tier drawing its own separator gets it\nwithout reimplementing the crumb, its link and its current-page branch.",
               "inheritedFrom": {
                 "name": "HelixBaseBreadcrumb",
                 "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
@@ -31995,6 +32025,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderTrigger",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The control that opens it, behind a seam the styled tier can move.\n\nThe same case `SpeedDial` records: a bare `<button>` is what this tier can\nwrite, `helix-button` lives a tier above, and a render method is how a tier\nthat has one reaches this without reimplementing the panel below it.",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -51359,6 +51404,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderTrigger",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The control that opens it, behind a seam the styled tier can move.\n\n**This is the case the tier rule blocks and a render method unblocks.** A\nbare `<button>` is what the headless tier can write: it must not reach for\n`helix-button`, which lives a tier above and would make `headless` depend\non `web`. So the base draws the plain control and a tier that has buttons\nof its own overrides this to use one, which is the whole shape #76 exists\nfor. Written inline the only way to change it was to reimplement the\ntemplate, panel and all.",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -69288,6 +69348,21 @@
               "name": "choose",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderMedia",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "What stands for the row: a thumbnail where there is one, and nothing where\nthere is not.\n\nA seam rather than inline, so a tier can draw a duration badge over it or\na placeholder in its place without reimplementing the row. A consumer\nslots `media` for the same reasons and neither has to know about the other.",
               "inheritedFrom": {
                 "name": "HelixBaseVideoPlaylistItem",
                 "module": "src/video-playlist/item/video-playlist-item.ts"

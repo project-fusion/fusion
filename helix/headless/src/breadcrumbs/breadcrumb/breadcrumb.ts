@@ -83,6 +83,22 @@ export class HelixBaseBreadcrumb extends HelixElement {
     this.internals.ariaCurrent = this.current ? 'page' : null
   }
 
+  /**
+   * The mark between one crumb and the next.
+   *
+   * The chevron is the slot's own fallback, so replacing it is a matter of
+   * filling the slot and costs the consumer no way to opt out of the default.
+   * The seam answers the other half: a tier drawing its own separator gets it
+   * without reimplementing the crumb, its link and its current-page branch.
+   */
+  protected renderSeparator(): TemplateResult {
+    return html`<slot name="separator"
+      ><svg fill="currentColor" viewBox=${caretRight.viewBox}>
+        ${unsafeSVG(caretRight.content)}
+      </svg></slot
+    >`
+  }
+
   protected override render(): TemplateResult {
     /* The label and whatever flanks it, which is the same content whether or
        not it is a link. Built once so the two branches below cannot drift. */
@@ -94,14 +110,8 @@ export class HelixBaseBreadcrumb extends HelixElement {
        contradicting each other in the markup. */
     const linked = this.href !== '' && !this.current
 
-    // The chevron is the slot's own fallback, so replacing it is a matter of
-    // filling the slot and costs the consumer no way to opt out of the default.
     return html`<span part="separator" aria-hidden="true"
-        ><slot name="separator"
-          ><svg fill="currentColor" viewBox=${caretRight.viewBox}>
-            ${unsafeSVG(caretRight.content)}
-          </svg></slot
-        ></span
+        >${this.renderSeparator()}</span
       >${
         linked
           ? html`<a

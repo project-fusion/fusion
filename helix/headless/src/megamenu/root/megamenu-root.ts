@@ -482,21 +482,32 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /**
+   * The control that opens it, behind a seam the styled tier can move.
+   *
+   * The same case `SpeedDial` records: a bare `<button>` is what this tier can
+   * write, `helix-button` lives a tier above, and a render method is how a tier
+   * that has one reaches this without reimplementing the panel below it.
+   */
+  protected renderTrigger(): TemplateResult {
+    return html`<slot name="trigger" @click=${this.handleTriggerClick}>
+      <button
+        part="trigger"
+        type="button"
+        aria-controls="panel"
+        aria-expanded=${this.open ? 'true' : 'false'}
+      >
+        ${this.label}
+      </button>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     /* The listeners sit on the host rather than the trigger, so the panel counts
        as inside it: the top layer changes where the panel is painted and not
        where it is in the tree, so a pointer moving off the trigger and onto the
        panel has not left this element and fires no leave. */
-    return html`<slot name="trigger" @click=${this.handleTriggerClick}>
-        <button
-          part="trigger"
-          type="button"
-          aria-controls="panel"
-          aria-expanded=${this.open ? 'true' : 'false'}
-        >
-          ${this.label}
-        </button>
-      </slot>
+    return html`${this.renderTrigger()}
       <div
         part="panel"
         id="panel"

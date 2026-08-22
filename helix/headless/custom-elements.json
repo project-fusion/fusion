@@ -1397,6 +1397,17 @@
               "readonly": true
             },
             {
+              "kind": "method",
+              "name": "renderInitials",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark shown where no image loaded, behind a seam a tier can move.\n\nA consumer replaces it by slotting something; a tier above replaces it by\noverriding this, and those answer different people. Written inline it\nanswered only the first, and a styled tier wanting initials drawn its own\nway had to reimplement the whole template to reach three elements."
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -2751,6 +2762,17 @@
               "default": "''",
               "description": "What the link declares about where it goes. The consumer's decision.",
               "attribute": "rel"
+            },
+            {
+              "kind": "method",
+              "name": "renderSeparator",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark between one crumb and the next.\n\nThe chevron is the slot's own fallback, so replacing it is a matter of\nfilling the slot and costs the consumer no way to opt out of the default.\nThe seam answers the other half: a tier drawing its own separator gets it\nwithout reimplementing the crumb, its link and its current-page branch."
             },
             {
               "kind": "field",
@@ -23790,6 +23812,17 @@
               "description": "Shuts the panel when a reader takes one of the destinations in it.\n\nNothing closed it before, so a click navigated and left the panel hanging\nover wherever the reader landed. With a router that navigates in place, and\nthis is one, that is a panel covering the page it was asked to go to.\n\n**A modified click leaves it open**, which is the same position this\nelement already takes on middle clicks and the status bar: `cmd` on a link\nopens a tab behind this page rather than navigating it, so the reader is\nstill standing in the menu and collecting, and shutting it under them would\nmake the second choice cost a second open.\n\n`requestOpen(false)` rather than `close()`, for the reason `pointerleave`\ngives: the trigger is not where the reader is going, and pulling focus back\nto a nav bar they have just left is a scroll they did not ask for.\n\n**On the host rather than on the panel**, which is the same reason the\npointer handlers give and one more. A row is slotted light DOM and the\npanel is in the shadow root, so a click only reaches the panel through the\nflattened tree: real ones do, and a DOM that does not implement slot\npropagation never delivers it, which makes every case here pass by never\nrunning this at all. The host is the row's own ancestor in both."
             },
             {
+              "kind": "method",
+              "name": "renderTrigger",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The control that opens it, behind a seam the styled tier can move.\n\nThe same case `SpeedDial` records: a bare `<button>` is what this tier can\nwrite, `helix-button` lives a tier above, and a render method is how a tier\nthat has one reaches this without reimplementing the panel below it."
+            },
+            {
               "kind": "field",
               "name": "open",
               "type": {
@@ -37410,6 +37443,17 @@
                 }
               },
               "description": "Tells a slotted trigger what it is doing, since it cannot know.\n\nThe fallback button is rendered by this element and says so in its own\ntemplate. A trigger the consumer slotted is their markup, and the state it\nneeds to announce is state only this element holds: without this, the\narrangement this component recommends, an icon button slotted as the\ntrigger, is a control that opens a menu and never says it has one.\n\nWritten onto their element rather than asked of them, because a consumer who\nhas to mirror `open` back onto their own trigger is a consumer who will\nforget, and the failure is silent to everyone who can see the screen."
+            },
+            {
+              "kind": "method",
+              "name": "renderTrigger",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The control that opens it, behind a seam the styled tier can move.\n\n**This is the case the tier rule blocks and a render method unblocks.** A\nbare `<button>` is what the headless tier can write: it must not reach for\n`helix-button`, which lives a tier above and would make `headless` depend\non `web`. So the base draws the plain control and a tier that has buttons\nof its own overrides this to use one, which is the whole shape #76 exists\nfor. Written inline the only way to change it was to reimplement the\ntemplate, panel and all."
             },
             {
               "kind": "field",
@@ -51640,6 +51684,17 @@
               "name": "choose",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "renderMedia",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "What stands for the row: a thumbnail where there is one, and nothing where\nthere is not.\n\nA seam rather than inline, so a tier can draw a duration badge over it or\na placeholder in its place without reimplementing the row. A consumer\nslots `media` for the same reasons and neither has to know about the other."
             },
             {
               "kind": "field",

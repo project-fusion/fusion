@@ -108,6 +108,18 @@ export class HelixBaseAvatar extends HelixElement {
       />`
     }
 
+    return this.renderInitials()
+  }
+
+  /**
+   * The mark shown where no image loaded, behind a seam a tier can move.
+   *
+   * A consumer replaces it by slotting something; a tier above replaces it by
+   * overriding this, and those answer different people. Written inline it
+   * answered only the first, and a styled tier wanting initials drawn its own
+   * way had to reimplement the whole template to reach three elements.
+   */
+  protected renderInitials(): TemplateResult {
     return html`<slot>
       <span part="initials" aria-hidden="true">${initialsOf(this.name)}</span>
     </slot>`

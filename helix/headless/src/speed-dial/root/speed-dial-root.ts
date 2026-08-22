@@ -194,25 +194,40 @@ export class HelixBaseSpeedDial extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  protected override render(): TemplateResult {
+  /**
+   * The control that opens it, behind a seam the styled tier can move.
+   *
+   * **This is the case the tier rule blocks and a render method unblocks.** A
+   * bare `<button>` is what the headless tier can write: it must not reach for
+   * `helix-button`, which lives a tier above and would make `headless` depend
+   * on `web`. So the base draws the plain control and a tier that has buttons
+   * of its own overrides this to use one, which is the whole shape #76 exists
+   * for. Written inline the only way to change it was to reimplement the
+   * template, panel and all.
+   */
+  protected renderTrigger(): TemplateResult {
     return html`<slot name="trigger" @click=${this.handleTriggerClick}>
-        <button
-          part="trigger"
-          type="button"
-          aria-expanded=${this.open ? 'true' : 'false'}
-          aria-haspopup="menu"
-          aria-label=${this.label}
-        >
-          ${
-            /* A glyph, because the fallback was an empty `<button>`: a consumer
-               who slots no trigger got a control with nothing in it, and a
-               floating action button whose whole job is to be found. `plus` is
-               what a speed dial opens with everywhere it exists. */
-            ''
-          }
-          ${drawIcon(plus)}
-        </button>
-      </slot>
+      <button
+        part="trigger"
+        type="button"
+        aria-expanded=${this.open ? 'true' : 'false'}
+        aria-haspopup="menu"
+        aria-label=${this.label}
+      >
+        ${
+          /* A glyph, because the fallback was an empty `<button>`: a consumer
+             who slots no trigger got a control with nothing in it, and a
+             floating action button whose whole job is to be found. `plus` is
+             what a speed dial opens with everywhere it exists. */
+          ''
+        }
+        ${drawIcon(plus)}
+      </button>
+    </slot>`
+  }
+
+  protected override render(): TemplateResult {
+    return html`${this.renderTrigger()}
       <div
         part="actions"
         popover="manual"

@@ -103,6 +103,24 @@ export class HelixBaseVideoPlaylistItem extends HelixElement {
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
+  /**
+   * What stands for the row: a thumbnail where there is one, and nothing where
+   * there is not.
+   *
+   * A seam rather than inline, so a tier can draw a duration badge over it or
+   * a placeholder in its place without reimplementing the row. A consumer
+   * slots `media` for the same reasons and neither has to know about the other.
+   */
+  protected renderMedia(): TemplateResult {
+    return html`<slot name="media">
+      ${
+        // `alt=""`, because the row's own words already name it and a
+        // thumbnail repeating them is the same thing said twice.
+        this.poster === '' ? nothing : html`<img part="thumbnail" alt="" src=${this.poster} />`
+      }
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     /* `aria-current="true"`, and absent rather than `"false"` otherwise. A
        reader is told which one is playing; being told about each of the others
@@ -115,17 +133,7 @@ export class HelixBaseVideoPlaylistItem extends HelixElement {
         ?disabled=${this.disabled}
         @click=${this.choose}
       >
-        <span part="media">
-          <slot name="media">
-            ${
-              // `alt=""`, because the row's own words already name it and a
-              // thumbnail repeating them is the same thing said twice.
-              this.poster === ''
-                ? nothing
-                : html`<img part="thumbnail" alt="" src=${this.poster} />`
-            }
-          </slot>
-        </span>
+        <span part="media">${this.renderMedia()}</span>
         <span part="label">
           <slot></slot>
           <slot name="meta"></slot>
