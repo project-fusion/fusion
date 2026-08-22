@@ -923,6 +923,15 @@ export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
      token is what the token layer calls it, which is the same direction the
      `foreground-on-accent` rename went. */
   const { body, display, mono } = theme.intent.font
+  if (body ?? display ?? mono) {
+    /* **The block names the faces and does not fetch them**, which is the line
+       between a preview and an artifact. A builder trying a face on may reach
+       for whatever host has it; a block a consumer pastes into their own
+       stylesheet must not thereby acquire a dependency on a host they did not
+       pick. So the theme says what it assumes and leaves the loading to whoever
+       owns the page. */
+    lines.push('  /* Assumes these faces are already loaded. */')
+  }
   if (body) {
     lines.push(`  --${namespace}-font-sans: ${body};`)
   }

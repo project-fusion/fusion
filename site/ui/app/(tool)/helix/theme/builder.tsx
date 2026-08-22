@@ -45,30 +45,50 @@ const SCOPE = '[data-theme="preview"]'
 const PREVIEW_SHARE = 68
 
 /**
- * The faces on offer.
+ * The faces on offer, fetched rather than vendored.
  *
- * **Stacks the reader already has, not web fonts.** A builder that loaded
- * Inter to show it would be measuring a page against a face the consumer's own
- * page may not ship, and the first thing a wrong face does is change every line
- * length in the preview. These resolve on the machine looking at them, which is
- * what a preview is for.
+ * **A preview is not a deployment, which is what makes this fine here.** The
+ * Sovereignty Constraint is about what a Fusion product does to a consumer's
+ * page: `site/ui/app/fonts.ts` vendors the site's own three faces precisely so
+ * the wordmark does not sit behind someone else's uptime. Nothing here ships to
+ * anybody. A reader is trying faces on, and trying one on means fetching it.
  *
- * The empty value is the stylesheet's own stack, so "leave it alone" is a
- * choice a reader can make and can come back to.
+ * **What is emitted stays free of it.** The artifact names the family and
+ * nothing more, because a consumer pasting the block into their own stylesheet
+ * should not thereby acquire a dependency on a host they did not pick. The
+ * block says which faces it assumes and leaves the loading to them.
+ *
+ * `family` is what CSS is given; `google` is the request, with the weights the
+ * token layer actually uses. The empty value is the stylesheet's own stack.
  */
-const FACES = [
-  { label: 'System sans', value: '' },
-  { label: 'Georgia, a serif', value: 'Georgia, "Times New Roman", serif' },
-  { label: 'Palatino, a book serif', value: '"Palatino Linotype", Palatino, Palladio, serif' },
-  { label: 'Verdana, a wide sans', value: 'Verdana, Geneva, sans-serif' },
-  { label: 'Trebuchet, a humanist sans', value: '"Trebuchet MS", Tahoma, sans-serif' },
-] as const
+interface Face {
+  family: string
+  google?: string
+  label: string
+}
 
-const MONO_FACES = [
-  { label: 'System mono', value: '' },
-  { label: 'Courier', value: '"Courier New", Courier, monospace' },
-  { label: 'Consolas', value: 'Consolas, "Liberation Mono", monospace' },
-] as const
+const SYSTEM: Face = { family: '', label: 'System default' }
+
+const FACES: Face[] = [
+  SYSTEM,
+  { family: 'Inter', google: 'Inter:wght@400;500;600', label: 'Inter' },
+  { family: 'DM Sans', google: 'DM+Sans:wght@400;500;700', label: 'DM Sans' },
+  { family: 'Work Sans', google: 'Work+Sans:wght@400;500;600', label: 'Work Sans' },
+  { family: 'Fraunces', google: 'Fraunces:wght@400;500;600', label: 'Fraunces' },
+  { family: 'Playfair Display', google: 'Playfair+Display:wght@400;500;600', label: 'Playfair' },
+  { family: 'Source Serif 4', google: 'Source+Serif+4:wght@400;500;600', label: 'Source Serif' },
+]
+
+const MONO_FACES: Face[] = [
+  { family: '', label: 'System mono' },
+  { family: 'JetBrains Mono', google: 'JetBrains+Mono:wght@400;500', label: 'JetBrains Mono' },
+  { family: 'IBM Plex Mono', google: 'IBM+Plex+Mono:wght@400;500', label: 'IBM Plex Mono' },
+  { family: 'Space Mono', google: 'Space+Mono:wght@400;700', label: 'Space Mono' },
+]
+
+/** The stack a face becomes, so a fetch that has not landed still reads. */
+const stack = (family: string, fallback: string): string =>
+  family ? `"${family}", ${fallback}` : ''
 
 type Mechanism = 'border' | 'fill' | 'shadow' | 'space'
 
@@ -86,6 +106,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
   const [bodyFace, setBodyFace] = useState('')
   const [displayFace, setDisplayFace] = useState('')
   const [monoFace, setMonoFace] = useState('')
+  const [motion, setMotion] = useState<'' | 'gentle' | 'snappy' | 'springy'>('')
   const [surface, setSurface] = useState<Mechanism>('border')
   const [floating, setFloating] = useState<Mechanism>('shadow')
 
@@ -105,7 +126,8 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     floating === 'shadow' &&
     bodyFace === '' &&
     displayFace === '' &&
-    monoFace === ''
+    monoFace === '' &&
+    motion === ''
 
   const reset = (): void => {
     setBrand(BRAND)
@@ -121,6 +143,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     setBodyFace('')
     setDisplayFace('')
     setMonoFace('')
+    setMotion('')
   }
 
   const intent: ThemeIntent = useMemo(
@@ -130,10 +153,11 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       chroma: { scale: chromaScale / 100 },
       contrastTarget,
       density: density / 100,
+      ...(motion ? { motion: { character: motion } } : {}),
       font: {
-        ...(bodyFace ? { body: bodyFace } : {}),
-        ...(displayFace ? { display: displayFace } : {}),
-        ...(monoFace ? { mono: monoFace } : {}),
+        ...(bodyFace ? { body: stack(bodyFace, 'system-ui, sans-serif') } : {}),
+        ...(displayFace ? { display: stack(displayFace, 'system-ui, sans-serif') } : {}),
+        ...(monoFace ? { mono: stack(monoFace, 'ui-monospace, monospace') } : {}),
       },
       radius: radius / 100,
       scheme,
@@ -151,6 +175,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       displayFace,
       floating,
       monoFace,
+      motion,
       radius,
       scheme,
       surface,
@@ -207,6 +232,34 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     document.head.append(tag)
     return () => tag.remove()
   }, [css])
+
+  /* **Only the faces actually chosen, and only while they are chosen.**
+     Requesting the whole list up front would fetch five faces to show one, and
+     leaving the old link behind on every change would accumulate one per
+     selection for the length of the session. The effect owns exactly one tag
+     and takes it away again.
+
+     `display=swap`, so a face that has not landed shows the fallback rather
+     than nothing: a preview whose text disappears while a font downloads is
+     worse than one that reflows. */
+  useEffect(() => {
+    const wanted = [bodyFace, displayFace, monoFace]
+      .map((family) => [...FACES, ...MONO_FACES].find((face) => face.family === family)?.google)
+      .filter((request): request is string => Boolean(request))
+
+    if (wanted.length === 0) {
+      return
+    }
+
+    const unique = [...new Set(wanted)]
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = `https://fonts.googleapis.com/css2?${unique
+      .map((request) => `family=${request}`)
+      .join('&')}&display=swap`
+    document.head.append(link)
+    return () => link.remove()
+  }, [bodyFace, displayFace, monoFace])
 
   const counts = theme.pairings.reduce<Record<string, number>>((all, pair) => {
     all[pair.status] = (all[pair.status] ?? 0) + 1
@@ -402,7 +455,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
               {FACES.map((face) => (
-                <helix-option key={face.label} value={face.value}>
+                <helix-option key={face.label} value={face.family}>
                   {face.label}
                 </helix-option>
               ))}
@@ -417,7 +470,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
               {FACES.map((face) => (
-                <helix-option key={face.label} value={face.value}>
+                <helix-option key={face.label} value={face.family}>
                   {face.label}
                 </helix-option>
               ))}
@@ -431,7 +484,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
               {MONO_FACES.map((face) => (
-                <helix-option key={face.label} value={face.value}>
+                <helix-option key={face.label} value={face.family}>
                   {face.label}
                 </helix-option>
               ))}
@@ -452,6 +505,23 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               step={10}
               value={String(allowance)}
             ></helix-slider>
+
+            {/* **Character rather than a duration**, because the pace and the
+              curve are one decision: a spring over 120ms is a twitch and a soft
+              curve over 120ms is a fade. Leaving it alone emits neither, so the
+              stylesheet's own pace stands. */}
+            <helix-toggle-group
+              label="Motion"
+              onhelix-change={(event) =>
+                setMotion(event.detail.value as '' | 'gentle' | 'snappy' | 'springy')
+              }
+              value={motion}
+            >
+              <helix-toggle value="">Default</helix-toggle>
+              <helix-toggle value="snappy">Snappy</helix-toggle>
+              <helix-toggle value="gentle">Gentle</helix-toggle>
+              <helix-toggle value="springy">Springy</helix-toggle>
+            </helix-toggle-group>
 
             {/* Two policies rather than one, because the two kinds of surface are
               not the same problem: a card sits on a ground the theme knows and a
