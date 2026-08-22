@@ -2,6 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseLegend } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as seriesStyles } from '../../chart/series.css.js'
 import { styles } from './legend-root.css.js'
 
 /**
@@ -29,7 +30,7 @@ import { styles } from './legend-root.css.js'
  */
 @customElement('helix-legend')
 export class HelixLegend extends HelixBaseLegend {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [seriesStyles, styles]
 
   /**
    * Where the legend sits and which way its entries run.

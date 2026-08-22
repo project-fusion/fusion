@@ -105,6 +105,7 @@ export class HelixBaseLegend extends HelixElement {
         (name, index) => html`<li
           data-series=${(index % PALETTE) + 1}
           part="entry"
+          style="--chart-series: var(--chart-series-${(index % PALETTE) + 1})"
           role="listitem"
         >
           <span aria-hidden="true" part="swatch"></span>

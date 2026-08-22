@@ -308,6 +308,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
       data-active=${this.pointer.at === index ? '' : nothing}
       data-series=${seriesIndex(index)}
       fill="none"
+      style="--chart-series: var(--chart-series-${seriesIndex(index)})"
       @pointerenter=${() => this.pointer.set(index)}
       part="segment"
       r=${this.radius}

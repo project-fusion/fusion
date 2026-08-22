@@ -42,6 +42,15 @@
   gap: 0.5rem;
 }
 
+helix-base-donut-chart {
+  --chart-series-1: #2a2a2e;
+  --chart-series-2: #4a4a50;
+  --chart-series-3: #6b6b73;
+  --chart-series-4: #8e8e96;
+  --chart-series-5: #b1b1b8;
+  --chart-series-6: #d2d2d7;
+}
+
 helix-base-donut-chart::part(tooltip) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
@@ -53,6 +62,12 @@ helix-base-donut-chart::part(mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+helix-base-donut-chart::part(segment) {
+  fill: none;
+  stroke: var(--chart-series);
+  stroke-width: var(--donut-chart-stroke);
 }
 
 helix-base-donut-chart::part(track) {

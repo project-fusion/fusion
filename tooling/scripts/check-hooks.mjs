@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * A documented CSS hook has to be read by a rule, or it does nothing at all.
+ * A documented CSS hook has to be read somewhere, or it does nothing at all.
  *
  * `@cssproperty` is how a component publishes a custom property a consumer may
  * set. It reaches the manifest, the reference doc and the API page, so a name
@@ -57,6 +57,9 @@ const ours = (name) => !name.startsWith('--_') && !name.startsWith('--helix-')
 
 const declared = new Map()
 const read = new Map()
+/* Prefixes read through an interpolation, so `--chart-series-7` counts as read
+   because something reads `var(--chart-series-${…})`. */
+const families = new Map()
 
 for (const tier of TIERS) {
   for (const path of walk(tier).filter(isSource)) {
@@ -73,13 +76,44 @@ for (const tier of TIERS) {
         }
       }
     }
+    /* A `style="--a: var(--b)"` in a template is a read too, and missing it
+       reported twenty-four live hooks as dead. The charts put the series index
+       into CSS this way precisely because CSS cannot count it: the component
+       writes `--chart-series: var(--chart-series-3)` onto the rectangle, so
+       `--chart-series-3` is read by the component rather than by a rule. Only
+       inside a `style=` attribute, so an ordinary `var()` in prose or in a
+       comment still does not count as one. */
+    if (extname(path) === '.ts') {
+      for (const [, attribute] of text.matchAll(/style="([^"]*)"/g)) {
+        /* A family read through an interpolation, `var(--chart-series-${n})`.
+           The number is chosen at runtime, so no literal `--chart-series-7`
+           exists anywhere and matching names alone reported twenty-four live
+           hooks as dead. What the component states is that it reads the whole
+           family, so that is what is recorded. */
+        for (const [, prefix] of attribute.matchAll(/var\(\s*(--[a-z0-9-]+)-\$\{/g)) {
+          if (ours(prefix)) {
+            families.set(prefix, path)
+          }
+        }
+        for (const [, name] of attribute.matchAll(/var\(\s*(--[a-z0-9-]+)\)/g)) {
+          if (ours(name) && !read.has(name)) {
+            read.set(name, path)
+          }
+        }
+      }
+    }
   }
 }
 
 const problems = []
 
+const inFamily = (name) => {
+  const at = name.lastIndexOf('-')
+  return at > 0 && /^\d+$/.test(name.slice(at + 1)) && families.has(name.slice(0, at))
+}
+
 for (const [name, path] of [...declared].sort()) {
-  if (!read.has(name)) {
+  if (!read.has(name) && !inFamily(name)) {
     problems.push(
       `${path}: documents \`${name}\` and no rule reads it. A hook nothing reads ` +
         'is listed on the API page and does nothing when a consumer sets it.',

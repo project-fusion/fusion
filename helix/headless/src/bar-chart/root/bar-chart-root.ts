@@ -289,7 +289,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     const lone = series.filter(own)
     const tint =
       lone.length === 1 && lone[0] !== undefined
-        ? `--bar-chart-secondary: var(--helix-color-series-${seriesIndex(series.indexOf(lone[0]))})`
+        ? `--bar-chart-secondary: var(--chart-series-${seriesIndex(series.indexOf(lone[0]))})`
         : undefined
 
     return html`${
@@ -368,6 +368,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
         ? svg`<rect
             data-series=${seriesIndex(tone)}
             height=${thickness}
+            style="--chart-series: var(--chart-series-${seriesIndex(tone)})"
             part="bar"
             width=${size}
             x=${along}
@@ -376,6 +377,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
         : svg`<rect
             data-series=${seriesIndex(tone)}
             height=${size}
+            style="--chart-series: var(--chart-series-${seriesIndex(tone)})"
             part="bar"
             width=${thickness}
             x=${across}
@@ -594,6 +596,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
       d=${linePath(points, 'straight')}
       data-series=${seriesIndex(depth)}
       part="line"
+      style="--chart-series: var(--chart-series-${seriesIndex(depth)})"
     />`
   }
 

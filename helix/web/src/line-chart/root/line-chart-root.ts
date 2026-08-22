@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseLineChart } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { styles as seriesStyles } from '../../chart/series.css.js'
 import { styles } from './line-chart-root.css.js'
 import '../../tooltip/index.js'
 
@@ -35,7 +36,7 @@ import '../../tooltip/index.js'
  */
 @customElement('helix-line-chart')
 export class HelixLineChart extends HelixBaseLineChart {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [seriesStyles, styles]
 }
 
 declare global {

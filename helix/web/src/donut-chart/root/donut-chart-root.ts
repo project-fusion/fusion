@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseDonutChart } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { styles as seriesStyles } from '../../chart/series.css.js'
 import { styles } from './donut-chart-root.css.js'
 import '../../tooltip/index.js'
 
@@ -37,7 +38,7 @@ import '../../tooltip/index.js'
  */
 @customElement('helix-donut-chart')
 export class HelixDonutChart extends HelixBaseDonutChart {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [seriesStyles, styles]
 }
 
 declare global {

@@ -7578,6 +7578,26 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/chart/series.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/chart/series.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/chart/terminus.css.ts",
       "declarations": [
         {

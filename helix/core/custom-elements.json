@@ -3764,8 +3764,110 @@
         },
         {
           "kind": "class",
-          "description": "The public surface `MixinChartSource` adds.\n\nDeclared separately because TypeScript cannot emit declarations for an\nanonymous class that has private or protected members (TS4094), and every\nclass extending `HelixElement` inherits protected `willUpdate` and `updated`.\nReturning the class directly was tried and refused for exactly that.\n\n**Every member here is documented twice, and that is the convention rather\nthan an oversight.** TypeScript reads this interface; the analyzer reads the\ninner class. Documented only here, `helix-convention-lint` failed the build\nwith six `Public member has no description` on three charts that had just\nbeen given a shared, fully documented property.\n\n**The protected members are declared here too, and have to be.** Cast to an\ninterface holding only `for` and `label`, `series` and `named` vanished from\nthe emitted `.d.ts` and every chart failed with `Property 'series' does not\nexist`. A mixin's interface is not its public API, it is everything a\nsubclass can see.",
+          "description": "The public surface `MixinChartSource` adds.\n\nDeclared separately because TypeScript cannot emit declarations for an\nanonymous class that has private or protected members (TS4094), and every\nclass extending `HelixElement` inherits protected `willUpdate` and `updated`.\nReturning the class directly was tried and refused for exactly that.\n\n**Every member here is documented twice, and that is the convention rather\nthan an oversight.** TypeScript reads this interface; the analyzer reads the\ninner class. Documented only here, `helix-convention-lint` failed the build\nwith six `Public member has no description` on three charts that had just\nbeen given a shared, fully documented property.\n\n**The protected members are declared here too, and have to be.** Cast to an\ninterface holding only `for` and `label`, `series` and `named` vanished from\nthe emitted `.d.ts` and every chart failed with `Property 'series' does not\nexist`. A mixin's interface is not its public API, it is everything a\nsubclass can see.\n\n**The series palette, and the one property every chart's mark reads.** A\nchart knows which series a bar belongs to and CSS cannot count it, so the\nheadless tier writes `--chart-series: var(--chart-series-3)` onto the\nrectangle and each styled sheet is one rule rather than twenty-four.\n\nDeclared here because this is where `seriesIndex` and `PALETTE` live, and\nbecause a hook repeated on four families is a hook four families have to keep\nagreeing about, which is the mistake the `PALETTE` comment above already\nrecords somebody making.\n\nThe numbered twenty-four are the seam between the tiers: `chart/series.css`\npoints each at a semantic token, which is a decision and so belongs to the\nstyled tier, and a consumer on `headless` sets the same names to whatever\nthey like. The base examples set them to a ramp of grays.",
           "name": "MixinChartSourceInterface",
+          "cssProperties": [
+            {
+              "description": "The colour of the mark this is set on. Written by the component, read by the sheet that paints.",
+              "name": "--chart-series"
+            },
+            {
+              "description": "The colour of series 1. The styled tier points it at a palette token.",
+              "name": "--chart-series-1"
+            },
+            {
+              "description": "The colour of series 2. The styled tier points it at a palette token.",
+              "name": "--chart-series-2"
+            },
+            {
+              "description": "The colour of series 3. The styled tier points it at a palette token.",
+              "name": "--chart-series-3"
+            },
+            {
+              "description": "The colour of series 4. The styled tier points it at a palette token.",
+              "name": "--chart-series-4"
+            },
+            {
+              "description": "The colour of series 5. The styled tier points it at a palette token.",
+              "name": "--chart-series-5"
+            },
+            {
+              "description": "The colour of series 6. The styled tier points it at a palette token.",
+              "name": "--chart-series-6"
+            },
+            {
+              "description": "The colour of series 7. The styled tier points it at a palette token.",
+              "name": "--chart-series-7"
+            },
+            {
+              "description": "The colour of series 8. The styled tier points it at a palette token.",
+              "name": "--chart-series-8"
+            },
+            {
+              "description": "The colour of series 9. The styled tier points it at a palette token.",
+              "name": "--chart-series-9"
+            },
+            {
+              "description": "The colour of series 10. The styled tier points it at a palette token.",
+              "name": "--chart-series-10"
+            },
+            {
+              "description": "The colour of series 11. The styled tier points it at a palette token.",
+              "name": "--chart-series-11"
+            },
+            {
+              "description": "The colour of series 12. The styled tier points it at a palette token.",
+              "name": "--chart-series-12"
+            },
+            {
+              "description": "The colour of series 13. The styled tier points it at a palette token.",
+              "name": "--chart-series-13"
+            },
+            {
+              "description": "The colour of series 14. The styled tier points it at a palette token.",
+              "name": "--chart-series-14"
+            },
+            {
+              "description": "The colour of series 15. The styled tier points it at a palette token.",
+              "name": "--chart-series-15"
+            },
+            {
+              "description": "The colour of series 16. The styled tier points it at a palette token.",
+              "name": "--chart-series-16"
+            },
+            {
+              "description": "The colour of series 17. The styled tier points it at a palette token.",
+              "name": "--chart-series-17"
+            },
+            {
+              "description": "The colour of series 18. The styled tier points it at a palette token.",
+              "name": "--chart-series-18"
+            },
+            {
+              "description": "The colour of series 19. The styled tier points it at a palette token.",
+              "name": "--chart-series-19"
+            },
+            {
+              "description": "The colour of series 20. The styled tier points it at a palette token.",
+              "name": "--chart-series-20"
+            },
+            {
+              "description": "The colour of series 21. The styled tier points it at a palette token.",
+              "name": "--chart-series-21"
+            },
+            {
+              "description": "The colour of series 22. The styled tier points it at a palette token.",
+              "name": "--chart-series-22"
+            },
+            {
+              "description": "The colour of series 23. The styled tier points it at a palette token.",
+              "name": "--chart-series-23"
+            },
+            {
+              "description": "The colour of series 24. The styled tier points it at a palette token.",
+              "name": "--chart-series-24"
+            }
+          ],
           "members": [
             {
               "kind": "field",

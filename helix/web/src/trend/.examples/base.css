@@ -48,6 +48,15 @@
   gap: 0.5rem;
 }
 
+helix-base-trend {
+  --chart-series-1: #2a2a2e;
+  --chart-series-2: #4a4a50;
+  --chart-series-3: #6b6b73;
+  --chart-series-4: #8e8e96;
+  --chart-series-5: #b1b1b8;
+  --chart-series-6: #d2d2d7;
+}
+
 helix-base-trend::part(icon) {
   block-size: 1em;
   flex: none;

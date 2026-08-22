@@ -59,98 +59,17 @@
  * point a chart of twelve painted series nine from the palette and its legend
  * painted the same entry series one: the two disagreeing is the one thing the
  * legend exists to prevent. */
-[part="entry"][data-series="1"] [part="swatch"] {
-  background-color: var(--helix-color-series-1);
-}
+/* One rule, not twenty-four. The headless tier knows which series a mark
+   belongs to and writes `--chart-series` onto it, pointing at one of the
+   twenty-four hooks `chart/series.css` defines, so the index reaches CSS
+   without an attribute selector having to carry it.
 
-[part="entry"][data-series="2"] [part="swatch"] {
-  background-color: var(--helix-color-series-2);
-}
-
-[part="entry"][data-series="3"] [part="swatch"] {
-  background-color: var(--helix-color-series-3);
-}
-
-[part="entry"][data-series="4"] [part="swatch"] {
-  background-color: var(--helix-color-series-4);
-}
-
-[part="entry"][data-series="5"] [part="swatch"] {
-  background-color: var(--helix-color-series-5);
-}
-
-[part="entry"][data-series="6"] [part="swatch"] {
-  background-color: var(--helix-color-series-6);
-}
-
-[part="entry"][data-series="7"] [part="swatch"] {
-  background-color: var(--helix-color-series-7);
-}
-
-[part="entry"][data-series="8"] [part="swatch"] {
-  background-color: var(--helix-color-series-8);
-}
-
-[part="entry"][data-series="9"] [part="swatch"] {
-  background-color: var(--helix-color-series-9);
-}
-
-[part="entry"][data-series="10"] [part="swatch"] {
-  background-color: var(--helix-color-series-10);
-}
-
-[part="entry"][data-series="11"] [part="swatch"] {
-  background-color: var(--helix-color-series-11);
-}
-
-[part="entry"][data-series="12"] [part="swatch"] {
-  background-color: var(--helix-color-series-12);
-}
-
-[part="entry"][data-series="13"] [part="swatch"] {
-  background-color: var(--helix-color-series-13);
-}
-
-[part="entry"][data-series="14"] [part="swatch"] {
-  background-color: var(--helix-color-series-14);
-}
-
-[part="entry"][data-series="15"] [part="swatch"] {
-  background-color: var(--helix-color-series-15);
-}
-
-[part="entry"][data-series="16"] [part="swatch"] {
-  background-color: var(--helix-color-series-16);
-}
-
-[part="entry"][data-series="17"] [part="swatch"] {
-  background-color: var(--helix-color-series-17);
-}
-
-[part="entry"][data-series="18"] [part="swatch"] {
-  background-color: var(--helix-color-series-18);
-}
-
-[part="entry"][data-series="19"] [part="swatch"] {
-  background-color: var(--helix-color-series-19);
-}
-
-[part="entry"][data-series="20"] [part="swatch"] {
-  background-color: var(--helix-color-series-20);
-}
-
-[part="entry"][data-series="21"] [part="swatch"] {
-  background-color: var(--helix-color-series-21);
-}
-
-[part="entry"][data-series="22"] [part="swatch"] {
-  background-color: var(--helix-color-series-22);
-}
-
-[part="entry"][data-series="23"] [part="swatch"] {
-  background-color: var(--helix-color-series-23);
-}
-
-[part="entry"][data-series="24"] [part="swatch"] {
-  background-color: var(--helix-color-series-24);
+   It was twenty-four rules keyed on `[data-series]`, which worked from in here
+   and could not be reached from outside: `::part()` takes no attribute
+   selector, so a consumer looking at `data-series="2"` written on the part had
+   no selector able to use it. Measured, `::part(bar)[data-series="2"]` is
+   dropped at parse time. `data-series` stays, because it is what a spec asserts
+   and what a document rule reaching in through the light DOM would still use. */
+[part="entry"] [part="swatch"] {
+  background-color: var(--chart-series);
 }
