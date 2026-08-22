@@ -8,7 +8,7 @@
  * count on screen cannot be wrong.
  *
  * The card art is the other half and is hand-written, keyed by that same slug in
- * five files under `site/ui/lib/component-art`. Two things about it are silent:
+ * five files under `helix/gallery/src`. Two things about it are silent:
  *
  * - **A family with no entry renders nothing**, deliberately: Card's media
  *   region is a bare `<slot>`, so an unassigned one generates no box and a new
@@ -33,7 +33,7 @@ const MANIFESTS = [
   'helix/headless/custom-elements.json',
   'helix/sandbox/custom-elements.json',
 ]
-const ART = 'site/ui/lib/component-art'
+const ART = 'helix/gallery/src'
 
 /* The same derivation the catalog uses, so this cannot disagree with the page:
    a family is the first path segment under `src/` of a module that declares a

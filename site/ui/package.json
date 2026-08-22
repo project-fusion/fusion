@@ -14,6 +14,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@helix-io/gallery": "workspace:*",
     "@helix-io/sandbox": "workspace:*",
     "@helix-io/styles": "workspace:*",
     "@helix-io/theme": "workspace:*",

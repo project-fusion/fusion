@@ -18,11 +18,11 @@ import { toolingArt } from './tooling'
  * `@helix-io/sandbox`. Counting directories is how five families were missed on
  * the first pass, and the count that matters is whatever `getFamilies` returns.
  *
- * **This is moving to `@helix-io/gallery`, and has not yet.** Art is versioned
- * content about components rendered by a site, which is exactly what
- * `@helix-io/docs` already is, so it belongs beside it rather than inside the
- * app that renders it: lockstep-versioned so a consumer's cards match their
- * Helix version, private, and TSX with its stylesheet kept together.
+ * **This is `@helix-io/gallery`, and the move is why.** Art is versioned content
+ * about components rendered by a site, which is exactly what `@helix-io/docs`
+ * already is, so it belongs beside it rather than inside the app that renders
+ * it: lockstep-versioned so a consumer's cards match their Helix version,
+ * private, and TSX with its stylesheet kept together in `gallery.css`.
  *
  * Not in `helix/web`, which has no React and no JSX transform, and which every
  * consumer installs: documentation illustration in the component library is the
@@ -33,6 +33,12 @@ import { toolingArt } from './tooling'
  * 54 of them move. Keeping either property means fetching and inlining
  * 57 files at build time, which is a docs build that breaks when the
  * CDN does.
+ *
+ * **The site is a consumer and is named nowhere in here.** What crossed with
+ * the move was one class: the motion rules keyed on `.familyCard:hover`, the
+ * site's own wrapper, and now read `:has(> .componentArt):hover`, which is the
+ * element holding this drawing whatever the consumer calls it. `gallery.css`
+ * carries the argument.
  *
  * No manifest annotation with it. The mapping is slug to slug, one to one by
  * name, and `check:art` already holds the two sets equal in both directions;

@@ -594,11 +594,13 @@ export const contentArt: Record<string, ReactNode> = {
     <>
       <g className="artMotion artOpen">
         <rect className="artRaised" height="128" rx="4" width="128" x="96" y="36" />
-        {[
-          [112, 52],
-          [176, 52],
-          [112, 116],
-        ].map(([x, y]) => (
+        {(
+          [
+            [112, 52],
+            [176, 52],
+            [112, 116],
+          ] as const
+        ).map(([x, y]) => (
           <g key={`${x}-${y}`}>
             <rect className="artInk" fillOpacity="0.55" height="32" rx="2" width="32" x={x} y={y} />
             <rect className="artRaised" height="20" rx="1" width="20" x={x + 6} y={y + 6} />
@@ -613,18 +615,20 @@ export const contentArt: Record<string, ReactNode> = {
             />
           </g>
         ))}
-        {[
-          [152, 92],
-          [164, 92],
-          [152, 104],
-          [176, 104],
-          [188, 92],
-          [152, 128],
-          [164, 140],
-          [188, 128],
-          [176, 140],
-          [188, 152],
-        ].map(([x, y], index) => (
+        {(
+          [
+            [152, 92],
+            [164, 92],
+            [152, 104],
+            [176, 104],
+            [188, 92],
+            [152, 128],
+            [164, 140],
+            [188, 128],
+            [176, 140],
+            [188, 152],
+          ] as const
+        ).map(([x, y], index) => (
           <rect
             className="artInk artMotion artRow"
             fillOpacity="0.28"

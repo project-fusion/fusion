@@ -57,7 +57,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
 ## Layout
 
 ```
-helix/     styles core headless web react icons theme cem docs
+helix/     styles core headless web react icons theme cem docs gallery
 cortex/    core trace engram docs
 docs/      company strategy, tracked
 tooling/   CI and build scripts

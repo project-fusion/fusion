@@ -1,6 +1,6 @@
+import { ComponentArt } from '@helix-io/gallery'
 import Link from 'next/link'
 import { type Family, getFamilies } from '../../../lib/catalog'
-import { ComponentArt } from '../../../lib/component-art'
 import { findVertical, stageAppearance } from '../../verticals'
 import { ComponentBrowser } from './component-browser'
 

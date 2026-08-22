@@ -1,0 +1,613 @@
+/*
+ * The card art, and the whole of what this package draws.
+ *
+ * **Kept beside the TSX because neither half is the drawing.** Every figure in
+ * `src/*.tsx` is geometry and class names, and every colour, every surface step
+ * and all thirteen motions are here: split across two packages, a drawing would
+ * name a class nothing defined and read as a component that failed to render.
+ * They version together for the same reason they ship together.
+ *
+ * **The hover surface is asked for by shape, not by name.** These rules read
+ * `.familyCard:hover` while they lived in the site, which is the site's own
+ * class for the link wrapping each card, and a package cannot know it: the art
+ * is content about a component and whatever it is put on is the consumer's
+ * business. `:has(> .componentArt):hover` says what the rule always meant,
+ * that the element holding this drawing is being pointed at, and it holds for
+ * a card, a list row, or a figure in a page, none of which this has to be told
+ * about. Measured equivalent on the gallery: the same thirteen animations run
+ * on the same pointer, because `helix-card` is what directly holds the `<svg>`
+ * and it fills the link that used to be named here.
+ *
+ * Import it once, beside the base layer:
+ *
+ *     import '@helix-io/gallery/gallery.css'
+ *
+ * A plain document stylesheet and not a shadow one, because the art is light
+ * DOM: it is slotted into a card's media region, so it is styled by the page
+ * the same way the card's own slotted heading is.
+ */
+
+/* The abstract drawing on a family's gallery card.
+ *
+ * `background`, the page's own color, so the media reads as a window onto a
+ * page rather than as a panel on a card. That suits what is drawn on it: every
+ * one of these is a picture of page content, and several are literally a page
+ * with something on it.
+ *
+ * It is the one surface in the ladder that is not a step *away* from the page,
+ * because it is the page: pure white in light and pure black in dark, either
+ * side of the card's own `surface`. So the separation runs in opposite
+ * directions per mode, a hair lighter than the card in light and clearly darker
+ * in dark, and no divider is needed in either.
+ *
+ * The rest is the card's job. It is slotted into `media`, which the card pulls
+ * out to its own border with a negative inset and clips to its corner radius,
+ * so a border or a radius stated here would draw a second frame inside the
+ * first.
+ *
+ * **Do not add `inline-size` here.** The card sets `inline-size: calc(100% +
+ * inset * 2)` on the slotted element through `::slotted()`, and a normal
+ * declaration in the outer tree beats an inner tree's `::slotted()` rule at any
+ * specificity. A `100%` here would silently un-bleed every card's art. */
+.componentArt {
+  aspect-ratio: 16 / 10;
+  background: var(--helix-color-background);
+  display: block;
+}
+
+/* The palette, and every value in it is a semantic token.
+ *
+ * The drawings used to be one fill at a ramp of alphas, which was legible but
+ * said nothing: a panel and a page and a scrim were the same gray at different
+ * strengths. Naming the real token instead means each shape is *the thing it
+ * depicts* — a floating panel is `surface-overlay`, a dimmed page is `overlay`,
+ * a tooltip is `surface-inverse` and flips with the mode on its own. It also
+ * means the whole gallery follows a rebrand, a density change or the border
+ * lightening, none of which a hardcoded rgba could.
+ *
+ * Ink is the exception and stays a percentage of `foreground`, for the reason
+ * the button's own fill gives in `base.css`: a percentage of the foreground is
+ * a step away from whatever it sits on in either mode, which a fixed neutral
+ * cannot be. Three steps only — 0.12, 0.28, 0.55 — and the top one is
+ * deliberately short of the real text color, because a solid bar standing in
+ * for text has no counters and reads heavier than the words it represents. */
+.artPage {
+  fill: var(--helix-color-background);
+}
+
+.artSunken {
+  fill: var(--helix-color-surface-sunken);
+}
+
+.artSurface {
+  fill: var(--helix-color-surface);
+}
+
+.artRaised {
+  fill: var(--helix-color-surface-raised);
+}
+
+/* Anything that floats: a dialog, a menu, a select's list, a toast. */
+.artOverlay {
+  fill: var(--helix-color-surface-overlay);
+}
+
+/* The mode's opposite. Only a tooltip, which is the one component that inverts
+   rather than lifts, and it flips on its own when the mode changes.
+
+   Pulled back in light mode by the same amount as `artSolid`, for the same
+   reason and to keep the two in step. They are the same color doing two jobs,
+   so softening one and not the other left the tooltip as the single pure-black
+   mark on the sheet, which read as an oversight rather than as an inversion. */
+.artInverse {
+  fill: light-dark(
+    color-mix(in oklab, var(--helix-color-surface-inverse) 60%, var(--helix-color-background)),
+    var(--helix-color-surface-inverse)
+  );
+}
+
+.artOnInverse {
+  fill: var(--helix-color-foreground-inverse);
+}
+
+/* The real scrim token, so a dimmed page in a drawing is dimmed by exactly what
+   dims a page. */
+.artScrim {
+  fill: var(--helix-color-overlay);
+}
+
+/* Emphasis, and it is monotone on purpose.
+ *
+ * This was `primary`, which put a blue mark on roughly half the grid — a
+ * selected date, a slider's fill, every solid button, a toast's leading edge.
+ * Color there was decoration rather than information: forty of the fifty-four
+ * families have no semantic color, so the accent was only ever saying "this
+ * one is emphasised", which weight says just as well and more quietly.
+ *
+ * `surface-inverse` rather than `foreground`, because the thing being drawn is
+ * a filled control rather than a mark: it is the mode's opposite, so it is a
+ * dark plate in light and a light one in dark, and it carries
+ * `foreground-inverse` for whatever sits on it. Both flip on their own.
+ *
+ * Pulled back toward the page in light mode, and not in dark. The two are not
+ * symmetric: a near-white plate on black is the brightest thing in the frame
+ * and reads as *lit*, while the same contrast inverted is a black hole punched
+ * in a white card, and on a sheet of fifty-four it is the only thing the eye
+ * goes to. Twenty six percent of the background mixed back in keeps it clearly
+ * the heaviest mark without it being a hole. `foreground-inverse` still passes
+ * against it by a wide margin, so the labels on it are unaffected. */
+.artSolid {
+  fill: light-dark(
+    color-mix(in oklab, var(--helix-color-surface-inverse) 60%, var(--helix-color-background)),
+    var(--helix-color-surface-inverse)
+  );
+}
+
+.artOnSolid {
+  fill: var(--helix-color-foreground-inverse);
+}
+
+/* The measured field every drawing sits on, rendered once in the wrapper.
+ *
+ * A 16 unit lattice at `space-md`, so the grid is the spacing scale rather than
+ * an arbitrary rhythm, and every drawing is visibly built on the same one. It
+ * is masked to fade out well before the frame, which is what stops it reading
+ * as graph paper: it says the drawing was measured, not that it is a chart. */
+/* Per mode, because one alpha cannot serve both.
+ *
+ * A dot is a tiny mark against a large field, and small marks do not carry
+ * equally in the two directions: near-black at 11% on white all but vanishes,
+ * while near-white at 11% on black is already a visible field. The same number
+ * was chosen in dark, checked in dark, and left light mode with no lattice at
+ * all. `light-dark()` takes colors only, so the strength has to live in the
+ * color rather than in `fill-opacity`, and `color-mix` keeps it derived from
+ * the foreground token rather than hardcoded to a gray. */
+.artGridDot {
+  fill: var(--site-lattice);
+}
+
+/* Softened in light mode only, at the color rather than at the three alphas.
+ *
+ * The top step is a bar standing in for a line of text, and at full foreground
+ * it is heavier than the words it represents, because real type has counters
+ * and a stem width and a solid bar has neither. Lifting the color 14% toward
+ * the page scales all three steps by the same factor, so the 0.12 / 0.28 / 0.55
+ * ladder keeps its ratios and only its absolute weight comes down. Dark mode
+ * keeps the token: there the bars sit on black and are already the quiet end. */
+.artInk {
+  fill: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 86%, var(--helix-color-background)),
+    var(--helix-color-foreground)
+  );
+}
+
+/* Ink as a line rather than as a fill.
+ *
+ * **A `fill="none"` attribute cannot do this**, which is not obvious and had
+ * already shipped: a presentation attribute sits below every author rule in the
+ * cascade, so `.artInk`'s own `fill` wins and the path renders solid whatever
+ * the attribute says. Measured on the Aura card, where two stroked strands came
+ * out as filled blobs with `fill="none"` on both, and on Popover's magnifying
+ * glass, which is built the same way and has been filled since it was drawn.
+ *
+ * Same color as `artInk`, because it is the same ink. Opacity and width stay on
+ * the element: they are facts about the line, not about the palette. */
+.artStroke {
+  fill: none;
+  stroke: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 86%, var(--helix-color-background)),
+    var(--helix-color-foreground)
+  );
+}
+
+/* A rule drawn as a filled rect rather than a stroke, so it stays exactly one
+   unit whatever the card is scaled to and never half-renders. */
+.artRule {
+  fill: var(--helix-color-border);
+}
+
+.artEdge {
+  fill: none;
+  stroke: var(--helix-color-border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Depth, for the panels that genuinely float. Black in both modes rather than
+   `foreground`, because a shadow is absence of light and a white shadow on a
+   dark page is a glow. Heavier in dark for the same reason the border had to be
+   quieter there: the surface it falls on is closer to the shadow's own color. */
+.componentArt {
+  --art-shadow: light-dark(oklch(0 0 0 / 0.16), oklch(0 0 0 / 0.55));
+}
+
+.artShadow feDropShadow {
+  flood-color: var(--art-shadow);
+  flood-opacity: 1;
+}
+
+/* ---------------------------------------------------------- motion ------- */
+
+/* At rest, still. On hover, the card performs its own component's interaction
+ * once, and hands off to a slow sustained movement where the component has a
+ * continuous state to hold. Only the perpetual pair move without being asked,
+ * because only they move without being asked in real life.
+ *
+ * Every drawing opts into exactly one of these, so the motion is seven rules
+ * rather than fifty-four timelines, and adding a family means picking an
+ * archetype instead of authoring an animation.
+ *
+ * These are illustration timings, not the component's own. `duration-normal` is
+ * right for a dialog answering a click and far too quick for a picture of one:
+ * an illustration is performing rather than responding. The easing tokens do
+ * carry over, because character survives the change of pace where duration
+ * does not.
+ *
+ * Only `transform` and `opacity` animate. Both composite, which matters because
+ * a gallery of fifty-four cards cannot afford anything that repaints.
+ *
+ * **Every hover animation starts where the card is already sitting.** No
+ * keyframe here declares a `from`, and none of them may. A `from` that differs
+ * from the resting value is an instantaneous jump on the first frame of hover:
+ * the browser is not easing *into* it, it is teleporting there and easing back,
+ * and what a reader sees is a flash. Seven of these ten had one. `artOn` was
+ * the worst, going to `opacity: 0`, so pointing at a checkbox blanked the tick
+ * before redrawing it.
+ *
+ * The replays were the cause. Each was written as "perform the entrance again",
+ * which needs the pre-entrance state to start from, and the card cannot be
+ * sitting in that state because at rest it has to *be* the component. So the
+ * motion is out-and-back instead: the mark presses and returns, the knob runs
+ * to off and comes back, the drawer retreats toward its own edge and slides
+ * home. Same story, told from where the reader already is.
+ *
+ * Mechanically that means every keyframe is an interior step, at 32 to 40
+ * percent, and 0% and 100% are left to resolve to the element's own computed
+ * value. It is also why no rule needs `animation-fill-mode` any more: there is
+ * no from-state to hold during a stagger's delay, because the from-state is the
+ * resting one. */
+.componentArt {
+  --art-arrive: 1100ms;
+  --art-lift: 600ms;
+  --art-sustain: 5.5s;
+  --art-stagger: 170ms;
+  --art-curve: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A center pivot, stated, because SVG does not give you one.
+ *
+ * `transform-box: fill-box` says *which* box the percentages resolve against.
+ * It does not set the origin, and SVG's UA stylesheet computes
+ * `transform-origin` to `0 0` rather than to the CSS initial `50% 50%`. So
+ * every scale in here was pivoting at the top-left corner of its own bounding
+ * box: a checkbox tick grew out of its upper left, a radio dot slid in from the
+ * corner rather than blooming, and every `artOpen` panel without an explicit
+ * origin scaled off its own top-left. Spinner hit this once and was fixed where
+ * it stood, which left the same bug in five other places.
+ *
+ * Anything wanting a different pivot overrides it: `artFill` from the left edge
+ * because a value grows from where it starts, and the panels that arrive from a
+ * trigger name the corner they came from. Those rules are all later in the
+ * cascade at equal specificity, so they win. */
+.artMotion {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The floor. Any drawing with no archetype of its own still answers a pointer.
+ *
+ * Nine cards were reaching for `artRow` or `artOpen` because every card had to
+ * move, which is how a system starts lying: a Divider does not lay its two
+ * groups out in sequence, a Stat does not, a type scale is not climbed one line
+ * at a time. Those were archetypes chosen to fill a slot rather than to say
+ * anything, and a stagger that means nothing is worse than no stagger, because
+ * it teaches the reader that the stagger means nothing.
+ *
+ * So the honest split is by whether the *component* does anything at runtime. A
+ * key press, a badge's mark, a header's nav: real, and they keep their own
+ * motion. Avatar, Blockquote, Divider, Flex, Grid, Icon, Quote, Stat and Text
+ * have no runtime behavior at all, and they get this instead.
+ *
+ * Selected rather than opted into. `:has()` asks the drawing whether it already
+ * carries an archetype, so a card cannot end up with both and a new family
+ * cannot be forgotten: draw it, and if you gave it no motion it has this one.
+ * The alternative was a marker class on every static card, which is a list that
+ * drifts from the thing it describes the first time someone adds an archetype
+ * and does not remove the marker.
+ *
+ * It is `helixArtSwell`, the same keyframe `artOpen` uses. That is not a
+ * shortcut: the floor and a panel settling open are the same gesture, and the
+ * only reason `artOpen` still has a name is that it needs to reach a `<g>`
+ * inside the drawing rather than the whole of it. */
+:has(> .componentArt):hover .artBody:not(:has(.artMotion, .artSweep, .artSpin)) {
+  animation: helixArtSwell var(--art-sustain) var(--art-curve) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* open — a panel arriving, then holding at a barely-there swell. */
+:has(> .componentArt):hover .artOpen {
+  animation: helixArtSwell var(--art-sustain) var(--art-curve) infinite;
+}
+
+/* Two steps, because one was doing the job of neither.
+ *
+ * A single `50%` over the 5.5s sustain put the peak 2750ms after the pointer
+ * arrived, at 1.014, which measured 1.2 screen pixels on a card. Both halves of
+ * that are wrong and they are separate mistakes: nobody holds a pointer for
+ * two and three quarter seconds waiting to find out whether a card responded,
+ * and a pixel of scale is not a response even once it gets there.
+ *
+ * It reads as an early gesture and then a hold: the first step lands at 550ms,
+ * the second is the breath it settles into. That is what the old two-animation
+ * pairing did with `helixArtSettle` in front of it, which is the thing that had
+ * to go because it started somewhere the card was not. One keyframe does both,
+ * and starts where the card already is.
+ *
+ * **The gesture is a translate and a fade, not only a scale.** A scale is
+ * relative, and these drawings are mostly small marks on a large frame: at
+ * 1.035 the same keyframe moved Announcement's band 1.8 screen pixels and
+ * Avatar's circle 0.7, because `artBody`'s box is the drawing rather than the
+ * canvas. So the amplitude was a function of how much happened to be drawn,
+ * which is not a property anything should depend on. Five units of travel and a
+ * fade to 0.7 are absolute: the smallest card in the set gets the same gesture
+ * as the largest, and the scale rides on top for the panels big enough to show
+ * it.
+ *
+ * Both halves are overridable, because one card wants the opposite balance.
+ * A tooltip's whole gesture is that it scales up out of the thing it describes,
+ * so it zeroes the shift and takes the scale instead: drift is exactly the
+ * wrong reading for a panel anchored to a target. Nothing else has needed to
+ * touch either. */
+@keyframes helixArtSwell {
+  12% {
+    opacity: 0.7;
+    transform: translateY(var(--art-swell-shift, 5px)) scale(var(--art-swell-scale, 1.02));
+  }
+
+  55% {
+    transform: scale(1.008);
+  }
+}
+
+/* edge — arrives from the side it stays attached to, and does not sustain,
+   because it has arrived. Starts wholly outside its clip so no frame shows it
+   displaced-but-visible.
+ *
+ * Toast staggers its second panel with an inline `animation-delay`, which used
+ * to need `backwards` so the delay held the from-state rather than the resting
+ * one. With the keyframe's ends resolving to the resting value there is nothing
+ * to hold: a panel waiting its turn is simply where it lives, and it leaves
+ * when its delay is up. */
+:has(> .componentArt):hover .artEdgeIn {
+  animation: helixArtEdge 1500ms var(--art-curve);
+}
+
+@keyframes helixArtEdge {
+  32% {
+    transform: translateX(var(--art-from, 120px));
+  }
+}
+
+/* reveal — rows in their own order. Never from zero: a replay that starts at
+   nothing blinks out the rows that are already on screen. */
+:has(> .componentArt):hover .artRow {
+  animation: helixArtRow var(--art-arrive) var(--art-curve);
+  animation-delay: calc(var(--art-i, 0) * var(--art-stagger));
+}
+
+@keyframes helixArtRow {
+  35% {
+    opacity: 0.55;
+    transform: translateX(-6px);
+  }
+}
+
+/* toggle — the mark crosses and the track takes the accent.
+ *
+ * **Drawn in the state it ends in, and the hover replays how it got there.**
+ * The first version transitioned *into* the on state from a hidden one, which
+ * meant the resting card showed a checkbox with no tick, two identical off
+ * switches, and a Badge with no mark on it. A gallery card has to be
+ * identifying while nobody is pointing at it: at rest it is the component, and
+ * the motion is a replay laid over that, never a precondition for it.
+ *
+ * Discrete, so nothing sustains: a checkbox that keeps pulsing after it is
+ * ticked is lying about its state. It presses and it is done. */
+:has(> .componentArt):hover .artOn {
+  animation: helixArtOn var(--art-arrive) var(--art-curve);
+}
+
+@keyframes helixArtOn {
+  35% {
+    transform: scale(0.94);
+  }
+}
+
+:has(> .componentArt):hover .artMark {
+  animation: helixArtMark var(--art-arrive) var(--art-curve);
+}
+
+/* A fade alongside the scale, for the same reason the swell needed one. Scale
+   is relative and the marks are not the same size: Kbd's 24 unit cap moves 3.3
+   screen pixels at this amplitude, Badge's 8 unit dot moves 1.1. Opacity does
+   not care how big the mark is, so it is what makes the small end read. */
+@keyframes helixArtMark {
+  35% {
+    opacity: 0.45;
+    transform: scale(0.72);
+  }
+}
+
+:has(> .componentArt):hover .artKnob {
+  animation: helixArtKnob var(--art-arrive) var(--art-curve);
+}
+
+@keyframes helixArtKnob {
+  40% {
+    transform: translateX(calc(var(--art-to, 18px) * -1));
+  }
+}
+
+/* travel — one marker moves and its fill follows, then wanders rather than
+   parking, because a value is a state being held.
+ *
+ * Two axes, because one is not enough for the set. A slider, a nav bar's marker
+ * and a toggle's indicator all move across; Outline's marker moves *down*, and
+ * with an inline-only rule the only way to say that was `--art-to: 0`, which
+ * parses and animates and moves nothing. A card that opts into an archetype and
+ * then sits still is worse than one that opts out. */
+.artTravel,
+.artFill {
+  transition: transform var(--art-arrive) var(--art-curve);
+}
+
+.artFill {
+  transform-origin: left center;
+}
+
+:has(> .componentArt):hover .artTravel {
+  animation: helixArtDrift var(--art-sustain) var(--art-arrive) ease-in-out infinite;
+  transform: translate(var(--art-to, 34px), var(--art-to-block, 0px));
+}
+
+:has(> .componentArt):hover .artFill {
+  animation: helixArtStretch var(--art-sustain) var(--art-arrive) ease-in-out infinite;
+  transform: scaleX(var(--art-grow, 1.33));
+}
+
+@keyframes helixArtDrift {
+  50% {
+    transform: translate(calc(var(--art-to, 34px) * 0.55), calc(var(--art-to-block, 0px) * 0.55));
+  }
+}
+
+/* The sustain interpolates the *delta*, not the scale, so a fill and a marker
+ * that arrive together stay together for the whole hold.
+ *
+ * `scaleX(grow * 0.84)` looked equivalent and is not. Drift eases a marker to
+ * 55% of its travel; a fill at 84% of its scale is a different fraction of its
+ * own growth entirely — for the slider that is +10 units of fill under a thumb
+ * that has gone +19, so the thumb spends the whole sustain sitting off the end
+ * of the track it is supposed to be filling. Same 0.55 on both, and they hold
+ * together at every point rather than only at the ends. */
+@keyframes helixArtStretch {
+  50% {
+    transform: scaleX(calc(1 + (var(--art-grow, 1.33) - 1) * 0.55));
+  }
+}
+
+/* lift — the same rise the `data-card` recipe performs, then a slow float. */
+.artLift {
+  transition: transform var(--art-lift) var(--art-curve);
+}
+
+.artLiftShadow {
+  opacity: 0;
+  transition: opacity var(--art-lift) var(--art-curve);
+}
+
+:has(> .componentArt):hover .artLift {
+  animation: helixArtFloat var(--art-sustain) var(--art-lift) ease-in-out infinite;
+  transform: translateY(-4px);
+}
+
+:has(> .componentArt):hover .artLiftShadow {
+  opacity: 1;
+}
+
+@keyframes helixArtFloat {
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* Parked where the animation begins, so hover has nothing to jump over. At
+   `translateX(0)` the sweep sat as a visible band across the middle of the
+   skeleton at rest and then leapt 210 units the moment a pointer arrived. Off
+   the content is also the truer resting state: a skeleton between sweeps has no
+   sheen on it.
+
+   perpetual — the two whose motion *is* the component, at the component's own
+ * timings rather than at illustration pace.
+ *
+ * Gated on hover like everything else, which is the opposite of what this
+ * archetype originally said. The argument for running them at rest was that a
+ * spinner which does not spin is not a spinner. True of a spinner on a page,
+ * false of a spinner in a gallery: in a grid of fifty-four still cards, two
+ * that move on their own do not read as alive, they read as the only two that
+ * are broken, and a rotating disc pulls the eye off whatever the reader was
+ * actually looking at. Both are still recognisable frozen. Eight marks around a
+ * ring with a fading trail is a spinner sitting still, and a skeleton without
+ * its sweep is exactly what a skeleton looks like between sweeps.
+ *
+ * Skeleton goes with it rather than being left as the one perpetual card. The
+ * inconsistency is the whole problem; halving it is not fixing it. */
+.artSweep {
+  transform: translateX(210px);
+}
+
+:has(> .componentArt):hover .artSweep {
+  animation: helixArtSweep 1.4s ease-in-out infinite;
+}
+
+@keyframes helixArtSweep {
+  from {
+    transform: translateX(210px);
+  }
+
+  to {
+    transform: translateX(-250px);
+  }
+}
+
+.artSpin {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+:has(> .componentArt):hover .artSpin {
+  animation: helixArtSpin 3.4s linear infinite;
+}
+
+@keyframes helixArtSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Named one selector at a time. A reduce rule written looser than the rule it
+   answers loses on specificity and does nothing, which is the trap
+   `check:motion` exists to catch in the library. */
+@media (prefers-reduced-motion: reduce) {
+  :has(> .componentArt):hover .artBody:not(:has(.artMotion, .artSweep, .artSpin)),
+  :has(> .componentArt):hover .artSweep,
+  :has(> .componentArt):hover .artSpin,
+  :has(> .componentArt):hover .artOpen,
+  :has(> .componentArt):hover .artEdgeIn,
+  :has(> .componentArt):hover .artRow,
+  :has(> .componentArt):hover .artTravel,
+  :has(> .componentArt):hover .artFill,
+  :has(> .componentArt):hover .artLift {
+    animation: none;
+  }
+
+  :has(> .componentArt):hover .artOn,
+  :has(> .componentArt):hover .artMark,
+  :has(> .componentArt):hover .artKnob {
+    animation: none;
+  }
+
+  .artTravel,
+  .artFill,
+  .artLift,
+  .artLiftShadow {
+    transition: none;
+  }
+
+  /* Only the lift's shadow needs restoring. Everything else is already drawn in
+     its resting state, which is the whole reason the toggles became replays. */
+  .artLiftShadow {
+    opacity: 1;
+  }
+}

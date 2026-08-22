@@ -1,0 +1,40 @@
+{
+  "name": "@helix-io/gallery",
+  "description": "Card art for Helix component families. Versioned content, rendered by a site.",
+  "version": "0.0.0-dev",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "directory": "helix/gallery",
+    "type": "git",
+    "url": "git+https://github.com/former-org/former-repo.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./gallery.css": "./src/gallery.css"
+  },
+  "files": [
+    "dist",
+    "src/gallery.css"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0"
+  }
+}
