@@ -40,7 +40,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 219 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 220 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 157 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
@@ -109,7 +109,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 279 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 236 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 236 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 131 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 130 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 88 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 71 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 41 |
@@ -123,7 +123,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 64 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 210 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 211 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 18 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 2 |
 | `--helix-radii-full` | `9999px` | 79 |
@@ -189,7 +189,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 222 |
+| `--helix-border-thin` | `1px` | 223 |
 | `--helix-border-thick` | `2px` | 63 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 2 |
 | `--helix-border-floating` | `0` | 20 |
@@ -280,7 +280,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 22 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 90 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 46 |
-| `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 13 |
+| `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 15 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 82 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 138 |
 | `--helix-size-focus-offset` | `2px` | 114 |

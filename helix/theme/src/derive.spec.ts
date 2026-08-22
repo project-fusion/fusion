@@ -393,6 +393,36 @@ describe('the separation policy', () => {
     expect(css).toMatch(/--helix-shadow-surface: 0 4px/)
   })
 
+  /* **`fill` and `space` used to do nothing at all**, both emitting a zero edge
+     and no lift, which made them identical to each other and to nobody's
+     benefit. What separates a surface when it is neither an edge nor a lift is
+     how far its own colour sits from the page, so the policy scales that. */
+  test('fill pushes the surface ladder away from the page', () => {
+    const ground = (surface: 'border' | 'fill') =>
+      deriveTheme({ brand: BRAND, separation: { surface } }).tokens.find(
+        (t) => t.name === 'color-surface-sunken',
+      )?.value.lightness ?? 0
+
+    expect(ground('fill')).toBeLessThan(ground('border'))
+  })
+
+  test('space collapses it, so only the gap tells them apart', () => {
+    const theme = deriveTheme({ brand: BRAND, separation: { surface: 'space' } })
+    const at = (name: string) => theme.tokens.find((t) => t.name === name)?.hex
+
+    expect(at('color-surface')).toBe(at('color-background'))
+    expect(at('color-surface-raised')).toBe(at('color-background'))
+    expect(at('color-surface-sunken')).toBe(at('color-background'))
+  })
+
+  /* Collapsing the ladder could have broken every ink solved against it, since
+     the foregrounds are solved against whatever the surfaces became. */
+  test('every mechanism still derives with nothing failing', () => {
+    for (const surface of ['border', 'fill', 'shadow', 'space'] as const) {
+      expect(deriveTheme({ brand: BRAND, separation: { surface } }).violations, surface).toEqual([])
+    }
+  })
+
   test('material is a policy and zero blur means flat', () => {
     expect(toCss(deriveTheme({ brand: BRAND, material: { blur: 0 } }))).toContain(
       '--helix-material-backdrop: none;',

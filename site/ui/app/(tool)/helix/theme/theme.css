@@ -20,20 +20,20 @@
 }
 
 /* A channel slider: the track is the value rather than a measure of it, which
-   is the same call `ColorPicker` makes on its hue and alpha channels. A filled
-   half would be a second reading of something the ramp already says. */
-.themeChannel[label="Saturation"] {
-  --slider-track-image: var(--theme-saturation-ramp);
-}
-
-.themeChannel[label="Accent angle"] {
-  --slider-track-image: var(--theme-accent-ramp);
-}
-
-/* A channel slider: the track is the value rather than a measure of it, which
    is the same call `ColorPicker` makes on its own hue and alpha channels, and
    through the same hook. A filled half would be a second reading of something
    the ramp already says. */
+/* The two swatches beside the brand: what was asked for, and what the solver
+   produced from it. */
+.themeSwatch {
+  block-size: var(--helix-size-icon-md);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-md);
+}
+
 .themeChannel[label="Saturation"] {
   --slider-track-image: var(--theme-saturation-ramp);
 }
@@ -101,11 +101,11 @@
   margin-inline: var(--helix-space-xl);
 }
 
-/* The artifact, in the pane the workbench gives its source. */
-.themeArtifact {
+/* The artifact fills its pane the way the workbench's editor fills its own:
+   no inset and no box, because a source pane is not a figure on a page. */
+helix-sandbox-editor {
   block-size: 100%;
-  overflow: auto;
-  padding: var(--helix-space-md);
+  min-block-size: 0;
 }
 
 .themeAudit {

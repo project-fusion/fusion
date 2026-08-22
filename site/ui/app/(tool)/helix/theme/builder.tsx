@@ -1,10 +1,11 @@
 'use client'
 
-import { deriveTheme, type ThemeIntent, toCss } from '@helix-io/theme'
+import { deriveTheme, hexToOklch, type ThemeIntent, toCss } from '@helix-io/theme'
 import { useEffect, useMemo, useState } from 'react'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
 import { Wordmark } from '../../../wordmark'
+import '@helix-io/sandbox/editor'
 import { ThemedPage } from './themed-page'
 import './theme.css'
 
@@ -118,6 +119,13 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
   }, [theme])
   const css = useMemo(() => toCss(theme, SCOPE), [theme])
 
+  /* **Lightness only**, because that is the one component the solver moves: a
+     brand keeps its hue and its chroma and gives up its lightness to reach the
+     target. Comparing the hexes would report a move on a rounding difference. */
+  const derived = theme.tokens.find((token) => token.name === 'color-primary')
+  const derivedPrimary = derived?.hex ?? brand
+  const moved = Math.abs((derived?.value.lightness ?? 0) - hexToOklch(brand).lightness) > 0.06
+
   /* **Injected rather than applied per property.** A `<style>` carrying the
      emitted block is the same code path as a consumer pasting it into their
      own stylesheet, so the preview cannot drift from the artifact. */
@@ -190,6 +198,26 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               onhelix-change={(event) => setBrand(event.detail.value)}
               value={brand}
             ></helix-color-input>
+
+            {/* **What the brand became, and why, because the gap surprises
+                everybody once.** Pick a bright yellow at AAA and the button
+                comes out olive: the hue and the chroma are kept and only the
+                lightness moves, because a fill that light cannot carry legible
+                text and cannot clear a near-white page at the same time.
+
+                Shown only when it actually moved, and only by enough to notice.
+                A swatch that always says "and here is the same colour again" is
+                a row of chrome nobody reads. */}
+            {moved ? (
+              <helix-flex align="center" gap="sm">
+                <span className="themeSwatch" style={{ background: brand }} />
+                <helix-icon name="arrow-right"></helix-icon>
+                <span className="themeSwatch" style={{ background: derivedPrimary }} />
+                <helix-text appearance="caption">
+                  Darkened to clear {contrastTarget}:1. The hue is kept; only the lightness moves.
+                </helix-text>
+              </helix-flex>
+            ) : null}
 
             <helix-select
               label="Colour scheme"
@@ -363,9 +391,24 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               <ThemedPage />
             </div>
 
-            <div className="themeArtifact" slot="source">
-              <helix-code-block label="theme.css">{css}</helix-code-block>
-            </div>
+            {/* **The editor, read-only, rather than a code block.** The
+                artifact pane should read as a source file, which is what the
+                workbench puts here: line numbers, the same syntax palette, the
+                same gutter. A code block is a figure in a page and this is a
+                pane in a tool.
+
+                `read-only` because the artifact is an output. The editor takes
+                it through `EditorState.readOnly` rather than by dropping focus,
+                so the text is still selectable and reachable by keyboard, which
+                is the whole point of showing it. */}
+            <helix-sandbox-editor
+              field-label="The generated stylesheet"
+              language="css"
+              name="artifact"
+              read-only
+              slot="source"
+              value={css}
+            ></helix-sandbox-editor>
 
             <div className="themeAudit" slot="panel">
               <helix-flex direction="column" gap="sm">

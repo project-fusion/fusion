@@ -294,7 +294,7 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   // palette passes in theory and fails by a hundredth in practice.
   const rawBackground: Oklch =
     scheme === 'dark' ? { ...neutral, lightness: 0.15 } : { ...neutral, lightness: 0.985 }
-  const rawSurface: Oklch =
+  const rawSurfaceBase: Oklch =
     scheme === 'dark' ? { ...neutral, lightness: 0.21 } : { chroma: 0, hue: 0, lightness: 1 }
   /* **The surfaces a component actually names, not just the two the page has.**
      A dropdown sits on `surface-overlay`, a recess on `surface-sunken`, a card
@@ -306,11 +306,33 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
      and overlay move off the surface; sunken goes *under the background*, and a
      light theme's surface is already pure white, so stepping it produced a
      lightness of 1.05 and the gamut check caught it. */
-  const rawRaised: Oklch = { ...neutral, lightness: scheme === 'dark' ? 0.25 : 0.96 }
-  const rawOverlay: Oklch = { ...neutral, lightness: scheme === 'dark' ? 0.25 : 1 }
-  const rawSunken: Oklch = { ...neutral, lightness: scheme === 'dark' ? 0.11 : 0.93 }
+  /* **`fill` and `space` were doing nothing, and this is the fix.**
+     Both emitted a zero edge and no lift, which made them identical to each
+     other and left two of the four mechanisms as options a reader could pick
+     with no effect. A mechanism nobody can see is not a choice.
+
+     What separates a surface, when it is neither an edge nor a lift, is how far
+     its own colour sits from the page. So the policy scales that distance:
+     `fill` pushes the ladder away from the background, `space` collapses it
+     onto the background so nothing but the gap tells them apart, and `border`
+     and `shadow` leave it where it has always been because on those the edge or
+     the lift is doing the work. */
+  const LADDER = { border: 1, fill: 1.7, shadow: 1, space: 0 } as const
+  const ladder = LADDER[resolved.separation.surface ?? 'border']
+  const step = (from: number): Oklch => ({
+    ...neutral,
+    lightness: rawBackground.lightness + (from - rawBackground.lightness) * ladder,
+  })
+
+  const rawRaised: Oklch = step(scheme === 'dark' ? 0.25 : 0.96)
+  const rawOverlay: Oklch = step(scheme === 'dark' ? 0.25 : 1)
+  const rawSunken: Oklch = step(scheme === 'dark' ? 0.11 : 0.93)
 
   const background = fitToGamut(rawBackground)
+  /* Declared after the ladder, since `surface` is on it: it is the ground a card
+     uses, so a fill-first theme has to move it too or the one surface the policy
+     is most about is the one it does not reach. */
+  const rawSurface = step(rawSurfaceBase.lightness)
   const surface = fitToGamut(rawSurface)
 
   // Text lands on more than one surface, and the hardest one is not always the
@@ -364,7 +386,7 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     const subtle: Oklch = {
       chroma: Math.min(base.chroma, policy(0.06)),
       hue: base.hue,
-      lightness: scheme === 'dark' ? rawSurface.lightness + 0.06 : 0.95,
+      lightness: scheme === 'dark' ? rawSurfaceBase.lightness + 0.06 : 0.95,
     }
     const raw = solveAgainst(
       [...surfaces, fitToGamut(subtle)],
