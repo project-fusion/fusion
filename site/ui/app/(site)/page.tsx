@@ -82,21 +82,24 @@ export default function Home() {
             <helix-tag>Fusion Development Group</helix-tag>
           </helix-flex>
           <helix-text as="h1" class="heroTitle">
-            Interface and intelligence engineering
+            The two hardest layers of a modern product, already built
           </helix-text>
-          {/* **Not a sentence about us.** "We build the software, and we built
-              the tools underneath it" is two clauses of who we are, offered to
-              a reader who has not yet been given a reason to care who we are.
-              What they can do with the page is the thing worth saying first,
-              and it happens to be the shortest way to say that this is two
-              audiences: one takes the tools and never talks to us, the other
-              hires the people who wrote them.
-    
-              One sentence. Three was a paragraph before anybody had decided to
-              read one, and the licence, the engagement and the pricing policy
-              each have a page that says it better. */}
+          {/* **The title is the reader's problem and this is the answer to it.**
+              Both lines were about us before: a discipline we practise, then
+              the two audiences we serve. Neither told a reader what they get.
+              The interface and the intelligence layers are the expensive part of
+              any serious product, which is a fact about their work rather than
+              about ours, and naming the two substrates is what turns the claim
+              into something checkable.
+
+              **The sovereignty argument is not here, deliberately.** It is a
+              claim about where this goes rather than about what exists, and a
+              front door that leads with it asks a reader to buy a future before
+              being shown a present. `/thesis` is where it belongs and where it
+              still is. */}
           <helix-text as="p" class="heroLede measure" tone="muted">
-            Take the tools, or hire the people who built them.
+            Helix is the design system. Cortex is the memory and provenance layer. Use them
+            yourself, or have us build with them.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
             <Link
@@ -117,24 +120,26 @@ export default function Home() {
       <section className="band reveal">
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
-              What we offer
-            </helix-text>
-            <helix-text as="h2" class="sectionTitle measure">
-              Take the substrates. Hire the work.
-            </helix-text>
-            {/* **The licence is not the argument, and it used to lead.** Whether
-                a package is MIT matters to about one reader in fifty and to
-                none of them first: it is a fact for the install page, where
-                somebody has already decided to try it. What every reader wants
-                to know is whether the thing keeps working without us, which is
-                the sovereignty constraint and is the sentence worth the space.
-    
-                Written for the reader who is not buying anything. `docs/18`
-                records why this band sits above the selling. */}
+            {/* **No kicker and no title.** Two named cards and a services block
+                below them are already legible as a choice; a heading above
+                saying some version of "here are the things" is a row of chrome
+                that names what the reader can see. The label and the h2 that
+                stood here answered the same question the section answers, in
+                the same words, one line earlier. */}
+            {/* **What they are, not what they promise.** This paragraph led
+                with the sovereignty constraint, that nothing here needs us to
+                keep running. True, and a claim about the future rather than a
+                description of the present, which is the line this page now
+                holds: what exists here, what is coming on `/thesis`. What a
+                reader wants at this point is what the two things *are* and how
+                they arrive, which is also the half that is checkable today.
+
+                The licence stays out of it for the reason it was taken out
+                before: whether a package is MIT matters to about one reader in
+                fifty and to none of them first. */}
             <helix-text as="p" class="measure" tone="muted">
-              Take them and go. They install from npm and ship as custom elements, so the framework
-              above them stays your choice, and nothing here needs us to keep running.
+              Two substrates, both in production. They install from npm and ship as custom elements,
+              so the framework above them stays your choice.
             </helix-text>
           </helix-flex>
 
