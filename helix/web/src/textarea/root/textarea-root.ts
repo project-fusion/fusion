@@ -15,7 +15,7 @@ import { styles } from './textarea-root.css.js'
  * dragged wider than the form holding it is a field that breaks the layout.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Multiline, TextArea
  * @documentation https://helix.fusion.dev/components/textarea

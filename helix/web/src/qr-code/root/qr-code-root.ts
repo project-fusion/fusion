@@ -17,7 +17,7 @@ import { styles } from './qr-code-root.css.js'
  * So the ground is stated and the ink is the foreground it is chosen for.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @documentation https://helix.fusion.dev/components/qr-code
  *

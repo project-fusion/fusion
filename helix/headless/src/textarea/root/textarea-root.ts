@@ -29,7 +29,7 @@ import { property } from 'lit/decorators.js'
  * somewhere.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Multiline, TextArea
  * @documentation https://helix.fusion.dev/components/textarea

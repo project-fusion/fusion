@@ -14,7 +14,7 @@ import { styles } from './checkbox-group-root.css.js'
  * line per answer rather than hunting along a row.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Checkbox list, Multi-select
  * @documentation https://helix.fusion.dev/components/checkbox-group

@@ -12,7 +12,7 @@ import { styles } from './scroll-area-root.css.js'
  * have content past them is measured by the base class.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Scroller, Overflow, Scroll container
  * @documentation https://helix.fusion.dev/components/scroll-area

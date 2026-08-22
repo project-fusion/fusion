@@ -5308,7 +5308,7 @@
           "helix": {
             "category": "forms",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/checkbox-group",
             "aliases": [
               "Checkbox list",
@@ -31727,7 +31727,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/qr-code",
             "aliases": [
               "QR",
@@ -34403,7 +34403,7 @@
           "helix": {
             "category": "layout",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/scroll-area",
             "aliases": [
               "Scroller",
@@ -43791,7 +43791,7 @@
           "helix": {
             "category": "forms",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/textarea",
             "aliases": [
               "Multiline",

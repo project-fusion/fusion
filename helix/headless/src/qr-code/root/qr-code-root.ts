@@ -120,7 +120,7 @@ const pathFor = (
  * moves when the slot is filled.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases QR, Barcode, Scan code
  * @documentation https://helix.fusion.dev/components/qr-code

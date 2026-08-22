@@ -35,7 +35,7 @@ import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
  * is a set.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Checkbox list, Multi-select
  * @documentation https://helix.fusion.dev/components/checkbox-group
