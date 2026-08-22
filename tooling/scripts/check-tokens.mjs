@@ -26,7 +26,18 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
+/* A git worktree is a second checkout of this repository, and a check that
+     walks into one is reading another branch. `.claude/worktrees/*` holds the
+     ones the agent tooling makes, so a session working on a different branch
+     puts a whole second copy of `helix/` inside this directory tree.
+     
+     This was not theoretical. `check:tokens` passed locally and failed in CI on
+     the same commit, because the sibling worktree was checked out before
+     `--helix-color-border-strong` was removed and its `tokens.css` put the
+     token back into the "defined" set. A real violation on `main` was masked by
+     a branch nobody was looking at. */
 const IGNORED = new Set([
+  '.claude',
   '.git',
   '.local',
   '.next',

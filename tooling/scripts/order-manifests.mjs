@@ -44,7 +44,21 @@ const PRIORITY = [
  */
 const CONDITIONS = ['types', 'browser', 'node', 'import', 'require', 'module', 'default']
 
-const IGNORED = new Set(['.git', '.local', '.next', '.turbo', 'dist', 'node_modules', 'target'])
+/* `.claude` holds the agent tooling's git worktrees, which are second checkouts
+   of this repository. Without it this walks into one and rewrites fifteen
+   package.json files on somebody else's branch: measured, and it found all
+   fifteen. They happened to already be in order, so nothing was damaged, which
+   is not a reason to leave it. */
+const IGNORED = new Set([
+  '.claude',
+  '.git',
+  '.local',
+  '.next',
+  '.turbo',
+  'dist',
+  'node_modules',
+  'target',
+])
 
 const sortByList = (obj, list) => {
   const rest = Object.keys(obj)
