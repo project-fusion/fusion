@@ -34,8 +34,15 @@ import { readFileSync } from 'node:fs'
 const scripts = JSON.parse(readFileSync('package.json', 'utf8')).scripts ?? {}
 const checks = Object.keys(scripts)
   .filter((name) => name.startsWith('check:'))
-  // Itself, and the two that compare generated files rather than counting a corpus.
-  .filter((name) => !['check:floors', 'check:reference', 'check:tokens-reference'].includes(name))
+  /* Itself; the two that compare generated files rather than counting a corpus;
+     and `check:node`, which asserts one fact about the runtime and has no corpus
+     at all. That last one is exempt twice over: its success line carries a
+     version, and `22.22.0` reads as a count of zero to the rule below, which is
+     the one shape of number that is never a tally. */
+  .filter(
+    (name) =>
+      !['check:floors', 'check:node', 'check:reference', 'check:tokens-reference'].includes(name),
+  )
 
 const problems = []
 for (const name of checks) {

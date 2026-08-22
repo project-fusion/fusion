@@ -665,6 +665,12 @@ The bug underneath is React's, [facebook/react#35446](https://github.com/faceboo
 open since January 2026 with a proposed fix unmerged. When it lands this becomes
 dead weight and should go.
 
+*Re-checked 21 Aug 2026: still open, and PR #35474 is still the proposed fix and
+still unmerged.* Which version this was measured against is not left to prose:
+`check:react-bridge` reads the number out of this file and fails if the
+installed `react-dom` has moved past it, because a probe is a claim about one
+release's internals and nothing in `verify` reads a comment.
+
 **Object and function *properties* have the same bug and are not fixed.** React
 skips everything it would have to apply imperatively while hydrating; strings,
 numbers and booleans survive only because the server wrote them as attributes.
@@ -773,7 +779,11 @@ and three things ended it:
   working silently on that migration. We have already lost time to one silent
   DSD failure.
 - **`@lit-labs/nextjs` has not published since July 2025.** There is no fixed
-  version to wait for.
+  version to wait for. *Re-checked 21 Aug 2026 against the registry: still
+  0.2.4, published 11 July 2025, thirteen months ago. `@lit-labs/ssr-react` did
+  move, to 0.3.4 on 23 December 2025, which makes the point sharper rather than
+  softer: the sibling is maintained and the Next.js integration is the one that
+  is not, and it is the one this depended on.*
 
 Marking pages `'use client'` did make it work, at 15.1 kB of route JavaScript.
 That is not the trade: it surrenders RSC on every page using a component, to

@@ -35,6 +35,17 @@ jobs:
         with:
           bun-version: 1.1.43
 
+      # Pinned for the same reason bun is, and it is not decoration: `cem
+      # analyze` is a Node CLI, so `bun run analyze` hands it to whatever Node
+      # is on `PATH`, and its config is TypeScript. Below 22.18 that config
+      # cannot load, the analyzer falls back to a default one and writes a
+      # manifest with every Helix plugin missing, and says it succeeded. This
+      # job set up bun and Rust and never Node, so the floor was whatever the
+      # runner image shipped. `bun run check:node` fails the run if it is not.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.20.0'
+
       # `--frozen-lockfile` so a lockfile that does not match `package.json`
       # fails here rather than being quietly updated in CI and not on the
       # machine that pushed.

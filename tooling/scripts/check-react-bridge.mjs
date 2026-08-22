@@ -22,6 +22,17 @@
  * It cannot be a spec: `helix/core` has no React dependency and should not gain
  * one to test a string.
  *
+ * **It also holds the rules file's measurement to the version it was taken on.**
+ * `.claude/rules/helix.md` says "measured in Chrome against 19.2.8" twice, and
+ * that is the whole basis for two rules: that a hyphenated `on` prop binds at
+ * all, and that binding at dispatch does not double up with React's own
+ * listener. Both are claims about one release's internals. React moves, the
+ * prose does not, and nothing in `verify` reads a comment: a note is true on a
+ * date and goes on reading as true forever. So a react-dom bump fails here until
+ * somebody re-runs the probe and moves the date, which is the only thing that
+ * makes the note worth trusting. This is the general fault #126 was filed about,
+ * fixed for the one measurement in the repository that names a version.
+ *
  * Run with `bun run check:react-bridge` (also part of `bun run verify`).
  */
 import { readFileSync } from 'node:fs'
@@ -69,4 +80,31 @@ if (missing.length > 0) {
 }
 
 const { version } = JSON.parse(readFileSync('node_modules/react-dom/package.json', 'utf8'))
-console.log(`react-bridge: \`${prefix}\` present in react-dom ${version}, both bundles`)
+
+/* Every version the rules file claims to have measured against. Read rather than
+   written here, so the two cannot drift apart, and a set because the same number
+   appears beside both probes. */
+const RULES = '.claude/rules/helix.md'
+const claimed = new Set(
+  [...readFileSync(RULES, 'utf8').matchAll(/[Aa]gainst\s+(?:React\s+)?(\d+\.\d+\.\d+)/g)].map(
+    (one) => one[1],
+  ),
+)
+const stale = [...claimed].filter((one) => one !== version)
+if (stale.length > 0) {
+  console.error(
+    `react-bridge: ${RULES} reports measurements against React ${stale.join(', ')}, and react-dom ` +
+      `is ${version}.\n\n` +
+      '  Two rules rest on those probes: that a hyphenated `on` prop binds at all, and that\n' +
+      "  binding at dispatch does not double up with React's own listener. Both are claims about\n" +
+      "  one release's internals, and prose does not move when a dependency does.\n\n" +
+      '  Re-run the probes on this version and write the new number into the file, or pin React\n' +
+      '  back. A measured note is true on a date, and this is the date.\n',
+  )
+  process.exit(1)
+}
+
+console.log(
+  `react-bridge: \`${prefix}\` present in react-dom ${version}, both bundles, and the rules file ` +
+    'measured against that version',
+)

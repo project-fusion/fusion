@@ -50,9 +50,14 @@ Rust for backend and substrate cores. TypeScript for frontend.
 - **Biome only** for TS/JS. `cargo fmt` and `clippy` for Rust.
 - **Lit** with legacy decorators (`experimentalDecorators: true`,
   `useDefineForClassFields: false`).
-- Config files are TypeScript (`*.config.ts`). The CLIs run under bun, which
-  resolves TS natively, so configs are type-checked rather than failing at
-  runtime on a typo.
+- Config files are TypeScript (`*.config.ts`), so they are type-checked rather
+  than failing at runtime on a typo. **Not all of them run under bun, and the
+  exception has a floor.** `cem analyze` is a Node CLI with its own shebang, so
+  `bun run analyze` hands it to whatever Node is on `PATH`. Below Node 22.18 it
+  cannot load a `.ts` config, falls back to a default one, and writes a manifest
+  with every Helix plugin missing while reporting success: measured on 18.16, a
+  manifest 69,081 lines shorter. `engines.node` states the floor,
+  `bun run check:node` enforces it, and CI pins it.
 
 ## Layout
 
