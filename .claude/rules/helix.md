@@ -60,6 +60,39 @@ shipped one package in five files.
   around it. Keep a wrapper only where it carries something real, as `<nav>`
   does in AppHeader, being a landmark whether or not it is filled.
 
+### State goes in markup, and `data-` is only a hook on top of it
+
+**A base component has no stylesheet, so any state a stylesheet has to
+interpret does not exist on that tier.** `hidden`, `inert`, `popover`, a real
+`<dialog>`, `open` on `<details>`: these are the state, because the platform
+already acts on them. `data-open` is a selector target the styled tier layers on
+top, and it can never be the mechanism.
+
+Twenty-four families already work this way and it was never written down, which
+is how the accordion became the outlier nobody noticed. Its content region
+carried `inert` and nothing else, so a closed section was out of the
+accessibility tree and off the tab order with every pixel still on the screen,
+under a trigger reporting `aria-expanded="false"`. The collapse was living in
+the styled tier's `grid-template-rows: 0fr`, an animation that was doing the
+hiding as a side effect.
+
+**The tell is that the styled tier gets it right and the base tier does not.**
+That is not a styling gap, which is the reading that hid this: it means the fact
+was recorded in one tier's CSS rather than in the component. Ask of any
+open/closed, shown/hidden, selected/not: *with every stylesheet deleted, is this
+still true?*
+
+**Adding the attribute usually costs the styled tier nothing**, because a styled
+sheet that animates the region already sets `display` on it unconditionally, and
+an author rule beats the UA sheet's `[hidden]`. Check that before reaching for
+anything cleverer.
+
+**`hidden="until-found"` is not a drop-in for `hidden`.** It hides through
+`content-visibility`, which an author `display` does not override, so a region a
+consumer styles would animate open to nothing. It also needs a `beforematch`
+handler to set the open state, or find-in-page reveals content while the trigger
+still reports collapsed.
+
 ### A component that renders another names the public tag and imports it
 
 A custom element registers on import. A tag nobody imported is not an error and
