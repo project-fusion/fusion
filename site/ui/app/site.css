@@ -1777,17 +1777,27 @@ helix-drawer helix-tree {
 
 /* A post is a centered column, and the column is the page's measure rather than
    the shell's full width. */
+/* **90ch, and in characters rather than rems for the reason a measure is.**
+   `44rem` is a length that happens to hold about 70 characters at the current
+   type size and holds a different number at any other: state the column in the
+   unit it is actually about, and it survives a change to the ramp. */
 .insightShell {
   margin-inline: auto;
-  max-inline-size: 44rem;
+  max-inline-size: 90ch;
   padding-block: var(--site-band);
   padding-inline: var(--site-inset);
 }
 
-/* Only the head is centered text. Past two lines, centered prose moves its own
-   left edge every line, so the body keeps a fixed edge to return to. */
+/* **Left, with the prose under it.**
+ *
+ * This was centred, on the argument that a centred measure is a column the eye
+ * can find. That holds for a narrow column and stops holding at 90ch: the head
+ * and the body now share an edge wide enough that a centred title starts in a
+ * different place from every line beneath it, and the reader's eye has two left
+ * edges to keep. One edge, and the title, the labels and the byline all return
+ * to it. */
 .insightHead {
-  text-align: center;
+  text-align: start;
 }
 
 .insightBack {

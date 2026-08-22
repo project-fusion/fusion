@@ -32,9 +32,15 @@ export async function generateMetadata({
  * with the title between them, and the way back belongs at the very top where a
  * reader's hand already is.
  *
- * Centered, and the prose is not. A measure centered in the page is a column a
- * reader's eye can find; centered *text* past two lines is a column whose left
- * edge moves every line, which is why only the head is set that way.
+ * Left, and the prose with it. Centred was the old arrangement, on the argument
+ * that a centred measure is a column the eye can find, and that holds while the
+ * column is narrow. At 90ch it stops: a centred head starts in a different place
+ * from every line beneath it, so the reader keeps two left edges instead of one.
+ *
+ * `align` and not only `text-align`. This is a flex column, so its children are
+ * placed as items rather than flowed as text: with `align="center"` the title,
+ * the labels and the byline each sat at their own left edge, 515, 694 and 585
+ * against the body's 429, and every one of them reported `text-align: start`.
  */
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -49,7 +55,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   return (
     <helix-flex class="insightShell" direction="column" gap="2xl">
-      <helix-flex align="center" class="insightHead" direction="column" gap="lg">
+      <helix-flex align="start" class="insightHead" direction="column" gap="lg">
         {/* The way out, above everything. A reader who opened this from the
             gallery wants it before they want the filing labels. */}
         <Link className="insightBack" data-link="quiet" href="/insights">
