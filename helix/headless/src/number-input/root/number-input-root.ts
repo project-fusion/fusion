@@ -213,7 +213,13 @@ export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixF
     this.nudge(large ? (this.largeStep ?? 10) : 1)
   }
 
-  /** One step down. */
+  /**
+   * Steps the value down, by `largeStep` when `large` is set.
+   *
+   * The same path a press of the down arrow takes, so a consumer driving this
+   * from their own control gets the clamping and the announcement rather than
+   * having to repeat both.
+   */
   stepDown(large = false): void {
     this.nudge(large ? -(this.largeStep ?? 10) : -1)
   }

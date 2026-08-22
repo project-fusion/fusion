@@ -5854,7 +5854,7 @@ takes and what a consumer writing `value="72"` means. A range of zero to one
 is a fraction, and a component that reads `value="72"` as seventy-two times
 over its maximum is a trap that costs nothing to avoid. */
   max?: HelixBaseMeter["max"];
-  /** The reading. */
+  /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
   value?: HelixBaseMeter["value"];
   /** Top of the low band. Absent leaves the range unbanded. */
   low?: HelixBaseMeter["low"];
@@ -5940,7 +5940,7 @@ takes and what a consumer writing `value="72"` means. A range of zero to one
 is a fraction, and a component that reads `value="72"` as seventy-two times
 over its maximum is a trap that costs nothing to avoid. */
   "prop:max"?: HelixBaseMeter["max"];
-  /** The reading. */
+  /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
   "prop:value"?: HelixBaseMeter["value"];
   /** Top of the low band. Absent leaves the range unbanded. */
   "prop:low"?: HelixBaseMeter["low"];
@@ -17408,7 +17408,7 @@ export type CustomElements = {
    * takes and what a consumer writing `value="72"` means. A range of zero to one
    * is a fraction, and a component that reads `value="72"` as seventy-two times
    * over its maximum is a trap that costs nothing to avoid.
-   * - `value`: The reading.
+   * - `value`: Where the reading sits between `min` and `max`. Outside them, it clamps.
    * - `low`: Top of the low band. Absent leaves the range unbanded.
    * - `high`: Bottom of the high band. Absent leaves the range unbanded.
    * - `optimum`: Where in the range it is best to be.
@@ -17663,7 +17663,11 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `stepUp(large = false) => void`: One step up, or `PageUp`'s larger one.
-   * - `stepDown(large = false) => void`: One step down.
+   * - `stepDown(large = false) => void`: Steps the value down, by `largeStep` when `large` is set.
+   *
+   * The same path a press of the down arrow takes, so a consumer driving this
+   * from their own control gets the clamping and the announcement rather than
+   * having to repeat both.
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `select() => void`: Selects the number, so typing replaces it.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
@@ -22102,7 +22106,11 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `focusItem() => void`: Moves focus to this item.
+   * - `focusItem() => void`: Moves focus to this item's own control.
+   *
+   * The group drives arrow-key navigation and cannot reach the control itself,
+   * which is inside this shadow root. Exposing the intent as a method keeps the
+   * group out of the child's internals.
    * - `select() => void`: Chooses this item and announces it.
    *
    * ## CSS Parts
@@ -22309,7 +22317,11 @@ export type CustomElements = {
    * anchored to something the page moves, which is why nothing wanted this
    * until a chart did.
    * - `show() => void`: Shows the bubble, unless there is nothing to show.
-   * - `hide() => void`: Hides the bubble.
+   * - `hide() => void`: Closes the bubble, and cancels a show that had not happened yet.
+   *
+   * The timer matters as much as the state: a pointer that arrives and leaves
+   * inside the delay left one queued, and the tooltip appeared over whatever
+   * the reader had moved on to.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
@@ -28632,7 +28644,7 @@ export type CustomElementsSolidJs = {
    * takes and what a consumer writing `value="72"` means. A range of zero to one
    * is a fraction, and a component that reads `value="72"` as seventy-two times
    * over its maximum is a trap that costs nothing to avoid.
-   * - `value`: The reading.
+   * - `value`: Where the reading sits between `min` and `max`. Outside them, it clamps.
    * - `low`: Top of the low band. Absent leaves the range unbanded.
    * - `high`: Bottom of the high band. Absent leaves the range unbanded.
    * - `optimum`: Where in the range it is best to be.
@@ -28893,7 +28905,11 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `stepUp(large = false) => void`: One step up, or `PageUp`'s larger one.
-   * - `stepDown(large = false) => void`: One step down.
+   * - `stepDown(large = false) => void`: Steps the value down, by `largeStep` when `large` is set.
+   *
+   * The same path a press of the down arrow takes, so a consumer driving this
+   * from their own control gets the clamping and the announcement rather than
+   * having to repeat both.
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `select() => void`: Selects the number, so typing replaces it.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
@@ -33460,7 +33476,11 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
-   * - `focusItem() => void`: Moves focus to this item.
+   * - `focusItem() => void`: Moves focus to this item's own control.
+   *
+   * The group drives arrow-key navigation and cannot reach the control itself,
+   * which is inside this shadow root. Exposing the intent as a method keeps the
+   * group out of the child's internals.
    * - `select() => void`: Chooses this item and announces it.
    *
    * ## CSS Parts
@@ -33673,7 +33693,11 @@ export type CustomElementsSolidJs = {
    * anchored to something the page moves, which is why nothing wanted this
    * until a chart did.
    * - `show() => void`: Shows the bubble, unless there is nothing to show.
-   * - `hide() => void`: Hides the bubble.
+   * - `hide() => void`: Closes the bubble, and cancels a show that had not happened yet.
+   *
+   * The timer matters as much as the state: a pointer that arrives and leaves
+   * inside the delay left one queued, and the tooltip appeared over whatever
+   * the reader had moved on to.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or

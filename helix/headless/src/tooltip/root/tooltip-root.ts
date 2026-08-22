@@ -389,7 +389,13 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     // path whether the bubble was opened by a pointer or by declaring `open`.
   }
 
-  /** Hides the bubble. */
+  /**
+   * Closes the bubble, and cancels a show that had not happened yet.
+   *
+   * The timer matters as much as the state: a pointer that arrives and leaves
+   * inside the delay left one queued, and the tooltip appeared over whatever
+   * the reader had moved on to.
+   */
   hide(): void {
     clearTimeout(this.timer)
     if (!this.open) {

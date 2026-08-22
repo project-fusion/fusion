@@ -25558,7 +25558,7 @@
                 "text": "number"
               },
               "default": "0",
-              "description": "The reading.",
+              "description": "Where the reading sits between `min` and `max`. Outside them, it clamps.",
               "attribute": "value"
             },
             {
@@ -25823,7 +25823,7 @@
                 "text": "number"
               },
               "default": "0",
-              "description": "The reading.",
+              "description": "Where the reading sits between `min` and `max`. Outside them, it clamps.",
               "fieldName": "value"
             },
             {
@@ -26418,7 +26418,7 @@
                   "default": "false"
                 }
               ],
-              "description": "One step down.",
+              "description": "Steps the value down, by `largeStep` when `large` is set.\n\nThe same path a press of the down arrow takes, so a consumer driving this\nfrom their own control gets the clamping and the announcement rather than\nhaving to repeat both.",
               "type": {
                 "text": "stepDown(large = false) => void"
               }
@@ -48386,7 +48386,7 @@
                   "text": "void"
                 }
               },
-              "description": "Moves focus to this item.",
+              "description": "Moves focus to this item's own control.\n\nThe group drives arrow-key navigation and cannot reach the control itself,\nwhich is inside this shadow root. Exposing the intent as a method keeps the\ngroup out of the child's internals.",
               "type": {
                 "text": "focusItem() => void"
               }
@@ -49085,7 +49085,7 @@
                   "text": "void"
                 }
               },
-              "description": "Hides the bubble.",
+              "description": "Closes the bubble, and cancels a show that had not happened yet.\n\nThe timer matters as much as the state: a pointer that arrives and leaves\ninside the delay left one queued, and the tooltip appeared over whatever\nthe reader had moved on to.",
               "type": {
                 "text": "hide() => void"
               }

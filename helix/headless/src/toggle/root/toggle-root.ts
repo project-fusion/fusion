@@ -38,7 +38,13 @@ export class HelixBaseToggle extends HelixElement {
   @property({ reflect: true, type: Boolean })
   disabled = false
 
-  /** Moves focus to this item. */
+  /**
+   * Moves focus to this item's own control.
+   *
+   * The group drives arrow-key navigation and cannot reach the control itself,
+   * which is inside this shadow root. Exposing the intent as a method keeps the
+   * group out of the child's internals.
+   */
   focusItem(): void {
     this.renderRoot.querySelector<HTMLElement>('[part="item"]')?.focus()
   }

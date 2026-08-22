@@ -13,7 +13,7 @@ export interface NavigableItem {
   contains(node: Node | null): boolean
   /** Whether the item can be reached at all. Skipped when it cannot. */
   disabled: boolean
-  /** Moves focus to the item. */
+  /** Moves focus to the item, which each family does its own way. */
   focusItem(): void
   /** Chooses the item, which for a radio group is the same act as arriving. */
   select(): void

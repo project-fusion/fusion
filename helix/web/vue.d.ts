@@ -3506,7 +3506,7 @@ takes and what a consumer writing `value="72"` means. A range of zero to one
 is a fraction, and a component that reads `value="72"` as seventy-two times
 over its maximum is a trap that costs nothing to avoid. */
   max?: HelixMeter["max"];
-  /** The reading. */
+  /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
   value?: HelixMeter["value"];
   /** Top of the low band. Absent leaves the range unbanded. */
   low?: HelixMeter["low"];

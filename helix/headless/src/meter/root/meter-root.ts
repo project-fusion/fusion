@@ -76,7 +76,7 @@ export class HelixBaseMeter extends HelixElement {
   @property({ type: Number })
   max = 100
 
-  /** The reading. */
+  /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
   @property({ type: Number })
   value = 0
 

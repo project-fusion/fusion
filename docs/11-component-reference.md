@@ -3143,7 +3143,7 @@ reading are what say how far past.
 | `optimum` | `optimum` | `number \| undefined` | - | `HelixBaseMeter` | Where in the range it is best to be. |
 | `shape` | `shape` | `'arc' \| 'ring' \| undefined` | - | `HelixBaseMeter` | Whether the reading is drawn as a bar, a ring or an arc. |
 | `showValue` | `show-value` | `boolean` | `false` | `HelixBaseMeter` | Whether the reading is shown beside the bar. |
-| `value` | `value` | `number` | `0` | `HelixBaseMeter` | The reading. |
+| `value` | `value` | `number` | `0` | `HelixBaseMeter` | Where the reading sits between `min` and `max`. Outside them, it clamps. |
 | `valueText` | `value-text` | `string` | `''` | `HelixBaseMeter` | What the reading says, where a number is not the whole story. |
 
 #### Parts
@@ -3270,7 +3270,7 @@ three times as long to cross.
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 | `select()` | `HelixBaseNumberInput` | Selects the number, so typing replaces it. |
-| `stepDown()` | `HelixBaseNumberInput` | One step down. |
+| `stepDown()` | `HelixBaseNumberInput` | Steps the value down, by `largeStep` when `large` is set. |
 | `stepUp()` | `HelixBaseNumberInput` | One step up, or `PageUp`'s larger one. |
 
 #### Events
@@ -6035,7 +6035,7 @@ one fill appearing as another disappears.
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focusItem()` | `HelixBaseToggle` | Moves focus to this item. |
+| `focusItem()` | `HelixBaseToggle` | Moves focus to this item's own control. |
 | `select()` | `HelixBaseToggle` | Chooses this item and announces it. |
 
 #### Events
@@ -6199,7 +6199,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 
 | Method | From | Description |
 | --- | --- | --- |
-| `hide()` | `HelixBaseTooltip` | Hides the bubble. |
+| `hide()` | `HelixBaseTooltip` | Closes the bubble, and cancels a show that had not happened yet. |
 | `reposition()` | `HelixBaseTooltip` | Places the bubble again, for an anchor that moved without the page moving. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
 | `show()` | `HelixBaseTooltip` | Shows the bubble, unless there is nothing to show. |

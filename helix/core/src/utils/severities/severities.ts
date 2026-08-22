@@ -11,7 +11,7 @@ export type HelixSeverity = 'danger' | 'info' | 'success' | 'warning'
 
 /** What a severity is drawn as, and what it is called. */
 export interface SeverityMark {
-  /** The glyph. */
+  /** The mark drawn beside the message. Never the only carrier of the meaning. */
   icon: HelixIcon
 
   /** What a screen reader is told, since the color says nothing to them. */
