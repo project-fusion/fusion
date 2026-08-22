@@ -912,15 +912,15 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                     not open the branch, which is what a press anywhere else in
                     this row does, and `Tree.Item` asks whether the press landed
                     on a link before it toggles. */}
-                <a
-                  aria-label={`${entry.label} documentation`}
-                  className="docsJump"
-                  href={`/helix/components/${entry.slug}`}
-                  slot="end"
-                  title={`${entry.label} documentation`}
-                >
-                  <helix-icon name="book-open-text" />
-                </a>
+                <helix-tooltip content={`${entry.label} documentation`} slot="end">
+                  <a
+                    aria-label={`${entry.label} documentation`}
+                    className="docsJump"
+                    href={`/helix/components/${entry.slug}`}
+                  >
+                    <helix-icon name="book-open-text" />
+                  </a>
+                </helix-tooltip>
                 {/* Everything here is experimental, and saying so on each row is the
               honest form of that: a badge on the page a reader has already
               opened tells them after they chose it. */}

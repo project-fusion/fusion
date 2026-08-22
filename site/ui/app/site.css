@@ -1190,14 +1190,21 @@ helix-code-block .tok-operator {
   display: inline-flex;
   inline-size: 1.5rem;
   justify-content: center;
-  /* **Present at rest, and it was not.** Revealed only on hover it was reported
-     as simply absent, which is the same fault as a shortcut nobody is told
-     about: the reader has to already know it is there to find out it is there.
-     One quiet 24 square mark on one row is not clutter, and hover now raises
-     the emphasis rather than creating the control. */
+  /* **On hover, as asked, and it took fixing the reasons it could not be seen
+     first.** Revealed-on-hover was reported as simply absent, and the cause was
+     not the gate: a 16 square glyph 4px from a chevron of the same size in the
+     same grey is invisible whenever it is shown. A 24 square target, twelve
+     pixels of air, and it reads. So the gate goes back.
+
+     `opacity` and not `display`, so the row's width does not change as a
+     pointer crosses it and the label does not shift under the reader at the
+     moment they are aiming at it. Not `visibility: hidden` either, which takes
+     it out of the accessibility tree and would hide a link that is there. */
+  opacity: 0;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
+    color var(--helix-duration-fast) var(--helix-easing-standard),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
 
   /* Off the chevron, which sits 4px away and is the same size and the same
      grey. Reported as not being there at all: two 16px marks that close
@@ -1207,22 +1214,38 @@ helix-code-block .tok-operator {
   --icon-size: var(--helix-size-icon-sm);
 }
 
-/* Its own hover and focus, and nothing keyed on the row.
+/* The row reveals it, and only `opacity` is keyed there.
  *
- * **A rule reaching in from `helix-tree-item` is one `check:overruled` fails
- * on, and it is right to.** `tree-item.css` colours `slot[name="start"]`
- * slotted content and not the end slot, so a document rule setting `color`
- * under that element kills nothing *today*: give the end slot a colour
- * tomorrow and it would, silently, because a document rule wins whatever the
- * specificity and whatever the layer.
+ * **A document rule reaching in from `helix-tree-item` is one `check:overruled`
+ * fails on, and it is right to**: it wins whatever the specificity and whatever
+ * the layer, so a property the component sets there is dead. `color` was, which
+ * is why an earlier version of this rule had to go. `opacity` is not set
+ * anywhere in `tree-item.css`, on the host or on slotted content, so keying the
+ * reveal on it collides with nothing and the check stays quiet.
  *
- * There is nothing to key on the row anyway now that the mark is present at
- * rest: the row-hover step existed to create the control, and what is left is
- * a pointer on the target saying so. Fewer rules and no collision. */
+ * `:focus-within` beside `:hover` is not decoration. Gated on hover alone the
+ * link is a control a keyboard can focus and never see, which is worse than one
+ * a keyboard cannot reach at all. */
+/* Descendant and not a child combinator: the link sits inside a `helix-tooltip`
+   now, the way the experimental flask beside it does, so the row's direct child
+   is the tooltip rather than the mark. */
+helix-tree-item:hover .docsJump,
+helix-tree-item:focus-within .docsJump {
+  opacity: 1;
+}
+
+/* A surface, not the accent.
+ *
+ * This painted `--helix-color-primary` and should never have: `tree-item.css`
+ * states the rule one file away, that the accent is reserved for state and
+ * using it for emphasis made the current page the loudest thing on screen. A
+ * link inside that tree does not get to disagree with the tree. The surface
+ * does the work and the ink goes to full strength, which is what the row's own
+ * hover does. */
 .docsJump:hover,
 .docsJump:focus-visible {
-  background-color: var(--helix-color-surface-sunken);
-  color: var(--helix-color-primary);
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
 }
 
 /* Named one selector at a time, for the reason `check:motion` exists: a reduce
