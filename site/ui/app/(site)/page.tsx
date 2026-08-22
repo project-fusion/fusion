@@ -72,10 +72,10 @@ export default function Home() {
       <helix-aura
         class="reelAura"
         gain={0.55}
-        scale={1.7}
+        scale={1.1}
         shape="flow"
         speed={1}
-        terminus={0.4}
+        terminus={0.5}
       ></helix-aura>
       <div className="reelScrim" />
 
@@ -89,7 +89,7 @@ export default function Home() {
             <helix-tag>Fusion Development Group</helix-tag>
           </helix-flex>
           <helix-text as="h1" class="heroTitle">
-            Interface and intelligence, already built
+            The interface layer, already built
           </helix-text>
           {/* **Half the words it had, because a hero is read standing up.** The
               title carried nine words and the lede three sentences, one of
@@ -101,10 +101,18 @@ export default function Home() {
               **The title is the reader's problem and the lede is the answer.**
               Both lines were about us before: a discipline we practise, then
               the two audiences we serve. Neither told a reader what they get.
-              The interface and the intelligence layers are the expensive part of
-              any serious product, which is a fact about their work rather than
-              about ours, and naming the two substrates is what turns the claim
-              into something checkable.
+              The interface layer is the expensive part of any serious product,
+              which is a fact about their work rather than about ours.
+
+              **Helix only, and Cortex is not named here.** The hero is a
+              reader's first sentence about us, and it should name the thing
+              they can have. Helix is nearly shippable and the line below this
+              installs it; Cortex is a long way from a release, and a front door
+              naming both spends half its only sentence on something nobody can
+              use yet. That is the argument the stage labels make everywhere
+              else on the site, applied to the place where getting it wrong
+              costs most. Cortex belongs where it can be described honestly,
+              with a stage on it, rather than in a line that reads as an offer.
 
               **The sovereignty argument is not here, deliberately.** It is a
               claim about where this goes rather than about what exists, and a
@@ -112,7 +120,7 @@ export default function Home() {
               being shown a present. `/thesis` is where it belongs and where it
               still is. */}
           <helix-text as="p" class="heroLede measure" tone="muted">
-            Take Helix and Cortex and go, or hire us to build with them.
+            Take Helix and go, or hire us to build with it.
           </helix-text>
           <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
             <Link
