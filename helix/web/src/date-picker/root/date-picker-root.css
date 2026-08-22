@@ -163,9 +163,18 @@
  *
  * A ring rather than a fill, because a fill is what selection is: the two land
  * on the same cell whenever the reader is choosing today, and one has to read
- * through the other. */
+ * through the other.
+ *
+ * **The resting hairline, because today is a fact and not an interaction.**
+ * This was `border-strong`, and it is the site the sweep that removed that
+ * token missed: seventeen others moved to `border` or to `primary` and this one
+ * kept naming a token that no longer exists, so the whole declaration was
+ * invalid at computed-value time and the ring simply never drew. `main` was red
+ * on it. Menu's note records the same choice for the same reason: `border-strong`
+ * existed because `border` was invisible against a raised surface in dark mode,
+ * and the ramp puts a step between them now. */
 [part="cell"][data-today] [part="day"] {
-  box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border-strong);
+  box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border);
 }
 
 [part="cell"][data-outside] [part="day"] {
@@ -221,13 +230,18 @@
 
 /* The ends of a range, and a single date, are the solid mark. The days between
    them carry only the band. */
-/* Grays rather than the accent, the same call Time's range takes.
-   `foreground-muted` and not `foreground`, which is a slab of near-black in a
-   grid of gray squares: measured at 21:1 against its own label where the muted
-   step is 6.01, past AA with room and leaving black to the text. */
+/* Grays rather than the accent, the same call Time's range takes, and now by the
+   same pair of tokens.
+
+   **`foreground-muted` is an ink, and this is a ground.** The 6.01 recorded here
+   was measured in light mode, where muted is a dark gray and white sits on it
+   comfortably. In dark it is a *light* gray, because an ink follows the page and
+   inverts with it, and white on it reads 2.58:1. A ground that must stay dark
+   while the page goes light is `surface-inverse`, which is what it says: the
+   opposite of the page, in either direction, carrying `foreground-inverse`. */
 [part="cell"][aria-selected]:not([data-range-middle]) [part="day"] {
-  background-color: var(--date-picker-selected-color, var(--helix-color-foreground-muted));
-  color: var(--helix-color-foreground-on-accent);
+  background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
+  color: var(--helix-color-foreground-inverse);
 }
 
 [part="cell"][aria-disabled] {
