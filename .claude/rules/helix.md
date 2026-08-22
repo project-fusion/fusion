@@ -93,6 +93,36 @@ consumer styles would animate open to nothing. It also needs a `beforematch`
 handler to set the open state, or find-in-page reveals content while the trigger
 still reports collapsed.
 
+### The base tier publishes facts, and CSS is a fine channel for them
+
+**Setting a custom property is not styling, so the tier rule does not bar it.**
+A base component knows things CSS cannot compute (where a thumb sits, how deep
+a row is nested, a video's intrinsic ratio) and writing one into a
+`style="--_thing: 0.42"` hands it to whoever is drawing without reaching for a
+single token. Ten families already do it: `--_slider-fraction`,
+`--_splitter-position`, `--_tree-level`, `--_progress-fraction`,
+`--_meter-sweep`, `--_calendar-columns`, `--_hue`, `--_video-ratio`,
+`--_megamenu-top`.
+
+**The line is a fact against a decision.** A fraction, a position, an index, a
+level, a measured ratio, a count: the component computed it and nothing else
+can. A colour, a spacing, a duration, an easing: those are the styled tier's,
+and a base component reaching for `--helix-*` to write one would be the
+dependency the tier split exists to prevent.
+
+**The leading underscore means the component writes it**, which is a different
+claim from the one it makes on `--_helix-*` primitives, where it means do not
+reach past the semantic layer. Both are "not yours to set" and only one is "not
+yours to read". Held at 100 out of 100 declarations, and never written down
+until now.
+
+**They are not declared, which is the gap.** `@cssproperty` appears once in the
+whole headless package, so none of these reaches the manifest or a docs page: a
+consumer on the headless tier, who needs `--_slider-fraction` precisely because
+they have no stylesheet from us, has no way to discover it and would have to
+recompute `(value - min) / (max - min)` themselves. That is the headless tier
+being less independently consumable than it claims. #137.
+
 ### A component that renders another names the public tag and imports it
 
 A custom element registers on import. A tag nobody imported is not an error and
