@@ -1,0 +1,18 @@
+<!-- @summary A bubble clamped to a box of the page's choosing rather than to the window. -->
+
+<div id="tooltipbounds">
+  <helix-flex
+    align="center"
+    gap="sm"
+  >
+    <helix-tooltip
+      content="Clamped to the row, not to the window"
+      within="tooltipbounds"
+    >
+      <helix-button>At the edge</helix-button>
+    </helix-tooltip>
+    <helix-tooltip content="Placed the ordinary way">
+      <helix-button>In the middle</helix-button>
+    </helix-tooltip>
+  </helix-flex>
+</div>

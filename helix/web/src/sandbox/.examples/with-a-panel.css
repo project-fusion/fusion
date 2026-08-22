@@ -1,0 +1,4 @@
+/* The shell fills what it is given, so an example has to give it a height. */
+.stage {
+  block-size: 24rem;
+}

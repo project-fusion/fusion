@@ -1,0 +1,14 @@
+<!-- @summary The month on show owned by the page, which is what paging from outside needs. -->
+
+<helix-date-picker
+  id="calendar"
+  month="2026-12"
+></helix-date-picker>
+
+<script>
+  const calendar = document.getElementById('calendar')
+
+  calendar.addEventListener('helix-navigate', (event) => {
+    calendar.month = event.detail.month
+  })
+</script>

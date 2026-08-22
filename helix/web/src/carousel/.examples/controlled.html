@@ -1,0 +1,19 @@
+<!-- @summary A carousel the page owns, so the slide it shows can be driven from elsewhere. -->
+
+<helix-carousel
+  id="reel"
+  index="1"
+  label="Screens"
+>
+  <div>First</div>
+  <div>Second</div>
+  <div>Third</div>
+</helix-carousel>
+
+<script>
+  const reel = document.getElementById('reel')
+
+  reel.addEventListener('helix-select', (event) => {
+    reel.index = event.detail.index
+  })
+</script>

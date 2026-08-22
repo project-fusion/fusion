@@ -1,0 +1,18 @@
+<!-- @summary A sequence the page owns, so a step only advances once the work behind it is done. -->
+
+<helix-steps
+  active="details"
+  id="flow"
+>
+  <helix-step value="account">Account</helix-step>
+  <helix-step value="details">Details</helix-step>
+  <helix-step value="review">Review</helix-step>
+</helix-steps>
+
+<script>
+  const flow = document.getElementById('flow')
+
+  flow.addEventListener('helix-change', (event) => {
+    flow.active = event.detail.value
+  })
+</script>

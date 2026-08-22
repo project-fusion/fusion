@@ -709,6 +709,10 @@
                 "slug": "default"
               },
               {
+                "description": "The mark at the end of the row, for a list read as a table of contents.",
+                "slug": "chevron-at-the-end"
+              },
+              {
                 "description": "A hairline around the set, for a panel that needs an edge against the page.",
                 "slug": "outlined"
               },
@@ -1452,6 +1456,10 @@
               {
                 "description": "Blurred over what scrolls beneath it.",
                 "slug": "material"
+              },
+              {
+                "description": "The navigation pulled to the start, beside the mark rather than centred.",
+                "slug": "navigation-at-the-start"
               },
               {
                 "description": "Held at the top while the page moves under it.",
@@ -6548,6 +6556,10 @@
                 "slug": "linked"
               },
               {
+                "description": "The picture down one side, for a row in a list rather than a tile in a grid.",
+                "slug": "media-beside"
+              },
+              {
                 "description": "A hairline and no fill.",
                 "slug": "outlined"
               },
@@ -7271,6 +7283,10 @@
               {
                 "description": "Slides with controls and indicators, one at a time.",
                 "slug": "default"
+              },
+              {
+                "description": "A carousel the page owns, so the slide it shows can be driven from elsewhere.",
+                "slug": "controlled"
               },
               {
                 "description": "Full-bleed slides with the controls over the picture.",
@@ -9237,6 +9253,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "The third state, for a parent whose children disagree.",
+                "slug": "indeterminate"
+              },
+              {
                 "description": "A checkbox reporting why it is not acceptable.",
                 "slug": "invalid"
               },
@@ -10967,6 +10987,10 @@
                 "slug": "invalid"
               },
               {
+                "description": "The value left exactly as written, for a field feeding something that parses it itself.",
+                "slug": "raw-value"
+              },
+              {
                 "description": "The swatch alone, for a toolbar with no room for a field.",
                 "slug": "swatch"
               },
@@ -12185,6 +12209,10 @@
               {
                 "description": "The picker reporting a value it cannot use.",
                 "slug": "invalid"
+              },
+              {
+                "description": "Without the readout and without the eyedropper, for a picker beside its own preview.",
+                "slug": "pared-back"
               },
               {
                 "description": "Prepared colours under the picker, with opacity on.",
@@ -17027,6 +17055,10 @@
               {
                 "description": "A start and an end, chosen as one gesture.",
                 "slug": "range"
+              },
+              {
+                "description": "Dates a reader may not choose, and a week that starts on Monday.",
+                "slug": "restricted"
               }
             ],
             "source": "helix/web/src/date-input"
@@ -18473,6 +18505,10 @@
                 "slug": "bounded"
               },
               {
+                "description": "The month on show owned by the page, which is what paging from outside needs.",
+                "slug": "controlled-month"
+              },
+              {
                 "description": "Disabled, showing its date and refusing to move.",
                 "slug": "disabled"
               },
@@ -19378,6 +19414,10 @@
                 "slug": "large"
               },
               {
+                "description": "A dialog Escape and an outside press will not close, for a choice that must be made.",
+                "slug": "persistent"
+              },
+              {
                 "description": "Narrow, which suits a question with two answers.",
                 "slug": "small"
               }
@@ -19710,6 +19750,10 @@
               {
                 "description": "Rules that stop short of the edge, for a divider inside a padded box.",
                 "slug": "inset"
+              },
+              {
+                "description": "A rule down the gap between two things on a line.",
+                "slug": "upright"
               },
               {
                 "description": "A word set into the rule, which is how a form says or.",
@@ -20849,6 +20893,10 @@
               {
                 "description": "A panel from the edge, opened by a button.",
                 "slug": "default"
+              },
+              {
+                "description": "A panel beside the page rather than over it, with the page still usable behind it.",
+                "slug": "inline"
               },
               {
                 "description": "The four edges a drawer can arrive from.",
@@ -22086,6 +22134,10 @@
               {
                 "description": "Nothing to show, with a heading, an explanation and a way forward.",
                 "slug": "default"
+              },
+              {
+                "description": "Not announced, for an empty state that arrives with the page rather than after a search.",
+                "slug": "quiet"
               }
             ],
             "source": "helix/web/src/empty"
@@ -23063,6 +23115,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "Asking a phone for its camera rather than its files.",
+                "slug": "from-a-camera"
+              },
+              {
                 "description": "A file the field will not take, and what it says about it.",
                 "slug": "invalid"
               },
@@ -23917,6 +23973,10 @@
                 "slug": "default"
               },
               {
+                "description": "Rows whose items sit on one line rather than stretching to the tallest.",
+                "slug": "aligned"
+              },
+              {
                 "description": "A named number of columns, for a layout that must not reflow.",
                 "slug": "fixed-columns"
               }
@@ -24581,6 +24641,10 @@
               {
                 "description": "Round or square, and lifted off the surface where it floats over content.",
                 "slug": "shapes"
+              },
+              {
+                "description": "The ranked forms, for a control bar that already had them before tone existed.",
+                "slug": "variants"
               }
             ],
             "source": "helix/web/src/icon-button"
@@ -30669,6 +30733,10 @@
                 "slug": "default"
               },
               {
+                "description": "The filter text owned by the page, for a list narrowed from a box outside it.",
+                "slug": "controlled-filter"
+              },
+              {
                 "description": "A whole list disabled, and one option disabled inside a live list.",
                 "slug": "disabled"
               },
@@ -31982,6 +32050,10 @@
               {
                 "description": "A band from edge to edge, for a panel too wide to hang off one word.",
                 "slug": "full"
+              },
+              {
+                "description": "Opening on hover, and spanning the whole width under the bar rather than its trigger.",
+                "slug": "on-hover"
               }
             ],
             "source": "helix/web/src/megamenu"
@@ -33434,6 +33506,10 @@
               {
                 "description": "Rows that navigate, as real anchors.",
                 "slug": "links"
+              },
+              {
+                "description": "A menu on a side of its own choosing, further off, with a row that saves a file.",
+                "slug": "placed"
               }
             ],
             "source": "helix/web/src/menu"
@@ -34169,6 +34245,10 @@
               {
                 "description": "A reading that says its own number, in words the reader chose.",
                 "slug": "counted"
+              },
+              {
+                "description": "A scale that does not start at zero, for a reading that never goes near it.",
+                "slug": "offset-range"
               },
               {
                 "description": "The reading drawn as a ring rather than a bar.",
@@ -35812,6 +35892,10 @@
               {
                 "description": "A grip that changes the value when dragged, with coarse and fine.",
                 "slug": "scrub"
+              },
+              {
+                "description": "A coarse step for Page Up and Page Down, over a fine one for the arrows.",
+                "slug": "steps"
               },
               {
                 "description": "A unit set beside the number rather than typed into it.",
@@ -40138,6 +40222,10 @@
               {
                 "description": "The characters hidden as they are typed, for a code that is a secret.",
                 "slug": "masked"
+              },
+              {
+                "description": "A code shown rather than asked for, still selectable and still announced.",
+                "slug": "read-only"
               }
             ],
             "source": "helix/web/src/pin-input"
@@ -40869,6 +40957,10 @@
               {
                 "description": "No arrow and no fill, for a panel that supplies its own.",
                 "slug": "plain"
+              },
+              {
+                "description": "Further from its trigger, for one that already carries a ring of its own.",
+                "slug": "roomy"
               }
             ],
             "source": "helix/web/src/popover"
@@ -43335,6 +43427,10 @@
               {
                 "description": "A question that has to be answered before the form will submit.",
                 "slug": "required"
+              },
+              {
+                "description": "The dot hidden, so the whole chip is the target rather than the mark beside it.",
+                "slug": "without-the-mark"
               }
             ],
             "source": "helix/web/src/radio"
@@ -45740,6 +45836,18 @@
               {
                 "description": "Source beside a preview, with a toolbar over both and a status bar under them.",
                 "slug": "default"
+              },
+              {
+                "description": "The real preview frame, which runs what it is given inside a sandboxed document.",
+                "slug": "a-live-preview"
+              },
+              {
+                "description": "The preview leading, stacked, with the source pane taking the smaller share.",
+                "slug": "preview-leading"
+              },
+              {
+                "description": "A third pane down the side, sized and collapsible, with every separator named.",
+                "slug": "with-a-panel"
               }
             ],
             "source": "helix/web/src/sandbox"
@@ -48052,6 +48160,10 @@
               {
                 "description": "Disabled, and one option disabled inside a live select.",
                 "slug": "disabled"
+              },
+              {
+                "description": "A search box in the list, for a set too long to scan.",
+                "slug": "filterable"
               },
               {
                 "description": "A select reporting that nothing was chosen.",
@@ -51241,6 +51353,10 @@
               {
                 "description": "A floating action button, and the few actions it fans out.",
                 "slug": "default"
+              },
+              {
+                "description": "The actions opening upward and to the side, further from the button that holds them.",
+                "slug": "placed"
               }
             ],
             "source": "helix/web/src/speed-dial"
@@ -52522,6 +52638,10 @@
                 "slug": "columns"
               },
               {
+                "description": "A divider the page owns, answering the event and assigning `position` and `collapsed`.",
+                "slug": "controlled"
+              },
+              {
                 "description": "A divider with a visible grip rather than a bare rule.",
                 "slug": "grip"
               },
@@ -53431,6 +53551,10 @@
               {
                 "description": "Steps that fold to the current one where there is no room for all of them.",
                 "slug": "collapsible"
+              },
+              {
+                "description": "A sequence the page owns, so a step only advances once the work behind it is done.",
+                "slug": "controlled"
               },
               {
                 "description": "Numbered steps rather than marked ones.",
@@ -55762,6 +55886,10 @@
               {
                 "description": "Rows and columns with a caption naming what they are.",
                 "slug": "default"
+              },
+              {
+                "description": "The track sizes written once on the table, rather than one width per column.",
+                "slug": "columns"
               }
             ],
             "source": "helix/web/src/table"
@@ -56714,6 +56842,10 @@
               {
                 "description": "Panels behind tabs, with a mark that travels between them.",
                 "slug": "default"
+              },
+              {
+                "description": "A strip the page owns, answering the event and assigning `active`.",
+                "slug": "controlled"
               },
               {
                 "description": "Arrow keys move between tabs without opening them, so a reader can look before choosing.",
@@ -64523,6 +64655,10 @@
                 "slug": "invalid"
               },
               {
+                "description": "The word before the control, for a row read as a sentence.",
+                "slug": "label-first"
+              },
+              {
                 "description": "No track and no edges, for a group inside something that has both.",
                 "slug": "plain"
               },
@@ -64915,6 +65051,10 @@
               {
                 "description": "Controls in a row that arrow keys move between as one stop.",
                 "slug": "default"
+              },
+              {
+                "description": "A column of controls, where the arrow keys move up and down instead.",
+                "slug": "upright"
               }
             ],
             "source": "helix/web/src/toolbar"
@@ -65685,6 +65825,10 @@
                 "slug": "described"
               },
               {
+                "description": "A bubble clamped to a box of the page's choosing rather than to the window.",
+                "slug": "kept-inside"
+              },
+              {
                 "description": "The twelve positions a tooltip can take around its anchor.",
                 "slug": "placements"
               },
@@ -66386,6 +66530,10 @@
               {
                 "description": "A path that opens a menu and a drawer to point at what is inside them.",
                 "slug": "nested"
+              },
+              {
+                "description": "The first and last stops saying so, with more room cut around what they point at.",
+                "slug": "positions"
               },
               {
                 "description": "Controls of your own, with a count of where the reader is.",
@@ -68576,6 +68724,14 @@
                 "slug": "chevron-placement"
               },
               {
+                "description": "A tree whose current node is the page's, which is what a router-driven one needs.",
+                "slug": "controlled"
+              },
+              {
+                "description": "A node told its own depth, for a tree built from a flat list rather than by nesting.",
+                "slug": "flattened"
+              },
+              {
                 "description": "The same tree with a glyph on each node.",
                 "slug": "with-icons"
               }
@@ -70040,8 +70196,16 @@
                 "slug": "beside-the-player"
               },
               {
+                "description": "A playlist whose current clip is the page's, so a deep link can choose one.",
+                "slug": "controlled"
+              },
+              {
                 "description": "The entries as a menu in the player's control bar, and no list beside it.",
                 "slug": "in-the-control-bar"
+              },
+              {
+                "description": "The list opening above the control that holds it, with one entry already playing.",
+                "slug": "placed"
               }
             ],
             "source": "helix/web/src/video-playlist"

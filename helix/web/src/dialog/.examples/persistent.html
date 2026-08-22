@@ -1,0 +1,20 @@
+<!-- @summary A dialog Escape and an outside press will not close, for a choice that must be made. -->
+
+<helix-dialog
+  default-open
+  label="Unsaved changes"
+  persistent
+>
+  <p>Two edits have not been saved. Closing now discards them.</p>
+  <helix-flex
+    gap="sm"
+    slot="footer"
+  >
+    <helix-button>Discard</helix-button>
+    <helix-button
+      appearance="solid"
+      tone="primary"
+    >Save</helix-button
+    >
+  </helix-flex>
+</helix-dialog>

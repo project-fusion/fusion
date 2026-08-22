@@ -1,0 +1,23 @@
+<!-- @summary A playlist whose current clip is the page's, so a deep link can choose one. -->
+
+<helix-video-playlist
+  active="two"
+  id="episodes"
+  label="Episodes"
+>
+  <helix-video
+    label="One of several"
+    slot="player"
+  ></helix-video>
+
+  <helix-video-playlist-item value="one">Getting started</helix-video-playlist-item>
+  <helix-video-playlist-item value="two">Tokens and themes</helix-video-playlist-item>
+</helix-video-playlist>
+
+<script>
+  const episodes = document.getElementById('episodes')
+
+  episodes.addEventListener('helix-change', (event) => {
+    episodes.active = event.detail.value
+  })
+</script>

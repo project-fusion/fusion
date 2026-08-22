@@ -1,0 +1,19 @@
+<!-- @summary The filter text owned by the page, for a list narrowed from a box outside it. -->
+
+<helix-listbox
+  filter="e"
+  id="zones"
+  label="Time zone"
+>
+  <helix-option value="lisbon">Europe/Lisbon</helix-option>
+  <helix-option value="london">Europe/London</helix-option>
+  <helix-option value="berlin">Europe/Berlin</helix-option>
+</helix-listbox>
+
+<script>
+  const zones = document.getElementById('zones')
+
+  zones.addEventListener('helix-filter', (event) => {
+    zones.filter = event.detail.value
+  })
+</script>

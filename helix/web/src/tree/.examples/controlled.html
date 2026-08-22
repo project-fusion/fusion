@@ -1,0 +1,19 @@
+<!-- @summary A tree whose current node is the page's, which is what a router-driven one needs. -->
+
+<helix-tree
+  active="engram"
+  id="packages"
+  label="Packages"
+>
+  <helix-tree-item value="core">core</helix-tree-item>
+  <helix-tree-item value="engram">engram</helix-tree-item>
+  <helix-tree-item value="trace">trace</helix-tree-item>
+</helix-tree>
+
+<script>
+  const packages = document.getElementById('packages')
+
+  packages.addEventListener('helix-change', (event) => {
+    packages.active = event.detail.value
+  })
+</script>

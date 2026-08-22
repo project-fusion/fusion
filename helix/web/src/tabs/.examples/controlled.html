@@ -1,0 +1,22 @@
+<!-- @summary A strip the page owns, answering the event and assigning `active`. -->
+
+<helix-tabs
+  active="usage"
+  id="strip"
+>
+  <helix-tabs-tab value="overview">Overview</helix-tabs-tab>
+  <helix-tabs-tab value="usage">Usage</helix-tabs-tab>
+
+  <div slot="panels">
+    <helix-tabs-panel value="overview">What the account is doing.</helix-tabs-panel>
+    <helix-tabs-panel value="usage">Requests, storage and egress.</helix-tabs-panel>
+  </div>
+</helix-tabs>
+
+<script>
+  const strip = document.getElementById('strip')
+
+  strip.addEventListener('helix-change', (event) => {
+    strip.active = event.detail.value
+  })
+</script>

@@ -1,0 +1,19 @@
+<!-- @summary A divider the page owns, answering the event and assigning `position` and `collapsed`. -->
+
+<helix-splitter
+  collapsed
+  id="panes"
+  position="35"
+>
+  <div slot="start">Folded until the page says otherwise.</div>
+  <div slot="end">The other side.</div>
+</helix-splitter>
+
+<script>
+  const panes = document.getElementById('panes')
+
+  panes.addEventListener('helix-change', (event) => {
+    panes.position = event.detail.position
+    panes.collapsed = event.detail.collapsed
+  })
+</script>
