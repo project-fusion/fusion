@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom, settled } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -150,6 +150,15 @@ if (hasLayout()) {
       const host = document.querySelector('helix-bar-chart') as HTMLElement
       const bar = part(host, 'bar') as unknown as SVGRectElement
       expect(typeof bar.getBBox).toBe('function')
+
+      /* **After the growing, or the box is the one it started at.** Columns
+         arrive from `@starting-style { height: 0 }` and transition into place,
+         so `getBBox` immediately after the update reports the *used* height,
+         which is zero, while the `height` attribute already holds the answer.
+         Measured in Chrome: attribute 44.44, bbox 0, two transitions running;
+         once they finish, bbox 44.44. The old form read the first of those and
+         reported a bar chart that draws nothing. */
+      await settled(bar)
       expect(bar.getBBox().height).toBeGreaterThan(0)
     })
   })

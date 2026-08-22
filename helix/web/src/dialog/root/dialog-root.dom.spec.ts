@@ -145,14 +145,15 @@ describe('dialog invokers', () => {
   })
 
   test('a command naming nothing reaches nothing', async () => {
-    /* No `toThrow` here, in either direction: the browser harness does not
-       implement it, and a press that threw would fail this test by itself. The
-       assertion after it is what says the press was a no-op rather than that it
-       merely survived. */
+    /* Both halves, and they say different things. `not.toThrow` is that the
+       press survived; the attribute after it is that it did nothing. A press
+       that threw would fail this test either way, which is why the second
+       assertion was carrying the meaning alone while the harness had no
+       `toThrow` to write the first with. */
     const { dialog, trigger } = await wired()
     trigger.setAttribute('commandfor', 'absent')
     await (trigger as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
-    press(trigger)
+    expect(() => press(trigger)).not.toThrow()
     await dialog.updateComplete
     expect(dialog.hasAttribute('data-open')).toBe(false)
   })

@@ -15,6 +15,7 @@
     "check:grounds": "node tooling/scripts/check-grounds.mjs",
     "check:hooks": "node tooling/scripts/check-hooks.mjs",
     "check:leaks": "node tooling/scripts/check-leaks.mjs",
+    "check:matchers": "node tooling/scripts/check-matchers.mjs",
     "check:icons": "node tooling/scripts/check-icons.mjs",
     "check:composed": "node tooling/scripts/check-composed.mjs",
     "check:disabled": "node tooling/scripts/check-disabled.mjs",
@@ -54,7 +55,7 @@
     "test": "turbo run test",
     "test:template": "node tooling/scripts/run-template-test.mjs",
     "typecheck": "turbo run typecheck",
-    "verify": "biome ci . && bun run check:publishable && bun run check:tokens && bun run typecheck && bun run analyze && bun run check:examples && bun run check:icons && bun run check:queue && bun run check:reference && bun run check:tokens-reference && bun run check:selectors && bun run check:overruled && bun run check:composed && bun run check:seams && bun run check:references && bun run check:reflected && bun run check:leaks && bun run check:disabled && bun run check:motion && bun run check:observers && bun run check:shaders && bun run check:hooks && bun run check:grounds && bun run check:parts && bun run check:art && bun run check:events && bun run check:controlled && bun run check:react-bridge && bun run check:specs && bun run check:stable && bun run check:floors && bun run test && bun run rs:check && bun run rs:test",
+    "verify": "biome ci . && bun run check:publishable && bun run check:tokens && bun run typecheck && bun run analyze && bun run check:examples && bun run check:icons && bun run check:queue && bun run check:reference && bun run check:tokens-reference && bun run check:selectors && bun run check:overruled && bun run check:composed && bun run check:seams && bun run check:references && bun run check:reflected && bun run check:leaks && bun run check:disabled && bun run check:motion && bun run check:observers && bun run check:shaders && bun run check:hooks && bun run check:grounds && bun run check:parts && bun run check:art && bun run check:events && bun run check:controlled && bun run check:react-bridge && bun run check:matchers && bun run check:specs && bun run check:stable && bun run check:floors && bun run test && bun run rs:check && bun run rs:test",
     "check:motion": "node tooling/scripts/check-motion.mjs",
     "check:observers": "node tooling/scripts/check-observers.mjs",
     "check:art": "node tooling/scripts/check-art.mjs"

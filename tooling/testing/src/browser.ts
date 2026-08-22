@@ -125,6 +125,12 @@ const show = (value: unknown): string => {
   if (value instanceof Element) {
     return `<${value.tagName.toLowerCase()}>`
   }
+  /* A thunk, which is the only thing `toThrow` is ever handed. Printed through
+     the branches below it is its own source text, so a one-line failure became
+     the whole arrow function and the message after it scrolled off. */
+  if (typeof value === 'function') {
+    return 'the call'
+  }
   if (value === null || value === undefined || typeof value !== 'object') {
     return String(value)
   }
@@ -187,6 +193,7 @@ const same = (a: unknown, b: unknown): boolean => {
 
 interface Matchers {
   toBe: (expected: unknown) => void
+  toBeCloseTo: (expected: number, digits?: number) => void
   toBeDefined: () => void
   toBeTruthy: () => void
   toBeUndefined: () => void
@@ -199,6 +206,7 @@ interface Matchers {
   toEqual: (expected: unknown) => void
   toHaveLength: (expected: number) => void
   toMatch: (expected: RegExp | string) => void
+  toThrow: (expected?: RegExp | string) => void
 }
 
 const build = (actual: unknown, negated: boolean): Matchers => {
@@ -224,6 +232,16 @@ const build = (actual: unknown, negated: boolean): Matchers => {
   const number = actual as number
   return {
     toBe: (expected) => check(Object.is(actual, expected), `to be ${show(expected)}`),
+    /* `bun:test`'s tolerance exactly, which is what makes a spec mean the same
+       thing in both runners: within half a unit of the last digit asked for, so
+       the default of 2 accepts a difference under 0.005. Geometry is why the
+       charts reach for it, an arc length landing on 100.00000000000001 being
+       the same arc as one landing on 100. */
+    toBeCloseTo: (expected, digits = 2) =>
+      check(
+        Math.abs(number - expected) < 10 ** -digits / 2,
+        `to be within ${10 ** -digits / 2} of ${expected}`,
+      ),
     toBeDefined: () => check(actual !== undefined, 'to be defined'),
     toBeGreaterThan: (expected) => check(number > expected, `to be greater than ${expected}`),
     toBeGreaterThanOrEqual: (expected) => check(number >= expected, `to be at least ${expected}`),
@@ -247,6 +265,35 @@ const build = (actual: unknown, negated: boolean): Matchers => {
     toMatch: (expected) => {
       const pattern = typeof expected === 'string' ? new RegExp(expected) : expected
       check(typeof actual === 'string' && pattern.test(actual), `to match ${show(expected)}`)
+    },
+    /* The thunk is called here rather than by the spec, which is the whole
+       point of it: a spec that called it would throw before reaching the
+       assertion. A non-function is a bug in the spec and says so, rather than
+       quietly reporting that the value did not throw, which it never could. */
+    toThrow: (expected) => {
+      if (typeof actual !== 'function') {
+        throw new Error(`toThrow needs a function to call, and was given ${show(actual)}`)
+      }
+      let thrown: unknown
+      let threw = false
+      try {
+        ;(actual as () => unknown)()
+      } catch (error) {
+        thrown = error
+        threw = true
+      }
+      if (expected === undefined) {
+        check(threw, 'to throw')
+        return
+      }
+      const message = thrown instanceof Error ? thrown.message : String(thrown)
+      const matched =
+        threw &&
+        (typeof expected === 'string' ? message.includes(expected) : expected.test(message))
+      check(
+        matched,
+        `to throw ${show(expected)}, and it threw ${threw ? show(message) : 'nothing'}`,
+      )
     },
   }
 }

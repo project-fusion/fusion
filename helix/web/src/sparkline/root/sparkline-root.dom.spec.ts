@@ -272,10 +272,10 @@ if (hasLayout()) {
          first version of this test did exactly that and reported the component
          for a stroke it had never lost. */
       await mount(`<div>
-        <helix-sparkline id="plain" values="1 9 3"></helix-sparkline>
+        <helix-sparkline id="bare" plot="line" values="1 9 3"></helix-sparkline>
         <helix-sparkline id="washed" plot="area" values="1 9 3"></helix-sparkline>
       </div>`)
-      const plain = document.getElementById('plain') as HTMLElement
+      const plain = document.getElementById('bare') as HTMLElement
       const washed = document.getElementById('washed') as HTMLElement
       await Promise.all(
         [plain, washed].map(
@@ -283,7 +283,14 @@ if (hasLayout()) {
         ),
       )
 
-      // A line plot draws no region at all now, rather than one kept invisible.
+      /* A line plot draws no region at all now, rather than one kept invisible.
+         **`plot="line"` written out, because absent is not it.** This mounted a
+         sparkline with no `plot` and called it the line case, and absent is
+         `area` here, deliberately and for the reason the class doc gives: at
+         the size a sparkline is drawn, a hairline in a wide box is mostly box.
+         So the assertion was made against the one element that must fail it,
+         and the case it names was never tested. It failed only in a real
+         engine, where this block runs. */
       expect(part(plain, 'area')).toBeNull()
       const stops = [...(washed.shadowRoot?.querySelectorAll('stop') ?? [])]
       const opacities = stops.map((stop) => Number(getComputedStyle(stop).stopOpacity))
