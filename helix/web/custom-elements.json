@@ -45846,6 +45846,10 @@
                 "slug": "preview-leading"
               },
               {
+                "description": "Panes opening at a stated size, which a workbench restores from a previous visit.",
+                "slug": "sized-panes"
+              },
+              {
                 "description": "A third pane down the side, sized and collapsible, with every separator named.",
                 "slug": "with-a-panel"
               }

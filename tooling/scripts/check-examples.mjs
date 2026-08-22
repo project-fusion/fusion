@@ -55,13 +55,29 @@ for (const module of JSON.parse(readFileSync(MANIFEST, 'utf8')).modules ?? []) {
           .map((member) => [member.name, member.helix.controlled]),
       ),
       attributes,
-      /* Which attributes hand the state to a consumer, derived rather than
-         listed: an attribute is a controlled state exactly when the element
-         also declares its `default-` sibling, because that pair is what the
-         model is. Twenty elements and twenty-four attributes fall out of it
-         today, and a twenty-fifth is covered the day someone adds it, which a
-         list in this file would not be. */
-      controlled: new Set([...attributes].filter((name) => attributes.has(`default-${name}`))),
+      /* Which attributes hand the state to a consumer, read from `@controlled`
+         and not from the `default-` naming pattern.
+       *
+       * The pattern was the first test, on the reasoning that an attribute is a
+         controlled state exactly when the element declares its `default-`
+         sibling, because that pair is the model. It is true of every component
+         that follows the contract and false of `Sandbox`, where `default-split`
+         means *what a reset makes it* rather than the seed of a controlled
+         pair: the element writes `split` back on every drag, so it owns the
+         state and hands nobody anything. Its own comment says so.
+       *
+         Derived, that produced a complaint with no fix in it. `@controlled`
+         also names the settling event, so a property without the tag has no
+         event to name, and the message degraded to "nothing here can answer",
+         which is true and useless. The tag is authoritative and loses no
+         coverage: `check:controlled` holds it and the `requestControlledChange`
+         call to each other in both directions, so a genuinely controlled
+         property cannot be missing it. */
+      controlled: new Set(
+        (declaration.members ?? [])
+          .filter((member) => member.helix?.controlled?.length && member.name)
+          .map((member) => member.attribute ?? member.name),
+      ),
       slots: new Set((declaration.slots ?? []).map((s) => s.name).filter(Boolean)),
     })
   }
