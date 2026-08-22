@@ -46,13 +46,23 @@
  * does not sit on the accent, and this is the one place in this component where
  * a row stops being a row on the panel. */
 :host([mode="range"]) [part="option"][selected]::part(item) {
-  /* `foreground-muted` rather than `foreground`, which was tried first and is a
-     slab of near-black in a list of gray rows: measured at 21:1 against its own
-     label, where the muted step is 6.01, comfortably past AA and leaving black
-     to the text that is actually text. `foreground-on-accent` for the label,
-     since that is the token for words on a filled control and this is one. */
-  background-color: var(--helix-color-foreground-muted);
-  color: var(--helix-color-foreground-on-accent);
+  /* **The inverse pair, because the muted one was measured in light only.**
+     This was `foreground-muted` carrying `foreground-on-accent`, on the
+     reasoning that `foreground` was a slab of near-black in a list of grey rows
+     and the muted step measured 6.01. That figure is a light-mode figure:
+     `foreground-muted` flips to a *light* grey in dark, and a pale ink on it
+     measured 2.96:1, under AA.
+
+     `surface-inverse` is the token for a slab that is the opposite of the page
+     whichever page it is, and `foreground-inverse` is the ink solved against
+     it: 7.20:1 in both schemes. It keeps what the old pairing was reaching for,
+     a fill that is not the accent and not black, without depending on which way
+     round the scheme happens to be.
+
+     Found by `check:pairings`, which reported this as a pair the model did not
+     declare and therefore one nothing measured. */
+  background-color: var(--helix-color-surface-inverse);
+  color: var(--helix-color-foreground-inverse);
 }
 
 /* The times inside a range, which are part of the answer without having been

@@ -95,10 +95,19 @@ export const GROUNDS: Ground[] = [
      the engine's job is to say it did not measure this rather than to imply it
      did. */
   { bounded: false, name: 'color-surface-media' },
+  /* The scrim itself, which `Video` paints its own controls over. Translucent
+     by definition, so what is behind it is the video: unbounded for the same
+     reason as the surface above, and found by `check:pairings` reporting a pair
+     the model had never heard of. */
+  { bounded: false, name: 'color-overlay' },
 ]
 
 export const INKS: Ink[] = [
-  { contrast: 'text', grounds: [...PAGE_SURFACES, ...TINTS], name: 'color-foreground' },
+  {
+    contrast: 'text',
+    grounds: [...PAGE_SURFACES, ...TINTS, 'color-overlay'],
+    name: 'color-foreground',
+  },
   { contrast: 'text', grounds: [...PAGE_SURFACES], name: 'color-foreground-muted' },
   { contrast: 'text', grounds: [...FILLS], name: 'color-foreground-on-accent' },
   { contrast: 'text', grounds: ['color-surface-inverse'], name: 'color-foreground-inverse' },
