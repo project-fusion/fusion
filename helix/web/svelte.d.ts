@@ -124,6 +124,7 @@ declare module 'svelte/elements' {
     'helix-video-playlist-menu': CustomElements['helix-video-playlist-menu']
     'helix-video-playlist': CustomElements['helix-video-playlist']
     'helix-video': CustomElements['helix-video']
+    'helix-virtual-list': CustomElements['helix-virtual-list']
   }
 }
 

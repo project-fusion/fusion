@@ -26211,6 +26211,14 @@
             "name": "*",
             "module": "src/video-playlist/index.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/virtual-list/index.js"
+          }
         }
       ]
     },
@@ -72287,6 +72295,335 @@
           "declaration": {
             "name": "HelixVideo",
             "module": "src/video/root/video-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/virtual-list/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/virtual-list/root/virtual-list-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/virtual-list/root/virtual-list-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/virtual-list/root/virtual-list-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/virtual-list/root/virtual-list-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The styled tier adds the scrolling box's own treatment and nothing else. Rows\nare the consumer's markup in the light DOM, so they are styled by the\nconsumer's stylesheet the way any other content is, and this must not reach\ninto them: a rule here for a row would be a design system styling markup it\ndid not write.",
+          "name": "HelixVirtualList",
+          "cssProperties": [
+            {
+              "description": "How tall the scrolling box is.",
+              "name": "--virtual-list-block-size"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The space standing in for rows below the window.",
+              "name": "after",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "description": "The space standing in for rows above the window.",
+              "name": "before",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "description": "The scrolling box.",
+              "name": "viewport",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "estimate",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "How tall one row is, in pixels, used to map scroll offset to an index.",
+              "attribute": "estimate",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Id of the element holding the rows, as JSON in a script.",
+              "attribute": "for",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the list is called, since the rendered rows are only a window on it.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "privacy": "private",
+              "default": "[]",
+              "description": "The parsed source. Empty on a server, which has nothing to read.",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "virtualize",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new VirtualizeController(this, { container: () => this.renderRoot.querySelector<HTMLElement>('[part=\"viewport\"]'), count: () => this.rows.length, estimate: () => this.estimate, })",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "read",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "place",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts the windowed rows into the light DOM, and takes the rest out.\n\nCleared and re-cloned rather than reconciled, which is the simple thing and\nis measured rather than assumed to be enough: a window is twenty-odd rows\nand cloning that many is well under a frame. A reconciler here would be\ncarrying keys and identity for a set nothing selects into, and is the kind\nof optimisation to add against a measurement rather than ahead of one.",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseVirtualList",
+            "package": "@helix-io/headless/virtual-list"
+          },
+          "summary": "Renders the rows of a long set that are on screen, and no others.",
+          "helix": {
+            "category": "layout",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://fusion.dev/helix/components/virtual-list",
+            "tier": "styled",
+            "group": "VirtualList",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "Two thousand rows as JSON, of which only the visible ones exist.",
+                "slug": "default"
+              }
+            ],
+            "source": "helix/web/src/virtual-list"
+          },
+          "tagName": "helix-virtual-list",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "estimate",
+              "type": {
+                "text": "number"
+              },
+              "default": "32",
+              "description": "How tall one row is, in pixels, used to map scroll offset to an index.",
+              "fieldName": "estimate",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Id of the element holding the rows, as JSON in a script.",
+              "fieldName": "for",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the list is called, since the rendered rows are only a window on it.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseVirtualList",
+                "module": "src/virtual-list/root/virtual-list-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/virtual-list/root/virtual-list-root.ts",
+          "definitionPath": "src/virtual-list/root/virtual-list-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixVirtualList",
+          "declaration": {
+            "name": "HelixVirtualList",
+            "module": "src/virtual-list/root/virtual-list-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-virtual-list",
+          "declaration": {
+            "name": "HelixVirtualList",
+            "module": "src/virtual-list/root/virtual-list-root.ts"
           }
         }
       ]

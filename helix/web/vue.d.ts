@@ -116,6 +116,7 @@ import type {
   HelixVideoPlaylistMenu,
   HelixVideoPlaylist,
   HelixVideo,
+  HelixVirtualList,
   HelixOpenEvent,
   HelixCloseEvent,
   HelixDismissEvent,
@@ -7163,6 +7164,17 @@ export type HelixVideoVueEvents = {
   ended: HelixVideoElementEvent;
 };
 
+export type HelixVirtualListVueProps = {
+  /** How tall one row is, in pixels, used to map scroll offset to an index. */
+  estimate?: HelixVirtualList["estimate"];
+  /** Id of the element holding the rows, as JSON in a script. */
+  for?: HelixVirtualList["for"];
+  /** What the list is called, since the rendered rows are only a window on it. */
+  label?: HelixVirtualList["label"];
+};
+
+export type HelixVirtualListVueEvents = {};
+
 export type CustomCssProperties = {
   /** Inset of the trigger and content. */
   "--accordion-item-padding"?: string;
@@ -7758,6 +7770,8 @@ export type CustomCssProperties = {
   "--video-accent-color"?: string;
   /** Width of the mark that starts it. */
   "--video-start-size"?: string;
+  /** How tall the scrolling box is. */
+  "--virtual-list-block-size"?: string;
 };
 
 // Vue SFC template type-checking (GlobalComponents) for non-Vue custom elements.
@@ -8464,6 +8478,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixVideo,
     HelixVideoVueProps,
     HelixVideoVueEvents
+  >;
+  /** The styled tier adds the scrolling box's own treatment and nothing else. Rows are the consumer's markup in the light DOM, so they are styled by the consumer's stylesheet the way any other content is, and this must not reach into them: a rule here for a row would be a design system styling markup it did not write. */
+  "helix-virtual-list": DefineCustomElement<
+    HelixVirtualList,
+    HelixVirtualListVueProps,
+    HelixVirtualListVueEvents
   >;
 }
 

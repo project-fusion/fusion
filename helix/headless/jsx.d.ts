@@ -108,6 +108,7 @@ import type {
   HelixBaseVideoPlaylist,
   HelixBaseVideoPlaylistItem,
   HelixBaseVideoPlaylistMenu,
+  HelixBaseVirtualList,
   HelixChangeEvent,
   HelixCloseEvent,
   HelixCompleteEvent,
@@ -12146,6 +12147,29 @@ regardless, because a reader who stopped it is deciding what to do next. */
   textContent?: string | number;
 };
 
+export type HelixBaseVirtualListProps = {
+  /** How tall one row is, in pixels, used to map scroll offset to an index. */
+  estimate?: HelixBaseVirtualList["estimate"];
+  /** Id of the element holding the rows, as JSON in a script. */
+  for?: HelixBaseVirtualList["for"];
+  /** What the list is called, since the rendered rows are only a window on it. */
+  label?: HelixBaseVirtualList["label"];
+};
+
+export type HelixBaseVirtualListSolidJsProps = {
+  /** How tall one row is, in pixels, used to map scroll offset to an index. */
+  "prop:estimate"?: HelixBaseVirtualList["estimate"];
+  /** Id of the element holding the rows, as JSON in a script. */
+  "prop:for"?: HelixBaseVirtualList["for"];
+  /** What the list is called, since the rendered rows are only a window on it. */
+  "prop:label"?: HelixBaseVirtualList["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type CustomElements = {
   /**
    * Carries its own open state, which is why it is an element rather than a slot.
@@ -23037,6 +23061,60 @@ export type CustomElements = {
    */
   "helix-base-video": Partial<
     HelixBaseVideoProps & BaseProps<HelixBaseVideo> & BaseEvents
+  >;
+
+  /**
+   * **The set arrives as data, which is what makes this a virtual list rather
+   * than a box that hides children.** `for` names a
+   * `<script type="application/json">` holding an array of objects, and a
+   * `<template>` child says what one row looks like: elements carrying
+   * `data-field="name"` are filled with that field of the item.
+   *
+   * Both halves are markup, and that is the whole reason for the shape.
+   * `VirtualizeController` says why the obvious alternatives are shut: an `items`
+   * property cannot survive React hydration, which skips every property it would
+   * have to apply imperatively, and light-DOM children exist by the time anything
+   * could decide not to create them. Text in the document is neither. A server
+   * emits it, React re-emits it as a child rather than applying it, and it is one
+   * node whatever the row count.
+   *
+   * **The same shape the charts already use**, `for="<id>"` pointing at markup the
+   * consumer wrote, and the difference is what is at the other end. A chart names
+   * a `<table>`, which is the accessible version of the picture and which a reader
+   * with no JavaScript still gets. Ten thousand rows cannot be that: the table
+   * would be the cost this exists to avoid. So the accessible version here is the
+   * rendered window plus `aria-setsize` and `aria-posinset`, which is what says
+   * "four thousand of ten thousand" rather than "four of twenty".
+   *
+   * **Rows are light DOM, deliberately.** They are cloned from the consumer's
+   * template and appended to the host, so a document rule reaches them, the base
+   * layer applies, and a class in the template means what it says. Cloned into
+   * the shadow root they would be markup the consumer wrote and could not style,
+   * which is the one thing a row template must not be.
+   *
+   * **Reading the source is client-only**, because a server has no document to
+   * query. The window renders empty from the server and fills on the first update,
+   * which is the same client-side enhancement rule every tree-reading component
+   * here follows.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `estimate`: How tall one row is, in pixels, used to map scroll offset to an index.
+   * - `for`: Id of the element holding the rows, as JSON in a script.
+   * - `label`: What the list is called, since the rendered rows are only a window on it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `after`: The space standing in for rows below the window.
+   * - `before`: The space standing in for rows above the window.
+   * - `viewport`: The scrolling box.
+   */
+  "helix-base-virtual-list": Partial<
+    HelixBaseVirtualListProps & BaseProps<HelixBaseVirtualList> & BaseEvents
   >;
 };
 
@@ -34243,6 +34321,63 @@ export type CustomElementsSolidJs = {
     HelixBaseVideoProps &
       HelixBaseVideoSolidJsProps &
       BaseProps<HelixBaseVideo> &
+      BaseEvents
+  >;
+
+  /**
+   * **The set arrives as data, which is what makes this a virtual list rather
+   * than a box that hides children.** `for` names a
+   * `<script type="application/json">` holding an array of objects, and a
+   * `<template>` child says what one row looks like: elements carrying
+   * `data-field="name"` are filled with that field of the item.
+   *
+   * Both halves are markup, and that is the whole reason for the shape.
+   * `VirtualizeController` says why the obvious alternatives are shut: an `items`
+   * property cannot survive React hydration, which skips every property it would
+   * have to apply imperatively, and light-DOM children exist by the time anything
+   * could decide not to create them. Text in the document is neither. A server
+   * emits it, React re-emits it as a child rather than applying it, and it is one
+   * node whatever the row count.
+   *
+   * **The same shape the charts already use**, `for="<id>"` pointing at markup the
+   * consumer wrote, and the difference is what is at the other end. A chart names
+   * a `<table>`, which is the accessible version of the picture and which a reader
+   * with no JavaScript still gets. Ten thousand rows cannot be that: the table
+   * would be the cost this exists to avoid. So the accessible version here is the
+   * rendered window plus `aria-setsize` and `aria-posinset`, which is what says
+   * "four thousand of ten thousand" rather than "four of twenty".
+   *
+   * **Rows are light DOM, deliberately.** They are cloned from the consumer's
+   * template and appended to the host, so a document rule reaches them, the base
+   * layer applies, and a class in the template means what it says. Cloned into
+   * the shadow root they would be markup the consumer wrote and could not style,
+   * which is the one thing a row template must not be.
+   *
+   * **Reading the source is client-only**, because a server has no document to
+   * query. The window renders empty from the server and fills on the first update,
+   * which is the same client-side enhancement rule every tree-reading component
+   * here follows.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `estimate`: How tall one row is, in pixels, used to map scroll offset to an index.
+   * - `for`: Id of the element holding the rows, as JSON in a script.
+   * - `label`: What the list is called, since the rendered rows are only a window on it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `after`: The space standing in for rows below the window.
+   * - `before`: The space standing in for rows above the window.
+   * - `viewport`: The scrolling box.
+   */
+  "helix-base-virtual-list": Partial<
+    HelixBaseVirtualListProps &
+      HelixBaseVirtualListSolidJsProps &
+      BaseProps<HelixBaseVirtualList> &
       BaseEvents
   >;
 };

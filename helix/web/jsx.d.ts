@@ -138,6 +138,7 @@ import type {
   HelixVideoPlaylist,
   HelixVideoPlaylistItem,
   HelixVideoPlaylistMenu,
+  HelixVirtualList,
 } from '@helix-io/web';
 
 /**
@@ -13810,6 +13811,29 @@ regardless, because a reader who stopped it is deciding what to do next. */
   textContent?: string | number;
 };
 
+export type HelixVirtualListProps = {
+  /** How tall one row is, in pixels, used to map scroll offset to an index. */
+  estimate?: HelixVirtualList["estimate"];
+  /** Id of the element holding the rows, as JSON in a script. */
+  for?: HelixVirtualList["for"];
+  /** What the list is called, since the rendered rows are only a window on it. */
+  label?: HelixVirtualList["label"];
+};
+
+export type HelixVirtualListSolidJsProps = {
+  /** How tall one row is, in pixels, used to map scroll offset to an index. */
+  "prop:estimate"?: HelixVirtualList["estimate"];
+  /** Id of the element holding the rows, as JSON in a script. */
+  "prop:for"?: HelixVirtualList["for"];
+  /** What the list is called, since the rendered rows are only a window on it. */
+  "prop:label"?: HelixVirtualList["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type CustomElements = {
   /**
    * The open and close transition animates `grid-template-rows` from `0fr` to
@@ -24941,6 +24965,39 @@ export type CustomElements = {
    * - `fullscreen`: The whole screen, and back.
    */
   "helix-video": Partial<HelixVideoProps & BaseProps<HelixVideo> & BaseEvents>;
+
+  /**
+   * The styled tier adds the scrolling box's own treatment and nothing else. Rows
+   * are the consumer's markup in the light DOM, so they are styled by the
+   * consumer's stylesheet the way any other content is, and this must not reach
+   * into them: a rule here for a row would be a design system styling markup it
+   * did not write.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `estimate`: How tall one row is, in pixels, used to map scroll offset to an index.
+   * - `for`: Id of the element holding the rows, as JSON in a script.
+   * - `label`: What the list is called, since the rendered rows are only a window on it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--virtual-list-block-size`: How tall the scrolling box is. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `after`: The space standing in for rows below the window.
+   * - `before`: The space standing in for rows above the window.
+   * - `viewport`: The scrolling box.
+   */
+  "helix-virtual-list": Partial<
+    HelixVirtualListProps & BaseProps<HelixVirtualList> & BaseEvents
+  >;
 };
 
 export type CustomElementsSolidJs = {
@@ -36433,6 +36490,42 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixVideo> &
       BaseEvents
   >;
+
+  /**
+   * The styled tier adds the scrolling box's own treatment and nothing else. Rows
+   * are the consumer's markup in the light DOM, so they are styled by the
+   * consumer's stylesheet the way any other content is, and this must not reach
+   * into them: a rule here for a row would be a design system styling markup it
+   * did not write.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `estimate`: How tall one row is, in pixels, used to map scroll offset to an index.
+   * - `for`: Id of the element holding the rows, as JSON in a script.
+   * - `label`: What the list is called, since the rendered rows are only a window on it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--virtual-list-block-size`: How tall the scrolling box is. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `after`: The space standing in for rows below the window.
+   * - `before`: The space standing in for rows above the window.
+   * - `viewport`: The scrolling box.
+   */
+  "helix-virtual-list": Partial<
+    HelixVirtualListProps &
+      HelixVirtualListSolidJsProps &
+      BaseProps<HelixVirtualList> &
+      BaseEvents
+  >;
 };
 
 export type CustomCssProperties = {
@@ -37030,6 +37123,8 @@ export type CustomCssProperties = {
   "--video-accent-color"?: string;
   /** Width of the mark that starts it. */
   "--video-start-size"?: string;
+  /** How tall the scrolling box is. */
+  "--virtual-list-block-size"?: string;
 };
 
 declare module "react" {

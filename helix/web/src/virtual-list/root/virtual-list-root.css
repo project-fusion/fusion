@@ -1,0 +1,24 @@
+/* The scrolling box, and it is the only thing this tier styles.
+ *
+ * Rows are the consumer's markup in the light DOM, so their treatment is the
+ * consumer's stylesheet. A rule here reaching a row would be the design system
+ * styling markup it did not write, and it would also be unreachable in the
+ * other direction the moment anybody wanted to change it. */
+:host {
+  display: block;
+}
+
+[part="viewport"] {
+  block-size: var(--virtual-list-block-size, 20em);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* The spacers are geometry, not content. They carry the room the rows outside
+   the window would have taken so the scrollbar is honest about the real length:
+   a box that scrolls for twenty rows while claiming ten thousand gives a thumb
+   the size of the track, and dragging it means nothing. */
+[part="after"],
+[part="before"] {
+  flex: none;
+}

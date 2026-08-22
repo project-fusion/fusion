@@ -660,38 +660,6 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /*
-   * One measurement at `text-3xl`, and the `text-xs` word for what it measures.
-   * The pair behind a rule is the group, which is what stops one bar over
-   * another from reading as `text`.
-   */
-  /*
-   * Two panes and the divider between them, which is the whole component.
-   *
-   * The panes are surfaces rather than the ink bars the rest of this group uses
-   * for text, because what a splitter arranges is regions and not sentences:
-   * filling them with lines would make this a card about content and it is a
-   * card about the boundary.
-   *
-   * The divider is a rule at one unit, which is the vocabulary this file fixes
-   * for a rule, and it is the only mark that has to survive at thumbnail size:
-   * two panes with nothing between them is `grid`.
-   *
-   * It moves on hover, because that is the one thing a splitter does.
-   */
-  /**
-   * A bounded box with rows running past its bottom edge, and the edge saying so.
-   *
-   * The subject is the fade rather than the scrolling. What this component adds
-   * over `overflow: auto` is the one fact CSS cannot work out, which is that
-   * there is more below, so the drawing is a stack of rows cut off by a band
-   * that dissolves into the ground.
-   *
-   * `artTravel` on the rows, downward, because the reader scrolls and the
-   * content is what moves. The clip is on a group outside the one that travels,
-   * for the reason `image` records: a clip on the moving group resolves in the
-   * space the transform just changed and grows along with it.
-   */
   'scroll-area': (
     <>
       <defs>
@@ -1012,6 +980,103 @@ export const contentArt: Record<string, ReactNode> = {
       <rect className="artInk" fillOpacity="0.12" height="28" rx="3" width="88" x="184" y="120" />
       <rect className="artInk" fillOpacity="0.4" height="16" rx="2" width="24" x="191" y="126" />
       <rect className="artInk" fillOpacity="0.28" height="4" rx="2" width="44" x="221" y="132" />
+    </>
+  ),
+
+  /*
+   * One measurement at `text-3xl`, and the `text-xs` word for what it measures.
+   * The pair behind a rule is the group, which is what stops one bar over
+   * another from reading as `text`.
+   */
+  /*
+   * Two panes and the divider between them, which is the whole component.
+   *
+   * The panes are surfaces rather than the ink bars the rest of this group uses
+   * for text, because what a splitter arranges is regions and not sentences:
+   * filling them with lines would make this a card about content and it is a
+   * card about the boundary.
+   *
+   * The divider is a rule at one unit, which is the vocabulary this file fixes
+   * for a rule, and it is the only mark that has to survive at thumbnail size:
+   * two panes with nothing between them is `grid`.
+   *
+   * It moves on hover, because that is the one thing a splitter does.
+   */
+  /**
+   * A bounded box with rows running past its bottom edge, and the edge saying so.
+   *
+   * The subject is the fade rather than the scrolling. What this component adds
+   * over `overflow: auto` is the one fact CSS cannot work out, which is that
+   * there is more below, so the drawing is a stack of rows cut off by a band
+   * that dissolves into the ground.
+   *
+   * `artTravel` on the rows, downward, because the reader scrolls and the
+   * content is what moves. The clip is on a group outside the one that travels,
+   * for the reason `image` records: a clip on the moving group resolves in the
+   * space the transform just changed and grows along with it.
+   */
+  /**
+   * A window over a set most of which is not there.
+   *
+   * The rows inside the frame are drawn and the ones outside it are a pair of
+   * spacers, which is exactly what the component renders: the picture is the
+   * mechanism rather than an illustration of it. The two ghosts above and below
+   * are at a fraction of the ink, so a reader can see there is more without the
+   * card claiming those rows exist.
+   *
+   * `artTravel` on the drawn rows, because a scroll is what moves the window
+   * and the window is the subject. The clip sits on a group outside the one
+   * that travels, for the reason `image` records and `scroll-area` repeats.
+   */
+  'virtual-list': (
+    <>
+      <defs>
+        <clipPath id="helixArtWindowFrame">
+          <rect height="72" rx="6" width="224" x="48" y="64" />
+        </clipPath>
+      </defs>
+      {/* The spacers, which stand in for the rows that were never made. */}
+      <rect className="artInk" fillOpacity="0.1" height="20" rx="4" width="224" x="48" y="40" />
+      <rect className="artInk" fillOpacity="0.1" height="20" rx="4" width="224" x="48" y="140" />
+      <rect className="artSunken" height="72" rx="6" width="224" x="48" y="64" />
+      <g clipPath="url(#helixArtWindowFrame)">
+        <g
+          className="artMotion artTravel"
+          style={{ '--art-to': '0px', '--art-to-block': '-16px' } as CSSProperties}
+        >
+          <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="150" x="60" y="72" />
+          <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="188" x="60" y="88" />
+          <rect
+            className="artInk"
+            fillOpacity="0.55"
+            height="8"
+            rx="4"
+            width="132"
+            x="60"
+            y="104"
+          />
+          <rect
+            className="artInk"
+            fillOpacity="0.28"
+            height="8"
+            rx="4"
+            width="176"
+            x="60"
+            y="120"
+          />
+          <rect
+            className="artInk"
+            fillOpacity="0.28"
+            height="8"
+            rx="4"
+            width="160"
+            x="60"
+            y="136"
+          />
+        </g>
+      </g>
+      {/* The frame edge, drawn over the rows so the window reads as a cut. */}
+      <rect className="artEdge" fill="none" height="72" rx="6" width="224" x="48" y="64" />
     </>
   ),
 }

@@ -6764,3 +6764,39 @@ not.
 | `--video-playlist-menu-color` | Colour of the trigger, defaulting to the control bar's. |
 | `--video-playlist-menu-poster` | Width of an entry's still. |
 | `--video-playlist-menu-size` | Size of the trigger's glyph. |
+
+## Virtual List
+
+### Root — `helix-virtual-list`
+
+Renders the rows of a long set that are on screen, and no others.
+
+Extends `HelixBaseVirtualList`.
+
+The styled tier adds the scrolling box's own treatment and nothing else. Rows
+are the consumer's markup in the light DOM, so they are styled by the
+consumer's stylesheet the way any other content is, and this must not reach
+into them: a rule here for a row would be a design system styling markup it
+did not write.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `estimate` | `estimate` | `number` | `32` | `HelixBaseVirtualList` | How tall one row is, in pixels, used to map scroll offset to an index. |
+| `for` | `for` | `string` | `''` | `HelixBaseVirtualList` | Id of the element holding the rows, as JSON in a script. |
+| `label` | `label` | `string` | `''` | `HelixBaseVirtualList` | What the list is called, since the rendered rows are only a window on it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `after` | The space standing in for rows below the window. |
+| `before` | The space standing in for rows above the window. |
+| `viewport` | The scrolling box. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--virtual-list-block-size` | How tall the scrolling box is. |
