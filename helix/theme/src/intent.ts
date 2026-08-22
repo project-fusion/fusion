@@ -20,6 +20,22 @@ export type Color = Oklch | string
  */
 export interface Relation {
   /**
+   * How far, in degrees, the angle may move to clear a role it cannot be told
+   * apart from. 45 by default.
+   *
+   * **The accent is the role that yields, and that is the whole point of the
+   * field.** A status hue carries meaning and a brand is a fact the consumer
+   * supplied; an accent is a relationship with no meaning attached, so when two
+   * of them collide the accent is the one with nothing to lose. Measured on the
+   * shipped blue: the complement lands at 80 degrees, `warning` is amber at 75,
+   * and no rotation of `warning` inside any sane allowance clears it, because
+   * `danger` and `success` box in every hue it could reach.
+   *
+   * Set it to 0 to hold the angle exactly and let `collisions` report the
+   * result. A pinned accent never moves at all, a colour being a fact.
+   */
+  allowance?: number
+  /**
    * Multiplier on the source's chroma. 1 keeps it, below 1 quiets it. An
    * accent louder than the thing it accents is a second primary, so this is
    * capped at 1 rather than trusted.

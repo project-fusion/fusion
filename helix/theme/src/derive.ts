@@ -392,7 +392,6 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   }
 
   const primary = emphasis(brand)
-  const accentSteps = emphasis(accent)
 
   /* **Status: hue is fixed by meaning, everything else derives.**
 
@@ -427,16 +426,16 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     const chroma = policy(rawBrand.chroma)
     let resolvedHue = hue
     if (allowance > 0) {
-      /* **Against every role already decided, not against the brand alone.**
-         The first version measured the candidate against `primary` and nothing
-         else, so a status colliding with the *accent* was reported by
-         `collisions` and repaired by nothing: with the shipped blue the accent
-         is the complement at 80 degrees and `warning` is amber at 75, five
-         apart, and the allowance rotated past it without ever looking.
+      /* **Against the brand and against the statuses already settled.**
+         Deliberately not against the accent, which has not been decided yet:
+         the accent is the role that yields, so a status must not spend its
+         allowance getting out of the way of something that is about to move
+         itself. See the accent's own search below.
 
-         Found by the theme builder within a minute of it existing, which is
-         most of the argument for building a consumer before porting an API. */
-      const decided = [primary.raw, accentSteps.raw, ...settled]
+         The set accumulates, so a status rotated clear of the brand cannot land
+         on the status decided before it: `warning` came to rest 20 degrees from
+         `danger` when it did not. Declared order, so it is deterministic. */
+      const decided = [primary.raw, ...settled]
       const clears = (candidate: Oklch): boolean =>
         decided.every(
           (role) =>
@@ -468,6 +467,50 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     settled.push(color)
     statusColors.set(name, { color, pinned: false })
   }
+
+  /* **The accent yields, because it is the only role with nothing to lose.**
+
+     A status hue carries meaning: a reader learns amber for caution once and
+     should not learn it again per product. A brand is a fact the consumer
+     supplied. An accent is a *relationship*, and a relationship whose exact
+     angle nobody specified has room to move where neither of the others does.
+
+     So it settles last and rotates outward from the angle asked for until it
+     clears every role that has already been decided. Measured on the shipped
+     blue, where the complement lands at 80 degrees and `warning` is amber at
+     75: before this, the two were reported as indistinguishable on every single
+     derivation and no allowance could repair it, because `danger` at 27 and
+     `success` at 155 box in every hue `warning` could have reached.
+
+     A pinned accent does not move: a colour is a fact. An angle of 0 holds the
+     relationship exactly and lets `collisions` report the result. */
+  const accentSettled = ((): Oklch => {
+    if (accentIsPinned) {
+      return accent
+    }
+    const bound = accentSeed.allowance ?? 45
+    const decided = [primary.raw, ...[...statusColors.values()].map(({ color }) => color)]
+    const clears = (candidate: Oklch): boolean =>
+      decided.every(
+        (role) => perceptualDistance(fitToGamut(candidate), fitToGamut(role)) >= COLLISION_DISTANCE,
+      )
+
+    for (let step = 0; step <= bound; step += 1) {
+      const tries = step === 0 ? [accent.hue] : [accent.hue + step, accent.hue - step]
+      const found = tries
+        .map((hue) => (hue + 360) % 360)
+        .find((hue) => clears(solveForAll({ chroma: accent.chroma, hue }, contrastTarget)))
+      if (found !== undefined) {
+        return { ...accent, hue: found }
+      }
+    }
+    /* Nothing inside the bound clears, so the angle asked for stands and the
+       collision is reported rather than a half-rotation shipped that is neither
+       the requested relationship nor distinguishable. */
+    return accent
+  })()
+
+  const accentSteps = emphasis(accentSettled)
 
   /* **Every filled ground `foreground-on-accent` lands on, not just the brand's
      resting one.** It was solved against `primary-surface` alone, so a hovered

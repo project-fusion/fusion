@@ -37,6 +37,10 @@ const DESTINATIONS: Findable[] = [
          and the catalogue already offers its reference page; this is the tool
          that page describes, which nothing else in the palette could reach. */
       { href: '/helix/sandbox', label: 'Sandbox, the component workbench' },
+      /* The other tool, and the same reasoning: `@helix-io/theme` is a package
+         rather than a component family, so the catalogue cannot offer it and
+         nothing else in the palette could reach the thing that drives it. */
+      { href: '/helix/theme', label: 'Theme builder, a palette and its audit' },
     ],
   },
   {

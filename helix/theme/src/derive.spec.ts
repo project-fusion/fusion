@@ -233,11 +233,31 @@ describe('the chroma policy', () => {
 })
 
 describe('the accent', () => {
-  test('a relation rotates off the brand and is marked related', () => {
-    const theme = deriveTheme({ accent: { from: 'brand', rotate: 180 }, brand: BRAND })
+  test('a relation holds its angle exactly when told not to yield', () => {
+    const theme = deriveTheme({
+      accent: { allowance: 0, from: 'brand', rotate: 180 },
+      brand: BRAND,
+    })
     const accent = theme.tokens.find((t) => t.name === 'color-accent')
     expect(accent?.origin).toBe('related')
     expect(accent?.value.hue).toBeCloseTo((BRAND.hue + 180) % 360, 0)
+  })
+
+  /* **The accent is the only role with nothing to lose.** A status hue carries
+     meaning and a brand is a fact the consumer supplied, so when two of them
+     collide the accent is what moves. On the shipped blue the complement lands
+     at 80 and `warning` is amber at 75, and no rotation of `warning` inside any
+     sane allowance clears it: `danger` at 27 and `success` at 155 box in every
+     hue it could reach. */
+  test('it yields to a status rather than the status yielding to it', () => {
+    const held = deriveTheme({ accent: { allowance: 0, from: 'brand', rotate: 180 }, brand: BRAND })
+    const free = deriveTheme({ brand: BRAND })
+    const warning = (theme: ReturnType<typeof deriveTheme>): number | undefined =>
+      theme.tokens.find((t) => t.name === 'color-warning')?.value.hue
+
+    expect(held.collisions.some((c) => c.includes('accent') && c.includes('warning'))).toBe(true)
+    expect(free.collisions.some((c) => c.includes('accent'))).toBe(false)
+    expect(warning(free)).toBeCloseTo(warning(held) ?? 0, 0)
   })
 
   test('a colour pins it and the rotation stands aside', () => {
@@ -246,8 +266,12 @@ describe('the accent', () => {
   })
 
   test('rethemeing the brand carries a related accent with it', () => {
-    const one = deriveTheme({ brand: BRAND })
-    const two = deriveTheme({ brand: { chroma: 0.19, hue: 20, lightness: 0.58 } })
+    /* Held exactly, or each brand's accent yields by a different amount to a
+       different neighbour and the angle between them stops being the thing
+       under test. */
+    const hold = { allowance: 0, from: 'brand' as const, rotate: 180 }
+    const one = deriveTheme({ accent: hold, brand: BRAND })
+    const two = deriveTheme({ accent: hold, brand: { chroma: 0.19, hue: 20, lightness: 0.58 } })
     const gap = (theme: ReturnType<typeof deriveTheme>): number => {
       const primary = theme.tokens.find((t) => t.name === 'color-primary')?.value.hue ?? 0
       const accent = theme.tokens.find((t) => t.name === 'color-accent')?.value.hue ?? 0

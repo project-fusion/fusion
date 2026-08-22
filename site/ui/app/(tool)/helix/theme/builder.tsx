@@ -74,10 +74,10 @@ export function ThemeBuilder() {
     return () => tag.remove()
   }, [css])
 
-  const counts = theme.pairings.reduce<Record<string, number>>(
-    (all, pair) => ({ ...all, [pair.status]: (all[pair.status] ?? 0) + 1 }),
-    {},
-  )
+  const counts = theme.pairings.reduce<Record<string, number>>((all, pair) => {
+    all[pair.status] = (all[pair.status] ?? 0) + 1
+    return all
+  }, {})
   const failures = theme.pairings.filter((pair) => pair.status === 'fail')
   const unmeasured = theme.pairings.filter((pair) => pair.status === 'unverifiable')
 
@@ -89,7 +89,7 @@ export function ThemeBuilder() {
             <helix-text appearance="label" as="h1">
               Theme builder
             </helix-text>
-            <helix-text appearance="muted">
+            <helix-text appearance="caption">
               Describe a brand. Every pair the palette produces is measured against the ground it
               lands on.
             </helix-text>
@@ -98,16 +98,14 @@ export function ThemeBuilder() {
           <helix-color-input
             label="Brand"
             name="brand"
-            onhelix-change={(event: CustomEvent<{ value: string }>) => setBrand(event.detail.value)}
+            onhelix-change={(event) => setBrand(event.detail.value)}
             value={brand}
           ></helix-color-input>
 
           <helix-select
             label="Colour scheme"
             name="scheme"
-            onhelix-change={(event: CustomEvent<{ value: string }>) =>
-              setScheme(event.detail.value as 'dark' | 'light')
-            }
+            onhelix-change={(event) => setScheme(event.detail.value as 'dark' | 'light')}
             value={scheme}
           >
             <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -118,9 +116,7 @@ export function ThemeBuilder() {
           <helix-select
             label="Contrast target"
             name="contrast"
-            onhelix-change={(event: CustomEvent<{ value: string }>) =>
-              setContrastTarget(Number(event.detail.value))
-            }
+            onhelix-change={(event) => setContrastTarget(Number(event.detail.value))}
             value={String(contrastTarget)}
           >
             <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -133,12 +129,10 @@ export function ThemeBuilder() {
             max={100}
             min={0}
             name="chroma"
-            onhelix-input={(event: CustomEvent<{ value: number }>) =>
-              setChromaScale(event.detail.value)
-            }
+            onhelix-input={(event) => setChromaScale(Number(event.detail.value))}
             show-value
             step={5}
-            value={chromaScale}
+            value={String(chromaScale)}
           ></helix-slider>
 
           <helix-slider
@@ -146,12 +140,10 @@ export function ThemeBuilder() {
             max={360}
             min={0}
             name="accent"
-            onhelix-input={(event: CustomEvent<{ value: number }>) =>
-              setAccentHue(event.detail.value)
-            }
+            onhelix-input={(event) => setAccentHue(Number(event.detail.value))}
             show-value
             step={15}
-            value={accentHue}
+            value={String(accentHue)}
           ></helix-slider>
 
           <helix-slider
@@ -159,12 +151,10 @@ export function ThemeBuilder() {
             max={120}
             min={80}
             name="density"
-            onhelix-input={(event: CustomEvent<{ value: number }>) =>
-              setDensity(event.detail.value)
-            }
+            onhelix-input={(event) => setDensity(Number(event.detail.value))}
             show-value
             step={5}
-            value={density}
+            value={String(density)}
           ></helix-slider>
 
           <helix-slider
@@ -172,10 +162,10 @@ export function ThemeBuilder() {
             max={150}
             min={0}
             name="radius"
-            onhelix-input={(event: CustomEvent<{ value: number }>) => setRadius(event.detail.value)}
+            onhelix-input={(event) => setRadius(Number(event.detail.value))}
             show-value
             step={10}
-            value={radius}
+            value={String(radius)}
           ></helix-slider>
 
           {/* The repair rather than the report. A status may rotate within its
@@ -188,12 +178,10 @@ export function ThemeBuilder() {
             max={60}
             min={0}
             name="allowance"
-            onhelix-input={(event: CustomEvent<{ value: number }>) =>
-              setAllowance(event.detail.value)
-            }
+            onhelix-input={(event) => setAllowance(Number(event.detail.value))}
             show-value
             step={10}
-            value={allowance}
+            value={String(allowance)}
           ></helix-slider>
 
           {/* Two policies rather than one, because the two kinds of surface are
@@ -202,9 +190,7 @@ export function ThemeBuilder() {
               offered here and refused there for that reason. */}
           <helix-toggle-group
             label="Separation, in flow"
-            onhelix-change={(event: CustomEvent<{ value: string }>) =>
-              setSurface(event.detail.value as Mechanism)
-            }
+            onhelix-change={(event) => setSurface(event.detail.value as Mechanism)}
             value={surface}
           >
             <helix-toggle value="border">Border</helix-toggle>
@@ -215,9 +201,7 @@ export function ThemeBuilder() {
 
           <helix-toggle-group
             label="Separation, floating"
-            onhelix-change={(event: CustomEvent<{ value: string }>) =>
-              setFloating(event.detail.value as Mechanism)
-            }
+            onhelix-change={(event) => setFloating(event.detail.value as Mechanism)}
             value={floating}
           >
             <helix-toggle value="shadow">Shadow</helix-toggle>
@@ -264,7 +248,7 @@ export function ThemeBuilder() {
               <helix-tag tone="info">Info</helix-tag>
             </helix-flex>
 
-            <helix-callout tone="info">
+            <helix-callout severity="info">
               <helix-text>A callout, which is a tinted ground carrying its own ink.</helix-text>
             </helix-callout>
           </helix-flex>
@@ -285,7 +269,7 @@ export function ThemeBuilder() {
               ) : null}
             </helix-flex>
 
-            <helix-text appearance="muted">
+            <helix-text appearance="caption">
               Every pair the surface model declares, measured against the ground it lands on rather
               than against the page alone. Unverifiable is not a softer failure: it means the ground
               is not knowable, which is what a caption over a photograph has.
@@ -294,7 +278,7 @@ export function ThemeBuilder() {
             {failures.length > 0 ? (
               <helix-flex direction="column" gap="xs">
                 {failures.map((pair) => (
-                  <helix-text appearance="muted" key={`${pair.foreground}-${pair.background}`}>
+                  <helix-text appearance="caption" key={`${pair.foreground}-${pair.background}`}>
                     {pair.foreground} on {pair.background}: {pair.ratio?.toFixed(2)}:1, under{' '}
                     {pair.target}:1
                   </helix-text>
@@ -303,7 +287,7 @@ export function ThemeBuilder() {
             ) : null}
 
             {theme.collisions.length > 0 ? (
-              <helix-callout tone="warning">
+              <helix-callout severity="warning">
                 <helix-flex direction="column" gap="xs">
                   {theme.collisions.map((collision) => (
                     <helix-text key={collision}>{collision}</helix-text>
@@ -313,7 +297,7 @@ export function ThemeBuilder() {
             ) : null}
 
             <helix-text appearance="label">The artifact</helix-text>
-            <helix-code-block language="css">{css}</helix-code-block>
+            <helix-code-block label="theme.css">{css}</helix-code-block>
           </helix-flex>
         </div>
       </section>
