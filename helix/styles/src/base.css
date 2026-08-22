@@ -424,6 +424,23 @@ helix-text[tone="danger"] {
  * because that value is the appearance and the rules below match it exactly. */
 [data-button] {
   --_button-edge: var(--helix-color-border);
+  /* The solid fill, separate from the tone, and it has to be separate.
+   *
+   * The same split `Button` makes, and it is here because the recipe was the
+   * half that never got it. `--_button-tone` is the colour of the *ink* on
+   * every appearance but `solid`: an outlined or ghost primary draws its label
+   * with it, and in dark mode that is deliberately the lighter brand so the
+   * text is legible on a dark page. A solid button wants the opposite, a fill
+   * dark enough to carry white. Pointing one variable at both is what the
+   * component measured at 2.80 for primary and 1.84 for warning, and a plain
+   * `<a data-button="solid" data-button-tone="primary">` measured 2.80 in dark
+   * and 4.40 in light against its own white label, both under AA, while
+   * `helix-button` beside it measured 5.41.
+   *
+   * Defaulted to the tone, which is what neutral wants and what this rule did
+   * before there were two of them, so nothing untoned moves. */
+  --_button-fill: var(--_button-tone);
+  --_button-fill-hover: var(--_button-tone-hover);
   --_button-on-tone: var(--helix-color-background);
   --_button-tone: var(--helix-color-foreground);
   --_button-tone-hover: color-mix(
@@ -493,12 +510,30 @@ helix-text[tone="danger"] {
    a plain anchor would still answer to a word the component no longer knows. */
 [data-button][data-button-tone="primary"] {
   --_button-edge: var(--helix-color-primary);
+  --_button-fill: var(--helix-color-primary-surface);
+  --_button-fill-hover: var(--helix-color-primary-surface-hover);
   --_button-on-tone: var(--helix-color-foreground-on-accent);
   --_button-tone: var(--helix-color-primary);
   --_button-tone-hover: var(--helix-color-primary-hover);
 }
+
+/* Accent, which the component has had and this did not, so `data-button-tone`
+   silently answered to one fewer word than `tone` did and an anchor asking for
+   it fell back to neutral. Six declarations, the same six as every other tone,
+   because a tone that behaves differently from the one beside it is a tone a
+   consumer has to learn separately. */
+[data-button][data-button-tone="accent"] {
+  --_button-edge: var(--helix-color-accent);
+  --_button-fill: var(--helix-color-accent-surface);
+  --_button-fill-hover: var(--helix-color-accent-surface-hover);
+  --_button-on-tone: var(--helix-color-foreground-on-accent);
+  --_button-tone: var(--helix-color-accent);
+  --_button-tone-hover: var(--helix-color-accent-hover);
+}
 [data-button][data-button-tone="danger"] {
   --_button-edge: var(--helix-color-danger);
+  --_button-fill: var(--helix-color-danger-surface);
+  --_button-fill-hover: var(--helix-color-danger-surface-hover);
   --_button-on-tone: var(--helix-color-foreground-on-accent);
   --_button-tone: var(--helix-color-danger);
   --_button-tone-hover: color-mix(
@@ -564,12 +599,12 @@ helix-text[tone="danger"] {
    `danger`, which had no hover rule anywhere: a red button that turned neutral
    grey under the pointer. */
 [data-button="solid"] {
-  background-color: var(--button-background-color, var(--_button-tone));
+  background-color: var(--button-background-color, var(--_button-fill));
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-on-tone));
 }
 [data-button="solid"]:not(:disabled):hover {
-  background-color: var(--button-background-color, var(--_button-tone-hover));
+  background-color: var(--button-background-color, var(--_button-fill-hover));
   border-color: transparent;
 }
 
