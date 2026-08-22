@@ -47,7 +47,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-base-app-header')
 export class HelixBaseAppHeader extends HelixElement {
   /**
-   * Where the navigation sits in the bar.
+   * Where the middle region sits in the bar.
    *
    * Centered by default, which reads as the site's spine when the navigation is
    * the primary thing in the header rather than an afterthought beside a logo.
@@ -55,10 +55,17 @@ export class HelixBaseAppHeader extends HelixElement {
    * left over, so the middle of the nav is the middle of the window whatever
    * the wordmark and the actions happen to measure.
    *
-   * `start` is the opt-out, for a header whose navigation trails the brand.
+   * `start` is the opt-out, for a header whose middle region trails the brand.
+   *
+   * **Named for the region and not for what is usually in it.** It was
+   * `nav-align`, which reads as a property about `Navigation` and is not: the
+   * middle slot takes whatever a consumer puts there, a search field or a
+   * breadcrumb trail as readily as a nav, and a header that centred its search
+   * box would have been setting `nav-align` to do it. The part is called
+   * `content`, so the property is too.
    */
-  @property({ attribute: 'nav-align', reflect: true })
-  navAlign?: 'start'
+  @property({ attribute: 'content-align', reflect: true })
+  contentAlign?: 'start'
 
   private readonly handleScroll = (): void => {
     this.toggleAttribute('data-scrolled', window.scrollY > 0)

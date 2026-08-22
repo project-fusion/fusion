@@ -647,7 +647,7 @@ It pairs with `appearance`: a bar that does not stick is only ever over the
 top of the page, so `material` and `transparent` have nothing to be
 translucent against and `data-scrolled` never lands. */
   sticky?: HelixAppHeader["sticky"];
-  /** Where the navigation sits in the bar.
+  /** Where the middle region sits in the bar.
 
 Centered by default, which reads as the site's spine when the navigation is
 the primary thing in the header rather than an afterthought beside a logo.
@@ -655,9 +655,16 @@ Centered against the banner rather than against whatever space the brand
 left over, so the middle of the nav is the middle of the window whatever
 the wordmark and the actions happen to measure.
 
-`start` is the opt-out, for a header whose navigation trails the brand. */
-  "nav-align"?: HelixAppHeader["navAlign"];
-  /** Where the navigation sits in the bar.
+`start` is the opt-out, for a header whose middle region trails the brand.
+
+**Named for the region and not for what is usually in it.** It was
+`nav-align`, which reads as a property about `Navigation` and is not: the
+middle slot takes whatever a consumer puts there, a search field or a
+breadcrumb trail as readily as a nav, and a header that centred its search
+box would have been setting `nav-align` to do it. The part is called
+`content`, so the property is too. */
+  "content-align"?: HelixAppHeader["contentAlign"];
+  /** Where the middle region sits in the bar.
 
 Centered by default, which reads as the site's spine when the navigation is
 the primary thing in the header rather than an afterthought beside a logo.
@@ -665,8 +672,15 @@ Centered against the banner rather than against whatever space the brand
 left over, so the middle of the nav is the middle of the window whatever
 the wordmark and the actions happen to measure.
 
-`start` is the opt-out, for a header whose navigation trails the brand. */
-  navAlign?: HelixAppHeader["navAlign"];
+`start` is the opt-out, for a header whose middle region trails the brand.
+
+**Named for the region and not for what is usually in it.** It was
+`nav-align`, which reads as a property about `Navigation` and is not: the
+middle slot takes whatever a consumer puts there, a search field or a
+breadcrumb trail as readily as a nav, and a header that centred its search
+box would have been setting `nav-align` to do it. The part is called
+`content`, so the property is too. */
+  contentAlign?: HelixAppHeader["contentAlign"];
 };
 
 export type HelixAppHeaderSolidJsProps = {
@@ -703,7 +717,7 @@ It pairs with `appearance`: a bar that does not stick is only ever over the
 top of the page, so `material` and `transparent` have nothing to be
 translucent against and `data-scrolled` never lands. */
   "prop:sticky"?: HelixAppHeader["sticky"];
-  /** Where the navigation sits in the bar.
+  /** Where the middle region sits in the bar.
 
 Centered by default, which reads as the site's spine when the navigation is
 the primary thing in the header rather than an afterthought beside a logo.
@@ -711,9 +725,16 @@ Centered against the banner rather than against whatever space the brand
 left over, so the middle of the nav is the middle of the window whatever
 the wordmark and the actions happen to measure.
 
-`start` is the opt-out, for a header whose navigation trails the brand. */
-  "attr:nav-align"?: HelixAppHeader["navAlign"];
-  /** Where the navigation sits in the bar.
+`start` is the opt-out, for a header whose middle region trails the brand.
+
+**Named for the region and not for what is usually in it.** It was
+`nav-align`, which reads as a property about `Navigation` and is not: the
+middle slot takes whatever a consumer puts there, a search field or a
+breadcrumb trail as readily as a nav, and a header that centred its search
+box would have been setting `nav-align` to do it. The part is called
+`content`, so the property is too. */
+  "attr:content-align"?: HelixAppHeader["contentAlign"];
+  /** Where the middle region sits in the bar.
 
 Centered by default, which reads as the site's spine when the navigation is
 the primary thing in the header rather than an afterthought beside a logo.
@@ -721,8 +742,15 @@ Centered against the banner rather than against whatever space the brand
 left over, so the middle of the nav is the middle of the window whatever
 the wordmark and the actions happen to measure.
 
-`start` is the opt-out, for a header whose navigation trails the brand. */
-  "prop:navAlign"?: HelixAppHeader["navAlign"];
+`start` is the opt-out, for a header whose middle region trails the brand.
+
+**Named for the region and not for what is usually in it.** It was
+`nav-align`, which reads as a property about `Navigation` and is not: the
+middle slot takes whatever a consumer puts there, a search field or a
+breadcrumb trail as readily as a nav, and a header that centred its search
+box would have been setting `nav-align` to do it. The part is called
+`content`, so the property is too. */
+  "prop:contentAlign"?: HelixAppHeader["contentAlign"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14068,7 +14096,7 @@ export type CustomElements = {
    * It pairs with `appearance`: a bar that does not stick is only ever over the
    * top of the page, so `material` and `transparent` have nothing to be
    * translucent against and `data-scrolled` never lands.
-   * - `nav-align`/`navAlign`: Where the navigation sits in the bar.
+   * - `content-align`/`contentAlign`: Where the middle region sits in the bar.
    *
    * Centered by default, which reads as the site's spine when the navigation is
    * the primary thing in the header rather than an afterthought beside a logo.
@@ -14076,7 +14104,14 @@ export type CustomElements = {
    * left over, so the middle of the nav is the middle of the window whatever
    * the wordmark and the actions happen to measure.
    *
-   * `start` is the opt-out, for a header whose navigation trails the brand.
+   * `start` is the opt-out, for a header whose middle region trails the brand.
+   *
+   * **Named for the region and not for what is usually in it.** It was
+   * `nav-align`, which reads as a property about `Navigation` and is not: the
+   * middle slot takes whatever a consumer puts there, a search field or a
+   * breadcrumb trail as readily as a nav, and a header that centred its search
+   * box would have been setting `nav-align` to do it. The part is called
+   * `content`, so the property is too.
    *
    * ## Slots
    *
@@ -25327,7 +25362,7 @@ export type CustomElementsSolidJs = {
    * It pairs with `appearance`: a bar that does not stick is only ever over the
    * top of the page, so `material` and `transparent` have nothing to be
    * translucent against and `data-scrolled` never lands.
-   * - `nav-align`/`navAlign`: Where the navigation sits in the bar.
+   * - `content-align`/`contentAlign`: Where the middle region sits in the bar.
    *
    * Centered by default, which reads as the site's spine when the navigation is
    * the primary thing in the header rather than an afterthought beside a logo.
@@ -25335,7 +25370,14 @@ export type CustomElementsSolidJs = {
    * left over, so the middle of the nav is the middle of the window whatever
    * the wordmark and the actions happen to measure.
    *
-   * `start` is the opt-out, for a header whose navigation trails the brand.
+   * `start` is the opt-out, for a header whose middle region trails the brand.
+   *
+   * **Named for the region and not for what is usually in it.** It was
+   * `nav-align`, which reads as a property about `Navigation` and is not: the
+   * middle slot takes whatever a consumer puts there, a search field or a
+   * breadcrumb trail as readily as a nav, and a header that centred its search
+   * box would have been setting `nav-align` to do it. The part is called
+   * `content`, so the property is too.
    *
    * ## Slots
    *

@@ -1319,12 +1319,12 @@
             },
             {
               "kind": "field",
-              "name": "navAlign",
+              "name": "contentAlign",
               "type": {
                 "text": "'start' | undefined"
               },
-              "description": "Where the navigation sits in the bar.\n\nCentered by default, which reads as the site's spine when the navigation is\nthe primary thing in the header rather than an afterthought beside a logo.\nCentered against the banner rather than against whatever space the brand\nleft over, so the middle of the nav is the middle of the window whatever\nthe wordmark and the actions happen to measure.\n\n`start` is the opt-out, for a header whose navigation trails the brand.",
-              "attribute": "nav-align",
+              "description": "Where the middle region sits in the bar.\n\nCentered by default, which reads as the site's spine when the navigation is\nthe primary thing in the header rather than an afterthought beside a logo.\nCentered against the banner rather than against whatever space the brand\nleft over, so the middle of the nav is the middle of the window whatever\nthe wordmark and the actions happen to measure.\n\n`start` is the opt-out, for a header whose middle region trails the brand.\n\n**Named for the region and not for what is usually in it.** It was\n`nav-align`, which reads as a property about `Navigation` and is not: the\nmiddle slot takes whatever a consumer puts there, a search field or a\nbreadcrumb trail as readily as a nav, and a header that centred its search\nbox would have been setting `nav-align` to do it. The part is called\n`content`, so the property is too.",
+              "attribute": "content-align",
               "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseAppHeader",
@@ -1430,12 +1430,12 @@
               "fieldName": "sticky"
             },
             {
-              "name": "nav-align",
+              "name": "content-align",
               "type": {
                 "text": "'start' | undefined"
               },
-              "description": "Where the navigation sits in the bar.\n\nCentered by default, which reads as the site's spine when the navigation is\nthe primary thing in the header rather than an afterthought beside a logo.\nCentered against the banner rather than against whatever space the brand\nleft over, so the middle of the nav is the middle of the window whatever\nthe wordmark and the actions happen to measure.\n\n`start` is the opt-out, for a header whose navigation trails the brand.",
-              "fieldName": "navAlign",
+              "description": "Where the middle region sits in the bar.\n\nCentered by default, which reads as the site's spine when the navigation is\nthe primary thing in the header rather than an afterthought beside a logo.\nCentered against the banner rather than against whatever space the brand\nleft over, so the middle of the nav is the middle of the window whatever\nthe wordmark and the actions happen to measure.\n\n`start` is the opt-out, for a header whose middle region trails the brand.\n\n**Named for the region and not for what is usually in it.** It was\n`nav-align`, which reads as a property about `Navigation` and is not: the\nmiddle slot takes whatever a consumer puts there, a search field or a\nbreadcrumb trail as readily as a nav, and a header that centred its search\nbox would have been setting `nav-align` to do it. The part is called\n`content`, so the property is too.",
+              "fieldName": "contentAlign",
               "inheritedFrom": {
                 "name": "HelixBaseAppHeader",
                 "module": "src/app-header/root/app-header-root.ts"

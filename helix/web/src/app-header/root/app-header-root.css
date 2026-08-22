@@ -147,7 +147,7 @@
 
 /* Navigation beside the brand instead of centered in the banner. The outer
    tracks stop being equal, so nothing is holding the middle any more. */
-:host([nav-align="start"]) [part="row"] {
+:host([content-align="start"]) [part="row"] {
   grid-template-columns: auto 1fr auto;
 }
 
@@ -175,7 +175,7 @@ slot[name="start"]::slotted(*) {
   overflow-x: auto;
 }
 
-:host([nav-align="start"]) [part="content"] {
+:host([content-align="start"]) [part="content"] {
   justify-content: flex-start;
 }
 
