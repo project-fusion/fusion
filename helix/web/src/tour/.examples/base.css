@@ -36,6 +36,13 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-button::part(button) {
   all: unset;
   box-sizing: border-box;
@@ -46,6 +53,12 @@ helix-base-icon-button::part(button) {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-base-tour-stop::part(arrow) {

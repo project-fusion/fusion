@@ -35,3 +35,33 @@
   --_gray-muted: light-dark(#63636b, #a1a1aa);
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
+
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+/* No parts at all, so the arrangement is the host and its children. */
+helix-base-stat-group {
+  display: flex;
+  gap: 1.5rem;
+}
+
+helix-base-stat {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.25rem;
+}
+
+helix-base-stat [slot="label"] {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+}

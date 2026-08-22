@@ -51,6 +51,13 @@ helix-base-bar-chart {
   --chart-series-6: #d2d2d7;
 }
 
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-bar-chart::part(axis) {
   stroke: var(--_gray-line);
 }

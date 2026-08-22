@@ -36,6 +36,13 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-timeline-item::part(dot) {
   background-color: var(--_gray-strong);
   block-size: 0.75rem;
@@ -49,4 +56,26 @@ helix-base-timeline-item::part(rail) {
   block-size: 0.5rem;
   display: block;
   inline-size: 100%;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+/* The rail the markers sit on, which the generic track rule drew as a
+   full-width bar across every entry. */
+helix-base-timeline-item::part(track) {
+  background-color: var(--_gray-fill);
+  block-size: auto;
+  inline-size: 1px;
+  justify-self: center;
+}
+
+helix-base-timeline-item::part(marker) {
+  background-color: var(--_gray-mark);
+  block-size: 0.5rem;
+  border-radius: 50%;
+  inline-size: 0.5rem;
 }

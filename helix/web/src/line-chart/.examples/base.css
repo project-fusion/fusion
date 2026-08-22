@@ -51,6 +51,13 @@ helix-base-line-chart {
   --chart-series-6: #d2d2d7;
 }
 
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-line-chart::part(area) {
   fill: var(--chart-series);
   opacity: 0.25;

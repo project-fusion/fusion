@@ -35,3 +35,32 @@
   --_gray-muted: light-dark(#63636b, #a1a1aa);
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
+
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
+/* The column tracks are the component's arithmetic, published as
+   `--table-template` because only it has counted the columns. */
+helix-base-table::part(table) {
+  display: grid;
+  grid-template-columns: var(--table-template);
+}
+
+helix-base-table-row {
+  display: contents;
+}
+
+helix-base-table-cell {
+  border-block-end: 1px solid var(--_gray-line);
+  padding: 0.375rem 0.5rem;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}

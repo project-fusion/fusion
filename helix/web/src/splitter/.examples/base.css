@@ -36,8 +36,49 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-splitter {
+  block-size: 8rem;
+  border: 1px solid var(--_gray-line);
+  display: block;
+}
+
+/* The divider is the component's whole point, so it has to be visible before
+   anything else here matters. */
+helix-base-splitter::part(divider) {
+  background-color: var(--_gray-line);
+}
+
 helix-base-splitter::part(separator) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+/* The panes and the handle between them, which is the whole
+   component: without a row the two stack and the separator is a stray square. */
+helix-base-splitter::part(start),
+helix-base-splitter::part(end) {
+  min-inline-size: 0;
+  overflow: auto;
+  padding: 0.5rem;
+}
+
+helix-base-splitter::part(separator) {
+  background-color: var(--_gray-line);
+  block-size: 100%;
+  cursor: col-resize;
+  inline-size: 3px;
 }

@@ -51,6 +51,13 @@ helix-base-donut-chart {
   --chart-series-6: #d2d2d7;
 }
 
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-donut-chart::part(tooltip) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);

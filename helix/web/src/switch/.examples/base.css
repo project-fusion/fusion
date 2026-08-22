@@ -36,6 +36,13 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-switch::part(field) {
   align-items: center;
   display: flex;
@@ -71,10 +78,54 @@ helix-base-switch::part(label) {
   font-weight: 600;
 }
 
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
    off without putting one back is the commonest way a headless control stops
    being operable without a pointer. */
 helix-base-switch::part(control):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+/* The input is the hit target and lies over the track, which is what
+   draws. Left visible it is a checkbox sitting beside a switch. */
+helix-base-switch::part(track) {
+  block-size: 1rem;
+  border-radius: 0.5rem;
+  display: inline-block;
+  inline-size: 1.75rem;
+  position: relative;
+}
+
+helix-base-switch::part(control) {
+  block-size: 100%;
+  inline-size: 100%;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+/* No transition, and `check:motion` is why it is worth saying: anything that
+   moves owes a `prefers-reduced-motion` block repeating the same selector. A
+   skeletal sheet has nothing to gain from the animation and would be teaching
+   the omission along with it. */
+helix-base-switch::part(thumb) {
+  inset-block-start: 0.125rem;
+  inset-inline-start: 0.125rem;
+  position: absolute;
+}
+
+helix-base-switch[data-checked]::part(track) {
+  background-color: var(--_gray-strong);
+}
+
+helix-base-switch[data-checked]::part(thumb) {
+  background-color: var(--_gray-surface);
+  translate: 0.75rem 0;
 }

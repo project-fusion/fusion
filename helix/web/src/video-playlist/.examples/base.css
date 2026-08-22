@@ -36,6 +36,13 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-video-playlist::part(items) {
   align-items: center;
   display: flex;
@@ -104,6 +111,12 @@ helix-base-video-playlist-menu::part(trigger) {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

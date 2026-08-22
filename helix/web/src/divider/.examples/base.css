@@ -35,3 +35,29 @@
   --_gray-muted: light-dark(#63636b, #a1a1aa);
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
+
+helix-base-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-divider {
+  background-color: var(--_gray-line);
+  block-size: 1px;
+  border: 0;
+  display: block;
+}
+
+helix-base-divider[orientation="vertical"] {
+  align-self: stretch;
+  block-size: auto;
+  inline-size: 1px;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
