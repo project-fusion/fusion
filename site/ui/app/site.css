@@ -216,9 +216,24 @@ helix-megamenu {
    * low opacity. Clipping it on the panel's own geometry means the two leave
    * together and there is nothing behind to outlive the thing it was behind. */
   clip-path: inset(0 0 100% 0);
+  /* **The opacity crosses the bar's, the clip follows the panel, and they are
+     not the same length on purpose.**
+
+     The fill used to fade over `slow` like everything else here, which put it
+     out of step with the thing it is taking over from: the masthead swaps its
+     own fill over `normal`, so at `slow` the sheet was still arriving long
+     after the bar had gone (a gap that showed the page through the bar) or,
+     held the other way, long enough for both to paint at once (two 72% fills
+     compositing to about 92%, a bar that goes dark and settles late).
+
+     Matched to `normal`, the two cross: the bar empties exactly as the sheet
+     fills, over one span, and the pair never sums to more or less than one
+     glass for long. The clip stays at `slow`, because that one is not a
+     handover at all. It is the sheet keeping pace with the panel's own travel,
+     and the panel takes `slow`. */
   transition:
     clip-path var(--helix-duration-slow) var(--helix-easing-decelerate),
-    opacity var(--helix-duration-slow) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-normal) var(--helix-easing-decelerate),
     visibility var(--helix-duration-slow) allow-discrete;
   /* Hidden rather than only transparent, so an idle page is not running a
      full-screen blur behind an invisible element. Discrete, so it flips at the

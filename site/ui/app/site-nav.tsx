@@ -63,50 +63,6 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [panelDown, setPanelDown] = useState(false)
 
-  /* Whether the bar has handed its painting over to the sheet yet.
-   *
-   * **Delayed on the way in, immediate on the way out, and the asymmetry is the
-   * whole point.** The bar drops its fill over `normal` and the sheet arrives
-   * over `slow`, 200 against 320. Strip the bar on the frame the panel opens
-   * and the faster of the two is the one *leaving*: at 200ms the bar is bare and
-   * the sheet is only two thirds in, so for that gap neither is painting and
-   * whatever is scrolled under the masthead reads straight through it.
-   *
-   * Closing has the same two durations and no gap, because there the faster one
-   * is *arriving*: the bar's own glass comes up over 200 while the sheet leaves
-   * over 320, which is a crossfade with no trough in it. So the bar waits for
-   * the sheet to be up before going bare, and takes its fill back the instant
-   * the sheet starts to leave.
-   *
-   * The cost is a moment of doubled glass at the end of the open, while the
-   * bar's own fill fades out over a sheet that is already full. Doubled is the
-   * cheap fault here and a gap is the expensive one, which is the same trade
-   * the closing half makes in the other direction. */
-  const [barBare, setBarBare] = useState(false)
-  const glassRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!panelDown) {
-      setBarBare(false)
-      return
-    }
-    const glass = glassRef.current
-    if (!glass) {
-      setBarBare(true)
-      return
-    }
-    /* Read off the sheet rather than written down again, so the two cannot
-       drift and `prefers-reduced-motion` resolves to zero and hands over at
-       once. A timer rather than only `transitionend`, because that event has to
-       arrive and there is no transition to end when motion is reduced. */
-    const style = getComputedStyle(glass)
-    const seconds = (value: string) =>
-      Math.max(0, ...value.split(',').map((part) => Number.parseFloat(part) || 0))
-    const wait = (seconds(style.transitionDuration) + seconds(style.transitionDelay)) * 1000
-    const timer = setTimeout(() => setBarBare(true), wait)
-    return () => clearTimeout(timer)
-  }, [panelDown])
-
   /* How far down the glass reaches while a panel is open.
    *
    * **One filter, not two, and this is what it costs.** `backdrop-filter` is
@@ -201,15 +157,6 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
       <div
         className="navGlass"
         data-open={panelDown ? '' : undefined}
-        /* The precise half of the handover. `opacity` only, since this also
-           transitions `clip-path` and `visibility` and would otherwise report
-           one arrival three times. */
-        onTransitionEnd={(event) => {
-          if (event.propertyName === 'opacity' && panelDown) {
-            setBarBare(true)
-          }
-        }}
-        ref={glassRef}
         style={{ blockSize: `${glassSize}px` }}
       />
 
@@ -235,8 +182,25 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
          * `appearance="transparent"` has no fill to take back and the override
          * is a no-op. Scrolled, where the same attribute takes the material, is
          * the only case with anything to see. */
+        /* **Swapped on the same frame the sheet starts arriving, because the
+         * two crossfade.**
+         *
+         * Three arrangements have been tried here and only one has no artifact.
+         * Releasing the bar first leaves a gap: the bar emptied over `normal`
+         * while the sheet filled over `slow`, so the faster of the two was the
+         * one leaving and for a moment neither painted, which showed the page
+         * through the masthead. Holding the bar until the sheet was full stacks
+         * them instead: two 72% fills composite to about 92%, so the bar went
+         * visibly darker for the length of its own fade and only settled when
+         * it finished.
+         *
+         * Neither is a timing bug. Overlap darkens and a gap shows through,
+         * and the only way to have neither is for the two to cross: one fading
+         * out exactly as the other fades in, over the same span. The sheet's
+         * opacity was moved to `normal` to match the bar, which is what makes
+         * this frame the right one to swap on. */
         style={
-          barBare
+          panelDown
             ? { '--app-header-backdrop': 'none', '--app-header-background': 'transparent' }
             : undefined
         }
