@@ -8,6 +8,15 @@
  * Deliberately skeletal, for the reason the checkbox's sheet gives: this is a
  * diagram of what has to be styled, not a theme to copy.
  *
+ * **The triggers are `helix-base-button` and not a bare `<button>`**, which is
+ * the one thing here that is not about appearance. `command` and `commandfor`
+ * are Chrome 135, Firefox 137 and Safari 18.4, and before those a bare button
+ * carrying them is simply inert: no error, no warning, the markup right and the
+ * control dead. `HelixBaseButton` already sends the event itself where the
+ * platform will not, which is why the styled twin of this example worked in a
+ * browser where this one did nothing at all. An example that only runs on
+ * last-year's browsers teaches a consumer to ship one.
+ *
  * **`::backdrop` inherits from its originating element**, which is worth
  * knowing because it did not always: the working group changed it, Chromium
  * shipped it, and a note in this repository claimed otherwise for years. So a
@@ -40,4 +49,14 @@ helix-base-dialog [slot="footer"] {
   gap: 0.5rem;
   justify-content: flex-end;
   margin-block-start: 1.25rem;
+}
+
+/* The trigger is a component rather than a bare element, so its own button is
+   what takes the treatment. `::part` is the published door into it. */
+helix-base-button::part(button) {
+  border: 1px solid;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.375rem 0.75rem;
 }

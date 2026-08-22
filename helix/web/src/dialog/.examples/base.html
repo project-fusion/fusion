@@ -5,11 +5,10 @@
   rel="stylesheet"
 />
 
-<button
+<helix-base-button
   command="--show"
   commandfor="base-confirm"
-  type="button"
->Delete project</button>
+>Delete project</helix-base-button>
 
 <helix-base-dialog
   id="base-confirm"
@@ -18,15 +17,13 @@
   <h2 slot="header">Delete project</h2>
   <p>This removes the project and everything in it. It cannot be undone.</p>
   <div slot="footer">
-    <button
+    <helix-base-button
       command="--close"
       commandfor="base-confirm"
-      type="button"
-    >Delete</button>
-    <button
+    >Delete</helix-base-button>
+    <helix-base-button
       command="--close"
       commandfor="base-confirm"
-      type="button"
-    >Cancel</button>
+    >Cancel</helix-base-button>
   </div>
 </helix-base-dialog>
