@@ -66,6 +66,15 @@ export interface Example {
   html: string
   label: string
   slug: string
+  /**
+   * Which tier the example shows, read from what it renders.
+   *
+   * Off the markup rather than off the filename, the same test `check:tokens`
+   * uses to know a base example's stylesheet may write raw values: an example
+   * is a base one when it renders a `helix-base-` element. A `base.html`
+   * convention would be a second place to remember, and this is the fact.
+   */
+  tier: 'headless' | 'styled'
 }
 
 export interface Family {
@@ -253,14 +262,16 @@ const examplesOf = (slug: string, declared: RawDeclaration['helix']): Example[] 
     .map((file) => {
       const slugged = file.replace(/\.html$/, '')
       const stylesheet = join(dir, `${slugged}.css`)
+      const html = readFileSync(join(dir, file), 'utf8').trim()
       return {
         css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
         description: described.get(slugged) ?? '',
-        html: readFileSync(join(dir, file), 'utf8').trim(),
+        html,
         // The canonical example reads as "Preview": it is the component's
         // headline, not a named variant sitting beside the others.
         label: slugged === 'default' ? 'Preview' : startCase(slugged),
         slug: slugged,
+        tier: (html.includes('<helix-base-') ? 'headless' : 'styled') as 'headless' | 'styled',
       }
     })
 }

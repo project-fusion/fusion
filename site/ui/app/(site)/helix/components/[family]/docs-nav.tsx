@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { type MouseEvent as ReactMouseEvent, useCallback, useRef } from 'react'
 
 /** One entry in the sidebar: what it is called and where it goes. */
@@ -54,8 +54,14 @@ const internal = (link: HTMLAnchorElement | undefined): string | undefined => {
   return url.origin === window.location.origin ? `${url.pathname}${url.search}` : undefined
 }
 
-export function DocsNav({ active, entries }: { active: string; entries: readonly DocsNavEntry[] }) {
+export function DocsNav({ entries }: { entries: readonly DocsNavEntry[] }) {
   const router = useRouter()
+  /* Read rather than taken as a prop, because the layout rendering this sits
+     above the `[family]` segment and is therefore not handed one: that is what
+     makes it survive a navigation between families, which is the whole reason
+     the rail lives there. A navigation knowing which route it is on is not a
+     burden on it. */
+  const active = usePathname().split('/').pop() ?? ''
   const warmed = useRef(new Set<string>())
 
   const navigate = useCallback(

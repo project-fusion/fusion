@@ -14,7 +14,6 @@ import {
   type PropertyDoc,
 } from '../../../../../lib/catalog'
 import { sourceUrl } from '../../../../../lib/source'
-import { DocsNav } from './docs-nav'
 import { ComponentPreview } from './preview'
 
 /**
@@ -104,7 +103,7 @@ function Code({ children }: { children: string }) {
   )
 }
 
-/**
+/*
  * Colours a type annotation by what each part of it is.
  *
  * Split rather than highlighted: a type is not a program, and running a real
@@ -292,13 +291,24 @@ function ElementApi({ element }: { element: Element }) {
   )
 }
 
+/**
+ * The one tier a set of examples all belong to, or nothing where they differ.
+ *
+ * Returned as `undefined` rather than a string when a family has both, because
+ * `data-tier` then has to be absent: an attribute naming one tier on a section
+ * holding both would hide it in the mode where half of it applies.
+ */
+function onlyTier(examples: readonly Example[]): 'headless' | 'styled' | undefined {
+  const tiers = new Set(examples.map((example) => example.tier))
+  return tiers.size === 1 ? [...tiers][0] : undefined
+}
+
 export default async function FamilyDocs({ params }: { params: Promise<{ family: string }> }) {
   const family = findFamily((await params).family)
   if (!family) {
     notFound()
   }
 
-  const families = getFamilies()
   const root = family.elements.find((entry) => entry.tagName === `helix-${family.slug}`)
   /* The one-liner, not the reasoning. `@description` is an essay: it argues
      with itself, cites measurements and names components that are not this one,
@@ -309,9 +319,9 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
   const source = sourceUrl(family.source)
 
   return (
-    <div className="docsShell">
-      <DocsNav active={family.slug} entries={families} />
-
+    /* The shell and the rail are the layout's, so the nav survives a navigation
+       between families and keeps the state a reader set on it. See #119. */
+    <>
       <article className="docsMain">
         {/* `3xl`, the top of the scale, because a section break should be the
             largest space on the page: at `2xl` Usage sat as far from Preview as
@@ -454,13 +464,24 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
           </helix-flex>
 
           {family.examples.length > 0 && (
-            <helix-flex direction="column" gap="md" id="examples">
+            /* The whole section carries a tier where every example in it is one
+               tier, which is 85 of the 88 families: selecting Base would
+               otherwise leave the heading standing over a table with every row
+               hidden, and an empty table reads as data that failed to load
+               rather than as a tier with nothing in it yet. Where a family has
+               both, the section stays and the rows filter themselves. */
+            <helix-flex
+              data-tier={onlyTier(family.examples)}
+              direction="column"
+              gap="md"
+              id="examples"
+            >
               <helix-text as="h2">Examples</helix-text>
               <helix-table label="Examples">
                 <helix-table-column>Name</helix-table-column>
                 <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
                 {byExample(family.examples).map((example) => (
-                  <helix-table-row key={example.slug}>
+                  <helix-table-row data-tier={example.tier} key={example.slug}>
                     <helix-table-cell header>
                       {/* `quiet`: a column where every row is a link does not
                           need every row underlined and blue. The variant carries
@@ -518,12 +539,12 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             </a>
           ))}
           {family.examples.length > 0 && (
-            <a href="#examples" suppressHydrationWarning>
+            <a data-tier={onlyTier(family.examples)} href="#examples" suppressHydrationWarning>
               Examples
             </a>
           )}
         </helix-outline>
       </aside>
-    </div>
+    </>
   )
 }

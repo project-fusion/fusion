@@ -6,10 +6,7 @@
  *
  * Deliberately skeletal, for the reason the checkbox's sheet gives: a diagram
  * of what has to be styled rather than a theme to copy.
- *
- * `default-open` and not `open` on the first item, because `open` is the
- * controlled half: writing it declares the consumer owns the state and the
- * section would freeze open with nothing answering it. */
+ * */
 
 helix-base-accordion-item {
   border-block-end: 1px solid;
