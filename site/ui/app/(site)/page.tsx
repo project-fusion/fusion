@@ -71,11 +71,11 @@ export default function Home() {
           nothing and the page is the type it always was. */}
       <helix-aura
         class="reelAura"
-        gain={0.55}
+        gain={0.85}
         scale={1.7}
         shape="flow"
         speed={1}
-        terminus={0.5}
+        terminus={0.1}
       ></helix-aura>
       <div className="reelScrim" />
 
