@@ -855,6 +855,26 @@ const MOTION = {
   springy: { curve: 'var(--helix-easing-spring)', pace: 1.1 },
 } as const
 
+/**
+ * The ramp, as steps away from the body size.
+ *
+ * Negative steps are the UI ramp and go down a pixel each: 12 and 13 sit a
+ * pixel apart because a label has to be smaller than its field and still be
+ * read, which is a floor rather than a ratio. Positive steps are the display
+ * ramp and compound by the scale.
+ */
+const TEXT_STEPS = { '2xl': 3, '3xl': 4, lg: 1, md: 0, sm: -1, xl: 2, xs: -2 } as const
+
+/** Below this a label stops being small and starts being unreadable. */
+const TEXT_FLOOR = 11
+
+/** What each character does to the three weights, which move together. */
+const WEIGHTS = {
+  light: { medium: 400, regular: 300, semibold: 500 },
+  regular: { medium: 500, regular: 400, semibold: 600 },
+  strong: { medium: 600, regular: 500, semibold: 700 },
+} as const
+
 /** The three durations a pace applies to. `instant` is 0 and is a statement. */
 const DURATIONS = { fast: 120, normal: 200, slow: 320 } as const
 
@@ -953,6 +973,44 @@ export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
   }
   if (character) {
     lines.push(`  --${namespace}-easing-standard: ${MOTION[character].curve};`)
+  }
+
+  /* The ramp, emitted only where a base or a ratio was asked for, so a theme
+     that says nothing about size leaves the hand-picked scale standing rather
+     than replacing it with a generated one that rounds differently. */
+  const { base, scale: ratio, weight } = theme.intent.font
+  if (base !== undefined || ratio !== undefined) {
+    const body = base ?? 14
+    const step = ratio ?? 1.32
+
+    /* **Compounded from the rounded step, not from the base.** A designer builds
+       a scale by taking the last round number and multiplying it, which is why
+       real ramps are whole pixels the whole way up; compounding from the base
+       and rounding once at the end produces a run that is a pixel off itself in
+       the middle. Measured at 1.32: 18, 24, 32, 42 from the rounded chain
+       against 19, 25, 33, 44 from the base.
+
+       **The shipped ramp is hand-picked and no single ratio reproduces it.** Its
+       steps run 1.29, 1.33, 1.33, 1.375, so the top one is wider than the rest.
+       1.32 matches four of the seven exactly and lands 42 where the stylesheet
+       has 44, which is why nothing is emitted unless a base or a ratio is asked
+       for: asking gives a generated ramp rather than a copy of the one that
+       ships. */
+    const above: number[] = []
+    for (let index = 0; index < 4; index += 1) {
+      above.push(Math.round((above[index - 1] ?? body) * step))
+    }
+
+    for (const [name, distance] of Object.entries(TEXT_STEPS)) {
+      const px =
+        distance < 0 ? Math.max(TEXT_FLOOR, body + distance) : (above[distance - 1] ?? body)
+      lines.push(`  --${namespace}-text-${name}: ${px / 16}rem;`)
+    }
+  }
+  if (weight) {
+    for (const [name, value] of Object.entries(WEIGHTS[weight])) {
+      lines.push(`  --${namespace}-weight-${name}: ${value};`)
+    }
   }
 
   const { blur, opacity } = theme.intent.material

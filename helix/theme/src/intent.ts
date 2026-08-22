@@ -144,9 +144,36 @@ export interface ThemeIntent {
    * three times.
    */
   font?: {
+    /**
+     * Body size in pixels. 14 is what ships.
+     *
+     * The whole ramp is built from it: the two steps below step down a pixel
+     * each and the four above compound by `scale`.
+     */
+    base?: number
     body?: string
     display?: string
     mono?: string
+    /**
+     * The ratio between the display steps. Roughly 1.33 is what ships, which is
+     * a perfect fourth.
+     *
+     * **It applies above the body size and not below it**, because the two ends
+     * of a type ramp are different problems. The steps under body are a UI
+     * ramp, where 12 and 13 sit a pixel apart because a label has to be smaller
+     * than its field and still be read; the steps above are a display ramp,
+     * where each one has to be obviously not the last. One ratio across both
+     * either crushes the top or blows out the bottom.
+     */
+    scale?: number
+    /**
+     * How heavy the three weights run. `regular` is 400, 500 and 600, which is
+     * what ships; `strong` shifts each up a step and `light` down one.
+     *
+     * A character rather than three numbers, because the three move together or
+     * the relationships between them stop meaning anything.
+     */
+    weight?: 'light' | 'regular' | 'strong'
   }
   /**
    * The token prefix, without dashes. `helix` by default.

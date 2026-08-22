@@ -472,6 +472,42 @@ describe('the separation policy', () => {
     }
   })
 
+  /* The ramp has two regimes and one ratio across both would crush the top or
+     blow out the bottom: below the body size a label has to be smaller than its
+     field and still be read, which is a floor rather than a ratio. */
+  test('the ramp steps down by a pixel and up by the ratio', () => {
+    const css = toCss(deriveTheme({ brand: BRAND, font: { base: 14, scale: 1.32 } }))
+    const px = (name: string) =>
+      Number(css.match(new RegExp(`--helix-text-${name}: ([0-9.]+)rem`))?.[1] ?? 0) * 16
+
+    expect([px('xs'), px('sm'), px('md')]).toEqual([12, 13, 14])
+    expect([px('lg'), px('xl'), px('2xl'), px('3xl')]).toEqual([18, 24, 32, 42])
+  })
+
+  test('the floor holds a small base off the bottom', () => {
+    const css = toCss(deriveTheme({ brand: BRAND, font: { base: 12 } }))
+    const px = (name: string) =>
+      Number(css.match(new RegExp(`--helix-text-${name}: ([0-9.]+)rem`))?.[1] ?? 0) * 16
+
+    expect(px('xs')).toBe(11)
+    expect(px('sm')).toBe(11)
+  })
+
+  test('a weight character moves all three together', () => {
+    const css = toCss(deriveTheme({ brand: BRAND, font: { weight: 'strong' } }))
+    expect(css).toContain('--helix-weight-regular: 500;')
+    expect(css).toContain('--helix-weight-medium: 600;')
+    expect(css).toContain('--helix-weight-semibold: 700;')
+  })
+
+  /* The shipped ramp is hand-picked, so a theme that says nothing about size
+     keeps it rather than getting a generated run that rounds differently. */
+  test('saying nothing about size emits no ramp', () => {
+    const css = toCss(deriveTheme({ brand: BRAND }))
+    expect(css).not.toContain('--helix-text-')
+    expect(css).not.toContain('--helix-weight-')
+  })
+
   test('a single face fills the display slot too', () => {
     const css = toCss(deriveTheme({ brand: BRAND, font: { body: 'Inter, sans-serif' } }))
     expect(css).toContain('--helix-font-sans: Inter, sans-serif;')

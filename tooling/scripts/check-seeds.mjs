@@ -203,6 +203,30 @@ const declaredAll = new Set(
   ]).map((m) => m[1]),
 )
 
+/* **A name interpolated twice is a family, and the family still has to exist.**
+   The type ramp is written `--${namespace}-text-${name}:`, so the whole of it
+   slipped past the pattern above, which stops at the first `$`. Matching the
+   prefix catches the failure that matters here, a family the token layer does
+   not have at all: `--helix-typeface-lg` would be reported where
+   `--helix-text-lg` is fine. It cannot check the leaf, and saying so is better
+   than implying otherwise. */
+const families = new Set(
+  [...uncommented(read(ENGINE)).matchAll(/`\s*--\$\{namespace\}-([a-z0-9-]+)-\$\{/g)].map(
+    (m) => m[1],
+  ),
+)
+
+const declaredFamilies = new Set([...declaredAll].map((name) => name.split('-')[0]))
+
+for (const family of [...families].sort()) {
+  if (!declaredFamilies.has(family)) {
+    problems.push(
+      `${ENGINE} writes a \`--helix-${family}-*\` family and no stylesheet ` +
+        'declares one, so every token in it sets a property nothing reads.',
+    )
+  }
+}
+
 for (const name of [...written].sort()) {
   if (name.startsWith('seed-') || declaredAll.has(name)) {
     continue
@@ -228,6 +252,6 @@ if (problems.length > 0) {
 const planned = PLANNED.size > 0 ? `, ${PLANNED.size} planned and each still read` : ''
 console.log(
   `seeds: ${emitted.size} emitted, ${consumed.size} read${planned}; ` +
-    `${new Set(modelNames).size} model names and ${written.size} written tokens, ` +
-    'every one declared',
+    `${new Set(modelNames).size} model names, ${written.size} written tokens and ` +
+    `${families.size} written families, every one declared`,
 )

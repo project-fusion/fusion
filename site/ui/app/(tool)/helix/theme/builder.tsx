@@ -107,6 +107,8 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
   const [displayFace, setDisplayFace] = useState('')
   const [monoFace, setMonoFace] = useState('')
   const [motion, setMotion] = useState<'' | 'gentle' | 'snappy' | 'springy'>('')
+  const [textBase, setTextBase] = useState(14)
+  const [textScale, setTextScale] = useState(132)
   const [surface, setSurface] = useState<Mechanism>('border')
   const [floating, setFloating] = useState<Mechanism>('shadow')
 
@@ -127,7 +129,9 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     bodyFace === '' &&
     displayFace === '' &&
     monoFace === '' &&
-    motion === ''
+    motion === '' &&
+    textBase === 14 &&
+    textScale === 132
 
   const reset = (): void => {
     setBrand(BRAND)
@@ -144,6 +148,8 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     setDisplayFace('')
     setMonoFace('')
     setMotion('')
+    setTextBase(14)
+    setTextScale(132)
   }
 
   const intent: ThemeIntent = useMemo(
@@ -155,6 +161,8 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       density: density / 100,
       ...(motion ? { motion: { character: motion } } : {}),
       font: {
+        base: textBase,
+        scale: textScale / 100,
         ...(bodyFace ? { body: stack(bodyFace, 'system-ui, sans-serif') } : {}),
         ...(displayFace ? { display: stack(displayFace, 'system-ui, sans-serif') } : {}),
         ...(monoFace ? { mono: stack(monoFace, 'ui-monospace, monospace') } : {}),
@@ -176,6 +184,8 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       floating,
       monoFace,
       motion,
+      textBase,
+      textScale,
       radius,
       scheme,
       surface,
@@ -504,6 +514,34 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               show-value
               step={10}
               value={String(allowance)}
+            ></helix-slider>
+
+            {/* **Two ends of one ramp, and they are different problems.** The
+              steps under the body size are a UI ramp where a label has to be
+              smaller than its field and still be read, so they step down a
+              pixel; the steps above are a display ramp where each has to be
+              obviously not the last, so they compound. One control for each. */}
+            <helix-slider
+              label="Body size"
+              max={18}
+              min={12}
+              name="text-base"
+              onhelix-input={(event) => setTextBase(Number(event.detail.value))}
+              show-value
+              step={1}
+              value={String(textBase)}
+            ></helix-slider>
+
+            <helix-slider
+              hint="The ratio between the display steps."
+              label="Type scale"
+              max={160}
+              min={110}
+              name="text-scale"
+              onhelix-input={(event) => setTextScale(Number(event.detail.value))}
+              show-value
+              step={2}
+              value={String(textScale)}
             ></helix-slider>
 
             {/* **Character rather than a duration**, because the pace and the
