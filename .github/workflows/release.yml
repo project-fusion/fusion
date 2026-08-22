@@ -26,6 +26,22 @@
 # pushed after promotion and says a release happened. Version computation reads
 # both, so a number is never handed out twice; everything else reads only the
 # second.
+# **Publishing is switched off, deliberately, and this is the switch.**
+#
+# `vars.PUBLISHING` is a repository variable. Unset, it is the empty string, so
+# every publishing job below is skipped and a merge to `main` releases nothing.
+# Set it to `on` in Settings, Secrets and variables, Actions, Variables, and the
+# pipeline resumes exactly as written. Nothing else has to change and no commit
+# is needed to flip it back.
+#
+# A variable rather than a commented-out trigger, because the rest of this
+# workflow has to keep running to be worth anything: `intent` still resolves the
+# domains, `verify` still runs, and the first real release is then a switch
+# rather than a re-derivation of a pipeline nobody has exercised in months.
+#
+# **What it does not gate is version allocation**, because nothing is allocated
+# until the job runs at all. A skipped job burns no number and pushes no tag.
+
 name: release
 
 on:
@@ -76,7 +92,7 @@ jobs:
 
   release:
     needs: intent
-    if: needs.intent.outputs.domains != '[]'
+    if: needs.intent.outputs.domains != '[]' && vars.PUBLISHING == 'on'
     runs-on: ubuntu-latest
     timeout-minutes: 40
     strategy:
