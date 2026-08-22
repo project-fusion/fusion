@@ -709,7 +709,7 @@
                 "slug": "default"
               },
               {
-                "description": "The headless tier: one section open at a time is the component's, the rows are yours.",
+                "description": "The same accordion on the headless tier, with every rule written by hand.",
                 "slug": "base"
               },
               {
@@ -9275,7 +9275,7 @@
                 "slug": "default"
               },
               {
-                "description": "The headless tier, styled from scratch: every rule here is one you would write.",
+                "description": "The same checkbox on the headless tier, with every rule written by hand.",
                 "slug": "base"
               },
               {
@@ -19498,7 +19498,7 @@
                 "slug": "default"
               },
               {
-                "description": "The headless tier: the top layer and the focus trap are the component's, the surface is yours.",
+                "description": "The same dialog on the headless tier, with every rule written by hand.",
                 "slug": "base"
               },
               {
