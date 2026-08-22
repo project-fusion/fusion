@@ -19,14 +19,14 @@ describe('page nav', () => {
        points at the old id. Marking nothing is right; failing to render is
        not. */
     const nav = (await mount(
-      `<helix-outline label="On this page"><a href="#gone">Gone</a></helix-outline>`,
+      `<helix-base-outline label="On this page"><a href="#gone">Gone</a></helix-base-outline>`,
     )) as Nav
     await nav.updateComplete
     expect(nav.querySelector('a')?.hasAttribute('aria-current')).toBe(false)
   })
 
   test('nothing is marked before anything has been measured', async () => {
-    const nav = (await mount('<helix-outline></helix-outline>')) as Nav
+    const nav = (await mount('<helix-base-outline></helix-base-outline>')) as Nav
     await nav.updateComplete
     expect(nav.current).toBe('')
   })
@@ -40,11 +40,11 @@ if (hasLayout()) {
        one below it. */
     const build = async (): Promise<Nav> => {
       const nav = (await mount(
-        `<helix-outline label="On this page">
+        `<helix-base-outline label="On this page">
           <a href="#one">One</a>
           <a href="#two">Two</a>
           <a href="#three">Three</a>
-        </helix-outline>
+        </helix-base-outline>
         <div id="one" style="height: 800px">One</div>
         <div id="two" style="height: 800px">Two</div>
         <div id="three" style="height: 800px">Three</div>`,
@@ -178,15 +178,15 @@ if (hasLayout()) {
          the last item in a contents list was unreachable by scrolling. */
       const nav = (await mount(
         `<div>
-          <helix-outline label="On this page">
+          <helix-base-outline label="On this page">
             <a href="#a">A</a><a href="#b">B</a><a href="#c">C</a>
-          </helix-outline>
+          </helix-base-outline>
           <section id="a" style="min-block-size:120vh"><h2>A</h2></section>
           <section id="b" style="min-block-size:120vh"><h2>B</h2></section>
           <section id="c" style="min-block-size:40px"><h2>C</h2></section>
         </div>`,
       )) as HTMLElement
-      const outline = nav.querySelector('helix-outline') as Nav
+      const outline = nav.querySelector('helix-base-outline') as Nav
       await outline.updateComplete
 
       /* To the bottom, which is where the rule under test only fires.
@@ -202,7 +202,7 @@ if (hasLayout()) {
       // Or it slides down from the top of the list on first paint, which reads
       // as the component correcting itself rather than as it arriving.
       const bare = (await mount(
-        '<helix-outline label="On this page"><a href="#gone">Gone</a></helix-outline>',
+        '<helix-base-outline label="On this page"><a href="#gone">Gone</a></helix-base-outline>',
       )) as Nav
       await bare.updateComplete
       expect((part(bare, 'indicator') as HTMLElement).hasAttribute('data-placed')).toBe(false)
@@ -213,12 +213,12 @@ if (hasLayout()) {
 describe('outline scrolling', () => {
   const page = async (attrs = '') => {
     const nav = (await mount(
-      `<div><helix-outline ${attrs} label="On this page">` +
+      `<div><helix-base-outline ${attrs} label="On this page">` +
         '<a href="#one">One</a><a href="#two">Two</a>' +
-        '</helix-outline>' +
+        '</helix-base-outline>' +
         '<section id="one"><h2>One</h2></section><section id="two"><h2>Two</h2></section></div>',
     )) as HTMLElement
-    const outline = nav.querySelector('helix-outline') as Nav
+    const outline = nav.querySelector('helix-base-outline') as Nav
     await outline.updateComplete
     return { outline, root: nav }
   }
@@ -283,8 +283,8 @@ describe('outline scrolling', () => {
     const { root } = await page('behavior="smooth"')
     const stale = document.createElement('a')
     stale.setAttribute('href', '#gone')
-    root.querySelector('helix-outline')?.append(stale)
-    await (root.querySelector('helix-outline') as Nav).updateComplete
+    root.querySelector('helix-base-outline')?.append(stale)
+    await (root.querySelector('helix-base-outline') as Nav).updateComplete
     const event = new MouseEvent('click', { bubbles: true, button: 0, cancelable: true })
     stale.dispatchEvent(event)
     expect(event.defaultPrevented).toBe(false)

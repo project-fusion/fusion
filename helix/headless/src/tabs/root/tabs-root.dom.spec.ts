@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
+import { mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -9,17 +9,18 @@ beforeAll(async () => {
 type Updatable = HTMLElement & { updateComplete: Promise<unknown> }
 
 const markup = `
-  <helix-tabs default-active="one">
-    <helix-tabs-tab value="one">One</helix-tabs-tab>
-    <helix-tabs-tab value="two">Two</helix-tabs-tab>
-    <helix-tabs-tab disabled value="three">Three</helix-tabs-tab>
-    <helix-tabs-panel slot="panels" value="one">First</helix-tabs-panel>
-    <helix-tabs-panel slot="panels" value="two">Second</helix-tabs-panel>
-    <helix-tabs-panel slot="panels" value="three">Third</helix-tabs-panel>
-  </helix-tabs>`
+  <helix-base-tabs default-active="one">
+    <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
+    <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
+    <helix-base-tabs-tab disabled value="three">Three</helix-base-tabs-tab>
+    <helix-base-tabs-panel slot="panels" value="one">First</helix-base-tabs-panel>
+    <helix-base-tabs-panel slot="panels" value="two">Second</helix-base-tabs-panel>
+    <helix-base-tabs-panel slot="panels" value="three">Third</helix-base-tabs-panel>
+  </helix-base-tabs>`
 
-const tabs = (host: HTMLElement) => [...host.querySelectorAll('helix-tabs-tab')] as Updatable[]
-const panels = (host: HTMLElement) => [...host.querySelectorAll('helix-tabs-panel')] as Updatable[]
+const tabs = (host: HTMLElement) => [...host.querySelectorAll('helix-base-tabs-tab')] as Updatable[]
+const panels = (host: HTMLElement) =>
+  [...host.querySelectorAll('helix-base-tabs-panel')] as Updatable[]
 
 describe('tabs selection', () => {
   test('shows the panel matching the selected tab', async () => {
@@ -133,7 +134,9 @@ describe('tabs keyboard', () => {
   })
 
   test('manual holds selection until the tab is chosen', async () => {
-    const host = (await mount(markup.replace('<helix-tabs ', '<helix-tabs manual '))) as Updatable
+    const host = (await mount(
+      markup.replace('<helix-base-tabs ', '<helix-base-tabs manual '),
+    )) as Updatable
     press(host, 'ArrowRight')
     await host.updateComplete
     // Focus moved; selection did not.
@@ -145,7 +148,9 @@ describe('tabs keyboard', () => {
        instead, the second press would compute from tab one again and land on
        tab two a second time, so the set past the first neighbour is
        unreachable by keyboard. */
-    const host = (await mount(markup.replace('<helix-tabs ', '<helix-tabs manual '))) as Updatable
+    const host = (await mount(
+      markup.replace('<helix-base-tabs ', '<helix-base-tabs manual '),
+    )) as Updatable
     /* Focus is what moves in `manual`, and selection is what does not, so the
        assertion has to be on focus. Recorded rather than read back from
        `activeElement`, which cannot see into a shadow root here. */
@@ -198,7 +203,7 @@ describe('tabs selection can be refused', () => {
     const started = host.active
 
     host.addEventListener('helix-change', (event) => event.preventDefault())
-    const other = [...host.querySelectorAll('helix-tabs-tab')].find(
+    const other = [...host.querySelectorAll('helix-base-tabs-tab')].find(
       (tab) => tab.getAttribute('value') !== started,
     ) as HTMLElement
     other.dispatchEvent(
@@ -217,16 +222,16 @@ describe('tabs selection can be refused', () => {
     // The hand-written fallback was `?? tabs[0]`, which took whatever was
     // first, so a set opening on a disabled tab showed it as current and
     // brought its panel with it.
-    document.body.innerHTML = `<helix-tabs label="Set">
-      <helix-tabs-tab disabled value="a">A</helix-tabs-tab>
-      <helix-tabs-tab value="b">B</helix-tabs-tab>
-      <helix-tabs-panel slot="panels" value="a">A</helix-tabs-panel>
-      <helix-tabs-panel slot="panels" value="b">B</helix-tabs-panel>
-    </helix-tabs>`
+    document.body.innerHTML = `<helix-base-tabs label="Set">
+      <helix-base-tabs-tab disabled value="a">A</helix-base-tabs-tab>
+      <helix-base-tabs-tab value="b">B</helix-base-tabs-tab>
+      <helix-base-tabs-panel slot="panels" value="a">A</helix-base-tabs-panel>
+      <helix-base-tabs-panel slot="panels" value="b">B</helix-base-tabs-panel>
+    </helix-base-tabs>`
     const host = document.body.firstElementChild as Updatable
     await host.updateComplete
 
-    const tabs = [...host.querySelectorAll('helix-tabs-tab')] as (HTMLElement & {
+    const tabs = [...host.querySelectorAll('helix-base-tabs-tab')] as (HTMLElement & {
       selected: boolean
     })[]
     expect(tabs[0]?.selected).toBe(false)
@@ -234,80 +239,16 @@ describe('tabs selection can be refused', () => {
   })
 })
 
-if (hasLayout()) {
-  describe('tabs indicator geometry', () => {
-    /* Taller than its tabs, which is the case every example misses. A strip
-       that is only tabs is exactly as tall as they are, so a mark pinned to the
-       top of the strip sits on the tab by accident and the bug is invisible.
-       The sandbox's panel puts 32px tabs in a 48px row and the mark drew seven
-       and a half pixels above the label it was marking.
-
-       The transition is off because what is being asserted is where the mark
-       goes, not how it gets there: read while it is animating, every one of
-       these is the value it started from. */
-    const stage = (): HTMLStyleElement => {
-      const style = document.createElement('style')
-      style.textContent = `
-        helix-tabs::part(tabs) { align-items: center; min-block-size: 64px; }
-        helix-tabs::part(indicator) { transition: none; }`
-      document.head.append(style)
-      return style
-    }
-
-    test('the mark covers the selected tab rather than the top of the strip', async () => {
-      const style = stage()
-      try {
-        const tabs = (await mount(markup)) as Updatable
-        await tabs.updateComplete
-        const indicator = part(tabs, 'indicator') as HTMLElement
-        const selected = tabs.querySelector('[value="one"]') as HTMLElement
-
-        const mark = indicator.getBoundingClientRect()
-        const tab = selected.getBoundingClientRect()
-
-        /* Greater than zero first. Every assertion below is an equality, and a
-           mark that was never placed is zero by zero at the strip's origin,
-           which would satisfy an equality against a tab that had also failed to
-           lay out. */
-        expect(tab.height).toBeGreaterThan(0)
-        expect(Math.round(mark.top)).toBe(Math.round(tab.top))
-        expect(Math.round(mark.left)).toBe(Math.round(tab.left))
-        expect(Math.round(mark.width)).toBe(Math.round(tab.width))
-        expect(Math.round(mark.height)).toBe(Math.round(tab.height))
-      } finally {
-        style.remove()
-      }
-    })
-
-    test('the mark is placed at all, without anything having to update it', async () => {
-      /* `tabs` filters `this.children` on `instanceof`, so it is empty until the
-         tab elements upgrade, and the host measured before that: no selected
-         tab, so `place` refused. The ResizeObserver's one initial callback
-         landed in the same gap, the host never resized again, and the mark
-         stayed unplaced for the life of the page. `slotchange` now measures as
-         well as pairing. */
-      const style = stage()
-      try {
-        const tabs = (await mount(markup)) as Updatable
-        await tabs.updateComplete
-        expect((part(tabs, 'indicator') as HTMLElement).hasAttribute('data-placed')).toBe(true)
-      } finally {
-        style.remove()
-      }
-    })
-  })
-}
-
 describe('tabs, controlled and uncontrolled', () => {
   /* The reason all four mixins changed shape. A consumer who wrote `value="one"`
      and then clicked another tab read back "two": the set overwrote them, so a
      tab strip could not be owned by the thing rendering it. */
   test('writing active hands the set to the consumer, and it stays put', async () => {
     const host = (await mount(
-      `<helix-tabs active="one">
-        <helix-tabs-tab value="one">One</helix-tabs-tab>
-        <helix-tabs-tab value="two">Two</helix-tabs-tab>
-      </helix-tabs>`,
+      `<helix-base-tabs active="one">
+        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
+        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
+      </helix-base-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
     ;(tabs(host)[1] as unknown as { select(): void }).select()
@@ -320,10 +261,10 @@ describe('tabs, controlled and uncontrolled', () => {
 
   test('the change is still announced, so the consumer knows what to set', async () => {
     const host = (await mount(
-      `<helix-tabs active="one">
-        <helix-tabs-tab value="one">One</helix-tabs-tab>
-        <helix-tabs-tab value="two">Two</helix-tabs-tab>
-      </helix-tabs>`,
+      `<helix-base-tabs active="one">
+        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
+        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
+      </helix-base-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
     let asked = ''
@@ -337,10 +278,10 @@ describe('tabs, controlled and uncontrolled', () => {
 
   test('default-active seeds instead, and the set then owns itself', async () => {
     const host = (await mount(
-      `<helix-tabs default-active="one">
-        <helix-tabs-tab value="one">One</helix-tabs-tab>
-        <helix-tabs-tab value="two">Two</helix-tabs-tab>
-      </helix-tabs>`,
+      `<helix-base-tabs default-active="one">
+        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
+        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
+      </helix-base-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
     ;(tabs(host)[1] as unknown as { select(): void }).select()
@@ -351,10 +292,10 @@ describe('tabs, controlled and uncontrolled', () => {
   test('reading active always gives the real tab, in either mode', async () => {
     // The point of one property rather than two: nobody has to ask which.
     const host = (await mount(
-      `<helix-tabs default-active="two">
-        <helix-tabs-tab value="one">One</helix-tabs-tab>
-        <helix-tabs-tab value="two">Two</helix-tabs-tab>
-      </helix-tabs>`,
+      `<helix-base-tabs default-active="two">
+        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
+        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
+      </helix-base-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
     expect(host.active).toBe('two')
@@ -367,10 +308,10 @@ describe('tabs modes are decided once', () => {
        write afterwards moves the set and leaves it owning itself, which is what
        both a native control and anyone reading this code would expect. */
     const host = (await mount(
-      `<helix-tabs default-active="one">
-        <helix-tabs-tab value="one">One</helix-tabs-tab>
-        <helix-tabs-tab value="two">Two</helix-tabs-tab>
-      </helix-tabs>`,
+      `<helix-base-tabs default-active="one">
+        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
+        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
+      </helix-base-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
 

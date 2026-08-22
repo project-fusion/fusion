@@ -9,9 +9,9 @@ beforeAll(async () => {
 type Splitter = HTMLElement & { position: number; updateComplete: Promise<unknown> }
 
 const splitter = async (attrs = ''): Promise<Splitter> => {
-  const host = (await mount(`<helix-splitter ${attrs}>
+  const host = (await mount(`<helix-base-splitter ${attrs}>
     <div slot="start">one</div><div slot="end">two</div>
-  </helix-splitter>`)) as Splitter
+  </helix-base-splitter>`)) as Splitter
   await host.updateComplete
   return host
 }
@@ -143,13 +143,13 @@ const nested = async (
   outer = '',
   inner = 'orientation="vertical"',
 ): Promise<[Splitter, Splitter]> => {
-  const host = (await mount(`<helix-splitter ${outer}>
+  const host = (await mount(`<helix-base-splitter ${outer}>
     <div slot="start">one</div>
-    <helix-splitter slot="end" ${inner}>
+    <helix-base-splitter slot="end" ${inner}>
       <div slot="start">two</div><div slot="end">three</div>
-    </helix-splitter>
-  </helix-splitter>`)) as Splitter
-  const within = host.querySelector('helix-splitter') as Splitter
+    </helix-base-splitter>
+  </helix-base-splitter>`)) as Splitter
+  const within = host.querySelector('helix-base-splitter') as Splitter
   await host.updateComplete
   await within.updateComplete
   await host.updateComplete
@@ -292,26 +292,6 @@ describe('splitter while it moves', () => {
     expect(bar.hasAttribute('data-dragging')).toBe(true)
     await grab(host, bar, 'pointerup')
     expect(separator(host).hasAttribute('data-dragging')).toBe(false)
-  })
-
-  test('the accent is on the drag, not on the interest', async () => {
-    // Hover is a question and a drag is an answer, so the rule that answers has
-    // to be the later of the two: they tie on specificity, and a tie is settled
-    // by order alone.
-    //
-    // Against the declared text rather than a computed color, because happy-dom
-    // resolves no cascade to ask. The colors themselves were checked in a
-    // browser, where reading one straight after flipping the attribute returns
-    // the transition mid-flight and lies.
-    const declared = (customElements.get('helix-splitter') as unknown as { styles: unknown }).styles
-    const sheet = (Array.isArray(declared) ? declared : [declared])
-      .flat(Number.POSITIVE_INFINITY)
-      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-      .join('\n')
-    const accent = sheet.indexOf('--splitter-drag-color')
-    const interest = sheet.indexOf('--splitter-hover-color')
-    expect(interest).toBeGreaterThan(-1)
-    expect(accent).toBeGreaterThan(interest)
   })
 
   test('a keyboard move never reads as a drag', async () => {

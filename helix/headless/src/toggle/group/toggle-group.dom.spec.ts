@@ -14,14 +14,14 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-const markup = `<helix-toggle-group label="Color mode" default-value="light">
-  <helix-toggle value="system">System</helix-toggle>
-  <helix-toggle value="light">Light</helix-toggle>
-  <helix-toggle value="dark">Dark</helix-toggle>
-</helix-toggle-group>`
+const markup = `<helix-base-toggle-group label="Color mode" default-value="light">
+  <helix-base-toggle value="system">System</helix-base-toggle>
+  <helix-base-toggle value="light">Light</helix-base-toggle>
+  <helix-base-toggle value="dark">Dark</helix-base-toggle>
+</helix-base-toggle-group>`
 
 const items = (group: HTMLElement) =>
-  [...group.querySelectorAll('helix-toggle')] as (HTMLElement & {
+  [...group.querySelectorAll('helix-base-toggle')] as (HTMLElement & {
     selected: boolean
     value: string
   })[]
@@ -87,14 +87,14 @@ describe('toggle group in a form', () => {
      way, which is why the button's passed and the first draft of this did not. */
   const inForm = async (extra = ''): Promise<{ form: HTMLFormElement; group: Updatable }> => {
     document.body.innerHTML = `<form>
-        <helix-toggle-group name="mode" label="Mode" ${extra}>
-          <helix-toggle value="system">System</helix-toggle>
-          <helix-toggle value="light">Light</helix-toggle>
-          <helix-toggle value="dark">Dark</helix-toggle>
-        </helix-toggle-group>
+        <helix-base-toggle-group name="mode" label="Mode" ${extra}>
+          <helix-base-toggle value="system">System</helix-base-toggle>
+          <helix-base-toggle value="light">Light</helix-base-toggle>
+          <helix-base-toggle value="dark">Dark</helix-base-toggle>
+        </helix-base-toggle-group>
       </form>`
     const form = document.body.firstElementChild as HTMLFormElement
-    const group = form.querySelector('helix-toggle-group') as Updatable
+    const group = form.querySelector('helix-base-toggle-group') as Updatable
     await group.updateComplete
     return { form, group }
   }
@@ -185,7 +185,7 @@ if (hasLayout()) {
         await settle(group)
 
         const indicator = part(group, 'indicator') as HTMLElement
-        const segment = group.querySelector(`helix-toggle[value="${value}"]`) as HTMLElement
+        const segment = group.querySelector(`helix-base-toggle[value="${value}"]`) as HTMLElement
         const marker = indicator.getBoundingClientRect()
         const target = segment.getBoundingClientRect()
 
