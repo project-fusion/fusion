@@ -483,24 +483,21 @@ helix-text[tone="danger"] {
   white-space: nowrap;
 }
 
-/* The `variant` shorthand, paired with the component's as everything here is.
-   `data-button-variant`, following `data-button-fill` and `data-button-tone`:
-   another axis on a recipe carries the recipe's name, and it cannot ride in the
-   `data-button` value, which is the appearance and is matched exactly below.
+/* **The tones, and the `variant` shorthand that used to sit above them is
+   gone, paired with the component's as everything here is.**
 
-   `:not()` rather than source order, for the reason the component's copy gives:
-   an axis said out loud always wins. `secondary` needs no rule, being the
-   resting state. */
-[data-button][data-button-tone="primary"],
-[data-button]:not([data-button-tone])[data-button-variant="primary"] {
+   `data-button-variant` mirrored `Button.variant`, which folded back into the
+   pair it was short for when `appearance` and `tone` moved to a shared mixin:
+   `primary`, `secondary` and `tertiary` are a rank and `danger` is a meaning.
+   A recipe that outlived the property it mirrors is worse than either, because
+   a plain anchor would still answer to a word the component no longer knows. */
+[data-button][data-button-tone="primary"] {
   --_button-edge: var(--helix-color-primary);
   --_button-on-tone: var(--helix-color-foreground-on-accent);
   --_button-tone: var(--helix-color-primary);
   --_button-tone-hover: var(--helix-color-primary-hover);
 }
-
-[data-button][data-button-tone="danger"],
-[data-button]:not([data-button-tone])[data-button-variant="danger"] {
+[data-button][data-button-tone="danger"] {
   --_button-edge: var(--helix-color-danger);
   --_button-on-tone: var(--helix-color-foreground-on-accent);
   --_button-tone: var(--helix-color-danger);
@@ -566,17 +563,12 @@ helix-text[tone="danger"] {
    fill the moment a pointer touches it. That is what happened to the old
    `danger`, which had no hover rule anywhere: a red button that turned neutral
    grey under the pointer. */
-[data-button="solid"],
-[data-button=""][data-button-variant="primary"],
-[data-button=""][data-button-variant="danger"] {
+[data-button="solid"] {
   background-color: var(--button-background-color, var(--_button-tone));
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-on-tone));
 }
-
-[data-button="solid"]:not(:disabled):hover,
-[data-button=""][data-button-variant="primary"]:not(:disabled):hover,
-[data-button=""][data-button-variant="danger"]:not(:disabled):hover {
+[data-button="solid"]:not(:disabled):hover {
   background-color: var(--button-background-color, var(--_button-tone-hover));
   border-color: transparent;
 }
@@ -618,9 +610,7 @@ helix-button-group:not([appearance="spaced"]) > [data-button]:not(:last-child) {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }
-
-[data-button="ghost"],
-[data-button=""][data-button-variant="tertiary"] {
+[data-button="ghost"] {
   background-color: var(--button-background-color, transparent);
   border-color: transparent;
 }
@@ -639,8 +629,7 @@ helix-button-group:not([appearance="spaced"]) > [data-button]:not(:last-child) {
  * fill has always worked this way, which is why it measured identically on both
  * panels while the transparent one did not, and `IconButton` was moved to it
  * earlier for the same reason. 8% wherever the resting state is transparent. */
-[data-button="ghost"]:not(:disabled):hover,
-[data-button=""][data-button-variant="tertiary"]:not(:disabled):hover {
+[data-button="ghost"]:not(:disabled):hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 8%, transparent)

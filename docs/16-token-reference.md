@@ -106,7 +106,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 224 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 278 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 277 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 236 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 236 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 127 |
@@ -145,7 +145,7 @@ Font size.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-text-xs` | `var(--_helix-size-12)` | 98 |
-| `--helix-text-sm` | `var(--_helix-size-13)` | 117 |
+| `--helix-text-sm` | `var(--_helix-size-13)` | 118 |
 | `--helix-text-md` | `var(--_helix-size-14)` | 49 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 19 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 23 |

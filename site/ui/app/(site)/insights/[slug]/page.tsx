@@ -30,7 +30,7 @@ export async function generateMetadata({
  * minutes all at the same weight, so nothing in it was answering a question
  * anyone had. Filing labels belong above the title, the byline belongs under it
  * with the title between them, and the way back belongs at the very top where a
- * reader's hand already is.
+ * reader's hand already is, as a trail rather than an arrow.
  *
  * Left, and the prose with it. Centred was the old arrangement, on the argument
  * that a centred measure is a column the eye can find, and that holds while the
@@ -58,10 +58,26 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <helix-flex align="start" class="insightHead" direction="column" gap="lg">
         {/* The way out, above everything. A reader who opened this from the
             gallery wants it before they want the filing labels. */}
-        <Link className="insightBack" data-link="quiet" href="/insights">
-          <helix-icon name="arrow-left"></helix-icon>
-          All insights
-        </Link>
+        {/* **A trail rather than a back arrow.**
+            An arrow says "the way you came", which is only true if a reader
+            arrived from the gallery: most arrive from a link, a search or the
+            palette, and for them it points at a page they have never seen. A
+            trail says where this *is*, which is true however they got here, and
+            it carries the same click. `Breadcrumbs` owns the separators, the
+            `aria-current` on the last item and the nav landmark. */}
+        <helix-breadcrumbs aria-label="Breadcrumb" class="insightTrail">
+          <helix-breadcrumb>
+            <Link data-link="quiet" href="/insights">
+              Insights
+            </Link>
+          </helix-breadcrumb>
+          <helix-breadcrumb>
+            <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
+              {insight.topic}
+            </Link>
+          </helix-breadcrumb>
+          <helix-breadcrumb current>{insight.title}</helix-breadcrumb>
+        </helix-breadcrumbs>
 
         <helix-flex align="center" data-density="sm" gap="xs" wrap>
           <helix-tag tone="primary">{insight.topic}</helix-tag>

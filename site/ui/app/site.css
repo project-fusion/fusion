@@ -1800,10 +1800,12 @@ helix-drawer helix-tree {
   text-align: start;
 }
 
-.insightBack {
-  align-items: center;
-  display: inline-flex;
-  gap: var(--helix-space-2xs);
+/* The trail is a line of navigation above a title, so it takes the quietest
+   text on the page and stays on one line: a wrapped breadcrumb is two rows of
+   chrome before the thing a reader came for. The title is the last crumb and is
+   the one that can be long, so it truncates rather than wraps. */
+.insightTrail {
+  font-size: var(--helix-text-sm);
 }
 
 .insightLede {
