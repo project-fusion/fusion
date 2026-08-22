@@ -1,0 +1,41 @@
+/* **A panel, not a hero, and the reason is a contract rather than a taste.** A
+   chart's own inks (its ticks, its labels, its gridlines) are solved against the
+   page surfaces, so standing one on an accent band puts every one of them on a
+   ground nothing measured them for: the first version of this file did exactly
+   that and the axis labels came out as gray on blue.
+
+   Which leaves the materials to show themselves, which is the honest test
+   anyway. Glass is not a tint here: what it is for is the gridlines reading
+   *through* the columns, so the rules stay continuous across the plot instead of
+   being interrupted by it. Gradient fades each column out toward the
+   baseline, into the wash the tier below already draws, which leaves the weight
+   at the top edge: the edge is what encodes the value, and the baseline is the
+   part every column shares.
+
+   The two charts share one table, so what changes across the pair is the
+   material and nothing else. */
+.panel {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  padding: var(--helix-space-lg);
+}
+
+.panel figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+  margin: 0;
+}
+
+.panel figcaption {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-wide);
+  text-transform: uppercase;
+}

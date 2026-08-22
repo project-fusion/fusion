@@ -1,0 +1,42 @@
+/* **Glass is a pair, and each half alone is a no-op.** A backdrop filter behind
+   an opaque ground filters nothing, and a translucent ground with no filter is a
+   tint. The attribute draws both, which is why it is one attribute rather than a
+   custom property a consumer sets on its own.
+
+   Beside it, the same card opaque, because the comparison is the point. A page
+   whose header is glass and whose cards are not reads as two designs sharing a
+   window, which is the thing a material policy exists to stop.
+
+   **Detailed rather than saturated, and both halves of that were measured.**
+   Blur is only visible on detail: a smooth fill blurs to itself and shows the
+   translucency alone, so the ground behind these is ruled, densely enough that
+   the rules survive being blurred.
+
+   Neutral, though, and that is the material's own constraint showing. A
+   translucent ground composites whatever is behind it, so a glass card's
+   contrast stops being the card's. Over a saturated blue this same pair measured
+   3.83:1: the body ink is `foreground-muted`, and the ground it was solved
+   against had become a pale blue. `check:contrast` caught it in this file, which
+   is the right place for a material to be caught teaching its own rule. A
+   neutral near the page's own lightness composites to something the ink was
+   solved for; glass carries whatever ground it is given, and giving it one that
+   keeps the ink legible is the consumer's half of the bargain. */
+.band {
+  background-color: var(--helix-color-surface-sunken);
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      transparent 0 1rem,
+      color-mix(in oklab, var(--helix-color-foreground) 22%, transparent) 1rem 1.125rem
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 1rem,
+      color-mix(in oklab, var(--helix-color-foreground) 22%, transparent) 1rem 1.125rem
+    );
+  border-radius: var(--helix-radii-lg);
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  padding: var(--helix-space-lg);
+}

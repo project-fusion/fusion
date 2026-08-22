@@ -4558,6 +4558,10 @@
                 "slug": "horizontal"
               },
               {
+                "description": "The same columns as glass and as gradient, over a ground that shows the difference.",
+                "slug": "material"
+              },
+              {
                 "description": "Two series as columns and a third as a line, all measured against one axis.",
                 "slug": "with-a-line"
               },
@@ -7374,6 +7378,10 @@
               {
                 "description": "A whole card that navigates, with the heading carrying the link.",
                 "slug": "linked"
+              },
+              {
+                "description": "Glass, which is a pair: a ground that lets light through and a filter behind it.",
+                "slug": "material"
               },
               {
                 "description": "The picture down one side, for a row in a list rather than a tile in a grid.",
