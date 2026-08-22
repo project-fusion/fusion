@@ -809,8 +809,26 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Places one element against another, and keeps it there.\n\nPositioning is `@floating-ui/dom` rather than arithmetic written here. Two\nthings in particular are why. A `position: fixed` element inside an ancestor\ncarrying `transform`, `filter`, `will-change`, or `contain` is positioned\nagainst that ancestor and not the viewport, so viewport coordinates land it\nsomewhere else entirely. And an overlay has to clear its nearest *clipping*\nancestor, not just the window, or it is placed correctly inside a scrolling\npanel and clipped out of sight by it. Both are ordinary here, and both are a\nlong tail of browser behavior rather than a formula.\n\n`autoUpdate` keeps the position through scrolling on any ancestor, resizes of\neither element, and layout shifts.\n\nThe side the element actually landed on is written back as `data-placement`,\nso a styled tier can animate from it rather than from the side that was\nasked for.",
+          "description": "Places one element against another, and keeps it there.\n\nPositioning is `@floating-ui/dom` rather than arithmetic written here. Two\nthings in particular are why. A `position: fixed` element inside an ancestor\ncarrying `transform`, `filter`, `will-change`, or `contain` is positioned\nagainst that ancestor and not the viewport, so viewport coordinates land it\nsomewhere else entirely. And an overlay has to clear its nearest *clipping*\nancestor, not just the window, or it is placed correctly inside a scrolling\npanel and clipped out of sight by it. Both are ordinary here, and both are a\nlong tail of browser behavior rather than a formula.\n\n`autoUpdate` keeps the position through scrolling on any ancestor, resizes of\neither element, and layout shifts.\n\nThe side the element actually landed on is written back as `data-placement`,\nso a styled tier can animate from it rather than from the side that was\nasked for.\n\n**The custom properties are declared here because this is what writes them.**\nEach carries a measurement taken against the viewport that no stylesheet can\ntake for itself, and `core` ships no CSS, so there is no reader inside this\npackage and none of them is private. `check:hooks` pairs a `@cssproperty`\nwith a rule that reads one, in both directions, and the underscore these used\nto carry was what exempted them from it.",
           "name": "FloatingController",
+          "cssProperties": [
+            {
+              "description": "How wide the anchor is, for a panel that matches it.",
+              "name": "--floating-anchor-width"
+            },
+            {
+              "description": "Where the pointer meets the anchor, along the inline axis.",
+              "name": "--floating-arrow-x"
+            },
+            {
+              "description": "Where the pointer meets the anchor, along the block axis.",
+              "name": "--floating-arrow-y"
+            },
+            {
+              "description": "How much room is left below, for a panel that scrolls.",
+              "name": "--floating-available-height"
+            }
+          ],
           "members": [
             {
               "kind": "field",
@@ -982,8 +1000,26 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Measures the marked child and writes the geometry onto a travelling mark.\n\n**Four components had written this and the copies had diverged.** `Navigation`,\n`Tabs`, `Toggle.Group` and `Outline` each measured an active child and wrote\na position onto an indicator, and two of them had bugs the others did not.\n`Outline`'s own comment counted the repetition rather than resolving it, and\nthe audit found the same shape independently in all four.\n\nWhat the copies disagreed about, and what this settles:\n\n**The inline axis is signed.** In a right-to-left document the distance is\nmeasured from the surface's right edge and applied as a negative translation,\nbecause the mark travels from the inline start and the inline start is on the\nright. `Navigation` measured from the physical left and applied it from the\ninline-start edge with an unsigned offset, so its marker went the wrong way\nin RTL. That is the bug this extraction exists to stop repeating.\n\n**The border has to come off both axes.** `getBoundingClientRect` gives the\nborder box and the containing block is the padding box, so a surface with a\nborder of its own puts the mark one border-width out. `Tabs` and\n`Toggle.Group` each did this arithmetic separately, `Outline` did the block\nhalf with `clientTop`, and `Navigation` did neither. `clientLeft` and `clientTop`\nare the border widths, already resolved, which is why they are used here\nrather than parsing `borderLeftWidth`.\n\n**Nothing is written until there is something to measure.** A zero-width box\nis a component whose children have not upgraded yet, and writing zeroes would\npark the mark at the origin and leave it there. The `data-placed` attribute is\nwhat a stylesheet waits for, so a mark fades in where it belongs rather than\nsliding from the corner on first paint.\n\nThe four custom properties are the contract: `--_indicator-x`, `-y`, `-w` and\n`-h`. What a component does with them is its own business, which is how one\ncontroller serves a bar under a tab, a pill filling it, and a rule down the\nside of a contents page.",
+          "description": "Measures the marked child and writes the geometry onto a travelling mark.\n\n**Four components had written this and the copies had diverged.** `Navigation`,\n`Tabs`, `Toggle.Group` and `Outline` each measured an active child and wrote\na position onto an indicator, and two of them had bugs the others did not.\n`Outline`'s own comment counted the repetition rather than resolving it, and\nthe audit found the same shape independently in all four.\n\nWhat the copies disagreed about, and what this settles:\n\n**The inline axis is signed.** In a right-to-left document the distance is\nmeasured from the surface's right edge and applied as a negative translation,\nbecause the mark travels from the inline start and the inline start is on the\nright. `Navigation` measured from the physical left and applied it from the\ninline-start edge with an unsigned offset, so its marker went the wrong way\nin RTL. That is the bug this extraction exists to stop repeating.\n\n**The border has to come off both axes.** `getBoundingClientRect` gives the\nborder box and the containing block is the padding box, so a surface with a\nborder of its own puts the mark one border-width out. `Tabs` and\n`Toggle.Group` each did this arithmetic separately, `Outline` did the block\nhalf with `clientTop`, and `Navigation` did neither. `clientLeft` and `clientTop`\nare the border widths, already resolved, which is why they are used here\nrather than parsing `borderLeftWidth`.\n\n**Nothing is written until there is something to measure.** A zero-width box\nis a component whose children have not upgraded yet, and writing zeroes would\npark the mark at the origin and leave it there. The `data-placed` attribute is\nwhat a stylesheet waits for, so a mark fades in where it belongs rather than\nsliding from the corner on first paint.\n\nThe four custom properties are the contract. What a component does with them\nis its own business, which is how one controller serves a bar under a tab, a\npill filling it, and a rule down the side of a contents page.\n\n**Declared here because this is what writes them.** They carry a measurement\nno stylesheet can take, they are read by whoever draws the mark, and `core`\nships no CSS, so there is no reader inside this package and nothing about\nthem is private. `check:hooks` pairs a `@cssproperty` with a rule that reads\none, in both directions, and the underscore these used to carry was what\nexempted them from it.",
           "name": "IndicatorController",
+          "cssProperties": [
+            {
+              "description": "How tall the active item is, in pixels.",
+              "name": "--indicator-height"
+            },
+            {
+              "description": "How wide the active item is, in pixels.",
+              "name": "--indicator-width"
+            },
+            {
+              "description": "Where the active item starts, along the inline axis.",
+              "name": "--indicator-x"
+            },
+            {
+              "description": "Where the active item starts, along the block axis.",
+              "name": "--indicator-y"
+            }
+          ],
           "members": [
             {
               "kind": "field",

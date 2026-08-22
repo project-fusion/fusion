@@ -161,11 +161,11 @@
 
 [part="surface"][data-placement^="top"] {
   --_travel: var(--helix-space-2xs);
-  transform-origin: var(--_floating-arrow-x, 50%) 100%;
+  transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
 
 [part="surface"][data-placement^="bottom"] {
-  transform-origin: var(--_floating-arrow-x, 50%) 0;
+  transform-origin: var(--floating-arrow-x, 50%) 0;
 }
 
 [part="surface"][data-placed] {

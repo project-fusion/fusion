@@ -507,7 +507,7 @@ if (hasLayout()) {
       for (let attempt = 0; attempt < 50 && !surface.hasAttribute('data-placed'); attempt += 1) {
         await new Promise((resolve) => requestAnimationFrame(resolve))
       }
-      expect(surface.style.getPropertyValue('--_floating-anchor-width')).toMatch(/^\d+px$/)
+      expect(surface.style.getPropertyValue('--floating-anchor-width')).toMatch(/^\d+px$/)
     })
   })
 }

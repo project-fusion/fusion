@@ -154,11 +154,11 @@
 /* Out of the edge it opened against. A calendar has no arrow, so the fallback
    applies and it grows from the middle of the near edge, as Select does. */
 [part="surface"][data-placement^="top"] {
-  transform-origin: var(--_floating-arrow-x, 50%) 100%;
+  transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
 
 [part="surface"][data-placement^="bottom"] {
-  transform-origin: var(--_floating-arrow-x, 50%) 0;
+  transform-origin: var(--floating-arrow-x, 50%) 0;
 }
 
 [part="surface"][hidden] {

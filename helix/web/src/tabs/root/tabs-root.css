@@ -134,14 +134,14 @@
   block-size: var(--_indicator-block, var(--helix-border-thick));
   border-radius: var(--_indicator-radius, var(--helix-radii-none));
   box-shadow: var(--_indicator-shadow, none);
-  inline-size: var(--_indicator-w, 0);
+  inline-size: var(--indicator-width, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
   opacity: 0;
   position: absolute;
   /* Where the tab is, plus where in the tab this mark goes.
    *
-   * `--_indicator-y` is measured: the selected tab's top within the strip. The
+   * `--indicator-y` is measured: the selected tab's top within the strip. The
    * offset is the appearance's own shift from there, nothing for a pill filling
    * the tab and the tab's height for a bar under it.
    *
@@ -152,7 +152,7 @@
    * panel puts 32px tabs in a 48px row, so the pill drew seven and a half
    * pixels above the label it was marking. A value computed and never used is
    * the tell, and it sat there through the whole of the indicator work. */
-  translate: var(--_indicator-x, 0) calc(var(--_indicator-y, 0px) + var(--_indicator-offset, 0px));
+  translate: var(--indicator-x, 0) calc(var(--indicator-y, 0px) + var(--_indicator-offset, 0px));
   /* It slides and then settles: `emphasized` overshoots slightly and comes
      back, which is the breath. Width and position move together, so a mark
      travelling to a longer tab grows as it goes rather than after it arrives. */
@@ -192,7 +192,7 @@
 :host([appearance="underlined"]) [part="indicator"] {
   --_indicator-block: var(--helix-border-thick);
   --_indicator-color: var(--helix-color-primary);
-  --_indicator-offset: calc(var(--_indicator-h, 0px) - var(--helix-border-thick));
+  --_indicator-offset: calc(var(--indicator-height, 0px) - var(--helix-border-thick));
 }
 
 /* Segmented: the same mark, grown to the tab's own box. The pill travels rather
@@ -203,7 +203,7 @@
    "this one" would double at the moment of the change, and the one that cannot
    move would win the eye. */
 :host([appearance="segmented"]) [part="indicator"] {
-  --_indicator-block: var(--_indicator-h, 0);
+  --_indicator-block: var(--indicator-height, 0);
   --_indicator-color: var(--helix-color-surface-overlay);
   --_indicator-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
   --_indicator-shadow: var(--helix-shadow-sm);
@@ -222,7 +222,7 @@
    with nothing framing it, where the segmented one sits inside a sunken track.
    The same distinction the rest of the library makes. */
 :host(:not([appearance])) [part="indicator"] {
-  --_indicator-block: var(--_indicator-h, 0);
+  --_indicator-block: var(--indicator-height, 0);
   --_indicator-color: var(--helix-color-surface-raised);
   --_indicator-radius: var(--helix-radii-sm);
   --_indicator-shadow: var(--helix-shadow-sm);

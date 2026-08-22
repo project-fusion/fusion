@@ -97,7 +97,7 @@
   border: none;
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-lg);
-  inline-size: var(--_floating-anchor-width, 100%);
+  inline-size: var(--floating-anchor-width, 100%);
   inset: auto;
   margin: var(--helix-space-none);
   min-inline-size: max-content;
@@ -134,11 +134,11 @@
 
 [part="surface"][data-placement^="top"] {
   --_travel: var(--helix-space-2xs);
-  transform-origin: var(--_floating-arrow-x, 50%) 100%;
+  transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
 
 [part="surface"][data-placement^="bottom"] {
-  transform-origin: var(--_floating-arrow-x, 50%) 0;
+  transform-origin: var(--floating-arrow-x, 50%) 0;
 }
 
 [part="surface"][data-placed] {

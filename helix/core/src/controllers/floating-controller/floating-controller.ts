@@ -55,8 +55,8 @@ export interface FloatingOptions {
   /**
    * Whether to cap the floating element to the space available.
    *
-   * On by default, written as `--_floating-available-height` and
-   * `--_floating-available-width` rather than as a height. A list decides for
+   * On by default, written as `--floating-available-height` and
+   * `--floating-available-width` rather than as a height. A list decides for
    * itself whether to scroll or to shrink; a controller that sets the height
    * has decided that for every element it places.
    */
@@ -100,6 +100,18 @@ export interface FloatingOptions {
  * The side the element actually landed on is written back as `data-placement`,
  * so a styled tier can animate from it rather than from the side that was
  * asked for.
+ *
+ * **The custom properties are declared here because this is what writes them.**
+ * Each carries a measurement taken against the viewport that no stylesheet can
+ * take for itself, and `core` ships no CSS, so there is no reader inside this
+ * package and none of them is private. `check:hooks` pairs a `@cssproperty`
+ * with a rule that reads one, in both directions, and the underscore these used
+ * to carry was what exempted them from it.
+ *
+ * @cssproperty --floating-anchor-width - How wide the anchor is, for a panel that matches it.
+ * @cssproperty --floating-arrow-x - Where the pointer meets the anchor, along the inline axis.
+ * @cssproperty --floating-arrow-y - Where the pointer meets the anchor, along the block axis.
+ * @cssproperty --floating-available-height - How much room is left below, for a panel that scrolls.
  */
 export class FloatingController implements ReactiveController {
   private readonly options: FloatingOptions
@@ -158,14 +170,18 @@ export class FloatingController implements ReactiveController {
     if (this.options.resize !== false) {
       middleware.push(
         size({
-          apply: ({ availableHeight, availableWidth, elements, rects }) => {
+          /* The height and not the width, which is asymmetric on purpose. A
+             panel that runs out of room grows a scrollbar downwards and every
+             rule reading this asks for a `max-block-size`; nothing in the
+             library has ever asked for the inline twin, so writing it was a
+             `setProperty` on every reposition of every floating element for
+             nobody. `check:hooks` is what says so out loud: declared and never
+             read is a promise on the API page with nothing behind it. It comes
+             back the day a rule wants it, together with that rule. */
+          apply: ({ availableHeight, elements, rects }) => {
             elements.floating.style.setProperty(
-              '--_floating-available-height',
+              '--floating-available-height',
               `${Math.round(availableHeight)}px`,
-            )
-            elements.floating.style.setProperty(
-              '--_floating-available-width',
-              `${Math.round(availableWidth)}px`,
             )
             /* The anchor's width, which a panel that has to match the control
                it hangs off cannot get any other way. `min-inline-size: 100%`
@@ -175,7 +191,7 @@ export class FloatingController implements ReactiveController {
                edge. It looked like a positioning fault and was a percentage
                resolving against something the CSS could not see. */
             elements.floating.style.setProperty(
-              '--_floating-anchor-width',
+              '--floating-anchor-width',
               `${Math.round(rects.reference.width)}px`,
             )
           },
@@ -248,15 +264,15 @@ export class FloatingController implements ReactiveController {
          *
          * Only the axis the arrow travels on is written. On a `top` placement
          * the arrow moves horizontally and its vertical position is the panel's
-         * edge, so `--_floating-arrow-y` is left unset and a consumer's fallback
+         * edge, so `--floating-arrow-y` is left unset and a consumer's fallback
          * stands. Cleared rather than zeroed when absent, so the fallback in
          * `var()` is what applies. */
         floating.style.setProperty(
-          '--_floating-arrow-x',
+          '--floating-arrow-x',
           point.x === undefined ? '' : `${Math.round(point.x + pointer.offsetWidth / 2)}px`,
         )
         floating.style.setProperty(
-          '--_floating-arrow-y',
+          '--floating-arrow-y',
           point.y === undefined ? '' : `${Math.round(point.y + pointer.offsetHeight / 2)}px`,
         )
       }

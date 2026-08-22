@@ -53,10 +53,21 @@ export interface IndicatorOptions {
  * what a stylesheet waits for, so a mark fades in where it belongs rather than
  * sliding from the corner on first paint.
  *
- * The four custom properties are the contract: `--_indicator-x`, `-y`, `-w` and
- * `-h`. What a component does with them is its own business, which is how one
- * controller serves a bar under a tab, a pill filling it, and a rule down the
- * side of a contents page.
+ * The four custom properties are the contract. What a component does with them
+ * is its own business, which is how one controller serves a bar under a tab, a
+ * pill filling it, and a rule down the side of a contents page.
+ *
+ * **Declared here because this is what writes them.** They carry a measurement
+ * no stylesheet can take, they are read by whoever draws the mark, and `core`
+ * ships no CSS, so there is no reader inside this package and nothing about
+ * them is private. `check:hooks` pairs a `@cssproperty` with a rule that reads
+ * one, in both directions, and the underscore these used to carry was what
+ * exempted them from it.
+ *
+ * @cssproperty --indicator-height - How tall the active item is, in pixels.
+ * @cssproperty --indicator-width - How wide the active item is, in pixels.
+ * @cssproperty --indicator-x - Where the active item starts, along the inline axis.
+ * @cssproperty --indicator-y - Where the active item starts, along the block axis.
  */
 export class IndicatorController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
@@ -172,10 +183,10 @@ export class IndicatorController implements ReactiveController {
     const moved = this.last !== undefined && (this.last.x !== x || this.last.y !== y)
     this.last = { x, y }
 
-    indicator.style.setProperty('--_indicator-x', x)
-    indicator.style.setProperty('--_indicator-y', y)
-    indicator.style.setProperty('--_indicator-w', `${box.width}px`)
-    indicator.style.setProperty('--_indicator-h', `${box.height}px`)
+    indicator.style.setProperty('--indicator-x', x)
+    indicator.style.setProperty('--indicator-y', y)
+    indicator.style.setProperty('--indicator-width', `${box.width}px`)
+    indicator.style.setProperty('--indicator-height', `${box.height}px`)
     indicator.toggleAttribute('data-placed', true)
 
     if (!moved) {

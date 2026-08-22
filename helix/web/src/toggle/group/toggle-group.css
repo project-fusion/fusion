@@ -154,15 +154,15 @@
      reason: the token is decided by what is behind the thumb, and `plain` has
      no track behind it. See `:host` above. */
   background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
-  block-size: var(--_indicator-h, 0);
+  block-size: var(--indicator-height, 0);
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
   box-shadow: var(--helix-shadow-sm);
-  inline-size: var(--_indicator-w, 0);
+  inline-size: var(--indicator-width, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
   opacity: 0;
   position: absolute;
-  translate: var(--_indicator-x, 0) var(--_indicator-y, 0);
+  translate: var(--indicator-x, 0) var(--indicator-y, 0);
   /* Width is a layout property and the rule is transform and opacity only. The
      indicator is out of flow, so animating it reflows nothing else, and scaling
      instead would distort the corner radius. */

@@ -82,14 +82,14 @@
   --_mark-width: var(--helix-border-thin);
 
   background-color: var(--helix-color-primary);
-  block-size: var(--_indicator-h, 0);
+  block-size: var(--indicator-height, 0);
   border-radius: var(--helix-radii-full);
   inline-size: var(--_mark-width);
   inset-block-start: 0;
   inset-inline-start: calc((var(--outline-rail) - var(--_mark-width)) / 2);
   opacity: 0;
   position: absolute;
-  translate: 0 var(--_indicator-y, 0);
+  translate: 0 var(--indicator-y, 0);
   /* It springs, and the height trails it.
    *
    * `--helix-easing-spring` is a `linear()` of thirteen stops that carries past

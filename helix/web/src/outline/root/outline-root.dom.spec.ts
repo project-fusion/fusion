@@ -161,13 +161,15 @@ if (hasLayout()) {
       window.scrollTo(0, 0)
       await settle()
       expect(mark.hasAttribute('data-placed')).toBe(true)
-      const first = mark.style.getPropertyValue('--_indicator-y')
+      const first = mark.style.getPropertyValue('--indicator-y')
 
       window.scrollTo(0, two.offsetTop + 20)
       await settle()
       expect(marked(nav)).toBe('#two')
-      expect(mark.style.getPropertyValue('--_indicator-y')).not.toBe(first)
-      expect(Number.parseFloat(mark.style.getPropertyValue('--_indicator-h'))).toBeGreaterThan(0)
+      expect(mark.style.getPropertyValue('--indicator-y')).not.toBe(first)
+      expect(Number.parseFloat(mark.style.getPropertyValue('--indicator-height'))).toBeGreaterThan(
+        0,
+      )
     })
 
     test('the end of the page marks the last section, reachable or not', async () => {
