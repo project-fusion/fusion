@@ -148,7 +148,11 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
     })
   }
 
-  /** Whether this node has children. */
+  /**
+   * @internal Read by the tree to identify a branch across the light DOM,
+   * which is cheaper than `instanceof` and is why this is public rather than
+   * protected. A consumer asks `branch`, which is the property they set.
+   */
   get isBranch(): boolean {
     return this.branch
   }

@@ -5616,24 +5616,6 @@
               "readonly": true
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",

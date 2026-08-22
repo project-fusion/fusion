@@ -130,7 +130,11 @@ export class HelixBaseMenuItem extends HelixElement {
   @property({ attribute: false })
   showingSubmenu = false
 
-  /** Marks this as a row a menu should count. Cheaper than an instanceof. */
+  /**
+   * @internal Read by a parent to identify its children across the light DOM,
+   * which is cheaper than `instanceof` and is why this is public rather than
+   * protected. Not a consumer's to read or set.
+   */
   readonly isMenuItem = true
 
   /**

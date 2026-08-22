@@ -13404,12 +13404,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -13551,12 +13545,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -13862,12 +13850,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -14374,12 +14356,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -14906,12 +14882,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -15662,7 +15632,6 @@ export type CustomElements = {
    *
    * - `disabled`: Whether the row can be reached at all.
    * - `value`: Identifies the row to whatever is listening.
-   * - `isDrilldownItem`: Marks this as a row a stack should count. Cheaper than an instanceof. (property only) (readonly)
    * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
    * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
    * - `focusable`: Whether this row holds the region's tab stop. Written by the stack.
@@ -15896,12 +15865,6 @@ export type CustomElements = {
    * Read from the input rather than mirrored into a field. The input is what
    * the picker filled and what a form submits, so a copy here could only ever
    * disagree with it. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -16409,12 +16372,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -16958,12 +16915,6 @@ export type CustomElements = {
    * list and its options and the keyboard has to move through a grouped list
    * exactly as it moves through a flat one. (property only) (readonly)
    * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -17360,7 +17311,6 @@ export type CustomElements = {
    * that basis takes its `slot[name="submenu"]` with it: the rows inside have
    * nowhere to be assigned and are never laid out. The element that holds the
    * page has to keep the slot even when it shows no row of its own. (property only)
-   * - `isMenuItem`: Marks this as a row a menu should count. Cheaper than an instanceof. (property only) (readonly)
    * - `hasSubmenu`: Whether anything was slotted into `submenu`.
    *
    * Client only, and the `?? []` is what makes that true rather than merely
@@ -17789,12 +17739,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -18538,12 +18482,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -18995,12 +18933,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -19258,12 +19190,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `score`: The score, as a number, clamped to what the marks can show. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -19515,12 +19441,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -19787,12 +19707,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -20030,7 +19944,6 @@ export type CustomElements = {
    *
    * - `value`: What this action stands for, carried in the event when it is chosen.
    * - `disabled`: Whether the action can be chosen.
-   * - `isSpeedDialItem`: Tells the dial its own rows apart from anything else slotted in. (property only) (readonly)
    * - `selected`: Whether this is the row the set is on, which here is where focus is.
    *
    * Asked of the document rather than of the shadow root: focus lands on the
@@ -20696,12 +20609,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -20854,7 +20761,6 @@ export type CustomElements = {
    * left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
    * `1fr` track keeps an automatic minimum and refuses to shrink under a long
    * cell, so one unbreakable value pushes the table past its container.
-   * - `isTableColumn`: Marks this as a column a table should count. Cheaper than an instanceof. (property only) (readonly)
    * - `track`: The track this column contributes, resolved. (property only) (readonly)
    *
    * ## Slots
@@ -21261,12 +21167,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -21471,12 +21371,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -22174,12 +22068,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -22809,7 +22697,6 @@ export type CustomElements = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
-   * - `isBranch`: Whether this node has children. (property only) (readonly)
    *
    * ## Events
    *
@@ -24766,12 +24653,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -24916,12 +24797,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -25236,12 +25111,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -25754,12 +25623,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -26295,12 +26158,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -27069,7 +26926,6 @@ export type CustomElementsSolidJs = {
    *
    * - `disabled`: Whether the row can be reached at all.
    * - `value`: Identifies the row to whatever is listening.
-   * - `isDrilldownItem`: Marks this as a row a stack should count. Cheaper than an instanceof. (property only) (readonly)
    * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
    * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
    * - `focusable`: Whether this row holds the region's tab stop. Written by the stack.
@@ -27312,12 +27168,6 @@ export type CustomElementsSolidJs = {
    * Read from the input rather than mirrored into a field. The input is what
    * the picker filled and what a form submits, so a copy here could only ever
    * disagree with it. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -27837,12 +27687,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -28404,12 +28248,6 @@ export type CustomElementsSolidJs = {
    * list and its options and the keyboard has to move through a grouped list
    * exactly as it moves through a flat one. (property only) (readonly)
    * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -28815,7 +28653,6 @@ export type CustomElementsSolidJs = {
    * that basis takes its `slot[name="submenu"]` with it: the rows inside have
    * nowhere to be assigned and are never laid out. The element that holds the
    * page has to keep the slot even when it shows no row of its own. (property only)
-   * - `isMenuItem`: Marks this as a row a menu should count. Cheaper than an instanceof. (property only) (readonly)
    * - `hasSubmenu`: Whether anything was slotted into `submenu`.
    *
    * Client only, and the `?? []` is what makes that true rather than merely
@@ -29256,12 +29093,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -30022,12 +29853,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -30494,12 +30319,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -30763,12 +30582,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `score`: The score, as a number, clamped to what the marks can show. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -31026,12 +30839,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -31304,12 +31111,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -31553,7 +31354,6 @@ export type CustomElementsSolidJs = {
    *
    * - `value`: What this action stands for, carried in the event when it is chosen.
    * - `disabled`: Whether the action can be chosen.
-   * - `isSpeedDialItem`: Tells the dial its own rows apart from anything else slotted in. (property only) (readonly)
    * - `selected`: Whether this is the row the set is on, which here is where focus is.
    *
    * Asked of the document rather than of the shadow root: focus lands on the
@@ -32240,12 +32040,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -32404,7 +32198,6 @@ export type CustomElementsSolidJs = {
    * left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
    * `1fr` track keeps an automatic minimum and refuses to shrink under a long
    * cell, so one unbreakable value pushes the table past its container.
-   * - `isTableColumn`: Marks this as a column a table should count. Cheaper than an instanceof. (property only) (readonly)
    * - `track`: The track this column contributes, resolved. (property only) (readonly)
    *
    * ## Slots
@@ -32832,12 +32625,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -33045,12 +32832,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -33766,12 +33547,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
-   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
-   *
-   * One at a time, because only one of the two is ever rendered. Naming both
-   * would point a screen reader at an id that resolves to nothing, which it
-   * reads as a description it cannot find. (property only) (readonly)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -34419,7 +34194,6 @@ export type CustomElementsSolidJs = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
-   * - `isBranch`: Whether this node has children. (property only) (readonly)
    *
    * ## Events
    *

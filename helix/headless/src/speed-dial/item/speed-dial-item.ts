@@ -42,7 +42,11 @@ export class HelixBaseSpeedDialItem extends HelixElement {
   @property({ reflect: true, type: Boolean })
   disabled = false
 
-  /** Tells the dial its own rows apart from anything else slotted in. */
+  /**
+   * @internal Read by a parent to identify its children across the light DOM,
+   * which is cheaper than `instanceof` and is why this is public rather than
+   * protected. Not a consumer's to read or set.
+   */
   readonly isSpeedDialItem = true
 
   /** Puts focus on the control inside, which is what a reader can reach. */

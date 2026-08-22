@@ -182,6 +182,9 @@ const properties = (rows: RawNamed[] | undefined): PropertyDoc[] =>
        `shadowRootOptions` is Lit's and `formAssociated` is the flag the browser
        reads to decide a control participates in a form. Thirty-five rows across
        the library, none of them anything a consumer sets on a tag. */
+    /* `@internal` needs nothing here: the analyzer drops a member carrying it
+       before the manifest is written, which was worth finding out before
+       building a plugin and a filter to do the same thing twice. */
     .filter((row) => row.kind === 'field' && isPublic(row) && row.static !== true)
     .map((row) => ({
       /* `undefined` is not a default, it is the absence of one, and the

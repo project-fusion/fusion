@@ -48,7 +48,11 @@ export class HelixBaseTableColumn extends HelixElement {
   @property()
   width = ''
 
-  /** Marks this as a column a table should count. Cheaper than an instanceof. */
+  /**
+   * @internal Read by a parent to identify its children across the light DOM,
+   * which is cheaper than `instanceof` and is why this is public rather than
+   * protected. Not a consumer's to read or set.
+   */
   readonly isTableColumn = true
 
   /** The track this column contributes, resolved. */

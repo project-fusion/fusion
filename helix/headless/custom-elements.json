@@ -4854,32 +4854,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -5727,32 +5701,6 @@
               },
               "privacy": "private",
               "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
@@ -7312,32 +7260,6 @@
               },
               "privacy": "private",
               "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
@@ -9853,32 +9775,6 @@
               },
               "privacy": "private",
               "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
@@ -12523,32 +12419,6 @@
               },
               "privacy": "private",
               "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
@@ -15940,16 +15810,6 @@
             },
             {
               "kind": "field",
-              "name": "isDrilldownItem",
-              "type": {
-                "text": "boolean"
-              },
-              "readonly": true,
-              "default": "true",
-              "description": "Marks this as a row a stack should count. Cheaper than an instanceof."
-            },
-            {
-              "kind": "field",
               "name": "onPage",
               "type": {
                 "text": "boolean"
@@ -17214,32 +17074,6 @@
               },
               "privacy": "private",
               "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
@@ -20057,32 +19891,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -22876,32 +22684,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -24473,16 +24255,6 @@
               },
               "default": "false",
               "description": "Whether this row's submenu is the page showing.\n\nSeparate from `onPage`, and it has to be. A row that opened a page is not\nitself on that page, so both are false for it, and rendering nothing on\nthat basis takes its `slot[name=\"submenu\"]` with it: the rows inside have\nnowhere to be assigned and are never laid out. The element that holds the\npage has to keep the slot even when it shows no row of its own."
-            },
-            {
-              "kind": "field",
-              "name": "isMenuItem",
-              "type": {
-                "text": "boolean"
-              },
-              "readonly": true,
-              "default": "true",
-              "description": "Marks this as a row a menu should count. Cheaper than an instanceof."
             },
             {
               "kind": "field",
@@ -26829,32 +26601,6 @@
               },
               "privacy": "private",
               "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
@@ -30189,32 +29935,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -32328,32 +32048,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -33664,32 +33358,6 @@
               },
               "privacy": "private",
               "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
@@ -35092,32 +34760,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -36375,32 +36017,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -37348,16 +36964,6 @@
               "description": "Whether the action can be chosen.",
               "attribute": "disabled",
               "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "isSpeedDialItem",
-              "type": {
-                "text": "boolean"
-              },
-              "readonly": true,
-              "default": "true",
-              "description": "Tells the dial its own rows apart from anything else slotted in."
             },
             {
               "kind": "method",
@@ -40234,32 +39840,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -40956,16 +40536,6 @@
               "default": "''",
               "description": "The track this column takes, as CSS.\n\nA single track value, so anything valid in `grid-template-columns` works:\n`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is\nleft over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare\n`1fr` track keeps an automatic minimum and refuses to shrink under a long\ncell, so one unbreakable value pushes the table past its container.",
               "attribute": "width"
-            },
-            {
-              "kind": "field",
-              "name": "isTableColumn",
-              "type": {
-                "text": "boolean"
-              },
-              "readonly": true,
-              "default": "true",
-              "description": "Marks this as a column a table should count. Cheaper than an instanceof."
             },
             {
               "kind": "field",
@@ -43289,32 +42859,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -44655,32 +44199,6 @@
               },
               "privacy": "private",
               "description": "Whether this element may be asked about its own validity at all.\n\nReading the static the platform itself reads to decide, rather than\nprobing: `validity` and `validationMessage` throw `NotSupportedError` on\nan element that is not form-associated, and a group whose members each\nsubmit themselves is not. Such a control still shows a message, it just\nhas to be given one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinField",
@@ -47808,32 +47326,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "resolvedFeedback",
-              "type": {
-                "text": "string"
-              },
-              "description": "The message actually shown: the consumer's, or the platform's, or none.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "describedBy",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Id of the description node, for `aria-describedby` on the control.\n\nOne at a time, because only one of the two is ever rendered. Naming both\nwould point a screen reader at an id that resolves to nothing, which it\nreads as a description it cannot find.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "renderGroupLabel",
               "privacy": "protected",
@@ -50626,15 +50118,6 @@
               "privacy": "private",
               "default": "false",
               "description": "Whether anything is slotted into `children`. Read after first render."
-            },
-            {
-              "kind": "field",
-              "name": "isBranch",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether this node has children.",
-              "readonly": true
             },
             {
               "kind": "method",

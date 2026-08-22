@@ -207,7 +207,11 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       return (this.constructor as { formAssociated?: boolean }).formAssociated === true
     }
 
-    /** The message actually shown: the consumer's, or the platform's, or none. */
+    /**
+     * @internal The message actually shown: the consumer's, or the platform's,
+     * or none. Wiring a field does to itself, read by its own template. A
+     * consumer sets `feedback` and reads validity from the platform.
+     */
     get resolvedFeedback(): string {
       if (this.feedback !== '') {
         return this.feedback
@@ -219,7 +223,8 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     }
 
     /**
-     * Id of the description node, for `aria-describedby` on the control.
+     * @internal Id of the description node, for `aria-describedby` on the
+     * control. Written by the field's own template into its own shadow root.
      *
      * One at a time, because only one of the two is ever rendered. Naming both
      * would point a screen reader at an id that resolves to nothing, which it

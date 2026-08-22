@@ -45,7 +45,11 @@ export class HelixBaseDrilldownItem extends HelixElement {
   @property()
   value = ''
 
-  /** Marks this as a row a stack should count. Cheaper than an instanceof. */
+  /**
+   * @internal Read by a parent to identify its children across the light DOM,
+   * which is cheaper than `instanceof` and is why this is public rather than
+   * protected. Not a consumer's to read or set.
+   */
   readonly isDrilldownItem = true
 
   /** Whether the page showing is the one this row is on. Written by the stack. */
