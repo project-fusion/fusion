@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { deriveTheme, toCss } from './derive.js'
+import { defaultPairings, deriveTheme, toCss } from './derive.js'
 import {
   contrastRatio,
   hexToOklch,
@@ -258,11 +258,47 @@ describe('the accent', () => {
 })
 
 describe('pairings and collisions', () => {
-  test('every requested pair comes back, passing or not', () => {
+  test('every pair the model declares is measured, in both schemes', () => {
+    for (const scheme of ['light', 'dark'] as const) {
+      const theme = deriveTheme({ brand: BRAND, scheme })
+      /* Derived from the model rather than counted by hand, or this asserts a
+         number somebody has to remember to update and stops asserting that the
+         model is what was checked. */
+      expect(theme.pairings, scheme).toHaveLength(defaultPairings(4.5).length)
+      expect(theme.violations, scheme).toEqual([])
+    }
+  })
+
+  /* The pairs the ten hand-written ones never mentioned. Each is a ground a
+     component really paints and nothing had ever measured an ink against. */
+  test('the pairs the old list missed are in the set', () => {
     const theme = deriveTheme({ brand: BRAND })
-    expect(theme.pairings).toHaveLength(10)
-    expect(theme.pairings.every((p) => p.status === 'pass')).toBe(true)
-    expect(theme.violations).toEqual([])
+    const has = (foreground: string, background: string): boolean =>
+      theme.pairings.some((p) => p.foreground === foreground && p.background === background)
+
+    expect(has('color-foreground', 'color-primary-subtle')).toBe(true)
+    expect(has('color-foreground-on-accent', 'color-primary-surface-hover')).toBe(true)
+    expect(has('color-foreground-on-accent', 'color-danger-surface')).toBe(true)
+    expect(has('color-focus-ring', 'color-surface-raised')).toBe(true)
+    expect(has('color-foreground-inverse', 'color-surface-inverse')).toBe(true)
+  })
+
+  test('a ring is held to 3:1 and text to the theme target', () => {
+    const theme = deriveTheme({ brand: BRAND, contrastTarget: 7 })
+    const ring = theme.pairings.find((p) => p.foreground === 'color-focus-ring')
+    const text = theme.pairings.find((p) => p.foreground === 'color-foreground')
+    expect(ring?.target).toBe(3)
+    expect(text?.target).toBe(7)
+  })
+
+  /* The second producer of `unverifiable`, and the principled one: a caption
+     over a photograph has the photograph behind it and no derivation knows
+     what that is. */
+  test('an unbounded ground is unverifiable however the theme is built', () => {
+    const theme = deriveTheme({ brand: BRAND })
+    const media = theme.pairings.find((p) => p.background === 'color-surface-media')
+    expect(media?.status).toBe('unverifiable')
+    expect(media?.ratio).toBeUndefined()
   })
 
   /* The property this output exists for. A pair nobody could measure has to be

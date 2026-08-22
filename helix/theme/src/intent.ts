@@ -54,6 +54,12 @@ export type StatusSeed = Color | { hue?: number }
 export interface PairingRequest {
   background: string
   foreground: string
+  /**
+   * The ratio this pair has to reach. Carried per pair rather than taken from
+   * the theme, because a focus ring answers to WCAG 1.4.11 at 3:1 while body
+   * text answers to `contrastTarget`, and one number cannot be both.
+   */
+  target: number
 }
 
 export interface ThemeIntent {

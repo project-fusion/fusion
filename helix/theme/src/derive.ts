@@ -7,6 +7,7 @@ import {
   type ThemeIntent,
   toOklch,
 } from './intent.js'
+import { GROUNDS, INKS, STATUSES } from './model.js'
 import { contrastRatio, fitToGamut, lightnessForContrast, type Oklch, oklchToHex } from './oklch.js'
 
 export type { Color, PairingRequest, Relation, Seed, StatusSeed, ThemeIntent } from './intent.js'
@@ -53,6 +54,13 @@ export interface Pairing {
    * behind a glass surface is whatever the reader scrolled under it.
    */
   status: 'fail' | 'pass' | 'unverifiable'
+  /**
+   * The ratio this pair had to reach. Recorded rather than inferred from the
+   * theme, because a focus ring answers to WCAG 1.4.11 at 3:1 while text
+   * answers to `contrastTarget`, and a reader of one row should not have to
+   * know which kind it is looking at.
+   */
+  target: number
 }
 
 export interface DerivedTheme {
@@ -224,7 +232,10 @@ const assertUsableIntent = (resolved: Required<ThemeIntent>): void => {
 export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   const resolved: Required<ThemeIntent> = {
     ...DEFAULTS,
-    pairings: DEFAULT_PAIRINGS,
+    /* Derived from the target the caller asked for, so a theme at AAA checks
+       its text against AAA rather than against the default the list was built
+       with. A constant could not have done that. */
+    pairings: intent.pairings ?? defaultPairings(intent.contrastTarget ?? DEFAULTS.contrastTarget),
     ...intent,
   }
   assertUsableIntent(resolved)
@@ -293,14 +304,30 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   // so light text loses contrast there. Solving against a single surface ships
   // a palette that passes on the page and fails inside every card.
   const surfaces = [background, surface, fitToGamut(rawRaised), fitToGamut(rawSunken)]
-  const solveForAll = (sample: Omit<Oklch, 'lightness'>, target: number): Oklch => {
+  /**
+   * Solves one ink against every ground it lands on, keeping whichever
+   * candidate has the best worst case.
+   *
+   * **Grounds are a parameter because the model says which ones**, and that is
+   * the whole correction: a hardcoded surface list solved `primary` against the
+   * page and left it failing on the tinted badge it also sits in.
+   */
+  const solveAgainst = (
+    grounds: Oklch[],
+    sample: Omit<Oklch, 'lightness'>,
+    target: number,
+  ): Oklch => {
     const worstCase = (candidate: Oklch): number =>
-      Math.min(...surfaces.map((s) => contrastRatio(fitToGamut(candidate), s)))
+      Math.min(...grounds.map((g) => contrastRatio(fitToGamut(candidate), g)))
 
-    return surfaces
-      .map((s) => lightnessForContrast(sample, s, target))
+    return grounds
+      .map((g) => lightnessForContrast(sample, g, target))
       .reduce((best, candidate) => (worstCase(candidate) > worstCase(best) ? candidate : best))
   }
+
+  /** The page ladder, which is what an ink with no ground of its own sits on. */
+  const solveForAll = (sample: Omit<Oklch, 'lightness'>, target: number): Oklch =>
+    solveAgainst(surfaces, sample, target)
 
   const foreground = solveForAll(neutral, contrastTarget * 1.6)
   const foregroundMuted = solveForAll(neutral, contrastTarget)
@@ -310,7 +337,26 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
      the accent behaving differently from each other is a difference a consumer
      would have to learn, and there is no reason for one. */
   const emphasis = (base: Oklch) => {
-    const raw = solveForAll({ chroma: base.chroma, hue: base.hue }, contrastTarget)
+    /* **Solved against its own tint as well as the page, because that is where
+       it lands.** The model says `primary` sits on the five page surfaces *and*
+       on `primary-subtle`, which is the ground a quiet badge gives it, and the
+       solver was reading a hardcoded surface list that did not include it. In
+       dark mode the tint is lighter than every page surface, so a primary
+       solved against the page alone came out at 4.25:1 on the one ground a
+       consumer most expects it to work on.
+
+       No cycle: the tint depends on the base colour and the scheme, never on
+       the solved ink, so it is computed first and solved against. */
+    const subtle: Oklch = {
+      chroma: Math.min(base.chroma, policy(0.06)),
+      hue: base.hue,
+      lightness: scheme === 'dark' ? rawSurface.lightness + 0.06 : 0.95,
+    }
+    const raw = solveAgainst(
+      [...surfaces, fitToGamut(subtle)],
+      { chroma: base.chroma, hue: base.hue },
+      contrastTarget,
+    )
     const toward = scheme === 'dark' ? 1 : -1
     const step = (by: number): Oklch => ({
       chroma: base.chroma,
@@ -328,29 +374,11 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
       contrastTarget,
       { darker: true },
     )
-    return {
-      active: step(0.1),
-      filled,
-      hover: step(0.05),
-      raw,
-      subtle: {
-        chroma: Math.min(base.chroma, policy(0.06)),
-        hue: base.hue,
-        lightness: scheme === 'dark' ? rawSurface.lightness + 0.06 : 0.95,
-      },
-    }
+    return { active: step(0.1), filled, hover: step(0.05), raw, subtle }
   }
 
   const primary = emphasis(brand)
   const accentSteps = emphasis(accent)
-
-  /* Solved against the surface it actually lands on. A brand fill is what
-     carries this text, and `primary` is not that fill. */
-  const onAccent = lightnessForContrast(
-    { chroma: 0, hue: 0 },
-    fitToGamut(primary.filled),
-    contrastTarget,
-  )
 
   /* **Status: hue is fixed by meaning, everything else derives.**
 
@@ -397,6 +425,65 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     })
   }
 
+  /* **Every filled ground `foreground-on-accent` lands on, not just the brand's
+     resting one.** It was solved against `primary-surface` alone, so a hovered
+     button and all four status fills carried an ink nothing had measured
+     against them. One token means one colour that clears the worst of them, and
+     where that is not reachable the pairing says so rather than the name
+     quietly meaning something different per family. */
+  const statusFills = new Map<string, { hover: Oklch; rest: Oklch }>()
+  for (const status of STATUSES) {
+    const { color } = statusColors.get(status) ?? {}
+    if (!color) {
+      continue
+    }
+    const steps = emphasis(color)
+    statusFills.set(status, { hover: steps.filled, rest: steps.filled })
+  }
+
+  /* **A fill darkens under a pointer in both modes, and it is the one hover
+     that does not follow the scheme.** An ink's hover steps toward the ink,
+     which is lighter on a dark page; a fill already carries light text by
+     construction, so lightening it in dark mode takes contrast away from the
+     very text it exists to hold. The first version stepped toward the ink for
+     consistency and the enumeration caught it at once: six filled grounds fell
+     to 3.67:1 against their own label. The stylesheet had it right the whole
+     time, `primary-surface` being the 600 and its hover the 700. */
+  const hoverOf = (fill: Oklch): Oklch => ({ ...fill, lightness: fill.lightness - 0.05 })
+
+  const filledGrounds: Oklch[] = [
+    primary.filled,
+    hoverOf(primary.filled),
+    accentSteps.filled,
+    hoverOf(accentSteps.filled),
+    ...[...statusFills.values()].flatMap(({ rest }) => [rest, hoverOf(rest)]),
+  ]
+
+  const onAccent = filledGrounds
+    .map((ground) =>
+      lightnessForContrast({ chroma: 0, hue: 0 }, fitToGamut(ground), contrastTarget),
+    )
+    .reduce((best, candidate) => {
+      const worst = (ink: Oklch): number =>
+        Math.min(...filledGrounds.map((g) => contrastRatio(fitToGamut(ink), fitToGamut(g))))
+      return worst(candidate) > worst(best) ? candidate : best
+    })
+
+  /* The inverse pair, which is one ground and one ink and has to be solved
+     together: a toast that is the opposite of the page it sits on. */
+  const surfaceInverse: Oklch =
+    scheme === 'dark' ? { ...neutral, lightness: 0.95 } : { ...neutral, lightness: 0.2 }
+  const foregroundInverse = lightnessForContrast(
+    neutral,
+    fitToGamut(surfaceInverse),
+    contrastTarget * 1.6,
+  )
+
+  /* A ring is seen rather than read, so 3:1 under WCAG 1.4.11 rather than the
+     text target, and solved against every page surface because a focused
+     control can sit on any of them. */
+  const focusRing = solveForAll({ chroma: brand.chroma, hue: brand.hue }, 3)
+
   const tokens: DerivedToken[] = [
     token('color-background', rawBackground),
     token('color-surface', rawSurface),
@@ -427,6 +514,20 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     ...[...statusColors].map(([name, { color, pinned }]) =>
       token(`color-${name}`, color, pinned ? 'pinned' : 'derived', background),
     ),
+    /* **The grounds the model says exist, which the engine never emitted.** A
+       filled danger button, a hovered filled anything, the inverse pair a toast
+       uses and the ring a keyboard depends on: each was a ground or an ink the
+       stylesheet had and the engine did not, so a themed page kept the stock
+       one exactly where it mattered most. */
+    token('color-primary-surface-hover', hoverOf(primary.filled)),
+    token('color-accent-surface-hover', hoverOf(accentSteps.filled)),
+    ...[...statusFills].flatMap(([name, { rest }]) => [
+      token(`color-${name}-surface`, rest),
+      token(`color-${name}-surface-hover`, hoverOf(rest)),
+    ]),
+    token('color-surface-inverse', surfaceInverse),
+    token('color-foreground-inverse', foregroundInverse, 'derived', surfaceInverse),
+    token('color-focus-ring', focusRing, 'derived', background),
   ]
 
   /* A pinned token replaces one output and is verified like anything else.
@@ -449,26 +550,33 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
      the moment a caller supplies pairings against their own token set: a pair
      silently missing from the results is how a guarantee becomes a claim about
      the pairs that happened to be easy. */
-  const pairings: Pairing[] = resolved.pairings.map(({ background: bg, foreground: fg }) => {
-    const ink = byName.get(fg)
-    const ground = byName.get(bg)
-    if (!ink || !ground) {
-      return { background: bg, foreground: fg, status: 'unverifiable' as const }
-    }
-    const ratio = contrastRatio(fitToGamut(ink), fitToGamut(ground))
-    return {
-      background: bg,
-      foreground: fg,
-      ratio,
-      status: ratio < contrastTarget ? ('fail' as const) : ('pass' as const),
-    }
-  })
+  /* A ground the model marks unbounded cannot be measured against, whatever the
+     theme: what sits behind a media surface is the media. */
+  const unbounded = new Set(GROUNDS.filter((g) => !g.bounded).map((g) => g.name))
+
+  const pairings: Pairing[] = resolved.pairings.map(
+    ({ background: bg, foreground: fg, target }) => {
+      const ink = byName.get(fg)
+      const ground = byName.get(bg)
+      if (!ink || !ground || unbounded.has(bg)) {
+        return { background: bg, foreground: fg, status: 'unverifiable' as const, target }
+      }
+      const ratio = contrastRatio(fitToGamut(ink), fitToGamut(ground))
+      return {
+        background: bg,
+        foreground: fg,
+        ratio,
+        status: ratio < target ? ('fail' as const) : ('pass' as const),
+        target,
+      }
+    },
+  )
 
   const violations = pairings
     .filter((p) => p.status === 'fail')
     .map(
       (p) =>
-        `${p.foreground} on ${p.background}: ${p.ratio?.toFixed(2)}:1 below target ${contrastTarget}:1`,
+        `${p.foreground} on ${p.background}: ${p.ratio?.toFixed(2)}:1 below target ${p.target}:1`,
     )
 
   /* Roles against each other rather than against a ground. Every pair once,
@@ -495,30 +603,32 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
 }
 
 /**
- * The pairs this engine's own token set is checked against.
+ * The pairs a theme is checked against, derived from the surface model.
  *
- * Declared explicitly rather than inferred from token names. Text sits on
- * `surface` as often as on `background` (cards, dialogs, menus), and a palette
- * that only verifies one of them ships a real failure.
+ * **This replaced ten hand-written pairs, which were a claim about ten pairs
+ * rather than about a theme.** A tag on a raised card, a hovered filled button,
+ * every status fill and the focus ring were all unmeasured, and none of them
+ * was ever going to be noticed by reading a list that did not mention them.
  *
- * **Ten pairs is a claim about ten pairs.** Real interfaces carry pairs nobody
- * enumerated: a tag on a raised card, placeholder text, a focus ring on a
- * filled button. This is the default rather than the truth, which is why
- * `pairings` is an input, and generating it from what components actually
- * paint is #141's remaining work.
+ * Derived, so adding a ground to an ink in `model.ts` adds its pairs
+ * everywhere at once and there is no second place to remember.
+ *
+ * `pairings` stays an input: a caller on their own tokens supplies their own
+ * surfaces, which is what makes the engine useful to somebody who has never
+ * heard of Helix. This is the default rather than the only answer.
  */
-export const DEFAULT_PAIRINGS: PairingRequest[] = [
-  { background: 'color-background', foreground: 'color-foreground' },
-  { background: 'color-surface', foreground: 'color-foreground' },
-  { background: 'color-background', foreground: 'color-foreground-muted' },
-  { background: 'color-surface', foreground: 'color-foreground-muted' },
-  { background: 'color-background', foreground: 'color-primary' },
-  { background: 'color-primary-surface', foreground: 'color-foreground-on-accent' },
-  { background: 'color-surface-raised', foreground: 'color-foreground' },
-  { background: 'color-surface-overlay', foreground: 'color-foreground' },
-  { background: 'color-surface-sunken', foreground: 'color-foreground' },
-  { background: 'color-surface-overlay', foreground: 'color-foreground-muted' },
-]
+export const defaultPairings = (contrastTarget: number): PairingRequest[] =>
+  INKS.flatMap((ink) =>
+    ink.grounds.map((ground) => ({
+      background: ground,
+      foreground: ink.name,
+      /* A component mark answers to WCAG 1.4.11 at 3:1 rather than to the body
+         text target, and pinning it to 3 rather than scaling it with
+         `contrastTarget` is deliberate: raising a theme to AAA raises what its
+         text must reach, not what the specification asks of a ring. */
+      target: ink.contrast === 'component' ? 3 : contrastTarget,
+    })),
+  )
 
 /**
  * Renders a derived theme as a CSS custom-property block.
@@ -528,8 +638,8 @@ export const DEFAULT_PAIRINGS: PairingRequest[] = [
  * `--helix-seed-*`, including the twenty-four series colours a chart reads, and
  * nothing here reaches those. Emitting the tokens alone moved the buttons, the
  * tags and the surfaces and left every chart on the page the original blue,
- * which the marketing site worked around by writing the seed itself. `check:seeds`
- * holds the two name sets to each other now, in both directions.
+ * which the marketing site worked around by writing the seed itself.
+ * `check:seeds` holds the two name sets to each other now, in both directions.
  */
 export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
   const { density, namespace, radius } = theme.intent

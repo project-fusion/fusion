@@ -43,6 +43,15 @@
  * instead would find the private names, which is the wrong set: those are the
  * stylesheet talking to itself.
  *
+ * **It covers the token names too, and the name of the check is narrower than
+ * the job it does.** The boundary is the same one: every colour token the
+ * engine emits has to be a name `tokens.css` declares, or a themed page sets a
+ * property nothing reads, which is the seed bug one level up and with thirty-six
+ * more chances to happen. They agree today, measured, which is precisely the
+ * state the seed names were in before they drifted. `seeds` stays the name
+ * because the seeds are the sharp edge and a renamed check loses its history in
+ * commit messages that cite it.
+ *
  * Run with `bun run check:seeds` (also part of `bun run verify`).
  */
 import { readFileSync } from 'node:fs'
@@ -52,6 +61,7 @@ import { fileURLToPath } from 'node:url'
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
 const ENGINE = 'helix/theme/src/derive.ts'
+const MODEL = 'helix/theme/src/model.ts'
 const SHEETS = ['helix/styles/src/primitives.css', 'helix/styles/src/tokens.css']
 
 /**
@@ -146,6 +156,30 @@ for (const [name, why] of PLANNED) {
   }
 }
 
+/* The token names, read from the model rather than from a derived theme, so the
+   check needs no colour math and cannot be fooled by a theme that happens not
+   to emit something. */
+const modelNames = [
+  ...[...uncommented(read(MODEL)).matchAll(/name:\s*'(color-[a-z0-9-]+)'/g)].map((m) => m[1]),
+  ...[...uncommented(read(MODEL)).matchAll(/'(color-[a-z0-9-]+)',?\s*$/gm)].map((m) => m[1]),
+]
+
+const declared = new Set(
+  SHEETS.flatMap((sheet) => [
+    ...uncommented(read(sheet)).matchAll(/^\s*--helix-(color-[a-z0-9-]+)\s*:/gm),
+  ]).map((m) => m[1]),
+)
+
+for (const name of [...new Set(modelNames)].sort()) {
+  if (!declared.has(name)) {
+    problems.push(
+      `${MODEL} names \`${name}\` as an ink or a ground and ${SHEETS[1]} does not ` +
+        'declare it, so a themed page would set a property nothing reads and the ' +
+        'pairing would be measured against a colour no component can paint.',
+    )
+  }
+}
+
 if (problems.length > 0) {
   console.error(`Seeds out of step (${problems.length}):\n\n  ${problems.join('\n\n  ')}\n`)
   process.exit(1)
@@ -158,4 +192,7 @@ if (problems.length > 0) {
    emits everything the stylesheet reads, so printing `0 planned` would turn
    the day this row is finished into a red build. */
 const planned = PLANNED.size > 0 ? `, ${PLANNED.size} planned and each still read` : ''
-console.log(`seeds: ${emitted.size} emitted, ${consumed.size} read${planned}`)
+console.log(
+  `seeds: ${emitted.size} emitted, ${consumed.size} read${planned}; ` +
+    `${new Set(modelNames).size} model names, every one declared`,
+)
