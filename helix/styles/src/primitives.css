@@ -372,7 +372,17 @@
    * and would have shipped one severity that still could not be read. */
   --_helix-info-600: oklch(from var(--_helix-info-500) calc(l - 0.07) calc(c - 0.04) h);
   --_helix-success-600: oklch(from var(--_helix-success-500) calc(l - 0.07) calc(c - 0.04) h);
-  --_helix-warning-600: oklch(from var(--_helix-warning-500) calc(l - 0.18) calc(c - 0.02) h);
+  /* **`c - 0.075`, not `c - 0.02`, because the smaller step was outside sRGB.**
+     It asked for chroma 0.165 at lightness 0.52 on hue 75 and the browser
+     painted 0.110, so the file said one thing and the screen showed another
+     with nothing anywhere saying so. The same fault the series ramp records
+     hitting, found from the other side: `@helix-io/theme` solves this hue for
+     itself, reports `chromaReduced`, and came out *more* saturated than the
+     token it was being compared against.
+     
+     Measured by fitting to gamut and reading the chroma back. Nothing on screen
+     moves, since 0.110 is what was already being painted. */
+  --_helix-warning-600: oklch(from var(--_helix-warning-500) calc(l - 0.18) calc(c - 0.075) h);
 
   /* The 700s, one step past the 600s on the same curve each of them took.
    *

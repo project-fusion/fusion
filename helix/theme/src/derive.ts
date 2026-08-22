@@ -2,6 +2,7 @@ import {
   type Color,
   isRelation,
   type PairingRequest,
+  STATUS_CHROMA,
   STATUS_HUE,
   type StatusName,
   type ThemeIntent,
@@ -501,7 +502,9 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
       continue
     }
     const hue = (supplied as { hue?: number } | undefined)?.hue ?? STATUS_HUE[name]
-    const chroma = policy(rawBrand.chroma)
+    /* The status's own chroma, scaled by the policy, and never the brand's:
+       see `STATUS_CHROMA` for what taking the brand's did to a muted one. */
+    const chroma = policy(STATUS_CHROMA[name])
     let resolvedHue = hue
     if (allowance > 0) {
       /* **Against the brand and against the statuses already settled.**

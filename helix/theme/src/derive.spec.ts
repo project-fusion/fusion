@@ -247,6 +247,24 @@ describe('the chroma policy', () => {
     )
   })
 
+  /* **A status's saturation is part of what it means and is not the brand's to
+     set.** Every status took the brand's chroma, so a muted brand at 0.035 gave
+     a danger at 0.035, which is a near-grey error state. */
+  test('a status keeps its own chroma whatever the brand does', () => {
+    const danger = (brand: string) =>
+      deriveTheme({ brand }).tokens.find((t) => t.name === 'color-danger')?.value.chroma ?? 0
+
+    expect(danger('#94a3b8')).toBeCloseTo(danger('#c026d3'), 3)
+    expect(danger('#94a3b8')).toBeGreaterThan(0.15)
+  })
+
+  /* The policy still reaches them, because how loud a palette is remains a
+     theme's decision even where the hue is not. */
+  test('but the chroma policy still scales it', () => {
+    const muted = deriveTheme({ brand: BRAND, chroma: { scale: 0.3 } })
+    expect(muted.tokens.find((t) => t.name === 'color-danger')?.value.chroma).toBeLessThan(0.1)
+  })
+
   test('a pinned value keeps its chroma, the policy being about what we derive', () => {
     const theme = deriveTheme({
       brand: BRAND,

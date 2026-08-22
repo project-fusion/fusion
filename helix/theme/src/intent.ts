@@ -297,6 +297,29 @@ export const STATUS_HUE = {
   warning: 75,
 } as const
 
+/**
+ * The chroma each status carries, taken from the same shipped primitives.
+ *
+ * **Per status, because sRGB is not chroma-uniform.** These are not four ways
+ * of saying "saturated": each hue holds a different maximum at the lightness a
+ * status sits at, which is the same fact `tokens.css` records for the series
+ * ramp, where one number for eight hues had three of them silently clipped.
+ *
+ * They exist at all because the engine was taking the *brand's* chroma for
+ * every status. A brand at 0.035 gave a danger at 0.035, which is to say a
+ * near-grey error; a magenta brand at 0.257 asked amber for a chroma its hue
+ * cannot hold and got 0.115 back after clipping, which is a muddy beige. A
+ * status's saturation is part of what it means and is not the brand's to set.
+ * The `chroma` policy still scales these, because how loud a palette is remains
+ * a theme's decision.
+ */
+export const STATUS_CHROMA = {
+  danger: 0.21,
+  info: 0.16,
+  success: 0.15,
+  warning: 0.185,
+} as const
+
 export type StatusName = keyof typeof STATUS_HUE
 
 /** Accepts a hex string or an OKLCH triple and always returns the triple. */
