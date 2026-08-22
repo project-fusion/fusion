@@ -23,6 +23,54 @@
    is the same call `ColorPicker` makes on its own hue and alpha channels, and
    through the same hook. A filled half would be a second reading of something
    the ramp already says. */
+/* What the brand became.
+ *
+ * **A caption under the field, not a callout.** A callout carries a severity
+ * and an icon and interrupts; this reports a normal consequence of the value
+ * just typed. As a callout it read as a warning about something that is not
+ * wrong, and in a quarter-width pane its icon and inset wrapped the sentence
+ * four times. */
+.themeShift {
+  display: grid;
+  gap: var(--helix-space-xs);
+  margin-block-start: calc(var(--helix-space-xs) * -1);
+}
+
+/* The pair reads left to right as one statement, so it gets its own line and a
+   size worth looking at rather than being squeezed beside the words. */
+.themeShiftPair {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-xs);
+}
+
+/* Drawn rather than iconised: an arrow glyph at this size is a component, a
+   focusable-looking mark and a name in the accessibility tree, for something
+   that is punctuation between two swatches. */
+.themeShiftArrow {
+  background-color: var(--helix-color-foreground-muted);
+  /* The box the clip-path draws inside, so it needs the arrowhead's height and
+     not the shaft's: at `--helix-border-thin` the polygon had one pixel to put
+     a head in and the whole mark disappeared. The shaft's thinness is the 40 to
+     60 per cent band in the polygon instead. */
+  block-size: var(--helix-space-sm);
+  clip-path: polygon(0 40%, 62% 40%, 62% 0, 100% 50%, 62% 100%, 62% 60%, 0 60%);
+  inline-size: var(--helix-space-md);
+}
+
+.themeSwatch {
+  block-size: var(--helix-size-control-sm);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-control-sm);
+}
+
+/* A channel slider: the track is the value rather than a measure of it, which
+   is the same call `ColorPicker` makes on its own hue and alpha channels, and
+   through the same hook. A filled half would be a second reading of something
+   the ramp already says. */
 /* The two swatches beside the brand: what was asked for, and what the solver
    produced from it. */
 .themeSwatch {
@@ -54,6 +102,9 @@
    the things being previewed: letting the site's show through would leave the
    one surface every other pair is measured against out of the picture. Its own
    scroller too, the page being taller than the pane. */
+/* Keyed on the class for layout and on the attribute for the palette: the
+   emitted block is written for `[data-theme="preview"]`, and which theme a
+   subtree is in is a different fact from how this pane is laid out. */
 .themePreview {
   background-color: var(--helix-color-background);
   block-size: 100%;

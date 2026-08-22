@@ -135,19 +135,33 @@ describe('deriveTheme', () => {
        0.008 this engine was hardcoding because a fixed chroma is a rising
        saturation as a surface darkens and it read navy across a dark page. So
        this test used to pass on a default nobody chose. */
+    /* `surface` and not `background`: the page takes no cast at all now, being
+       the one surface with nothing behind it to sit against, so it is the wrong
+       token to ask about a tint that could not be rendered. */
     const theme = deriveTheme({ brand: BRAND, neutral: { chroma: 0.02 } })
-    const background = theme.tokens.find((t) => t.name === 'color-background')
-    if (!background) {
-      throw new Error('theme is missing a background token')
+    const surface = theme.tokens.find((t) => t.name === 'color-surface')
+    if (!surface) {
+      throw new Error('theme is missing a surface token')
     }
-    expect(background.chromaReduced).toBe(true)
-    expect(isOutOfGamut(background.value)).toBe(false)
+    expect(surface.chromaReduced).toBe(true)
+    expect(isOutOfGamut(surface.value)).toBe(false)
   })
 
   test('the neutral default is a dead grey, agreeing with the stylesheet', () => {
     const theme = deriveTheme({ brand: BRAND })
-    const background = theme.tokens.find((t) => t.name === 'color-background')
-    expect(background?.value.chroma).toBe(0)
+    expect(theme.tokens.find((t) => t.name === 'color-surface')?.value.chroma).toBe(0)
+  })
+
+  /* The page is the one fixed point either mode has, and `tokens.css` says so:
+     `#ffffff` and `#000000`, with the ladder moving around it. The engine had
+     0.985 and 0.15, and in light it had the page and the surface the wrong way
+     round, so a themed page came out faintly grey carrying white cards. */
+  test('the page is pure white and pure black, as the stylesheet paints it', () => {
+    const page = (scheme: 'dark' | 'light') =>
+      deriveTheme({ brand: BRAND, scheme }).tokens.find((t) => t.name === 'color-background')?.hex
+
+    expect(page('light')).toBe('#ffffff')
+    expect(page('dark')).toBe('#000000')
   })
 
   // `violations` fails open on non-finite input: every `ratio < target`

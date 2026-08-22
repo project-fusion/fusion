@@ -15,13 +15,20 @@ const BRAND = '#3b82f6'
 /**
  * The selector the emitted block is written for.
  *
+ * **A data attribute rather than a class**, because this is not styling: it
+ * names *which theme* a subtree is in, the same way `data-helix-theme` names
+ * that a subtree is themed at all and `data-color-mode` names which half of
+ * `light-dark()` resolves. A class would say the preview looks a certain way,
+ * where the attribute says it is a particular theme, and the emitted block is
+ * about the second.
+ *
  * **The preview is styled by exactly the CSS the page is showing**, which is
  * the one property a builder has to have: what you copy is what you saw. The
  * alternative, setting properties on the node and rendering a separate string,
  * is two derivations of the same answer, and this session spent most of its
  * time finding bugs of exactly that shape.
  */
-const SCOPE = '.themePreview'
+const SCOPE = '[data-theme="preview"]'
 
 /**
  * What share of the stage the preview starts with.
@@ -230,21 +237,27 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                 Shown only when it actually moved, and only by enough to notice.
                 A swatch that always says "and here is the same colour again" is
                 a row of chrome nobody reads. */}
+            {/* **Not a callout.** A callout is an interruption with a severity
+                and an icon, and this is neither: it is a caption under the
+                field it is about, saying what happened to the value that was
+                just typed. As a callout it read as a warning about a normal
+                thing, and its icon and inset crowded a quarter-width pane until
+                the sentence wrapped four times.
+
+                So: the two swatches on their own line, at a size worth looking
+                at, and the reason under them. */}
             {moved ? (
-              <helix-callout className="themeShift" key={shift > 0 ? 'up' : 'down'} severity="info">
-                <helix-flex align="center" gap="sm">
+              <div className="themeShift" key={shift > 0 ? 'up' : 'down'}>
+                <div className="themeShiftPair">
                   <span className="themeSwatch" style={{ background: brand }} />
-                  <helix-icon name="arrow-right"></helix-icon>
+                  <span className="themeShiftArrow" />
                   <span className="themeSwatch" style={{ background: derivedPrimary }} />
-                  {/* Short, because this pane is a quarter of the window and the
-                      swatches have already said "this became that". The sentence
-                      only has to say which way and why. */}
-                  <helix-text appearance="caption">
-                    {shift > 0 ? 'Lightened' : 'Darkened'} to clear {contrastTarget}:1. Hue and
-                    chroma are kept.
-                  </helix-text>
-                </helix-flex>
-              </helix-callout>
+                </div>
+                <helix-text appearance="caption">
+                  {shift > 0 ? 'Lightened' : 'Darkened'} to clear {contrastTarget}:1. Hue and chroma
+                  are kept.
+                </helix-text>
+              </div>
             ) : null}
 
             <helix-select
@@ -438,7 +451,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                 the values, and the attribute is what makes `helix/styles` re-run
                 its own declarations here so the series ramp and the scales
                 re-derive. */}
-            <div className="themePreview" data-helix-theme slot="preview">
+            <div className="themePreview" data-helix-theme data-theme="preview" slot="preview">
               <ThemedPage />
             </div>
 

@@ -292,10 +292,28 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   // every contrast solve uses the fitted version. Solving against a color that
   // cannot be rendered and then measuring against the one that can is how a
   // palette passes in theory and fails by a hundredth in practice.
+  /* **The page is pure white and pure black, and it was neither.**
+     `tokens.css` states the decision outright, that the page is `#ffffff` and
+     `#000000` and is the one fixed point either mode has, and records rejecting
+     the near-black it was briefly given to make room underneath for `sunken`.
+     This engine shipped that rejected arrangement and worse: in light it had
+     the page at 0.985 and `surface` at pure white, which is the two of them the
+     wrong way round, so a themed page came out faintly grey with white cards on
+     it where the stylesheet paints a white page with faintly grey cards.
+
+     The third disagreement of this kind between the two derivations, after the
+     dead density seeds and the neutral chroma the stylesheet had already
+     rejected for reading navy. `check:seeds` holds the names to each other and
+     nothing holds the values, which is #141's remaining work.
+
+     No cast on the page, for the reason the primitive gives: it is the one
+     surface with nothing behind it to sit against, so the trace of brand hue
+     that makes a card feel part of the palette has nothing to do there and
+     reads as a colour cast across the whole window. */
   const rawBackground: Oklch =
-    scheme === 'dark' ? { ...neutral, lightness: 0.15 } : { ...neutral, lightness: 0.985 }
+    scheme === 'dark' ? { chroma: 0, hue: 0, lightness: 0 } : { chroma: 0, hue: 0, lightness: 1 }
   const rawSurfaceBase: Oklch =
-    scheme === 'dark' ? { ...neutral, lightness: 0.21 } : { chroma: 0, hue: 0, lightness: 1 }
+    scheme === 'dark' ? { ...neutral, lightness: 0.21 } : { ...neutral, lightness: 0.985 }
   /* **The surfaces a component actually names, not just the two the page has.**
      A dropdown sits on `surface-overlay`, a recess on `surface-sunken`, a card
      that lifts on `surface-raised`. Emitting only `background` and `surface`
@@ -324,9 +342,17 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     lightness: rawBackground.lightness + (from - rawBackground.lightness) * ladder,
   })
 
-  const rawRaised: Oklch = step(scheme === 'dark' ? 0.25 : 0.96)
-  const rawOverlay: Oklch = step(scheme === 'dark' ? 0.25 : 1)
-  const rawSunken: Oklch = step(scheme === 'dark' ? 0.11 : 0.93)
+  /* **Every rung taken from the stylesheet's own ladder**, since the two are
+     meant to agree for the brand that ships and every figure here was a little
+     off: raised and overlay sat at 0.25 against `neutral-800`'s 0.29, and
+     sunken at 0.11 against `neutral-950`'s 0.15. Small enough to look like
+     rounding and large enough to be a different grey.
+
+     `overlay` is pure white in light and takes no cast, matching `neutral-0`:
+     a menu on a white page is white, which is what every desktop menu does. */
+  const rawRaised: Oklch = step(scheme === 'dark' ? 0.29 : 0.97)
+  const rawOverlay: Oklch = scheme === 'dark' ? step(0.29) : { chroma: 0, hue: 0, lightness: 1 }
+  const rawSunken: Oklch = step(scheme === 'dark' ? 0.15 : 0.96)
 
   const background = fitToGamut(rawBackground)
   /* Declared after the ladder, since `surface` is on it: it is the ground a card
