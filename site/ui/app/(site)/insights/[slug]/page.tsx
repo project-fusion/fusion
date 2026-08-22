@@ -57,32 +57,25 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     <helix-flex class="insightShell" direction="column" gap="2xl">
       <helix-flex align="start" class="insightHead" direction="column" gap="lg">
         {/* The way out, above everything. A reader who opened this from the
-            gallery wants it before they want the filing labels. */}
-        {/* **One crumb pointing back, and it is a real `Breadcrumbs` rather
-            than a link dressed as one.** The crumb already owns the hover wash,
-            the radius, the padding and the pull-back that makes the first step
-            start where the content does. A back link styled to match would be
-            those four decisions copied into a stylesheet, to drift the first
-            time one of them changes.
+            gallery wants it before they want the filing labels.
 
-            A full trail was here for a moment and said `Insights / Company /
-            this title`, which is where the page sits and is not what a reader
-            wants from the top left: the title is already the next thing they
-            read, and the topic is a filter they did not ask for. The one thing
-            worth offering is the way out.
+            **A control, not a crumb.** A trail's separators point forward, into
+            a hierarchy, and this step points out of one, so the single crumb it
+            was built from spent the component on a shape it does not have. The
+            heights say the same thing: a crumb link measures 28 and every
+            control measures 40, so the moment anything sits beside this (a
+            share, a subscribe) the row steps around it.
 
-            The chevron is inside the link rather than drawn by the component,
-            which is what lets a single crumb point left: `Breadcrumbs` puts its
-            separators *between* steps, so it has none to give before the
-            first. */}
-        <helix-breadcrumbs aria-label="Breadcrumb" class="insightTrail">
-          <helix-breadcrumb>
-            <Link data-link="quiet" href="/insights">
-              <helix-icon name="caret-left"></helix-icon>
-              All insights
-            </Link>
-          </helix-breadcrumb>
-        </helix-breadcrumbs>
+            The recipe carries all of it. `[data-button]` is `inline-flex`,
+            centred, with a gap for the icon and a hover wash, so the chevron is
+            just the first child and nothing here needs a rule for any of it.
+            `Button` itself takes no `href`, which is the whole reason the
+            recipe exists: this is the router's own anchor wearing the control's
+            clothes. */}
+        <Link className="insightTrail" data-button="ghost" href="/insights">
+          <helix-icon name="caret-left"></helix-icon>
+          All insights
+        </Link>
 
         <helix-flex align="center" data-density="sm" gap="xs" wrap>
           <helix-tag tone="primary">{insight.topic}</helix-tag>
