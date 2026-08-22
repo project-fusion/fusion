@@ -20,6 +20,7 @@
     "check:matchers": "node tooling/scripts/check-matchers.mjs",
     "check:icons": "node tooling/scripts/check-icons.mjs",
     "check:composed": "node tooling/scripts/check-composed.mjs",
+    "check:contrast": "node tooling/scripts/check-contrast.mjs",
     "check:disabled": "node tooling/scripts/check-disabled.mjs",
     "check:orphans": "node tooling/scripts/check-orphans.mjs",
     "check:overruled": "node tooling/scripts/check-overruled.mjs",

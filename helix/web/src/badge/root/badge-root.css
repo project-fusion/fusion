@@ -16,7 +16,12 @@
 
 [part="indicator"] {
   align-items: center;
-  background-color: var(--badge-background-color, var(--helix-color-primary));
+  /* **`primary-surface`, not `primary`.** The ink here is
+     `foreground-on-accent`, and the grounds that ink is solved against are the
+     fills: `primary` is the colour primary *text* is set in, which in a dark
+     scheme is a light blue. White on it measured 3.2:1, and only in dark,
+     because in light the two happen to land the same way round. */
+  background-color: var(--badge-background-color, var(--helix-color-primary-surface));
   block-size: var(--_badge-size);
   border-radius: var(--helix-radii-full);
   /* A ring in the page's own color, so the mark stays separate from whatever it
@@ -118,7 +123,7 @@
    red on everything that has unread anything is a page that is always shouting.
    `primary` is gone, having become the default and so a second name for it. */
 :host([appearance="danger"]) [part="indicator"] {
-  background-color: var(--badge-background-color, var(--helix-color-danger));
+  background-color: var(--badge-background-color, var(--helix-color-danger-surface));
 }
 
 :host([appearance="neutral"]) [part="indicator"] {

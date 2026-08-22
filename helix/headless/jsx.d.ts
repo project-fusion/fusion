@@ -12777,6 +12777,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. (default: `undefined`)
    * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
    * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
@@ -12787,6 +12788,8 @@ export type CustomElements = {
    * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
    * - `band`: The slot the pointer is resting in.
    * - `bar`: One column.
+   * - `bar-wash-end`: The far stop of a bar's gradient, where one is used.
+   * - `bar-wash-start`: The stop of a bar's gradient at its base.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
    * - `group`: One category's columns, together.
@@ -23999,6 +24002,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. (default: `undefined`)
    * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
    * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
@@ -24009,6 +24013,8 @@ export type CustomElementsSolidJs = {
    * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
    * - `band`: The slot the pointer is resting in.
    * - `bar`: One column.
+   * - `bar-wash-end`: The far stop of a bar's gradient, where one is used.
+   * - `bar-wash-start`: The stop of a bar's gradient at its base.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
    * - `group`: One category's columns, together.
@@ -34917,6 +34923,8 @@ export type CustomElementsSolidJs = {
 };
 
 export type CustomCssProperties = {
+  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. */
+  "--chart-bar-wash"?: string;
   /** The colour of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;
   /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */

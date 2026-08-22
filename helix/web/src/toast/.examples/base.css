@@ -74,6 +74,8 @@ helix-base-toast-item::part(icon-mark) {
 }
 
 helix-base-toast-item::part(item) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 

@@ -169,27 +169,27 @@ const chartRule = (part) => {
     return 'stroke: var(--_gray-line);'
   }
   if (/^(bar|slice|point|terminus)$/.test(part)) {
-    return 'fill: var(--chart-series);'
+    return 'fill: var(--chart-series, var(--chart-series-1));'
   }
   if (part === 'line') {
     /* `non-scaling-stroke`, because the plot has a `viewBox` and a stroke is
        scaled with it: a width of 2 came out a finger thick. */
-    return 'fill: none;\n  stroke: var(--chart-series);\n  stroke-width: 2;\n  vector-effect: non-scaling-stroke;'
+    return 'fill: none;\n  stroke: var(--chart-series, var(--chart-series-1));\n  stroke-width: 2;\n  vector-effect: non-scaling-stroke;'
   }
   if (part === 'segment') {
     /* The ring is a stroke and how thick it is is the component's own
        arithmetic: `--donut-chart-stroke` is derived from `hole` and published
        for exactly this. With no width the arc is drawn and nothing appears. */
-    return 'fill: none;\n  stroke: var(--chart-series);\n  stroke-width: var(--donut-chart-stroke);'
+    return 'fill: none;\n  stroke: var(--chart-series, var(--chart-series-1));\n  stroke-width: var(--donut-chart-stroke);'
   }
   if (part === 'swatch') {
-    return 'background-color: var(--chart-series);\n  block-size: 0.75rem;\n  display: inline-block;\n  flex: none;\n  inline-size: 0.75rem;'
+    return 'background-color: var(--chart-series, var(--chart-series-1));\n  block-size: 0.75rem;\n  display: inline-block;\n  flex: none;\n  inline-size: 0.75rem;'
   }
   if (part === 'entry') {
     return 'align-items: center;\n  display: flex;\n  gap: 0.5rem;'
   }
   if (part === 'area') {
-    return 'fill: var(--chart-series);\n  opacity: 0.25;'
+    return 'fill: var(--chart-series, var(--chart-series-1));\n  opacity: 0.25;'
   }
   if (/^(label|labels)$/.test(part)) {
     return 'fill: var(--_gray-muted);\n  font-size: 0.75rem;'
@@ -226,7 +226,11 @@ const rulesFor = (part, slug) => {
     return 'background-color: var(--_gray-surface);\n  border: 1px solid var(--_gray-line);\n  color: var(--_gray-strong);\n  padding: 0.5rem;'
   }
   if (/^(item|option|row|tab|crumb|day|cell)$/.test(part)) {
-    return 'padding: 0.25rem 0.5rem;'
+    /* **Undressed, because several of these are `button`s.** A `button` left
+       alone is drawn by the browser, and in a dark scheme that is `buttonface`,
+       a mid gray: Video Playlist's duration measured 4.4:1 on one. Padding alone
+       said where the row was and left the platform to paint it. */
+    return 'background-color: transparent;\n  border: 0;\n  padding: 0.25rem 0.5rem;'
   }
   if (/^(items|list|actions|controls|options|group|toolbar)$/.test(part)) {
     return 'align-items: center;\n  display: flex;\n  gap: 0.25rem;'
@@ -373,7 +377,13 @@ const INDICATORS = {
  * out entirely from the host, and a switch's `control` is a hit target lying
  * over its track rather than a box beside it.
  */
+/* **Filled, not coloured.** These parts are `<svg>`s, and an `<svg>` given no
+   `fill` takes SVG's initial value, black, inheriting nothing from the `color`
+   around it. Sized and never painted, Tree's chevron read 1:1 against the dark
+   half of these sheets: on the light half black on near-white looks like a
+   diagram drawn in ink, which is why it went unnoticed. */
 const GLYPH = `block-size: 1em;
+  fill: var(--_gray-muted);
   flex: none;
   inline-size: 1em;`
 
@@ -643,8 +653,15 @@ const sheetFor = (slug, tagsUsed, usesRow, usesStack) => {
      comparing, and a chart wanting more wants colour. */
   const palette = CHART.has(slug)
     ? [
-        `helix-base-${slug} {\n${['#2a2a2e', '#4a4a50', '#6b6b73', '#8e8e96', '#b1b1b8', '#d2d2d7']
-          .map((hex, at) => `  --chart-series-${at + 1}: ${hex};`)
+        `helix-base-${slug} {\n${[
+          ['#2a2a2e', '#e9e9ec'],
+          ['#4a4a50', '#c9c9ce'],
+          ['#6b6b73', '#a1a1aa'],
+          ['#8e8e96', '#86868f'],
+          ['#b1b1b8', '#63636b'],
+          ['#d2d2d7', '#45454b'],
+        ]
+          .map(([light, dark], at) => `  --chart-series-${at + 1}: light-dark(${light}, ${dark});`)
           .join('\n')}\n}`,
       ]
     : []

@@ -824,9 +824,18 @@ and at a 720 pixel window it lands at 611, a third of the way further left.
 Nothing is wrong with either number and neither is what anybody asked for.
 
 Given as a fraction rather than a length so it survives the same change:
-`0.5` is the middle of the top edge at every size. Absent leaves `tilt` in
-charge, so an angle is still sayable where the angle really is the point,
-which is what an aura in a square tile wants.
+`0` is the left edge, `0.5` the middle and `1` the right edge, at every
+size. Absent leaves `tilt` in charge, so an angle is still sayable where
+the angle really is the point, which is what an aura in a square tile
+wants.
+
+**The fraction is measured across the whole width, and for a while it was
+not.** The first expression corrected for the aspect once in the wrong
+direction and never subtracted the centre, so the value read as an offset
+from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
+put the axis at 81.3% of the width and `0` was the only value that reached
+the middle. The contract above is now solved against what the shader draws
+rather than asserted beside it.
 
 Derived from the box the resize observer already keeps, so it costs no
 layout read per frame, and the drift is applied to the result rather than
@@ -915,9 +924,18 @@ and at a 720 pixel window it lands at 611, a third of the way further left.
 Nothing is wrong with either number and neither is what anybody asked for.
 
 Given as a fraction rather than a length so it survives the same change:
-`0.5` is the middle of the top edge at every size. Absent leaves `tilt` in
-charge, so an angle is still sayable where the angle really is the point,
-which is what an aura in a square tile wants.
+`0` is the left edge, `0.5` the middle and `1` the right edge, at every
+size. Absent leaves `tilt` in charge, so an angle is still sayable where
+the angle really is the point, which is what an aura in a square tile
+wants.
+
+**The fraction is measured across the whole width, and for a while it was
+not.** The first expression corrected for the aspect once in the wrong
+direction and never subtracted the centre, so the value read as an offset
+from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
+put the axis at 81.3% of the width and `0` was the only value that reached
+the middle. The contract above is now solved against what the shader draws
+rather than asserted beside it.
 
 Derived from the box the resize observer already keeps, so it costs no
 layout read per frame, and the drift is applied to the result rather than
@@ -1037,6 +1055,26 @@ export type HelixBadgeSolidJsProps = {
 };
 
 export type HelixBarChartProps = {
+  /** What the columns are made of.
+
+**A third axis on the chart, not on the bar.** A bar is a mark inside a
+drawing and nobody writes markup for one; the chart is what a consumer
+addresses, so the choice belongs here and reaches every column at once.
+
+`glass` lets the gridlines read through the columns, which is what puts a
+chart in the same language as a glass header rather than leaving it the one
+opaque slab on the page. `gradient` fades each column toward its base, into
+the wash the headless tier draws whether or not anything points at it.
+
+Absent is solid, per the rule that a reflected property takes no default,
+so the stylesheet describes only the departure. The strength is the
+theme's: `glass` scales with `--helix-material-opacity`, so a language that
+is more see-through everywhere is more see-through here.
+
+Styled rather than headless, because what a bar is filled with is a
+treatment and this tier is where treatments live. The gradient it points at
+is drawn below, which is an element and therefore that tier's business. */
+  material?: HelixBarChart["material"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -1128,6 +1166,26 @@ of any scale question the picture raises. */
 };
 
 export type HelixBarChartSolidJsProps = {
+  /** What the columns are made of.
+
+**A third axis on the chart, not on the bar.** A bar is a mark inside a
+drawing and nobody writes markup for one; the chart is what a consumer
+addresses, so the choice belongs here and reaches every column at once.
+
+`glass` lets the gridlines read through the columns, which is what puts a
+chart in the same language as a glass header rather than leaving it the one
+opaque slab on the page. `gradient` fades each column toward its base, into
+the wash the headless tier draws whether or not anything points at it.
+
+Absent is solid, per the rule that a reflected property takes no default,
+so the stylesheet describes only the departure. The strength is the
+theme's: `glass` scales with `--helix-material-opacity`, so a language that
+is more see-through everywhere is more see-through here.
+
+Styled rather than headless, because what a bar is filled with is a
+treatment and this tier is where treatments live. The gradient it points at
+is drawn below, which is an element and therefore that tier's business. */
+  "prop:material"?: HelixBarChart["material"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -1570,6 +1628,24 @@ export type HelixCardProps = {
   is the surface. For a card inside something already bounded, where a
   second box adds a line and no meaning. */
   appearance?: HelixCard["appearance"];
+  /** What the card is made of.
+
+**A third axis, and it passes the test the other two answer to.**
+`appearance` is how a thing is drawn and `tone` is what it means; both of
+those can be true at once with this, an elevated glass card being a
+perfectly ordinary thing to want, so it is not a value of either.
+
+**An attribute rather than a hook, because glass is not one declaration.**
+It is a translucent ground *and* a backdrop filter, and either without the
+other does nothing: a blur behind an opaque background is invisible, and a
+translucent card over an unfiltered page is a smear. `--card-backdrop`
+shipped on its own for exactly one commit and was that trap, a published
+hook a consumer could set and see nothing happen. The component owns the
+pair; a theme owns how strong it is.
+
+Absent is opaque, per the rule that a reflected property takes no default,
+so the stylesheet only describes the departure. */
+  material?: HelixCard["material"];
   /** Whether media sits above the content stack or beside it. */
   orientation?: HelixCard["orientation"];
   /** Puts the media after the content instead of before it.
@@ -1611,6 +1687,24 @@ export type HelixCardSolidJsProps = {
   is the surface. For a card inside something already bounded, where a
   second box adds a line and no meaning. */
   "prop:appearance"?: HelixCard["appearance"];
+  /** What the card is made of.
+
+**A third axis, and it passes the test the other two answer to.**
+`appearance` is how a thing is drawn and `tone` is what it means; both of
+those can be true at once with this, an elevated glass card being a
+perfectly ordinary thing to want, so it is not a value of either.
+
+**An attribute rather than a hook, because glass is not one declaration.**
+It is a translucent ground *and* a backdrop filter, and either without the
+other does nothing: a blur behind an opaque background is invisible, and a
+translucent card over an unfiltered page is a smear. `--card-backdrop`
+shipped on its own for exactly one commit and was that trap, a published
+hook a consumer could set and see nothing happen. The component owns the
+pair; a theme owns how strong it is.
+
+Absent is opaque, per the rule that a reflected property takes no default,
+so the stylesheet only describes the departure. */
+  "prop:material"?: HelixCard["material"];
   /** Whether media sits above the content stack or beside it. */
   "prop:orientation"?: HelixCard["orientation"];
   /** Puts the media after the content instead of before it.
@@ -14246,9 +14340,18 @@ export type CustomElements = {
    * Nothing is wrong with either number and neither is what anybody asked for.
    *
    * Given as a fraction rather than a length so it survives the same change:
-   * `0.5` is the middle of the top edge at every size. Absent leaves `tilt` in
-   * charge, so an angle is still sayable where the angle really is the point,
-   * which is what an aura in a square tile wants.
+   * `0` is the left edge, `0.5` the middle and `1` the right edge, at every
+   * size. Absent leaves `tilt` in charge, so an angle is still sayable where
+   * the angle really is the point, which is what an aura in a square tile
+   * wants.
+   *
+   * **The fraction is measured across the whole width, and for a while it was
+   * not.** The first expression corrected for the aspect once in the wrong
+   * direction and never subtracted the centre, so the value read as an offset
+   * from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
+   * put the axis at 81.3% of the width and `0` was the only value that reached
+   * the middle. The contract above is now solved against what the shader draws
+   * rather than asserted beside it.
    *
    * Derived from the box the resize observer already keeps, so it costs no
    * layout read per frame, and the drift is applied to the result rather than
@@ -14421,6 +14524,25 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `material`: What the columns are made of.
+   *
+   * **A third axis on the chart, not on the bar.** A bar is a mark inside a
+   * drawing and nobody writes markup for one; the chart is what a consumer
+   * addresses, so the choice belongs here and reaches every column at once.
+   *
+   * `glass` lets the gridlines read through the columns, which is what puts a
+   * chart in the same language as a glass header rather than leaving it the one
+   * opaque slab on the page. `gradient` fades each column toward its base, into
+   * the wash the headless tier draws whether or not anything points at it.
+   *
+   * Absent is solid, per the rule that a reflected property takes no default,
+   * so the stylesheet describes only the departure. The strength is the
+   * theme's: `glass` scales with `--helix-material-opacity`, so a language that
+   * is more see-through everywhere is more see-through here.
+   *
+   * Styled rather than headless, because what a bar is filled with is a
+   * treatment and this tier is where treatments live. The gradient it points at
+   * is drawn below, which is an element and therefore that tier's business.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -14535,6 +14657,7 @@ export type CustomElements = {
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
+   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. (default: `undefined`)
    * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
    * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
@@ -14545,6 +14668,8 @@ export type CustomElements = {
    * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
    * - `band`: The slot the pointer is resting in.
    * - `bar`: One column.
+   * - `bar-wash-end`: The far stop of a bar's gradient, where one is used.
+   * - `bar-wash-start`: The stop of a bar's gradient at its base.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
    * - `group`: One category's columns, together.
@@ -14974,6 +15099,23 @@ export type CustomElements = {
    * - `plain` has no frame at all: the card is a layout and whatever it sits in
    *   is the surface. For a card inside something already bounded, where a
    *   second box adds a line and no meaning.
+   * - `material`: What the card is made of.
+   *
+   * **A third axis, and it passes the test the other two answer to.**
+   * `appearance` is how a thing is drawn and `tone` is what it means; both of
+   * those can be true at once with this, an elevated glass card being a
+   * perfectly ordinary thing to want, so it is not a value of either.
+   *
+   * **An attribute rather than a hook, because glass is not one declaration.**
+   * It is a translucent ground *and* a backdrop filter, and either without the
+   * other does nothing: a blur behind an opaque background is invisible, and a
+   * translucent card over an unfiltered page is a smear. `--card-backdrop`
+   * shipped on its own for exactly one commit and was that trap, a published
+   * hook a consumer could set and see nothing happen. The component owns the
+   * pair; a theme owns how strong it is.
+   *
+   * Absent is opaque, per the rule that a reflected property takes no default,
+   * so the stylesheet only describes the departure.
    * - `orientation`: Whether media sits above the content stack or beside it.
    * - `media-placement`/`mediaPlacement`: Puts the media after the content instead of before it.
    *
@@ -15000,6 +15142,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--card-backdrop`: Filter applied behind a `material="glass"` card. Follows the theme's material policy; set it to override the strength on one card. (default: `undefined`)
    * - `--card-background-color`: Surface behind the card. (default: `undefined`)
    * - `--card-border-color`: Border color of the surface. (default: `undefined`)
    * - `--card-border-width`: Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. (default: `undefined`)
@@ -25403,9 +25546,18 @@ export type CustomElementsSolidJs = {
    * Nothing is wrong with either number and neither is what anybody asked for.
    *
    * Given as a fraction rather than a length so it survives the same change:
-   * `0.5` is the middle of the top edge at every size. Absent leaves `tilt` in
-   * charge, so an angle is still sayable where the angle really is the point,
-   * which is what an aura in a square tile wants.
+   * `0` is the left edge, `0.5` the middle and `1` the right edge, at every
+   * size. Absent leaves `tilt` in charge, so an angle is still sayable where
+   * the angle really is the point, which is what an aura in a square tile
+   * wants.
+   *
+   * **The fraction is measured across the whole width, and for a while it was
+   * not.** The first expression corrected for the aspect once in the wrong
+   * direction and never subtracted the centre, so the value read as an offset
+   * from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
+   * put the axis at 81.3% of the width and `0` was the only value that reached
+   * the middle. The contract above is now solved against what the shader draws
+   * rather than asserted beside it.
    *
    * Derived from the box the resize observer already keeps, so it costs no
    * layout read per frame, and the drift is applied to the result rather than
@@ -25591,6 +25743,25 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `material`: What the columns are made of.
+   *
+   * **A third axis on the chart, not on the bar.** A bar is a mark inside a
+   * drawing and nobody writes markup for one; the chart is what a consumer
+   * addresses, so the choice belongs here and reaches every column at once.
+   *
+   * `glass` lets the gridlines read through the columns, which is what puts a
+   * chart in the same language as a glass header rather than leaving it the one
+   * opaque slab on the page. `gradient` fades each column toward its base, into
+   * the wash the headless tier draws whether or not anything points at it.
+   *
+   * Absent is solid, per the rule that a reflected property takes no default,
+   * so the stylesheet describes only the departure. The strength is the
+   * theme's: `glass` scales with `--helix-material-opacity`, so a language that
+   * is more see-through everywhere is more see-through here.
+   *
+   * Styled rather than headless, because what a bar is filled with is a
+   * treatment and this tier is where treatments live. The gradient it points at
+   * is drawn below, which is an element and therefore that tier's business.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -25705,6 +25876,7 @@ export type CustomElementsSolidJs = {
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
+   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. (default: `undefined`)
    * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
    * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
@@ -25715,6 +25887,8 @@ export type CustomElementsSolidJs = {
    * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
    * - `band`: The slot the pointer is resting in.
    * - `bar`: One column.
+   * - `bar-wash-end`: The far stop of a bar's gradient, where one is used.
+   * - `bar-wash-start`: The stop of a bar's gradient at its base.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
    * - `group`: One category's columns, together.
@@ -26165,6 +26339,23 @@ export type CustomElementsSolidJs = {
    * - `plain` has no frame at all: the card is a layout and whatever it sits in
    *   is the surface. For a card inside something already bounded, where a
    *   second box adds a line and no meaning.
+   * - `material`: What the card is made of.
+   *
+   * **A third axis, and it passes the test the other two answer to.**
+   * `appearance` is how a thing is drawn and `tone` is what it means; both of
+   * those can be true at once with this, an elevated glass card being a
+   * perfectly ordinary thing to want, so it is not a value of either.
+   *
+   * **An attribute rather than a hook, because glass is not one declaration.**
+   * It is a translucent ground *and* a backdrop filter, and either without the
+   * other does nothing: a blur behind an opaque background is invisible, and a
+   * translucent card over an unfiltered page is a smear. `--card-backdrop`
+   * shipped on its own for exactly one commit and was that trap, a published
+   * hook a consumer could set and see nothing happen. The component owns the
+   * pair; a theme owns how strong it is.
+   *
+   * Absent is opaque, per the rule that a reflected property takes no default,
+   * so the stylesheet only describes the departure.
    * - `orientation`: Whether media sits above the content stack or beside it.
    * - `media-placement`/`mediaPlacement`: Puts the media after the content instead of before it.
    *
@@ -26191,6 +26382,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--card-backdrop`: Filter applied behind a `material="glass"` card. Follows the theme's material policy; set it to override the strength on one card. (default: `undefined`)
    * - `--card-background-color`: Surface behind the card. (default: `undefined`)
    * - `--card-border-color`: Border color of the surface. (default: `undefined`)
    * - `--card-border-width`: Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. (default: `undefined`)
@@ -36527,6 +36719,8 @@ export type CustomCssProperties = {
   "--bar-chart-block-size"?: string;
   /** Space between the drawing and its labels. */
   "--bar-chart-gap"?: string;
+  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. */
+  "--chart-bar-wash"?: string;
   /** The colour of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;
   /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
@@ -36559,6 +36753,8 @@ export type CustomCssProperties = {
   "--callout-background-color"?: string;
   /** Corner radius of the callout. */
   "--callout-radii"?: string;
+  /** Filter applied behind a `material="glass"` card. Follows the theme's material policy; set it to override the strength on one card. */
+  "--card-backdrop"?: string;
   /** Surface behind the card. */
   "--card-background-color"?: string;
   /** Border color of the surface. */

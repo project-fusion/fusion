@@ -56,6 +56,8 @@ helix-base-time-picker::part(items) {
 }
 
 helix-base-time-picker::part(option) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 

@@ -44,10 +44,14 @@ helix-base-icon {
 }
 
 helix-base-date-picker::part(cell) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 
 helix-base-date-picker::part(day) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 

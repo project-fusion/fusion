@@ -65,6 +65,8 @@ helix-base-radio-group::part(feedback) {
 }
 
 helix-base-radio::part(item) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 

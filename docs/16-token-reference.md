@@ -32,16 +32,16 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 41 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 93 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 22 |
-| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 293 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 186 |
+| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 295 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 184 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 121 |
-| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 40 |
-| `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 16 |
-| `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 10 |
+| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 38 |
+| `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 18 |
+| `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 12 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 224 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 156 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 226 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 151 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 7 |
@@ -51,7 +51,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-accent-subtle` | `light-dark(var(--_helix-accent-50), var(--_helix-accent-900))` | 0 |
 | `--helix-color-accent-surface` | `var(--_helix-accent-600)` | 4 |
 | `--helix-color-accent-surface-hover` | `var(--_helix-accent-700)` | 4 |
-| `--helix-color-primary-surface` | `var(--_helix-brand-600)` | 10 |
+| `--helix-color-primary-surface` | `var(--_helix-brand-600)` | 15 |
 | `--helix-color-primary-surface-hover` | `var(--_helix-brand-700)` | 4 |
 | `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 122 |
 | `--helix-color-brand-mark` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 1 |
@@ -90,8 +90,8 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-info` | `light-dark(var(--_helix-info-600), var(--_helix-info-400))` | 8 |
 | `--helix-color-success` | `light-dark(var(--_helix-success-600), var(--_helix-success-400))` | 29 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-600), var(--_helix-warning-400))` | 22 |
-| `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 133 |
-| `--helix-color-danger-surface` | `var(--_helix-danger-600)` | 4 |
+| `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 131 |
+| `--helix-color-danger-surface` | `var(--_helix-danger-600)` | 6 |
 | `--helix-color-danger-surface-hover` | `var(--_helix-danger-700)` | 4 |
 | `--helix-color-info-surface` | `var(--_helix-info-600)` | 0 |
 | `--helix-color-info-surface-hover` | `var(--_helix-info-700)` | 0 |
@@ -217,8 +217,8 @@ Blur and translucency, for a surface that lets the page through.
 | `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | 6 |
 | `--helix-material-opacity` | `1` | 12 |
 | `--helix-material-blur-sm` | `8px` | 0 |
-| `--helix-material-blur-md` | `16px` | 3 |
-| `--helix-material-blur-lg` | `32px` | 2 |
+| `--helix-material-blur-md` | `16px` | 2 |
+| `--helix-material-blur-lg` | `32px` | 4 |
 | `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 10 |
 | `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 0 |
 | `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 1 |
@@ -232,7 +232,7 @@ How long something takes.
 | `--helix-duration-instant` | `0ms` | 4 |
 | `--helix-duration-fast` | `var(--_helix-ms-120)` | 343 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 130 |
-| `--helix-duration-slow` | `var(--_helix-ms-320)` | 26 |
+| `--helix-duration-slow` | `var(--_helix-ms-320)` | 28 |
 
 ## easing
 
@@ -279,7 +279,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-md` | `calc(1.5rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-loader-sm` | `calc(1rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 8 |
-| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 23 |
+| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 24 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 90 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 47 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 17 |

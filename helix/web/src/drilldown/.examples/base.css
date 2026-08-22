@@ -61,6 +61,8 @@ helix-base-drilldown::part(title) {
 }
 
 helix-base-drilldown-item::part(item) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 

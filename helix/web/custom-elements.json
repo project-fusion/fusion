@@ -1444,9 +1444,23 @@
             },
             {
               "kind": "field",
+              "name": "scrolled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "inheritedFrom": {
+                "name": "HelixBaseAppHeader",
+                "module": "src/app-header/root/app-header-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "handleScroll",
               "privacy": "private",
               "readonly": true,
+              "description": "A band rather than a line, so the fill cannot flicker at the boundary.\n\n**`scrollY > 0` is a threshold with no width, and a threshold with no width\nis a switch sitting exactly where scroll positions cluster.** Zero is not a\nquiet place: rubber-banding overshoots past it and comes back, scroll\nanchoring nudges by a pixel when an image or a font lands, and a\n`scroll-behavior: smooth` jump settles by oscillating around its target.\nEvery one of those crossings toggled the attribute, and the fill and the\nblur are both transitioned, so each toggle started a fresh animation in the\nopposite direction. What a reader sees is a bar that shimmers, and text\nlegible through it for as long as the fill is part way in.\n\nEight pixels to take the fill, two to give it back. Asymmetric on purpose:\nthe bar should look attached to the top of the page for as long as it\nhonestly is, so leaving is nearly the whole way back, and arriving needs\nenough travel to mean the reader moved rather than the layout did.",
               "inheritedFrom": {
                 "name": "HelixBaseAppHeader",
                 "module": "src/app-header/root/app-header-root.ts"
@@ -1821,7 +1835,7 @@
               "type": {
                 "text": "number | undefined"
               },
-              "description": "Where the axis crosses the top edge, as a fraction of the width.\n\n**An angle does not say what a consumer means, and this does.** The axis\nruns `x = y * tan(tilt)`, so the same `tilt` puts the exit somewhere else\nthe moment the box changes shape. Measured on the landing page hero, which\nwas tuned to 23 degrees against a box two screens tall: at a 1152 pixel\nwindow that lands the exit at 979, between the navigation and the actions,\nand at a 720 pixel window it lands at 611, a third of the way further left.\nNothing is wrong with either number and neither is what anybody asked for.\n\nGiven as a fraction rather than a length so it survives the same change:\n`0.5` is the middle of the top edge at every size. Absent leaves `tilt` in\ncharge, so an angle is still sayable where the angle really is the point,\nwhich is what an aura in a square tile wants.\n\nDerived from the box the resize observer already keeps, so it costs no\nlayout read per frame, and the drift is applied to the result rather than\nto the angle behind it: the field still wanders, around a bearing that\nholds the exit where it was put.",
+              "description": "Where the axis crosses the top edge, as a fraction of the width.\n\n**An angle does not say what a consumer means, and this does.** The axis\nruns `x = y * tan(tilt)`, so the same `tilt` puts the exit somewhere else\nthe moment the box changes shape. Measured on the landing page hero, which\nwas tuned to 23 degrees against a box two screens tall: at a 1152 pixel\nwindow that lands the exit at 979, between the navigation and the actions,\nand at a 720 pixel window it lands at 611, a third of the way further left.\nNothing is wrong with either number and neither is what anybody asked for.\n\nGiven as a fraction rather than a length so it survives the same change:\n`0` is the left edge, `0.5` the middle and `1` the right edge, at every\nsize. Absent leaves `tilt` in charge, so an angle is still sayable where\nthe angle really is the point, which is what an aura in a square tile\nwants.\n\n**The fraction is measured across the whole width, and for a while it was\nnot.** The first expression corrected for the aspect once in the wrong\ndirection and never subtracted the centre, so the value read as an offset\nfrom the middle that also moved with the box: on a 1440 by 1800 hero `0.5`\nput the axis at 81.3% of the width and `0` was the only value that reached\nthe middle. The contract above is now solved against what the shader draws\nrather than asserted beside it.\n\nDerived from the box the resize observer already keeps, so it costs no\nlayout read per frame, and the drift is applied to the result rather than\nto the angle behind it: the field still wanders, around a bearing that\nholds the exit where it was put.",
               "attribute": "terminus"
             },
             {
@@ -2421,7 +2435,7 @@
               "type": {
                 "text": "number | undefined"
               },
-              "description": "Where the axis crosses the top edge, as a fraction of the width.\n\n**An angle does not say what a consumer means, and this does.** The axis\nruns `x = y * tan(tilt)`, so the same `tilt` puts the exit somewhere else\nthe moment the box changes shape. Measured on the landing page hero, which\nwas tuned to 23 degrees against a box two screens tall: at a 1152 pixel\nwindow that lands the exit at 979, between the navigation and the actions,\nand at a 720 pixel window it lands at 611, a third of the way further left.\nNothing is wrong with either number and neither is what anybody asked for.\n\nGiven as a fraction rather than a length so it survives the same change:\n`0.5` is the middle of the top edge at every size. Absent leaves `tilt` in\ncharge, so an angle is still sayable where the angle really is the point,\nwhich is what an aura in a square tile wants.\n\nDerived from the box the resize observer already keeps, so it costs no\nlayout read per frame, and the drift is applied to the result rather than\nto the angle behind it: the field still wanders, around a bearing that\nholds the exit where it was put.",
+              "description": "Where the axis crosses the top edge, as a fraction of the width.\n\n**An angle does not say what a consumer means, and this does.** The axis\nruns `x = y * tan(tilt)`, so the same `tilt` puts the exit somewhere else\nthe moment the box changes shape. Measured on the landing page hero, which\nwas tuned to 23 degrees against a box two screens tall: at a 1152 pixel\nwindow that lands the exit at 979, between the navigation and the actions,\nand at a 720 pixel window it lands at 611, a third of the way further left.\nNothing is wrong with either number and neither is what anybody asked for.\n\nGiven as a fraction rather than a length so it survives the same change:\n`0` is the left edge, `0.5` the middle and `1` the right edge, at every\nsize. Absent leaves `tilt` in charge, so an angle is still sayable where\nthe angle really is the point, which is what an aura in a square tile\nwants.\n\n**The fraction is measured across the whole width, and for a while it was\nnot.** The first expression corrected for the aspect once in the wrong\ndirection and never subtracted the centre, so the value read as an offset\nfrom the middle that also moved with the box: on a 1440 by 1800 hero `0.5`\nput the axis at 81.3% of the width and `0` was the only value that reached\nthe middle. The contract above is now solved against what the shader draws\nrather than asserted beside it.\n\nDerived from the box the resize observer already keeps, so it costs no\nlayout read per frame, and the drift is applied to the result rather than\nto the angle behind it: the field still wanders, around a bearing that\nholds the exit where it was put.",
               "fieldName": "terminus"
             },
             {
@@ -3802,6 +3816,14 @@
               "name": "--bar-chart-gap"
             },
             {
+              "description": "The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material=\"gradient\"` asks for it.",
+              "name": "--chart-bar-wash",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
               "description": "The colour of a single-series axis, taken from that series.",
               "name": "--bar-chart-axis",
               "inheritedFrom": {
@@ -3819,6 +3841,16 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "material",
+              "type": {
+                "text": "'glass' | 'gradient' | undefined"
+              },
+              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page. `gradient` fades each column toward its base, into\nthe wash the headless tier draws whether or not anything points at it.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.",
+              "attribute": "material",
+              "reflects": true
+            },
             {
               "kind": "field",
               "name": "source",
@@ -4407,62 +4439,15 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseBarChart",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Categories as columns, read from a table.",
-          "helix": {
-            "category": "content",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/bar-chart",
-            "aliases": [
-              "Column Chart",
-              "Categorical Chart"
-            ],
-            "tier": "styled",
-            "group": "BarChart",
-            "part": "Root",
-            "examples": [
-              {
-                "description": "Revenue by quarter, read from the table beside it. The cell text is what a reader sees and data-value is the number.",
-                "slug": "default"
-              },
-              {
-                "description": "The same bar chart on the headless tier, with every rule written by hand.",
-                "slug": "base"
-              },
-              {
-                "description": "Three series over the same categories, each taking the next series colour, with a legend reading the same table.",
-                "slug": "grouped"
-              },
-              {
-                "description": "Categories down the side, which is what names rather than dates need: a row of long labels either overlaps or turns on its side.",
-                "slug": "horizontal"
-              },
-              {
-                "description": "Two series as columns and a third as a line, all measured against one axis.",
-                "slug": "with-a-line"
-              },
-              {
-                "description": "A count and a percentage, each on its own scale, both scales labelled.",
-                "slug": "with-a-second-axis"
-              },
-              {
-                "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
-                "slug": "with-a-tooltip"
-              },
-              {
-                "description": "Rules across the measured axis, which turns with the direction the columns run.",
-                "slug": "with-gridlines"
-              }
-            ],
-            "source": "helix/web/src/bar-chart"
-          },
-          "tagName": "helix-bar-chart",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "material",
+              "type": {
+                "text": "'glass' | 'gradient' | undefined"
+              },
+              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page. `gradient` fades each column toward its base, into\nthe wash the headless tier draws whether or not anything points at it.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.",
+              "fieldName": "material"
+            },
             {
               "name": "for",
               "type": {
@@ -4538,6 +4523,61 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseBarChart",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Categories as columns, read from a table.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/bar-chart",
+            "aliases": [
+              "Column Chart",
+              "Categorical Chart"
+            ],
+            "tier": "styled",
+            "group": "BarChart",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "Revenue by quarter, read from the table beside it. The cell text is what a reader sees and data-value is the number.",
+                "slug": "default"
+              },
+              {
+                "description": "The same bar chart on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
+                "description": "Three series over the same categories, each taking the next series colour, with a legend reading the same table.",
+                "slug": "grouped"
+              },
+              {
+                "description": "Categories down the side, which is what names rather than dates need: a row of long labels either overlaps or turns on its side.",
+                "slug": "horizontal"
+              },
+              {
+                "description": "Two series as columns and a third as a line, all measured against one axis.",
+                "slug": "with-a-line"
+              },
+              {
+                "description": "A count and a percentage, each on its own scale, both scales labelled.",
+                "slug": "with-a-second-axis"
+              },
+              {
+                "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
+                "slug": "with-a-tooltip"
+              },
+              {
+                "description": "Rules across the measured axis, which turns with the direction the columns run.",
+                "slug": "with-gridlines"
+              }
+            ],
+            "source": "helix/web/src/bar-chart"
+          },
+          "tagName": "helix-bar-chart",
+          "customElement": true,
           "cssParts": [
             {
               "description": "One scale's numbers, drawn only when `secondary` splits them.",
@@ -4558,6 +4598,22 @@
             {
               "description": "One column.",
               "name": "bar",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "The far stop of a bar's gradient, where one is used.",
+              "name": "bar-wash-end",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "The stop of a bar's gradient at its base.",
+              "name": "bar-wash-start",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -7021,6 +7077,10 @@
           "name": "HelixCard",
           "cssProperties": [
             {
+              "description": "Filter applied behind a `material=\"glass\"` card. Follows the theme's material policy; set it to override the strength on one card.",
+              "name": "--card-backdrop"
+            },
+            {
               "description": "Surface behind the card.",
               "name": "--card-background-color"
             },
@@ -7096,6 +7156,16 @@
               },
               "description": "How the card separates itself from the page.\n\n- `outlined` is the default, and a hairline is usually enough. It costs\n  less attention than a shadow: a screen of shadowed cards reads as a stack\n  of things floating, none of them settled.\n- `elevated` is lifted off the page instead of framed, for a card on a\n  colored or busy background, where a line has to compete with whatever is\n  behind it and a shadow does not.\n- `plain` has no frame at all: the card is a layout and whatever it sits in\n  is the surface. For a card inside something already bounded, where a\n  second box adds a line and no meaning.",
               "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "material",
+              "type": {
+                "text": "'glass' | undefined"
+              },
+              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`appearance` is how a thing is drawn and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "attribute": "material",
               "reflects": true
             },
             {
@@ -7237,6 +7307,14 @@
               },
               "description": "How the card separates itself from the page.\n\n- `outlined` is the default, and a hairline is usually enough. It costs\n  less attention than a shadow: a screen of shadowed cards reads as a stack\n  of things floating, none of them settled.\n- `elevated` is lifted off the page instead of framed, for a card on a\n  colored or busy background, where a line has to compete with whatever is\n  behind it and a shadow does not.\n- `plain` has no frame at all: the card is a layout and whatever it sits in\n  is the surface. For a card inside something already bounded, where a\n  second box adds a line and no meaning.",
               "fieldName": "appearance"
+            },
+            {
+              "name": "material",
+              "type": {
+                "text": "'glass' | undefined"
+              },
+              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`appearance` is how a thing is drawn and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "fieldName": "material"
             },
             {
               "name": "orientation",

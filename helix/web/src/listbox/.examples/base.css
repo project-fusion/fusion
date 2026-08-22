@@ -71,6 +71,8 @@ helix-base-listbox::part(label) {
 }
 
 helix-base-option::part(item) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 

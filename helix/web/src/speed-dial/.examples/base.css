@@ -74,6 +74,8 @@ helix-base-icon::part(svg) {
 }
 
 helix-base-speed-dial-item::part(item) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 

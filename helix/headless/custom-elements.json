@@ -1073,9 +1073,19 @@
             },
             {
               "kind": "field",
+              "name": "scrolled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
               "name": "handleScroll",
               "privacy": "private",
-              "readonly": true
+              "readonly": true,
+              "description": "A band rather than a line, so the fill cannot flicker at the boundary.\n\n**`scrollY > 0` is a threshold with no width, and a threshold with no width\nis a switch sitting exactly where scroll positions cluster.** Zero is not a\nquiet place: rubber-banding overshoots past it and comes back, scroll\nanchoring nudges by a pixel when an image or a font lands, and a\n`scroll-behavior: smooth` jump settles by oscillating around its target.\nEvery one of those crossings toggled the attribute, and the fill and the\nblur are both transitioned, so each toggle started a fresh animation in the\nopposite direction. What a reader sees is a bar that shimmers, and text\nlegible through it for as long as the fill is part way in.\n\nEight pixels to take the fill, two to give it back. Asymmetric on purpose:\nthe bar should look attached to the top of the page for as long as it\nhonestly is, so leaving is nearly the whole way back, and arriving needs\nenough travel to mean the reader moved rather than the layout did."
             },
             {
               "kind": "field",
@@ -2083,6 +2093,10 @@
           "name": "HelixBaseBarChart",
           "cssProperties": [
             {
+              "description": "The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material=\"gradient\"` asks for it.",
+              "name": "--chart-bar-wash"
+            },
+            {
               "description": "The colour of a single-series axis, taken from that series.",
               "name": "--bar-chart-axis"
             },
@@ -2103,6 +2117,14 @@
             {
               "description": "One column.",
               "name": "bar"
+            },
+            {
+              "description": "The far stop of a bar's gradient, where one is used.",
+              "name": "bar-wash-end"
+            },
+            {
+              "description": "The stop of a bar's gradient at its base.",
+              "name": "bar-wash-start"
             },
             {
               "description": "The rule the columns stand on.",

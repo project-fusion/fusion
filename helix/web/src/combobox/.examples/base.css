@@ -74,6 +74,8 @@ helix-base-combobox::part(items) {
 }
 
 helix-base-option::part(item) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 
@@ -98,6 +100,7 @@ helix-base-combobox::part(control):focus-visible {
 
 helix-base-combobox::part(indicator) {
   block-size: 1em;
+  fill: var(--_gray-muted);
   flex: none;
   inline-size: 1em;
 }

@@ -62,6 +62,8 @@ helix-base-rating::part(mark) {
 }
 
 helix-base-rating::part(option) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 

@@ -50,6 +50,8 @@ helix-base-pin-input::part(field) {
 }
 
 helix-base-pin-input::part(cell) {
+  background-color: transparent;
+  border: 0;
   padding: 0.25rem 0.5rem;
 }
 
