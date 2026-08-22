@@ -14,7 +14,7 @@ describe('textarea', () => {
     /* The whole reason this is not an Input with a taller box: in a single-line
        field Enter submits the form and here it inserts a line, and that is
        behavior the platform owns. */
-    const host = await mount('<helix-textarea label="A"></helix-textarea>')
+    const host = await mount('<helix-base-textarea label="A"></helix-base-textarea>')
     expect(control(host).tagName).toBe('TEXTAREA')
   })
 
@@ -22,12 +22,14 @@ describe('textarea', () => {
     /* Asserted on the attribute rather than the `rows` property: happy-dom does
        not reflect it back, and what the component is responsible for is putting
        it on the control. What the browser does with it is the browser's. */
-    const host = await mount('<helix-textarea label="A" rows="6"></helix-textarea>')
+    const host = await mount('<helix-base-textarea label="A" rows="6"></helix-base-textarea>')
     expect(control(host).getAttribute('rows')).toBe('6')
   })
 
   test('typing reports the new text', async () => {
-    const host = (await mount('<helix-textarea label="A" name="q"></helix-textarea>')) as Updatable
+    const host = (await mount(
+      '<helix-base-textarea label="A" name="q"></helix-base-textarea>',
+    )) as Updatable
     const field = control(host)
     field.value = 'hello'
     field.dispatchEvent(new Event('input', { bubbles: true }))
@@ -39,7 +41,9 @@ describe('textarea', () => {
   test('a refused change puts the text back', async () => {
     // The control has already taken the character by the time this runs, so
     // refusing has to restore it or the screen and the form disagree.
-    const host = (await mount('<helix-textarea label="A" name="q"></helix-textarea>')) as Updatable
+    const host = (await mount(
+      '<helix-base-textarea label="A" name="q"></helix-base-textarea>',
+    )) as Updatable
     host.addEventListener('helix-input', (event) => event.preventDefault())
     const field = control(host)
     field.value = 'nope'
@@ -51,7 +55,7 @@ describe('textarea', () => {
   test('read-only still submits, unlike disabled', async () => {
     // A read-only field is a value the reader may take and may not change.
     const host = await mount(
-      '<helix-textarea label="A" name="q" read-only default-value="x"></helix-textarea>',
+      '<helix-base-textarea label="A" name="q" read-only default-value="x"></helix-base-textarea>',
     )
     expect(control(host).readOnly).toBe(true)
     expect(formValue(host)).toBe('x')

@@ -6,8 +6,8 @@ import '../index.js'
 describe('virtual list server output', () => {
   test('ships the box and its name, which is what a server can know', () => {
     const markup = ssr(
-      html`<helix-virtual-list for="rows" label="Rows"
-        ><template><div data-field="name"></div></template></helix-virtual-list
+      html`<helix-base-virtual-list for="rows" label="Rows"
+        ><template><div data-field="name"></div></template></helix-base-virtual-list
       >`,
     )
     expect(hasPart(markup, 'viewport')).toBe(true)
@@ -24,11 +24,11 @@ describe('virtual list server output', () => {
        reason `scroll-area` records: the stylesheet ships inside the output and
        names its own parts, so a substring check passes on a selector. */
     const markup = ssr(
-      html`<helix-virtual-list for="rows" label="Rows"
-        ><template><div data-field="name"></div></template></helix-virtual-list
+      html`<helix-base-virtual-list for="rows" label="Rows"
+        ><template><div data-field="name"></div></template></helix-base-virtual-list
       >`,
     )
     expect(markup).not.toContain('aria-posinset')
-    expect(hostAttributes(markup, 'helix-virtual-list')).not.toContain('data-rows')
+    expect(hostAttributes(markup, 'helix-base-virtual-list')).not.toContain('data-rows')
   })
 })

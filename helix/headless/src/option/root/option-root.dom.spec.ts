@@ -8,7 +8,9 @@ beforeAll(async () => {
 
 describe('option', () => {
   test('is an option, which is what an owning listbox needs it to be', async () => {
-    const host = (await mount('<helix-option value="a">Alpha</helix-option>')) as HTMLElement & {
+    const host = (await mount(
+      '<helix-base-option value="a">Alpha</helix-base-option>',
+    )) as HTMLElement & {
       internals: ElementInternals
     }
     expect(host.internals.role).toBe('option')
@@ -17,7 +19,9 @@ describe('option', () => {
   test('announces rather than selecting itself', async () => {
     /* An option that selected itself would be a second answer to which one is
        chosen, and the two would disagree the first time a listener refused. */
-    const host = (await mount('<helix-option value="a">Alpha</helix-option>')) as HTMLElement & {
+    const host = (await mount(
+      '<helix-base-option value="a">Alpha</helix-base-option>',
+    )) as HTMLElement & {
       select: () => void
       selected: boolean
     }
@@ -32,7 +36,7 @@ describe('option', () => {
 
   test('a disabled option announces nothing at all', async () => {
     const host = (await mount(
-      '<helix-option disabled value="a">Alpha</helix-option>',
+      '<helix-base-option disabled value="a">Alpha</helix-base-option>',
     )) as HTMLElement & { select: () => void }
     let announced = false
     host.addEventListener('helix-select', () => {
@@ -45,7 +49,9 @@ describe('option', () => {
   test('its words are read from its content, not asked for twice', async () => {
     // Which is what a listbox matches a filter against. Asking for both a
     // property and the content is asking for two things to disagree.
-    const host = (await mount('<helix-option value="a"> Alpha </helix-option>')) as HTMLElement & {
+    const host = (await mount(
+      '<helix-base-option value="a"> Alpha </helix-base-option>',
+    )) as HTMLElement & {
       text: string
     }
     /* Asserted through the slot rather than the label's `textContent`, which

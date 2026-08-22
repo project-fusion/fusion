@@ -3,7 +3,7 @@ import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion-io
 import { html } from 'lit'
 import '../index.js'
 
-const code = html`<helix-pin-input label="Code" length="4"></helix-pin-input>`
+const code = html`<helix-base-pin-input label="Code" length="4"></helix-base-pin-input>`
 
 describe('input pin server output', () => {
   test('every box ships, so the field is usable before any script loads', () => {
@@ -20,11 +20,11 @@ describe('input pin server output', () => {
   })
 
   test('a seeded code is already in its boxes', () => {
-    const seeded = html`<helix-pin-input
+    const seeded = html`<helix-base-pin-input
       default-value="1234"
       label="Code"
       length="4"
-    ></helix-pin-input>`
+    ></helix-base-pin-input>`
     expect(withoutStyles(ssr(seeded))).toContain('value="1"')
   })
 
@@ -38,6 +38,6 @@ describe('input pin server output', () => {
        `type="numeric"` onto every pin ever rendered, an attribute no consumer's
        markup had, which is the fault `Input`'s own `type` had. Reflection exists
        so a selector can reach a value, and no rule selects on this one. */
-    expect(hostAttributes(ssr(code), 'helix-pin-input')).toEqual(['label', 'length'])
+    expect(hostAttributes(ssr(code), 'helix-base-pin-input')).toEqual(['label', 'length'])
   })
 })

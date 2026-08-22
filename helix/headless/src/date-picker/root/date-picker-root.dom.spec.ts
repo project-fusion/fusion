@@ -18,7 +18,7 @@ const calendar = async (
   attrs = 'default-month="2026-08" default-value="2026-08-14"',
 ): Promise<DatePicker> =>
   (await mount(
-    `<helix-date-picker label="Choose a date" ${attrs}></helix-date-picker>`,
+    `<helix-base-date-picker label="Choose a date" ${attrs}></helix-base-date-picker>`,
   )) as DatePicker
 
 /** The cells, which is what carries a day's role, state, and tab stop. */

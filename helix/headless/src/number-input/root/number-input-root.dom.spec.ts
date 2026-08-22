@@ -15,7 +15,7 @@ type Field = HTMLElement & {
 
 const field = async (attrs = ''): Promise<Field> => {
   const host = (await mount(
-    `<helix-number-input label="Guests" ${attrs}></helix-number-input>`,
+    `<helix-base-number-input label="Guests" ${attrs}></helix-base-number-input>`,
   )) as Field
   await host.updateComplete
   return host
@@ -263,14 +263,14 @@ describe('number input scrub', () => {
   }
 
   const scrubField = async (attrs: string) =>
-    mount(`<helix-number-input label="N" scrub ${attrs}></helix-number-input>`)
+    mount(`<helix-base-number-input label="N" scrub ${attrs}></helix-base-number-input>`)
 
   test('a label without `scrub` does not move the value', async () => {
     /* The part is there either way, because every field has a label. What
        `scrub` decides is whether a press on it does anything, so this asks the
        value rather than asking whether an element exists. */
     const host = await mount(
-      '<helix-number-input label="N" default-value="10"></helix-number-input>',
+      '<helix-base-number-input label="N" default-value="10"></helix-base-number-input>',
     )
     await drag(host, 40)
     expect((host as HTMLElement & { value: string }).value).toBe('10')

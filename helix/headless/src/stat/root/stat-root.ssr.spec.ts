@@ -6,7 +6,9 @@ import '../index.js'
 describe('stat server output', () => {
   test('the figure and its label are in the served markup', () => {
     const markup = withoutStyles(
-      ssr(html`<helix-stat><span slot="label">Revenue</span><span>42</span></helix-stat>`),
+      ssr(
+        html`<helix-base-stat><span slot="label">Revenue</span><span>42</span></helix-base-stat>`,
+      ),
     )
     expect(markup).toContain('Revenue')
     expect(markup).toContain('42')
@@ -14,7 +16,10 @@ describe('stat server output', () => {
 
   test('the host carries nothing the consumer did not write', () => {
     expect(
-      hostAttributes(ssr(html`<helix-stat><span>42</span></helix-stat>`), 'helix-stat'),
+      hostAttributes(
+        ssr(html`<helix-base-stat><span>42</span></helix-base-stat>`),
+        'helix-base-stat',
+      ),
     ).toEqual([])
   })
 })

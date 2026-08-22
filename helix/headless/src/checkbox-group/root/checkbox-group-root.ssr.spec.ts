@@ -4,10 +4,10 @@ import { html } from 'lit'
 import '../index.js'
 import '../../checkbox/index.js'
 
-const group = html`<helix-checkbox-group label="Verticals" name="verticals">
-  <helix-checkbox value="design">Design</helix-checkbox>
-  <helix-checkbox value="mind">Mind</helix-checkbox>
-</helix-checkbox-group>`
+const group = html`<helix-base-checkbox-group label="Verticals" name="verticals">
+  <helix-base-checkbox value="design">Design</helix-base-checkbox>
+  <helix-base-checkbox value="mind">Mind</helix-base-checkbox>
+</helix-base-checkbox-group>`
 
 describe('checkbox group server output', () => {
   test('every box is in the served markup', () => {
@@ -17,6 +17,6 @@ describe('checkbox group server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(group), 'helix-checkbox-group')).toEqual(['label', 'name'])
+    expect(hostAttributes(ssr(group), 'helix-base-checkbox-group')).toEqual(['label', 'name'])
   })
 })

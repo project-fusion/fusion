@@ -29,15 +29,15 @@ import '../index.js'
    assertion nobody maintains. */
 describe('option group server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
-    expect(withoutStyles(ssr(html`<helix-option-group></helix-option-group>`))).toContain(
-      'helix-option-group',
+    expect(withoutStyles(ssr(html`<helix-base-option-group></helix-base-option-group>`))).toContain(
+      'helix-base-option-group',
     )
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-option-group></helix-option-group>`),
-      'helix-option-group',
+      ssr(html`<helix-base-option-group></helix-base-option-group>`),
+      'helix-base-option-group',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

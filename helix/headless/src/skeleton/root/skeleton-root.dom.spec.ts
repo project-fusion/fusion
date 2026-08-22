@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 describe('skeleton', () => {
   test('says the region is filling rather than saying nothing', async () => {
-    const skeleton = (await mount('<helix-skeleton></helix-skeleton>')) as HTMLElement & {
+    const skeleton = (await mount('<helix-base-skeleton></helix-base-skeleton>')) as HTMLElement & {
       internals?: ElementInternals
     }
     expect(skeleton.internals?.ariaBusy).toBe('true')
@@ -21,7 +21,7 @@ describe('skeleton', () => {
     // exists for not having.
     const { HelixBaseSkeleton } = await import('@helix-io/headless')
     expect('shape' in HelixBaseSkeleton.prototype).toBe(false)
-    const skeleton = await mount('<helix-skeleton shape="circle"></helix-skeleton>')
+    const skeleton = await mount('<helix-base-skeleton shape="circle"></helix-base-skeleton>')
     expect(part(skeleton, 'skeleton')).not.toBeNull()
   })
 })

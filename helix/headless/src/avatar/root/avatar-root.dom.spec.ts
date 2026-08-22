@@ -10,20 +10,20 @@ type Updatable = HTMLElement & { updateComplete: Promise<unknown> }
 
 describe('avatar', () => {
   test('shows initials when there is no image', async () => {
-    const avatar = await mount('<helix-avatar name="Ross Sheppard"></helix-avatar>')
+    const avatar = await mount('<helix-base-avatar name="Ross Sheppard"></helix-base-avatar>')
     expect(part(avatar, 'initials')?.textContent?.trim()).toBe('RS')
     expect(part(avatar, 'image')).toBeNull()
   })
 
   test('a single name yields one initial', async () => {
-    const avatar = await mount('<helix-avatar name="Fusion"></helix-avatar>')
+    const avatar = await mount('<helix-base-avatar name="Fusion"></helix-base-avatar>')
     expect(part(avatar, 'initials')?.textContent?.trim()).toBe('F')
   })
 
   test('initials are hidden from assistive technology', async () => {
     // The name is already announced by the avatar's own label, so reading the
     // initials too would spell it out a second time, letter by letter.
-    const avatar = await mount('<helix-avatar name="Ross Sheppard"></helix-avatar>')
+    const avatar = await mount('<helix-base-avatar name="Ross Sheppard"></helix-base-avatar>')
     expect(part(avatar, 'initials')?.getAttribute('aria-hidden')).toBe('true')
   })
 
@@ -32,7 +32,7 @@ describe('avatar', () => {
     // markup lacks, and the avatar itself is what announces rather than a span
     // inside it.
     const avatar = (await mount(
-      '<helix-avatar name="Ross Sheppard"></helix-avatar>',
+      '<helix-base-avatar name="Ross Sheppard"></helix-base-avatar>',
     )) as HTMLElement & {
       internals?: ElementInternals
     }
@@ -43,7 +43,7 @@ describe('avatar', () => {
 
   test('an author `aria-label` overrides the name for what is announced', async () => {
     const avatar = (await mount(
-      '<helix-avatar aria-label="The design team" name="Ross Sheppard"></helix-avatar>',
+      '<helix-base-avatar aria-label="The design team" name="Ross Sheppard"></helix-base-avatar>',
     )) as HTMLElement & { internals?: ElementInternals }
     // The attribute takes precedence over the implicit name from internals, so
     // no property mirrors it. Initials still come from the name, because that is
@@ -57,7 +57,7 @@ describe('avatar', () => {
     // "This image, and my icon if it fails" is the case a total replacement
     // could not express.
     const avatar = (await mount(
-      '<helix-avatar name="Ross" src="/missing.avif"><span id="mine">icon</span></helix-avatar>',
+      '<helix-base-avatar name="Ross" src="/missing.avif"><span id="mine">icon</span></helix-base-avatar>',
     )) as Updatable
     expect(part(avatar, 'image')).not.toBeNull()
 
@@ -72,7 +72,7 @@ describe('avatar', () => {
 
   test('the image relays its load and error, which do not cross on their own', async () => {
     const avatar = (await mount(
-      '<helix-avatar name="Ross" src="/me.avif"></helix-avatar>',
+      '<helix-base-avatar name="Ross" src="/me.avif"></helix-base-avatar>',
     )) as Updatable
     const heard: string[] = []
     avatar.addEventListener('load', () => heard.push('load'))
@@ -83,7 +83,7 @@ describe('avatar', () => {
   })
 
   test('shows the image when there is one', async () => {
-    const avatar = await mount('<helix-avatar name="Ross" src="/me.avif"></helix-avatar>')
+    const avatar = await mount('<helix-base-avatar name="Ross" src="/me.avif"></helix-base-avatar>')
     expect(part(avatar, 'image')?.getAttribute('src')).toBe('/me.avif')
     // The image is decorative: the label is on the avatar, so alt would repeat it.
     expect(part(avatar, 'image')?.getAttribute('alt')).toBe('')
@@ -93,7 +93,7 @@ describe('avatar', () => {
     // The reason this is an element rather than a styled span: a broken image
     // otherwise leaves an icon and no name.
     const avatar = (await mount(
-      '<helix-avatar name="Ross Sheppard" src="/missing.avif"></helix-avatar>',
+      '<helix-base-avatar name="Ross Sheppard" src="/missing.avif"></helix-base-avatar>',
     )) as Updatable
     part(avatar, 'image')?.dispatchEvent(new Event('error'))
     await avatar.updateComplete

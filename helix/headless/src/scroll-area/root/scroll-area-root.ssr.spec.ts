@@ -5,9 +5,9 @@ import '../index.js'
 
 describe('scroll area server output', () => {
   test('ships the box, so the content is scrollable before hydration', () => {
-    expect(hasPart(ssr(html`<helix-scroll-area><p>One</p></helix-scroll-area>`), 'viewport')).toBe(
-      true,
-    )
+    expect(
+      hasPart(ssr(html`<helix-base-scroll-area><p>One</p></helix-base-scroll-area>`), 'viewport'),
+    ).toBe(true)
   })
 
   test('says nothing about edges, because the server cannot measure', () => {
@@ -17,13 +17,18 @@ describe('scroll area server output', () => {
        Asked of the host's attributes rather than of the whole document: the
        stylesheet ships inside the output and names `data-more` in its own
        selectors, so a substring check found it every time and passed on nothing. */
-    const markup = ssr(html`<helix-scroll-area label="Notes"><p>One</p></helix-scroll-area>`)
-    const attributes = hostAttributes(markup, 'helix-scroll-area')
+    const markup = ssr(
+      html`<helix-base-scroll-area label="Notes"><p>One</p></helix-base-scroll-area>`,
+    )
+    const attributes = hostAttributes(markup, 'helix-base-scroll-area')
     expect(attributes.some((one) => one.startsWith('data-more'))).toBe(false)
   })
 
   test('and gives no tab stop it cannot know is needed', () => {
-    const markup = partTag(ssr(html`<helix-scroll-area><p>One</p></helix-scroll-area>`), 'viewport')
+    const markup = partTag(
+      ssr(html`<helix-base-scroll-area><p>One</p></helix-base-scroll-area>`),
+      'viewport',
+    )
     expect(markup).not.toContain('tabindex')
   })
 })

@@ -5,7 +5,7 @@ import '../index.js'
 
 describe('code server output', () => {
   test('renders its code element with no DOM to read', () => {
-    const markup = withoutStyles(ssr(html`<helix-code>one</helix-code>`))
+    const markup = withoutStyles(ssr(html`<helix-base-code>one</helix-base-code>`))
     expect(hasPart(markup, 'code')).toBe(true)
   })
 })

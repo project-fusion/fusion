@@ -29,15 +29,15 @@ import '../index.js'
    assertion nobody maintains. */
 describe('speed dial item server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
-    expect(withoutStyles(ssr(html`<helix-speed-dial-item></helix-speed-dial-item>`))).toContain(
-      'helix-speed-dial-item',
-    )
+    expect(
+      withoutStyles(ssr(html`<helix-base-speed-dial-item></helix-base-speed-dial-item>`)),
+    ).toContain('helix-base-speed-dial-item')
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-speed-dial-item></helix-speed-dial-item>`),
-      'helix-speed-dial-item',
+      ssr(html`<helix-base-speed-dial-item></helix-base-speed-dial-item>`),
+      'helix-base-speed-dial-item',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

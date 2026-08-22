@@ -3,10 +3,10 @@ import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion-io/testing/
 import { html } from 'lit'
 import '../index.js'
 
-const bar = html`<helix-navigation label="Sections">
+const bar = html`<helix-base-navigation label="Sections">
   <a aria-current="page" data-navigation-item href="/design">Design</a>
   <a data-navigation-item href="/mind">Mind</a>
-</helix-navigation>`
+</helix-base-navigation>`
 
 describe('nav bar server output', () => {
   test('the landmark and its name are served', () => {
@@ -21,6 +21,6 @@ describe('nav bar server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(bar), 'helix-navigation')).toEqual(['label'])
+    expect(hostAttributes(ssr(bar), 'helix-base-navigation')).toEqual(['label'])
   })
 })

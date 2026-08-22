@@ -16,11 +16,11 @@ type Group = HTMLElement & {
 }
 
 const group = async (attrs = 'label="Verticals" name="verticals" value="design,mind"') =>
-  (await mount(`<helix-checkbox-group ${attrs}>
-    <helix-checkbox value="design">Design</helix-checkbox>
-    <helix-checkbox value="mind">Mind</helix-checkbox>
-    <helix-checkbox value="energy">Energy</helix-checkbox>
-  </helix-checkbox-group>`)) as Group
+  (await mount(`<helix-base-checkbox-group ${attrs}>
+    <helix-base-checkbox value="design">Design</helix-base-checkbox>
+    <helix-base-checkbox value="mind">Mind</helix-base-checkbox>
+    <helix-base-checkbox value="energy">Energy</helix-base-checkbox>
+  </helix-base-checkbox-group>`)) as Group
 
 const tick = async (g: Group, index: number) => {
   const box = g.boxes[index] as HTMLElement
@@ -69,9 +69,9 @@ describe('checkbox group', () => {
   })
 
   test('a box that names itself keeps its own', async () => {
-    const g = (await mount(`<helix-checkbox-group name="shared">
-      <helix-checkbox name="its-own" value="a">A</helix-checkbox>
-    </helix-checkbox-group>`)) as Group
+    const g = (await mount(`<helix-base-checkbox-group name="shared">
+      <helix-base-checkbox name="its-own" value="a">A</helix-base-checkbox>
+    </helix-base-checkbox-group>`)) as Group
     expect(g.boxes[0]?.name).toBe('its-own')
   })
 
@@ -125,7 +125,7 @@ describe('checkbox group as a field', () => {
        host is in the light DOM and its label is in the shadow root, so an IDREF
        cannot reach and the plain element reflection drops the reference. */
     const host = (await mount(
-      '<helix-checkbox-group label="Label" hint="Hint"><helix-checkbox value="a">A</helix-checkbox></helix-checkbox-group>',
+      '<helix-base-checkbox-group label="Label" hint="Hint"><helix-base-checkbox value="a">A</helix-base-checkbox></helix-base-checkbox-group>',
     )) as Updatable & { internals: ElementInternals }
     await settle(host)
 
@@ -142,7 +142,7 @@ describe('checkbox group as a field', () => {
        mixin asks whether the element is form-associated before it asks the
        platform anything. */
     const host = (await mount(
-      '<helix-checkbox-group label="L" hint="H" feedback="Pick at least one"><helix-checkbox value="a">A</helix-checkbox></helix-checkbox-group>',
+      '<helix-base-checkbox-group label="L" hint="H" feedback="Pick at least one"><helix-base-checkbox value="a">A</helix-base-checkbox></helix-base-checkbox-group>',
     )) as Updatable
     await settle(host)
 
@@ -154,7 +154,7 @@ describe('checkbox group as a field', () => {
     // On the host it laid out the label too, so a horizontal group put its own
     // name in the row beside the first box.
     const host = await mount(
-      '<helix-checkbox-group label="L" orientation="horizontal"><helix-checkbox value="a">A</helix-checkbox></helix-checkbox-group>',
+      '<helix-base-checkbox-group label="L" orientation="horizontal"><helix-base-checkbox value="a">A</helix-base-checkbox></helix-base-checkbox-group>',
     )
     const items = part(host, 'items') as HTMLElement
     const label = part(host, 'label') as HTMLElement

@@ -9,7 +9,9 @@ beforeAll(async () => {
 type Pin = HTMLElement & { clear(): void; updateComplete: Promise<unknown>; value: string }
 
 const pin = async (attrs = ''): Promise<Pin> => {
-  const host = (await mount(`<helix-pin-input label="Code" ${attrs}></helix-pin-input>`)) as Pin
+  const host = (await mount(
+    `<helix-base-pin-input label="Code" ${attrs}></helix-base-pin-input>`,
+  )) as Pin
   await host.updateComplete
   return host
 }

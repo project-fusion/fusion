@@ -5,20 +5,20 @@ import '../index.js'
 
 describe('input server output', () => {
   test('the control ships as an input, so it works before any script', () => {
-    const markup = ssr(html`<helix-input label="Search"></helix-input>`)
+    const markup = ssr(html`<helix-base-input label="Search"></helix-base-input>`)
     expect(partTag(markup, 'control')).toMatch(/<input\s/)
   })
 
   test('the type is in the served markup, which is what picks the keyboard', () => {
     // A phone chooses its keyboard from the parsed markup. Waiting for a
     // lifecycle hook would give the first render a text keyboard for an email.
-    const markup = ssr(html`<helix-input label="Email" type="email"></helix-input>`)
+    const markup = ssr(html`<helix-base-input label="Email" type="email"></helix-base-input>`)
     expect(partTag(markup, 'control')).toContain('type="email"')
   })
 
   test('the name and placeholder are served, not added on upgrade', () => {
     const markup = partTag(
-      ssr(html`<helix-input name="q" placeholder="Search"></helix-input>`),
+      ssr(html`<helix-base-input name="q" placeholder="Search"></helix-base-input>`),
       'control',
     )
     expect(markup).toContain('name="q"')
@@ -28,14 +28,17 @@ describe('input server output', () => {
   test('a field with no name carries no empty one', () => {
     // `nothing` rather than an empty string: `name=""` is a field the form would
     // try to submit under no name at all.
-    const markup = partTag(ssr(html`<helix-input label="Search"></helix-input>`), 'control')
+    const markup = partTag(
+      ssr(html`<helix-base-input label="Search"></helix-base-input>`),
+      'control',
+    )
     expect(markup).not.toContain('name=')
     expect(markup).not.toContain('placeholder=')
   })
 
   test('required and read-only are served on the control', () => {
     const markup = partTag(
-      ssr(html`<helix-input name="q" required read-only></helix-input>`),
+      ssr(html`<helix-base-input name="q" required read-only></helix-base-input>`),
       'control',
     )
     expect(markup).toContain('required')
@@ -45,7 +48,7 @@ describe('input server output', () => {
   test('the default value is in the field on the server', () => {
     // Seeded in `willUpdate`, which SSR calls, rather than in a hook it does
     // not: anything later would serve an empty field and fill it at hydration.
-    const markup = ssr(html`<helix-input default-value="hello" name="q"></helix-input>`)
+    const markup = ssr(html`<helix-base-input default-value="hello" name="q"></helix-base-input>`)
     expect(markup).toContain('hello')
   })
 
@@ -53,13 +56,13 @@ describe('input server output', () => {
     /* The whole point of the label being markup rather than a property read at
        upgrade. A reader on a slow connection sees a named field, and a screen
        reader announces one. */
-    const markup = ssr(html`<helix-input label="Search"></helix-input>`)
+    const markup = ssr(html`<helix-base-input label="Search"></helix-base-input>`)
     expect(partTag(markup, 'label')).toMatch(/<label\s/)
     expect(withoutStyles(markup)).toContain('Search')
   })
 
   test('a hint reaches the markup and the control points at it', () => {
-    const markup = ssr(html`<helix-input label="A" hint="Help text"></helix-input>`)
+    const markup = ssr(html`<helix-base-input label="A" hint="Help text"></helix-base-input>`)
     expect(withoutStyles(markup)).toContain('Help text')
     expect(partTag(markup, 'control')).toContain('aria-describedby')
   })
@@ -67,7 +70,7 @@ describe('input server output', () => {
   test('a field with nothing to describe serves no description', () => {
     // An `aria-describedby` pointing at an id that renders nothing is a field
     // whose description a screen reader cannot find.
-    const markup = ssr(html`<helix-input label="A"></helix-input>`)
+    const markup = ssr(html`<helix-base-input label="A"></helix-base-input>`)
     expect(hasPart(markup, 'hint')).toBe(false)
     expect(partTag(markup, 'control')).not.toContain('aria-describedby')
   })

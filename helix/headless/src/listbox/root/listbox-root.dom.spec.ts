@@ -21,11 +21,11 @@ const settle = async (host: Updatable): Promise<void> => {
 }
 
 const list = async (extra = ''): Promise<Updatable> => {
-  document.body.innerHTML = `<helix-listbox label="L" name="c" ${extra}>
-    <helix-option value="one">Alpha</helix-option>
-    <helix-option value="two">Beta</helix-option>
-    <helix-option value="three">Gamma</helix-option>
-  </helix-listbox>`
+  document.body.innerHTML = `<helix-base-listbox label="L" name="c" ${extra}>
+    <helix-base-option value="one">Alpha</helix-base-option>
+    <helix-base-option value="two">Beta</helix-base-option>
+    <helix-base-option value="three">Gamma</helix-base-option>
+  </helix-base-listbox>`
   const host = document.body.firstElementChild as Updatable
   await settle(host)
   return host
@@ -187,10 +187,10 @@ describe('listbox filtering', () => {
     /* CSS cannot do this: the rule would be `:host(:has(...))`, which is
        dropped at parse time. The listbox can, because it did the hiding. Left
        showing, the picture was a heading over nothing. */
-    document.body.innerHTML = `<helix-listbox label="L">
-      <helix-option-group label="One"><helix-option value="a">Alpha</helix-option></helix-option-group>
-      <helix-option-group label="Two"><helix-option value="b">Beta</helix-option></helix-option-group>
-    </helix-listbox>`
+    document.body.innerHTML = `<helix-base-listbox label="L">
+      <helix-base-option-group label="One"><helix-base-option value="a">Alpha</helix-base-option></helix-base-option-group>
+      <helix-base-option-group label="Two"><helix-base-option value="b">Beta</helix-base-option></helix-base-option-group>
+    </helix-base-listbox>`
     const host = document.body.firstElementChild as Updatable & { filter: string }
     await settle(host)
     host.filter = 'alph'
@@ -267,11 +267,11 @@ if (hasLayout()) {
   describe('listbox active descendant', () => {
     const listbox = async (): Promise<HTMLElement> => {
       const host = (await mount(
-        `<helix-listbox label="Owner" default-value="a">
-          <helix-option value="a">Ross</helix-option>
-          <helix-option value="b">Sam</helix-option>
-          <helix-option value="c">Kit</helix-option>
-        </helix-listbox>`,
+        `<helix-base-listbox label="Owner" default-value="a">
+          <helix-base-option value="a">Ross</helix-base-option>
+          <helix-base-option value="b">Sam</helix-base-option>
+          <helix-base-option value="c">Kit</helix-base-option>
+        </helix-base-listbox>`,
       )) as HTMLElement
       await settle(host as Updatable)
       return host
@@ -349,10 +349,10 @@ if (hasLayout()) {
          keyboard and not with a mouse, for as long as it has existed. Every
          spec for it chose by key or by method, which is exactly why. */
       const host = (await mount(
-        `<helix-listbox label="Owner">
-          <helix-option value="one">One</helix-option>
-          <helix-option value="two">Two</helix-option>
-        </helix-listbox>`,
+        `<helix-base-listbox label="Owner">
+          <helix-base-option value="one">One</helix-base-option>
+          <helix-base-option value="two">Two</helix-base-option>
+        </helix-base-listbox>`,
       )) as Updatable & { value: string }
       await host.updateComplete
 
@@ -377,11 +377,11 @@ if (hasLayout()) {
       [...(CSS.highlights.get('helix-filter-match') ?? [])].map((range) => range.toString())
 
     const filtered = async (needle: string): Promise<HTMLElement> => {
-      document.body.innerHTML = `<helix-listbox aria-label="L">
-        <helix-option value="rs">Rust</helix-option>
-        <helix-option value="rb">Ruby</helix-option>
-        <helix-option value="go">Go</helix-option>
-      </helix-listbox>`
+      document.body.innerHTML = `<helix-base-listbox aria-label="L">
+        <helix-base-option value="rs">Rust</helix-base-option>
+        <helix-base-option value="rb">Ruby</helix-base-option>
+        <helix-base-option value="go">Go</helix-base-option>
+      </helix-base-listbox>`
       const host = document.body.firstElementChild as HTMLElement & {
         requestFilter: (next: string) => boolean
         updateComplete: Promise<boolean>

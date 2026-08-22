@@ -5,16 +5,16 @@ import '../index.js'
 
 describe('tag server output', () => {
   test('the label is in the served markup', () => {
-    const markup = ssr(html`<helix-tag>Draft</helix-tag>`)
+    const markup = ssr(html`<helix-base-tag>Draft</helix-base-tag>`)
     expect(withoutStyles(markup)).toContain('Draft')
   })
 
   test('a plain tag ships no control', () => {
-    expect(hasPart(ssr(html`<helix-tag>Draft</helix-tag>`), 'dismiss')).toBe(false)
+    expect(hasPart(ssr(html`<helix-base-tag>Draft</helix-base-tag>`), 'dismiss')).toBe(false)
   })
 
   test('the dismiss control is named before any JavaScript runs', () => {
-    const markup = ssr(html`<helix-tag dismissible>Draft</helix-tag>`)
+    const markup = ssr(html`<helix-base-tag dismissible>Draft</helix-base-tag>`)
     expect(partTag(markup, 'dismiss')).toContain('aria-label="Remove"')
   })
 })

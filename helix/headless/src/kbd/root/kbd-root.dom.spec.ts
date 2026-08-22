@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 describe('kbd', () => {
   test('renders a real kbd, so the markup still means "press this"', async () => {
-    const kbd = await mount('<helix-kbd>K</helix-kbd>')
+    const kbd = await mount('<helix-base-kbd>K</helix-base-kbd>')
     expect(part(kbd, 'kbd')?.tagName).toBe('KBD')
   })
 })

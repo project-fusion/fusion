@@ -13,12 +13,18 @@ describe('a collection on the server', () => {
        Shipping "Nothing to show" over markup that is about to have rows in it
        is the one thing an empty state must never do, and it would be shipped
        into the first paint where a reader would see it. */
-    expect(hasPart(ssr(html`<helix-tree label="Files"></helix-tree>`), 'empty')).toBe(false)
-    expect(hasPart(ssr(html`<helix-table label="Invoices"></helix-table>`), 'empty')).toBe(false)
-    expect(hasPart(ssr(html`<helix-menu label="Actions"></helix-menu>`), 'empty')).toBe(false)
-    expect(hasPart(ssr(html`<helix-drilldown label="Pages"></helix-drilldown>`), 'empty')).toBe(
+    expect(hasPart(ssr(html`<helix-base-tree label="Files"></helix-base-tree>`), 'empty')).toBe(
       false,
     )
+    expect(
+      hasPart(ssr(html`<helix-base-table label="Invoices"></helix-base-table>`), 'empty'),
+    ).toBe(false)
+    expect(hasPart(ssr(html`<helix-base-menu label="Actions"></helix-base-menu>`), 'empty')).toBe(
+      false,
+    )
+    expect(
+      hasPart(ssr(html`<helix-base-drilldown label="Pages"></helix-base-drilldown>`), 'empty'),
+    ).toBe(false)
   })
 
   test('but loading does ship, because the consumer declared it', () => {
@@ -26,11 +32,11 @@ describe('a collection on the server', () => {
        stated, so one can cross the wire and the other cannot. A reader on a
        slow connection sees "Loading" in the first paint rather than a blank
        box that fills in when a script arrives. */
-    expect(hasPart(ssr(html`<helix-tree label="Files" loading></helix-tree>`), 'loading')).toBe(
-      true,
-    )
     expect(
-      hasPart(ssr(html`<helix-table label="Invoices" loading></helix-table>`), 'loading'),
+      hasPart(ssr(html`<helix-base-tree label="Files" loading></helix-base-tree>`), 'loading'),
+    ).toBe(true)
+    expect(
+      hasPart(ssr(html`<helix-base-table label="Invoices" loading></helix-base-table>`), 'loading'),
     ).toBe(true)
   })
 })

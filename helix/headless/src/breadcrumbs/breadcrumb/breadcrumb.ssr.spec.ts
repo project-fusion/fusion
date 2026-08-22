@@ -29,15 +29,15 @@ import '../index.js'
    assertion nobody maintains. */
 describe('breadcrumb server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
-    expect(withoutStyles(ssr(html`<helix-breadcrumb></helix-breadcrumb>`))).toContain(
-      'helix-breadcrumb',
+    expect(withoutStyles(ssr(html`<helix-base-breadcrumb></helix-base-breadcrumb>`))).toContain(
+      'helix-base-breadcrumb',
     )
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-breadcrumb></helix-breadcrumb>`),
-      'helix-breadcrumb',
+      ssr(html`<helix-base-breadcrumb></helix-base-breadcrumb>`),
+      'helix-base-breadcrumb',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

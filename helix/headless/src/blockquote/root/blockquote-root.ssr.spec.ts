@@ -5,12 +5,12 @@ import '../index.js'
 
 describe('blockquote server output', () => {
   test('the quotation is a real blockquote in the served markup', () => {
-    const markup = ssr(html`<helix-blockquote><p>Said so.</p></helix-blockquote>`)
+    const markup = ssr(html`<helix-base-blockquote><p>Said so.</p></helix-base-blockquote>`)
     expect(partTag(markup, 'blockquote')).toContain('<blockquote')
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    const markup = ssr(html`<helix-blockquote>x</helix-blockquote>`)
-    expect(hostAttributes(markup, 'helix-blockquote')).toEqual([])
+    const markup = ssr(html`<helix-base-blockquote>x</helix-base-blockquote>`)
+    expect(hostAttributes(markup, 'helix-base-blockquote')).toEqual([])
   })
 })

@@ -13,7 +13,7 @@ describe('callout severity', () => {
   test('carries the severity as an accessible name, not only as a color', async () => {
     // Someone who cannot see that the box is red still has to learn it is an
     // error, so the icon is labelled rather than decorative.
-    const callout = await mount('<helix-callout severity="danger">Failed</helix-callout>')
+    const callout = await mount('<helix-base-callout severity="danger">Failed</helix-base-callout>')
     expect(iconSvg(callout)?.getAttribute('role')).toBe('img')
     expect(iconSvg(callout)?.getAttribute('aria-label')).toBe('Error')
   })
@@ -25,18 +25,20 @@ describe('callout severity', () => {
       ['warning', 'Warning'],
       ['danger', 'Error'],
     ] as const) {
-      const callout = await mount(`<helix-callout severity="${severity}">x</helix-callout>`)
+      const callout = await mount(
+        `<helix-base-callout severity="${severity}">x</helix-base-callout>`,
+      )
       expect(iconSvg(callout)?.getAttribute('aria-label'), severity).toBe(label)
     }
   })
 
   test('an unknown severity falls back rather than rendering nothing', async () => {
-    const callout = await mount('<helix-callout severity="nonsense">x</helix-callout>')
+    const callout = await mount('<helix-base-callout severity="nonsense">x</helix-base-callout>')
     expect(iconSvg(callout)?.getAttribute('aria-label')).toBe('Information')
   })
 
   test('is announced as a note', async () => {
-    const callout = await mount('<helix-callout>x</helix-callout>')
+    const callout = await mount('<helix-base-callout>x</helix-base-callout>')
     expect(role(callout)).toBe('note')
   })
 })
@@ -46,15 +48,15 @@ describe('callout icon slot', () => {
     // Slot fallback is the native mechanism for "default unless replaced", so
     // this needs no emptiness check and works on the server.
     const callout = await mount(
-      '<helix-callout><helix-icon slot="icon" name="check"></helix-icon>Done</helix-callout>',
+      '<helix-base-callout><helix-base-icon slot="icon" name="check"></helix-base-icon>Done</helix-base-callout>',
     )
     const slot = callout.shadowRoot?.querySelector('slot[name="icon"]') as HTMLSlotElement
     expect(slot.assignedElements().length).toBe(1)
-    expect(slot.assignedElements()[0]?.tagName).toBe('HELIX-ICON')
+    expect(slot.assignedElements()[0]?.tagName).toBe('HELIX-BASE-ICON')
   })
 
   test('with nothing slotted, the fallback is what is there', async () => {
-    const callout = await mount('<helix-callout>x</helix-callout>')
+    const callout = await mount('<helix-base-callout>x</helix-base-callout>')
     const slot = callout.shadowRoot?.querySelector('slot[name="icon"]') as HTMLSlotElement
     expect(slot.assignedElements().length).toBe(0)
     expect(slot.querySelector('svg')).not.toBeNull()

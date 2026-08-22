@@ -9,16 +9,16 @@ describe('toast server output', () => {
        be in the document before a message is put into it, so one that arrives
        with its first message is one that is frequently not announced. Serving
        the empty region is what makes the first toast of a session work. */
-    expect(hasPart(ssr(html`<helix-toast label="Notifications"></helix-toast>`), 'region')).toBe(
-      true,
-    )
+    expect(
+      hasPart(ssr(html`<helix-base-toast label="Notifications"></helix-base-toast>`), 'region'),
+    ).toBe(true)
   })
 
   test('messages already there are served with it', () => {
     const markup = withoutStyles(
       ssr(
-        html`<helix-toast
-          ><helix-toast-item severity="success">Saved</helix-toast-item></helix-toast
+        html`<helix-base-toast
+          ><helix-base-toast-item severity="success">Saved</helix-base-toast-item></helix-base-toast
         >`,
       ),
     )
@@ -28,15 +28,20 @@ describe('toast server output', () => {
   test('the host carries only what the consumer wrote', () => {
     expect(
       hostAttributes(
-        ssr(html`<helix-toast label="Notifications" placement="top-center"></helix-toast>`),
-        'helix-toast',
+        ssr(
+          html`<helix-base-toast label="Notifications" placement="top-center"></helix-base-toast>`,
+        ),
+        'helix-base-toast',
       ),
     ).toEqual(['label', 'placement'])
   })
 
   test('a message serves its dismiss control, so it works before hydration', () => {
     expect(
-      hasPart(ssr(html`<helix-toast-item dismissible>Saved</helix-toast-item>`), 'dismiss'),
+      hasPart(
+        ssr(html`<helix-base-toast-item dismissible>Saved</helix-base-toast-item>`),
+        'dismiss',
+      ),
     ).toBe(true)
   })
 })

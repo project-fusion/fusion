@@ -8,18 +8,22 @@ beforeAll(async () => {
 
 describe('icon button', () => {
   test('names itself for a screen reader from `label`', async () => {
-    const button = await mount('<helix-icon-button label="Settings">i</helix-icon-button>')
+    const button = await mount(
+      '<helix-base-icon-button label="Settings">i</helix-base-icon-button>',
+    )
     expect(part(button, 'button')?.getAttribute('aria-label')).toBe('Settings')
   })
 
   test('disabled reaches the control, not just the host', async () => {
     // A host attribute alone would style a disabled button that still clicks.
-    const button = await mount('<helix-icon-button disabled label="x">i</helix-icon-button>')
+    const button = await mount(
+      '<helix-base-icon-button disabled label="x">i</helix-base-icon-button>',
+    )
     expect((part(button, 'button') as HTMLButtonElement).disabled).toBe(true)
   })
 
   test('a click on the control reaches a listener on the host', async () => {
-    const button = await mount('<helix-icon-button label="x">i</helix-icon-button>')
+    const button = await mount('<helix-base-icon-button label="x">i</helix-base-icon-button>')
     let clicks = 0
     button.addEventListener('click', () => {
       clicks += 1

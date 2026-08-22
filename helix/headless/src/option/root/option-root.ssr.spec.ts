@@ -5,7 +5,7 @@ import '../index.js'
 
 describe('option server output', () => {
   test('the row and its words are in the served markup', () => {
-    const markup = ssr(html`<helix-option value="ross">Ross</helix-option>`)
+    const markup = ssr(html`<helix-base-option value="ross">Ross</helix-base-option>`)
     expect(hasPart(markup, 'item')).toBe(true)
     expect(withoutStyles(markup)).toContain('Ross')
   })
@@ -14,12 +14,17 @@ describe('option server output', () => {
     // `role="option"` and `aria-selected` go through internals, which write no
     // attribute, so the host is the consumer"s markup and hydration agrees.
     expect(
-      hostAttributes(ssr(html`<helix-option value="ross">Ross</helix-option>`), 'helix-option'),
+      hostAttributes(
+        ssr(html`<helix-base-option value="ross">Ross</helix-base-option>`),
+        'helix-base-option',
+      ),
     ).toEqual(['value'])
   })
 
   test('a group serves its own label, which is not one of its options', () => {
-    const markup = ssr(html`<helix-option-group label="Engineering"></helix-option-group>`)
+    const markup = ssr(
+      html`<helix-base-option-group label="Engineering"></helix-base-option-group>`,
+    )
     expect(withoutStyles(markup)).toContain('Engineering')
     expect(hasPart(markup, 'items')).toBe(true)
   })

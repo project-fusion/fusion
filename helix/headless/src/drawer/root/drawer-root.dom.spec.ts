@@ -14,9 +14,9 @@ type Updatable = HTMLElement & {
 }
 
 const markup = `
-  <helix-drawer label="Examples">
-    <helix-button>Inside</helix-button>
-  </helix-drawer>`
+  <helix-base-drawer label="Examples">
+    <helix-base-button>Inside</helix-base-button>
+  </helix-base-drawer>`
 
 describe('drawer', () => {
   test('the panel is a real dialog, so the platform owns the modality', async () => {
@@ -98,7 +98,7 @@ describe('drawer', () => {
     await drawer.updateComplete
     await new Promise((resolve) => requestAnimationFrame(resolve))
 
-    const inside = drawer.querySelector('helix-button')
+    const inside = drawer.querySelector('helix-base-button')
     expect(drawer.contains(document.activeElement) || document.activeElement === inside).toBe(true)
   })
 

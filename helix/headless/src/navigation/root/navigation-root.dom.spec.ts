@@ -6,10 +6,10 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-const bar = `<helix-navigation label="Sections">
+const bar = `<helix-base-navigation label="Sections">
   <a aria-current="page" data-navigation-item href="/design">Design</a>
   <a data-navigation-item href="/mind">Mind</a>
-</helix-navigation>`
+</helix-base-navigation>`
 
 describe('nav bar', () => {
   test('wraps its links in a named landmark', async () => {

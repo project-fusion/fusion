@@ -78,15 +78,21 @@ for (const family of families('helix/web/src')) {
   }
 
   for (const part of parts(web)) {
-    const dir = join(web, part)
-    const files = readdirSync(dir)
+    /* Both tiers, because a part's specs are split across them now. The
+       functional ones moved to `headless`, which is where the behaviour is, and
+       what stays in `web` is what asserts presentation. A part is covered when
+       the pair exists somewhere, not when it exists here: reading only `web`
+       reported eleven stable families as untested the day the specs moved, and
+       every one of them had gained coverage rather than lost it. */
+    const dirs = [join(web, part), join(headless, part)].filter((one) => existsSync(one))
+    const files = dirs.flatMap((one) => readdirSync(one))
     if (!files.some((one) => one.endsWith('.dom.spec.ts'))) {
-      problems.push(`${family}/${part}: stable with no \`*.dom.spec.ts\`.`)
+      problems.push(`${family}/${part}: stable with no \`*.dom.spec.ts\` in either tier.`)
     }
     if (!files.some((one) => one.endsWith('.ssr.spec.ts'))) {
       problems.push(
-        `${family}/${part}: stable with no \`*.ssr.spec.ts\`. A DOM spec runs after hydration, ` +
-          'when a promise broken at first paint already looks kept.',
+        `${family}/${part}: stable with no \`*.ssr.spec.ts\` in either tier. A DOM spec runs ` +
+          'after hydration, when a promise broken at first paint already looks kept.',
       )
     }
   }

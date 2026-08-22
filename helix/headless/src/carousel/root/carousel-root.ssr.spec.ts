@@ -3,10 +3,10 @@ import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion-io/testing/
 import { html } from 'lit'
 import '../index.js'
 
-const carousel = html`<helix-carousel label="Verticals">
+const carousel = html`<helix-base-carousel label="Verticals">
   <div>Design</div>
   <div>Mind</div>
-</helix-carousel>`
+</helix-base-carousel>`
 
 describe('carousel server output', () => {
   test('every slide is in the served markup, not only the one in view', () => {
@@ -27,6 +27,6 @@ describe('carousel server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(carousel), 'helix-carousel')).toEqual(['label'])
+    expect(hostAttributes(ssr(carousel), 'helix-base-carousel')).toEqual(['label'])
   })
 })

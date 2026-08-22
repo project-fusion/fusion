@@ -9,20 +9,20 @@ describe('qr code server output', () => {
        square can be in the first response. A code that appeared only after
        hydration would be a blank box in any reader with script turned off, and
        a picture is exactly the thing that should not need one. */
-    const markup = ssr(html`<helix-qr-code value="https://fusion.dev"></helix-qr-code>`)
+    const markup = ssr(html`<helix-base-qr-code value="https://fusion.dev"></helix-base-qr-code>`)
     expect(hasPart(markup, 'code')).toBe(true)
     expect(markup).toContain('<path')
   })
 
   test('and it is named, so the name ships with it', () => {
     const markup = ssr(
-      html`<helix-qr-code label="Our site" value="https://fusion.dev"></helix-qr-code>`,
+      html`<helix-base-qr-code label="Our site" value="https://fusion.dev"></helix-base-qr-code>`,
     )
     expect(markup).toContain('Our site')
   })
 
   test('an empty value draws nothing rather than an empty square', () => {
-    const markup = ssr(html`<helix-qr-code value=""></helix-qr-code>`)
+    const markup = ssr(html`<helix-base-qr-code value=""></helix-base-qr-code>`)
     expect(hasPart(markup, 'code')).toBe(false)
   })
 })

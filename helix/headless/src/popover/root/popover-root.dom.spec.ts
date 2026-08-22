@@ -17,10 +17,10 @@ type Popover = HTMLElement & {
 
 const popover = async (extra = ''): Promise<Popover> =>
   (await mount(
-    `<helix-popover label="Details" ${extra}>
+    `<helix-base-popover label="Details" ${extra}>
       <button slot="trigger">Details</button>
       <span>Body</span>
-    </helix-popover>`,
+    </helix-base-popover>`,
   )) as Popover
 
 describe('popover', () => {
@@ -64,8 +64,8 @@ describe('popover', () => {
        thing that opens a panel is often somewhere else entirely, and wiring it
        up should not require the panel to be wrapped around it. */
     const host = (await mount(
-      `<helix-button command="--show" commandfor="panel">Open</helix-button>
-       <helix-popover id="panel" label="Details"><span>Body</span></helix-popover>`,
+      `<helix-base-button command="--show" commandfor="panel">Open</helix-base-button>
+       <helix-base-popover id="panel" label="Details"><span>Body</span></helix-base-popover>`,
     )) as HTMLElement & { updateComplete: Promise<boolean> }
     const target = host.nextElementSibling as Popover
     await host.updateComplete

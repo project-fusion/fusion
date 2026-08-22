@@ -3,8 +3,8 @@ import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion-io
 import { html } from 'lit'
 import '../index.js'
 
-const given = html`<helix-rating label="Rate this" value="4.2"></helix-rating>`
-const shown = html`<helix-rating readonly value="4.2"></helix-rating>`
+const given = html`<helix-base-rating label="Rate this" value="4.2"></helix-base-rating>`
+const shown = html`<helix-base-rating readonly value="4.2"></helix-base-rating>`
 
 describe('rating server output', () => {
   test('the score is drawn on the server, from a number it already has', () => {
@@ -39,6 +39,6 @@ describe('rating server output', () => {
     /* `appearance` reflected and defaulted to `marks`, so the server stamped
        `appearance="marks"` onto every rating anybody rendered and React, which
        holds no such prop, reported a hydration mismatch for each one. */
-    expect(hostAttributes(ssr(given), 'helix-rating')).toEqual(['label', 'value'])
+    expect(hostAttributes(ssr(given), 'helix-base-rating')).toEqual(['label', 'value'])
   })
 })

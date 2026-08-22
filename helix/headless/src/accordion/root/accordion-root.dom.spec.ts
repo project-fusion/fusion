@@ -9,7 +9,7 @@ beforeAll(async () => {
 type Item = HTMLElement & { open: boolean; requestOpen(next: boolean): boolean }
 
 const items = (host: HTMLElement): Item[] =>
-  [...host.querySelectorAll('helix-accordion-item')] as Item[]
+  [...host.querySelectorAll('helix-base-accordion-item')] as Item[]
 
 /**
  * Clicks an item's trigger.
@@ -23,13 +23,16 @@ const click = (item: Item): void => {
 }
 
 const three = `
-  <helix-accordion>
-    <helix-accordion-item><span slot="summary">One</span>1</helix-accordion-item>
-    <helix-accordion-item><span slot="summary">Two</span>2</helix-accordion-item>
-    <helix-accordion-item><span slot="summary">Three</span>3</helix-accordion-item>
-  </helix-accordion>`
+  <helix-base-accordion>
+    <helix-base-accordion-item><span slot="summary">One</span>1</helix-base-accordion-item>
+    <helix-base-accordion-item><span slot="summary">Two</span>2</helix-base-accordion-item>
+    <helix-base-accordion-item><span slot="summary">Three</span>3</helix-base-accordion-item>
+  </helix-base-accordion>`
 
-const single = three.replace('<helix-accordion>', '<helix-accordion mode="single-collapsible">')
+const single = three.replace(
+  '<helix-base-accordion>',
+  '<helix-base-accordion mode="single-collapsible">',
+)
 
 describe('accordion exclusivity', () => {
   test('nothing closes unexpectedly by default', async () => {
@@ -65,7 +68,7 @@ describe('accordion exclusivity', () => {
   test('single refuses to close the last one', async () => {
     // The difference between the two single modes, and the only difference.
     const accordion = await mount(
-      three.replace('<helix-accordion>', '<helix-accordion mode="single">'),
+      three.replace('<helix-base-accordion>', '<helix-base-accordion mode="single">'),
     )
     const [first] = items(accordion)
     click(first as Item)
@@ -88,7 +91,7 @@ describe('accordion exclusivity', () => {
     const [first] = items(accordion)
     click(first as Item)
 
-    const added = document.createElement('helix-accordion-item') as Item
+    const added = document.createElement('helix-base-accordion-item') as Item
     accordion.appendChild(added)
     await (added as unknown as { updateComplete: Promise<unknown> }).updateComplete
     click(added)
@@ -101,17 +104,17 @@ describe('accordion exclusivity', () => {
     // An item inside another item's content finds the same accordion through
     // `closest`, so only being a *direct* child is what makes it a peer.
     const accordion = await mount(`
-      <helix-accordion mode="single-collapsible">
-        <helix-accordion-item><span slot="summary">One</span>
-          <helix-accordion mode="single-collapsible">
-            <helix-accordion-item><span slot="summary">Inner</span>i</helix-accordion-item>
-          </helix-accordion>
-        </helix-accordion-item>
-        <helix-accordion-item><span slot="summary">Two</span>2</helix-accordion-item>
-      </helix-accordion>`)
+      <helix-base-accordion mode="single-collapsible">
+        <helix-base-accordion-item><span slot="summary">One</span>
+          <helix-base-accordion mode="single-collapsible">
+            <helix-base-accordion-item><span slot="summary">Inner</span>i</helix-base-accordion-item>
+          </helix-base-accordion>
+        </helix-base-accordion-item>
+        <helix-base-accordion-item><span slot="summary">Two</span>2</helix-base-accordion-item>
+      </helix-base-accordion>`)
     const [outer] = items(accordion)
     click(outer as Item)
-    const inner = (outer as HTMLElement).querySelector('helix-accordion-item') as Item
+    const inner = (outer as HTMLElement).querySelector('helix-base-accordion-item') as Item
     click(inner)
     expect(inner.open).toBe(true)
     expect(outer?.open).toBe(true)

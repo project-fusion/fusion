@@ -11,7 +11,7 @@ describe('blockquote', () => {
     // The attribution is about the quotation rather than part of it. Inside the
     // quoted text it claims the source said their own name.
     const quote = await mount(
-      '<helix-blockquote><p>Said so.</p><cite slot="attribution">A</cite></helix-blockquote>',
+      '<helix-base-blockquote><p>Said so.</p><cite slot="attribution">A</cite></helix-base-blockquote>',
     )
     expect(part(quote, 'blockquote')?.tagName).toBe('BLOCKQUOTE')
     expect(part(quote, 'attribution')?.tagName).toBe('FOOTER')
@@ -19,7 +19,9 @@ describe('blockquote', () => {
   })
 
   test('a source is carried through to cite', async () => {
-    const quote = await mount('<helix-blockquote cite="https://x.test">x</helix-blockquote>')
+    const quote = await mount(
+      '<helix-base-blockquote cite="https://x.test">x</helix-base-blockquote>',
+    )
     expect(part(quote, 'blockquote')?.getAttribute('cite')).toBe('https://x.test')
   })
 })

@@ -7,11 +7,11 @@ beforeAll(async () => {
 })
 
 const markup = `
-  <helix-stat>
+  <helix-base-stat>
     <span slot="label">Revenue</span>
     <span>42</span>
     <span slot="unit">M</span>
-  </helix-stat>`
+  </helix-base-stat>`
 
 describe('stat', () => {
   test('every region is a bare slot the consumer fills', async () => {
@@ -25,7 +25,7 @@ describe('stat', () => {
   })
 
   test('an omitted region costs nothing', async () => {
-    const stat = await mount('<helix-stat><span>42</span></helix-stat>')
+    const stat = await mount('<helix-base-stat><span>42</span></helix-base-stat>')
     expect(slotted(stat, 'unit')).toHaveLength(0)
   })
 })
@@ -46,7 +46,7 @@ describe('stat direction', () => {
 
   test('and it reflects, so the stylesheet can arrange the pair', async () => {
     const stat = (await mount(
-      '<helix-stat direction="row"><span slot="label">Uptime</span><span>98</span></helix-stat>',
+      '<helix-base-stat direction="row"><span slot="label">Uptime</span><span>98</span></helix-base-stat>',
     )) as HTMLElement & { direction: string }
     expect(stat.direction).toBe('row')
     expect(stat.getAttribute('direction')).toBe('row')
@@ -97,7 +97,7 @@ if (hasLayout()) {
 
     test('the unit sits on the value baseline, not above it', async () => {
       const bare = await mount(
-        '<helix-stat>212<span slot="label">p99</span><span slot="unit">ms</span></helix-stat>',
+        '<helix-base-stat>212<span slot="label">p99</span><span slot="unit">ms</span></helix-base-stat>',
       )
       expect(unitAbove(bare)).toBeLessThan(12)
     })
@@ -106,7 +106,7 @@ if (hasLayout()) {
       // A bare value is an anonymous grid item with no element to carry
       // `align-self`; a wrapped one has the element and was broken anyway.
       const wrapped = await mount(
-        '<helix-stat><span>212</span><span slot="label">p99</span><span slot="unit">ms</span></helix-stat>',
+        '<helix-base-stat><span>212</span><span slot="label">p99</span><span slot="unit">ms</span></helix-base-stat>',
       )
       expect(unitAbove(wrapped)).toBeLessThan(12)
     })

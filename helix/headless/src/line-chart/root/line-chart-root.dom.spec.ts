@@ -57,8 +57,8 @@ const SWING = `<table id="swing">
 </table>`
 
 const chart = async (table: string, attributes = ''): Promise<HTMLElement> => {
-  await mount(`<div>${table}<helix-line-chart ${attributes}></helix-line-chart></div>`)
-  const host = document.querySelector('helix-line-chart') as HTMLElement & {
+  await mount(`<div>${table}<helix-base-line-chart ${attributes}></helix-base-line-chart></div>`)
+  const host = document.querySelector('helix-base-line-chart') as HTMLElement & {
     updateComplete: Promise<unknown>
   }
   await host.updateComplete

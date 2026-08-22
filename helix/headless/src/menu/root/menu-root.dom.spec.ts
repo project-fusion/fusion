@@ -18,9 +18,11 @@ type Menu = HTMLElement & {
 }
 type Item = HTMLElement & { checked: boolean; disabled: boolean; value: string }
 
-const menu = async (rows = '<helix-menu-item value="copy">Copy</helix-menu-item>'): Promise<Menu> =>
+const menu = async (
+  rows = '<helix-base-menu-item value="copy">Copy</helix-base-menu-item>',
+): Promise<Menu> =>
   (await mount(
-    `<helix-menu label="Actions"><button slot="trigger">Open</button>${rows}</helix-menu>`,
+    `<helix-base-menu label="Actions"><button slot="trigger">Open</button>${rows}</helix-base-menu>`,
   )) as Menu
 
 describe('moving through a menu with the keyboard', () => {
@@ -30,13 +32,13 @@ describe('moving through a menu with the keyboard', () => {
      menu asks of it. */
   const opened = async (): Promise<{ host: Menu; rows: Item[] }> => {
     const host = await menu(
-      `<helix-menu-item value="cut">Cut</helix-menu-item>
-       <helix-menu-item value="copy">Copy</helix-menu-item>
-       <helix-menu-item value="paste">Paste</helix-menu-item>`,
+      `<helix-base-menu-item value="cut">Cut</helix-base-menu-item>
+       <helix-base-menu-item value="copy">Copy</helix-base-menu-item>
+       <helix-base-menu-item value="paste">Paste</helix-base-menu-item>`,
     )
     host.open = true
     await host.updateComplete
-    const rows = [...host.querySelectorAll('helix-menu-item')] as Item[]
+    const rows = [...host.querySelectorAll('helix-base-menu-item')] as Item[]
     for (const one of rows) {
       await (one as unknown as { updateComplete: Promise<boolean> }).updateComplete
     }
@@ -98,10 +100,10 @@ describe('moving through a menu with the keyboard', () => {
        controller to take them first, a submenu could not be opened from the
        keyboard at all. */
     const host = await menu(
-      `<helix-menu-item value="share">Share
-         <helix-menu-item slot="submenu" value="link">Copy link</helix-menu-item>
-       </helix-menu-item>
-       <helix-menu-item value="rename">Rename</helix-menu-item>`,
+      `<helix-base-menu-item value="share">Share
+         <helix-base-menu-item slot="submenu" value="link">Copy link</helix-base-menu-item>
+       </helix-base-menu-item>
+       <helix-base-menu-item value="rename">Rename</helix-base-menu-item>`,
     )
     host.open = true
     await host.updateComplete
@@ -110,8 +112,8 @@ describe('moving through a menu with the keyboard', () => {
        document order is the child rather than the next row along: an assertion
        written against `rows[1]` is asking about the wrong element and reads a
        correct submenu entry as a failure. It did. */
-    const share = host.querySelector('helix-menu-item[value="share"]') as Item
-    const link = host.querySelector('helix-menu-item[value="link"]') as Item
+    const share = host.querySelector('helix-base-menu-item[value="share"]') as Item
+    const link = host.querySelector('helix-base-menu-item[value="link"]') as Item
     await (share as unknown as { updateComplete: Promise<boolean> }).updateComplete
 
     press(host, 'ArrowDown')
@@ -131,10 +133,10 @@ describe('moving through a menu with the keyboard', () => {
 
 describe('a menu row that navigates', () => {
   const row = async (attrs: string) => {
-    const host = await menu(`<helix-menu-item ${attrs}>Docs</helix-menu-item>`)
+    const host = await menu(`<helix-base-menu-item ${attrs}>Docs</helix-base-menu-item>`)
     host.open = true
     await host.updateComplete
-    const item = host.querySelector('helix-menu-item') as Item & {
+    const item = host.querySelector('helix-base-menu-item') as Item & {
       renderRoot: ShadowRoot
       updateComplete: Promise<boolean>
     }
@@ -226,7 +228,7 @@ describe('menu', () => {
     // The row dispatches and the consumer decides. A row that closed the menu
     // itself would be a second source of truth for whether it is open.
     const el = await menu()
-    const item = el.querySelector('helix-menu-item') as Item
+    const item = el.querySelector('helix-base-menu-item') as Item
     let chosen = ''
     el.addEventListener('helix-select', (event) => {
       chosen = (event as CustomEvent<{ value: string }>).detail.value
@@ -238,8 +240,8 @@ describe('menu', () => {
   })
 
   test('a disabled row says nothing at all', async () => {
-    const el = await menu('<helix-menu-item disabled value="copy">Copy</helix-menu-item>')
-    const item = el.querySelector('helix-menu-item') as Item
+    const el = await menu('<helix-base-menu-item disabled value="copy">Copy</helix-base-menu-item>')
+    const item = el.querySelector('helix-base-menu-item') as Item
     let heard = false
     el.addEventListener('helix-select', () => {
       heard = true
@@ -249,8 +251,10 @@ describe('menu', () => {
   })
 
   test('a checkable row is a checkbox to a screen reader, not a command', async () => {
-    const el = await menu('<helix-menu-item checkable value="wrap">Wrap</helix-menu-item>')
-    const item = el.querySelector('helix-menu-item') as Item
+    const el = await menu(
+      '<helix-base-menu-item checkable value="wrap">Wrap</helix-base-menu-item>',
+    )
+    const item = el.querySelector('helix-base-menu-item') as Item
     const row = item.shadowRoot?.querySelector('[part="item"]')
     expect(row?.getAttribute('role')).toBe('menuitemcheckbox')
     expect(row?.getAttribute('aria-checked')).toBe('false')
@@ -260,16 +264,16 @@ describe('menu', () => {
 describe('menu submenus, coming and going', () => {
   const nested = async (): Promise<Menu> =>
     (await mount(
-      `<helix-menu label="Settings"><button slot="trigger">Open</button>
-        <helix-menu-item value="environment">Environment
-          <helix-menu-item slot="submenu" value="html">HTML</helix-menu-item>
-          <helix-menu-item slot="submenu" value="tsx">TSX</helix-menu-item>
-        </helix-menu-item>
-      </helix-menu>`,
+      `<helix-base-menu label="Settings"><button slot="trigger">Open</button>
+        <helix-base-menu-item value="environment">Environment
+          <helix-base-menu-item slot="submenu" value="html">HTML</helix-base-menu-item>
+          <helix-base-menu-item slot="submenu" value="tsx">TSX</helix-base-menu-item>
+        </helix-base-menu-item>
+      </helix-base-menu>`,
     )) as Menu
 
   const row = (host: Menu): HTMLElement & { hasSubmenu: boolean; showingSubmenu: boolean } =>
-    host.querySelector('helix-menu-item') as HTMLElement & {
+    host.querySelector('helix-base-menu-item') as HTMLElement & {
       hasSubmenu: boolean
       showingSubmenu: boolean
     }

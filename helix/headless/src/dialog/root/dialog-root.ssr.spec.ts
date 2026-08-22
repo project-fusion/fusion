@@ -8,7 +8,9 @@ describe('dialog server output', () => {
     /* Present and shut, so the content is in the served HTML for anything
        reading the page. `showModal()` is a client-side act and there is no
        server equivalent: a dialog cannot be open in markup. */
-    const markup = ssr(html`<helix-dialog label="Delete">Cannot be undone.</helix-dialog>`)
+    const markup = ssr(
+      html`<helix-base-dialog label="Delete">Cannot be undone.</helix-base-dialog>`,
+    )
     expect(hasPart(markup, 'dialog')).toBe(true)
     expect(partTag(markup, 'dialog')).toMatch(/<dialog/)
     expect(withoutStyles(markup)).toContain('Cannot be undone.')
@@ -18,13 +20,16 @@ describe('dialog server output', () => {
     // The attribute is the consumer's request; opening is something only a
     // browser can do, so the server serves it shut and the client opens it.
     expect(
-      partTag(ssr(html`<helix-dialog label="D" open>x</helix-dialog>`), 'dialog'),
+      partTag(ssr(html`<helix-base-dialog label="D" open>x</helix-base-dialog>`), 'dialog'),
     ).not.toContain('open')
   })
 
   test('the host carries only what the consumer wrote', () => {
     expect(
-      hostAttributes(ssr(html`<helix-dialog label="Delete">x</helix-dialog>`), 'helix-dialog'),
+      hostAttributes(
+        ssr(html`<helix-base-dialog label="Delete">x</helix-base-dialog>`),
+        'helix-base-dialog',
+      ),
     ).toEqual(['label'])
   })
 })

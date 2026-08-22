@@ -13,11 +13,11 @@ const settle = async (host: Updatable): Promise<void> => {
 }
 
 const group = async (extra = '', chosen = ''): Promise<Updatable> => {
-  document.body.innerHTML = `<helix-radio-group label="Label" name="choice" ${extra} default-value="${chosen}">
-    <helix-radio value="one">One</helix-radio>
-    <helix-radio value="two">Two</helix-radio>
-    <helix-radio value="three">Three</helix-radio>
-  </helix-radio-group>`
+  document.body.innerHTML = `<helix-base-radio-group label="Label" name="choice" ${extra} default-value="${chosen}">
+    <helix-base-radio value="one">One</helix-base-radio>
+    <helix-base-radio value="two">Two</helix-base-radio>
+    <helix-base-radio value="three">Three</helix-base-radio>
+  </helix-base-radio-group>`
   const host = document.body.firstElementChild as Updatable
   await settle(host)
   return host
@@ -144,10 +144,10 @@ describe('radio group as a field', () => {
 
 describe('radio group disabled cascades', () => {
   const withDisabled = async (): Promise<Updatable> => {
-    document.body.innerHTML = `<helix-radio-group label="L" name="c">
-      <helix-radio value="one">One</helix-radio>
-      <helix-radio disabled value="two">Two</helix-radio>
-    </helix-radio-group>`
+    document.body.innerHTML = `<helix-base-radio-group label="L" name="c">
+      <helix-base-radio value="one">One</helix-base-radio>
+      <helix-base-radio disabled value="two">Two</helix-base-radio>
+    </helix-base-radio-group>`
     const host = document.body.firstElementChild as Updatable
     await settle(host)
     return host

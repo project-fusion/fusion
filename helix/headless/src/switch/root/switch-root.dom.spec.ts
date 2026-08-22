@@ -13,7 +13,7 @@ describe('switch', () => {
     /* The input is what a form submits and what a label forwards a press to;
        the role is what a screen reader announces. Neither half can be got from
        the other, which is why this pairing rather than a button. */
-    const host = await mount('<helix-switch>On</helix-switch>')
+    const host = await mount('<helix-base-switch>On</helix-base-switch>')
     expect(control(host).type).toBe('checkbox')
     expect(control(host).getAttribute('role')).toBe('switch')
   })
@@ -21,15 +21,17 @@ describe('switch', () => {
   test('off submits nothing rather than a blank', async () => {
     // Which is how a checkbox behaves, and is the difference between "no" and
     // "an empty answer".
-    const off = await mount('<helix-switch name="a" value="yes">A</helix-switch>')
+    const off = await mount('<helix-base-switch name="a" value="yes">A</helix-base-switch>')
     expect(formValue(off)).toBeNull()
 
-    const on = await mount('<helix-switch default-checked name="a" value="yes">A</helix-switch>')
+    const on = await mount(
+      '<helix-base-switch default-checked name="a" value="yes">A</helix-base-switch>',
+    )
     expect(formValue(on)).toBe('yes')
   })
 
   test('a refused change leaves the control where it was', async () => {
-    const host = (await mount('<helix-switch name="a">A</helix-switch>')) as Updatable
+    const host = (await mount('<helix-base-switch name="a">A</helix-base-switch>')) as Updatable
     host.addEventListener('helix-toggle', (event) => event.preventDefault())
     const field = control(host)
     field.checked = true
@@ -39,7 +41,9 @@ describe('switch', () => {
   })
 
   test('required says so in its own words once asked', async () => {
-    const host = (await mount('<helix-switch name="a" required>A</helix-switch>')) as Updatable
+    const host = (await mount(
+      '<helix-base-switch name="a" required>A</helix-base-switch>',
+    )) as Updatable
     while ((await host.updateComplete) === false) {
       // Validity moves outside the property system, so this takes two passes.
     }

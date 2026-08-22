@@ -6,16 +6,18 @@ import '../index.js'
 describe('list server output', () => {
   test('the rows are in the served markup', () => {
     const markup = withoutStyles(
-      ssr(html`<helix-list><helix-list-item>One</helix-list-item></helix-list>`),
+      ssr(
+        html`<helix-base-list><helix-base-list-item>One</helix-base-list-item></helix-base-list>`,
+      ),
     )
     expect(markup).toContain('One')
   })
 
   test('neither the list nor a row carries an attribute the consumer did not write', () => {
     const markup = ssr(
-      html`<helix-list label="Files"><helix-list-item>x</helix-list-item></helix-list>`,
+      html`<helix-base-list label="Files"><helix-base-list-item>x</helix-base-list-item></helix-base-list>`,
     )
-    expect(hostAttributes(markup, 'helix-list')).toEqual(['label'])
-    expect(hostAttributes(markup, 'helix-list-item')).toEqual([])
+    expect(hostAttributes(markup, 'helix-base-list')).toEqual(['label'])
+    expect(hostAttributes(markup, 'helix-base-list-item')).toEqual([])
   })
 })

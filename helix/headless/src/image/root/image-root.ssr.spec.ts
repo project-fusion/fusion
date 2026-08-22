@@ -3,7 +3,7 @@ import { hasPart, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const pier = html`<helix-image alt="A pier" src="/pier.jpg"></helix-image>`
+const pier = html`<helix-base-image alt="A pier" src="/pier.jpg"></helix-base-image>`
 
 describe('image server output', () => {
   test('ships the picture, so the browser can start fetching it', () => {
@@ -22,7 +22,7 @@ describe('image server output', () => {
   })
 
   test('a decorative picture ships an empty alt rather than none', () => {
-    const mark = html`<helix-image alt="" src="/rule.svg"></helix-image>`
+    const mark = html`<helix-base-image alt="" src="/rule.svg"></helix-base-image>`
     expect(partTag(ssr(mark), 'image')).toContain('alt=""')
   })
 

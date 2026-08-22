@@ -3,10 +3,10 @@ import { hostAttributes, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const group = html`<helix-button-group label="Text alignment">
-  <helix-button>Left</helix-button>
-  <helix-button>Right</helix-button>
-</helix-button-group>`
+const group = html`<helix-base-button-group label="Text alignment">
+  <helix-base-button>Left</helix-base-button>
+  <helix-base-button>Right</helix-base-button>
+</helix-base-button-group>`
 
 describe('button group server output', () => {
   test('the buttons are served, not built on the client', () => {
@@ -16,6 +16,6 @@ describe('button group server output', () => {
   })
 
   test('the group role is on internals, so the host stays as written', () => {
-    expect(hostAttributes(ssr(group), 'helix-button-group')).toEqual(['label'])
+    expect(hostAttributes(ssr(group), 'helix-base-button-group')).toEqual(['label'])
   })
 })
