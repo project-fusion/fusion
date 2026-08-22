@@ -481,7 +481,6 @@ helix-drawer {
     color-mix(in oklab, var(--helix-color-primary) 26%, transparent) 0%,
     transparent 72%
   );
-  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   text-align: center;
 }
 
@@ -2048,13 +2047,102 @@ helix-drawer helix-tree {
   color: inherit;
   display: block;
   margin-inline: calc(var(--helix-space-md) * -1);
-  padding: var(--helix-space-lg) var(--helix-space-md);
+  padding: var(--helix-space-md);
   text-decoration: none;
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 .insightNext:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+}
+
+/* The arrow leans the way the row goes.
+ *
+ * It was a static glyph at the end of a link, which is a picture of a direction
+ * rather than a sign of one: three of them down a page read as decoration
+ * because nothing about them answers the pointer. Four pixels is enough, and
+ * more is a row that feels like it is trying to leave.
+ *
+ * `translate` rather than `transform`, so it composites on its own and cannot
+ * collide with a transform the icon might want later. Declared on the icon
+ * rather than the row, because only the arrow moves.
+ *
+ * The component sets no `translate` of its own, so this adds a property rather
+ * than overruling one. */
+.insightNext helix-icon {
+  transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.insightNext:hover helix-icon {
+  translate: var(--helix-space-2xs) 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightNext helix-icon {
+    transition: none;
+  }
+
+  .insightNext:hover helix-icon {
+    translate: none;
+  }
+}
+
+/* The tags in the byline separate by fill, not by edge.
+ *
+ * Five chips in a row each drawing its own hairline is five more lines than the
+ * row needs: the fill already says where each one begins and ends, and the
+ * edges turned a set of facts into a set of boxes. Through `--tag-border-color`,
+ * which `Tag` now publishes beside the fill and label hooks it already had, so
+ * this is the component's own property rather than a document rule reaching
+ * past it.
+ *
+ * `outlined` goes with the edges, since an outlined chip with no outline is
+ * nothing at all. Every tag is `subtle` now and the subject keeps `primary`,
+ * which is the one distinction the row was making with colour anyway. */
+.insightByline helix-tag {
+  --tag-border-color: transparent;
+}
+
+/* Two of the five are links, and the chip is the whole target.
+ *
+ * `quiet` rather than no treatment at all, because a bare anchor draws an
+ * underline and that line propagates into the label the tag has slotted from
+ * this tree: the chip would come out underlined through its own shadow root.
+ * `quiet` is the variant that takes the decoration off, and its colour never
+ * reaches the label, which `Tag` sets on its own host.
+ *
+ * `inline-flex` so the anchor is exactly the chip. Left inline it takes the
+ * line box's height instead, which puts a taller invisible target around a
+ * short chip and lands the row's `align: center` on the wrong box. */
+.insightByline a {
+  display: inline-flex;
+}
+
+/* The section's escape hatch, wearing the rows' arrow so the whole block has
+   one sign for "goes somewhere" rather than a link that says it in blue and
+   three rows that say it with a glyph. */
+.insightAll {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}
+
+.insightAll helix-icon {
+  transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.insightAll:hover helix-icon {
+  translate: var(--helix-space-2xs) 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightAll helix-icon {
+    transition: none;
+  }
+
+  .insightAll:hover helix-icon {
+    translate: none;
+  }
 }
 
 /* Larger than a section title and smaller than the hero's, which is the whole

@@ -117,17 +117,25 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             would turn a row into a mosaic. The subject keeps its wash, so the
             one tag that leads somewhere else is the one that looks like it
             does, and the kind stays neutral beside it. */}
-        <helix-flex align="center" class="insightByline" data-density="sm" gap="xs" wrap>
-          <helix-tag appearance="outlined">
+        <helix-flex align="center" class="insightByline" gap="xs" wrap>
+          <helix-tag>
             <helix-avatar name={insight.author} slot="prefix"></helix-avatar>
             {insight.author}
           </helix-tag>
-          <helix-tag appearance="outlined">
+          <helix-tag>
             <time dateTime={insight.date}>{formatDate(insight.date)}</time>
           </helix-tag>
-          <helix-tag appearance="outlined">{insight.minutes} min read</helix-tag>
-          <helix-tag tone="primary">{insight.topic}</helix-tag>
-          <helix-tag>{insight.kind}</helix-tag>
+          <helix-tag>{insight.minutes} min read</helix-tag>
+          {/* The two that lead somewhere actually lead there. The gallery
+              already seeds its filters from the query string on the server, so
+              a topic is a working filter rather than a label describing one,
+              and it costs an `href`. */}
+          <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
+            <helix-tag tone="primary">{insight.topic}</helix-tag>
+          </Link>
+          <Link data-link="quiet" href={`/insights?kind=${encodeURIComponent(insight.kind)}`}>
+            <helix-tag>{insight.kind}</helix-tag>
+          </Link>
         </helix-flex>
       </helix-flex>
 
@@ -143,8 +151,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <helix-text appearance="title" as="h2">
             Keep reading
           </helix-text>
-          <Link data-link href="/insights">
+          {/* Quiet rather than the default link treatment. A bright underlined
+              link beside a section heading competes with the heading, and this
+              one is an escape hatch under three rows that are themselves the
+              main way on. It takes the rows' arrow so the section has one
+              vocabulary for "goes somewhere". */}
+          <Link className="insightAll" data-link="quiet" href="/insights">
             All insights
+            <helix-icon name="arrow-right"></helix-icon>
           </Link>
         </helix-flex>
 

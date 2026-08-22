@@ -25,6 +25,7 @@ import { styles } from './tag-root.css.js'
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
  *
  * @cssproperty --tag-background-color - Fill behind the tag.
+ * @cssproperty --tag-border-color - Color of the edge, for a chip that separates by fill alone.
  * @cssproperty --tag-foreground-color - Label color.
  * @cssproperty --tag-radii - Corner radius of the tag.
  */
