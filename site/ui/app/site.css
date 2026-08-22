@@ -1951,7 +1951,17 @@ helix-drawer helix-tree {
 .insightShell {
   margin-inline: auto;
   max-inline-size: 90ch;
-  padding-block: var(--site-band);
+  /* **Not a band at the top, because a post is not a section of the landing
+     page.** `--site-band` is the rhythm that gives each claim on the front page
+     a screen of its own, and it clamps to 12vh, which is 108 on a laptop. Above
+     an article that is 108 pixels of nothing between the masthead and the way
+     out, before a reader reaches a single word of the thing they opened. A page
+     of prose wants to start.
+
+     The end keeps the band. There the space is doing work: it separates the
+     last line of the argument from the footer, and running an article straight
+     into the chrome is the fault the top padding does not have. */
+  padding-block: var(--helix-space-2xl) var(--site-band);
   padding-inline: var(--site-inset);
 }
 
@@ -1967,33 +1977,28 @@ helix-drawer helix-tree {
   text-align: start;
 }
 
-/* One left edge, and it is the words that have to make it.
+/* The chevron sits on the column, and the label sits after it.
  *
- * The pull-back used to be one control inset, which put the *chevron* on the
- * column and the label 29 past it. That is aligning the wrong thing: a reader
- * does not align on an icon, they align on the text, so the masthead had a
- * title and a standfirst at one edge and the only other words on the page at
- * another. Measured at 24 for the title and 53 for the label.
+ * **Both alignments were built and looked at, and this is the one that
+ * survives.** Aligning the *label* is the better-sounding argument: a reader
+ * aligns on words, not on icons, and with the chevron on the column the label
+ * starts 29 inside it, so the masthead has a title and a standfirst at one edge
+ * and the only other words at another. Measured at 24 against 53.
  *
- * So the pull-back is everything before the label: the control inset, the
- * icon, and the gap between them. The label lands on 24 with the title and the
- * chevron hangs into the margin, which is what a leading marker is supposed to
- * do. It is the same idea as hanging punctuation, and the same idea the crumb
- * this replaced used to get for free.
+ * It loses anyway, because the fix has to put the chevron somewhere and the
+ * only place left is outside. Pulling back far enough to land the label on the
+ * column drags the whole control 44 to the left, and the hover fill goes with
+ * it, since anything that hangs still has to sit inside the thing that lights
+ * up. That gives a wash reaching 44 one way and 16 the other, hanging off the
+ * side of a centred column with nothing under it. A resting misalignment of 29
+ * costs less than a moving one of 44: the first is a slightly indented label,
+ * the second is a shape that looks broken every time a pointer crosses it.
  *
- * **The cost is an uneven wash, and it is the right trade.** The fill now
- * reaches 44 to the left of the column and 16 to the right, because everything
- * that hangs has to stay inside the thing that lights up. That asymmetry shows
- * only under a pointer, and only on a band of empty margin; the misalignment it
- * buys out was visible all the time, to everyone, at rest.
- *
- * Every term is the token the recipe itself uses, so nothing here drifts if the
- * control inset or the icon step changes. */
+ * So one control inset, the fill overhangs evenly, and the chevron holds the
+ * edge that the title and the standfirst hold. The label is inset by the icon
+ * and its gap, which is what a leading icon does to a label anywhere. */
 .insightTrail {
-  margin-inline-start: calc(
-    -1 *
-    (var(--helix-space-control) + var(--helix-space-xs) + var(--helix-size-icon))
-  );
+  margin-inline-start: calc(var(--helix-space-control) * -1);
 }
 
 .insightLede {
