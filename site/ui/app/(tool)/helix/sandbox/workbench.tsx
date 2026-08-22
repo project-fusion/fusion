@@ -23,8 +23,9 @@ import type {
   HelixTree,
   HelixTreeItem,
 } from '@helix-io/web'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
+import { useApiTier } from '../../../../lib/use-api-tier'
 import { useElementRef } from '../../../../lib/use-element-ref'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
@@ -359,7 +360,30 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     return () => query.removeEventListener('change', sync)
   }, [])
 
-  const { example, family, withExamples } = resolve(families, familySlug, exampleSlug)
+  /* The reader's tier decides which examples exist here, not which ones are
+     painted over. The reference pages render both tiers and let CSS hide one,
+     because they are static and the preference is in `localStorage`; this is a
+     client component that has already read it, so it can drop the examples of
+     the other tier from the data and never build the rows at all. Hiding is
+     what put two rows called "Preview" in this rail: the stylesheet doing the
+     work only reached the surface it was written for.
+     `base` is what the drawer calls it and `headless` is what the manifest
+     calls the tier those examples render, which is the same tier under the two
+     names each surface already uses. */
+  const wanted = useApiTier() === 'base' ? 'headless' : 'styled'
+  const inTier = useMemo(() => {
+    const kept = families.map((entry) => ({
+      ...entry,
+      examples: entry.examples.filter((item) => item.tier === wanted),
+    }))
+    /* A floor, not a feature. `resolve` has to come back with an example for
+       the panes to have anything to show, so a tier nothing has written an
+       example for yet would leave the workbench with nothing to open. Three
+       families carry base examples today and #135 is about the rest. */
+    return kept.some((entry) => entry.examples.length > 0) ? kept : families
+  }, [families, wanted])
+
+  const { example, family, withExamples } = resolve(inTier, familySlug, exampleSlug)
   const current = SYNTAXES.find((entry) => entry.value === syntax) ?? SYNTAXES[0]
 
   const select = useCallback((value: string) => {

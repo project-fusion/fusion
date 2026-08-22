@@ -2,20 +2,9 @@
 
 import type { HelixDrawer, HelixToggleGroup } from '@helix-io/web'
 import { useEffect, useRef, useState } from 'react'
+import type { ApiTier } from '../lib/use-api-tier'
 
 type ColorMode = 'system' | 'light' | 'dark'
-
-/**
- * Which tier's API a reference page documents.
- *
- * `styled` is the default because it is the tier almost everyone consumes, and
- * because it is a superset: the styled element extends the base one, so its
- * tables already contain every member the base tables would show. A reader who
- * has not expressed a preference is better served by the larger, more common
- * answer than by being asked a question they have no reason to have an opinion
- * about yet.
- */
-type ApiTier = 'styled' | 'base'
 
 const STORAGE_KEY = 'fusion-color-mode'
 const TIER_KEY = 'fusion-api-tier'
