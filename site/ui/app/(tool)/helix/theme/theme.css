@@ -97,6 +97,10 @@
   padding: var(--helix-space-lg) var(--helix-space-xl);
 }
 
+.themedSplit {
+  padding-inline: var(--helix-space-xl);
+}
+
 .themedPage helix-callout {
   margin-inline: var(--helix-space-xl);
 }
@@ -108,10 +112,39 @@ helix-sandbox-editor {
   min-block-size: 0;
 }
 
-.themeAudit {
+/* The findings, inside whichever tab is showing. The tabs own the panel's
+   height; each pane scrolls on its own so switching tabs does not move the
+   scroll position of the one you left. */
+.themeFindings {
   block-size: 100%;
   overflow-y: auto;
   padding: var(--helix-space-md);
+}
+
+/* **It transitions in, because it appears in response to something the reader
+   just did.** A notice that materialises with no motion reads as having always
+   been there, and the thing it is reporting, that the brand moved, is a
+   consequence of the colour they typed a moment ago.
+
+   Keyed on the direction in the markup, so switching from lightened to darkened
+   remounts and plays again rather than silently swapping a word. */
+.themeShift {
+  animation: themeShiftIn var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+@keyframes themeShiftIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--helix-space-2xs) * -1));
+  }
+}
+
+/* The base layer caps duration for a reader who asked not to be moved, and a
+   keyframe animation is not a transition, so it needs saying here. */
+@media (prefers-reduced-motion: reduce) {
+  .themeShift {
+    animation: none;
+  }
 }
 
 /* The header's centre and end collide before the page does: a nav is centred in
@@ -137,6 +170,15 @@ helix-sandbox-editor {
 
   .themedFigures {
     padding-inline: var(--helix-space-lg);
+  }
+
+  .themedSplit {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: var(--helix-space-lg);
+  }
+
+  .themedSplit {
+    padding-inline: var(--helix-space-xl);
   }
 
   .themedPage helix-callout {

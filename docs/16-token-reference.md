@@ -107,11 +107,11 @@ The spacing scale, used for gaps, padding and margins alike.
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 224 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 279 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 236 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 238 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 236 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 130 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 88 |
-| `--helix-space-xl` | `var(--_helix-scale-8)` | 71 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 89 |
+| `--helix-space-xl` | `var(--_helix-scale-8)` | 73 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 41 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 23 |
 | `--helix-space-control` | `var(--helix-space-md)` | 7 |
@@ -228,7 +228,7 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 4 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 341 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 342 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 130 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 26 |
 
@@ -238,7 +238,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 305 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 306 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 65 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 59 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
@@ -278,7 +278,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-sm` | `calc(1rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 8 |
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 22 |
-| `--helix-size-icon` | `var(--helix-size-icon-md)` | 90 |
+| `--helix-size-icon` | `var(--helix-size-icon-md)` | 91 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 46 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 15 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 82 |

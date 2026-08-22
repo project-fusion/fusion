@@ -119,12 +119,19 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
   }, [theme])
   const css = useMemo(() => toCss(theme, SCOPE), [theme])
 
-  /* **Lightness only**, because that is the one component the solver moves: a
-     brand keeps its hue and its chroma and gives up its lightness to reach the
-     target. Comparing the hexes would report a move on a rounding difference. */
+  /* **Lightness only, and in whichever direction reaches the target.** The
+     solver moves one component: a brand keeps its hue and its chroma and gives
+     up its lightness. Which way it gives it up depends on where the brand
+     started, and the first version of this said "Darkened" unconditionally,
+     which was a lie for every brand that began too dark: `#2e394a` comes back
+     *lighter* and the label still claimed it had been darkened.
+
+     Comparing hexes would report a move on a rounding difference, so the
+     comparison is on lightness and the threshold is what a reader could see. */
   const derived = theme.tokens.find((token) => token.name === 'color-primary')
   const derivedPrimary = derived?.hex ?? brand
-  const moved = Math.abs((derived?.value.lightness ?? 0) - hexToOklch(brand).lightness) > 0.06
+  const shift = (derived?.value.lightness ?? 0) - hexToOklch(brand).lightness
+  const moved = Math.abs(shift) > 0.06
 
   /* **Injected rather than applied per property.** A `<style>` carrying the
      emitted block is the same code path as a consumer pasting it into their
@@ -209,14 +216,20 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                 A swatch that always says "and here is the same colour again" is
                 a row of chrome nobody reads. */}
             {moved ? (
-              <helix-flex align="center" gap="sm">
-                <span className="themeSwatch" style={{ background: brand }} />
-                <helix-icon name="arrow-right"></helix-icon>
-                <span className="themeSwatch" style={{ background: derivedPrimary }} />
-                <helix-text appearance="caption">
-                  Darkened to clear {contrastTarget}:1. The hue is kept; only the lightness moves.
-                </helix-text>
-              </helix-flex>
+              <helix-callout className="themeShift" key={shift > 0 ? 'up' : 'down'} severity="info">
+                <helix-flex align="center" gap="sm">
+                  <span className="themeSwatch" style={{ background: brand }} />
+                  <helix-icon name="arrow-right"></helix-icon>
+                  <span className="themeSwatch" style={{ background: derivedPrimary }} />
+                  {/* Short, because this pane is a quarter of the window and the
+                      swatches have already said "this became that". The sentence
+                      only has to say which way and why. */}
+                  <helix-text appearance="caption">
+                    {shift > 0 ? 'Lightened' : 'Darkened'} to clear {contrastTarget}:1. Hue and
+                    chroma are kept.
+                  </helix-text>
+                </helix-flex>
+              </helix-callout>
             ) : null}
 
             <helix-select
@@ -237,8 +250,14 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               value={String(contrastTarget)}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              <helix-option value="4.5">4.5, WCAG AA</helix-option>
-              <helix-option value="7">7, WCAG AAA</helix-option>
+              {/* **3:1 is a real target, not a lesser one.** WCAG 1.4.11 asks it
+                  of a graphic or a control's own boundary, and 1.4.3 asks it of
+                  large text, which is 24px or 18.66px bold. A theme built for a
+                  display face answers to it, and holding such a theme to 4.5
+                  darkens every brand for text that is never set that small. */}
+              <helix-option value="3">3, AA for large text and controls</helix-option>
+              <helix-option value="4.5">4.5, AA</helix-option>
+              <helix-option value="7">7, AAA</helix-option>
             </helix-select>
 
             {/* **Painted through `--slider-track-image`, the hook Slider already
@@ -410,33 +429,95 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               value={css}
             ></helix-sandbox-editor>
 
-            <div className="themeAudit" slot="panel">
-              <helix-flex direction="column" gap="sm">
-                <helix-text appearance="caption">
-                  Every pair the surface model declares, measured against the ground it lands on
-                  rather than against the page alone. Unverifiable is not a softer failure: it means
-                  the ground is not knowable, which is what a caption over a photograph has.
-                </helix-text>
+            {/* **Tabs, because these are three different questions.** A
+                contrast failure is a token against a ground, a collision is two
+                roles against each other, and an unmeasured pair is neither: it
+                is a ground nobody can know. Stacked in one column they read as
+                one list of complaints, and a reader looking for the second kind
+                has to know it exists. */}
+            <helix-tabs data-density="sm" defaultActive="contrast" label="The audit" slot="panel">
+              <helix-tabs-tab value="contrast">
+                Contrast
+                {failures.length > 0 ? ` (${failures.length})` : ''}
+              </helix-tabs-tab>
+              <helix-tabs-tab value="collisions">
+                Collisions
+                {theme.collisions.length > 0 ? ` (${theme.collisions.length})` : ''}
+              </helix-tabs-tab>
+              <helix-tabs-tab value="unmeasured">
+                Unverifiable
+                {unmeasured.length > 0 ? ` (${unmeasured.length})` : ''}
+              </helix-tabs-tab>
 
-                {failures.map((pair) => (
-                  <helix-text key={`${pair.foreground}-${pair.background}`}>
-                    {pair.foreground} on {pair.background}: {pair.ratio?.toFixed(2)}:1, under{' '}
-                    {pair.target}:1
-                  </helix-text>
-                ))}
+              <helix-tabs-panel slot="panels" value="contrast">
+                <div className="themeFindings">
+                  {failures.length === 0 ? (
+                    <helix-text appearance="caption">
+                      All {counts.pass ?? 0} measured pairs clear their target. Each is a foreground
+                      against a ground the surface model says it lands on, rather than against the
+                      page alone.
+                    </helix-text>
+                  ) : (
+                    <helix-table label="Contrast failures">
+                      <helix-table-column slot="columns">Foreground</helix-table-column>
+                      <helix-table-column slot="columns">Ground</helix-table-column>
+                      <helix-table-column slot="columns">Measured</helix-table-column>
+                      <helix-table-column slot="columns">Target</helix-table-column>
+                      {failures.map((pair) => (
+                        <helix-table-row key={`${pair.foreground}-${pair.background}`}>
+                          <helix-table-cell>{pair.foreground}</helix-table-cell>
+                          <helix-table-cell>{pair.background}</helix-table-cell>
+                          <helix-table-cell>{pair.ratio?.toFixed(2)}:1</helix-table-cell>
+                          <helix-table-cell>{pair.target}:1</helix-table-cell>
+                        </helix-table-row>
+                      ))}
+                    </helix-table>
+                  )}
+                </div>
+              </helix-tabs-panel>
 
-                {theme.collisions.map((collision) => (
-                  <helix-text key={collision}>{collision}</helix-text>
-                ))}
+              <helix-tabs-panel slot="panels" value="collisions">
+                <div className="themeFindings">
+                  {theme.collisions.length === 0 ? (
+                    <helix-text appearance="caption">
+                      Every role is distinguishable from every other. A collision is two roles a
+                      reader cannot tell apart, which no contrast measurement can see: both may
+                      clear the page and still say the same thing.
+                    </helix-text>
+                  ) : (
+                    <helix-flex direction="column" gap="sm">
+                      {theme.collisions.map((collision) => (
+                        <helix-callout key={collision} severity="warning">
+                          <helix-text>{collision}</helix-text>
+                        </helix-callout>
+                      ))}
+                      <helix-text appearance="caption">
+                        The accent yields on its own, and a status may rotate within its meaning up
+                        to the allowance. What is left here could not be repaired by either.
+                      </helix-text>
+                    </helix-flex>
+                  )}
+                </div>
+              </helix-tabs-panel>
 
-                {failures.length === 0 && theme.collisions.length === 0 ? (
-                  <helix-text>
-                    Nothing to report: every measured pair clears its target and every role is
-                    distinguishable from every other.
-                  </helix-text>
-                ) : null}
-              </helix-flex>
-            </div>
+              <helix-tabs-panel slot="panels" value="unmeasured">
+                <div className="themeFindings">
+                  <helix-flex direction="column" gap="sm">
+                    <helix-text appearance="caption">
+                      Not a softer failure: these pairs were never measured, because the ground is
+                      not knowable: what sits behind a caption over a photograph is the photograph.
+                      Folding them into the passes is how a guarantee becomes a claim about the
+                      pairs that happened to be easy.
+                    </helix-text>
+                    {unmeasured.map((pair) => (
+                      <helix-text key={`${pair.foreground}-${pair.background}`}>
+                        {pair.foreground} on {pair.background}
+                      </helix-text>
+                    ))}
+                  </helix-flex>
+                </div>
+              </helix-tabs-panel>
+            </helix-tabs>
           </helix-sandbox>
         </div>
       </helix-splitter>
