@@ -19,7 +19,21 @@
   font-size: var(--helix-text-sm);
   min-block-size: var(--helix-size-control-md);
   min-inline-size: 0;
+  /* A long identifier breaks rather than running into the column beside it.
+     `anywhere` and not `break-word`, because only `anywhere` lowers the
+     min-content size: the track is `minmax(0, 1fr)` by default, which is
+     allowed to be narrower than the content, so a cell that refuses to break is
+     a cell that overflows. Measured at 760px on the Tree reference page, where
+     `defaultActive` sat eleven pixels into the Type column. */
+  overflow-wrap: anywhere;
   padding: var(--helix-space-xs) var(--helix-space-md) var(--helix-space-xs) var(--helix-space-none);
+}
+
+/* The cell can shrink and its content could not: `min-inline-size: 0` above
+   frees the grid item, and a flex item inside keeps an automatic minimum of its
+   own until it is told otherwise. Both are needed and neither is enough. */
+::slotted(*) {
+  min-inline-size: 0;
 }
 
 /* A *row* header, which is content and not a label: "helix-web" names the row

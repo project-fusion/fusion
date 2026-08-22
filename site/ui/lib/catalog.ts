@@ -31,6 +31,8 @@ export interface PropertyDoc {
   default: string
   description: string
   name: string
+  /** Whether it is a getter, so a reader is not invited to set it. */
+  readonly: boolean
   type: string
 }
 
@@ -101,7 +103,9 @@ interface RawNamed {
   parameters?: { name?: string; type?: { text?: string } }[]
   privacy?: string
   reactProp?: string
+  readonly?: boolean
   return?: { type?: { text?: string } }
+  static?: boolean
   type?: { text?: string }
 }
 
@@ -170,7 +174,12 @@ const isPublic = (row: RawNamed): boolean => row.privacy === undefined || row.pr
  */
 const properties = (rows: RawNamed[] | undefined): PropertyDoc[] =>
   (rows ?? [])
-    .filter((row) => row.kind === 'field' && isPublic(row))
+    /* Instance fields only. A static is the class's, not an element's, and the
+       two that reach here are the platform's rather than ours:
+       `shadowRootOptions` is Lit's and `formAssociated` is the flag the browser
+       reads to decide a control participates in a form. Thirty-five rows across
+       the library, none of them anything a consumer sets on a tag. */
+    .filter((row) => row.kind === 'field' && isPublic(row) && row.static !== true)
     .map((row) => ({
       /* `undefined` is not a default, it is the absence of one, and the
          analyzer records the initialiser verbatim. Printed, the column reads
@@ -180,6 +189,13 @@ const properties = (rows: RawNamed[] | undefined): PropertyDoc[] =>
       default: row.default === 'undefined' ? '' : (row.default ?? ''),
       description: row.description ?? '',
       name: row.name ?? '',
+      /* A getter reads as a field in the manifest and assigning to one throws,
+         which is the same trap the React generator already skips these for. In
+         a table they are indistinguishable from a property a reader may set:
+         `AvatarGroup.avatars` sat beside its slot looking like a second way to
+         pass the same thing, and there is no second way. A hundred and
+         fifty-five of them. */
+      readonly: row.readonly === true,
       type: withoutUndefined(row.type?.text ?? ''),
     }))
 

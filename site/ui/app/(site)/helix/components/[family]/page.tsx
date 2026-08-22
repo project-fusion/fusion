@@ -236,7 +236,19 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
           <helix-table-cell>
             <TypeText>{row.type}</TypeText>
           </helix-table-cell>
-          <helix-table-cell>{row.default && <TypeText>{row.default}</TypeText>}</helix-table-cell>
+          <helix-table-cell>
+            {/* A getter has no default and cannot be set, so the column that
+                would hold one says which of the two it is. Read only rather
+                than a dash, because a dash is what the settable ones with no
+                initialiser already show and the two are not the same. */}
+            {row.readonly ? (
+              <helix-text appearance="caption" tone="muted">
+                Read only
+              </helix-text>
+            ) : (
+              row.default && <TypeText>{row.default}</TypeText>
+            )}
+          </helix-table-cell>
           <helix-table-cell>
             <helix-text appearance="caption" tone="muted">
               {first(row.description)}
