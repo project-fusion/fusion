@@ -190,7 +190,11 @@ helix-megamenu {
 }
 
 .navGlass {
-  backdrop-filter: blur(var(--helix-material-blur-md));
+  /* The same step the scrolled masthead takes, so the handover is invisible.
+     The bar blurs at `lg` and hands its painting to this sheet part way through
+     an open: at `md` the blur would visibly slacken at the moment it changed
+     hands, which is a tell that there are two things doing one job. */
+  backdrop-filter: blur(var(--helix-material-blur-lg));
   background-color: var(--helix-material-translucent);
   inset-block-start: 0;
   inset-inline: 0;
