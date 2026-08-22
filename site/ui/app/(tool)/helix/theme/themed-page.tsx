@@ -1,21 +1,56 @@
 /**
- * What the preview shows: a landing page, not a row of samples.
+ * What the preview shows: a page somebody would ship.
  *
- * **A palette is judged in composition, not in isolation.** The first version
- * held a card, a callout, some tags and a popover, which answers "what colour
- * is a tag" and not "would I ship this". Contrast between an ink and its ground
- * is measured by the engine and reported in the audit; what a reader is here to
+ * **A palette is judged in composition, not in isolation.** An earlier version
+ * was a card, a callout and a row of tags, which answers "what colour is a tag"
+ * and not "would I ship this". Contrast between an ink and its ground is
+ * measured by the engine and reported in the audit; what a reader is here to
  * judge is the thing the audit cannot see, which is whether the palette holds
- * together across a page of real hierarchy.
+ * together across real hierarchy.
  *
- * So: a header, a hero, a row of features, a band of figures, and a close. Each
- * one lands on a different surface, which is also what puts every ground in the
- * model on screen at once rather than one at a time.
+ * So it is a full landing page: header, hero, proof, features, a working
+ * detail section, a closing band and a footer. Each lands on a different
+ * surface, which also puts every ground in the model on screen at once rather
+ * than one at a time.
  *
- * Static markup on purpose. It takes no props and holds no state, so it renders
- * once and every change a reader makes reaches it through inherited custom
+ * **The copy is a company's, not ours.** It said things like "every foreground
+ * measured against the ground it lands on", which is Fusion's pitch wearing a
+ * customer's header: a reader judging a palette should not be reading about the
+ * palette. Nothing here refers to theming at all.
+ *
+ * Static on purpose. It takes no props and holds no state, so it renders once
+ * and every change a reader makes reaches it through inherited custom
  * properties rather than through React.
  */
+
+/** The one place the name lives, so settling on another is one line. */
+const COMPANY = 'Halyard'
+
+const FEATURES = [
+  {
+    body: 'Every route, every stop, every exception, in one place and current to the minute.',
+    icon: 'gauge',
+    title: 'One view of the fleet',
+  },
+  {
+    body: 'Delays surface before they cascade, with the three moves that recover the schedule.',
+    icon: 'pulse',
+    title: 'Warnings that arrive early',
+  },
+  {
+    body: 'Read your own data out whenever you like. No export queue, no support ticket.',
+    icon: 'share-network',
+    title: 'Yours to take with you',
+  },
+] as const
+
+const SHIPMENTS = [
+  { lane: 'Rotterdam to Felixstowe', state: 'success', status: 'On time', window: '14:20' },
+  { lane: 'Algeciras to Genoa', state: 'warning', status: 'Delayed 40m', window: '09:05' },
+  { lane: 'Gdansk to Aarhus', state: 'danger', status: 'Missed window', window: '22:45' },
+  { lane: 'Bilbao to Cork', state: 'success', status: 'On time', window: '06:30' },
+] as const
+
 export function ThemedPage() {
   return (
     <div className="themedPage">
@@ -25,28 +60,20 @@ export function ThemedPage() {
             button fill has to carry white and the link colour has to clear the
             page as text. `--helix-color-brand-mark` answers to the 3:1 a graphic
             owes rather than the 4.5 a word does, so a reader who picks a colour
-            can find it here even when every button has moved away from it.
-
-            Drawn rather than pictured: a mark that is one shape and one fill is
-            CSS, and an asset would need loading, sizing and a licence to say the
-            same thing. `aria-hidden`, the name beside it being the accessible
-            one, so a screen reader is not told the company twice. */}
+            can find it here even when every button has moved away from it. */}
         <helix-flex align="center" gap="xs" slot="start">
           <span aria-hidden="true" className="themedMark" />
-          <helix-text appearance="label">Halyard</helix-text>
+          <helix-text appearance="label">{COMPANY}</helix-text>
         </helix-flex>
+
         {/* Plain anchors carrying `data-navigation-item`, which is the base
             layer's helper for exactly this: `helix-navigation` is the landmark
-            and takes whatever is slotted into it, and there is no item element
-            to reach for. */}
-        {/* Wrapped, because the container query below hides it and a document
-            rule setting `display` on the component would kill the component's
-            own: a shadow rule loses to a document rule whatever the specificity
-            and whatever the layer. The wrapper is this file's to hide. */}
+            and takes whatever is slotted into it. Wrapped, because the container
+            query that hides it must not set `display` on the component itself. */}
         <div className="themedNav">
           <helix-navigation label="Product">
-            <a data-navigation-item href="#product">
-              Product
+            <a data-navigation-item href="#platform">
+              Platform
             </a>
             <a data-navigation-item href="#pricing">
               Pricing
@@ -56,92 +83,120 @@ export function ThemedPage() {
             </a>
           </helix-navigation>
         </div>
+
         <helix-flex align="center" gap="xs" slot="end">
           <helix-button appearance="ghost">Sign in</helix-button>
           <helix-button appearance="solid" tone="primary">
-            Start free
+            Book a walkthrough
           </helix-button>
         </helix-flex>
       </helix-app-header>
 
-      <helix-flex className="themedHero" direction="column" gap="md">
-        <helix-tag appearance="subtle" tone="accent">
-          Now in general release
-        </helix-tag>
-        <helix-text appearance="display" as="h1">
-          Ship the interface, not the argument about it.
-        </helix-text>
-        <helix-text appearance="body">
-          One colour in, a whole palette out, and every foreground measured against the ground it
-          actually lands on rather than against the page alone.
-        </helix-text>
-        <helix-flex gap="sm">
-          <helix-button appearance="solid" tone="primary">
-            Start free
-          </helix-button>
-          <helix-button appearance="outlined">Read the derivation</helix-button>
+      <section className="themedHero">
+        <helix-flex direction="column" gap="md">
+          <helix-flex align="center" gap="xs">
+            <helix-tag appearance="subtle" tone="accent">
+              New
+            </helix-tag>
+            <helix-text appearance="caption">Live berth windows, in twelve more ports</helix-text>
+          </helix-flex>
+          <helix-text appearance="display" as="h1">
+            Know where the freight is before the customer asks.
+          </helix-text>
+          <helix-text appearance="body">
+            {COMPANY} reads the schedules, the terminals and the telematics, and tells you which of
+            today&rsquo;s shipments is about to be late while there is still something to do about
+            it.
+          </helix-text>
+          <helix-flex gap="sm">
+            <helix-button appearance="solid" tone="primary">
+              Start free
+            </helix-button>
+            <helix-button appearance="outlined">
+              Book a walkthrough
+              <helix-icon name="arrow-right" slot="end"></helix-icon>
+            </helix-button>
+          </helix-flex>
+          <helix-flex align="center" gap="xs">
+            <helix-icon name="check-circle-fill"></helix-icon>
+            <helix-text appearance="caption">
+              No card. Two weeks of your own history loaded on the first day.
+            </helix-text>
+          </helix-flex>
         </helix-flex>
-      </helix-flex>
-
-      <helix-grid className="themedFeatures" columns={3} gap="md">
-        {[
-          {
-            body: 'Foregrounds are solved for their target, not picked and then audited.',
-            title: 'Contrast by construction',
-          },
-          {
-            body: 'Change the brand and the charts, the tints and the borders move with it.',
-            title: 'One seed, one palette',
-          },
-          {
-            body: 'Every pair it could not measure says so, rather than going quiet.',
-            title: 'Honest about the gaps',
-          },
-        ].map((feature) => (
-          <helix-card key={feature.title}>
-            <helix-flex direction="column" gap="xs">
-              <helix-text appearance="subheading" as="h2">
-                {feature.title}
-              </helix-text>
-              <helix-text appearance="caption">{feature.body}</helix-text>
-            </helix-flex>
-          </helix-card>
-        ))}
-      </helix-grid>
+      </section>
 
       {/* A recessed band, so `surface-sunken` is on screen beside the others
           rather than being the one ground nobody looks at. */}
-      <helix-flex className="themedFigures" gap="lg" justify="between">
-        {/* The figure is the default slot and the label is slotted beside it;
-            neither is an attribute, which is the content-property rule the area
-            notes state. */}
+      <section className="themedFigures">
         {[
-          { label: 'Pairs measured', value: '63' },
-          { label: 'Contrast floor', value: '4.5:1' },
-          { label: 'Colours to pick', value: '1' },
-          { label: 'Audits to book', value: '0' },
-        ].map((figure) => (
-          <helix-stat key={figure.label}>
-            {figure.value}
-            <span slot="label">{figure.label}</span>
+          { figure: '2,400', label: 'Lanes watched' },
+          { figure: '19 min', label: 'Median warning lead' },
+          { figure: '98.6%', label: 'Window accuracy' },
+          { figure: '31', label: 'Ports live' },
+        ].map((stat) => (
+          <helix-stat key={stat.label}>
+            {stat.figure}
+            <span slot="label">{stat.label}</span>
           </helix-stat>
         ))}
-      </helix-flex>
+      </section>
 
-      {/* A form, a table and an overlay: the three shapes a landing page's
-          screenshots are usually of, and the three that put the rest of the
-          palette on screen. A page of headings and buttons exercises four
-          tokens; a page with a control in an invalid state, a row that reads as
-          selected and a panel over the top exercises most of them. */}
-      <helix-grid className="themedSplit" columns={2} gap="lg">
+      <section className="themedFeatures" id="platform">
+        <helix-grid columns={3} gap="md">
+          {FEATURES.map((feature) => (
+            <helix-card key={feature.title}>
+              <helix-flex direction="column" gap="sm">
+                <helix-icon className="themedFeatureIcon" name={feature.icon}></helix-icon>
+                <helix-text appearance="subheading" as="h2">
+                  {feature.title}
+                </helix-text>
+                <helix-text appearance="caption">{feature.body}</helix-text>
+              </helix-flex>
+            </helix-card>
+          ))}
+        </helix-grid>
+      </section>
+
+      <section className="themedSplit">
+        <helix-card>
+          <helix-flex direction="column" gap="md">
+            <helix-flex align="center" gap="sm" justify="between">
+              <helix-text appearance="subheading" as="h2">
+                Today
+              </helix-text>
+              <helix-tag appearance="subtle" tone="neutral">
+                Updated 14:02
+              </helix-tag>
+            </helix-flex>
+            <helix-table label="Shipments today">
+              <helix-table-column slot="columns">Lane</helix-table-column>
+              <helix-table-column slot="columns">Window</helix-table-column>
+              <helix-table-column slot="columns">Status</helix-table-column>
+              {SHIPMENTS.map((row) => (
+                <helix-table-row key={row.lane}>
+                  <helix-table-cell>{row.lane}</helix-table-cell>
+                  <helix-table-cell>{row.window}</helix-table-cell>
+                  <helix-table-cell>
+                    <helix-tag appearance="subtle" tone={row.state}>
+                      {row.status}
+                    </helix-tag>
+                  </helix-table-cell>
+                </helix-table-row>
+              ))}
+            </helix-table>
+            <helix-flex align="center" gap="sm">
+              <helix-progress value={68}></helix-progress>
+              <helix-text appearance="caption">68% of today&rsquo;s windows closed</helix-text>
+            </helix-flex>
+          </helix-flex>
+        </helix-card>
+
         <helix-card>
           <helix-flex direction="column" gap="md">
             <helix-text appearance="subheading" as="h2">
               Start a trial
             </helix-text>
-            {/* `default-value`, not `value`: declaring `value` claims ownership and the
-                control announces and applies nothing until it is answered. This is a
-                picture of a filled field, so it is seeded. */}
             <helix-input
               default-value="ada@example.com"
               label="Work email"
@@ -150,71 +205,63 @@ export function ThemedPage() {
             {/* `feedback` and not an `invalid` attribute, which does not exist:
                 the styled tier keys its wrong-state off `data-invalid`, which the
                 component writes from the same validity that decides the message.
-                Markup claiming it would be setting a mirror the component owns
-                and overwrites. What a preview can honestly show is the message. */}
+                Markup claiming it would be setting a mirror the component owns. */}
             <helix-input
-              default-value="Example"
-              feedback="That domain is already on a plan."
+              default-value="Example Freight"
+              feedback="That company is already on a plan."
               label="Company"
               name="company"
               required
             ></helix-input>
-            <helix-checkbox name="terms">Send me the release notes</helix-checkbox>
+            <helix-checkbox name="terms">Send me the monthly reliability report</helix-checkbox>
             <helix-flex gap="sm">
               <helix-button appearance="solid" tone="primary">
                 Create account
               </helix-button>
-              <helix-button appearance="ghost">Talk to us</helix-button>
+              <helix-button appearance="ghost">Talk to sales</helix-button>
             </helix-flex>
           </helix-flex>
         </helix-card>
+      </section>
 
-        <helix-card>
-          <helix-flex direction="column" gap="md">
+      {/* The closing band, on the brand fill, which is the one large area of
+          `primary-surface` on the page and therefore the one place
+          `foreground-on-accent` is doing real work. */}
+      <section className="themedClose">
+        <helix-flex align="center" gap="md" justify="between">
+          <helix-flex direction="column" gap="2xs">
             <helix-text appearance="subheading" as="h2">
-              Recent themes
+              See it against your own lanes
             </helix-text>
-            <helix-table label="Recent themes">
-              <helix-table-column slot="columns">Name</helix-table-column>
-              <helix-table-column slot="columns">Target</helix-table-column>
-              <helix-table-column slot="columns">State</helix-table-column>
-              {(
-                [
-                  { name: 'Halyard', state: 'success', target: '4.5:1', word: 'Passing' },
-                  {
-                    name: 'Halyard dark',
-                    state: 'warning',
-                    target: '4.5:1',
-                    word: 'One collision',
-                  },
-                  { name: 'Archive', state: 'danger', target: '7:1', word: 'Two failures' },
-                ] as const
-              ).map((row) => (
-                <helix-table-row key={row.name}>
-                  <helix-table-cell>{row.name}</helix-table-cell>
-                  <helix-table-cell>{row.target}</helix-table-cell>
-                  <helix-table-cell>
-                    <helix-tag appearance="subtle" tone={row.state}>
-                      {row.word}
-                    </helix-tag>
-                  </helix-table-cell>
-                </helix-table-row>
-              ))}
-            </helix-table>
-            <helix-flex align="center" gap="sm">
-              <helix-progress value={68}></helix-progress>
-              <helix-text appearance="caption">68% of pairs measured</helix-text>
-            </helix-flex>
+            <helix-text appearance="caption">
+              Two weeks of your history, loaded before the call.
+            </helix-text>
           </helix-flex>
-        </helix-card>
-      </helix-grid>
+          <helix-button appearance="solid">Book a walkthrough</helix-button>
+        </helix-flex>
+      </section>
 
-      <helix-callout severity="success">
-        <helix-text>
-          Every pair on this page clears its target, and the ones that could not be measured are
-          named rather than skipped.
-        </helix-text>
-      </helix-callout>
+      <footer className="themedFooter">
+        <helix-flex align="center" gap="md" justify="between">
+          <helix-flex align="center" gap="xs">
+            <span aria-hidden="true" className="themedMark" />
+            <helix-text appearance="caption">
+              &copy; {COMPANY} {new Date().getFullYear()}
+            </helix-text>
+          </helix-flex>
+          <helix-flex gap="md">
+            <a data-link="subtle" href="#privacy">
+              Privacy
+            </a>
+            <a data-link="subtle" href="#terms">
+              Terms
+            </a>
+            <a data-link="subtle" href="#status">
+              Status
+            </a>
+          </helix-flex>
+        </helix-flex>
+      </footer>
     </div>
   )
 }

@@ -125,11 +125,20 @@
   overflow-y: auto;
 }
 
+/* A page's own rhythm: sections stacked with air between them, and each one
+   insetting its own content rather than the page insetting everything. Bands
+   that paint a ground have to run edge to edge, which they cannot do if the
+   inset is on the container above them. */
 .themedPage {
   display: flex;
   flex-direction: column;
-  gap: var(--helix-space-xl);
-  padding-block-end: var(--helix-space-xl);
+  gap: var(--helix-space-2xl);
+  padding-block-end: var(--helix-space-2xl);
+}
+
+/* Full bleed inside the preview, the way a real page's header is. */
+.themedHeader {
+  --app-header-max-inline-size: none;
 }
 
 /* The mark. One shape, one fill, and the fill is the whole point: it is the
@@ -144,35 +153,71 @@
   flex: 0 0 auto;
 }
 
-/* Full bleed inside the preview, the way a real page's header is. */
-.themedHeader {
-  --app-header-max-inline-size: none;
-}
-
 .themedHero {
-  padding-inline: var(--helix-space-xl);
+  max-inline-size: 46rem;
+  padding-inline: var(--helix-space-2xl);
   padding-block-start: var(--helix-space-lg);
-  max-inline-size: 44rem;
-}
-
-.themedFeatures {
-  padding-inline: var(--helix-space-xl);
 }
 
 /* The recessed band, so `surface-sunken` is on screen beside the others rather
-   than being the one ground nobody looks at. */
+   than being the one ground nobody looks at. Edge to edge, because a band that
+   insets is a card. */
 .themedFigures {
   background-color: var(--helix-color-surface-sunken);
+  border-block: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
   flex-wrap: wrap;
-  padding: var(--helix-space-lg) var(--helix-space-xl);
+  gap: var(--helix-space-2xl);
+  padding: var(--helix-space-lg) var(--helix-space-2xl);
+}
+
+.themedFeatures,
+.themedSplit {
+  padding-inline: var(--helix-space-2xl);
 }
 
 .themedSplit {
-  padding-inline: var(--helix-space-xl);
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.themedPage helix-callout {
-  margin-inline: var(--helix-space-xl);
+/* The icon carries the brand rather than the ink, so a feature row reads as
+   part of the palette rather than as three more paragraphs. */
+.themedFeatureIcon {
+  color: var(--helix-color-primary);
+  --icon-size: var(--helix-size-icon-lg);
+}
+
+/* The one large area of `primary-surface` on the page, which makes it the one
+   place `foreground-on-accent` is doing real work rather than sitting on a
+   button the size of a word. */
+.themedClose {
+  background-color: var(--helix-color-primary-surface);
+  color: var(--helix-color-foreground-on-accent);
+  padding: var(--helix-space-xl) var(--helix-space-2xl);
+}
+
+/* **The call to action inverts on the band.** A solid neutral button on a brand
+   fill comes out near-black, which has contrast and reads as unconsidered: on a
+   coloured band the emphatic thing is the pale one. Through the two hooks
+   Button publishes for it rather than a rule of ours reaching into the
+   component, and it borrows the same pair the band already uses, so the button
+   cannot disagree with the text beside it about what is legible here. */
+.themedClose helix-button {
+  --button-background-color: var(--helix-color-foreground-on-accent);
+  --button-foreground-color: var(--helix-color-primary-surface);
+}
+
+.themedFooter {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding: var(--helix-space-lg) var(--helix-space-2xl);
+}
+
+@container (width < 52rem) {
+  .themedSplit {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* The artifact fills its pane the way the workbench's editor fills its own:
@@ -229,29 +274,16 @@ helix-sandbox-editor {
 
 /* The hero is set for a page, so it needs stepping down for a pane. */
 @container (width < 40rem) {
-  .themedHero {
-    padding-inline: var(--helix-space-lg);
-  }
-
-  .themedFeatures {
-    grid-template-columns: minmax(0, 1fr);
+  .themedHero,
+  .themedFeatures,
+  .themedSplit,
+  .themedClose,
+  .themedFooter {
     padding-inline: var(--helix-space-lg);
   }
 
   .themedFigures {
+    gap: var(--helix-space-lg);
     padding-inline: var(--helix-space-lg);
-  }
-
-  .themedSplit {
-    grid-template-columns: minmax(0, 1fr);
-    padding-inline: var(--helix-space-lg);
-  }
-
-  .themedSplit {
-    padding-inline: var(--helix-space-xl);
-  }
-
-  .themedPage helix-callout {
-    margin-inline: var(--helix-space-lg);
   }
 }
