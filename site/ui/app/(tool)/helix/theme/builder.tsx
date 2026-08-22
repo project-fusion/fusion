@@ -23,6 +23,20 @@ const BRAND = '#3b82f6'
  */
 const SCOPE = '.themePreview'
 
+/**
+ * What share of the stage the preview starts with.
+ *
+ * **`split` follows the lead pane, not the source pane**, which is worth
+ * knowing because the manifest says otherwise: its description reads
+ * "percentage of the sandbox given to the source pane", and measured with
+ * `lead="preview"` a split of 32 gave the *preview* 32 per cent. The area
+ * rules have it right, that `split` means the same thing in both directions.
+ *
+ * The artifact is a column of custom properties whose longest line is a token
+ * name and a hex, so it wants a third and the preview wants the rest.
+ */
+const PREVIEW_SHARE = 68
+
 type Mechanism = 'border' | 'fill' | 'shadow' | 'space'
 
 export function ThemeBuilder({ findable }: { findable: Findable[] }) {
@@ -35,6 +49,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
   const [density, setDensity] = useState(100)
   const [radius, setRadius] = useState(50)
   const [allowance, setAllowance] = useState(20)
+  const [split, setSplit] = useState(PREVIEW_SHARE)
   const [surface, setSurface] = useState<Mechanism>('border')
   const [floating, setFloating] = useState<Mechanism>('shadow')
 
@@ -367,12 +382,29 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               leads with its source, being a place to write; here the artifact is
               an output rather than an input and a reader is judging a palette,
               not editing CSS. */}
+          {/* **The artifact is a column of custom properties**, so its longest
+              line is a token name and a hex, so it wants a third of the stage
+              and the preview wants the rest. See `PREVIEW_SHARE` for which pane
+              the number is actually about, which is not what the manifest says.
+
+              Held as state and written back on settle, which is the workbench's
+              pattern and is necessary rather than tidy: `Sandbox` owns `split`
+              and writes it back on every drag, so a bare prop would be reapplied
+              by the next render and undo the reader's drag. `default-split` is
+              not the lever either, being what a *reset* returns to. */}
           <helix-sandbox
             corner-label="Preview, artifact and audit"
+            default-split={PREVIEW_SHARE}
             lead="preview"
+            onhelix-change={(event) => {
+              if (event.detail.property === 'split') {
+                setSplit((event.target as HTMLElement & { split: number }).split)
+              }
+            }}
             orientation="horizontal"
             panel-label="The audit"
             separator-label="Preview and artifact"
+            split={split}
           >
             {/* Status rather than settings: what the palette measured, always
                 on screen, with the detail one panel away. The form holds every
