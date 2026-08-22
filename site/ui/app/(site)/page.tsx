@@ -407,7 +407,7 @@ export default function Home() {
                 key={insight.slug}
               >
                 <helix-card appearance="outlined">
-                  <InsightArt image={insight.image} slot="media" topic={insight.topic} />
+                  <InsightArt image={insight.image} slot="media" />
                   <helix-tag slot="header">{insight.topic}</helix-tag>
                   <helix-flex direction="column" gap="xs">
                     <helix-text appearance="title" as="h3">
