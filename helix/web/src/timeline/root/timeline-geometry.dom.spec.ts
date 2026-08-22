@@ -24,41 +24,12 @@ const three = `
   <helix-timeline-item datetime="2026-08-19T08:47"><span slot="time">08:47</span>Rolled back</helix-timeline-item>
   <helix-timeline-item><span slot="time">Yesterday</span>Opened</helix-timeline-item>`
 
-describe('a timeline', () => {
-  test('is a list of entries, named for a reader arriving out of context', async () => {
-    const host = await timeline(three)
-    expect(role(host)).toBe('list')
-    const entries = [...host.querySelectorAll('helix-timeline-item')] as HTMLElement[]
-    expect(entries.map((one) => role(one))).toEqual(['listitem', 'listitem', 'listitem'])
-  })
-
-  test('a time with an instant behind it is a <time>, and one without is not', async () => {
-    /* The machine-readable form travels with the human one, so "yesterday" is a
-       word and `2026-08-19T09:12` is a date. A `<time>` with nothing to be
-       precise about would be markup pretending, so the entry that has no
-       `datetime` gets a span. */
-    const host = await timeline(three)
-    const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
-
-    const dated = part(entries[0], 'time') as HTMLElement
-    expect(dated.tagName).toBe('TIME')
-    expect(dated.getAttribute('datetime')).toBe('2026-08-19T09:12')
-
-    const undated = part(entries[2], 'time') as HTMLElement
-    expect(undated.tagName).toBe('SPAN')
-    expect(undated.hasAttribute('datetime')).toBe(false)
-  })
-
-  test('the mark is a dot until something is slotted for it', async () => {
-    const host = await timeline(
-      `<helix-timeline-item><helix-icon name="check" slot="marker"></helix-icon>Done</helix-timeline-item>`,
-    )
-    const entry = host.querySelector('helix-timeline-item') as Entry
-    const marker = part(entry, 'marker') as HTMLElement
-    expect(marker).not.toBeNull()
-    expect(marker.querySelector('slot[name="marker"]')).not.toBeNull()
-  })
-
+/* Where the line and the mark land, which is this tier's drawing: the
+   connector is hidden on the first entry and the last by `:host(:first-child)`
+   and its pair, and the mark is aligned to the title rather than to the top of
+   the entry. The list, the `<time>` and the slotted mark are behaviour and are
+   tested on the base. */
+describe('a timeline, as the stylesheet draws it', () => {
   if (hasLayout()) {
     test('the first entry has no line arriving at it', async () => {
       /* Each entry draws the line that reaches it, which needs no index and no

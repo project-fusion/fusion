@@ -7,7 +7,7 @@ beforeAll(async () => {
 })
 
 const spark = async (attributes: string): Promise<HTMLElement> =>
-  mount(`<helix-sparkline ${attributes}></helix-sparkline>`)
+  mount(`<helix-base-sparkline ${attributes}></helix-base-sparkline>`)
 
 const path = (host: HTMLElement): string | null => part(host, 'line')?.getAttribute('d') ?? null
 
@@ -208,8 +208,8 @@ describe('sparkline from a table', () => {
         <tr><th scope="row">Mon</th><td>10</td></tr>
         <tr><th scope="row">Tue</th><td>30</td></tr>
         <tr><th scope="row">Wed</th><td>20</td></tr>
-      </tbody></table><helix-sparkline ${attributes}></helix-sparkline></div>`)
-    const host = document.querySelector('helix-sparkline') as HTMLElement & {
+      </tbody></table><helix-base-sparkline ${attributes}></helix-base-sparkline></div>`)
+    const host = document.querySelector('helix-base-sparkline') as HTMLElement & {
       updateComplete: Promise<unknown>
     }
     await host.updateComplete
@@ -239,105 +239,3 @@ describe('sparkline from a table', () => {
     expect(heights(host)).toHaveLength(4)
   })
 })
-
-if (hasLayout()) {
-  describe('sparkline geometry', () => {
-    test('the path is really SVG, and not an HTML element wearing the name', async () => {
-      /* The bug this exists for, and every other spec in this file passed while
-         it was there. A nested Lit template is parsed on its own, so the
-         `<path>` written in one had no `<svg>` around it and came out in the
-         XHTML namespace. It took the part, took the `d`, inherited the stroke,
-         reported `vector-effect: non-scaling-stroke` when asked, and drew
-         nothing whatsoever, because geometry belongs to the SVG namespace and
-         not to the tag name.
-
-         `getBBox` is the shortest question that separates the two: an HTML
-         element does not have it. The width is asserted as well, since a real
-         path that happened to be empty would answer zero. */
-      const host = await mount('<helix-sparkline values="1 9 3 7 2"></helix-sparkline>')
-      const line = part(host, 'line') as unknown as SVGPathElement
-      expect(typeof line.getBBox).toBe('function')
-      expect(line.getBBox().width).toBeGreaterThan(0)
-      expect(line.getBBox().height).toBeGreaterThan(0)
-    })
-
-    test('the wash is a ramp off the line, and the line keeps its full strength', async () => {
-      /* Two elements rather than a fill on the line itself: a closed path
-         strokes its closing edges, so filling the line would draw a rule along
-         the bottom of the box and up both sides.
-
-         Both mounted together, because `mount` replaces the body and reading
-         the first one's computed style after mounting the second reads a
-         detached element, where every computed value is the empty string. The
-         first version of this test did exactly that and reported the component
-         for a stroke it had never lost. */
-      await mount(`<div>
-        <helix-sparkline id="bare" plot="line" values="1 9 3"></helix-sparkline>
-        <helix-sparkline id="washed" plot="area" values="1 9 3"></helix-sparkline>
-      </div>`)
-      const plain = document.getElementById('bare') as HTMLElement
-      const washed = document.getElementById('washed') as HTMLElement
-      await Promise.all(
-        [plain, washed].map(
-          (one) => (one as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete,
-        ),
-      )
-
-      /* A line plot draws no region at all now, rather than one kept invisible.
-         **`plot="line"` written out, because absent is not it.** This mounted a
-         sparkline with no `plot` and called it the line case, and absent is
-         `area` here, deliberately and for the reason the class doc gives: at
-         the size a sparkline is drawn, a hairline in a wide box is mostly box.
-         So the assertion was made against the one element that must fail it,
-         and the case it names was never tested. It failed only in a real
-         engine, where this block runs. */
-      expect(part(plain, 'area')).toBeNull()
-      const stops = [...(washed.shadowRoot?.querySelectorAll('stop') ?? [])]
-      const opacities = stops.map((stop) => Number(getComputedStyle(stop).stopOpacity))
-      expect(opacities[0]).toBeGreaterThan(opacities[1] as number)
-      expect(opacities[1]).toBeGreaterThan(0)
-      // The line stays at full strength over it, which an `opacity` on the
-      // element would not have allowed.
-      expect(getComputedStyle(part(washed, 'line') as Element).stroke).toBe(
-        getComputedStyle(part(plain, 'line') as Element).stroke,
-      )
-    })
-
-    test('weight moves the stroke, and the hook still wins over it', async () => {
-      await mount(`<div>
-        <helix-sparkline id="thin" values="1 9 3" weight="thin"></helix-sparkline>
-        <helix-sparkline id="regular" values="1 9 3"></helix-sparkline>
-        <helix-sparkline id="thick" values="1 9 3" weight="thick"></helix-sparkline>
-      </div>`)
-      const widths = await Promise.all(
-        ['thin', 'regular', 'thick'].map(async (id) => {
-          const host = document.getElementById(id) as HTMLElement & {
-            updateComplete: Promise<unknown>
-          }
-          await host.updateComplete
-          return Number.parseFloat(getComputedStyle(part(host, 'line') as Element).strokeWidth)
-        }),
-      )
-      expect(widths[0]).toBeLessThan(widths[1] as number)
-      expect(widths[1]).toBeLessThan(widths[2] as number)
-    })
-
-    test('the line keeps its weight whatever the box, and the mark stays round', async () => {
-      /* `preserveAspectRatio="none"` is what lets one drawing fill any slot and
-         it stretches everything in that coordinate space with it. The stroke
-         escapes through `vector-effect`; a circle cannot, which is why the mark
-         is an element beside the drawing rather than a `<circle>` inside it. */
-      const host = await mount(
-        `<helix-sparkline
-           style="--sparkline-inline-size: 400px; --sparkline-block-size: 24px"
-           values="1 9 3 7 2"
-         ></helix-sparkline>`,
-      )
-      const line = part(host, 'line') as SVGPathElement
-      const mark = (part(host, 'terminus') as HTMLElement).getBoundingClientRect()
-      expect(getComputedStyle(line).vectorEffect).toBe('non-scaling-stroke')
-      expect(Math.abs(mark.width - mark.height)).toBeLessThan(0.5)
-      expect(Math.abs(host.getBoundingClientRect().width - 400)).toBeLessThan(1)
-    })
-  })
-}

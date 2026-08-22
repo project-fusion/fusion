@@ -14,11 +14,11 @@ type Carousel = HTMLElement & {
 }
 
 const carousel = async (attrs = ''): Promise<Carousel> =>
-  (await mount(`<helix-carousel label="Verticals" ${attrs}>
+  (await mount(`<helix-base-carousel label="Verticals" ${attrs}>
     <div>Design</div>
     <div>Mind</div>
     <div>Energy</div>
-  </helix-carousel>`)) as Carousel
+  </helix-base-carousel>`)) as Carousel
 
 describe('carousel', () => {
   test('announces itself as a carousel, not as a bare group', async () => {
@@ -44,7 +44,7 @@ describe('carousel', () => {
 
   test('a slide that names itself keeps its own name', async () => {
     const cal = (await mount(
-      '<helix-carousel label="x"><div aria-label="Fusion Design">D</div></helix-carousel>',
+      '<helix-base-carousel label="x"><div aria-label="Fusion Design">D</div></helix-base-carousel>',
     )) as Carousel
     expect(cal.children[0]?.getAttribute('aria-label')).toBe('Fusion Design')
   })
@@ -115,7 +115,9 @@ describe('carousel naming', () => {
        property straight through, so a consumer emptying it on purpose, which is
        what you do when a wrapper already names the thing, got the broken half
        of that rather than the honest one. */
-    const host = (await mount('<helix-carousel label=""></helix-carousel>')) as Updatable & {
+    const host = (await mount(
+      '<helix-base-carousel label=""></helix-base-carousel>',
+    )) as Updatable & {
       internals: ElementInternals
     }
     expect(host.internals.ariaLabel).toBeNull()
@@ -131,9 +133,9 @@ describe('carousel selection can be refused', () => {
     HTMLElement & { goTo(index: number): void; index: number; updateComplete: Promise<boolean> }
   > => {
     const host = (await mount(
-      `<helix-carousel label="Highlights">
+      `<helix-base-carousel label="Highlights">
         <div>One</div><div>Two</div><div>Three</div>
-      </helix-carousel>`,
+      </helix-base-carousel>`,
     )) as HTMLElement & {
       goTo(index: number): void
       index: number
@@ -185,9 +187,9 @@ describe('carousel, controlled and uncontrolled', () => {
     HTMLElement & { goTo(index: number): void; index: number; updateComplete: Promise<boolean> }
   > => {
     const host = (await mount(
-      `<helix-carousel label="Highlights" ${attrs}>
+      `<helix-base-carousel label="Highlights" ${attrs}>
         <div>One</div><div>Two</div><div>Three</div>
-      </helix-carousel>`,
+      </helix-base-carousel>`,
     )) as HTMLElement & {
       goTo(index: number): void
       index: number
@@ -244,9 +246,9 @@ describe('carousel settling', () => {
   const scrolling = async (
     attrs = '',
   ): Promise<{ host: Carousel & { goTo(index: number): void }; track: HTMLElement }> => {
-    const host = (await mount(`<helix-carousel label="Shots" ${attrs}>
+    const host = (await mount(`<helix-base-carousel label="Shots" ${attrs}>
       <div>One</div><div>Two</div><div>Three</div><div>Four</div>
-    </helix-carousel>`)) as Carousel & { goTo(index: number): void }
+    </helix-base-carousel>`)) as Carousel & { goTo(index: number): void }
     await host.updateComplete
     const track = part(host, 'track') as HTMLElement
     /* Offsets past the track's own bleed, so a stated position is one the
@@ -395,9 +397,9 @@ describe('carousel across several slides at once', () => {
      here is that one number, and every failure it replaced came from counting
      slides instead. */
   const four = async (): Promise<HTMLElement> =>
-    mount(`<helix-carousel label="Reel" per-view="4">
+    mount(`<helix-base-carousel label="Reel" per-view="4">
       <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
-    </helix-carousel>`)
+    </helix-base-carousel>`)
 
   test('the indicators count positions, not slides', async () => {
     const host = await four()
@@ -414,9 +416,9 @@ describe('carousel across several slides at once', () => {
   })
 
   test('one across is unchanged, so a plain carousel counts its slides', async () => {
-    const host = await mount(`<helix-carousel label="Reel">
+    const host = await mount(`<helix-base-carousel label="Reel">
       <div>1</div><div>2</div><div>3</div>
-    </helix-carousel>`)
+    </helix-base-carousel>`)
     expect(part(host, 'indicators')?.querySelectorAll('[part="indicator"]')).toHaveLength(3)
   })
 })
@@ -428,54 +430,3 @@ describe('carousel across several slides at once', () => {
    stylesheet and reports `''` for every side of the track's padding, so the
    number under test does not exist on that harness and neither does the
    scrolling it has to survive. */
-if (hasLayout()) {
-  describe('the bleed the scroller keeps for a slide’s own edge', () => {
-    const wide = async (): Promise<HTMLElement> => {
-      const host = (await mount(`<helix-carousel label="Shots" per-view="2">
-        <div style="inline-size: 12rem">One</div>
-        <div style="inline-size: 12rem">Two</div>
-        <div style="inline-size: 12rem">Three</div>
-        <div style="inline-size: 12rem">Four</div>
-      </helix-carousel>`)) as HTMLElement & { updateComplete: Promise<unknown> }
-      await host.updateComplete
-      return host
-    }
-
-    const bleedOf = (track: HTMLElement): number =>
-      Number.parseFloat(getComputedStyle(track).paddingLeft)
-
-    test('the leading slide is inset by it at rest, not shaved by the clip edge', async () => {
-      /* The fault this is here for. A snap position aligns a slide to the
-         snapport, and with no `scroll-padding` that is the padding box, so the
-         leading slide snapped its own edge onto the edge the scroller clips at:
-         the track rested at `scrollLeft: 4` against a 4px bleed and the first
-         card was shaved with nobody having scrolled anything. */
-      const host = await wide()
-      const track = part(host, 'track') as HTMLElement
-      const bleed = bleedOf(track)
-      expect(bleed).toBeGreaterThan(0)
-      expect(track.scrollLeft).toBe(0)
-      const room =
-        host.children[0].getBoundingClientRect().left - track.getBoundingClientRect().left
-      expect(Math.round(room)).toBe(Math.round(bleed))
-    })
-
-    test('and the trailing slide keeps it with the track run to its end', async () => {
-      const host = await wide()
-      const track = part(host, 'track') as HTMLElement
-      track.scrollTo({ behavior: 'instant', left: track.scrollWidth })
-      await new Promise((resolve) => requestAnimationFrame(resolve))
-      const last = host.children[host.children.length - 1].getBoundingClientRect()
-      const room = track.getBoundingClientRect().right - last.right
-      expect(Math.round(room)).toBe(Math.round(bleedOf(track)))
-    })
-
-    test('the bleed clears the shadow a slide is likely to carry', async () => {
-      // `--helix-shadow-md` is `0 4px 12px`, so it reaches 16px below the box
-      // it is on, which is the number the default is cut to.
-      const host = await wide()
-      const track = part(host, 'track') as HTMLElement
-      expect(bleedOf(track)).toBeGreaterThanOrEqual(16)
-    })
-  })
-}
