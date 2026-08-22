@@ -345,15 +345,26 @@ describe('pairings and collisions', () => {
     expect(theme.violations.length).toBe(theme.pairings.filter((p) => p.status === 'fail').length)
   })
 
-  test('a brand that is already red collides with danger', () => {
-    const theme = deriveTheme({ brand: { chroma: 0.21, hue: 27, lightness: 0.57 } })
+  /* A brand that *is* red is the case the allowance exists for: a red brand
+     beside a red danger carries no information at all. */
+  test('a status held at its convention collides with a brand of the same hue', () => {
+    const theme = deriveTheme({
+      brand: { chroma: 0.21, hue: 27, lightness: 0.57 },
+      status: { allowance: 0 },
+    })
     expect(theme.collisions.some((c) => c.includes('danger'))).toBe(true)
   })
 
-  test('an allowance rotates danger far enough to clear it', () => {
-    const brand = { chroma: 0.21, hue: 27, lightness: 0.57 }
-    const repaired = deriveTheme({ brand, status: { allowance: 40 } })
+  test('and the default allowance repairs it without being asked', () => {
+    const repaired = deriveTheme({ brand: { chroma: 0.21, hue: 27, lightness: 0.57 } })
     expect(repaired.collisions.some((c) => c.includes('danger'))).toBe(false)
+  })
+
+  /* The reason the default is 20 rather than 0: a palette that ships reporting
+     a collision it has the means to fix is a palette nobody trusts the report
+     of. */
+  test('the shipped brand derives with nothing left to report', () => {
+    expect(deriveTheme({ brand: BRAND }).collisions).toEqual([])
   })
 })
 

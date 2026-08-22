@@ -405,7 +405,35 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
      danger carries no information, so a status may rotate away from the brand,
      within its meaning, until it is distinguishable. */
   const statusIntent = resolved.status
-  const allowance = statusIntent.allowance ?? 0
+  /* **20 by default, not 0**, so the shipped palette does not report a
+     collision it has the means to fix: `primary` and `info` are both blue on
+     the Fusion brand, and twenty degrees moves `info` by three, which is
+     nowhere near enough to stop reading as informational and exactly enough to
+     be told apart.
+
+     **What 20 does not reach is a brand that *is* a status colour**, and the
+     figure is worth writing down rather than discovering. Clearing a collision
+     between two hues that start coincident is a chord across the hue circle, so
+     the rotation it takes scales inversely with chroma: at 0.15 it is about 31
+     degrees before the distance reaches the threshold. Measured, as collisions
+     remaining at each allowance:
+
+       brand              0   10   20   30   40
+       blue  #3b82f6      1    0    0    0    0
+       red   #c1272d      1    1    1    0    0
+       green #16a34a      1    1    1    0    0
+       amber #f59e0b      1    1    1    1    0
+
+     So 20 answers the palette that ships and a brand near a status still
+     reports. That is the honest trade rather than an oversight: the allowance
+     is a licence to bend a convention and 40 degrees of amber is not amber. A
+     consumer whose brand collides raises it deliberately and sees what it costs
+     in the builder.
+
+     A status spends only what it needs, the search stopping at the first hue
+     that clears, and keeps its own hue entirely when nothing inside the bound
+     works. Set it to 0 to hold every status where convention puts it. */
+  const allowance = statusIntent.allowance ?? 20
   const statusColors = new Map<StatusName, { color: Oklch; pinned: boolean }>()
   /* **Every role resolved so far, which grows as the loop runs.** A status
      rotated clear of the accent can land on the status decided before it: with

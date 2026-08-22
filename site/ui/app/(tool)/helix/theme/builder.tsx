@@ -28,7 +28,7 @@ export function ThemeBuilder() {
   const [accentHue, setAccentHue] = useState(180)
   const [density, setDensity] = useState(100)
   const [radius, setRadius] = useState(50)
-  const [allowance, setAllowance] = useState(0)
+  const [allowance, setAllowance] = useState(20)
   const [surface, setSurface] = useState<Mechanism>('border')
   const [floating, setFloating] = useState<Mechanism>('shadow')
 

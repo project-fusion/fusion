@@ -196,10 +196,17 @@ export interface ThemeIntent {
    * `contrastTarget` like any other ink. Only the hue is held, and only
    * because moving it changes what the colour means.
    *
-   * `allowance` is how far a status may rotate on its own to clear a collision
-   * with the brand, which is what turns `collisions` from a finding into a
-   * repair: a red brand beside a red danger carries no information, and twenty
-   * degrees makes the danger crimson without making it not-red.
+   * `allowance` is how far a status may rotate on its own to clear a collision,
+   * which is what turns `collisions` from a finding into a repair: a red brand
+   * beside a red danger carries no information, and twenty degrees makes the
+   * danger crimson without making it not-red.
+   *
+   * **20 by default, not 0.** A palette that ships reporting a collision it has
+   * the means to fix is a palette nobody trusts the report of. A status spends
+   * only what it needs, the search stopping at the first hue that clears, and
+   * it keeps its own hue entirely when nothing inside the bound works. Set it
+   * to 0 to hold every status where convention puts it and read the result off
+   * `collisions` instead.
    */
   status?: {
     allowance?: number
