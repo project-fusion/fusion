@@ -709,6 +709,10 @@
                 "slug": "default"
               },
               {
+                "description": "The headless tier: one section open at a time is the component's, the rows are yours.",
+                "slug": "base"
+              },
+              {
                 "description": "The mark at the end of the row, for a list read as a table of contents.",
                 "slug": "chevron-at-the-end"
               },
@@ -9269,6 +9273,10 @@
               {
                 "description": "One checkbox with a label and a hint under it.",
                 "slug": "default"
+              },
+              {
+                "description": "The headless tier, styled from scratch: every rule here is one you would write.",
+                "slug": "base"
               },
               {
                 "description": "Checkboxes drawn as cards, for options that need room to explain themselves.",
@@ -19488,6 +19496,10 @@
               {
                 "description": "A dialog opened by a button, with actions in its footer.",
                 "slug": "default"
+              },
+              {
+                "description": "The headless tier: the top layer and the focus trap are the component's, the surface is yours.",
+                "slug": "base"
               },
               {
                 "description": "A dialog whose content sits centred, for a short confirmation.",

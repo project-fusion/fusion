@@ -1,0 +1,48 @@
+/* What the headless tier asks a consumer to write.
+ *
+ * `helix-base-accordion` owns which section is open, the disclosure semantics
+ * and the measured height the revealed region animates to. What it does not own
+ * is any of the appearance, which is everything below.
+ *
+ * Deliberately skeletal, for the reason the checkbox's sheet gives: a diagram
+ * of what has to be styled rather than a theme to copy.
+ *
+ * `default-open` and not `open` on the first item, because `open` is the
+ * controlled half: writing it declares the consumer owns the state and the
+ * section would freeze open with nothing answering it. */
+
+helix-base-accordion-item {
+  border-block-end: 1px solid;
+  display: block;
+}
+
+helix-base-accordion-item::part(trigger) {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  inline-size: 100%;
+  padding-block: 0.75rem;
+  text-align: start;
+}
+
+/* The chevron is drawn by the component and turned by it. Only its size is
+   left, and the turn is worth leaving alone: it is keyed on the open state the
+   component resolves, not on a class a consumer has to keep in step. */
+helix-base-accordion-item::part(chevron) {
+  block-size: 0.75rem;
+  inline-size: 0.75rem;
+}
+
+helix-base-accordion-item::part(content-inner) {
+  padding-block-end: 0.75rem;
+}
+
+/* The keyboard reaches the trigger, so the ring goes there. Taking the UA
+   outline off without putting one back is the commonest way a headless
+   disclosure stops being operable without a pointer. */
+helix-base-accordion-item::part(trigger):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}

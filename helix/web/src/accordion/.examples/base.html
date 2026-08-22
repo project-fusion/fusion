@@ -1,0 +1,24 @@
+<!-- @summary The headless tier: one section open at a time is the component's, the rows are yours. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-base-accordion>
+  <helix-base-accordion-item default-open>
+    <span slot="summary">What ships in the headless tier</span>
+    Structure, ARIA, state and form participation. No CSS and no tokens, which
+    is what makes it consumable without taking a design with it.
+  </helix-base-accordion-item>
+  <helix-base-accordion-item>
+    <span slot="summary">What you write yourself</span>
+    Every rule in the stylesheet beside this one. The parts are the interface,
+    so nothing here reaches past what the component publishes.
+  </helix-base-accordion-item>
+  <helix-base-accordion-item>
+    <span slot="summary">What you do not have to write</span>
+    The single-open behaviour, the chevron's state, and the height the revealed
+    region animates to, which no stylesheet can measure on its own.
+  </helix-base-accordion-item>
+</helix-base-accordion>

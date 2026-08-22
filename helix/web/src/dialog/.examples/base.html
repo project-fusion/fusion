@@ -1,0 +1,32 @@
+<!-- @summary The headless tier: the top layer and the focus trap are the component's, the surface is yours. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<button
+  command="--show"
+  commandfor="base-confirm"
+  type="button"
+>Delete project</button>
+
+<helix-base-dialog
+  id="base-confirm"
+  label="Delete project"
+>
+  <h2 slot="header">Delete project</h2>
+  <p>This removes the project and everything in it. It cannot be undone.</p>
+  <div slot="footer">
+    <button
+      command="--close"
+      commandfor="base-confirm"
+      type="button"
+    >Cancel</button>
+    <button
+      command="--close"
+      commandfor="base-confirm"
+      type="button"
+    >Delete</button>
+  </div>
+</helix-base-dialog>

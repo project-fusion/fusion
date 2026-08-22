@@ -1,0 +1,87 @@
+/* What the headless tier asks a consumer to write.
+ *
+ * `helix-base-checkbox` ships a real `<input type="checkbox">`, its label, its
+ * ARIA and its form participation, and no appearance at all. Everything below
+ * is the part you own.
+ *
+ * Deliberately skeletal. No colour beyond `currentColor`, no type ramp and no
+ * token, because this is a diagram of what has to be styled rather than a theme
+ * to copy: `@helix-io/web` is the theme, and a second one growing inside an
+ * example would be a design system nobody decided on.
+ *
+ * **The input is the box, and a first draft of this got that backwards.** It
+ * painted `box` and left the input alone, so the browser drew its own control
+ * beside the frame and what a reader saw was the UA checkbox, blue tick and
+ * all, with the rules below doing nothing visible. `appearance: none` on the
+ * real input is the whole technique, and it is what the styled tier does too.
+ *
+ * Parts are the interface. `::part()` is the published door into a shadow root,
+ * so nothing here depends on the component's internal structure. */
+
+helix-base-checkbox {
+  display: block;
+  margin-block-end: 0.75rem;
+}
+
+/* The row the control and its label share. */
+helix-base-checkbox::part(field) {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* One cell with both children in it, so the mark is centred over the input
+   with no offsets to keep in step. */
+helix-base-checkbox::part(box) {
+  display: grid;
+  place-items: center;
+}
+
+/* The input, painted rather than replaced. */
+helix-base-checkbox::part(control) {
+  appearance: none;
+  block-size: 1rem;
+  border: 1px solid currentColor;
+  border-radius: 0.1875rem;
+  grid-area: 1 / 1;
+  inline-size: 1rem;
+  margin: 0;
+}
+
+/* The mark, over the input in the same cell.
+ *
+ * **The base tier draws no glyph, and that is the point of it.** The component
+ * renders the element and shows it when the box is checked; what shape it is is
+ * a design decision, so it ships without one and a bare block is what you get
+ * until you say. A `clip-path` is the cheapest way to say "tick" with no asset
+ * and no icon set. */
+helix-base-checkbox::part(mark) {
+  block-size: 0.625rem;
+  clip-path: polygon(14% 44%, 0 65%, 40% 100%, 100% 16%, 84% 0, 39% 62%);
+  grid-area: 1 / 1;
+  inline-size: 0.625rem;
+}
+
+/* State comes off the host, not off a class a consumer maintains. */
+helix-base-checkbox[data-checked]::part(control) {
+  background-color: currentColor;
+}
+
+helix-base-checkbox[data-checked]::part(mark) {
+  background-color: canvas;
+}
+
+/* Disabled is the native pseudo-class, the control being a real input on a
+   form-associated element. */
+helix-base-checkbox:disabled::part(field) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* The ring is yours as well. Taking the UA outline off without putting one back
+   is the commonest way a headless control stops being usable by keyboard. */
+helix-base-checkbox::part(control):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

@@ -23,7 +23,7 @@
  * Scans `css` tagged templates in .ts files and plain .css files.
  * Run with `bun run check:tokens` (part of `check` and `verify`).
  */
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const IGNORED = new Set([
@@ -159,6 +159,25 @@ for (const file of walk(root)) {
   const rel = relative(root, file)
   const source = readFileSync(file, 'utf8')
   const ownsPrimitives = OWNS_PRIMITIVES.test(rel)
+
+  /* An example showing the headless tier writes raw values on purpose.
+   *
+   * `helix/headless` does not depend on `helix/styles`, which is the property
+   * that makes it independently consumable, so a consumer taking it has no
+   * `--helix-space-*` to reach for. An example demonstrating that and then
+   * reaching for one would teach the opposite of what it is for, and a reader
+   * copying it would get a stylesheet resolving to nothing.
+   *
+   * Read off the markup rather than the filename: a stylesheet is exempt when
+   * the example beside it renders a `helix-base-` element, which is the thing
+   * that makes it a base example. `base.css` would be a convention to remember;
+   * this is the fact itself. */
+  if (rel.includes('.examples') && file.endsWith('.css')) {
+    const markup = file.replace(/\.css$/, '.html')
+    if (existsSync(markup) && readFileSync(markup, 'utf8').includes('<helix-base-')) {
+      continue
+    }
+  }
 
   for (const block of cssBlocks(file, source)) {
     const text = stripComments(block.text)

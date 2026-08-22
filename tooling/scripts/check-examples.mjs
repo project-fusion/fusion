@@ -11,7 +11,16 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const MANIFEST = 'helix/web/custom-elements.json'
+/* Both tiers, because an example may show either.
+ *
+ * The examples live beside the styled components and most of them use styled
+ * tags, so this read the styled manifest alone and would have reported
+ * `<helix-base-checkbox>` as an element that does not exist. It does exist: it
+ * is registered by `helix/headless`, which is the tier the base examples are
+ * there to show is real and consumable. Reading one manifest meant a base
+ * example could not be validated at all, so a typo in one would have rendered
+ * an inert unknown element and passed. */
+const MANIFESTS = ['helix/web/custom-elements.json', 'helix/headless/custom-elements.json']
 const ROOT = 'helix/web/src'
 
 /**
@@ -38,7 +47,9 @@ const GLOBAL = new Set([
 ])
 
 const tags = new Map()
-for (const module of JSON.parse(readFileSync(MANIFEST, 'utf8')).modules ?? []) {
+for (const module of MANIFESTS.flatMap(
+  (path) => JSON.parse(readFileSync(path, 'utf8')).modules ?? [],
+)) {
   for (const declaration of module.declarations ?? []) {
     if (!declaration.tagName) {
       continue
