@@ -441,7 +441,47 @@ helix-drawer {
   letter-spacing: var(--helix-tracking-tight);
 }
 
+/* **The page opens in light and closes in it.**
+ *
+ * The last band was the sixth in a row on the page's own colour, so a reader
+ * scrolling reached the one thing they are being asked to do and it looked like
+ * another section. Nothing said the page had ended, and an ending is most of
+ * what a closing call is for.
+ *
+ * A ground first, the same pair `/insights` uses for its hero, so the site has
+ * one answer to "a band that steps off the page" rather than two. The hairline
+ * is what makes it an edge rather than a smudge: at these strengths the fill
+ * alone fades in and a reader does not see a boundary they cannot locate.
+ *
+ * **Then the light, which is the hero's, painted rather than run.** The reel
+ * opens under a live `Aura` and this is a gradient, which is the same trade the
+ * insight cards were rewritten for: one closing band does not need a second
+ * WebGL context to say the light came back.
+ *
+ * It rises from *below* the bottom edge, not from behind the button. A halo
+ * centred on the call would put a primary wash under a primary fill and cost
+ * the button the separation it needs, and it would also be the fourth thing on
+ * the page competing to be looked at. Off the edge it reads as a horizon: the
+ * page ends into light, and the button stays the only bright object in it.
+ *
+ * A background image and not a pseudo-element, so there is no stacking to
+ * arrange. Backgrounds paint under content by definition, which is what the
+ * lattice on `.designHero` needs a layer token, an `isolation` and a lift to
+ * achieve, because that one has to be masked and this one does not.
+ *
+ * Mixing toward `transparent` rather than into the ground, which is the
+ * `[data-button]` recipe and is load-bearing here: a mix into an opaque colour
+ * collapses in dark mode, where 8% of the foreground into black is still black
+ * at 8 bits. Toward transparent it composites over whatever the ground is, so
+ * one declaration is right in both modes. */
 .closing {
+  background-color: light-dark(var(--helix-color-surface-sunken), var(--helix-color-surface));
+  background-image: radial-gradient(
+    ellipse 68% 88% at 50% 116%,
+    color-mix(in oklab, var(--helix-color-primary) 26%, transparent) 0%,
+    transparent 72%
+  );
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   text-align: center;
 }
 
@@ -1099,6 +1139,22 @@ helix-drawer {
  * It was `tone="primary"`, which is the colour of a link and of a filled
  * button: the first column of six tables was shouting in the one colour the
  * page uses for things a reader can act on, and none of them were. */
+/* The table scrolls sideways rather than colliding with itself.
+ *
+ * A union member is `nowrap`, so it cannot break, and the Type column's floor
+ * fits every literal and most named types but not the longest: twenty-four
+ * characters of `HelixBaseAccordionItem[]` would need a floor that squeezes the
+ * other three columns on every narrow screen to serve one row. Given a member
+ * that does not fit, scrolling shows all of it and clipping would show part,
+ * which is the difference between a table a reader can use narrow and one they
+ * cannot.
+ *
+ * On the wrapper rather than the component, because a scroll region is the
+ * page's decision about its own layout: another consumer may have room. */
+.apiTable {
+  overflow-x: auto;
+}
+
 .apiName {
   color: var(--helix-color-syntax-name);
 }
@@ -1128,13 +1184,16 @@ helix-drawer {
    trailing its own `|`, and a twelve-member one had the bar leading some lines
    and trailing others, which reads as two different lists in one cell. */
 .apiTypeMember {
-  /* No `nowrap`, and that is the point rather than an omission. The bar is
-     attached to its member by margin rather than by a space, so there is no
-     break opportunity between them and they hold together without being told
-     to. `nowrap` would also stop a member longer than the column from breaking
-     at all: measured in an 83px Type cell, `| "particles"` overflowed with it
-     and wrapped inside itself without. */
-  display: inline;
+  /* Unbreakable, so the only break a union can take is between its members and
+     the bar therefore starts a line rather than ending one.
+     Without it the members hold together anyway, because the bar is attached by
+     margin rather than by a space, and that is not enough: `overflow-wrap:
+     break-word` above will break *inside* a literal once one does not fit, so a
+     narrow column gave `"flat" | "mat` / `erial" | "tra` / `nsparent"`, which is
+     the bar trailing again and a word cut in half as well.
+     It is only safe next to a floor on the column, which `page.tsx` sets: a
+     member that cannot fit and cannot break is a member that overflows. */
+  white-space: nowrap;
 }
 
 .apiTypeBar {

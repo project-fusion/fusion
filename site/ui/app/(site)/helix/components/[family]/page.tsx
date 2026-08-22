@@ -61,6 +61,17 @@ const SECTIONS = [
  */
 const DESCRIPTION = '26rem'
 
+/**
+ * A floor under the Type column, because its members must not break.
+ *
+ * A union member is `white-space: nowrap`, so a wrap can only happen between
+ * members and the bar always starts the line. The cost is that a member wider
+ * than the column overflows instead of breaking, and `minmax(0, 1fr)`, the
+ * default track, is allowed to be arbitrarily narrow. Six rems fits the longest
+ * literal the library has, `"transparent"`, at the size this table sets.
+ */
+const TYPE = 'minmax(8rem, 1fr)'
+
 const first = (text: string): string => text.split('\n\n')[0] ?? ''
 
 /**
@@ -241,28 +252,30 @@ function MemberTable({
     return null
   }
   return (
-    <helix-table label={label}>
-      <helix-table-column>{label}</helix-table-column>
-      {typed && <helix-table-column>Type</helix-table-column>}
-      <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
-      {byName(rows).map((row) => (
-        <helix-table-row key={row.name}>
-          <helix-table-cell header>
-            {/* The unnamed slot has no name, and printing `(default)` in the
+    <div className="apiTable">
+      <helix-table label={label}>
+        <helix-table-column>{label}</helix-table-column>
+        {typed && <helix-table-column width={TYPE}>Type</helix-table-column>}
+        <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
+        {byName(rows).map((row) => (
+          <helix-table-row key={row.name}>
+            <helix-table-cell header>
+              {/* The unnamed slot has no name, and printing `(default)` in the
                 identifier colour dressed an absence up as one. */}
-            {row.name ? <Code>{row.name}</Code> : <span className="apiUnnamed">(default)</span>}
-          </helix-table-cell>
-          {typed && (
-            <helix-table-cell>{row.type && <TypeText>{row.type}</TypeText>}</helix-table-cell>
-          )}
-          <helix-table-cell>
-            <helix-text appearance="caption" tone="muted">
-              {first(row.description)}
-            </helix-text>
-          </helix-table-cell>
-        </helix-table-row>
-      ))}
-    </helix-table>
+              {row.name ? <Code>{row.name}</Code> : <span className="apiUnnamed">(default)</span>}
+            </helix-table-cell>
+            {typed && (
+              <helix-table-cell>{row.type && <TypeText>{row.type}</TypeText>}</helix-table-cell>
+            )}
+            <helix-table-cell>
+              <helix-text appearance="caption" tone="muted">
+                {first(row.description)}
+              </helix-text>
+            </helix-table-cell>
+          </helix-table-row>
+        ))}
+      </helix-table>
+    </div>
   )
 }
 
@@ -272,40 +285,42 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
     return null
   }
   return (
-    <helix-table label="Properties">
-      <helix-table-column>Prop</helix-table-column>
-      <helix-table-column>Type</helix-table-column>
-      <helix-table-column>Default</helix-table-column>
-      <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
-      {byName(rows).map((row) => (
-        <helix-table-row key={row.name}>
-          <helix-table-cell header>
-            <Code>{row.name}</Code>
-          </helix-table-cell>
-          <helix-table-cell>
-            <TypeText>{row.type}</TypeText>
-          </helix-table-cell>
-          <helix-table-cell>
-            {/* A getter has no default and cannot be set, so the column that
+    <div className="apiTable">
+      <helix-table label="Properties">
+        <helix-table-column>Prop</helix-table-column>
+        <helix-table-column width={TYPE}>Type</helix-table-column>
+        <helix-table-column>Default</helix-table-column>
+        <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
+        {byName(rows).map((row) => (
+          <helix-table-row key={row.name}>
+            <helix-table-cell header>
+              <Code>{row.name}</Code>
+            </helix-table-cell>
+            <helix-table-cell>
+              <TypeText>{row.type}</TypeText>
+            </helix-table-cell>
+            <helix-table-cell>
+              {/* A getter has no default and cannot be set, so the column that
                 would hold one says which of the two it is. Read only rather
                 than a dash, because a dash is what the settable ones with no
                 initialiser already show and the two are not the same. */}
-            {row.readonly ? (
+              {row.readonly ? (
+                <helix-text appearance="caption" tone="muted">
+                  Read only
+                </helix-text>
+              ) : (
+                row.default && <TypeText>{row.default}</TypeText>
+              )}
+            </helix-table-cell>
+            <helix-table-cell>
               <helix-text appearance="caption" tone="muted">
-                Read only
+                {first(row.description)}
               </helix-text>
-            ) : (
-              row.default && <TypeText>{row.default}</TypeText>
-            )}
-          </helix-table-cell>
-          <helix-table-cell>
-            <helix-text appearance="caption" tone="muted">
-              {first(row.description)}
-            </helix-text>
-          </helix-table-cell>
-        </helix-table-row>
-      ))}
-    </helix-table>
+            </helix-table-cell>
+          </helix-table-row>
+        ))}
+      </helix-table>
+    </div>
   )
 }
 
