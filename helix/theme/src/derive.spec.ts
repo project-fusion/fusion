@@ -250,12 +250,52 @@ describe('the chroma policy', () => {
   /* **A status's saturation is part of what it means and is not the brand's to
      set.** Every status took the brand's chroma, so a muted brand at 0.035 gave
      a danger at 0.035, which is a near-grey error state. */
-  test('a status keeps its own chroma whatever the brand does', () => {
-    const danger = (brand: string) =>
-      deriveTheme({ brand }).tokens.find((t) => t.name === 'color-danger')?.value.chroma ?? 0
+  test('a status never simply takes the brand chroma', () => {
+    const danger = (brand: string, harmony?: number) =>
+      deriveTheme({ brand, ...(harmony === undefined ? {} : { status: { harmony } }) }).tokens.find(
+        (t) => t.name === 'color-danger',
+      )?.value.chroma ?? 0
 
-    expect(danger('#94a3b8')).toBeCloseTo(danger('#c026d3'), 3)
-    expect(danger('#94a3b8')).toBeGreaterThan(0.15)
+    /* Held apart from the palette entirely, the four are the same whatever the
+       brand: this is the chroma the hue owns. */
+    expect(danger('#94a3b8', 0)).toBeCloseTo(danger('#c026d3', 0), 3)
+
+    /* And under the default pull it still sits far above a brand at 0.035,
+       which is the near-grey error state this replaced. */
+    expect(danger('#94a3b8')).toBeGreaterThan(0.1)
+  })
+
+  /* **Hue is meaning and loudness is not.** Against a muted brand, a status
+     pinned to its own chroma measured six times the chroma of primary, which is
+     a red that shouts on a near-grey page. */
+  test('a status is pulled toward the loudness of the palette it sits in', () => {
+    const ratio = (harmony: number) => {
+      const theme = deriveTheme({ brand: '#94a3b8', status: { harmony } })
+      const at = (name: string) =>
+        theme.tokens.find((t) => t.name === `color-${name}`)?.value.chroma ?? 0
+      return at('color-danger'.replace('color-', '')) / at('primary')
+    }
+
+    expect(ratio(0)).toBeGreaterThan(5)
+    expect(ratio(0.5)).toBeLessThan(4)
+  })
+
+  /* And there is a floor, because a danger too quiet to read as danger is worse
+     than a loud one: following the brand all the way is what the earlier bug
+     did. */
+  test('the floor stops it following a grey brand to grey', () => {
+    const theme = deriveTheme({ brand: '#94a3b8', status: { harmony: 1 } })
+    expect(theme.tokens.find((t) => t.name === 'color-danger')?.value.chroma).toBeGreaterThan(0.1)
+  })
+
+  /* The shipped brand is an ordinary one, so it should barely move. */
+  test('a normal brand is left where it was', () => {
+    const at = (harmony: number) =>
+      deriveTheme({ brand: BRAND, status: { harmony } }).tokens.find(
+        (t) => t.name === 'color-danger',
+      )?.value.chroma ?? 0
+
+    expect(at(0.5)).toBeCloseTo(at(0), 2)
   })
 
   /* The policy still reaches them, because how loud a palette is remains a

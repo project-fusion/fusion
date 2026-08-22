@@ -805,6 +805,7 @@ element you slotted, not a wrapper around it.
 
 | Property | Description |
 | --- | --- |
+| `--card-backdrop` | Filter applied to what is behind the card. `none` by default; a translucent language sets it and reaches every card at once. |
 | `--card-background-color` | Surface behind the card. |
 | `--card-border-color` | Border color of the surface. |
 | `--card-border-width` | Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. |

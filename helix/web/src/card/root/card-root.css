@@ -1,6 +1,17 @@
 /* The host is the surface. A wrapper would be a second box doing nothing this
    one cannot, on every card on the page. */
 :host {
+  /* **A card can go glass, and could not before.** Its ground was the one thing
+     a translucent language could not reach: `app-header` and `megamenu` had a
+     backdrop hook and every surface in the flow had none, so a glass theme
+     produced frosted chrome over opaque cards.
+
+     `none` by default, so nothing moves until a theme asks. It is a hook rather
+     than the policy itself because a card in the flow is not chrome over
+     content: turning every card on a page to glass is a decision, where a
+     header doing it is what a header is for. A theme that wants it writes one
+     declaration and reaches all of them. */
+  backdrop-filter: var(--card-backdrop, none);
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--card-border-width, var(--helix-border-surface)) solid
     var(--card-border-color, var(--helix-color-border));

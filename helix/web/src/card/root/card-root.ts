@@ -34,6 +34,8 @@ import { styles } from './card-root.css.js'
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
  *
+ * @cssproperty --card-backdrop - Filter applied to what is behind the card. `none` by
+ *   default; a translucent language sets it and reaches every card at once.
  * @cssproperty --card-background-color - Surface behind the card.
  * @cssproperty --card-border-color - Border color of the surface.
  * @cssproperty --card-border-width - Width of the surface's edge. Follows

@@ -276,6 +276,22 @@ export interface ThemeIntent {
    */
   status?: {
     allowance?: number
+    /**
+     * How far the statuses follow the palette's own loudness, 0 to 1.
+     *
+     * **Hue is meaning and loudness is not**, which is the distinction this
+     * field turns on. A status that rotates with the brand is a warning a
+     * reader re-learns per product, and that stays refused. A status that
+     * ignores how loud the palette around it is has a different problem:
+     * against a muted brand, danger measured six times the chroma of primary,
+     * which is a vivid red screaming on a near-grey page.
+     *
+     * 0 holds each status at its own chroma. 1 follows the palette as far as the
+     * floor allows, and there is a floor: a danger quiet enough to stop reading
+     * as danger is worse than a loud one. It never goes above its own chroma
+     * either, that already being what its hue can hold.
+     */
+    harmony?: number
     danger?: StatusSeed
     info?: StatusSeed
     success?: StatusSeed

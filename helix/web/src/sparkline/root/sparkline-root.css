@@ -98,7 +98,10 @@
 }
 
 :host(:not([plot="bar"]):not([plot="line"])) [part="wash-start"] {
-  stop-opacity: var(--sparkline-area-opacity, 0.45);
+  /* The wash follows the theme's material policy, the same as the line chart's
+     area: 0.45 is the strength this drawing was made at and the multiplier is
+     the language it is drawn in. */
+  stop-opacity: calc(var(--sparkline-area-opacity, 0.45) * var(--helix-material-opacity));
 }
 
 /* The far stop does not reach nothing.
@@ -110,7 +113,7 @@
  * fade. A ninth is the third number and the one that holds: the floor is still
  * present, and the falloff is most of the height rather than a hint. */
 :host(:not([plot="bar"]):not([plot="line"])) [part="wash-end"] {
-  stop-opacity: calc(var(--sparkline-area-opacity, 0.45) / 9);
+  stop-opacity: calc(var(--sparkline-area-opacity, 0.45) / 9 * var(--helix-material-opacity));
 }
 
 /* Three steps, and the hook still wins over all of them. */

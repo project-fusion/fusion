@@ -102,6 +102,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
   const [density, setDensity] = useState(100)
   const [radius, setRadius] = useState(50)
   const [allowance, setAllowance] = useState(20)
+  const [harmony, setHarmony] = useState(50)
   const [split, setSplit] = useState(PREVIEW_SHARE)
   const [bodyFace, setBodyFace] = useState('')
   const [displayFace, setDisplayFace] = useState('')
@@ -124,6 +125,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     density === 100 &&
     radius === 50 &&
     allowance === 20 &&
+    harmony === 50 &&
     surface === 'border' &&
     floating === 'shadow' &&
     bodyFace === '' &&
@@ -142,6 +144,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     setDensity(100)
     setRadius(50)
     setAllowance(20)
+    setHarmony(50)
     setSurface('border')
     setFloating('shadow')
     setBodyFace('')
@@ -170,7 +173,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       radius: radius / 100,
       scheme,
       separation: { floating: floating as 'border' | 'fill' | 'shadow', surface },
-      status: { allowance },
+      status: { allowance, harmony: harmony / 100 },
     }),
     [
       accentHue,
@@ -182,6 +185,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       density,
       displayFace,
       floating,
+      harmony,
       monoFace,
       motion,
       textBase,
@@ -499,6 +503,23 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                 </helix-option>
               ))}
             </helix-select>
+
+            {/* **Hue is meaning and loudness is not**, which is the line this
+              draws. A status that rotates with the brand is a warning a reader
+              re-learns per product and stays refused; a status that ignores how
+              loud the palette around it is measured six times primary's chroma
+              against a muted brand, which is a red that shouts. */}
+            <helix-slider
+              hint="How far the statuses follow the palette's loudness."
+              label="Status harmony"
+              max={100}
+              min={0}
+              name="harmony"
+              onhelix-input={(event) => setHarmony(Number(event.detail.value))}
+              show-value
+              step={10}
+              value={String(harmony)}
+            ></helix-slider>
 
             {/* The repair rather than the report. A status may rotate within its
               meaning to clear a role it cannot be told apart from, and it keeps

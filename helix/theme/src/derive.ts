@@ -485,6 +485,7 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
      that clears, and keeps its own hue entirely when nothing inside the bound
      works. Set it to 0 to hold every status where convention puts it. */
   const allowance = statusIntent.allowance ?? 20
+  const harmony = statusIntent.harmony ?? 0.5
   const statusColors = new Map<StatusName, { color: Oklch; pinned: boolean }>()
   /* **Every role resolved so far, which grows as the loop runs.** A status
      rotated clear of the accent can land on the status decided before it: with
@@ -502,9 +503,19 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
       continue
     }
     const hue = (supplied as { hue?: number } | undefined)?.hue ?? STATUS_HUE[name]
-    /* The status's own chroma, scaled by the policy, and never the brand's:
-       see `STATUS_CHROMA` for what taking the brand's did to a muted one. */
-    const chroma = policy(STATUS_CHROMA[name])
+    /* **Its own chroma, pulled toward the palette's loudness, never the
+       brand's outright.** Taking the brand's gave a grey danger on a muted
+       brand; ignoring the brand entirely gave the opposite, danger measuring six
+       times primary's chroma on the same palette, which is a red that shouts.
+
+       So the multiplier walks from 1 toward how loud this brand is against a
+       normal one, as far as `harmony` asks, and is clamped at both ends: never
+       above the status's own chroma, that already being what its hue can hold,
+       and never below the floor, a danger too quiet to read as danger being
+       worse than a loud one. */
+    const loudness = policy(rawBrand.chroma) / REFERENCE_CHROMA
+    const pull = 1 - harmony + harmony * loudness
+    const chroma = policy(STATUS_CHROMA[name]) * Math.min(1, Math.max(STATUS_FLOOR, pull))
     let resolvedHue = hue
     if (allowance > 0) {
       /* **Against the brand and against the statuses already settled.**
@@ -889,6 +900,23 @@ const MOTION = {
  * ramp and compound by the scale.
  */
 const TEXT_STEPS = { '2xl': 3, '3xl': 4, lg: 1, md: 0, sm: -1, xl: 2, xs: -2 } as const
+
+/**
+ * The chroma a brand is measured against for loudness: the shipped seed's.
+ *
+ * A reference rather than a maximum. What matters is whether this brand is
+ * quieter or louder than an ordinary one, and the one that ships is the only
+ * ordinary one this file knows about.
+ */
+const REFERENCE_CHROMA = 0.19
+
+/**
+ * How far a status may be quieted before it stops reading as itself.
+ *
+ * Measured as a fraction of its own chroma rather than an absolute, because the
+ * four differ: amber can hold less than red at the lightness a status sits at.
+ */
+const STATUS_FLOOR = 0.55
 
 /** Below this a label stops being small and starts being unreadable. */
 const TEXT_FLOOR = 11
