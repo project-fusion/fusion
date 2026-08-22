@@ -6458,6 +6458,10 @@
               "name": "--card-border-color"
             },
             {
+              "description": "Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise.",
+              "name": "--card-border-width"
+            },
+            {
               "description": "Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has.",
               "name": "--card-media-block-size"
             },
@@ -10114,16 +10118,28 @@
               "name": "--color-input-background-color"
             },
             {
-              "description": "Edge length of the block in `appearance=\"swatch\"`.",
-              "name": "--color-input-swatch-size"
+              "description": "Colour of the panel's edge.",
+              "name": "--color-input-border-color"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--color-input-border-width"
+            },
+            {
+              "description": "Width of the panel, and so of the square.",
+              "name": "--color-input-panel-size"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--color-input-shadow"
             },
             {
               "description": "Corner radius of that block.",
               "name": "--color-input-swatch-radii"
             },
             {
-              "description": "Width of the panel, and so of the square.",
-              "name": "--color-input-panel-size"
+              "description": "Edge length of the block in `appearance=\"swatch\"`.",
+              "name": "--color-input-swatch-size"
             },
             {
               "description": "The chosen colour, to paint over the transparency check.",
@@ -12864,12 +12880,24 @@
               "name": "--combobox-background-color"
             },
             {
-              "description": "Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`.",
+              "description": "Colour of the panel's edge.",
+              "name": "--combobox-border-color"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--combobox-border-width"
+            },
+            {
+              "description": "Smallest the text field shrinks to",
               "name": "--combobox-control-size"
             },
             {
               "description": "Width of the panel. Follows the field by default.",
               "name": "--combobox-panel-size"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--combobox-shadow"
             }
           ],
           "members": [
@@ -16155,6 +16183,18 @@
             {
               "description": "Fill behind the field.",
               "name": "--date-input-background-color"
+            },
+            {
+              "description": "Colour of the panel's edge.",
+              "name": "--date-input-border-color"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--date-input-border-width"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--date-input-shadow"
             }
           ],
           "members": [
@@ -19360,8 +19400,12 @@
           "name": "HelixDialog",
           "cssProperties": [
             {
-              "description": "The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.",
-              "name": "--dialog-scrim"
+              "description": "Colour of the panel's edge.",
+              "name": "--dialog-border-color"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--dialog-border-width"
             },
             {
               "description": "How big the mark above the title is.",
@@ -19374,6 +19418,14 @@
             {
               "description": "Padding inside the panel.",
               "name": "--dialog-inset"
+            },
+            {
+              "description": "The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.",
+              "name": "--dialog-scrim"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--dialog-shadow"
             }
           ],
           "members": [
@@ -20927,16 +20979,12 @@
           "name": "HelixDrawer",
           "cssProperties": [
             {
-              "description": "The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.",
-              "name": "--drawer-scrim"
+              "description": "Colour of the panel's edge.",
+              "name": "--drawer-border-color"
             },
             {
-              "description": "Corner radius on the edges that face the page.",
-              "name": "--drawer-radii"
-            },
-            {
-              "description": "Width or height of the panel.",
-              "name": "--drawer-size"
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--drawer-border-width"
             },
             {
               "description": "Padding inside the panel.",
@@ -20945,6 +20993,22 @@
             {
               "description": "Padding above the content, which clears the close control.",
               "name": "--drawer-inset-block-start"
+            },
+            {
+              "description": "Corner radius on the edges that face the page.",
+              "name": "--drawer-radii"
+            },
+            {
+              "description": "The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.",
+              "name": "--drawer-scrim"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--drawer-shadow"
+            },
+            {
+              "description": "Width or height of the panel.",
+              "name": "--drawer-size"
             }
           ],
           "cssParts": [
@@ -31985,16 +32049,16 @@
           "name": "HelixMegamenu",
           "cssProperties": [
             {
-              "description": "The panel's own fill.",
-              "name": "--megamenu-background"
-            },
-            {
               "description": "A filter behind the panel, for glass.",
               "name": "--megamenu-backdrop"
             },
             {
-              "description": "How wide the panel may get.",
-              "name": "--megamenu-size"
+              "description": "The panel's own fill.",
+              "name": "--megamenu-background"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--megamenu-border-width"
             },
             {
               "description": "The narrowest a column goes before the grid wraps.",
@@ -32003,6 +32067,14 @@
             {
               "description": "How wide the band's contents may get, centred in it.",
               "name": "--megamenu-full-size"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--megamenu-shadow"
+            },
+            {
+              "description": "How wide the panel may get.",
+              "name": "--megamenu-size"
             },
             {
               "description": "Where the panel starts, measured from the bar above it.",
@@ -33448,6 +33520,18 @@
           "name": "HelixMenu",
           "cssProperties": [
             {
+              "description": "Fill of the surface.",
+              "name": "--menu-background-color"
+            },
+            {
+              "description": "Colour of the panel's edge.",
+              "name": "--menu-border-color"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--menu-border-width"
+            },
+            {
               "description": "Tallest the surface grows before it scrolls.",
               "name": "--menu-max-block-size"
             },
@@ -33456,8 +33540,8 @@
               "name": "--menu-min-inline-size"
             },
             {
-              "description": "Fill of the surface.",
-              "name": "--menu-background-color"
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--menu-shadow"
             }
           ],
           "members": [
@@ -41317,16 +41401,28 @@
           "name": "HelixPopover",
           "cssProperties": [
             {
-              "description": "Tallest the panel grows before it scrolls.",
-              "name": "--popover-max-block-size"
+              "description": "Colour of the panel's edge.",
+              "name": "--popover-border-color"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--popover-border-width"
+            },
+            {
+              "description": "Width of the panel.",
+              "name": "--popover-inline-size"
             },
             {
               "description": "Space between the panel's edge and its contents.",
               "name": "--popover-inset"
             },
             {
-              "description": "Width of the panel.",
-              "name": "--popover-inline-size"
+              "description": "Tallest the panel grows before it scrolls.",
+              "name": "--popover-max-block-size"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--popover-shadow"
             }
           ],
           "members": [
@@ -48089,6 +48185,18 @@
           "description": "The trigger wears the same frame as an `Input`, because in a form it stands\nin a row with them and a control that looks like a button among fields reads\nas an action rather than an answer.\n\nThe panel is an overlay surface rather than a sunken one: it sits over the\npage instead of on it, which is what its shadow says and what tells it apart\nfrom the field it came out of.",
           "name": "HelixSelect",
           "cssProperties": [
+            {
+              "description": "Colour of the panel's edge.",
+              "name": "--select-border-color"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--select-border-width"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--select-shadow"
+            },
             {
               "description": "How tall the panel gets.",
               "name": "--select-surface-max-block-size"
@@ -60139,6 +60247,18 @@
             {
               "description": "Fill behind the field.",
               "name": "--time-input-background-color"
+            },
+            {
+              "description": "Colour of the panel's edge.",
+              "name": "--time-input-border-color"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--time-input-border-width"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--time-input-shadow"
             }
           ],
           "members": [
@@ -63586,8 +63706,20 @@
           "name": "HelixToastItem",
           "cssProperties": [
             {
+              "description": "Colour of the panel's edge.",
+              "name": "--toast-border-color"
+            },
+            {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--toast-border-width"
+            },
+            {
               "description": "Space between the message's edge and its contents.",
               "name": "--toast-item-inset"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--toast-shadow"
             },
             {
               "description": "How long this message stays, in milliseconds, for a progress hint.",
@@ -67857,12 +67989,20 @@
               "name": "--tour-arrow-size"
             },
             {
+              "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
+              "name": "--tour-border-width"
+            },
+            {
               "description": "How wide the panel may grow.",
               "name": "--tour-bubble-size"
             },
             {
               "description": "Inset inside the panel.",
               "name": "--tour-padding"
+            },
+            {
+              "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
+              "name": "--tour-shadow"
             },
             {
               "description": "The panel's own surface.",

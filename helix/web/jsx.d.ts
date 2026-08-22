@@ -14967,6 +14967,7 @@ export type CustomElements = {
    *
    * - `--card-background-color`: Surface behind the card. (default: `undefined`)
    * - `--card-border-color`: Border color of the surface. (default: `undefined`)
+   * - `--card-border-width`: Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. (default: `undefined`)
    * - `--card-media-block-size`: Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. (default: `undefined`)
    * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
    * - `--card-padding`: Inset applied to each region. (default: `undefined`)
@@ -15749,9 +15750,12 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--color-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
-   * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
+   * - `--color-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--color-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--color-input-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
+   * - `--color-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
+   * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
+   * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
    * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
    *
    * ## CSS Parts
@@ -16193,8 +16197,11 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--combobox-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--combobox-control-size`: Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. (default: `undefined`)
+   * - `--combobox-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--combobox-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
+   * - `--combobox-control-size`: Smallest the text field shrinks to (default: `undefined`)
    * - `--combobox-panel-size`: Width of the panel. Follows the field by default. (default: `undefined`)
+   * - `--combobox-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16703,6 +16710,9 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--date-input-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--date-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--date-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
+   * - `--date-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16991,10 +17001,13 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--dialog-scrim`: The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
+   * - `--dialog-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--dialog-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
    * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
+   * - `--dialog-scrim`: The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
+   * - `--dialog-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -17271,11 +17284,14 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--drawer-scrim`: The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
-   * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
-   * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
+   * - `--drawer-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--drawer-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
    * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
+   * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
+   * - `--drawer-scrim`: The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
+   * - `--drawer-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
+   * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -18880,11 +18896,13 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
    * - `--megamenu-backdrop`: A filter behind the panel, for glass. (default: `undefined`)
-   * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
+   * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
+   * - `--megamenu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
    * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
+   * - `--megamenu-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
+   * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-top`: Where the panel starts, measured from the bar above it. (default: `undefined`)
    *
    * ## CSS Parts
@@ -19106,9 +19124,12 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
+   * - `--menu-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--menu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--menu-max-block-size`: Tallest the surface grows before it scrolls. (default: `undefined`)
    * - `--menu-min-inline-size`: Narrowest the surface gets. (default: `undefined`)
-   * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
+   * - `--menu-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -20156,9 +20177,12 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--popover-max-block-size`: Tallest the panel grows before it scrolls. (default: `undefined`)
-   * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
+   * - `--popover-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--popover-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
+   * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
+   * - `--popover-max-block-size`: Tallest the panel grows before it scrolls. (default: `undefined`)
+   * - `--popover-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -21447,6 +21471,9 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--select-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--select-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
+   * - `--select-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--select-surface-max-block-size`: How tall the panel gets. (default: `undefined`)
    *
    * ## CSS Parts
@@ -23331,6 +23358,9 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--time-input-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--time-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--time-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
+   * - `--time-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -23720,7 +23750,10 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--toast-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--toast-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
+   * - `--toast-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--toast-duration`: How long this message stays, in milliseconds, for a progress hint. (default: `undefined`)
    *
    * ## CSS Parts
@@ -24287,8 +24320,10 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--tour-arrow-size`: The point's box, before it is rotated. (default: `undefined`)
+   * - `--tour-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--tour-bubble-size`: How wide the panel may grow. (default: `undefined`)
    * - `--tour-padding`: Inset inside the panel. (default: `undefined`)
+   * - `--tour-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--tour-surface-color`: The panel's own surface. (default: `undefined`)
    *
    * ## CSS Parts
@@ -26228,6 +26263,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--card-background-color`: Surface behind the card. (default: `undefined`)
    * - `--card-border-color`: Border color of the surface. (default: `undefined`)
+   * - `--card-border-width`: Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. (default: `undefined`)
    * - `--card-media-block-size`: Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. (default: `undefined`)
    * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
    * - `--card-padding`: Inset applied to each region. (default: `undefined`)
@@ -27026,9 +27062,12 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--color-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
-   * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
+   * - `--color-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--color-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--color-input-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
+   * - `--color-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
+   * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
+   * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
    * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
    *
    * ## CSS Parts
@@ -27476,8 +27515,11 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--combobox-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--combobox-control-size`: Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. (default: `undefined`)
+   * - `--combobox-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--combobox-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
+   * - `--combobox-control-size`: Smallest the text field shrinks to (default: `undefined`)
    * - `--combobox-panel-size`: Width of the panel. Follows the field by default. (default: `undefined`)
+   * - `--combobox-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -27995,6 +28037,9 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--date-input-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--date-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--date-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
+   * - `--date-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -28289,10 +28334,13 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--dialog-scrim`: The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
+   * - `--dialog-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--dialog-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
    * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
+   * - `--dialog-scrim`: The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
+   * - `--dialog-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -28578,11 +28626,14 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--drawer-scrim`: The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
-   * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
-   * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
+   * - `--drawer-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--drawer-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
    * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
+   * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
+   * - `--drawer-scrim`: The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
+   * - `--drawer-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
+   * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -30242,11 +30293,13 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
    * - `--megamenu-backdrop`: A filter behind the panel, for glass. (default: `undefined`)
-   * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
+   * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
+   * - `--megamenu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
    * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
+   * - `--megamenu-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
+   * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-top`: Where the panel starts, measured from the bar above it. (default: `undefined`)
    *
    * ## CSS Parts
@@ -30474,9 +30527,12 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
+   * - `--menu-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--menu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--menu-max-block-size`: Tallest the surface grows before it scrolls. (default: `undefined`)
    * - `--menu-min-inline-size`: Narrowest the surface gets. (default: `undefined`)
-   * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
+   * - `--menu-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -31558,9 +31614,12 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--popover-max-block-size`: Tallest the panel grows before it scrolls. (default: `undefined`)
-   * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
+   * - `--popover-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--popover-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
+   * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
+   * - `--popover-max-block-size`: Tallest the panel grows before it scrolls. (default: `undefined`)
+   * - `--popover-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -32895,6 +32954,9 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--select-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--select-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
+   * - `--select-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--select-surface-max-block-size`: How tall the panel gets. (default: `undefined`)
    *
    * ## CSS Parts
@@ -34844,6 +34906,9 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--time-input-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--time-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--time-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
+   * - `--time-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -35245,7 +35310,10 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--toast-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--toast-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
+   * - `--toast-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--toast-duration`: How long this message stays, in milliseconds, for a progress hint. (default: `undefined`)
    *
    * ## CSS Parts
@@ -35834,8 +35902,10 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--tour-arrow-size`: The point's box, before it is rotated. (default: `undefined`)
+   * - `--tour-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--tour-bubble-size`: How wide the panel may grow. (default: `undefined`)
    * - `--tour-padding`: Inset inside the panel. (default: `undefined`)
+   * - `--tour-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--tour-surface-color`: The panel's own surface. (default: `undefined`)
    *
    * ## CSS Parts
@@ -36675,6 +36745,8 @@ export type CustomCssProperties = {
   "--card-background-color"?: string;
   /** Border color of the surface. */
   "--card-border-color"?: string;
+  /** Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. */
+  "--card-border-width"?: string;
   /** Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. */
   "--card-media-block-size"?: string;
   /** Width of the media column when horizontal. */
@@ -36715,12 +36787,18 @@ export type CustomCssProperties = {
   "--code-size"?: string;
   /** Fill behind the field. */
   "--color-input-background-color"?: string;
-  /** Edge length of the block in `appearance="swatch"`. */
-  "--color-input-swatch-size"?: string;
-  /** Corner radius of that block. */
-  "--color-input-swatch-radii"?: string;
+  /** Colour of the panel's edge. */
+  "--color-input-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--color-input-border-width"?: string;
   /** Width of the panel, and so of the square. */
   "--color-input-panel-size"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--color-input-shadow"?: string;
+  /** Corner radius of that block. */
+  "--color-input-swatch-radii"?: string;
+  /** Edge length of the block in `appearance="swatch"`. */
+  "--color-input-swatch-size"?: string;
   /** The chosen colour, to paint over the transparency check. */
   "--color-input-swatch"?: string;
   /** Inset of the rows under the square, and the bottom. */
@@ -36743,16 +36821,28 @@ export type CustomCssProperties = {
   "--color-picker-swatch"?: string;
   /** Fill behind the field. */
   "--combobox-background-color"?: string;
-  /** Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. */
+  /** Colour of the panel's edge. */
+  "--combobox-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--combobox-border-width"?: string;
+  /** Smallest the text field shrinks to */
   "--combobox-control-size"?: string;
   /** Width of the panel. Follows the field by default. */
   "--combobox-panel-size"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--combobox-shadow"?: string;
   /** How wide the palette is. Defaults to `40rem`. */
   "--command-size"?: string;
   /** How tall the list grows before it scrolls. */
   "--command-list-size"?: string;
   /** Fill behind the field. */
   "--date-input-background-color"?: string;
+  /** Colour of the panel's edge. */
+  "--date-input-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--date-input-border-width"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--date-input-shadow"?: string;
   /** Months per row. Two unless there is only one. */
   "--date-picker-columns"?: string;
   /** Width and height of a day. */
@@ -36767,14 +36857,20 @@ export type CustomCssProperties = {
   "--date-picker-range-color"?: string;
   /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
   "--date-picker-column-count"?: string;
-  /** The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
-  "--dialog-scrim"?: string;
+  /** Colour of the panel's edge. */
+  "--dialog-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--dialog-border-width"?: string;
   /** How big the mark above the title is. */
   "--dialog-icon-size"?: string;
   /** Width of the panel. */
   "--dialog-inline-size"?: string;
   /** Padding inside the panel. */
   "--dialog-inset"?: string;
+  /** The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
+  "--dialog-scrim"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--dialog-shadow"?: string;
   /** Color of the rule. */
   "--divider-color"?: string;
   /** Thickness of the rule. */
@@ -36793,16 +36889,22 @@ export type CustomCssProperties = {
   "--donut-chart-track-color"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
   "--donut-chart-stroke"?: string;
-  /** The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
-  "--drawer-scrim"?: string;
-  /** Corner radius on the edges that face the page. */
-  "--drawer-radii"?: string;
-  /** Width or height of the panel. */
-  "--drawer-size"?: string;
+  /** Colour of the panel's edge. */
+  "--drawer-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--drawer-border-width"?: string;
   /** Padding inside the panel. */
   "--drawer-inset"?: string;
   /** Padding above the content, which clears the close control. */
   "--drawer-inset-block-start"?: string;
+  /** Corner radius on the edges that face the page. */
+  "--drawer-radii"?: string;
+  /** The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
+  "--drawer-scrim"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--drawer-shadow"?: string;
+  /** Width or height of the panel. */
+  "--drawer-size"?: string;
   /** Fill when a row is under the pointer. */
   "--drilldown-item-hover-color"?: string;
   /** Fill behind the pages. */
@@ -36875,28 +36977,38 @@ export type CustomCssProperties = {
   "--loader-color"?: string;
   /** Color of the circle behind it. */
   "--loader-track-color"?: string;
-  /** The panel's own fill. */
-  "--megamenu-background"?: string;
   /** A filter behind the panel, for glass. */
   "--megamenu-backdrop"?: string;
-  /** How wide the panel may get. */
-  "--megamenu-size"?: string;
+  /** The panel's own fill. */
+  "--megamenu-background"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--megamenu-border-width"?: string;
   /** The narrowest a column goes before the grid wraps. */
   "--megamenu-column-size"?: string;
   /** How wide the band's contents may get, centred in it. */
   "--megamenu-full-size"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--megamenu-shadow"?: string;
+  /** How wide the panel may get. */
+  "--megamenu-size"?: string;
   /** Where the panel starts, measured from the bar above it. */
   "--megamenu-top"?: string;
   /** Width of the leading column, for a row carrying more than a mark. */
   "--menu-item-start"?: string;
   /** Fill under the pointer. */
   "--menu-item-hover-color"?: string;
+  /** Fill of the surface. */
+  "--menu-background-color"?: string;
+  /** Colour of the panel's edge. */
+  "--menu-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--menu-border-width"?: string;
   /** Tallest the surface grows before it scrolls. */
   "--menu-max-block-size"?: string;
   /** Narrowest the surface gets. */
   "--menu-min-inline-size"?: string;
-  /** Fill of the surface. */
-  "--menu-background-color"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--menu-shadow"?: string;
   /** Edge length of the drawing, in `ring` and `arc`. */
   "--meter-ring-size"?: string;
   /** Thickness of the stroke there. */
@@ -36943,12 +37055,18 @@ export type CustomCssProperties = {
   "--pagination-size"?: string;
   /** Space between one box and the next. */
   "--pin-gap"?: string;
-  /** Tallest the panel grows before it scrolls. */
-  "--popover-max-block-size"?: string;
-  /** Space between the panel's edge and its contents. */
-  "--popover-inset"?: string;
+  /** Colour of the panel's edge. */
+  "--popover-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--popover-border-width"?: string;
   /** Width of the panel. */
   "--popover-inline-size"?: string;
+  /** Space between the panel's edge and its contents. */
+  "--popover-inset"?: string;
+  /** Tallest the panel grows before it scrolls. */
+  "--popover-max-block-size"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--popover-shadow"?: string;
   /** Thickness of the bar. */
   "--progress-size"?: string;
   /** Fill of the part that is done. */
@@ -37047,6 +37165,12 @@ export type CustomCssProperties = {
   "--scroll-area-thumb-color"?: string;
   /** And its track. */
   "--scroll-area-track-color"?: string;
+  /** Colour of the panel's edge. */
+  "--select-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--select-border-width"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--select-shadow"?: string;
   /** How tall the panel gets. */
   "--select-surface-max-block-size"?: string;
   /** Diameter of the circle shape. */
@@ -37153,6 +37277,12 @@ export type CustomCssProperties = {
   "--textarea-background-color"?: string;
   /** Fill behind the field. */
   "--time-input-background-color"?: string;
+  /** Colour of the panel's edge. */
+  "--time-input-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--time-input-border-width"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--time-input-shadow"?: string;
   /** How tall the list is before it scrolls. */
   "--time-picker-list-height"?: string;
   /** How tall a wheel is. Five rows by default. */
@@ -37171,8 +37301,14 @@ export type CustomCssProperties = {
   "--timeline-rail-size"?: string;
   /** Space between one entry and the next. */
   "--timeline-gap"?: string;
+  /** Colour of the panel's edge. */
+  "--toast-border-color"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--toast-border-width"?: string;
   /** Space between the message's edge and its contents. */
   "--toast-item-inset"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--toast-shadow"?: string;
   /** How long this message stays, in milliseconds, for a progress hint. */
   "--toast-duration"?: string;
   /** Distance from the edges of the window. */
@@ -37195,10 +37331,14 @@ export type CustomCssProperties = {
   "--tour-spotlight-radius"?: string;
   /** The point's box, before it is rotated. */
   "--tour-arrow-size"?: string;
+  /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
+  "--tour-border-width"?: string;
   /** How wide the panel may grow. */
   "--tour-bubble-size"?: string;
   /** Inset inside the panel. */
   "--tour-padding"?: string;
+  /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
+  "--tour-shadow"?: string;
   /** The panel's own surface. */
   "--tour-surface-color"?: string;
   /** Indent added per level. */
