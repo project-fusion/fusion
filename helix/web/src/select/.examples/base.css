@@ -12,7 +12,10 @@
  * except where one surface ends and the next begins, which is the whole job.
  *
  * Named by role rather than numbered, because a number implies a scale somebody
- * maintains and this is seven values in one file. Written through
+ * maintains and this is seven values in one file. Underscored, because they are
+ * declared and read in that same file and never leave it, which is the one case
+ * the sigil is for: `check:hooks` pairs a public name with an `@cssproperty`
+ * and would otherwise ask this example to publish its own palette. Written through
  * `light-dark()` with `color-scheme` declared, so the sandbox's dark mode gets
  * a sheet that inverts rather than a pale card on a dark page: the headless tier
  * has no theming and this is the cheapest honest substitute.
@@ -24,17 +27,17 @@
 
 :root {
   color-scheme: light dark;
-  --gray-surface: light-dark(#fafafa, #18181b);
-  --gray-subtle: light-dark(#f0f0f1, #232326);
-  --gray-fill: light-dark(#e2e2e5, #2f2f33);
-  --gray-line: light-dark(#c9c9ce, #45454b);
-  --gray-mark: light-dark(#8e8e96, #86868f);
-  --gray-muted: light-dark(#63636b, #a1a1aa);
-  --gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
 helix-base-select::part(label) {
-  color: var(--gray-strong);
+  color: var(--_gray-strong);
   font-weight: 600;
 }
 
@@ -45,16 +48,16 @@ helix-base-select::part(trigger) {
 }
 
 helix-base-select::part(surface) {
-  background-color: var(--gray-surface);
-  border: 1px solid var(--gray-line);
-  color: var(--gray-strong);
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
   padding: 0.5rem;
 }
 
 helix-base-select::part(listbox) {
-  background-color: var(--gray-surface);
-  border: 1px solid var(--gray-line);
-  color: var(--gray-strong);
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
   padding: 0.5rem;
 }
 
@@ -65,12 +68,12 @@ helix-base-select::part(items) {
 }
 
 helix-base-select::part(hint) {
-  color: var(--gray-muted);
+  color: var(--_gray-muted);
   font-size: 0.875em;
 }
 
 helix-base-select::part(feedback) {
-  color: var(--gray-muted);
+  color: var(--_gray-muted);
   font-size: 0.875em;
 }
 
@@ -85,7 +88,7 @@ helix-base-option::part(item) {
 }
 
 helix-base-option::part(label) {
-  color: var(--gray-strong);
+  color: var(--_gray-strong);
   font-weight: 600;
 }
 
@@ -93,6 +96,6 @@ helix-base-option::part(label) {
    off without putting one back is the commonest way a headless control stops
    being operable without a pointer. */
 helix-base-select::part(trigger):focus-visible {
-  outline: 2px solid var(--gray-mark);
+  outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
