@@ -45,10 +45,16 @@ export class HelixBaseBlockquote extends HelixElement {
    */
   private markEmpty(): void {
     const footer = this.renderRoot?.querySelector<HTMLElement>('[part="attribution"]')
-    footer?.toggleAttribute(
-      'data-empty',
-      !slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="attribution"]')),
+    const empty = !slotFilled(
+      this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="attribution"]'),
     )
+    footer?.toggleAttribute('data-empty', empty)
+    /* `hidden` beside the mirror, because `data-empty` is a hook the styled
+       sheet reads and this tier has no sheet: an empty region left in the box
+       tree is a gap a consumer cannot close without knowing to look for it. The
+       styled rule stays, because that sheet sets `display` on this part and so
+       outranks the UA one. */
+    footer?.toggleAttribute('hidden', empty)
   }
 
   protected override updated(changed: PropertyValues): void {

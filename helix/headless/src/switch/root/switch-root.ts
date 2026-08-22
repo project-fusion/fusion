@@ -104,10 +104,16 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
    */
   private markEmpty(): void {
     const region = this.renderRoot?.querySelector<HTMLElement>('[part="label"]')
-    region?.toggleAttribute(
-      'data-empty',
-      !slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>('[part="label"] slot')),
+    const empty = !slotFilled(
+      this.renderRoot?.querySelector<HTMLSlotElement>('[part="label"] slot'),
     )
+    region?.toggleAttribute('data-empty', empty)
+    /* `hidden` beside the mirror, because `data-empty` is a hook the styled
+       sheet reads and this tier has no sheet: an empty region left in the box
+       tree is a gap a consumer cannot close without knowing to look for it. The
+       styled rule stays, because that sheet sets `display` on this part and so
+       outranks the UA one. */
+    region?.toggleAttribute('hidden', empty)
   }
 
   protected override render(): TemplateResult {

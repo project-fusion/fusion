@@ -143,6 +143,11 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
       (node) => node.textContent?.trim() !== '' || node.nodeType === Node.ELEMENT_NODE,
     )
     this.toggleAttribute('data-has-label', filled)
+    /* And `hidden` on the region itself, because the mirror is on the host and
+       this tier has no sheet to turn one into the other: a checkbox with no
+       label kept an empty label box beside it. The styled rule stays, since it
+       hides through a descendant selector this cannot replace. */
+    this.renderRoot.querySelector<HTMLElement>('[part="label"]')?.toggleAttribute('hidden', !filled)
   }
 
   protected override render(): TemplateResult {

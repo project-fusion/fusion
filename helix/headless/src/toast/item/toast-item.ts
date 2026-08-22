@@ -270,6 +270,15 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
        one the consumer declared, and that attribute is what ownership is read
        from. `data-open` can never be mistaken for a declaration. */
     this.toggleAttribute('data-open', this.open)
+    /* And `hidden` beside it, because `data-open` is a hook and not a
+       mechanism. A dismissed toast was hidden by `opacity: 0` and
+       `visibility: hidden` in the styled sheet and by nothing at all here, so a
+       consumer on this tier had a message that never went away: measured, a
+       closed base toast printed its text on the page.
+       It costs the styled tier nothing, the same as the accordion: `:host` sets
+       `display: grid` unconditionally so the author rule beats the UA sheet,
+       and the exit still animates its row down from `1fr`. */
+    this.toggleAttribute('hidden', !this.open)
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

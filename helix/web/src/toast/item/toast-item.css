@@ -358,6 +358,24 @@ slot[name="icon"]::slotted(*) {
   transition: padding-block var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
+/* Hidden and still laid out, which is the one case `HelixElement`'s prepended
+ * rule leaves open on purpose: it says so itself, that `!important` is not used
+ * because a component with a real reason to stay laid out while hidden should
+ * be able to answer it.
+ *
+ * This is that reason. The headless tier writes `hidden` the moment a toast is
+ * dismissed, because on that tier there is no sheet and a message that never
+ * goes away is the alternative. Here the exit is an animation, and
+ * `display: none` from the first frame skips it: the toast vanished instead of
+ * collapsing. Same specificity as the rule it answers, and later in the
+ * cascade, which is what the prepended rule was arranged to allow.
+ *
+ * The row below still ends at `visibility: hidden`, so the box leaves the
+ * accessibility tree once it has finished travelling. */
+:host([hidden]:not([hidden="until-found"])) {
+  display: grid;
+}
+
 :host(:not([data-open])) {
   grid-template-rows: minmax(0, 0fr);
   margin-block-start: 0;
