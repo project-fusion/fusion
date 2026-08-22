@@ -1808,6 +1808,15 @@ helix-drawer helix-tree {
   font-size: var(--helix-text-sm);
 }
 
+/* The chevron sits with the words rather than beside them, which is the whole
+   reason it is in the link: it is part of the label, so it takes the label's
+   hover, its radius and its fill without a rule of its own. */
+.insightTrail a {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}
+
 .insightLede {
   font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
   max-inline-size: 34rem;

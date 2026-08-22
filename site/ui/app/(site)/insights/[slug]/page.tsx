@@ -58,25 +58,30 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <helix-flex align="start" class="insightHead" direction="column" gap="lg">
         {/* The way out, above everything. A reader who opened this from the
             gallery wants it before they want the filing labels. */}
-        {/* **A trail rather than a back arrow.**
-            An arrow says "the way you came", which is only true if a reader
-            arrived from the gallery: most arrive from a link, a search or the
-            palette, and for them it points at a page they have never seen. A
-            trail says where this *is*, which is true however they got here, and
-            it carries the same click. `Breadcrumbs` owns the separators, the
-            `aria-current` on the last item and the nav landmark. */}
+        {/* **One crumb pointing back, and it is a real `Breadcrumbs` rather
+            than a link dressed as one.** The crumb already owns the hover wash,
+            the radius, the padding and the pull-back that makes the first step
+            start where the content does. A back link styled to match would be
+            those four decisions copied into a stylesheet, to drift the first
+            time one of them changes.
+
+            A full trail was here for a moment and said `Insights / Company /
+            this title`, which is where the page sits and is not what a reader
+            wants from the top left: the title is already the next thing they
+            read, and the topic is a filter they did not ask for. The one thing
+            worth offering is the way out.
+
+            The chevron is inside the link rather than drawn by the component,
+            which is what lets a single crumb point left: `Breadcrumbs` puts its
+            separators *between* steps, so it has none to give before the
+            first. */}
         <helix-breadcrumbs aria-label="Breadcrumb" class="insightTrail">
           <helix-breadcrumb>
             <Link data-link="quiet" href="/insights">
-              Insights
+              <helix-icon name="caret-left"></helix-icon>
+              All insights
             </Link>
           </helix-breadcrumb>
-          <helix-breadcrumb>
-            <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
-              {insight.topic}
-            </Link>
-          </helix-breadcrumb>
-          <helix-breadcrumb current>{insight.title}</helix-breadcrumb>
         </helix-breadcrumbs>
 
         <helix-flex align="center" data-density="sm" gap="xs" wrap>
