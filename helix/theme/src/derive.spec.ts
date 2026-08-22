@@ -129,14 +129,25 @@ describe('deriveTheme', () => {
   })
 
   test('gamut mapping is reported rather than applied silently', () => {
-    // A near-white surface carrying brand tint cannot be rendered as authored.
-    const theme = deriveTheme({ brand: BRAND })
+    /* A near-white surface carrying a brand tint cannot be rendered as
+       authored. The cast has to be asked for now: the neutral default moved to
+       chroma 0 to agree with `primitives.css`, which had already rejected the
+       0.008 this engine was hardcoding because a fixed chroma is a rising
+       saturation as a surface darkens and it read navy across a dark page. So
+       this test used to pass on a default nobody chose. */
+    const theme = deriveTheme({ brand: BRAND, neutral: { chroma: 0.02 } })
     const background = theme.tokens.find((t) => t.name === 'color-background')
     if (!background) {
       throw new Error('theme is missing a background token')
     }
     expect(background.chromaReduced).toBe(true)
     expect(isOutOfGamut(background.value)).toBe(false)
+  })
+
+  test('the neutral default is a dead grey, agreeing with the stylesheet', () => {
+    const theme = deriveTheme({ brand: BRAND })
+    const background = theme.tokens.find((t) => t.name === 'color-background')
+    expect(background?.value.chroma).toBe(0)
   })
 
   // `violations` fails open on non-finite input: every `ratio < target`
@@ -181,6 +192,117 @@ describe('deriveTheme', () => {
        name reached anything: a spec can only hold a name it names. */
     expect(css).toContain('--helix-seed-density: 1')
     expect(css).toContain('--helix-seed-radii: 0.5rem')
+  })
+})
+
+describe('the chroma policy', () => {
+  test('a ceiling of zero makes every derived colour grey', () => {
+    const theme = deriveTheme({ brand: BRAND, chroma: { ceiling: 0 } })
+    const derived = theme.tokens.filter((t) => t.origin !== 'pinned')
+    expect(derived.every((t) => t.value.chroma === 0)).toBe(true)
+  })
+
+  test('it scales what the brand supplies without moving its hue', () => {
+    const full = deriveTheme({ brand: BRAND })
+    const half = deriveTheme({ brand: BRAND, chroma: { scale: 0.5 } })
+    const primary = (theme: ReturnType<typeof deriveTheme>) =>
+      theme.tokens.find((t) => t.name === 'color-primary')
+    expect(primary(half)?.value.chroma).toBeLessThan(primary(full)?.value.chroma ?? 0)
+    expect(primary(half)?.value.hue).toBeCloseTo(primary(full)?.value.hue ?? 0, 5)
+  })
+
+  /* The whole point of the policy: a restrained theme whose status colours are
+     literals is a restrained theme with one vivid red in it, which reads as a
+     bug rather than as a warning. */
+  test('status follows the palette rather than staying a literal', () => {
+    const muted = deriveTheme({ brand: BRAND, chroma: { ceiling: 0.02 } })
+    const danger = muted.tokens.find((t) => t.name === 'color-danger')
+    expect(danger?.value.chroma).toBeLessThanOrEqual(0.02)
+  })
+
+  test('a pinned value keeps its chroma, the policy being about what we derive', () => {
+    const theme = deriveTheme({
+      brand: BRAND,
+      chroma: { ceiling: 0 },
+      tokens: { 'color-primary': '#c1272d' },
+    })
+    const primary = theme.tokens.find((t) => t.name === 'color-primary')
+    expect(primary?.origin).toBe('pinned')
+    expect(primary?.value.chroma).toBeGreaterThan(0)
+  })
+})
+
+describe('the accent', () => {
+  test('a relation rotates off the brand and is marked related', () => {
+    const theme = deriveTheme({ accent: { from: 'brand', rotate: 180 }, brand: BRAND })
+    const accent = theme.tokens.find((t) => t.name === 'color-accent')
+    expect(accent?.origin).toBe('related')
+    expect(accent?.value.hue).toBeCloseTo((BRAND.hue + 180) % 360, 0)
+  })
+
+  test('a colour pins it and the rotation stands aside', () => {
+    const theme = deriveTheme({ accent: '#ff6f3c', brand: BRAND })
+    expect(theme.tokens.find((t) => t.name === 'color-accent')?.origin).toBe('pinned')
+  })
+
+  test('rethemeing the brand carries a related accent with it', () => {
+    const one = deriveTheme({ brand: BRAND })
+    const two = deriveTheme({ brand: { chroma: 0.19, hue: 20, lightness: 0.58 } })
+    const gap = (theme: ReturnType<typeof deriveTheme>): number => {
+      const primary = theme.tokens.find((t) => t.name === 'color-primary')?.value.hue ?? 0
+      const accent = theme.tokens.find((t) => t.name === 'color-accent')?.value.hue ?? 0
+      return (accent - primary + 720) % 360
+    }
+    expect(gap(one)).toBeCloseTo(gap(two), 0)
+  })
+})
+
+describe('pairings and collisions', () => {
+  test('every requested pair comes back, passing or not', () => {
+    const theme = deriveTheme({ brand: BRAND })
+    expect(theme.pairings).toHaveLength(10)
+    expect(theme.pairings.every((p) => p.status === 'pass')).toBe(true)
+    expect(theme.violations).toEqual([])
+  })
+
+  /* The property this output exists for. A pair nobody could measure has to be
+     distinguishable from one that was measured and passed, or the guarantee
+     quietly becomes a claim about the pairs that happened to be easy. */
+  test('a pair naming a token the theme does not emit is unverifiable, not dropped', () => {
+    const theme = deriveTheme({
+      brand: BRAND,
+      pairings: [{ background: 'color-glass-header', foreground: 'color-foreground' }],
+    })
+    expect(theme.pairings).toHaveLength(1)
+    expect(theme.pairings[0]?.status).toBe('unverifiable')
+    expect(theme.pairings[0]?.ratio).toBeUndefined()
+    expect(theme.violations).toEqual([])
+  })
+
+  test('violations render the failures and nothing else', () => {
+    const theme = deriveTheme({ brand: BRAND, tokens: { 'color-foreground': '#f8f8f8' } })
+    expect(theme.violations.length).toBeGreaterThan(0)
+    expect(theme.violations.length).toBe(theme.pairings.filter((p) => p.status === 'fail').length)
+  })
+
+  test('a brand that is already red collides with danger', () => {
+    const theme = deriveTheme({ brand: { chroma: 0.21, hue: 27, lightness: 0.57 } })
+    expect(theme.collisions.some((c) => c.includes('danger'))).toBe(true)
+  })
+
+  test('an allowance rotates danger far enough to clear it', () => {
+    const brand = { chroma: 0.21, hue: 27, lightness: 0.57 }
+    const repaired = deriveTheme({ brand, status: { allowance: 40 } })
+    expect(repaired.collisions.some((c) => c.includes('danger'))).toBe(false)
+  })
+})
+
+describe('the namespace', () => {
+  test('it renames every token and every seed', () => {
+    const css = toCss(deriveTheme({ brand: BRAND, namespace: 'acme' }))
+    expect(css).toContain('--acme-color-primary: #')
+    expect(css).toContain('--acme-seed-brand: #')
+    expect(css).not.toContain('--helix-')
   })
 })
 

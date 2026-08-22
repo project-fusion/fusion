@@ -97,6 +97,24 @@
     oklch(from var(--_helix-seed-brand) l c calc(h + var(--helix-seed-accent-hue)))
   );
 
+  /* How saturated this palette is, as a fraction of what it would otherwise be.
+   *
+   * **Feel is chroma, and it had no input at all.** Monotone, muted, restrained
+   * and vivid are all chroma statements and none of them is a hue, so a brand
+   * could move anywhere around the wheel and not one of those was sayable.
+   *
+   * **It reaches the two halves of the palette by different routes, which is
+   * worth knowing before changing either.** The brand ramp copies `c` from the
+   * seed, so a quieter brand arrives already quiet and needs nothing here: the
+   * engine applies the policy before emitting the seed. The series ramp does
+   * not, because its chroma is stated per series as the most its own hue can
+   * hold, measured against sRGB rather than chosen. Those ceilings are still
+   * the ceilings; this says how much of one to use.
+   *
+   * Which is why the series ignored the brand entirely until #141: they take
+   * its hue and state the other two components as literals, so a deliberately
+   * monotone brand still painted twenty-four vivid charts. */
+  --_helix-seed-chroma-scale: var(--helix-seed-chroma-scale, 1);
   --_helix-seed-neutral-chroma: var(--helix-seed-neutral-chroma, 0);
   --_helix-seed-neutral-hue: var(--helix-seed-neutral-hue, 258);
 
