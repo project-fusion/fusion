@@ -30,7 +30,9 @@ const clipboard = (behaviour: 'accept' | 'refuse') => {
 describe('copy button', () => {
   test('writes its value and confirms', async () => {
     const written = clipboard('accept')
-    const el = await mount('<helix-copy-button value="bun add @helix-io/web"></helix-copy-button>')
+    const el = await mount(
+      '<helix-base-copy-button value="bun add @helix-io/web"></helix-base-copy-button>',
+    )
     const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
     button.click()
     await Promise.resolve()
@@ -41,7 +43,7 @@ describe('copy button', () => {
 
   test('announces what it copied, after the write', async () => {
     clipboard('accept')
-    const el = await mount('<helix-copy-button value="one"></helix-copy-button>')
+    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
     let detail: unknown
     el.addEventListener('helix-copy', (event) => {
       detail = (event as CustomEvent).detail
@@ -58,7 +60,7 @@ describe('copy button', () => {
      exists to report. */
   test('says nothing when the platform refuses', async () => {
     clipboard('refuse')
-    const el = await mount('<helix-copy-button value="one"></helix-copy-button>')
+    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
     let fired = false
     el.addEventListener('helix-copy', () => {
       fired = true
@@ -75,7 +77,7 @@ describe('copy button', () => {
 
 describe('what it says and shows', () => {
   test('draws both icons itself, so a bare button is a copy button', async () => {
-    const el = await mount('<helix-copy-button value="one"></helix-copy-button>')
+    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
     const slots = [...(el.shadowRoot?.querySelectorAll('slot') ?? [])]
     /* Read off the slot's own children rather than through
        `assignedNodes({ flatten: true })`. That call is the one that answers
@@ -91,8 +93,10 @@ describe('what it says and shows', () => {
      leaves a screen reader user on a button that never acknowledges the press. */
   test('moves its name and its tooltip together', async () => {
     clipboard('accept')
-    const el = await mount('<helix-copy-button value="one"></helix-copy-button>')
-    const tip = el.shadowRoot?.querySelector('helix-tooltip') as HTMLElement & { content: string }
+    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
+    const tip = el.shadowRoot?.querySelector('helix-base-tooltip') as HTMLElement & {
+      content: string
+    }
     const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
     expect([tip.content, button.getAttribute('aria-label')]).toEqual(['Copy', 'Copy'])
     button.click()

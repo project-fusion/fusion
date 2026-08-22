@@ -11,26 +11,33 @@
  * complete reimplementation of `render`.
  *
  * The convention this enforces is the one Combobox already described in a
- * comment: the template names the *public* tag, and each tier side-effect
- * imports its own version of it. What the comment could not do is apply to the
- * other twenty-one files, which is what this is for.
+ * comment: each tier side-effect imports its own version of the family it
+ * composes. What the comment could not do is apply to the other twenty-one
+ * files, which is what this is for.
  *
  * **The seam is a `protected render<Something>()` method**, one per composed
  * element, called from `render`. Overriding it is then the ordinary way to
  * change what goes there, and it is the same seam a consumer subclassing the
  * base gets.
  *
- * **What counts as another family.** The tag's family, taken from where it is
- * declared rather than from its name: `helix-menu-item` is declared in
- * `menu/item/`, so its family is `menu`. A component rendering its own family
- * is exempt, since a part rendering a sibling part is one folder composing
- * itself, and there is no tier decision in it.
+ * **What counts as another family.** The name inside `this.tag()`, resolved to
+ * where that element is declared rather than read off the name itself:
+ * `menu-item` is declared in `menu/item/`, so its family is `menu`. A component
+ * rendering its own family is exempt, since a part rendering a sibling part is
+ * one folder composing itself, and there is no tier decision in it.
  *
- * `<helix-icon>` is exempt too, and that is a judgement rather than an
- * oversight. It is a leaf that takes a name and draws it, it appears in
- * fourteen families, and there is no version of "render a different icon
- * element" that a consumer wants and `--icon-size` plus their own `helix-icon`
- * does not already give them. Wrapping every one of them in a method would be
+ * **It reads the interpolation, not a literal tag**, and reading literals is
+ * how it stopped working. A template names no tag now: `tier` resolves
+ * `<${this.tag('listbox')}>` to the base element here and the styled one in the
+ * tier above. The scan for `<helix-…` then matched nothing at all and this
+ * reported "0 families compose another" as a pass, which is what `check:floors`
+ * exists to catch and did.
+ *
+ * `icon` is exempt too, and that is a judgement rather than an oversight. It is
+ * a leaf that takes a name and draws it, it appears in fourteen families, and
+ * there is no version of "render a different icon element" that a consumer
+ * wants and `--icon-size` plus their own icon element does not already give
+ * them. Wrapping every one of them in a method would be
  * fourteen seams nobody opens.
  *
  * Comments and JSDoc are stripped first, for the reason `check:composed` gives:
@@ -75,7 +82,7 @@ for (const file of sources(TIER)) {
     readFileSync(file, 'utf8'),
   )
   if (declared) {
-    families.set(`helix-${declared[1]}`, file.split('/').at(-3))
+    families.set(declared[1], file.split('/').at(-3))
   }
 }
 
@@ -129,7 +136,7 @@ for (const file of sources(TIER)) {
   const ranges = seams(text)
   const reported = new Set()
 
-  for (const match of text.matchAll(/<(helix-[a-z0-9-]+)/g)) {
+  for (const match of text.matchAll(/<\$\{this\.tag\('([a-z0-9-]+)'\)\}/g)) {
     const tag = match[1]
     const family = families.get(tag)
     if (family === undefined || family === own || EXEMPT.has(family)) {
@@ -139,7 +146,7 @@ for (const file of sources(TIER)) {
     if (!inside && !reported.has(tag)) {
       reported.add(tag)
       problems.push(
-        `${file}: renders <${tag}> inline. Put it behind a \`protected render…()\` method, ` +
+        `${file}: renders \`${tag}\` inline. Put it behind a \`protected render…()\` method, ` +
           'so the styled tier can render something else there without reimplementing `render`.',
       )
     }
@@ -156,7 +163,7 @@ const composing = new Set(
     .filter((file) => {
       const own = file.split('/').at(-3)
       const text = withoutComments(readFileSync(file, 'utf8'))
-      return [...text.matchAll(/<(helix-[a-z0-9-]+)/g)].some((match) => {
+      return [...text.matchAll(/<\$\{this\.tag\('([a-z0-9-]+)'\)\}/g)].some((match) => {
         const family = families.get(match[1])
         return family !== undefined && family !== own && !EXEMPT.has(family)
       })

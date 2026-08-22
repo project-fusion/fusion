@@ -5506,6 +5506,7 @@ the status colors gets the tints with them.
 | Property | Description |
 | --- | --- |
 | `--tag-background-color` | Fill behind the tag. |
+| `--tag-border-color` | Color of the edge, for a chip that separates by fill alone. |
 | `--tag-foreground-color` | Label color. |
 | `--tag-radii` | Corner radius of the tag. |
 

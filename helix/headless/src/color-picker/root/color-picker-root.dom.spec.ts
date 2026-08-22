@@ -9,7 +9,9 @@ beforeAll(async () => {
 type Color = HTMLElement & { format: string; updateComplete: Promise<unknown>; value: string }
 
 const picker = async (attrs = ''): Promise<Color> => {
-  const host = (await mount(`<helix-color-picker ${attrs}></helix-color-picker>`)) as Color
+  const host = (await mount(
+    `<helix-base-color-picker ${attrs}></helix-base-color-picker>`,
+  )) as Color
   await host.updateComplete
   return host
 }

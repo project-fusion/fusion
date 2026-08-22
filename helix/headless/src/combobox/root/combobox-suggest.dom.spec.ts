@@ -10,11 +10,11 @@ type Combobox = HTMLElement & { open: boolean; updateComplete: Promise<unknown> 
 
 const combobox = async (attrs = 'suggest'): Promise<Combobox> => {
   const host = (await mount(
-    `<helix-combobox label="Language" ${attrs}>
-      <helix-option value="rb">Ruby</helix-option>
-      <helix-option value="rs">Rust</helix-option>
-      <helix-option value="ts">TypeScript</helix-option>
-    </helix-combobox>`,
+    `<helix-base-combobox label="Language" ${attrs}>
+      <helix-base-option value="rb">Ruby</helix-base-option>
+      <helix-base-option value="rs">Rust</helix-base-option>
+      <helix-base-option value="ts">TypeScript</helix-base-option>
+    </helix-base-combobox>`,
   )) as Combobox
   await host.updateComplete
   return host

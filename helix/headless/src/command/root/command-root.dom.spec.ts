@@ -7,11 +7,11 @@ beforeAll(async () => {
   await import('../../option/index.js')
 })
 
-const markup = `<helix-command hotkey="mod+k" label="Commands">
-  <helix-option value="new">New file</helix-option>
-  <helix-option value="open">Open recent</helix-option>
-  <helix-option value="theme">Switch colour mode</helix-option>
-</helix-command>`
+const markup = `<helix-base-command hotkey="mod+k" label="Commands">
+  <helix-base-option value="new">New file</helix-base-option>
+  <helix-base-option value="open">Open recent</helix-base-option>
+  <helix-base-option value="theme">Switch colour mode</helix-base-option>
+</helix-base-command>`
 
 type Palette = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
 
@@ -143,8 +143,8 @@ if (hasLayout()) {
 
       const withOne = await palette(
         markup.replace(
-          '</helix-command>',
-          '<span slot="footer">Esc to close</span></helix-command>',
+          '</helix-base-command>',
+          '<span slot="footer">Esc to close</span></helix-base-command>',
         ),
       )
       expect((part(withOne, 'footer') as HTMLElement).hidden).toBe(false)
@@ -171,7 +171,9 @@ if (hasLayout()) {
 
       listbox(host).requestFilter('colour')
       ;(
-        host.querySelector('helix-option[value="theme"]') as HTMLElement & { select: () => void }
+        host.querySelector('helix-base-option[value="theme"]') as HTMLElement & {
+          select: () => void
+        }
       ).select()
       await settle(host)
 
@@ -186,7 +188,7 @@ if (hasLayout()) {
       press('k', { metaKey: true })
       await settle(host)
       ;(
-        host.querySelector('helix-option[value="new"]') as HTMLElement & { select: () => void }
+        host.querySelector('helix-base-option[value="new"]') as HTMLElement & { select: () => void }
       ).select()
       await settle(host)
       expect(host.open).toBe(false)
@@ -198,7 +200,7 @@ if (hasLayout()) {
       await settle(host)
       host.addEventListener('helix-select', (event) => event.preventDefault())
       ;(
-        host.querySelector('helix-option[value="new"]') as HTMLElement & { select: () => void }
+        host.querySelector('helix-base-option[value="new"]') as HTMLElement & { select: () => void }
       ).select()
       await settle(host)
       expect(host.open).toBe(true)
@@ -214,11 +216,15 @@ if (hasLayout()) {
       // The words, not the value: an option is matched on what it says.
       listbox(host).requestFilter('colour')
       await settle(host)
-      expect([...host.querySelectorAll('helix-option')].filter((one) => !one.hidden).length).toBe(1)
+      expect(
+        [...host.querySelectorAll('helix-base-option')].filter((one) => !one.hidden).length,
+      ).toBe(1)
 
       press('k', { metaKey: true })
       await settle(host)
-      expect([...host.querySelectorAll('helix-option')].filter((one) => !one.hidden).length).toBe(3)
+      expect(
+        [...host.querySelectorAll('helix-base-option')].filter((one) => !one.hidden).length,
+      ).toBe(3)
     })
   })
 }

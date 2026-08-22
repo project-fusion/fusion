@@ -9,7 +9,7 @@ beforeAll(async () => {
 type Time = HTMLElement & { updateComplete: Promise<unknown>; value: string }
 
 const picker = async (attrs = ''): Promise<Time> => {
-  const host = (await mount(`<helix-time-picker ${attrs}></helix-time-picker>`)) as Time
+  const host = (await mount(`<helix-base-time-picker ${attrs}></helix-base-time-picker>`)) as Time
   await host.updateComplete
   return host
 }
@@ -76,14 +76,14 @@ describe('time', () => {
   test('the list is a real listbox, not a column written here', async () => {
     // It brings the keyboard, the typeahead and the scroll into view, which is
     // most of what a set of options is.
-    expect(part(await picker(), 'list')?.tagName.toLowerCase()).toBe('helix-listbox')
+    expect(part(await picker(), 'list')?.tagName.toLowerCase()).toBe('helix-base-listbox')
   })
 })
 
 describe('time as wheels', () => {
   const wheels = async (attrs = ''): Promise<Time> => {
     const host = (await mount(
-      `<helix-time-picker appearance="wheels" ${attrs}></helix-time-picker>`,
+      `<helix-base-time-picker appearance="wheels" ${attrs}></helix-base-time-picker>`,
     )) as Time
     await host.updateComplete
     return host
@@ -167,7 +167,7 @@ describe('time as wheels', () => {
 
 describe('time holds more than one', () => {
   const many = async (attrs: string): Promise<Time> => {
-    const host = (await mount(`<helix-time-picker ${attrs}></helix-time-picker>`)) as Time
+    const host = (await mount(`<helix-base-time-picker ${attrs}></helix-base-time-picker>`)) as Time
     await host.updateComplete
     return host
   }
@@ -231,7 +231,7 @@ describe('time holds more than one', () => {
 
 describe('time is off', () => {
   const picker = async (attrs = ''): Promise<Time> => {
-    const host = (await mount(`<helix-time-picker ${attrs}></helix-time-picker>`)) as Time
+    const host = (await mount(`<helix-base-time-picker ${attrs}></helix-base-time-picker>`)) as Time
     await host.updateComplete
     return host
   }
@@ -277,7 +277,7 @@ describe('time is off', () => {
 
 describe('times can be taken out of the list by name', () => {
   const picker = async (attrs = ''): Promise<Time> => {
-    const host = (await mount(`<helix-time-picker ${attrs}></helix-time-picker>`)) as Time
+    const host = (await mount(`<helix-base-time-picker ${attrs}></helix-base-time-picker>`)) as Time
     await host.updateComplete
     return host
   }

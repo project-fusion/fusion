@@ -21,10 +21,10 @@ const settle = async (host: Updatable): Promise<void> => {
 }
 
 const select = async (extra = ''): Promise<Updatable> => {
-  document.body.innerHTML = `<helix-select label="L" name="c" ${extra}>
-    <helix-option value="one">Alpha</helix-option>
-    <helix-option value="two">Beta</helix-option>
-  </helix-select>`
+  document.body.innerHTML = `<helix-base-select label="L" name="c" ${extra}>
+    <helix-base-option value="one">Alpha</helix-base-option>
+    <helix-base-option value="two">Beta</helix-base-option>
+  </helix-base-select>`
   const host = document.body.firstElementChild as Updatable
   await settle(host)
   return host
@@ -118,31 +118,6 @@ if (hasLayout()) {
     expect(surface.style.position).toBe('fixed')
   })
 
-  test('the panel takes the trigger"s width, and the content is its floor', async () => {
-    /* Two rules in one declaration, and the second is what stops a long option
-       from wrapping to fit a field it has no relationship to. The panel has no
-       inline padding of its own, so its width is the rows" width exactly. */
-    const host = (await select('open')) as unknown as HTMLElement
-    const surface = part(host, 'surface') as HTMLElement
-    const trigger = part(host, 'trigger') as HTMLElement
-    await placed(surface)
-    const style = getComputedStyle(surface)
-    expect(style.minInlineSize).toBe('max-content')
-    expect(style.paddingInline).toBe('0px')
-    /* `offsetWidth`, not `getBoundingClientRect`, and that is the whole of this
-       spec's history. The panel opens with `scale: 0.96` transitioning to `1`,
-       and `data-placed` is set when that transition *starts*, so `placed()`
-       returns with the box still scaled. `getBoundingClientRect` reports the
-       transformed box, so a 1280px panel measured 1228.8, which is 1280 x 0.96
-       exactly. `offsetWidth` is layout width and ignores transforms, which is
-       what this assertion was always about.
-
-       It passed for as long as it did because the numbers only diverge when the
-       trigger is wide: at a 200px control the scaled box is 8px short and the
-       assertion is against the trigger, not a constant. */
-    expect(surface.offsetWidth).toBeGreaterThanOrEqual(trigger.offsetWidth)
-  })
-
   test('the panel is told how wide its trigger is, because CSS cannot ask', async () => {
     // `min-inline-size: 100%` on a `position: fixed` panel is the viewport, so
     // the list came out the full width of the window. The controller publishes
@@ -188,10 +163,10 @@ if (hasLayout()) {
          `:popover-open` is the only thing that distinguishes the two. A panel
          that is merely visible passes every other spec in this file. */
       const host = (await mount(
-        `<helix-select label="Fruit" open>
-          <helix-option value="apple">Apple</helix-option>
-          <helix-option value="pear">Pear</helix-option>
-        </helix-select>`,
+        `<helix-base-select label="Fruit" open>
+          <helix-base-option value="apple">Apple</helix-base-option>
+          <helix-base-option value="pear">Pear</helix-base-option>
+        </helix-base-select>`,
       )) as HTMLElement & { updateComplete: Promise<boolean> }
       await host.updateComplete
       const surface = part(host, 'surface') as HTMLElement
@@ -200,9 +175,9 @@ if (hasLayout()) {
 
     test('a closed panel is not in it, and paints nothing', async () => {
       const host = (await mount(
-        `<helix-select label="Fruit">
-          <helix-option value="apple">Apple</helix-option>
-        </helix-select>`,
+        `<helix-base-select label="Fruit">
+          <helix-base-option value="apple">Apple</helix-base-option>
+        </helix-base-select>`,
       )) as HTMLElement & { updateComplete: Promise<boolean> }
       await host.updateComplete
       const surface = part(host, 'surface') as HTMLElement
@@ -222,10 +197,10 @@ if (hasLayout()) {
        not be operated with a mouse at all. */
     const opened = async (attrs = ''): Promise<Updatable & { value: string }> => {
       const host = (await mount(
-        `<helix-select label="Fruit" name="fruit" ${attrs}>
-          <helix-option value="apple">Apple</helix-option>
-          <helix-option value="pear">Pear</helix-option>
-        </helix-select>`,
+        `<helix-base-select label="Fruit" name="fruit" ${attrs}>
+          <helix-base-option value="apple">Apple</helix-base-option>
+          <helix-base-option value="pear">Pear</helix-base-option>
+        </helix-base-select>`,
       )) as Updatable & { value: string }
       await host.updateComplete
       ;(part(host as HTMLElement, 'trigger') as HTMLElement).click()

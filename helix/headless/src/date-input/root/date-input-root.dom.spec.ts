@@ -15,7 +15,7 @@ type InputDate = HTMLElement & {
 
 const field = async (attrs = ''): Promise<InputDate> => {
   const host = (await mount(
-    `<helix-date-input label="Starts" ${attrs}></helix-date-input>`,
+    `<helix-base-date-input label="Starts" ${attrs}></helix-base-date-input>`,
   )) as InputDate
   await host.updateComplete
   return host
@@ -39,7 +39,7 @@ const type = async (host: InputDate, text: string): Promise<void> => {
 describe('input date', () => {
   test('the calendar is the real one, not a grid written here', async () => {
     const host = await field()
-    expect(picker(host).tagName).toBe('HELIX-DATE-PICKER')
+    expect(picker(host).tagName).toBe('HELIX-BASE-DATE-PICKER')
   })
 
   test('typing sets the value, so a reader who knows the date never uses the grid', async () => {
@@ -147,7 +147,7 @@ describe('input date opens on focus', () => {
     attrs = '',
   ): Promise<HTMLElement & { open: boolean; updateComplete: Promise<unknown> }> => {
     const host = (await mount(
-      `<helix-date-input label="Starts" ${attrs}></helix-date-input>`,
+      `<helix-base-date-input label="Starts" ${attrs}></helix-base-date-input>`,
     )) as HTMLElement & {
       open: boolean
       updateComplete: Promise<unknown>
@@ -190,7 +190,7 @@ describe('input date holds more than one', () => {
     attrs: string,
   ): Promise<HTMLElement & { open: boolean; updateComplete: Promise<unknown>; value: string }> => {
     const host = (await mount(
-      `<helix-date-input label="Stay" ${attrs}></helix-date-input>`,
+      `<helix-base-date-input label="Stay" ${attrs}></helix-base-date-input>`,
     )) as HTMLElement & {
       open: boolean
       updateComplete: Promise<unknown>
@@ -267,7 +267,7 @@ describe('input date shows what it holds', () => {
     attrs: string,
   ): Promise<HTMLElement & { open: boolean; updateComplete: Promise<unknown>; value: string }> => {
     const host = (await mount(
-      `<helix-date-input label="Dates" ${attrs}></helix-date-input>`,
+      `<helix-base-date-input label="Dates" ${attrs}></helix-base-date-input>`,
     )) as HTMLElement & {
       open: boolean
       updateComplete: Promise<unknown>
@@ -367,7 +367,7 @@ describe('input date can be written out', () => {
     attrs: string,
   ): Promise<HTMLElement & { updateComplete: Promise<unknown>; value: string }> => {
     const host = (await mount(
-      `<helix-date-input label="Starts" ${attrs}></helix-date-input>`,
+      `<helix-base-date-input label="Starts" ${attrs}></helix-base-date-input>`,
     )) as HTMLElement & {
       updateComplete: Promise<unknown>
       value: string
@@ -439,7 +439,7 @@ describe('input date can cap its tags', () => {
     attrs: string,
   ): Promise<HTMLElement & { updateComplete: Promise<unknown>; value: string }> => {
     const host = (await mount(
-      `<helix-date-input label="Dates" mode="multiple" ${attrs}></helix-date-input>`,
+      `<helix-base-date-input label="Dates" mode="multiple" ${attrs}></helix-base-date-input>`,
     )) as HTMLElement & {
       updateComplete: Promise<unknown>
       value: string
@@ -482,7 +482,7 @@ describe('input date keeps the tag row readable', () => {
     attrs: string,
   ): Promise<HTMLElement & { updateComplete: Promise<unknown> }> => {
     const host = (await mount(
-      `<helix-date-input label="Dates" mode="multiple" ${attrs}></helix-date-input>`,
+      `<helix-base-date-input label="Dates" mode="multiple" ${attrs}></helix-base-date-input>`,
     )) as HTMLElement & {
       updateComplete: Promise<unknown>
     }
@@ -515,7 +515,9 @@ describe('input date keeps the tag row readable', () => {
   })
 
   test('a single-date field keeps its placeholder, since nothing is held as a tag', async () => {
-    const host = (await mount('<helix-date-input label="d"></helix-date-input>')) as HTMLElement & {
+    const host = (await mount(
+      '<helix-base-date-input label="d"></helix-base-date-input>',
+    )) as HTMLElement & {
       updateComplete: Promise<unknown>
     }
     await host.updateComplete
@@ -530,7 +532,7 @@ describe('an invalid date field marks the calendar too', () => {
        come from one state, so a reader who opens the panel to fix the error is
        not looking at a calendar that says everything is fine. */
     const host = (await mount(
-      `<helix-date-input feedback="Pick a weekday" label="When"></helix-date-input>`,
+      `<helix-base-date-input feedback="Pick a weekday" label="When"></helix-base-date-input>`,
     )) as HTMLElement & { updateComplete: Promise<unknown> }
     await host.updateComplete
     expect(host.hasAttribute('data-invalid')).toBe(true)
@@ -539,7 +541,7 @@ describe('an invalid date field marks the calendar too', () => {
 
   test('and drops it when the message goes', async () => {
     const host = (await mount(
-      `<helix-date-input label="When"></helix-date-input>`,
+      `<helix-base-date-input label="When"></helix-base-date-input>`,
     )) as HTMLElement & { updateComplete: Promise<unknown> }
     await host.updateComplete
     expect(part(host, 'picker')?.hasAttribute('invalid')).toBe(false)

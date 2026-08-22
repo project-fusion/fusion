@@ -10,14 +10,14 @@ beforeAll(async () => {
 type Palette = HTMLElement & { open: boolean; updateComplete: Promise<unknown> }
 
 const palette = async (): Promise<Palette> => {
-  const host = (await mount(`<helix-command default-open label="Commands">
-      <helix-option
+  const host = (await mount(`<helix-base-command default-open label="Commands">
+      <helix-base-option
         alternate="/helix/sandbox?family=card"
         alternate-label="Open in the sandbox"
         value="/components/card"
-      >Card</helix-option>
-      <helix-option value="/components/button">Button</helix-option>
-    </helix-command>`)) as Palette
+      >Card</helix-base-option>
+      <helix-base-option value="/components/button">Button</helix-base-option>
+    </helix-base-command>`)) as Palette
   await host.updateComplete
   return host
 }
@@ -26,7 +26,7 @@ const palette = async (): Promise<Palette> => {
    the palette does. happy-dom runs no layout, so the listbox may not have
    settled one: the spec marks it, which is the same attribute either way. */
 const activate = (host: Palette, value: string): void => {
-  for (const option of host.querySelectorAll('helix-option')) {
+  for (const option of host.querySelectorAll('helix-base-option')) {
     option.toggleAttribute('data-active', option.getAttribute('value') === value)
   }
 }
@@ -82,7 +82,7 @@ describe('a command row with two destinations', () => {
      footer is told about one of two things the row does. */
   test('the second destination is in the row description, not its name', async () => {
     const host = await palette()
-    const row = host.querySelector('helix-option') as HTMLElement & {
+    const row = host.querySelector('helix-base-option') as HTMLElement & {
       updateComplete: Promise<unknown>
     }
     await row.updateComplete

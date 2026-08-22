@@ -14,11 +14,11 @@ const settle = async (host: Updatable): Promise<void> => {
 }
 
 const combobox = async (extra = ''): Promise<Updatable> => {
-  document.body.innerHTML = `<helix-combobox label="L" name="c" ${extra}>
-    <helix-option value="rs">Rust</helix-option>
-    <helix-option value="rb">Ruby</helix-option>
-    <helix-option value="go">Go</helix-option>
-  </helix-combobox>`
+  document.body.innerHTML = `<helix-base-combobox label="L" name="c" ${extra}>
+    <helix-base-option value="rs">Rust</helix-base-option>
+    <helix-base-option value="rb">Ruby</helix-base-option>
+    <helix-base-option value="go">Go</helix-base-option>
+  </helix-base-combobox>`
   const host = document.body.firstElementChild as Updatable
   await settle(host)
   return host
@@ -28,7 +28,7 @@ const control = (host: Updatable): HTMLInputElement =>
   part(host as HTMLElement, 'control') as HTMLInputElement
 
 const options = (host: Updatable): (HTMLElement & { active: boolean })[] =>
-  [...(host as HTMLElement).querySelectorAll('helix-option')] as (HTMLElement & {
+  [...(host as HTMLElement).querySelectorAll('helix-base-option')] as (HTMLElement & {
     active: boolean
   })[]
 
@@ -184,11 +184,11 @@ describe('combobox', () => {
 
 describe('combobox holding several', () => {
   const many = async (extra = ''): Promise<Updatable> => {
-    document.body.innerHTML = `<helix-combobox label="L" multiple name="c" ${extra}>
-      <helix-option value="rs">Rust</helix-option>
-      <helix-option value="rb">Ruby</helix-option>
-      <helix-option value="go">Go</helix-option>
-    </helix-combobox>`
+    document.body.innerHTML = `<helix-base-combobox label="L" multiple name="c" ${extra}>
+      <helix-base-option value="rs">Rust</helix-base-option>
+      <helix-base-option value="rb">Ruby</helix-base-option>
+      <helix-base-option value="go">Go</helix-base-option>
+    </helix-base-combobox>`
     const host = document.body.firstElementChild as Updatable
     await settle(host)
     return host
@@ -279,10 +279,10 @@ describe('combobox holding several', () => {
 
 describe('combobox that takes an answer it was not given', () => {
   const open = async (extra = ''): Promise<Updatable> => {
-    document.body.innerHTML = `<helix-combobox creatable label="L" name="c" ${extra}>
-      <helix-option value="rs">Rust</helix-option>
-      <helix-option value="rb">Ruby</helix-option>
-    </helix-combobox>`
+    document.body.innerHTML = `<helix-base-combobox creatable label="L" name="c" ${extra}>
+      <helix-base-option value="rs">Rust</helix-base-option>
+      <helix-base-option value="rb">Ruby</helix-base-option>
+    </helix-base-combobox>`
     const host = document.body.firstElementChild as Updatable
     await settle(host)
     return host
@@ -366,11 +366,11 @@ describe('combobox that takes an answer it was not given', () => {
 
 describe('combobox that finishes the word', () => {
   const suggesting = async (extra = ''): Promise<Updatable> => {
-    document.body.innerHTML = `<helix-combobox label="L" name="c" suggest ${extra}>
-      <helix-option value="rs">Rust</helix-option>
-      <helix-option value="rb">Ruby</helix-option>
-      <helix-option value="go">Go</helix-option>
-    </helix-combobox>`
+    document.body.innerHTML = `<helix-base-combobox label="L" name="c" suggest ${extra}>
+      <helix-base-option value="rs">Rust</helix-base-option>
+      <helix-base-option value="rb">Ruby</helix-base-option>
+      <helix-base-option value="go">Go</helix-base-option>
+    </helix-base-combobox>`
     const host = document.body.firstElementChild as Updatable
     await settle(host)
     return host
@@ -453,11 +453,11 @@ if (hasLayout()) {
        The tags need it twice over: they are read off those same options, so in
        happy-dom a combobox with a value came up holding none. */
     const manySet = async (extra = ''): Promise<Updatable> => {
-      document.body.innerHTML = `<helix-combobox label="L" multiple name="c" ${extra}>
-        <helix-option value="rs">Rust</helix-option>
-        <helix-option value="rb">Ruby</helix-option>
-        <helix-option value="go">Go</helix-option>
-      </helix-combobox>`
+      document.body.innerHTML = `<helix-base-combobox label="L" multiple name="c" ${extra}>
+        <helix-base-option value="rs">Rust</helix-base-option>
+        <helix-base-option value="rb">Ruby</helix-base-option>
+        <helix-base-option value="go">Go</helix-base-option>
+      </helix-base-combobox>`
       const host = document.body.firstElementChild as Updatable
       await settle(host)
       return host

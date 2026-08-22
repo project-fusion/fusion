@@ -18,7 +18,22 @@ import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
-const source = join(root, 'helix/web/src')
+
+/**
+ * Both tiers, merged by family.
+ *
+ * The specs moved when the tiers stopped sharing tags: a family's functional
+ * tests are `helix/headless`'s and its stylesheet tests are `helix/web`'s, so
+ * twenty files left one directory for the other. Reading only `helix/web`,
+ * which is what this did, would have dropped every one of them from the browser
+ * runner while still printing a family count and a size, which is the shape of
+ * a coverage loss nobody sees.
+ *
+ * Merged rather than kept apart, because the sandbox opens a *family*: pressing
+ * Select should run what Select is tested by, and which tier a file sits in is
+ * a fact about this repository rather than about the component.
+ */
+const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/web/src')]
 const harness = join(root, 'tooling/testing/src/browser.ts')
 const entries = join(root, '.local/spec-entries')
 const out = join(root, 'site/ui/public/specs')
@@ -26,23 +41,25 @@ const out = join(root, 'site/ui/public/specs')
 /** Every family holding at least one DOM spec, with the specs it holds. */
 const families = async () => {
   const found = new Map()
-  for (const family of await readdir(source, { withFileTypes: true })) {
-    if (!family.isDirectory() || family.name === 'testing') {
-      continue
-    }
-    const specs = []
-    for (const part of await readdir(join(source, family.name), { withFileTypes: true })) {
-      if (!part.isDirectory()) {
+  for (const source of SOURCES) {
+    for (const family of await readdir(source, { withFileTypes: true })) {
+      if (!family.isDirectory() || family.name === 'testing') {
         continue
       }
-      for (const file of await readdir(join(source, family.name, part.name))) {
-        if (file.endsWith('.dom.spec.ts')) {
-          specs.push(join(source, family.name, part.name, file))
+      const specs = found.get(family.name) ?? []
+      for (const part of await readdir(join(source, family.name), { withFileTypes: true })) {
+        if (!part.isDirectory()) {
+          continue
+        }
+        for (const file of await readdir(join(source, family.name, part.name))) {
+          if (file.endsWith('.dom.spec.ts')) {
+            specs.push(join(source, family.name, part.name, file))
+          }
         }
       }
-    }
-    if (specs.length > 0) {
-      found.set(family.name, specs.sort())
+      if (specs.length > 0) {
+        found.set(family.name, specs.sort())
+      }
     }
   }
   return found

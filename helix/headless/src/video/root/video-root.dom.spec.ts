@@ -8,7 +8,9 @@ beforeAll(async () => {
 
 type Player = HTMLElement & { updateComplete: Promise<boolean> }
 
-const player = async (markup = '<helix-video label="A clip" src="/clip.mp4"></helix-video>') => {
+const player = async (
+  markup = '<helix-base-video label="A clip" src="/clip.mp4"></helix-base-video>',
+) => {
   const host = (await mount(markup)) as Player
   await host.updateComplete
   return host
@@ -135,14 +137,16 @@ describe('the mark that starts it', () => {
 
   test('and `none` is for a video that is decoration rather than something to start', async () => {
     const host = await player(
-      '<helix-video label="A clip" src="/clip.mp4" start-control="none"></helix-video>',
+      '<helix-base-video label="A clip" src="/clip.mp4" start-control="none"></helix-base-video>',
     )
     expect(part(host, 'start')).toBeNull()
   })
 
   test('the browser drawing its own controls takes it away too', async () => {
     // That bar has a play button in it, and two would be two.
-    const host = await player('<helix-video controls label="A clip" src="/clip.mp4"></helix-video>')
+    const host = await player(
+      '<helix-base-video controls label="A clip" src="/clip.mp4"></helix-base-video>',
+    )
     expect(part(host, 'start')).toBeNull()
   })
 
@@ -181,7 +185,7 @@ describe('the download control', () => {
        markup, so it is written only when it holds, and a new tab is the best a
        page can do with somebody else's file. */
     const away = await player(
-      '<helix-video extra-controls="download" label="A clip" src="https://example.com/clip.mp4"></helix-video>',
+      '<helix-base-video extra-controls="download" label="A clip" src="https://example.com/clip.mp4"></helix-base-video>',
     )
     const link = part(away, 'download') as HTMLAnchorElement
     expect(link.hasAttribute('download')).toBe(false)
@@ -198,7 +202,7 @@ describe('the download control', () => {
        environment passes in one and fails in the other, which is what the first
        version of this did. */
     const ours = await player(
-      '<helix-video extra-controls="download" label="A clip" src="blob:whatever"></helix-video>',
+      '<helix-base-video extra-controls="download" label="A clip" src="blob:whatever"></helix-base-video>',
     )
     const link = part(ours, 'download') as HTMLAnchorElement
     expect(link.hasAttribute('download')).toBe(true)
@@ -209,7 +213,7 @@ describe('the download control', () => {
 describe('asking for another item in a set', () => {
   const skipper = async () =>
     player(
-      '<helix-video extra-controls="previous next" label="A clip" src="/clip.mp4"></helix-video>',
+      '<helix-base-video extra-controls="previous next" label="A clip" src="/clip.mp4"></helix-base-video>',
     )
 
   test('both controls are offered without anything being checked', async () => {
@@ -267,7 +271,9 @@ describe('video', () => {
   test('and the browser"s instead when it was asked for', async () => {
     // Two bars over one video is worse than either alone, and a consumer who
     // asked for the native one has a reason.
-    const host = await player('<helix-video controls label="A clip" src="/clip.mp4"></helix-video>')
+    const host = await player(
+      '<helix-base-video controls label="A clip" src="/clip.mp4"></helix-base-video>',
+    )
     expect((part(host, 'video') as HTMLVideoElement).controls).toBe(true)
     expect(part(host, 'controls')).toBeNull()
   })
@@ -291,7 +297,7 @@ describe('video', () => {
        platform answers `watchAvailability` late and often with nothing, so the
        control waits for an actual target rather than for the API to exist. */
     const host = await player(
-      '<helix-video extra-controls="remote" label="A clip" src="/clip.mp4"></helix-video>',
+      '<helix-base-video extra-controls="remote" label="A clip" src="/clip.mp4"></helix-base-video>',
     )
     expect(part(host, 'remote')).toBeNull()
   })
@@ -304,8 +310,8 @@ describe('video', () => {
     if (!session) {
       return
     }
-    const first = await player('<helix-video label="First" src="/a.mp4"></helix-video>')
-    const second = await player('<helix-video label="Second" src="/b.mp4"></helix-video>')
+    const first = await player('<helix-base-video label="First" src="/a.mp4"></helix-base-video>')
+    const second = await player('<helix-base-video label="Second" src="/b.mp4"></helix-base-video>')
 
     ;(part(first, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
     await (first as Player).updateComplete
@@ -323,11 +329,11 @@ describe('video', () => {
     if (!session) {
       return
     }
-    const first = await player('<helix-video label="First" src="/a.mp4"></helix-video>')
+    const first = await player('<helix-base-video label="First" src="/a.mp4"></helix-base-video>')
     ;(part(first, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
     await (first as Player).updateComplete
 
-    const second = await player('<helix-video label="Second" src="/b.mp4"></helix-video>')
+    const second = await player('<helix-base-video label="Second" src="/b.mp4"></helix-base-video>')
     ;(part(second, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
     await (second as Player).updateComplete
 
@@ -339,7 +345,9 @@ describe('video', () => {
     /* Two handlers on one press is a video that seeks twice, or plays and
        immediately pauses. A consumer who asked for the browser's bar asked for
        its keyboard with it, and it brings its own focus stop. */
-    const host = await player('<helix-video controls label="A clip" src="/clip.mp4"></helix-video>')
+    const host = await player(
+      '<helix-base-video controls label="A clip" src="/clip.mp4"></helix-base-video>',
+    )
     const stage = part(host, 'stage') as HTMLElement
     expect(stage.hasAttribute('tabindex')).toBe(false)
     expect(stage.hasAttribute('role')).toBe(false)
@@ -431,36 +439,6 @@ if (hasLayout()) {
       expect(video.currentTime).toBe(before)
     })
 
-    test('the box is the video"s shape before the video has said what it is', async () => {
-      /* A `<video>` is 300 by 150 until its metadata arrives, which is the
-         default every replaced element starts at. At 480 wide the box was 150
-         tall where the frames wanted 270, and the poster is painted into that
-         box: it came out letterboxed and half the height of the video that
-         replaced it a moment later. It is also a layout shift, over exactly the
-         interval a poster is shown for.
-
-         **Sixteen by nine, and deliberately not `auto 16 / 9`**, which is what
-         this asserted while never running. `auto` takes the element's intrinsic
-         ratio, and a video carrying a poster reports the *poster's*, so the box
-         took the still's shape and the clip letterboxed inside it. The element
-         writes `--video-intrinsic-ratio` from `videoWidth` and `videoHeight` instead,
-         which is the only source that is always the video. */
-      const host = await player()
-      const video = part(host, 'video') as HTMLVideoElement
-      expect(getComputedStyle(video).aspectRatio).toBe('16 / 9')
-
-      // And it follows the real one the moment the element knows it.
-      ;(host as HTMLElement).style.setProperty('--video-intrinsic-ratio', '4 / 3')
-      expect(getComputedStyle(video).aspectRatio).toBe('4 / 3')
-    })
-
-    test('and whatever fills it is fitted the same way', async () => {
-      // So a poster and a frame cannot disagree, even where a consumer's ratio
-      // and their file's do.
-      const host = await player()
-      expect(getComputedStyle(part(host, 'video') as HTMLElement).objectFit).toBe('contain')
-    })
-
     test('playback is on the host, because CSS cannot ask a video', async () => {
       /* `paused` is a property and never an attribute, so `video:not([paused])`
          matched every video in existence: the rule that hides the bar while
@@ -488,18 +466,6 @@ if (hasLayout()) {
       video.dispatchEvent(new Event('pause'))
       await (host as Player).updateComplete
       expect(host.hasAttribute('data-playing')).toBe(false)
-    })
-
-    test('the well is dark in both modes, and so is the ink on the bar', async () => {
-      /* `surface-inverse` looks like the token for this and is not: it is
-         near-white in dark mode, so the well came out white on a black page and
-         took the bar's light ink with it. Media sits in a dark well everywhere
-         it has ever been shown. */
-      const host = await player()
-      const well = getComputedStyle(part(host, 'video') as HTMLElement).backgroundColor
-      const ink = getComputedStyle(part(host, 'controls') as HTMLElement).color
-      expect(well).not.toBe(ink)
-      expect(well).toBe('oklch(0 0 0)')
     })
 
     test('seeking is clamped to what exists', async () => {
