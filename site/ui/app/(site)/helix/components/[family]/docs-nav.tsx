@@ -108,20 +108,23 @@ export function DocsNav({ active, entries }: { active: string; entries: readonly
             it. Seeding is what markup is for. */}
         <helix-tree-item default-open suppressHydrationWarning value="components">
           Components
-          {/* The way back to the index, and the only one in this header since
-              the wordmark went home. The `end` slot rather than an `href` on
-              the row: a branch that is a link gives its chevron the job of
-              opening it, and this row's whole job is opening. So the row still
-              toggles from anywhere, and one small target navigates.
+          {/* The way back to the index, and the only one in this rail since the
+              wordmark went home.
 
-              Shown on hover *and* focus-within, which is not decoration: a
-              control that appears only under a pointer is one a keyboard
-              cannot reach, and this is a link in a navigation. */}
-          <helix-tooltip content="All components" slot="end">
-            <a aria-label="All components" className="docsJump" href="/helix">
-              <helix-icon name="list" />
-            </a>
-          </helix-tooltip>
+              **A row, not a mark on the branch.** It was a small hover-revealed
+              button in the branch's `end` slot, which put a navigation
+              affordance behind a pointer and beside a chevron, where it read as
+              a second toggle. A destination in a list of destinations is a row
+              in that list: it is in the tab order without a rule saying so, it
+              is legible without hovering anything, and it needs no tooltip to
+              say what it does because it says what it does.
+
+              First, because it is the whole of what the rows under it are part
+              of, and `value="all"` matches no family so it is never marked
+              current on a component's page. */}
+          <helix-tree-item href="/helix" slot="children" value="all">
+            All Components
+          </helix-tree-item>
           {entries.map((entry) => (
             <helix-tree-item
               href={`/helix/components/${entry.slug}`}

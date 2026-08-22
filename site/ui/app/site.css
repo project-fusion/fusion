@@ -1167,8 +1167,14 @@ helix-code-block .tok-operator {
   position: sticky;
 }
 
-/* The way out of a rail and into the docs: the component index from the
- * sidebar's parent row, and a family's own page from the sandbox's.
+/* The way out of the sandbox rail and into a family's own docs page.
+ *
+ * The reference sidebar had one of these too, going up to the index, and it is
+ * a row in the list now rather than a mark on the branch: a destination among
+ * destinations belongs in the list, where it is legible without hovering and in
+ * the tab order without a rule saying so. What is left here is the case that
+ * genuinely is a mark, one per row against eighty-eight rows, where rows would
+ * double the length of the rail to say the same thing.
  *
  * **Hover and focus-within, not hover alone.** A control revealed only by a
  * pointer is one a keyboard reader never finds, and this is a link in a
