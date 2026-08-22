@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { findInsight, formatDate, INSIGHTS } from '../../../../lib/insights'
 import { BODIES } from '../../../../lib/insights/bodies'
+import { PublishedOn, ReadingProgress } from './reading'
 
 export function generateStaticParams(): { slug: string }[] {
   return INSIGHTS.map((insight) => ({ slug: insight.slug }))
@@ -55,6 +56,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   return (
     <helix-flex class="insightShell" direction="column" gap="2xl">
+      <ReadingProgress />
       {/* **Three groups, not five evenly spaced things.**
           
           Every child used to sit `lg` from the next, so the way out, the
@@ -123,7 +125,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             {insight.author}
           </helix-tag>
           <helix-tag>
-            <time dateTime={insight.date}>{formatDate(insight.date)}</time>
+            <PublishedOn date={insight.date}>{formatDate(insight.date)}</PublishedOn>
           </helix-tag>
           <helix-tag>{insight.minutes} min read</helix-tag>
           {/* The two that lead somewhere actually lead there. The gallery

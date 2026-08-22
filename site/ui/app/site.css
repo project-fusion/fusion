@@ -2118,6 +2118,30 @@ helix-drawer helix-tree {
   display: inline-flex;
 }
 
+/* The read-through line, on the one strip of the page that never moves.
+ *
+ * Pinned to the masthead's own height at the masthead's own layer, so it rides
+ * the bottom edge of a sticky bar rather than floating somewhere under it. Two
+ * pixels: enough to see at the edge of vision while reading, not enough to be
+ * a second piece of chrome.
+ *
+ * `transform-origin` at the start edge, because the component scales it on X
+ * from 0 and a bar that grows from its middle is not a progress bar. Logical,
+ * so it fills the way the script reads.
+ *
+ * No transition. The value already tracks the scroll frame by frame, and easing
+ * a thing that is already following the pointer makes it lag behind the content
+ * it is reporting on. */
+.readingProgress {
+  background-color: var(--helix-color-primary);
+  block-size: 2px;
+  inset-block-start: var(--helix-size-header);
+  inset-inline: 0;
+  position: fixed;
+  transform-origin: 0 50%;
+  z-index: var(--helix-layer-sticky);
+}
+
 /* The section's escape hatch, wearing the rows' arrow so the whole block has
    one sign for "goes somewhere" rather than a link that says it in blue and
    three rows that say it with a glyph. */
