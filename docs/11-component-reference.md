@@ -789,6 +789,7 @@ element you slotted, not a wrapper around it.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'outlined' \| 'elevated' \| 'plain' \| undefined` | - | - | How the card separates itself from the page. |
+| `material` | `material` | `'glass' \| undefined` | - | - | What the card is made of. |
 | `mediaPlacement` | `media-placement` | `'end' \| undefined` | - | `HelixBaseCard` | Puts the media after the content instead of before it. |
 | `orientation` | `orientation` | `'vertical' \| 'horizontal' \| undefined` | - | - | Whether media sits above the content stack or beside it. |
 
@@ -805,7 +806,7 @@ element you slotted, not a wrapper around it.
 
 | Property | Description |
 | --- | --- |
-| `--card-backdrop` | Filter applied to what is behind the card. `none` by default; a translucent language sets it and reaches every card at once. |
+| `--card-backdrop` | Filter applied behind a `material="glass"` card. Follows the theme's material policy; set it to override the strength on one card. |
 | `--card-background-color` | Surface behind the card. |
 | `--card-border-color` | Border color of the surface. |
 | `--card-border-width` | Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. |

@@ -34,8 +34,8 @@ import { styles } from './card-root.css.js'
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
  *
- * @cssproperty --card-backdrop - Filter applied to what is behind the card. `none` by
- *   default; a translucent language sets it and reaches every card at once.
+ * @cssproperty --card-backdrop - Filter applied behind a `material="glass"` card. Follows
+ *   the theme's material policy; set it to override the strength on one card.
  * @cssproperty --card-background-color - Surface behind the card.
  * @cssproperty --card-border-color - Border color of the surface.
  * @cssproperty --card-border-width - Width of the surface's edge. Follows
@@ -66,6 +66,28 @@ export class HelixCard extends HelixBaseCard {
    */
   @property({ reflect: true })
   appearance?: 'outlined' | 'elevated' | 'plain'
+
+  /**
+   * What the card is made of.
+   *
+   * **A third axis, and it passes the test the other two answer to.**
+   * `appearance` is how a thing is drawn and `tone` is what it means; both of
+   * those can be true at once with this, an elevated glass card being a
+   * perfectly ordinary thing to want, so it is not a value of either.
+   *
+   * **An attribute rather than a hook, because glass is not one declaration.**
+   * It is a translucent ground *and* a backdrop filter, and either without the
+   * other does nothing: a blur behind an opaque background is invisible, and a
+   * translucent card over an unfiltered page is a smear. `--card-backdrop`
+   * shipped on its own for exactly one commit and was that trap, a published
+   * hook a consumer could set and see nothing happen. The component owns the
+   * pair; a theme owns how strong it is.
+   *
+   * Absent is opaque, per the rule that a reflected property takes no default,
+   * so the stylesheet only describes the departure.
+   */
+  @property({ reflect: true })
+  material?: 'glass'
 
   /** Whether media sits above the content stack or beside it. */
   @property({ reflect: true })

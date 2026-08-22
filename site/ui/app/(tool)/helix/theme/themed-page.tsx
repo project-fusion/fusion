@@ -202,7 +202,11 @@ export function ThemedPage() {
           `aria-label` generated from an array. The table is clipped rather than
           hidden, so it stays in the accessibility tree. */}
       <section className="themedChart">
-        <helix-card>
+        {/* Glass on one card, so the material policy has something to act on
+            that a reader can compare against the opaque ones beside it. It is an
+            attribute rather than two custom properties because glass is a
+            translucent ground *and* a backdrop, and either alone does nothing. */}
+        <helix-card material="glass">
           <helix-flex direction="column" gap="md">
             <helix-text appearance="subheading" as="h2">
               On-time arrivals
