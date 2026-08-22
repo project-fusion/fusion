@@ -2420,22 +2420,19 @@ helix-drawer helix-tree {
   --option-radii: var(--helix-radii-sm);
 }
 
-/* **The topic composition on an insight card.**
+/* **The field on an insight card, which is `Aura` at thumbnail size.**
  *
- * A picture rather than a band, and the height comes from the width: an
- * `aspect-ratio` on the drawing means the art grows with the card instead of
- * being a fixed strip that looks generous on a narrow card and mean on a wide
- * one. 16/10 is the gallery's ratio, so a card here and a card on `/helix` are
- * the same object.
+ * The ratio is the gallery's, so a card here and a card on `/helix` are the same
+ * object, and the height comes from the width rather than a fixed strip that
+ * looks generous on a narrow card and mean on a wide one.
  *
- * `--card-media-block-size: auto` hands the height back to the drawing.
- * `Card`'s media rule sets it for the reason its own comment gives, that a
- * chart has no intrinsic shape and needs one from the box; an `<svg>` with an
- * aspect ratio does have one, which is the case that rule's default was
- * written for.
+ * `--card-media-block-size: auto` hands the height back to the element, which
+ * is the case `Card`'s default was written for: it sets a height because a chart
+ * has no intrinsic shape, and this one carries a ratio.
  *
- * The ground is `surface-sunken`, so the picture reads as a recess the card
- * opens onto rather than a second card stacked on the first. */
+ * No background. The field paints the whole box, so a ground behind it is a
+ * colour nobody sees except in the moment before WebGL answers, and
+ * `surface-sunken` is the right thing to see then. */
 .insightArt {
   aspect-ratio: 16 / 10;
   background-color: var(--helix-color-surface-sunken);
@@ -2444,40 +2441,6 @@ helix-drawer helix-tree {
 
 .insightCard helix-card {
   --card-media-block-size: auto;
-}
-
-/* **The gallery's layer names, because it is the gallery's grammar.**
- *
- * A surface, a recess in it, ink at two weights and one solid mark. Five
- * drawings built from the same six pieces read as a set; five drawn freely read
- * as five decisions. Neutral throughout except the solid, which is the only
- * thing that takes colour: an accent used to point rather than to decorate is
- * what keeps a composition from becoming a diagram. */
-.insightArt .artSurface {
-  fill: var(--helix-color-surface-raised);
-}
-
-.insightArt .artSunken {
-  fill: var(--helix-color-border);
-}
-
-.insightArt .artSolid {
-  fill: var(--_insight-series);
-}
-
-.insightArt .artNode {
-  fill: var(--helix-color-surface-raised);
-  stroke: var(--helix-color-border);
-  stroke-width: 3;
-}
-
-.insightArt .artInk,
-.insightArt .artRule {
-  fill: none;
-  stroke: var(--helix-color-border);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 4;
 }
 
 .insightArt .artRule {

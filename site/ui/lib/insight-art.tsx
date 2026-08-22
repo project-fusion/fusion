@@ -1,116 +1,62 @@
-import type { ReactElement } from 'react'
+import type { HelixAura } from '@helix-io/web'
 import type { Topic } from './insights'
 
 /**
- * A composition for each topic, in the same vocabulary the gallery draws
- * components in.
+ * A field of light for each topic, drawn by the same component as the hero.
  *
- * **Per topic and not per insight, which is the decision worth stating.** A
- * drawing for every post is a drawing somebody has to make before publishing,
- * so the fifth post is illustrated and the fiftieth is not: art that scales with
- * the writing is art nobody draws. Five compositions cover every post there will
- * ever be, and a reader meeting two Engineering pieces sees a family rather than
- * a repeat, which is what a topic is.
+ * **`Aura` rather than a drawing, which is the whole point.** The schematic this
+ * replaced was five compositions in the gallery's vocabulary, and it read as
+ * documentation: correct, legible, and the wrong register for writing. What the
+ * hero does is atmosphere, and a card that opens onto the same light belongs to
+ * the same publication.
  *
- * **The gallery's grammar, deliberately.** Surfaces, a recess, ink at two
- * weights and one solid mark, laid out on a 320 by 200 field: the same pieces
- * `ComponentArt` builds from, so a card on `/insights` and a card on `/helix`
- * read as one publication rather than two design exercises. What differs is the
- * subject, since a component drawing shows a control and this shows an idea.
+ * **Per topic, and the shape is the only thing that varies.** Eleven are
+ * available and five are used, one per topic, so two Engineering pieces are the
+ * same field rather than two arbitrary ones. The rest of the knobs are held
+ * still on purpose: a card is a thumbnail, and a field tuned per post is five
+ * decisions nobody can defend later.
  *
- * **The solid mark takes the series colour** and everything else is neutral.
- * One accent per composition is what keeps five drawings a set: colour used to
- * point rather than to decorate, and the ramp follows a themed seed so a
- * reskinned page takes these with it.
+ * **Slow and quiet, because this sits behind a title rather than under a
+ * masthead.** `speed` is a third of the hero's and `gain` is under half, so the
+ * card reads as a lit surface rather than as something competing with the words
+ * on it. `Aura` stops on its own when it is off screen or the tab is in the
+ * background, and answers `prefers-reduced-motion` with a single still frame,
+ * so a page of these is not a page of running shaders.
  */
-const ART: Record<Topic, { series: number; body: ReactElement }> = {
-  /* Panels stacking upward, the last one solid: a thing being built up. */
-  Company: {
-    body: (
-      <>
-        <rect className="artSurface" height="52" rx="4" width="72" x="36" y="120" />
-        <rect className="artSurface" height="84" rx="4" width="72" x="124" y="88" />
-        <rect className="artSolid" height="116" rx="4" width="72" x="212" y="56" />
-        <path className="artRule" d="M20 180h280" />
-      </>
-    ),
-    series: 1,
-  },
-  /* One shape at four sizes on a shared baseline, which is what a ramp is. */
-  'Design systems': {
-    body: (
-      <>
-        <rect className="artSurface" height="24" rx="3" width="24" x="40" y="132" />
-        <rect className="artSurface" height="40" rx="3" width="40" x="88" y="116" />
-        <rect className="artSurface" height="60" rx="4" width="60" x="152" y="96" />
-        <rect className="artSolid" height="84" rx="5" width="84" x="228" y="72" />
-        <path className="artRule" d="M20 168h280" />
-      </>
-    ),
-    series: 3,
-  },
-  /* Members meeting at joints: load carried by the arrangement, not the parts. */
-  Engineering: {
-    body: (
-      <>
-        <path className="artRule" d="M32 152h256" />
-        <path className="artInk" d="M32 152 96 56l64 96 64-96 64 96" />
-        <path className="artInk" d="M96 56h128" />
-        <circle className="artSolid" cx="160" cy="152" r="9" />
-        <circle className="artNode" cx="96" cy="56" r="7" />
-        <circle className="artNode" cx="224" cy="56" r="7" />
-      </>
-    ),
-    series: 5,
-  },
-  /* A signal leaving one point and something further out reading it. */
-  Intelligence: {
-    body: (
-      <>
-        <path className="artInk" d="M64 168a48 48 0 0 1 48-48" />
-        <path className="artInk" d="M64 168a88 88 0 0 1 88-88" />
-        <path className="artInk" d="M64 168a128 128 0 0 1 128-128" />
-        <circle className="artSolid" cx="64" cy="168" r="11" />
-        <rect className="artSurface" height="56" rx="4" width="76" x="212" y="60" />
-        <rect className="artSunken" height="12" rx="2" width="44" x="228" y="78" />
-      </>
-    ),
-    series: 7,
-  },
-  /* Two panels and a clean break: the shape of a thing that comes apart whole. */
-  Sovereignty: {
-    body: (
-      <>
-        <rect className="artSurface" height="104" rx="4" width="108" x="32" y="56" />
-        <rect className="artSunken" height="12" rx="2" width="68" x="48" y="76" />
-        <rect className="artSunken" height="12" rx="2" width="48" x="48" y="100" />
-        <rect className="artSolid" height="104" rx="4" width="108" x="180" y="56" />
-        <path className="artRule" d="M160 40v136" />
-      </>
-    ),
-    series: 8,
-  },
+const FIELD: Record<
+  Topic,
+  { gain: number; scale: number; shape: NonNullable<HelixAura['shape']> }
+> = {
+  /* Braid: strands running together, which is what a company is. */
+  Company: { gain: 0.42, scale: 1.4, shape: 'braid' },
+  /* Lattice: a regular field, the thing a system is. */
+  'Design systems': { gain: 0.38, scale: 1.2, shape: 'lattice' },
+  /* Threads: many lines under tension, holding. */
+  Engineering: { gain: 0.4, scale: 1.3, shape: 'threads' },
+  /* Caustics: light gathered and focused, which is what reading a signal is. */
+  Intelligence: { gain: 0.44, scale: 1.5, shape: 'caustics' },
+  /* Aurora: a field that is entirely its own and owes nothing. */
+  Sovereignty: { gain: 0.4, scale: 1.6, shape: 'aurora' },
 }
 
 /**
- * The band across the top of an insight card.
+ * The field across the top of an insight card.
  *
  * `slot` is a declared prop rather than a spread, because React types an
  * intrinsic element's props from the element rather than from the component
- * around it: without it the attribute is refused at the call site and the mark
+ * around it: without it the attribute is refused at the call site and the field
  * renders inside the card's inset like content.
  */
 export function InsightArt({ slot, topic }: { slot?: string; topic: Topic }) {
-  const art = ART[topic]
+  const field = FIELD[topic]
   return (
-    <svg
-      aria-hidden="true"
-      className="insightArt"
+    <helix-aura
+      class="insightArt"
+      gain={field.gain}
+      scale={field.scale}
+      shape={field.shape}
       slot={slot}
-      style={{ ['--_insight-series' as string]: `var(--helix-color-series-${art.series})` }}
-      viewBox="0 0 320 200"
-    >
-      {art.body}
-    </svg>
+      speed={0.3}
+    ></helix-aura>
   )
 }
