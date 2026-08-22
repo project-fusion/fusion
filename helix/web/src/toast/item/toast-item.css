@@ -86,7 +86,9 @@
   grid-template-columns: auto 1fr;
   background-color: var(--helix-color-surface-overlay);
   border-radius: var(--helix-radii-sm);
-  box-shadow: var(--helix-shadow-lg);
+  border: var(--toast-border-width, var(--helix-border-floating)) solid
+    var(--toast-border-color, var(--helix-color-border));
+  box-shadow: var(--toast-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);

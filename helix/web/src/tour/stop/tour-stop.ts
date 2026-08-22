@@ -17,8 +17,13 @@ import '../../button/index.js'
  * @documentation https://helix.fusion.dev/components/tour
  *
  * @cssproperty --tour-arrow-size - The point's box, before it is rotated.
+ * @cssproperty --tour-border-width - Width of the panel's edge. Follows
+ *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
+ *   theme says otherwise.
  * @cssproperty --tour-bubble-size - How wide the panel may grow.
  * @cssproperty --tour-padding - Inset inside the panel.
+ * @cssproperty --tour-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
+ *   floating surface sits over content nobody can predict, so it keeps a lift by default.
  * @cssproperty --tour-surface-color - The panel's own surface.
  */
 @customElement('helix-tour-stop')

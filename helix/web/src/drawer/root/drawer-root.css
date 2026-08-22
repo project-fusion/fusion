@@ -236,7 +236,9 @@
 }
 
 :host([data-open]) [part="panel"] {
-  box-shadow: var(--helix-shadow-lg);
+  border: var(--drawer-border-width, var(--helix-border-floating)) solid
+    var(--drawer-border-color, var(--helix-color-border));
+  box-shadow: var(--drawer-shadow, var(--helix-shadow-floating));
   transform: translate(0, 0);
 }
 

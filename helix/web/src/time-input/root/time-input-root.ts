@@ -32,6 +32,12 @@ import { styles } from './time-input-root.css.js'
  * @documentation https://helix.fusion.dev/components/time-input
  *
  * @cssproperty --time-input-background-color - Fill behind the field.
+ * @cssproperty --time-input-border-color - Colour of the panel's edge.
+ * @cssproperty --time-input-border-width - Width of the panel's edge. Follows
+ *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
+ *   theme says otherwise.
+ * @cssproperty --time-input-shadow - Lift under the panel. Follows `--helix-shadow-floating`:
+ *   a floating surface sits over content nobody can predict, so it keeps a lift by default.
  */
 @customElement('helix-time-input')
 export class HelixTimeInput extends HelixBaseTimeInput {

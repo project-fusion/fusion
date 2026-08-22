@@ -19,9 +19,15 @@ import { styles } from './menu-root.css.js'
  * @aliases Dropdown, Action menu
  * @documentation https://helix.fusion.dev/components/menu
  *
+ * @cssproperty --menu-background-color - Fill of the surface.
+ * @cssproperty --menu-border-color - Colour of the panel's edge.
+ * @cssproperty --menu-border-width - Width of the panel's edge. Follows
+ *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
+ *   theme says otherwise.
  * @cssproperty --menu-max-block-size - Tallest the surface grows before it scrolls.
  * @cssproperty --menu-min-inline-size - Narrowest the surface gets.
- * @cssproperty --menu-background-color - Fill of the surface.
+ * @cssproperty --menu-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
+ *   floating surface sits over content nobody can predict, so it keeps a lift by default.
  */
 @customElement('helix-menu')
 export class HelixMenu extends HelixBaseMenu {

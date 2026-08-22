@@ -20,14 +20,15 @@
      `border: solid`, so dropping the declaration leaves a three-pixel medium
      border rather than none at all. The shadow is what says it is floating; a
      rule as well only makes it look cut out. */
-  border: none;
+  border: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
   /* The house radius. Dialog, tooltip and toast settled here and the surfaces
      that float were left at `md`, so a menu and the dialog it opens from drew
      two different corners. Card's argument is the one that decides it: at
      anything larger the corner is softer than the controls inside it, and a
      surface holding controls should recede. */
   border-radius: var(--helix-radii-sm);
-  box-shadow: var(--helix-shadow-lg);
+  box-shadow: var(--popover-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   /* The popover API puts it in the top layer, where the UA's own inset would

@@ -146,7 +146,7 @@ export function InsightBrowser({
 
   return (
     <>
-      <section className="pageHero">
+      <section className="pageHero insightsHero">
         <helix-flex align="center" className="pageHeroInner" direction="column" gap="lg">
           <helix-flex align="center" data-density="sm" direction="column" gap="sm">
             <helix-tag>Fusion Development Group</helix-tag>

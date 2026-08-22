@@ -96,9 +96,10 @@
    * of its own, `solid` with no width or colour, which computes to a medium
    * black rule. Deleting the declaration once drew a three pixel black box
    * around the panel instead of no box at all. */
-  border: var(--helix-border-thin) solid light-dark(transparent, var(--helix-color-border));
+  border: var(--megamenu-border-width, var(--helix-border-thin)) solid
+    light-dark(transparent, var(--helix-color-border));
   border-radius: var(--helix-radii-md);
-  box-shadow: var(--helix-shadow-lg);
+  box-shadow: var(--megamenu-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
   /* The panel expands downward rather than appearing, and the clip is what does
      it: the box is laid out at its full size from the first frame and revealed

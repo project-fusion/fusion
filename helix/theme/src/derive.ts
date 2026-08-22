@@ -95,10 +95,12 @@ const DEFAULTS = {
   chroma: {},
   contrastTarget: 4.5,
   density: 1,
+  material: {},
   namespace: 'helix',
   neutral: {},
   radius: 0.5,
   scheme: 'light',
+  separation: {},
   status: {},
   tokens: {},
 } as const
@@ -631,6 +633,20 @@ export const defaultPairings = (contrastTarget: number): PairingRequest[] =>
   )
 
 /**
+ * What each mechanism means for an edge.
+ *
+ * `fill` and `space` both come out as no edge and no lift, which is not a bug:
+ * the difference between them lives in the surface colours and in `density`.
+ */
+const EDGE = { border: '1px', fill: '0', shadow: '0', space: '0' } as const
+
+/* Stated rather than referenced, because the emitted file has to stand on its
+   own: a consumer who takes the block and not the stylesheet still gets a
+   lift. */
+const SHADOW_IN_FLOW = '0 4px 12px color-mix(in oklab, oklch(0.13 0 0) 10%, transparent)'
+const SHADOW_FLOATING = '0 12px 32px color-mix(in oklab, oklch(0.13 0 0) 14%, transparent)'
+
+/**
  * Renders a derived theme as a CSS custom-property block.
  *
  * **The seeds are emitted beside the tokens, and that is what stops the two
@@ -651,5 +667,37 @@ export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
   }
   lines.push(`  --${namespace}-seed-density: ${density};`)
   lines.push(`  --${namespace}-seed-radii: ${radius}rem;`)
+
+  /* **The separation policy, which is what makes the knob turn.** The audit
+     that produced these tokens put every surface's edge and lift behind a hook
+     defaulting to one of them, so a single declaration here reaches thirteen
+     surfaces. Emitted only when asked for: an omitted policy leaves the
+     stylesheet's own defaults standing, which are border-first in the flow and
+     shadow-first over content. */
+  const { floating, surface } = theme.intent.separation
+  if (surface) {
+    lines.push(`  --${namespace}-border-surface: ${EDGE[surface]};`)
+    lines.push(
+      `  --${namespace}-shadow-surface: ${surface === 'shadow' ? SHADOW_IN_FLOW : 'none'};`,
+    )
+  }
+  if (floating) {
+    lines.push(`  --${namespace}-border-floating: ${EDGE[floating]};`)
+    lines.push(
+      `  --${namespace}-shadow-floating: ${floating === 'shadow' ? SHADOW_FLOATING : 'none'};`,
+    )
+  }
+
+  const { blur, opacity } = theme.intent.material
+  if (blur !== undefined) {
+    lines.push(`  --${namespace}-material-backdrop: ${blur === 0 ? 'none' : `blur(${blur}px)`};`)
+  }
+  if (opacity !== undefined) {
+    lines.push(
+      `  --${namespace}-material-translucent: color-mix(in oklab, ` +
+        `var(--${namespace}-color-surface) ${Math.round(opacity * 100)}%, transparent);`,
+    )
+  }
+
   return `${selector} {\n${lines.join('\n')}\n}\n`
 }

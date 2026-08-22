@@ -755,6 +755,28 @@
   /* ======================================================== border ====== */
   --helix-border-thin: 1px;
   --helix-border-thick: 2px;
+  /* **How a surface is told apart from what is behind it, said once.**
+   *
+   * A design language leads with one of four mechanisms, fill, border, shadow
+   * or space, and until now this library could express none of them: of 68
+   * border declarations reaching for `--helix-color-border`, eight put the
+   * *colour* behind a hook and **none** put the width behind one. So a border
+   * could be recoloured and never removed, and the floating surfaces wrote
+   * `border: none` outright, so one could never be added either. Separation was
+   * unthemeable in both directions.
+   *
+   * **Two policies rather than one, because the two kinds of surface are not
+   * the same problem.** A card sits in the flow on a ground the theme knows, so
+   * how it separates is a style choice. A menu floats over whatever the reader
+   * scrolled under it, so its elevation is *semantic*: it is the thing saying
+   * "above". A theme may take a card down to nothing; a floating panel with
+   * neither edge nor lift is unreadable over content nobody can predict, and it
+   * is the one failure the engine cannot detect, the ground being unbounded.
+   *
+   * The defaults reproduce exactly what shipped before them: in flow is
+   * border-first with no lift, floating is shadow-first with no edge. */
+  --helix-border-surface: var(--helix-border-thin);
+  --helix-border-floating: 0;
 
   /* ======================================================== shadow ====== */
   /* Used sparingly. Depth is a hairline border first; shadow is reserved for
@@ -763,11 +785,23 @@
   --helix-shadow-sm: 0 1px 2px color-mix(in oklab, var(--_helix-neutral-950) 8%, transparent);
   --helix-shadow-md: 0 4px 12px color-mix(in oklab, var(--_helix-neutral-950) 10%, transparent);
   --helix-shadow-lg: 0 12px 32px color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent);
+  /* The lift half of the separation policy above. Paired with
+     `--helix-border-surface` and `--helix-border-floating`, and a theme moves
+     the pair together: border-first sets the edge and clears the lift, and
+     shadow-first does the reverse. */
+  --helix-shadow-surface: var(--helix-shadow-none);
+  --helix-shadow-floating: var(--helix-shadow-lg);
 
   /* ======================================================== material ==== */
   /* Translucency and blur, for surfaces that sit above content and should
      acknowledge what is behind them: headers, popovers, sheets, command
      palettes. Never for flat page content, where it reads as decoration. */
+  /* The material half of the same policy: how much a surface above content
+     admits what is behind it. `app-header` is translucent chrome by design and
+     follows this; `megamenu` keeps its own `none`, because a band that sits on
+     the page rather than over it is a per-instance choice and turning glass on
+     for every one of them would be a visual change nobody asked for. */
+  --helix-material-backdrop: blur(var(--helix-material-blur-md));
   --helix-material-blur-sm: 8px;
   --helix-material-blur-md: 16px;
   --helix-material-blur-lg: 32px;

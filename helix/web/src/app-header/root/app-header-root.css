@@ -66,7 +66,7 @@
  * gradient returns very nearly the same gradient, and what the filter was
  * contributing at the top of a page is mostly the artifact. */
 :host([appearance="material"]) {
-  backdrop-filter: var(--app-header-backdrop, blur(var(--helix-material-blur-md)));
+  backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
   background-color: var(--app-header-background, var(--helix-material-translucent));
 }
 
@@ -99,7 +99,7 @@
  * stays legible as motion. The hook still wins where a consumer sets it, in
  * both states, which is how a scrolled bar gets tinted to match a hero. */
 :host([appearance="transparent"][data-scrolled]) {
-  backdrop-filter: var(--app-header-backdrop, blur(var(--helix-material-blur-md)));
+  backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
   background-color: var(--app-header-background, var(--helix-material-translucent));
 }
 

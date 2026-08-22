@@ -2,7 +2,8 @@
    one cannot, on every card on the page. */
 :host {
   background-color: var(--card-background-color, var(--helix-color-surface));
-  border: var(--helix-border-thin) solid var(--card-border-color, var(--helix-color-border));
+  border: var(--card-border-width, var(--helix-border-surface)) solid
+    var(--card-border-color, var(--helix-color-border));
   /* `sm`, the same 4px the controls take. A card is a container and the reflex
      is to round it more than the things inside it, but at `md` the corner was
      twice a button's and the card read as the softest object on a page full of
@@ -14,7 +15,7 @@
      reaching into the shadow root. `elevated` sets it below, and the
      `data-card` recipe sets it on hover: one property, so a card cannot end up
      lifted by two rules that disagree about how far. */
-  box-shadow: var(--card-shadow, var(--helix-shadow-none));
+  box-shadow: var(--card-shadow, var(--helix-shadow-surface));
   color: var(--helix-color-foreground-muted);
   display: grid;
   gap: var(--helix-space-sm);

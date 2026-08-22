@@ -560,6 +560,42 @@ helix-drawer {
  * one control on the page a reader has to aim at. The mask leaves it strongest
  * across the top, where there is nothing but air, and gone by the time the band
  * ends. */
+/* A step off the page, and the masthead is see-through so it takes the step too.
+ *
+ * `.pageHero` is the page's own colour on both galleries, which is right on
+ * `/helix` because the lattice and its lit dots are what separate the band from
+ * what follows. Insights has neither, so the hero was the same flat colour as
+ * the grid below it and the only thing marking the band was the filter bar's
+ * hairline: a heading, a search box and no edge until 448 pixels down.
+ *
+ * **A different token per mode, because the neutral ramp is not symmetric.**
+ * `surface` alone measures a 1.18 step from the page in dark and 1.04 in light,
+ * which on white is five values out of 255 and reads as nothing: the ask was a
+ * subtle band and light mode got no band at all. The cause is the ramp, where
+ * `neutral-50` sits five off `neutral-0` while `neutral-900` sits twenty-four
+ * off `neutral-1000`. Queued as 145 rather than fixed here, since moving
+ * `surface` moves every card and panel in the library.
+ *
+ * So each mode takes the token that is actually one step off its own page:
+ * 1.12 and 1.18, matched and both quiet. `light-dark()` is the idiom the ramp
+ * itself is built from and `--site-lattice` already uses, and it follows
+ * `data-color-mode` because that sets `color-scheme`.
+ *
+ * A foreground mix was tried first, the way `[data-button]` washes itself, and
+ * measured wrong: mixing 4% of white into black in oklab lands on rgb(0,0,0),
+ * still black at 8 bits, and 8% reaches rgb(2,2,2). That recipe works because
+ * it mixes toward *transparent* and composites over whatever is behind it. Mix
+ * into an opaque black and there is nothing to composite with.
+ *
+ * The bar above it needs no rule at all. `/insights` is already in `onHero`, so
+ * the masthead is `transparent` at rest, and the hero's negative start margin
+ * already pulls up by the header *plus the hairline* for precisely this case,
+ * which the rule above calls out as the thing that stops being invisible the
+ * day the hero takes a colour of its own. This is that day. */
+.insightsHero {
+  background-color: light-dark(var(--helix-color-surface-sunken), var(--helix-color-surface));
+}
+
 .designHero {
   /* One falloff, named once, because two surfaces wear it: the lattice itself
      and the layer of shines that light up dots within it. Written twice they
@@ -1733,7 +1769,16 @@ helix-drawer helix-tree {
  * wide window is a column of broken lines. The steps below fall where a
  * sentence stops fitting rather than at a list of device widths. */
 .insightGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Three steps down rather than two, because four across needs one more.
+   Straight from four to two would double the card width in a single breakpoint,
+   which is the jump the intermediate step exists to avoid. */
+@media (width < 88rem) {
+  .insightGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (width < 70rem) {

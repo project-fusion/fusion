@@ -121,9 +121,10 @@
  * pads its own lower rows, which is why the padding cannot simply live here. */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
-  border: none;
+  border: var(--color-input-border-width, var(--helix-border-floating)) solid
+    var(--color-input-border-color, var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
-  box-shadow: var(--helix-shadow-lg);
+  box-shadow: var(--color-input-shadow, var(--helix-shadow-floating));
   inline-size: var(--color-input-panel-size, 264px);
   inset: auto;
   margin: var(--helix-space-none);

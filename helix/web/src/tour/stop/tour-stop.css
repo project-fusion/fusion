@@ -7,9 +7,9 @@
    be a second answer to a question the library has already answered. */
 [part="bubble"] {
   background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border: var(--tour-border-width, var(--helix-border-thin)) solid var(--helix-color-border);
   border-radius: var(--helix-radii-md);
-  box-shadow: var(--helix-shadow-lg);
+  box-shadow: var(--tour-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   display: flex;

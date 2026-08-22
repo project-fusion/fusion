@@ -94,7 +94,7 @@
      `lg` here rather than `sm` for that reason: it is carrying the separation
      on its own. */
   border-radius: var(--helix-radii-md);
-  box-shadow: var(--helix-shadow-lg);
+  box-shadow: var(--select-shadow, var(--helix-shadow-floating));
   /* The trigger's width, with the content as the floor.
    *
    * From the controller rather than from a percentage: the panel is positioned
@@ -131,7 +131,8 @@
      of trying to get above the page from inside it, and neither works against
      an ancestor with `overflow: hidden`, which is what was actually clipping
      it. The top layer is above everything by construction. */
-  border: none;
+  border: var(--select-border-width, var(--helix-border-floating)) solid
+    var(--select-border-color, var(--helix-color-border));
   inset: auto;
   margin: var(--helix-space-none);
 }

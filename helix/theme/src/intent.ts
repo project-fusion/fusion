@@ -98,6 +98,22 @@ export interface ThemeIntent {
    */
   density?: number
   /**
+   * Translucency and blur: how much a surface above content admits what is
+   * behind it. `blur` is pixels and 0 is flat; `opacity` is 0 to 1.
+   *
+   * **The one material choice that can invalidate the guarantee.** Contrast is
+   * measured against a known ground and a translucent surface does not have
+   * one, so a pair over it comes back `unverifiable` rather than measured.
+   *
+   * The audit found this half nearly done already: six declarations across two
+   * families, both already behind hooks, so material needed a policy token to
+   * default to and nothing else.
+   */
+  material?: {
+    blur?: number
+    opacity?: number
+  }
+  /**
    * The token prefix, without dashes. `helix` by default.
    *
    * **What makes the engine useful to somebody who has never heard of Helix.**
@@ -117,6 +133,30 @@ export interface ThemeIntent {
   neutral?: {
     chroma?: number
     hue?: number
+  }
+  /**
+   * How a surface is told apart from what is behind it.
+   *
+   * **Two policies, because the two kinds of surface are not the same
+   * problem.** A card sits in the flow on a ground the theme knows, so how it
+   * separates is a style choice. A menu floats over whatever the reader
+   * scrolled under it, so its elevation is semantic: it is the thing saying
+   * "above".
+   *
+   * `space` is therefore offered for a surface in the flow and not for a
+   * floating one. A floating panel with neither edge nor lift nor fill is
+   * unreadable over content nobody can predict, and it is the one failure the
+   * engine cannot detect, the ground being unbounded. The type refuses it
+   * rather than a comment asking nicely.
+   *
+   * `fill` and `space` produce the same edge and lift, which is none of
+   * either: the difference between them lives in the surface colours and in
+   * `density`, not here. Said out loud because two values with one output
+   * looks like a bug until it is explained.
+   */
+  separation?: {
+    floating?: 'border' | 'fill' | 'shadow'
+    surface?: 'border' | 'fill' | 'shadow' | 'space'
   }
   /**
    * Which pairs to measure. Defaults to the surfaces and inks this engine

@@ -807,6 +807,7 @@ element you slotted, not a wrapper around it.
 | --- | --- |
 | `--card-background-color` | Surface behind the card. |
 | `--card-border-color` | Border color of the surface. |
+| `--card-border-width` | Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. |
 | `--card-media-block-size` | Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. |
 | `--card-media-size` | Width of the media column when horizontal. |
 | `--card-padding` | Inset applied to each region. |
@@ -1209,9 +1210,12 @@ pads its own lower rows.
 | Property | Description |
 | --- | --- |
 | `--color-input-background-color` | Fill behind the field. |
-| `--color-input-swatch-size` | Edge length of the block in `appearance="swatch"`. |
-| `--color-input-swatch-radii` | Corner radius of that block. |
+| `--color-input-border-color` | Colour of the panel's edge. |
+| `--color-input-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--color-input-panel-size` | Width of the panel, and so of the square. |
+| `--color-input-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| `--color-input-swatch-radii` | Corner radius of that block. |
+| `--color-input-swatch-size` | Edge length of the block in `appearance="swatch"`. |
 | `--color-input-swatch` | The chosen colour, to paint over the transparency check. |
 
 ## Color Picker
@@ -1413,8 +1417,11 @@ Input, Color Input and Date Input all take.
 | Property | Description |
 | --- | --- |
 | `--combobox-background-color` | Fill behind the field. |
-| `--combobox-control-size` | Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. |
+| `--combobox-border-color` | Colour of the panel's edge. |
+| `--combobox-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--combobox-control-size` | Smallest the text field shrinks to |
 | `--combobox-panel-size` | Width of the panel. Follows the field by default. |
+| `--combobox-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Command
 
@@ -1645,6 +1652,9 @@ whatever holds it.
 | Property | Description |
 | --- | --- |
 | `--date-input-background-color` | Fill behind the field. |
+| `--date-input-border-color` | Colour of the panel's edge. |
+| `--date-input-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--date-input-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Date Picker
 
@@ -1797,10 +1807,13 @@ dialog rather than being a div somebody positioned.
 
 | Property | Description |
 | --- | --- |
-| `--dialog-scrim` | The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
+| `--dialog-border-color` | Colour of the panel's edge. |
+| `--dialog-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--dialog-icon-size` | How big the mark above the title is. |
 | `--dialog-inline-size` | Width of the panel. |
 | `--dialog-inset` | Padding inside the panel. |
+| `--dialog-scrim` | The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
+| `--dialog-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Divider
 
@@ -1973,11 +1986,14 @@ rest is flat and the movement is what says something happened.
 
 | Property | Description |
 | --- | --- |
-| `--drawer-scrim` | The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
-| `--drawer-radii` | Corner radius on the edges that face the page. |
-| `--drawer-size` | Width or height of the panel. |
+| `--drawer-border-color` | Colour of the panel's edge. |
+| `--drawer-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--drawer-inset` | Padding inside the panel. |
 | `--drawer-inset-block-start` | Padding above the content, which clears the close control. |
+| `--drawer-radii` | Corner radius on the edges that face the page. |
+| `--drawer-scrim` | The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
+| `--drawer-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| `--drawer-size` | Width or height of the panel. |
 
 ## Drilldown
 
@@ -2951,11 +2967,13 @@ Everything about what opens it and what closes it is the base class.
 
 | Property | Description |
 | --- | --- |
-| `--megamenu-background` | The panel's own fill. |
 | `--megamenu-backdrop` | A filter behind the panel, for glass. |
-| `--megamenu-size` | How wide the panel may get. |
+| `--megamenu-background` | The panel's own fill. |
+| `--megamenu-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--megamenu-column-size` | The narrowest a column goes before the grid wraps. |
 | `--megamenu-full-size` | How wide the band's contents may get, centred in it. |
+| `--megamenu-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| `--megamenu-size` | How wide the panel may get. |
 | `--megamenu-top` | Where the panel starts, measured from the bar above it. |
 
 ## Menu
@@ -3024,9 +3042,12 @@ one panel and reads the same on a phone as on a desk.
 
 | Property | Description |
 | --- | --- |
+| `--menu-background-color` | Fill of the surface. |
+| `--menu-border-color` | Colour of the panel's edge. |
+| `--menu-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--menu-max-block-size` | Tallest the surface grows before it scrolls. |
 | `--menu-min-inline-size` | Narrowest the surface gets. |
-| `--menu-background-color` | Fill of the surface. |
+| `--menu-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ### Item — `helix-menu-item`
 
@@ -3726,9 +3747,12 @@ time.
 
 | Property | Description |
 | --- | --- |
-| `--popover-max-block-size` | Tallest the panel grows before it scrolls. |
-| `--popover-inset` | Space between the panel's edge and its contents. |
+| `--popover-border-color` | Colour of the panel's edge. |
+| `--popover-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--popover-inline-size` | Width of the panel. |
+| `--popover-inset` | Space between the panel's edge and its contents. |
+| `--popover-max-block-size` | Tallest the panel grows before it scrolls. |
+| `--popover-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Progress
 
@@ -4573,6 +4597,9 @@ from the field it came out of.
 
 | Property | Description |
 | --- | --- |
+| `--select-border-color` | Colour of the panel's edge. |
+| `--select-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--select-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 | `--select-surface-max-block-size` | How tall the panel gets. |
 
 ## Skeleton
@@ -5743,6 +5770,9 @@ belongs to. That is the same reasoning Select gives for its own list.
 | Property | Description |
 | --- | --- |
 | `--time-input-background-color` | Fill behind the field. |
+| `--time-input-border-color` | Colour of the panel's edge. |
+| `--time-input-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--time-input-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Time Picker
 
@@ -6007,7 +6037,10 @@ costs contrast for something the mark already says.
 
 | Property | Description |
 | --- | --- |
+| `--toast-border-color` | Colour of the panel's edge. |
+| `--toast-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--toast-item-inset` | Space between the message's edge and its contents. |
+| `--toast-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 | `--toast-duration` | How long this message stays, in milliseconds, for a progress hint. |
 
 ## Toggle
@@ -6348,8 +6381,10 @@ name, on purpose.
 | Property | Description |
 | --- | --- |
 | `--tour-arrow-size` | The point's box, before it is rotated. |
+| `--tour-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--tour-bubble-size` | How wide the panel may grow. |
 | `--tour-padding` | Inset inside the panel. |
+| `--tour-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 | `--tour-surface-color` | The panel's own surface. |
 
 ## Tree

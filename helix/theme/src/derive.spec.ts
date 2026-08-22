@@ -333,6 +333,41 @@ describe('pairings and collisions', () => {
   })
 })
 
+describe('the separation policy', () => {
+  test('an omitted policy emits nothing, leaving the stylesheet standing', () => {
+    const css = toCss(deriveTheme({ brand: BRAND }))
+    expect(css).not.toContain('--helix-border-surface')
+    expect(css).not.toContain('--helix-shadow-floating')
+  })
+
+  /* The reason there are two policies: a theme can flatten what sits in the
+     flow while leaving a menu legible over content nobody can predict. */
+  test('the two halves move independently', () => {
+    const css = toCss(
+      deriveTheme({ brand: BRAND, separation: { floating: 'shadow', surface: 'border' } }),
+    )
+    expect(css).toContain('--helix-border-surface: 1px;')
+    expect(css).toContain('--helix-shadow-surface: none;')
+    expect(css).toContain('--helix-border-floating: 0;')
+    expect(css).toMatch(/--helix-shadow-floating: 0 12px/)
+  })
+
+  test('shadow-first in flow clears the edge and lights the lift', () => {
+    const css = toCss(deriveTheme({ brand: BRAND, separation: { surface: 'shadow' } }))
+    expect(css).toContain('--helix-border-surface: 0;')
+    expect(css).toMatch(/--helix-shadow-surface: 0 4px/)
+  })
+
+  test('material is a policy and zero blur means flat', () => {
+    expect(toCss(deriveTheme({ brand: BRAND, material: { blur: 0 } }))).toContain(
+      '--helix-material-backdrop: none;',
+    )
+    expect(toCss(deriveTheme({ brand: BRAND, material: { blur: 24 } }))).toContain(
+      '--helix-material-backdrop: blur(24px);',
+    )
+  })
+})
+
 describe('the namespace', () => {
   test('it renames every token and every seed', () => {
     const css = toCss(deriveTheme({ brand: BRAND, namespace: 'acme' }))

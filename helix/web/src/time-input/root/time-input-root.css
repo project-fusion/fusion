@@ -94,9 +94,10 @@
  * longest time. */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
-  border: none;
+  border: var(--time-input-border-width, var(--helix-border-floating)) solid
+    var(--time-input-border-color, var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
-  box-shadow: var(--helix-shadow-lg);
+  box-shadow: var(--time-input-shadow, var(--helix-shadow-floating));
   inline-size: var(--floating-anchor-width, 100%);
   inset: auto;
   margin: var(--helix-space-none);

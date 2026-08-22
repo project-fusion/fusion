@@ -37,9 +37,16 @@ import { styles } from './color-input-root.css.js'
  * @documentation https://helix.fusion.dev/components/color-input
  *
  * @cssproperty --color-input-background-color - Fill behind the field.
- * @cssproperty --color-input-swatch-size - Edge length of the block in `appearance="swatch"`.
- * @cssproperty --color-input-swatch-radii - Corner radius of that block.
+ * @cssproperty --color-input-border-color - Colour of the panel's edge.
+ * @cssproperty --color-input-border-width - Width of the panel's edge. Follows
+ *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
+ *   theme says otherwise.
  * @cssproperty --color-input-panel-size - Width of the panel, and so of the square.
+ * @cssproperty --color-input-shadow - Lift under the panel. Follows
+ *   `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it
+ *   keeps a lift by default.
+ * @cssproperty --color-input-swatch-radii - Corner radius of that block.
+ * @cssproperty --color-input-swatch-size - Edge length of the block in `appearance="swatch"`.
  */
 @customElement('helix-color-input')
 export class HelixColorInput extends HelixBaseColorInput {

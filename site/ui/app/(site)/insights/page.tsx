@@ -55,7 +55,7 @@ export default async function Page({
       order={order}
       sorts={Object.keys(SORTS)}
     >
-      <helix-grid className="insightGrid" columns={3} gap="xl">
+      <helix-grid className="insightGrid" columns={4} gap="xl">
         {insights.map((insight) => (
           <Link
             aria-label={insight.title}
