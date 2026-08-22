@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
 import { Wordmark } from '../../../wordmark'
+import { ThemedPage } from './themed-page'
 import './theme.css'
 
 /** Where a reader starts, and what the reset goes back to. */
@@ -135,12 +136,14 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
-      {/* A splitter rather than a grid, for the reason the sandbox gives: the
-          form is a pane a reader can size rather than a column at whatever
-          width this file picked. The form leads because this is a place to
-          write a theme, the same argument `lead="source"` makes in the
-          workbench. */}
-      <helix-splitter className="workbenchBody" default-position={32}>
+      {/* A splitter for the form, and `helix-sandbox` for everything else.
+
+          **The same component the workbench uses**, rather than a grid shaped
+          like it. It already owns the two-pane split, the collapsible bottom
+          panel, the toolbar row and the separators a keyboard can move, and all
+          of that was going to be rebuilt here badly. What it does not carry is
+          file tabs, because a theme has one artifact and not four. */}
+      <helix-splitter className="workbenchBody" default-position={24}>
         <section className="themeControls" slot="start">
           <helix-flex direction="column" gap="lg">
             <helix-flex direction="column" gap="xs">
@@ -276,120 +279,87 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
           </helix-flex>
         </section>
 
-        <section className="themeResult" slot="end">
-          {/* `data-helix-theme` and not only the class: the emitted block sets the
-            values, and the attribute is what makes `helix/styles` re-run its own
-            declarations here so the series ramp and the scales re-derive. */}
-          <div className="themePreview" data-helix-theme>
-            <helix-flex direction="column" gap="lg">
-              <helix-card>
-                <helix-flex direction="column" gap="md">
-                  <helix-text as="h2">A card on the page</helix-text>
-                  <helix-text>
-                    Body text on a surface, which is one of the pairs measured below rather than one
-                    anybody eyeballed.
-                  </helix-text>
-                  <helix-flex gap="sm">
-                    <helix-button appearance="solid" tone="primary">
-                      Primary
-                    </helix-button>
-                    <helix-button appearance="solid" tone="accent">
-                      Accent
-                    </helix-button>
-                    <helix-button appearance="outlined">Outlined</helix-button>
-                    <helix-button appearance="solid" tone="danger">
-                      Danger
-                    </helix-button>
-                  </helix-flex>
-                </helix-flex>
-              </helix-card>
-
-              {/* **A real floating surface, because the floating policy needs
-                  something to move.** Without one, half the separation control
-                  was a knob with nothing under it: the preview held a card, a
-                  callout and some tags, every one of them in the flow. Held
-                  open, since a reader here is comparing surfaces rather than
-                  operating a menu. */}
-              {/* `default-open`, not `open`: declaring `open` claims ownership and the
-                  component then announces and applies nothing until it is
-                  answered, which is the controlled contract the generated types
-                  enforce. Seeded, it opens once and a reader may still close
-                  it. */}
-              <helix-popover default-open placement="bottom-start">
-                <helix-button appearance="outlined" slot="trigger">
-                  A floating panel
-                </helix-button>
-                <helix-flex direction="column" gap="sm">
-                  <helix-text appearance="label">Over the page</helix-text>
-                  <helix-text>
-                    Told apart from whatever is behind it, which is why its separation is a
-                    different policy from the card's.
-                  </helix-text>
-                </helix-flex>
-              </helix-popover>
-
-              <helix-flex gap="sm">
-                <helix-tag tone="primary">Primary</helix-tag>
-                <helix-tag tone="accent">Accent</helix-tag>
-                <helix-tag tone="success">Success</helix-tag>
-                <helix-tag tone="warning">Warning</helix-tag>
-                <helix-tag tone="danger">Danger</helix-tag>
-                <helix-tag tone="info">Info</helix-tag>
-              </helix-flex>
-
-              <helix-callout severity="info">
-                <helix-text>A callout, which is a tinted ground carrying its own ink.</helix-text>
-              </helix-callout>
-            </helix-flex>
-          </div>
-
-          <div className="themeAudit">
-            <helix-flex direction="column" gap="md">
-              <helix-flex align="center" gap="sm">
-                <helix-text appearance="label">The audit</helix-text>
-                <helix-tag tone={failures.length > 0 ? 'danger' : 'success'}>
+        <div className="themeStage" slot="end">
+          {/* `lead="preview"` because this is a place to look. The workbench
+              leads with its source, being a place to write; here the artifact is
+              an output rather than an input and a reader is judging a palette,
+              not editing CSS. */}
+          <helix-sandbox
+            corner-label="Preview, artifact and audit"
+            lead="preview"
+            orientation="horizontal"
+            panel-label="The audit"
+            separator-label="Preview and artifact"
+          >
+            {/* Status rather than settings: what the palette measured, always
+                on screen, with the detail one panel away. The form holds every
+                input, so a toolbar of controls here would be a second place to
+                look for the same thing. */}
+            <helix-sandbox-toolbar slot="toolbar">
+              <helix-flex align="center" gap="xs">
+                <helix-tag appearance="subtle" tone={failures.length > 0 ? 'danger' : 'success'}>
                   {counts.pass ?? 0} pass
                 </helix-tag>
                 {failures.length > 0 ? (
-                  <helix-tag tone="danger">{failures.length} fail</helix-tag>
+                  <helix-tag appearance="subtle" tone="danger">
+                    {failures.length} fail
+                  </helix-tag>
                 ) : null}
                 {unmeasured.length > 0 ? (
-                  <helix-tag tone="neutral">{unmeasured.length} unverifiable</helix-tag>
+                  <helix-tag appearance="subtle" tone="neutral">
+                    {unmeasured.length} unverifiable
+                  </helix-tag>
+                ) : null}
+                {theme.collisions.length > 0 ? (
+                  <helix-tag appearance="subtle" tone="warning">
+                    {theme.collisions.length} collision
+                    {theme.collisions.length === 1 ? '' : 's'}
+                  </helix-tag>
                 ) : null}
               </helix-flex>
+            </helix-sandbox-toolbar>
 
-              <helix-text appearance="caption">
-                Every pair the surface model declares, measured against the ground it lands on
-                rather than against the page alone. Unverifiable is not a softer failure: it means
-                the ground is not knowable, which is what a caption over a photograph has.
-              </helix-text>
+            {/* `data-helix-theme` and not only the class: the emitted block sets
+                the values, and the attribute is what makes `helix/styles` re-run
+                its own declarations here so the series ramp and the scales
+                re-derive. */}
+            <div className="themePreview" data-helix-theme slot="preview">
+              <ThemedPage />
+            </div>
 
-              {failures.length > 0 ? (
-                <helix-flex direction="column" gap="xs">
-                  {failures.map((pair) => (
-                    <helix-text appearance="caption" key={`${pair.foreground}-${pair.background}`}>
-                      {pair.foreground} on {pair.background}: {pair.ratio?.toFixed(2)}:1, under{' '}
-                      {pair.target}:1
-                    </helix-text>
-                  ))}
-                </helix-flex>
-              ) : null}
-
-              {theme.collisions.length > 0 ? (
-                <helix-callout severity="warning">
-                  <helix-flex direction="column" gap="xs">
-                    {theme.collisions.map((collision) => (
-                      <helix-text key={collision}>{collision}</helix-text>
-                    ))}
-                  </helix-flex>
-                </helix-callout>
-              ) : null}
-
-              <helix-text appearance="label">The artifact</helix-text>
+            <div className="themeArtifact" slot="source">
               <helix-code-block label="theme.css">{css}</helix-code-block>
-            </helix-flex>
-          </div>
-        </section>
+            </div>
+
+            <div className="themeAudit" slot="panel">
+              <helix-flex direction="column" gap="sm">
+                <helix-text appearance="caption">
+                  Every pair the surface model declares, measured against the ground it lands on
+                  rather than against the page alone. Unverifiable is not a softer failure: it means
+                  the ground is not knowable, which is what a caption over a photograph has.
+                </helix-text>
+
+                {failures.map((pair) => (
+                  <helix-text key={`${pair.foreground}-${pair.background}`}>
+                    {pair.foreground} on {pair.background}: {pair.ratio?.toFixed(2)}:1, under{' '}
+                    {pair.target}:1
+                  </helix-text>
+                ))}
+
+                {theme.collisions.map((collision) => (
+                  <helix-text key={collision}>{collision}</helix-text>
+                ))}
+
+                {failures.length === 0 && theme.collisions.length === 0 ? (
+                  <helix-text>
+                    Nothing to report: every measured pair clears its target and every role is
+                    distinguishable from every other.
+                  </helix-text>
+                ) : null}
+              </helix-flex>
+            </div>
+          </helix-sandbox>
+        </div>
       </helix-splitter>
     </>
   )
