@@ -143,6 +143,38 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
     this.renderRoot.querySelector<HTMLButtonElement>(`#${TRIGGER_ID}`)?.focus()
   }
 
+  /**
+   * The item, with `hidden` doing the collapsing.
+   *
+   * **A closed section has to be closed with no stylesheet at all**, which is
+   * the whole claim `headless` makes. `inert` alone was not that: it takes the
+   * region out of the accessibility tree and off the tab order and leaves every
+   * pixel of it on the screen, so a consumer taking this tier got two sections
+   * of text permanently open with a trigger underneath saying
+   * `aria-expanded="false"`. Worse than merely unstyled: a sighted reader saw
+   * content a screen reader was told is not there.
+   *
+   * The collapse was living in the styled tier's `grid-template-rows: 0fr`,
+   * which is an animation and was doing the hiding as a side effect. So the
+   * state was in a stylesheet, and only one of the two tiers had it.
+   *
+   * **`hidden` costs the styled tier nothing**, which is what makes this the
+   * cheap fix rather than a trade. The UA sheet hides `[hidden]` from the UA
+   * origin, and `accordion-item.css` already sets `display: grid` on this part
+   * unconditionally, so the author rule wins and the 0fr transition runs
+   * exactly as before. Measured both tiers after the change.
+   *
+   * **Not `hidden="until-found"`**, which would be the better accordion and is
+   * a different piece of work. It hides through `content-visibility` rather
+   * than `display`, so the styled tier's `display: grid` would no longer
+   * override it and a collapsed section would animate open to nothing. It also
+   * needs a `beforematch` handler to set `open`, or find-in-page reveals text
+   * while the trigger still reports collapsed.
+   *
+   * `inert` stays. `hidden` answers the reader who can see and `inert` answers
+   * the one tabbing through, and in the styled tier, where `display` is
+   * overridden, `inert` is the only one of the two still in force.
+   */
   protected override render(): TemplateResult {
     const open = this.open
     return html`
@@ -163,6 +195,7 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
           id=${CONTENT_ID}
           aria-labelledby=${TRIGGER_ID}
           part="content"
+          ?hidden=${!open}
           ?inert=${!open}
           role="region"
         >

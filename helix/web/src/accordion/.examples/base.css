@@ -1,8 +1,15 @@
 /* What the headless tier asks a consumer to write.
  *
- * `helix-base-accordion` owns which section is open, the disclosure semantics
- * and the measured height the revealed region animates to. What it does not own
- * is any of the appearance, which is everything below.
+ * `helix-base-accordion` owns which section is open and the disclosure
+ * semantics, and it closes a closed section itself: the content region carries
+ * `hidden`, so nothing below has to hide anything and removing this whole sheet
+ * leaves a working accordion. What it does not own is any of the appearance,
+ * which is everything below.
+ *
+ * There is no open/close transition here, and that is the tier rather than an
+ * omission. Animating to a content's intrinsic height is a grid collapsing from
+ * `0fr` to `1fr`, which is a rule a consumer writes and which has to override
+ * the `hidden` the component sets. The styled tier does exactly that.
  *
  * Deliberately skeletal, for the reason the checkbox's sheet gives: a diagram
  * of what has to be styled rather than a theme to copy.
