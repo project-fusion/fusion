@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { InsightArt } from '../../lib/insight-art'
 import { formatDate, INSIGHTS } from '../../lib/insights'
 import { PRODUCTS } from '../products'
 import { SERVICES } from '../services'
@@ -407,6 +408,7 @@ export default function Home() {
                 key={insight.slug}
               >
                 <helix-card appearance="outlined">
+                  <InsightArt slot="media" topic={insight.topic} />
                   <helix-tag slot="header">{insight.topic}</helix-tag>
                   <helix-flex direction="column" gap="xs">
                     <helix-text appearance="title" as="h3">

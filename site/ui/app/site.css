@@ -2409,3 +2409,40 @@ helix-drawer helix-tree {
   --option-active-color: var(--helix-color-primary-subtle);
   --option-radii: var(--helix-radii-sm);
 }
+
+/* **The topic mark on an insight card.**
+ *
+ * A band rather than a picture, and the height is the card's to give: `media`
+ * is the one region that escapes the inset, and `--card-media-block-size` is
+ * what sizes a drawing there, `auto` being an image's own shape and not
+ * something a mark has.
+ *
+ * The ground is `surface-sunken`, so the band reads as a recess the mark sits
+ * in rather than as a second card stacked on the first. One step, because the
+ * card is already a step off the page and two would be a stack. */
+/* **No `inline-size` here.** It was `100%`, which is a document rule and beats
+   the card's own `slot[name="media"]::slotted(*) { inline-size: calc(100% +
+   inset * 2) }` whatever the specificity: measured, the band bled to the border
+   on the left and stopped 33px short on the right, which reads as a drawing
+   that failed to load rather than as a rule losing a fight. The card decides
+   how wide its media is. */
+.insightArt {
+  background-color: var(--helix-color-surface-sunken);
+  display: block;
+}
+
+.insightCard helix-card {
+  --card-media-block-size: 5.5rem;
+}
+
+/* Stroked and never filled, which is what holds the five marks together as a
+   set: they are the same weight of line on the same grid, and a fill would make
+   whichever one had it the odd member. `round` on both, so a truss and an arc
+   are drawn by the same pen. */
+.insightArt path {
+  fill: none;
+  stroke: var(--_insight-series);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
