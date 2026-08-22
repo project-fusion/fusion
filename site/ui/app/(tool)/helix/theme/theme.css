@@ -145,12 +145,13 @@
    brand at the 3:1 a graphic owes, where every other use of the brand on the
    page has been solved for a word. */
 .themedMark {
-  aspect-ratio: 1;
-  background-color: var(--helix-color-brand-mark);
   block-size: var(--helix-size-icon-md);
-  clip-path: polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%);
+  /* `color`, not a fill: the bands take `currentColor`, so one definition serves
+     the header and the footer and inherits wherever else it is put. */
+  color: var(--helix-color-brand-mark);
   display: block;
   flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-md);
 }
 
 .themedHero {

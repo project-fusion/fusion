@@ -24,7 +24,7 @@
  */
 
 /** The one place the name lives, so settling on another is one line. */
-const COMPANY = 'Halyard'
+const COMPANY = 'Strata'
 
 const FEATURES = [
   {
@@ -51,6 +51,40 @@ const SHIPMENTS = [
   { lane: 'Bilbao to Cork', state: 'success', status: 'On time', window: '06:30' },
 ] as const
 
+/**
+ * The mark: three strata with a fault through them.
+ *
+ * **Figure and ground rather than one silhouette**, which is most of what
+ * separates a logo from a shape. The bands are the figure and the gaps between
+ * them are the page showing through, so the mark has structure at any size
+ * instead of being a filled polygon.
+ *
+ * The middle band is displaced, which is what a fault does to strata and is the
+ * one thing here that could not be any other name's mark. Two ideas, one form.
+ *
+ * **Drawn rather than fetched.** Three rectangles is markup, not an asset: an
+ * SVG file would need loading, sizing and a licence to say the same thing, and
+ * `currentColor` lets one definition serve the header and the footer.
+ *
+ * `aria-hidden`, because the wordmark beside it is the accessible name and a
+ * reader should not be told the company twice.
+ */
+function Mark() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="themedMark"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect height="5" rx="1.6" width="18" x="1" y="2" />
+      <rect height="5" rx="1.6" width="18" x="5" y="9.5" />
+      <rect height="5" rx="1.6" width="18" x="1" y="17" />
+    </svg>
+  )
+}
+
 export function ThemedPage() {
   return (
     <div className="themedPage">
@@ -62,7 +96,7 @@ export function ThemedPage() {
             owes rather than the 4.5 a word does, so a reader who picks a colour
             can find it here even when every button has moved away from it. */}
         <helix-flex align="center" gap="xs" slot="start">
-          <span aria-hidden="true" className="themedMark" />
+          <Mark />
           <helix-text appearance="label">{COMPANY}</helix-text>
         </helix-flex>
 
@@ -244,7 +278,7 @@ export function ThemedPage() {
       <footer className="themedFooter">
         <helix-flex align="center" gap="md" justify="between">
           <helix-flex align="center" gap="xs">
-            <span aria-hidden="true" className="themedMark" />
+            <Mark />
             <helix-text appearance="caption">
               &copy; {COMPANY} {new Date().getFullYear()}
             </helix-text>
