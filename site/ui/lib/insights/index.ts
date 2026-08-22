@@ -14,6 +14,44 @@ export type Topic = 'Company' | 'Design systems' | 'Engineering' | 'Intelligence
 export type Kind = 'Decision' | 'Essay' | 'Note'
 
 /**
+ * A picture for a post's card, where a post has one.
+ *
+ * **Optional, and the painted field is not a placeholder for it.** A post with
+ * no picture renders the generated field, which is a finished state rather than
+ * a gap waiting to be filled, so the set can be half photographed without
+ * looking half done.
+ *
+ * Self-hosted under `public/`, never a vendor URL. Hotlinking a stock library's
+ * CDN makes it a runtime dependency of the site, which is the Sovereignty
+ * Constraint applied to our own pages, and the permissive licences are the ones
+ * that let you take the file rather than the link. It is also the difference
+ * between two sets of terms: the Unsplash *licence* asks for no attribution,
+ * while their *API* requires it.
+ */
+export interface InsightImage {
+  /**
+   * What the picture shows, for a reader who cannot see it.
+   *
+   * Not the title again. The card already carries the title next to this, so
+   * repeating it spends a screen reader's time saying the same words twice.
+   */
+  alt: string
+  /**
+   * Where it came from, as a note to us rather than to a reader.
+   *
+   * Nothing renders this. Recorded because the licence that made the picture
+   * free is a fact about the file, and a year from now the only way to answer
+   * whether it can stay is to know where it came from. Photographer and source,
+   * enough to find it again.
+   */
+  credit?: string
+  /**
+   * The path under `public/`, as `/insights/some-post.jpg`.
+   */
+  src: string
+}
+
+/**
  * One post, reduced to what a card, a filter and a sort need.
  *
  * **Metadata only, and the body is deliberately not on it.** The gallery filters
@@ -32,6 +70,10 @@ export interface Insight {
    * Publication date, ISO `YYYY-MM-DD`, which is what sorts and what displays.
    */
   date: string
+  /**
+   * A picture for the card, if this post has one.
+   */
+  image?: InsightImage
   /**
    * What kind of writing it is.
    */

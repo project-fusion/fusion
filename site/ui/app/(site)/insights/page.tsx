@@ -66,7 +66,7 @@ export default async function Page({
             key={insight.slug}
           >
             <helix-card appearance="outlined">
-              <InsightArt slot="media" topic={insight.topic} />
+              <InsightArt image={insight.image} slot="media" topic={insight.topic} />
               <helix-flex align="center" data-density="sm" gap="sm" slot="header" wrap>
                 <helix-tag>{insight.topic}</helix-tag>
                 {/* Neutral and quiet. The kind is a fact about the writing, not

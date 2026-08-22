@@ -2495,6 +2495,83 @@ helix-drawer helix-tree {
   display: block;
 }
 
+/* A photograph, treated so that six of them read as one set.
+ *
+ * **The treatment is the design here, and the vendor is only supply.** Six
+ * pictures chosen well are still six pictures until something ties them
+ * together, and a stock library's abstract-technology shelf is the most reused
+ * imagery on the web, so untreated it reads as the default anyone would have
+ * reached for. Desaturated, they read as ours.
+ *
+ * `grayscale` and not a duotone, for now. A duotone needs a tint strength tuned
+ * against real photographs and there are none in the repository yet, so a
+ * two-element blend stack would be a guess wearing more markup. The filter is
+ * behind a hook: point `--insight-photo-filter` at a `sepia`/`hue-rotate` pair
+ * or at `none` once there is something to look at.
+ *
+ * Everything else goes through the component's own hooks. The ratio is the
+ * gallery's, matching the painted field beside it so a mixed grid keeps one
+ * card shape, and the placeholder is the ground the field uses, so the box
+ * before a picture lands is the same colour as a card that never had one. */
+.insightPhoto {
+  --image-aspect: 16 / 10;
+  --image-placeholder-color: var(--helix-color-surface-sunken);
+
+  filter: var(--insight-photo-filter, grayscale(1));
+}
+
 .insightCard helix-card {
   --card-media-block-size: auto;
+}
+
+/* ------------------------------------------------------------------ theme --
+   The theme builder, `(tool)/helix/theme`.
+
+   A tool rather than a page: no centred column and no site chrome, for the
+   reason the sandbox already gives, that every row around it is a row taken
+   from the thing being examined. Controls on one side, the palette and its
+   audit on the other. */
+.themeBuilder {
+  display: grid;
+  gap: var(--helix-space-xl);
+  grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+  min-block-size: 100dvh;
+  padding: var(--helix-space-xl);
+}
+
+@media (width < 60rem) {
+  .themeBuilder {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.themeControls {
+  align-self: start;
+  position: sticky;
+  top: var(--helix-space-xl);
+}
+
+.themeResult {
+  display: grid;
+  gap: var(--helix-space-xl);
+  grid-template-rows: auto auto;
+  min-inline-size: 0;
+}
+
+/* The preview paints its own page, because a theme's background is one of the
+   things being previewed and letting the site's show through would leave the
+   one surface every other pair is measured against out of the picture. */
+.themePreview {
+  background-color: var(--helix-color-background);
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-foreground);
+  padding: var(--helix-space-xl);
+}
+
+.themeAudit {
+  min-inline-size: 0;
+}
+
+.themeAudit helix-code-block {
+  max-block-size: 24rem;
 }
