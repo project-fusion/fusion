@@ -2,6 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseCopyButton } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { HelixIconButton } from '../../icon-button/root/icon-button-root.js'
+import { MixinControlSurface } from '../../mixins/mixin-control-surface/mixin-control-surface.js'
 import { styles } from './copy-button-root.css.js'
 import '../../tooltip/index.js'
 
@@ -20,7 +21,7 @@ import '../../tooltip/index.js'
  * @documentation https://helix.fusion.dev/components/copy-button
  */
 @customElement('helix-copy-button')
-export class HelixCopyButton extends HelixBaseCopyButton {
+export class HelixCopyButton extends MixinControlSurface(HelixBaseCopyButton) {
   static override styles: CSSResultGroup = [HelixIconButton.styles, styles].flat()
 }
 

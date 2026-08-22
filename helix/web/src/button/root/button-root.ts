@@ -2,6 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseButton } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { MixinControlSurface } from '../../mixins/mixin-control-surface/mixin-control-surface.js'
 import { styles } from './button-root.css.js'
 
 /**
@@ -35,75 +36,7 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-radii-end - Trailing corners, which a group flattens.
  */
 @customElement('helix-button')
-export class HelixButton extends HelixBaseButton {
-  /**
-   * How much of its colour the button wears, which is how much it matters.
-   *
-   * - `outlined` is the resting state and is never written: a line, a hairline
-   *   wash inside it, and the label in the tone's own ink. Most buttons on most
-   *   pages are this, and a page whose every button is filled has said nothing
-   *   about which one matters.
-   * - `solid` fills with the tone and puts the label on top of it, for the one
-   *   action a region is for. There should be one.
-   * - `subtle` is the tone as a wash with no line, for a button that should
-   *   read as coloured without reading as the thing to press.
-   * - `ghost` is the label alone until a pointer is over it: for actions that
-   *   are available rather than suggested. Cancel, dismiss, a toolbar.
-   *
-   * This is where emphasis comes from, rather than size: a filled button says
-   * "this one matters" far louder than eight more pixels would.
-   *
-   * **Independent of `tone`, which is the point of there being two.** Until
-   * these were split, colour and fill were welded together as `primary`,
-   * `secondary`, `tertiary` and `danger`: three of those are a rank and the
-   * fourth is a meaning, so an outlined Delete and a Delete in a menu row could
-   * not be written at all, and neither could a filled neutral. `Tag` reached
-   * the same conclusion first and its note carries the longer argument.
-   */
-  @property({ reflect: true })
-  appearance?: 'ghost' | 'outlined' | 'solid' | 'subtle'
-
-  /**
-   * What the button means, which decides its colour and nothing else.
-   *
-   * - `neutral` is the resting state and is never written. The button is drawn
-   *   in the page's own ink.
-   * - `primary` is the brand colour, for the action a region is about.
-   * - `danger` says the action is destructive before the confirmation does. The
-   *   colour of the control is what a reader recognizes at a glance, where a red
-   *   word inside a neutral button is something they have to read first.
-   *
-   * Three and not six. `Tag` carries the full status set because a tag reports
-   * a state, and a button performs an action: a success button and a warning
-   * button are not things anybody writes, and offering them invites a page
-   * where the colour of a control means nothing in particular.
-   */
-  @property({ reflect: true })
-  tone?: 'accent' | 'danger' | 'neutral' | 'primary'
-
-  /**
-   * One word for the four pairings anybody actually writes.
-   *
-   * - `primary` is `appearance="solid" tone="primary"`.
-   * - `secondary` is the resting button, and writing it says so out loud.
-   * - `tertiary` is `appearance="ghost"`.
-   * - `danger` is `appearance="solid" tone="danger"`.
-   *
-   * **A spelling of the two axes, not a third thing beside them.** It exists
-   * because the split cost a second attribute on the commonest control, and the
-   * mapping lives in the stylesheet as extra selectors on the blocks that
-   * already exist, so there is nowhere for the shorthand and the axes to drift
-   * apart. Anything the four do not cover is written the long way, which is what
-   * the axes are for: an outlined Delete is `appearance="outlined"
-   * tone="danger"` and has no short name, because it is not one of four.
-   *
-   * **An axis said out loud wins.** `variant="primary" appearance="ghost"` is a
-   * ghost in the brand colour. That is the only reading of such markup that is
-   * not a guess, and the selectors say it rather than relying on their order.
-   */
-  @property({ reflect: true })
-  variant?: 'danger' | 'primary' | 'secondary' | 'tertiary'
-
+export class HelixButton extends MixinControlSurface(HelixBaseButton) {
   /**
    * How much of the space available to it the button takes.
    *

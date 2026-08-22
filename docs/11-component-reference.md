@@ -635,7 +635,7 @@ ring is declared here rather than inherited, because the base layer's
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much of its colour the button wears, which is how much it matters. |
+| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -648,9 +648,8 @@ ring is declared here rather than inherited, because the base layer's
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
-| `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | - | What the button means, which decides its colour and nothing else. |
+| `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | `MixinControlSurface` | What it means. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
-| `variant` | `variant` | `'danger' \| 'primary' \| 'secondary' \| 'tertiary' \| undefined` | - | - | One word for the four pairings anybody actually writes. |
 
 #### Methods
 
@@ -1500,6 +1499,7 @@ it for reassurance reads as a second, accidental press.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
 | `copiedLabel` | `copied-label` | `string` | `'Copied'` | `HelixBaseCopyButton` | What it is called, and says, after one. |
@@ -1512,6 +1512,7 @@ it for reassurance reads as a second, accidental press.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | `MixinControlSurface` | What it means. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
 | `value` | `value` | `string` | `''` | `HelixBaseCopyButton` | What goes on the clipboard. |
 
@@ -2346,7 +2347,7 @@ common way a toolbar becomes unusable without sight.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much of its colour the button wears. See `Button` for the full note. |
+| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -2360,9 +2361,8 @@ common way a toolbar becomes unusable without sight.
 | `raised` | `raised` | `boolean` | `false` | - | Whether it is raised off the page it sits on. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `shape` | `shape` | `'circle' \| undefined` | - | - | The outline it is cut to, which is a third axis and not a fourth appearance. |
-| `tone` | `tone` | `'danger' \| 'neutral' \| 'primary' \| undefined` | - | - | What the button means, which decides its colour and nothing else. |
+| `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | `MixinControlSurface` | What it means. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
-| `variant` | `variant` | `'danger' \| 'primary' \| 'secondary' \| 'tertiary' \| undefined` | - | - | One word for the four pairings. See `Button` for the full note. |
 
 #### Methods
 
@@ -2388,6 +2388,7 @@ common way a toolbar becomes unusable without sight.
 
 | Property | Description |
 | --- | --- |
+| `--icon-button-radii` | Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`. |
 | `--icon-button-size` | Edge length of the control. |
 | `--icon-button-shadow` | What it casts, where it is raised off the page. |
 

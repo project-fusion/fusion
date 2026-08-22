@@ -5534,36 +5534,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
-              },
-              "description": "How much of its colour the button wears, which is how much it matters.\n\n- `outlined` is the resting state and is never written: a line, a hairline\n  wash inside it, and the label in the tone's own ink. Most buttons on most\n  pages are this, and a page whose every button is filled has said nothing\n  about which one matters.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  action a region is for. There should be one.\n- `subtle` is the tone as a wash with no line, for a button that should\n  read as coloured without reading as the thing to press.\n- `ghost` is the label alone until a pointer is over it: for actions that\n  are available rather than suggested. Cancel, dismiss, a toolbar.\n\nThis is where emphasis comes from, rather than size: a filled button says\n\"this one matters\" far louder than eight more pixels would.\n\n**Independent of `tone`, which is the point of there being two.** Until\nthese were split, colour and fill were welded together as `primary`,\n`secondary`, `tertiary` and `danger`: three of those are a rank and the\nfourth is a meaning, so an outlined Delete and a Delete in a menu row could\nnot be written at all, and neither could a filled neutral. `Tag` reached\nthe same conclusion first and its note carries the longer argument.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "tone",
-              "type": {
-                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
-              },
-              "description": "What the button means, which decides its colour and nothing else.\n\n- `neutral` is the resting state and is never written. The button is drawn\n  in the page's own ink.\n- `primary` is the brand colour, for the action a region is about.\n- `danger` says the action is destructive before the confirmation does. The\n  colour of the control is what a reader recognizes at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThree and not six. `Tag` carries the full status set because a tag reports\na state, and a button performs an action: a success button and a warning\nbutton are not things anybody writes, and offering them invites a page\nwhere the colour of a control means nothing in particular.",
-              "attribute": "tone",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'danger' | 'primary' | 'secondary' | 'tertiary' | undefined"
-              },
-              "description": "One word for the four pairings anybody actually writes.\n\n- `primary` is `appearance=\"solid\" tone=\"primary\"`.\n- `secondary` is the resting button, and writing it says so out loud.\n- `tertiary` is `appearance=\"ghost\"`.\n- `danger` is `appearance=\"solid\" tone=\"danger\"`.\n\n**A spelling of the two axes, not a third thing beside them.** It exists\nbecause the split cost a second attribute on the commonest control, and the\nmapping lives in the stylesheet as extra selectors on the blocks that\nalready exist, so there is nowhere for the shorthand and the axes to drift\napart. Anything the four do not cover is written the long way, which is what\nthe axes are for: an outlined Delete is `appearance=\"outlined\"\ntone=\"danger\"` and has no short name, because it is not one of four.\n\n**An axis said out loud wins.** `variant=\"primary\" appearance=\"ghost\"` is a\nghost in the brand colour. That is the only reading of such markup that is\nnot a guess, and the selectors say it rather than relying on their order.",
-              "attribute": "variant",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "fill",
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
@@ -5571,6 +5541,34 @@
               "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the three are independent: a `ghost\nstandard` Cancel beside a `solid primary standard` Save is exactly the\npairing a dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
               "attribute": "fill",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
+              },
+              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "attribute": "appearance",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What it means.\n\nThree and an accent, not the full status set. A tag reports a state and a\nbutton performs an action: a success button and a warning button are not\nthings anybody writes, and offering them invites a page where the colour\nof a control means nothing in particular. `accent` is the second\nemphasis, a rotation off the brand seed rather than a colour of its own,\nso it stays in relation when somebody rethemes.",
+              "attribute": "tone",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
             },
             {
               "kind": "field",
@@ -5916,36 +5914,36 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
-              "type": {
-                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
-              },
-              "description": "How much of its colour the button wears, which is how much it matters.\n\n- `outlined` is the resting state and is never written: a line, a hairline\n  wash inside it, and the label in the tone's own ink. Most buttons on most\n  pages are this, and a page whose every button is filled has said nothing\n  about which one matters.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  action a region is for. There should be one.\n- `subtle` is the tone as a wash with no line, for a button that should\n  read as coloured without reading as the thing to press.\n- `ghost` is the label alone until a pointer is over it: for actions that\n  are available rather than suggested. Cancel, dismiss, a toolbar.\n\nThis is where emphasis comes from, rather than size: a filled button says\n\"this one matters\" far louder than eight more pixels would.\n\n**Independent of `tone`, which is the point of there being two.** Until\nthese were split, colour and fill were welded together as `primary`,\n`secondary`, `tertiary` and `danger`: three of those are a rank and the\nfourth is a meaning, so an outlined Delete and a Delete in a menu row could\nnot be written at all, and neither could a filled neutral. `Tag` reached\nthe same conclusion first and its note carries the longer argument.",
-              "fieldName": "appearance"
-            },
-            {
-              "name": "tone",
-              "type": {
-                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
-              },
-              "description": "What the button means, which decides its colour and nothing else.\n\n- `neutral` is the resting state and is never written. The button is drawn\n  in the page's own ink.\n- `primary` is the brand colour, for the action a region is about.\n- `danger` says the action is destructive before the confirmation does. The\n  colour of the control is what a reader recognizes at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThree and not six. `Tag` carries the full status set because a tag reports\na state, and a button performs an action: a success button and a warning\nbutton are not things anybody writes, and offering them invites a page\nwhere the colour of a control means nothing in particular.",
-              "fieldName": "tone"
-            },
-            {
-              "name": "variant",
-              "type": {
-                "text": "'danger' | 'primary' | 'secondary' | 'tertiary' | undefined"
-              },
-              "description": "One word for the four pairings anybody actually writes.\n\n- `primary` is `appearance=\"solid\" tone=\"primary\"`.\n- `secondary` is the resting button, and writing it says so out loud.\n- `tertiary` is `appearance=\"ghost\"`.\n- `danger` is `appearance=\"solid\" tone=\"danger\"`.\n\n**A spelling of the two axes, not a third thing beside them.** It exists\nbecause the split cost a second attribute on the commonest control, and the\nmapping lives in the stylesheet as extra selectors on the blocks that\nalready exist, so there is nowhere for the shorthand and the axes to drift\napart. Anything the four do not cover is written the long way, which is what\nthe axes are for: an outlined Delete is `appearance=\"outlined\"\ntone=\"danger\"` and has no short name, because it is not one of four.\n\n**An axis said out loud wins.** `variant=\"primary\" appearance=\"ghost\"` is a\nghost in the brand colour. That is the only reading of such markup that is\nnot a guess, and the selectors say it rather than relying on their order.",
-              "fieldName": "variant"
-            },
-            {
               "name": "fill",
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
               },
               "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the three are independent: a `ghost\nstandard` Cancel beside a `solid primary standard` Save is exactly the\npairing a dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
               "fieldName": "fill"
+            },
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
+              },
+              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "fieldName": "appearance",
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
+            },
+            {
+              "name": "tone",
+              "type": {
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What it means.\n\nThree and an accent, not the full status set. A tag reports a state and a\nbutton performs an action: a success button and a warning button are not\nthings anybody writes, and offering them invites a page where the colour\nof a control means nothing in particular. `accent` is the second\nemphasis, a rotation off the brand seed rather than a colour of its own,\nso it stays in relation when somebody rethemes.",
+              "fieldName": "tone",
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
             },
             {
               "name": "type",
@@ -6026,6 +6024,12 @@
               }
             }
           ],
+          "mixins": [
+            {
+              "name": "MixinControlSurface",
+              "module": "/src/mixins/mixin-control-surface/mixin-control-surface.js"
+            }
+          ],
           "superclass": {
             "name": "HelixBaseButton",
             "package": "@helix-io/headless"
@@ -6069,8 +6073,8 @@
                 "slug": "fill"
               },
               {
-                "description": "One word for the four pairings most buttons are.",
-                "slug": "variants"
+                "description": "The four tones, each saying what the action means rather than how loud it is.",
+                "slug": "tones"
               },
               {
                 "description": "Buttons in a narrow column, where the label decides whether it wraps.",
@@ -15320,6 +15324,34 @@
           "members": [
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
+              },
+              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "attribute": "appearance",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What it means.\n\nThree and an accent, not the full status set. A tag reports a state and a\nbutton performs an action: a success button and a warning button are not\nthings anybody writes, and offering them invites a page where the colour\nof a control means nothing in particular. `accent` is the second\nemphasis, a rotation off the brand seed rather than a colour of its own,\nso it stays in relation when somebody rethemes.",
+              "attribute": "tone",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "value",
               "type": {
                 "text": "string"
@@ -15816,6 +15848,12 @@
               }
             }
           ],
+          "mixins": [
+            {
+              "name": "MixinControlSurface",
+              "module": "/src/mixins/mixin-control-surface/mixin-control-surface.js"
+            }
+          ],
           "superclass": {
             "name": "HelixBaseCopyButton",
             "package": "@helix-io/headless"
@@ -15843,67 +15881,31 @@
           },
           "tagName": "helix-copy-button",
           "customElement": true,
-          "slots": [
-            {
-              "description": "The resting icon. Falls back to a clipboard.",
-              "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "description": "What replaces it once the write succeeds. Falls back to a check.",
-              "name": "copied",
-              "inheritedFrom": {
-                "name": "HelixBaseCopyButton",
-                "module": "src/copy-button/root/copy-button-root.ts"
-              }
-            },
-            {
-              "description": "Content before the label, usually an icon.",
-              "name": "start",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "description": "Content after the label.",
-              "name": "end",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The inner button.",
-              "name": "button",
-              "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
-              }
-            },
-            {
-              "description": "The clipboard glyph, and the confirmation that replaces it.",
-              "name": "mark",
-              "inheritedFrom": {
-                "name": "HelixBaseCopyButton",
-                "module": "src/copy-button/root/copy-button-root.ts"
-              }
-            },
-            {
-              "description": "The bubble, forwarded from the tooltip inside.",
-              "name": "tooltip",
-              "inheritedFrom": {
-                "name": "HelixBaseCopyButton",
-                "module": "src/copy-button/root/copy-button-root.ts"
-              }
-            }
-          ],
           "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
+              },
+              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "fieldName": "appearance",
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
+            },
+            {
+              "name": "tone",
+              "type": {
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What it means.\n\nThree and an accent, not the full status set. A tag reports a state and a\nbutton performs an action: a success button and a warning button are not\nthings anybody writes, and offering them invites a page where the colour\nof a control means nothing in particular. `accent` is the second\nemphasis, a rotation off the brand seed rather than a colour of its own,\nso it stays in relation when somebody rethemes.",
+              "fieldName": "tone",
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
+            },
             {
               "name": "value",
               "type": {
@@ -16006,6 +16008,66 @@
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The resting icon. Falls back to a clipboard.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "description": "What replaces it once the write succeeds. Falls back to a check.",
+              "name": "copied",
+              "inheritedFrom": {
+                "name": "HelixBaseCopyButton",
+                "module": "src/copy-button/root/copy-button-root.ts"
+              }
+            },
+            {
+              "description": "Content before the label, usually an icon.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "description": "Content after the label.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The inner button.",
+              "name": "button",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "description": "The clipboard glyph, and the confirmation that replaces it.",
+              "name": "mark",
+              "inheritedFrom": {
+                "name": "HelixBaseCopyButton",
+                "module": "src/copy-button/root/copy-button-root.ts"
+              }
+            },
+            {
+              "description": "The bubble, forwarded from the tooltip inside.",
+              "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixBaseCopyButton",
+                "module": "src/copy-button/root/copy-button-root.ts"
               }
             }
           ],
@@ -24449,6 +24511,10 @@
           "name": "HelixIconButton",
           "cssProperties": [
             {
+              "description": "Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`.",
+              "name": "--icon-button-radii"
+            },
+            {
               "description": "Edge length of the control.",
               "name": "--icon-button-size"
             },
@@ -24496,26 +24562,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
-              },
-              "description": "How much of its colour the button wears. See `Button` for the full note.\n\n`ghost` is the resting state here rather than `outlined`, and is never\nwritten: a toolbar of framed squares is a toolbar of boxes.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "tone",
-              "type": {
-                "text": "'danger' | 'neutral' | 'primary' | undefined"
-              },
-              "description": "What the button means, which decides its colour and nothing else.",
-              "attribute": "tone",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "shape",
               "type": {
                 "text": "'circle' | undefined"
@@ -24537,13 +24583,31 @@
             },
             {
               "kind": "field",
-              "name": "variant",
+              "name": "appearance",
               "type": {
-                "text": "'danger' | 'primary' | 'secondary' | 'tertiary' | undefined"
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "One word for the four pairings. See `Button` for the full note.\n\nThe mapping differs by one, because this control rests as a ghost:\n`tertiary` is the resting state here, and `danger` is a red mark on it\nrather than a filled red square.",
-              "attribute": "variant",
-              "reflects": true
+              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "attribute": "appearance",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What it means.\n\nThree and an accent, not the full status set. A tag reports a state and a\nbutton performs an action: a success button and a warning button are not\nthings anybody writes, and offering them invites a page where the colour\nof a control means nothing in particular. `accent` is the second\nemphasis, a rotation off the brand seed rather than a colour of its own,\nso it stays in relation when somebody rethemes.",
+              "attribute": "tone",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
             },
             {
               "kind": "field",
@@ -24889,22 +24953,6 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
-              "type": {
-                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
-              },
-              "description": "How much of its colour the button wears. See `Button` for the full note.\n\n`ghost` is the resting state here rather than `outlined`, and is never\nwritten: a toolbar of framed squares is a toolbar of boxes.",
-              "fieldName": "appearance"
-            },
-            {
-              "name": "tone",
-              "type": {
-                "text": "'danger' | 'neutral' | 'primary' | undefined"
-              },
-              "description": "What the button means, which decides its colour and nothing else.",
-              "fieldName": "tone"
-            },
-            {
               "name": "shape",
               "type": {
                 "text": "'circle' | undefined"
@@ -24922,12 +24970,28 @@
               "fieldName": "raised"
             },
             {
-              "name": "variant",
+              "name": "appearance",
               "type": {
-                "text": "'danger' | 'primary' | 'secondary' | 'tertiary' | undefined"
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "One word for the four pairings. See `Button` for the full note.\n\nThe mapping differs by one, because this control rests as a ghost:\n`tertiary` is the resting state here, and `danger` is a red mark on it\nrather than a filled red square.",
-              "fieldName": "variant"
+              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "fieldName": "appearance",
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
+            },
+            {
+              "name": "tone",
+              "type": {
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What it means.\n\nThree and an accent, not the full status set. A tag reports a state and a\nbutton performs an action: a success button and a warning button are not\nthings anybody writes, and offering them invites a page where the colour\nof a control means nothing in particular. `accent` is the second\nemphasis, a rotation off the brand seed rather than a colour of its own,\nso it stays in relation when somebody rethemes.",
+              "fieldName": "tone",
+              "inheritedFrom": {
+                "name": "MixinControlSurface",
+                "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+              }
             },
             {
               "name": "type",
@@ -25008,6 +25072,12 @@
               }
             }
           ],
+          "mixins": [
+            {
+              "name": "MixinControlSurface",
+              "module": "/src/mixins/mixin-control-surface/mixin-control-surface.js"
+            }
+          ],
           "superclass": {
             "name": "HelixBaseIconButton",
             "package": "@helix-io/headless"
@@ -25043,8 +25113,8 @@
                 "slug": "shapes"
               },
               {
-                "description": "The ranked forms, for a control bar that already had them before tone existed.",
-                "slug": "variants"
+                "description": "The tones an icon button carries, including the accent it gained with the shared surface.",
+                "slug": "tones"
               }
             ],
             "source": "helix/web/src/icon-button"
@@ -34953,6 +35023,107 @@
           "declaration": {
             "name": "HelixMeter",
             "module": "src/meter/root/meter-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/mixins/mixin-control-surface/mixin-control-surface.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "How a control is drawn and what it means, for the three that are buttons.\n\n**The first mixin in `helix/web`, and it belongs here rather than in core.**\n`helix/core` is consumed by the headless tier, which must never take styling,\nand these two properties are purely presentational: they carry no behaviour,\nno ARIA and no form participation, only which rules a stylesheet applies.\nDeclaring them in core would put an appearance on the tier whose whole\npurpose is not having one.\n\n**Why a mixin rather than inheritance.** `Button`, `IconButton` and\n`CopyButton` all want this pair, and the styled tier cannot get it by\nextending: each styled class extends its own base, which is what keeps a\ncontrol's behaviour and its presentation in one branch. `CopyButton` already\ncomposes `IconButton`'s stylesheet, `[HelixIconButton.styles, styles]`, which\nis the same move for CSS; this is that move for API. Redeclared instead, the\nthree drift the first time one gains a value.",
+          "name": "MixinControlSurfaceInterface",
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
+              },
+              "description": "How filled it is drawn. Absent is the control's own resting treatment."
+            },
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What it means. Absent is `neutral`, which is the resting case."
+            }
+          ],
+          "helix": {}
+        },
+        {
+          "kind": "mixin",
+          "description": "",
+          "name": "MixinControlSurface",
+          "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
+              },
+              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What it means.\n\nThree and an accent, not the full status set. A tag reports a state and a\nbutton performs an action: a success button and a warning button are not\nthings anybody writes, and offering them invites a page where the colour\nof a control means nothing in particular. `accent` is the second\nemphasis, a rotation off the brand seed rather than a colour of its own,\nso it stays in relation when somebody rethemes.",
+              "attribute": "tone",
+              "reflects": true
+            }
+          ],
+          "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
+              },
+              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "fieldName": "appearance"
+            },
+            {
+              "name": "tone",
+              "type": {
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What it means.\n\nThree and an accent, not the full status set. A tag reports a state and a\nbutton performs an action: a success button and a warning button are not\nthings anybody writes, and offering them invites a page where the colour\nof a control means nothing in particular. `accent` is the second\nemphasis, a rotation off the brand seed rather than a colour of its own,\nso it stays in relation when somebody rethemes.",
+              "fieldName": "tone"
+            }
+          ],
+          "parameters": [
+            {
+              "name": "Base",
+              "type": {
+                "text": "T"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "MixinControlSurfaceInterface",
+          "declaration": {
+            "name": "MixinControlSurfaceInterface",
+            "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinControlSurface",
+          "declaration": {
+            "name": "MixinControlSurface",
+            "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
           }
         }
       ]

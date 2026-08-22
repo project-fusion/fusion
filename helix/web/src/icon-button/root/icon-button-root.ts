@@ -2,6 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseIconButton } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { MixinControlSurface } from '../../mixins/mixin-control-surface/mixin-control-surface.js'
 import { styles } from './icon-button-root.css.js'
 
 /**
@@ -27,24 +28,12 @@ import { styles } from './icon-button-root.css.js'
  *
  * @csspart button - The inner button or anchor.
  *
+ * @cssproperty --icon-button-radii - Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`.
  * @cssproperty --icon-button-size - Edge length of the control.
  * @cssproperty --icon-button-shadow - What it casts, where it is raised off the page.
  */
 @customElement('helix-icon-button')
-export class HelixIconButton extends HelixBaseIconButton {
-  /**
-   * How much of its colour the button wears. See `Button` for the full note.
-   *
-   * `ghost` is the resting state here rather than `outlined`, and is never
-   * written: a toolbar of framed squares is a toolbar of boxes.
-   */
-  @property({ reflect: true })
-  appearance?: 'ghost' | 'outlined' | 'solid' | 'subtle'
-
-  /** What the button means, which decides its colour and nothing else. */
-  @property({ reflect: true })
-  tone?: 'danger' | 'neutral' | 'primary'
-
+export class HelixIconButton extends MixinControlSurface(HelixBaseIconButton) {
   /**
    * The outline it is cut to, which is a third axis and not a fourth appearance.
    *
@@ -74,16 +63,6 @@ export class HelixIconButton extends HelixBaseIconButton {
    */
   @property({ reflect: true, type: Boolean })
   raised = false
-
-  /**
-   * One word for the four pairings. See `Button` for the full note.
-   *
-   * The mapping differs by one, because this control rests as a ghost:
-   * `tertiary` is the resting state here, and `danger` is a red mark on it
-   * rather than a filled red square.
-   */
-  @property({ reflect: true })
-  variant?: 'danger' | 'primary' | 'secondary' | 'tertiary'
 
   static override styles: CSSResultGroup = styles
 }

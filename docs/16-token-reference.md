@@ -35,7 +35,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 291 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 185 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 120 |
-| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 36 |
+| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 38 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 14 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
@@ -45,8 +45,8 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 7 |
-| `--helix-color-accent` | `light-dark(var(--_helix-accent-500), var(--_helix-accent-400))` | 6 |
-| `--helix-color-accent-hover` | `var(--_helix-accent-600)` | 2 |
+| `--helix-color-accent` | `light-dark(var(--_helix-accent-500), var(--_helix-accent-400))` | 14 |
+| `--helix-color-accent-hover` | `var(--_helix-accent-600)` | 4 |
 | `--helix-color-accent-active` | `var(--_helix-accent-700)` | 0 |
 | `--helix-color-accent-subtle` | `light-dark(var(--_helix-accent-50), var(--_helix-accent-900))` | 0 |
 | `--helix-color-accent-surface` | `var(--_helix-accent-600)` | 2 |
@@ -123,7 +123,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 64 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 203 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 209 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 18 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 2 |
 | `--helix-radii-full` | `9999px` | 79 |

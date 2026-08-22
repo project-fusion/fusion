@@ -26,16 +26,7 @@
     var(--helix-color-background)
   );
 }
-
-/* The `variant` shorthand, joining the rules rather than repeating them. See
-   `Button` for the whole argument, including why an axis said out loud wins
-   through `:not()` rather than through source order.
-
-   The mapping differs by one, because this control rests as a ghost: `tertiary`
-   is the resting state and needs no rule, and `danger` is a red mark on it
-   rather than a filled red square, so it sets the tone and no appearance. */
-:host([tone="primary"]),
-:host(:not([tone])[variant="primary"]) {
+:host([tone="primary"]) {
   --_icon-button-edge: var(--helix-color-primary);
   --_icon-button-ink: var(--helix-color-primary);
   --_icon-button-ink-hover: var(--helix-color-primary);
@@ -43,9 +34,27 @@
   --_icon-button-tone: var(--helix-color-primary);
   --_icon-button-tone-hover: var(--helix-color-primary-hover);
 }
+/* **The second emphasis, and it arrives with the shared surface.**
+ *
+ * `tone` moved to `MixinControlSurface`, which `Button` and `CopyButton` take
+ * as well, and Button's union has always carried `accent`: a rotation off the
+ * brand seed rather than a colour of its own, so it stays in relation when
+ * somebody rethemes. Nothing about it was ever specific to a control with words
+ * in it, and an icon button doing a second emphasised action wanted it.
+ *
+ * Written here rather than only widened in the type, because a value a
+ * stylesheet does not answer is the quietest kind of broken: valid to write,
+ * accepted by TypeScript, and drawn as neutral. */
+:host([tone="accent"]) {
+  --_icon-button-edge: var(--helix-color-accent);
+  --_icon-button-ink: var(--helix-color-accent);
+  --_icon-button-ink-hover: var(--helix-color-accent);
+  --_icon-button-on-tone: var(--helix-color-foreground-on-accent);
+  --_icon-button-tone: var(--helix-color-accent);
+  --_icon-button-tone-hover: var(--helix-color-accent-hover);
+}
 
-:host([tone="danger"]),
-:host(:not([tone])[variant="danger"]) {
+:host([tone="danger"]) {
   --_icon-button-edge: var(--helix-color-danger);
   --_icon-button-ink: var(--helix-color-danger);
   --_icon-button-ink-hover: var(--helix-color-danger);
@@ -66,7 +75,31 @@
   background-color: transparent;
   block-size: var(--_icon-button-size);
   border: var(--helix-border-thin) solid transparent;
-  border-radius: var(--helix-radii-sm);
+  /* **Four corners, so a group can flatten the two it needs to.**
+   *
+   * One `border-radius` here meant `ButtonGroup` could not reach this control:
+   * the group hands `--button-radii-start` and `--button-radii-end` across as
+   * custom properties, which is the one thing that crosses a shadow boundary
+   * however deep the group is, and `Button` publishes and reads them. This did
+   * not, so a copy button beside a button in a group kept all four corners and
+   * the pair read as two controls that happen to touch rather than one split in
+   * two. Measured on `/contact`: the anchor came out `4px 0 0 4px` and the copy
+   * button `4px` all round.
+   *
+   * The same hook names as `Button`, deliberately. The group's contract is
+   * those two properties, and an icon button that answered to different ones
+   * would be a control a group cannot flatten by design rather than by
+   * omission. `--icon-button-radii` stays as this control's own override. */
+  border-end-end-radius: var(--button-radii-end, var(--icon-button-radii, var(--helix-radii-sm)));
+  border-end-start-radius: var(
+    --button-radii-start,
+    var(--icon-button-radii, var(--helix-radii-sm))
+  );
+  border-start-end-radius: var(--button-radii-end, var(--icon-button-radii, var(--helix-radii-sm)));
+  border-start-start-radius: var(
+    --button-radii-start,
+    var(--icon-button-radii, var(--helix-radii-sm))
+  );
   color: var(--_icon-button-ink);
   cursor: pointer;
   display: inline-flex;
@@ -138,15 +171,12 @@
  * an appearance without a hover of its own loses its fill the moment a pointer
  * touches it. Both notes below were written the first time that happened here.
  */
-:host([appearance="solid"]) [part="button"],
-:host(:not([appearance])[variant="primary"]) [part="button"] {
+:host([appearance="solid"]) [part="button"] {
   background-color: var(--_icon-button-tone);
   border-color: transparent;
   color: var(--_icon-button-on-tone);
 }
-
-:host(:not(:disabled)[appearance="solid"]) [part="button"]:hover,
-:host(:not(:disabled):not([appearance])[variant="primary"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="solid"]) [part="button"]:hover {
   background-color: var(--_icon-button-tone-hover);
   color: var(--_icon-button-on-tone);
 }
@@ -161,15 +191,12 @@
  * border and radius, so a row holding one of each read as two kinds of control.
  * A percentage of the ink is a step away from whatever it sits on in either
  * mode, where a fixed neutral is not. */
-:host([appearance="outlined"]) [part="button"],
-:host(:not([appearance])[variant="secondary"]) [part="button"] {
+:host([appearance="outlined"]) [part="button"] {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 6%, transparent);
   border-color: var(--_icon-button-edge);
   color: var(--_icon-button-tone);
 }
-
-:host(:not(:disabled)[appearance="outlined"]) [part="button"]:hover,
-:host(:not(:disabled):not([appearance])[variant="secondary"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="outlined"]) [part="button"]:hover {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 12%, transparent);
   color: var(--_icon-button-tone);
 }

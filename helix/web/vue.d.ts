@@ -657,62 +657,6 @@ it and nothing lands on the host that a consumer's markup did not have. */
 export type HelixButtonGroupVueEvents = {};
 
 export type HelixButtonVueProps = {
-  /** How much of its colour the button wears, which is how much it matters.
-
-- `outlined` is the resting state and is never written: a line, a hairline
-  wash inside it, and the label in the tone's own ink. Most buttons on most
-  pages are this, and a page whose every button is filled has said nothing
-  about which one matters.
-- `solid` fills with the tone and puts the label on top of it, for the one
-  action a region is for. There should be one.
-- `subtle` is the tone as a wash with no line, for a button that should
-  read as coloured without reading as the thing to press.
-- `ghost` is the label alone until a pointer is over it: for actions that
-  are available rather than suggested. Cancel, dismiss, a toolbar.
-
-This is where emphasis comes from, rather than size: a filled button says
-"this one matters" far louder than eight more pixels would.
-
-**Independent of `tone`, which is the point of there being two.** Until
-these were split, colour and fill were welded together as `primary`,
-`secondary`, `tertiary` and `danger`: three of those are a rank and the
-fourth is a meaning, so an outlined Delete and a Delete in a menu row could
-not be written at all, and neither could a filled neutral. `Tag` reached
-the same conclusion first and its note carries the longer argument. */
-  appearance?: HelixButton["appearance"];
-  /** What the button means, which decides its colour and nothing else.
-
-- `neutral` is the resting state and is never written. The button is drawn
-  in the page's own ink.
-- `primary` is the brand colour, for the action a region is about.
-- `danger` says the action is destructive before the confirmation does. The
-  colour of the control is what a reader recognizes at a glance, where a red
-  word inside a neutral button is something they have to read first.
-
-Three and not six. `Tag` carries the full status set because a tag reports
-a state, and a button performs an action: a success button and a warning
-button are not things anybody writes, and offering them invites a page
-where the colour of a control means nothing in particular. */
-  tone?: HelixButton["tone"];
-  /** One word for the four pairings anybody actually writes.
-
-- `primary` is `appearance="solid" tone="primary"`.
-- `secondary` is the resting button, and writing it says so out loud.
-- `tertiary` is `appearance="ghost"`.
-- `danger` is `appearance="solid" tone="danger"`.
-
-**A spelling of the two axes, not a third thing beside them.** It exists
-because the split cost a second attribute on the commonest control, and the
-mapping lives in the stylesheet as extra selectors on the blocks that
-already exist, so there is nowhere for the shorthand and the axes to drift
-apart. Anything the four do not cover is written the long way, which is what
-the axes are for: an outlined Delete is `appearance="outlined"
-tone="danger"` and has no short name, because it is not one of four.
-
-**An axis said out loud wins.** `variant="primary" appearance="ghost"` is a
-ghost in the brand colour. That is the only reading of such markup that is
-not a guess, and the selectors say it rather than relying on their order. */
-  variant?: HelixButton["variant"];
   /** How much of the space available to it the button takes.
 
 - `auto` is the default and is never written: the button is as wide as its
@@ -740,6 +684,23 @@ styled as a button and a real button are indistinguishable, and a dialog's
 button row is built on `standard`, so the one place the promise mattered
 most was the one place it did not hold. */
   fill?: HelixButton["fill"];
+  /** How filled it is drawn.
+
+Reflected because the stylesheet selects on it, and undefaulted because
+it reflects: a reflected property with a default writes its attribute
+onto every host anybody renders. The resting treatment is the attribute's
+absence, which each control names for itself, `outlined` on `Button` and
+`ghost` on `IconButton`. */
+  appearance?: HelixButton["appearance"];
+  /** What it means.
+
+Three and an accent, not the full status set. A tag reports a state and a
+button performs an action: a success button and a warning button are not
+things anybody writes, and offering them invites a page where the colour
+of a control means nothing in particular. `accent` is the second
+emphasis, a rotation off the brand seed rather than a colour of its own,
+so it stays in relation when somebody rethemes. */
+  tone?: HelixButton["tone"];
   /** What activating the button does to its form. */
   type?: HelixButton["type"];
   /** Accessible name, for a button whose content is not text.
@@ -1803,6 +1764,23 @@ export type HelixCopyButtonHelixCopyElementEvent =
   HelixCopyButtonElementEvent<HelixCopyEvent>;
 
 export type HelixCopyButtonVueProps = {
+  /** How filled it is drawn.
+
+Reflected because the stylesheet selects on it, and undefaulted because
+it reflects: a reflected property with a default writes its attribute
+onto every host anybody renders. The resting treatment is the attribute's
+absence, which each control names for itself, `outlined` on `Button` and
+`ghost` on `IconButton`. */
+  appearance?: HelixCopyButton["appearance"];
+  /** What it means.
+
+Three and an accent, not the full status set. A tag reports a state and a
+button performs an action: a success button and a warning button are not
+things anybody writes, and offering them invites a page where the colour
+of a control means nothing in particular. `accent` is the second
+emphasis, a rotation off the brand seed rather than a colour of its own,
+so it stays in relation when somebody rethemes. */
+  tone?: HelixCopyButton["tone"];
   /** What goes on the clipboard. */
   value?: HelixCopyButton["value"];
   /** What it is called, and says, before a press.
@@ -2638,13 +2616,6 @@ is two intentions in one element. */
 export type HelixGridVueEvents = {};
 
 export type HelixIconButtonVueProps = {
-  /** How much of its colour the button wears. See `Button` for the full note.
-
-`ghost` is the resting state here rather than `outlined`, and is never
-written: a toolbar of framed squares is a toolbar of boxes. */
-  appearance?: HelixIconButton["appearance"];
-  /** What the button means, which decides its colour and nothing else. */
-  tone?: HelixIconButton["tone"];
   /** The outline it is cut to, which is a third axis and not a fourth appearance.
 
 `appearance` says how filled it is and `tone` says what it means; neither of
@@ -2667,12 +2638,23 @@ raised whatever its outline, and a circle inside a toolbar is not raised at
 all. Shadow rather than a border, since what is under a floating control is
 the page and a line drawn on the page is not the same as being above it. */
   raised?: HelixIconButton["raised"];
-  /** One word for the four pairings. See `Button` for the full note.
+  /** How filled it is drawn.
 
-The mapping differs by one, because this control rests as a ghost:
-`tertiary` is the resting state here, and `danger` is a red mark on it
-rather than a filled red square. */
-  variant?: HelixIconButton["variant"];
+Reflected because the stylesheet selects on it, and undefaulted because
+it reflects: a reflected property with a default writes its attribute
+onto every host anybody renders. The resting treatment is the attribute's
+absence, which each control names for itself, `outlined` on `Button` and
+`ghost` on `IconButton`. */
+  appearance?: HelixIconButton["appearance"];
+  /** What it means.
+
+Three and an accent, not the full status set. A tag reports a state and a
+button performs an action: a success button and a warning button are not
+things anybody writes, and offering them invites a page where the colour
+of a control means nothing in particular. `accent` is the second
+emphasis, a rotation off the brand seed rather than a colour of its own,
+so it stays in relation when somebody rethemes. */
+  tone?: HelixIconButton["tone"];
   /** What activating the button does to its form. */
   type?: HelixIconButton["type"];
   /** Accessible name, for a button whose content is not text.
@@ -7400,6 +7382,8 @@ export type CustomCssProperties = {
   "--file-input-background-color"?: string;
   /** Padding inside the field. */
   "--file-input-inset"?: string;
+  /** Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`. */
+  "--icon-button-radii"?: string;
   /** Edge length of the control. */
   "--icon-button-size"?: string;
   /** What it casts, where it is raised off the page. */

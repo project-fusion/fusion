@@ -65,27 +65,7 @@
     var(--helix-color-background)
   );
 }
-
-/* `variant` is a shorthand, and it joins the rules rather than repeating them.
- *
- * Four names for the four pairings anybody actually writes: `primary` is a solid
- * button in the brand colour, `secondary` the resting outlined one, `tertiary` a
- * ghost, `danger` a solid red. It exists because the split cost a second
- * attribute on the commonest control, and it earns its keep only if it stays a
- * *spelling* of the two axes rather than a third thing beside them. So it adds
- * selectors to the blocks that already exist, and there is nowhere for the two
- * to drift apart.
- *
- * `:not([appearance])` and `:not([tone])` rather than source order. Both
- * selectors are two class-equivalents, so ordering would decide it and would go
- * on deciding it correctly only for as long as nobody moved a block. Written
- * into the selector, an axis said out loud always wins, whatever the order:
- * `variant="primary" appearance="ghost"` is a ghost in the brand colour, which
- * is the only reading of that markup that is not a guess.
- *
- * `secondary` needs no rule at all, being the resting state. */
-:host([tone="primary"]),
-:host(:not([tone])[variant="primary"]) {
+:host([tone="primary"]) {
   --_button-edge: var(--helix-color-primary);
   --_button-fill: var(--helix-color-primary-surface);
   --_button-fill-hover: var(--helix-color-primary-surface-hover);
@@ -107,9 +87,7 @@
   --_button-tone: var(--helix-color-accent);
   --_button-tone-hover: var(--helix-color-accent-hover);
 }
-
-:host([tone="danger"]),
-:host(:not([tone])[variant="danger"]) {
+:host([tone="danger"]) {
   --_button-edge: var(--helix-color-danger);
   --_button-fill: var(--helix-color-danger-surface);
   --_button-fill-hover: var(--helix-color-danger-surface-hover);
@@ -231,17 +209,12 @@
  * a pointer touches it. Measured on the old `danger`, which had no hover rule:
  * a red button that turned neutral grey under the pointer, in every build since
  * it was written. */
-:host([appearance="solid"]) [part="button"],
-:host(:not([appearance])[variant="primary"]) [part="button"],
-:host(:not([appearance])[variant="danger"]) [part="button"] {
+:host([appearance="solid"]) [part="button"] {
   background-color: var(--button-background-color, var(--_button-fill));
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-on-tone));
 }
-
-:host(:not(:disabled)[appearance="solid"]) [part="button"]:hover,
-:host(:not(:disabled):not([appearance])[variant="primary"]) [part="button"]:hover,
-:host(:not(:disabled):not([appearance])[variant="danger"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="solid"]) [part="button"]:hover {
   background-color: var(--button-background-color, var(--_button-fill-hover));
   border-color: transparent;
 }
@@ -264,9 +237,7 @@
   );
   border-color: transparent;
 }
-
-:host([appearance="ghost"]) [part="button"],
-:host(:not([appearance])[variant="tertiary"]) [part="button"] {
+:host([appearance="ghost"]) [part="button"] {
   background-color: var(--button-background-color, transparent);
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-tone));
@@ -282,8 +253,7 @@
  * where the token was chosen, the step is 1.11 and correct. A translucent mix
  * composites against whatever is behind it, so one value is right on every
  * surface and there is nothing to keep in sync. */
-:host(:not(:disabled)[appearance="ghost"]) [part="button"]:hover,
-:host(:not(:disabled):not([appearance])[variant="tertiary"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="ghost"]) [part="button"]:hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 8%, transparent)
