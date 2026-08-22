@@ -159,19 +159,37 @@ for (const path of stylesheets('helix/web/src')) {
    * `sandbox/toolbar/sandbox-toolbar.css` is `helix-sandbox-toolbar`. */
   const [family, part] = path.split('/').slice(-3, -1)
   const tag = part === 'root' ? `helix-${family}` : `helix-${family}-${part}`
-  const owned = new Set()
+  /* **The host and the slots are two sets, because a document rule reaches one
+     or the other and never both.**
+   *
+   * These were merged, so any rule naming the tag was held against everything
+   * the file declared anywhere. `.workbenchMain helix-sandbox` setting
+   * `block-size` was reported against `sandbox-root.css`, which sets
+   * `block-size` on `::slotted([slot="panel"])` and on the preview: a rule for
+   * the host cannot reach a slotted child, and nothing was dead.
+   *
+   * `reaches` already records what follows the tag. Nothing after it is the
+   * host; anything after it is a descendant, which is what `::slotted` styles. */
+  const host = new Set()
+  const slotted = new Set()
   for (const rule of rules(readFileSync(path, 'utf8'))) {
-    if (!/::slotted\(|:host/.test(rule.selector)) {
+    const into = /::slotted\(/.test(rule.selector)
+      ? slotted
+      : /:host/.test(rule.selector)
+        ? host
+        : null
+    if (!into) {
       continue
     }
     for (const property of declared(rule.body)) {
-      owned.add(property)
+      into.add(property)
     }
   }
   for (const rule of documentRules) {
     if (rule.tag !== tag) {
       continue
     }
+    const owned = rule.rest === '' ? host : slotted
     const dead = [...rule.properties].filter((property) => owned.has(property))
     if (dead.length > 0) {
       problems.push(

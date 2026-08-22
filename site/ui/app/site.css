@@ -2358,10 +2358,6 @@ helix-drawer helix-tree {
   min-inline-size: 0;
 }
 
-.insightNextRow > helix-icon {
-  flex: none;
-}
-
 /* **Columns, not a grid.**
  *
  * A grid pads every row to its tallest cell, so a card with a table in it sets
