@@ -136,10 +136,25 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * chooses, because a reader passing over four options on the way to the fifth
  * did not mean to pick all five.
  *
- * That is also why this does not use `KeyboardNavigationController`, which
- * moves and chooses in one act by design. Half of this component needs that and
- * half needs the opposite, and a flag on the controller would be this paragraph
- * written twice.
+ * **This does not use `KeyboardNavigationController`, and the reason given here
+ * was the wrong one.** It said the controller moves and chooses in one act by
+ * design, so half of this component needed that and half the opposite. The
+ * controller does not work that way: it takes `origin: 'focus' | 'selection'`,
+ * and `focus` exists precisely so a reader can arrow without choosing, which is
+ * what `Tabs` uses in `manual` mode. `focusItem()` and `select()` are separate
+ * members of `NavigableItem`. The incompatibility named above is one the
+ * controller had already solved.
+ *
+ * The real one is where focus lives. `NavigableItem.focusItem()` moves DOM
+ * focus to the item, because the controller's model is a roving tab stop. A
+ * filterable list cannot do that: focus has to stay in the field or typing
+ * stops, so what moves is a virtual cursor and `aria-activedescendant` is what
+ * says where it is. Those two disagree about the one thing neither can
+ * abstract, and no flag reconciles them.
+ *
+ * Worth keeping the distinction sharp, because the old wording invites the
+ * wrong fix: someone reading it would add `origin` to the controller, find it
+ * already there, and conclude this component could adopt it.
  *
  * **Filtering hides rather than removes.** An option the filter has hidden is
  * still the consumer's element in the consumer's order, so a filter that clears
