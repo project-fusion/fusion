@@ -436,14 +436,18 @@ export default function Home() {
           <helix-text as="p" class="measure" tone="muted">
             Tell us what you need built. We will say plainly whether we are the right people for it.
           </helix-text>
+          {/* `/contact` rather than the mail client. The address is still the
+              action and is on that page; what a `mailto:` cannot carry is what
+              to put in the message and what happens after it, which is the part
+              a reader is actually uncertain about. */}
           <a
             data-button="solid"
             data-button-fill="standard"
             data-button-tone="primary"
             data-density="lg"
-            href="mailto:hello@fusion.dev"
+            href="/contact"
           >
-            hello@fusion.dev
+            Start a conversation
           </a>
         </helix-flex>
       </section>

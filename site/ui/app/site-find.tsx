@@ -41,7 +41,10 @@ const DESTINATIONS: Findable[] = [
   },
   {
     group: 'Services',
-    items: [{ href: '/services', label: 'What you can buy today' }],
+    items: [
+      { href: '/services', label: 'What you can buy today' },
+      { href: '/contact', label: 'Contact, and what to put in the first message' },
+    ],
   },
   {
     group: 'Reading',
