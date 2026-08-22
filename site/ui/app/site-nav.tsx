@@ -63,6 +63,59 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [panelDown, setPanelDown] = useState(false)
 
+  /* Whether the bar is still letting the sheet do its painting.
+   *
+   * **Separate from `panelDown`, because the two end at different moments.**
+   * The sheet has to start leaving when the panel does, so `panelDown` clears
+   * on `helix-close`. The bar has to keep its fill off until the sheet has
+   * actually gone, and `helix-close` fires before the panel has moved at all:
+   * cleared there, a scrolled bar took its own `material` back on the first
+   * frame of the collapse and carried it *and* the sheet for the whole of it,
+   * which is the double glass the sheet exists to avoid.
+   *
+   * Only visible when the bar has a fill to take back. At the top of a hero
+   * `appearance="transparent"` is genuinely transparent, so there is nothing to
+   * flash to; scrolled, the same attribute takes the material, and that is the
+   * case this is for. */
+  const [barBare, setBarBare] = useState(false)
+  const glassRef = useRef<HTMLDivElement>(null)
+
+  /* **Whichever comes first: the sheet saying it has gone, or its own duration
+   * elapsing.**
+   *
+   * `transitionend` alone is the precise signal and cannot be the only one. It
+   * is a single event that has to arrive, and every way it fails to arrive
+   * leaves the bar with no fill permanently, which is a worse fault than the
+   * flash this removes: it does not fire under `prefers-reduced-motion`, where
+   * the sheet is given `transition: none`, nor if the element is swapped, nor
+   * if the property never animates. Measured in a browser running no
+   * transitions at all, the event version left the bar bare for good.
+   *
+   * A timer alone is robust and imprecise, since it can only ever be as good as
+   * the duration it is given and a throttled one fires late.
+   *
+   * So both, and the first to land wins. The duration is read off the sheet's
+   * own computed style rather than written down again, so reduced motion
+   * resolves to zero and clears on the spot, and the worst a wrong reading can
+   * do is restore the fill a little early or late rather than never. */
+  useEffect(() => {
+    if (panelDown) {
+      setBarBare(true)
+      return
+    }
+    const glass = glassRef.current
+    if (!glass) {
+      setBarBare(false)
+      return
+    }
+    const style = getComputedStyle(glass)
+    const seconds = (property: string) =>
+      Math.max(0, ...property.split(',').map((value) => Number.parseFloat(value) || 0))
+    const wait = (seconds(style.transitionDuration) + seconds(style.transitionDelay)) * 1000
+    const timer = setTimeout(() => setBarBare(false), wait)
+    return () => clearTimeout(timer)
+  }, [panelDown])
+
   /* How far down the glass reaches while a panel is open.
    *
    * **One filter, not two, and this is what it costs.** `backdrop-filter` is
@@ -157,6 +210,17 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
       <div
         className="navGlass"
         data-open={panelDown ? '' : undefined}
+        /* The precise half of the pair. `opacity` only, because this also
+           transitions `clip-path` and `visibility` and would otherwise report
+           one departure three times. Guarded on `panelDown` for a reopen part
+           way through, where the interrupted fade still ends and must not strip
+           a bar that is bare again on purpose. */
+        onTransitionEnd={(event) => {
+          if (event.propertyName === 'opacity' && !panelDown) {
+            setBarBare(false)
+          }
+        }}
+        ref={glassRef}
         style={{ blockSize: `${glassSize}px` }}
       />
 
@@ -165,7 +229,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
         data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
         sticky
         style={
-          panelDown
+          barBare
             ? { '--app-header-backdrop': 'none', '--app-header-background': 'transparent' }
             : undefined
         }
