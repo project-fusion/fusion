@@ -1167,7 +1167,8 @@ helix-code-block .tok-operator {
   position: sticky;
 }
 
-/* The way back to the component index, on the branch that holds them.
+/* The way out of a rail and into the docs: the component index from the
+ * sidebar's parent row, and a family's own page from the sandbox's.
  *
  * **Hover and focus-within, not hover alone.** A control revealed only by a
  * pointer is one a keyboard reader never finds, and this is a link in a
@@ -1181,7 +1182,7 @@ helix-code-block .tok-operator {
  *
  * Not `visibility: hidden`, which takes it out of the accessibility tree and
  * would hide from a screen reader a link that is genuinely there. */
-.docsNavUp {
+.docsJump {
   align-items: center;
   block-size: 1.5rem;
   border-radius: var(--helix-radii-sm);
@@ -1218,8 +1219,8 @@ helix-code-block .tok-operator {
  * There is nothing to key on the row anyway now that the mark is present at
  * rest: the row-hover step existed to create the control, and what is left is
  * a pointer on the target saying so. Fewer rules and no collision. */
-.docsNavUp:hover,
-.docsNavUp:focus-visible {
+.docsJump:hover,
+.docsJump:focus-visible {
   background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-primary);
 }
@@ -1227,7 +1228,7 @@ helix-code-block .tok-operator {
 /* Named one selector at a time, for the reason `check:motion` exists: a reduce
    rule written looser than the rule it answers loses on specificity. */
 @media (prefers-reduced-motion: reduce) {
-  .docsNavUp {
+  .docsJump {
     transition: none;
   }
 }

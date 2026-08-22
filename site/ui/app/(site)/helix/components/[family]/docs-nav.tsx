@@ -119,7 +119,7 @@ export function DocsNav({ active, entries }: { active: string; entries: readonly
               cannot reach, and this is a link in a navigation. */}
           <a
             aria-label="All components"
-            className="docsNavUp"
+            className="docsJump"
             href="/helix"
             slot="end"
             title="All components"

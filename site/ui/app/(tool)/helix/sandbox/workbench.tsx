@@ -902,6 +902,25 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           >
             {shown.map((entry) => (
               <helix-tree-item key={entry.slug} value={entry.slug}>
+                {/* Out of the workbench and into the family's own page, which is
+                    the reading the rail could not otherwise reach: the sandbox
+                    shows what a component does and the docs page says what it
+                    is, and there was no way from the first to the second.
+
+                    On the row that names the family rather than on an example,
+                    because a docs page is about the family. Pressing it must
+                    not open the branch, which is what a press anywhere else in
+                    this row does, and `Tree.Item` asks whether the press landed
+                    on a link before it toggles. */}
+                <a
+                  aria-label={`${entry.label} documentation`}
+                  className="docsJump"
+                  href={`/helix/components/${entry.slug}`}
+                  slot="end"
+                  title={`${entry.label} documentation`}
+                >
+                  <helix-icon name="book-open-text" />
+                </a>
                 {/* Everything here is experimental, and saying so on each row is the
               honest form of that: a badge on the page a reader has already
               opened tells them after they chose it. */}
