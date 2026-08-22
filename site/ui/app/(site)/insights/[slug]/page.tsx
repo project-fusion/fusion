@@ -144,7 +144,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </Link>
         </helix-flex>
 
-        <helix-flex direction="column" gap="none">
+        {/* A hair of space between the rows now that no line divides them. Not
+            more: these are one list, and a gap wide enough to read as a break
+            would make three lists of them. */}
+        <helix-flex direction="column" gap="2xs">
           {others.map((other) => (
             <Link className="insightNext" href={`/insights/${other.slug}`} key={other.slug}>
               <helix-flex align="center" class="insightNextRow" gap="md" justify="between">

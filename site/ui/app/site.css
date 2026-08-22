@@ -608,24 +608,18 @@ helix-drawer {
  * the grid below it and the only thing marking the band was the filter bar's
  * hairline: a heading, a search box and no edge until 448 pixels down.
  *
- * **A different token per mode, because the neutral ramp is not symmetric.**
- * `surface` alone measures a 1.18 step from the page in dark and 1.04 in light,
- * which on white is five values out of 255 and reads as nothing: the ask was a
- * subtle band and light mode got no band at all. The cause is the ramp, where
- * `neutral-50` sits five off `neutral-0` while `neutral-900` sits twenty-four
- * off `neutral-1000`. Queued as 145 rather than fixed here, since moving
- * `surface` moves every card and panel in the library.
+ * **One token in both modes, after a pass at two.** This paired
+ * `surface-sunken` in light with `surface` in dark, on the reasoning that the
+ * neutral ramp is not symmetric and each mode should take whichever token is
+ * genuinely one step off its own page. The measurements were right and the band
+ * was still too heavy: `surface-sunken` is thirteen values off white across 448
+ * pixels of a hero, which is a grey panel rather than a step. `surface` is five,
+ * and the band is a change in the paper rather than a block on it.
  *
- * So each mode takes the token that is actually one step off its own page:
- * 1.12 and 1.18, matched and both quiet. `light-dark()` is the idiom the ramp
- * itself is built from and `--site-lattice` already uses, and it follows
- * `data-color-mode` because that sets `color-scheme`.
- *
- * A foreground mix was tried first, the way `[data-button]` washes itself, and
- * measured wrong: mixing 4% of white into black in oklab lands on rgb(0,0,0),
- * still black at 8 bits, and 8% reaches rgb(2,2,2). That recipe works because
- * it mixes toward *transparent* and composites over whatever is behind it. Mix
- * into an opaque black and there is nothing to composite with.
+ * Which also retires a workaround. Pairing two tokens through `light-dark()` to
+ * compensate for the ramp is the thing 145 says should not spread, and this was
+ * one of the two places doing it. One token, no compensation, and the ramp's
+ * asymmetry stays 145's problem rather than becoming this rule's.
  *
  * The bar above it needs no rule at all. `/insights` is already in `onHero`, so
  * the masthead is `transparent` at rest, and the hero's negative start margin
@@ -633,7 +627,7 @@ helix-drawer {
  * which the rule above calls out as the thing that stops being invisible the
  * day the hero takes a colour of its own. This is that day. */
 .insightsHero {
-  background-color: light-dark(var(--helix-color-surface-sunken), var(--helix-color-surface));
+  background-color: var(--helix-color-surface);
 }
 
 .designHero {
@@ -1991,14 +1985,33 @@ helix-drawer helix-tree {
   --divider-length: 1em;
 }
 
-/* A row that is a link, ruled from the next one. Cards were tried here and are
-   wrong at the foot of an article: three boxes after a column of prose read as
-   a different page starting, where rows read as the same page continuing. */
+/* A row that is a link. Cards were tried here and are wrong at the foot of an
+   article: three boxes after a column of prose read as a different page
+   starting, where rows read as the same page continuing.
+ *
+ * **The rules are gone, because the hover wash was already doing their job.**
+ * Every row carried a hairline above it *and* a fill on hover, which is two
+ * separators for one boundary: the wash says where a row begins and ends more
+ * exactly than a line between them does, and it says it on the row the reader
+ * is actually pointing at. The one divider that stays is the one above the
+ * whole section, which separates the list from the article rather than the rows
+ * from each other. That one is a real boundary and nothing else marks it.
+ *
+ * **Inset, and pulled back by the same amount.** The wash had no inline padding
+ * at all, so it opened flush against the words and read as a stripe behind the
+ * text rather than as a row containing it. The padding gives it room and the
+ * negative margin puts the text back on the article's own measure, so nothing
+ * moves when the fill appears and the column of prose above still lines up with
+ * the titles below. Same construction the back step uses.
+ *
+ * The radius comes with the inset: a fill with corners is an object, and a fill
+ * that runs to both edges of the page is a band. These are objects. */
 .insightNext {
-  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
   color: inherit;
   display: block;
-  padding-block: var(--helix-space-lg);
+  margin-inline: calc(var(--helix-space-md) * -1);
+  padding: var(--helix-space-lg) var(--helix-space-md);
   text-decoration: none;
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
