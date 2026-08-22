@@ -240,29 +240,28 @@ helix-app-header {
   --app-header-max-inline-size: none;
 }
 
-/* A scrolled bar has to stop the page, and 72% does not.
+/* A scrolled bar has to stop the page being *read*, not stop it being seen.
  *
- * `--helix-material-translucent` is the library's glass, and it is right for
- * what it was drawn for: a popover, a sheet, a command palette, all of which
- * sit briefly over content that is holding still. A sticky masthead is the
- * opposite case. Content runs under it for the whole session, and 28% of
- * high-contrast text is legible even blurred: what a reader sees is words
- * sliding behind the bar, which is the thing the component's own note says
- * cannot happen, that "the content still stops at the bar because it cannot be
- * read through it".
+ * The first attempt at this raised the fill to 88%, which does stop the text
+ * and also stops the glass: at that point the bar is a solid strip that happens
+ * to be a fraction translucent, and the whole character of the thing is gone.
+ * Opacity is the wrong instrument. It works by hiding what is behind, and the
+ * entire idea of glass is that what is behind stays visible.
  *
- * Raised through the hook the component publishes, and only on this site for
- * now. The same reasoning probably belongs in `AppHeader` itself, since it is
- * about what a sticky bar is rather than about this page, but that moves the
- * glass on every consumer and this is a change that has to be looked at rather
- * than measured.
+ * Blur is the instrument. It keeps the colour, the movement and the shape of
+ * what passes under the bar, and destroys only the part that was the problem,
+ * which is that the shapes resolved into words. `--helix-material-blur-md` is
+ * 16, which the library picks for a popover: something that sits briefly over
+ * content holding still. A masthead has content running under it for the whole
+ * session, so it takes the `lg` step at 32.
+ *
+ * The fill is left at the component's own default. It was never the fault.
  *
  * Selected on `data-scrolled`, which the component reflects, so the unscrolled
- * bar is untouched. The panel's own override is an inline style and still wins
- * over this, which is what keeps the sheet doing the painting while a megamenu
- * is down. */
+ * bar is untouched. The panel's override is an inline style and still wins over
+ * this, which keeps the sheet doing the painting while a megamenu is down. */
 helix-app-header[data-scrolled] {
-  --app-header-background: color-mix(in oklab, var(--helix-color-background) 88%, transparent);
+  --app-header-backdrop: blur(var(--helix-material-blur-lg));
 }
 
 /* Every drawer here runs under that header. A drawer is `position: fixed` with
