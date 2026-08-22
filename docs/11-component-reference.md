@@ -912,7 +912,6 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `appearance` | `appearance` | `'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 | `checked` | `checked` | `boolean` | - | `MixinControllerChecked` | Whether the control is checked. |
 | `defaultChecked` | `default-checked` | `boolean` | `false` | `MixinControllerChecked` | Initial checked state for uncontrolled use, where nothing declared one. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -924,7 +923,6 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseCheckbox` | Focus is delegated to the input, so the host is never the focus target. |
 | `value` | `value` | `string` | `'on'` | `HelixBaseCheckbox` | Value submitted when the box is checked. |
 
@@ -991,7 +989,6 @@ line per answer rather than hunting along a row.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `boxes` | - | `HelixBaseCheckbox[]` | - | `HelixBaseCheckboxGroup` | The boxes, in light-DOM order. Client only: the server has no tree. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -1003,7 +1000,6 @@ line per answer rather than hunting along a row.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `orientation` | `orientation` | `'horizontal' \| undefined` | - | - | Which way the boxes run. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `value` | `value` | `string` | `''` | `HelixBaseCheckboxGroup` | The checked values, comma separated. |
 
 #### Methods
@@ -1144,7 +1140,6 @@ pads its own lower rows.
 | `appearance` | `appearance` | `'swatch' \| undefined` | - | `HelixBaseColorInput` | Whether the field is a text box with a swatch on it, or only the swatch. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -1159,7 +1154,6 @@ pads its own lower rows.
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'#000000'` | `HelixBaseColorInput` | What the field says before a color is in it. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `swatches` | `swatches` | `string` | `''` | `HelixBaseColorInput` | Colors offered under the picker, as a comma-separated list. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a color'` | `HelixBaseColorInput` | Accessible name for the control that opens the panel. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -1343,7 +1337,6 @@ Input, Color Input and Date Input all take.
 | `createLabel` | `create-label` | `string` | `'Add'` | `HelixBaseCombobox` | What the create row says, before the words it would add. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixBaseCombobox` | Words shown where the filter has hidden everything. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
@@ -1363,7 +1356,6 @@ Input, Color Input and Date Input all take.
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseCombobox` | Text shown while nothing has been chosen. |
 | `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseCombobox` | What a tag's remove control is called, since the mark has no name. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `suggest` | `suggest` | `boolean` | `false` | `HelixBaseCombobox` | Whether the field finishes the word as it is typed. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
@@ -1580,7 +1572,6 @@ whatever holds it.
 | `dateStyle` | `date-style` | `'full' \| 'iso' \| 'long' \| 'medium' \| 'short'` | `'long'` | `HelixBaseDateInput` | How a date is written in the field: `short` through `full`, or ISO. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseDateInput` | Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. |
 | `disableDays` | `disable-days` | `string` | `''` | `HelixBaseDateInput` | Days of the week that cannot be chosen, `0` for Sunday through `6`. |
@@ -1602,7 +1593,6 @@ whatever holds it.
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'YYYY-MM-DD'` | `HelixBaseDateInput` | What the field says before a date is in it. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a date'` | `HelixBaseDateInput` | Accessible name for the control that opens the calendar. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
@@ -2074,7 +2064,6 @@ lines up with the edge the eye is already following down the list.
 | --- | --- | --- | --- | --- | --- |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether the row can be reached at all. |
 | `focusable` | - | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether this row holds the region's tab stop. Written by the stack. |
-| `isDrilldownItem` | - | `boolean` | `true` | `HelixBaseDrilldownItem` | Marks this as a row a stack should count. Cheaper than an instanceof. |
 | `onPage` | - | `boolean` | `true` | `HelixBaseDrilldownItem` | Whether the page showing is the one this row is on. Written by the stack. |
 | `showingPage` | - | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether this row's own page is the one showing. Written by the stack. |
 | `value` | `value` | `string` | `''` | `HelixBaseDrilldownItem` | Identifies the row to whatever is listening. |
@@ -2175,7 +2164,6 @@ invisible.
 | --- | --- | --- | --- | --- | --- |
 | `accept` | `accept` | `string` | `''` | `HelixBaseFileInput` | Which files the picker offers, as a native `accept` list. |
 | `capture` | `capture` | `'environment' \| 'user' \| undefined` | - | `HelixBaseFileInput` | Which camera or microphone a mobile picker should offer, if any. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `files` | - | `File[]` | - | `HelixBaseFileInput` | The files chosen, which is the element's own and never assigned. |
@@ -2190,7 +2178,6 @@ invisible.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseFileInput` | What the control removing one file is called, per file. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose files'` | `HelixBaseFileInput` | What the trigger reads, where nothing is slotted into it. |
 
 #### Methods
@@ -2492,7 +2479,6 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `clearable` | `clearable` | `boolean` | `false` | `HelixBaseInput` | Whether the field offers a button that empties it. |
 | `clearLabel` | `clear-label` | `string` | `'Clear'` | `HelixBaseInput` | What the clear button is called, since an icon has no name of its own. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -2508,7 +2494,6 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `reveal` | `reveal` | `boolean` | `false` | `HelixBaseInput` | Whether a password field offers a toggle that shows what was typed. |
 | `revealLabel` | `reveal-label` | `string` | `'Show password'` | `HelixBaseInput` | What the reveal toggle is called. The state is `aria-pressed`, not this. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseInput` | Focus is delegated to the input, so the host is never the focus target. |
@@ -2798,7 +2783,6 @@ list moves under the reader rather than the reader moving to find it.
 | --- | --- | --- | --- | --- | --- |
 | `defaultFilter` | `default-filter` | `string` | `''` | `HelixBaseListbox` | What to start narrowed to, where nothing declared it. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
@@ -2817,7 +2801,6 @@ list moves under the reader rather than the reader moving to find it.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `options` | - | `HelixBaseOption[]` | - | `HelixBaseListbox` | Every option, in the order a reader meets them. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseListbox` | Focusing the host focuses the list inside it. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `values` | - | `string[]` | - | `HelixBaseListbox` | The chosen values, which is a list whether or not `multiple` is set. |
@@ -3069,7 +3052,6 @@ than as a ragged list.
 | `download` | `download` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the link saves the file rather than opening it. |
 | `hasSubmenu` | - | `boolean` | - | `HelixBaseMenuItem` | Whether anything was slotted into `submenu`. |
 | `href` | `href` | `string` | `''` | `HelixBaseMenuItem` | Where the row goes, which makes it a real link. |
-| `isMenuItem` | - | `boolean` | `true` | `HelixBaseMenuItem` | Marks this as a row a menu should count. Cheaper than an instanceof. |
 | `onPage` | - | `boolean` | `true` | `HelixBaseMenuItem` | Whether this row is on the page currently showing. |
 | `rel` | `rel` | `string` | `''` | `HelixBaseMenuItem` | The relationship, which `target="_blank"` should always set. |
 | `selected` | - | `boolean` | - | `HelixBaseMenuItem` | Whether this is the row the set is on, which in a menu is where focus is. |
@@ -3258,7 +3240,6 @@ three times as long to cross.
 | --- | --- | --- | --- | --- | --- |
 | `decrementLabel` | `decrement-label` | `string` | `'Decrease'` | `HelixBaseNumberInput` | Accessible name for the control that steps down. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -3275,7 +3256,6 @@ three times as long to cross.
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseNumberInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseNumberInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `scrub` | `scrub` | `boolean` | `false` | `HelixBaseNumberInput` | Whether a grip is shown that changes the value when it is dragged. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseNumberInput` | Focus is delegated to the field, so the host is never the focus target. |
 | `step` | `step` | `number` | `1` | `HelixBaseNumberInput` | How far one step moves. |
@@ -3633,7 +3613,6 @@ breathe as a code is typed into it.
 | --- | --- | --- | --- | --- | --- |
 | `cellLabel` | `cell-label` | `string` | `'Character {index} of {length}'` | `HelixBasePinInput` | Accessible name for one box, with `{index}` and `{length}` filled in. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -3648,7 +3627,6 @@ breathe as a code is typed into it.
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBasePinInput` | What an empty box shows, usually a single dot. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBasePinInput` | Whether the boxes refuse input while still submitting their value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBasePinInput` | Focus is delegated, so the host is never the focus target. |
 | `type` | `type` | `PinType` | `'numeric'` | `HelixBasePinInput` | What a box accepts, which decides the keyboard a phone offers. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -3977,7 +3955,6 @@ group keeps its question above the row rather than beside the first choice.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -3990,7 +3967,6 @@ group keeps its question above the row rather than beside the first choice.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseRadioGroup` | Which way the choices run. A column reads one line per answer. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
@@ -4048,7 +4024,6 @@ Everything about what the score is and how it is chosen is the base class.
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'dots' \| 'marks' \| undefined` | - | - | Which mark the row is drawn with. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -4061,7 +4036,6 @@ Everything about what the score is and how it is chosen is the base class.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `readOnly` | `readonly` | `boolean` | `false` | `HelixBaseRating` | Whether this shows a score rather than asks for one. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `score` | - | `number` | - | `HelixBaseRating` | The score, as a number, clamped to what the marks can show. |
 | `showValue` | `show-value` | `boolean` | `false` | `HelixBaseRating` | Whether the score is written out beside the marks. |
 | `step` | `step` | `number` | `1` | `HelixBaseRating` | The smallest part of a mark that can be chosen. |
@@ -4527,7 +4501,6 @@ from the field it came out of.
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixBaseSelect` | What it says where there are none. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
@@ -4545,7 +4518,6 @@ from the field it came out of.
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'Choose'` | `HelixBaseSelect` | Shown on the trigger while nothing is chosen. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
@@ -4655,7 +4627,6 @@ the thumb being dragged.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -4672,7 +4643,6 @@ the thumb being dragged.
 | `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseSlider` | Which way the track runs, `vertical` standing it on end. |
 | `range` | `range` | `boolean` | `false` | `HelixBaseSlider` | Whether there are two thumbs and the value is a pair. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseSlider` | Focus is delegated to the control, so the host is never the target. |
 | `showValue` | `show-value` | `boolean` | `false` | `HelixBaseSlider` | Whether the chosen value is shown beside the track. |
 | `step` | `step` | `number` | `1` | `HelixBaseSlider` | How far one press of an arrow key moves it. |
@@ -4860,7 +4830,6 @@ over. Everything about choosing it is the base class.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseSpeedDialItem` | Whether the action can be chosen. |
-| `isSpeedDialItem` | - | `boolean` | `true` | `HelixBaseSpeedDialItem` | Tells the dial its own rows apart from anything else slotted in. |
 | `selected` | - | `boolean` | - | `HelixBaseSpeedDialItem` | Whether this is the row the set is on, which here is where focus is. |
 | `value` | `value` | `string` | `''` | `HelixBaseSpeedDialItem` | What this action stands for, carried in the event when it is chosen. |
 
@@ -5195,7 +5164,6 @@ consumer has to keep.
 | --- | --- | --- | --- | --- | --- |
 | `checked` | `checked` | `boolean` | - | `MixinControllerChecked` | Whether the control is checked. |
 | `defaultChecked` | `default-checked` | `boolean` | `false` | `MixinControllerChecked` | Initial checked state for uncontrolled use, where nothing declared one. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -5206,7 +5174,6 @@ consumer has to keep.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `value` | `value` | `string` | `'on'` | `HelixBaseSwitch` | Value submitted when the switch is on. |
 
 #### Methods
@@ -5332,7 +5299,6 @@ table.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `isTableColumn` | - | `boolean` | `true` | `HelixBaseTableColumn` | Marks this as a column a table should count. Cheaper than an instanceof. |
 | `track` | - | `string` | - | `HelixBaseTableColumn` | The track this column contributes, resolved. |
 | `width` | `width` | `string` | `''` | `HelixBaseTableColumn` | The track this column takes, as CSS. |
 
@@ -5625,7 +5591,6 @@ dragged wider than the form holding it is a field that breaks the layout.
 | --- | --- | --- | --- | --- | --- |
 | `autoGrow` | `auto-grow` | `boolean` | `false` | `HelixBaseTextarea` | Whether the box follows its own content rather than scrolling. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -5640,7 +5605,6 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseTextarea` | Shown while the field is empty. Not a label: it goes when typing starts. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseTextarea` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `rows` | `rows` | `number` | `3` | `HelixBaseTextarea` | How many lines the box is before anything is typed. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseTextarea` | Focus is delegated to the control, so the host is never the target. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -5700,7 +5664,6 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `appearance` | `appearance` | `'list' \| 'wheels' \| undefined` | - | `HelixBaseTimeInput` | Whether the panel is one list of times or a column each. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -5718,7 +5681,6 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'HH:mm'` | `HelixBaseTimeInput` | What the field says before a time is in it. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `step` | `step` | `number` | `15` | `HelixBaseTimeInput` | How far apart the offered times are, in minutes. |
 | `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixBaseTimeInput` | Whether the field writes the time out, or holds the value as it is. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a time'` | `HelixBaseTimeInput` | Accessible name for the control that opens the list. |
@@ -6111,7 +6073,6 @@ corner radius, which is worse than the exception.
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'filled' \| 'plain' \| undefined` | - | - | How much chrome the group carries around its items. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -6123,7 +6084,6 @@ corner radius, which is worse than the exception.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
@@ -6469,7 +6429,6 @@ the row itself stays flat.
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `focusable` | - | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item holds the tree's single tab stop. |
 | `href` | `href` | `string` | `''` | `HelixBaseTreeItem` | Where this node goes, which makes its row a real link. |
-| `isBranch` | - | `boolean` | - | `HelixBaseTreeItem` | Whether this node has children. |
 | `level` | `level` | `number \| undefined` | - | `HelixBaseTreeItem` | Depth from the root, set by the tree so indentation needs no CSS nesting. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `rel` | `rel` | `string` | `''` | `HelixBaseTreeItem` | What the link declares about where it goes. |

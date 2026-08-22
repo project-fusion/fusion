@@ -19,6 +19,29 @@
   padding: var(--helix-space-lg);
 }
 
+/* A channel slider: the track is the value rather than a measure of it, which
+   is the same call `ColorPicker` makes on its hue and alpha channels. A filled
+   half would be a second reading of something the ramp already says. */
+.themeChannel[label="Saturation"] {
+  --slider-track-image: var(--theme-saturation-ramp);
+}
+
+.themeChannel[label="Accent angle"] {
+  --slider-track-image: var(--theme-accent-ramp);
+}
+
+/* A channel slider: the track is the value rather than a measure of it, which
+   is the same call `ColorPicker` makes on its own hue and alpha channels, and
+   through the same hook. A filled half would be a second reading of something
+   the ramp already says. */
+.themeChannel[label="Saturation"] {
+  --slider-track-image: var(--theme-saturation-ramp);
+}
+
+.themeChannel[label="Accent angle"] {
+  --slider-track-image: var(--theme-accent-ramp);
+}
+
 /* The stage is `helix-sandbox` and nothing else: the component owns the split,
    the panel, the toolbar row and the separators. */
 .themeStage {

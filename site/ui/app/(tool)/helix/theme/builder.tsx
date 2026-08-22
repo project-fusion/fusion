@@ -95,6 +95,27 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
      lines of colour math rather than a request. `violations` is the whole
      product, so it has to be as live as the swatches are. */
   const theme = useMemo(() => deriveTheme(intent), [intent])
+
+  /* **The ramps are inline, because a stylesheet cannot know the brand.** Both
+     are written in OKLCH off the derived primary so the track and the palette
+     agree: a saturation ramp drawn in sRGB would promise a colour the engine
+     never produces. */
+  const channelRamps = useMemo((): React.CSSProperties => {
+    const primary = theme.tokens.find((token) => token.name === 'color-primary')?.value
+    if (!primary) {
+      return {}
+    }
+    const { chroma, hue, lightness } = primary
+    const wheel = Array.from(
+      { length: 13 },
+      (_, step) => `oklch(${lightness} ${chroma} ${(hue + step * 30) % 360})`,
+    ).join(', ')
+
+    return {
+      '--theme-accent-ramp': `linear-gradient(to right, ${wheel})`,
+      '--theme-saturation-ramp': `linear-gradient(to right, oklch(${lightness} 0 ${hue}), oklch(${lightness} ${chroma} ${hue}))`,
+    } as React.CSSProperties
+  }, [theme])
   const css = useMemo(() => toCss(theme, SCOPE), [theme])
 
   /* **Injected rather than applied per property.** A `<style>` carrying the
@@ -144,7 +165,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
           of that was going to be rebuilt here badly. What it does not carry is
           file tabs, because a theme has one artifact and not four. */}
       <helix-splitter className="workbenchBody" default-position={24}>
-        <section className="themeControls" slot="start">
+        <section className="themeControls" slot="start" style={channelRamps}>
           <helix-flex direction="column" gap="lg">
             <helix-flex direction="column" gap="xs">
               <helix-flex align="center" gap="sm" justify="between">
@@ -192,7 +213,19 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               <helix-option value="7">7, WCAG AAA</helix-option>
             </helix-select>
 
+            {/* **Painted through `--slider-track-image`, the hook Slider already
+                publishes for exactly this.** `ColorPicker` paints its own hue
+                and alpha channels the same way and is itself built out of
+                `helix-slider`, so a colour channel is a slider with a ramp on it
+                rather than a component of its own: it adds no behaviour, no
+                state and no API, which is the test for whether something earns
+                an element.
+
+                The ramp is the value it chooses. Saturation runs from grey to
+                the brand at full chroma, both ends at the brand's own lightness
+                and hue, so the track shows what the slider will produce. */}
             <helix-slider
+              className="themeChannel"
               label="Saturation"
               max={100}
               min={0}
@@ -203,7 +236,10 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               value={String(chromaScale)}
             ></helix-slider>
 
+            {/* The whole wheel, starting at the brand, so a reader is choosing
+                a direction off their own colour and not an abstract number. */}
             <helix-slider
+              className="themeChannel"
               label="Accent angle"
               max={360}
               min={0}
