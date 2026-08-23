@@ -850,8 +850,7 @@ helix-drawer helix-tree {
       animation-range: entry 10% entry 90%;
       animation-timeline: view();
     }
-  
-}
+  }
 }
 
 /* Cross-route transitions. The header and its indicator persist while the
