@@ -146,11 +146,27 @@ const primitives = new Map(
   ),
 )
 
-/** One category, as the markdown table a Foundations page carries. */
-const table = (category) => {
-  const rows = registry.tokens.filter((token) => token.category === category)
+/**
+ * One category or named group, as the markdown table a page carries.
+ *
+ * A group is resolved first, because the two the registry has are the two the
+ * prose refers to by name: the surface ladder is a sequence and the separation
+ * policy spans two categories, and neither is a thing a category or a prefix
+ * can select.
+ */
+const table = (name) => {
+  const group = registry.groups[name]
+  const rows = group
+    ? group.map((token) => {
+        const found = registry.tokens.find((entry) => entry.name === `--helix-${token}`)
+        if (!found) {
+          throw new Error(`the ${name} group names --helix-${token}, which is not a token`)
+        }
+        return found
+      })
+    : registry.tokens.filter((token) => token.category === name)
   if (rows.length === 0) {
-    throw new Error(`tokens:${category} names a category the registry does not have`)
+    throw new Error(`tokens:${name} names neither a category nor a group the registry has`)
   }
   /* A third column when the category is described, and none when it is not.
      Half a column is a table with holes in it, and the registry's own rule is
@@ -212,8 +228,18 @@ for (const slug of slugs) {
   const onDisk = readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8')
 
   /* Filled before anything else reads it, so the em dash rule, the childless
-     component rule and the inlined sources all see the page a reader will. */
-  const source = filled(onDisk)
+     component rule and the inlined sources all see the page a reader will.
+     
+     A marker naming something the registry does not have throws, and a throw
+     out of here is a stack trace where every other problem in this script is a
+     sentence. Caught and reported like the rest of them. */
+  let source = onDisk
+  try {
+    source = filled(onDisk)
+  } catch (error) {
+    fail(slug, error instanceof Error ? error.message : String(error))
+    continue
+  }
   if (source !== onDisk) {
     refilled.push(slug)
   }
