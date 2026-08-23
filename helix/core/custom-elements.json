@@ -660,6 +660,16 @@
             },
             {
               "kind": "field",
+              "name": "here",
+              "type": {
+                "text": "Row | null"
+              },
+              "privacy": "private",
+              "description": "The row whose page is showing, once the tree has been asked about it.\n\n**A held reference can outlive the row it names, and the walk alone does\nnot catch it.** Removing the row a reader is *on* works: its\n`parentElement` is null and the walk stops. Removing one of its\n*ancestors* does not, because the subtree comes away intact, so the child\nstill has a parent and the parent still has a parent. Measured on a\nthree-level menu with the middle page removed: `depth` answered 2, `rows`\nlisted a page nobody could see, and `back()` walked to a second detached\nrow before reaching the top.\n\nThat is the disagreement with the tree the walk exists to prevent, so the\nquestion is asked here, once, and every reader below goes through it.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "page",
               "type": {
                 "text": "Row | null"
