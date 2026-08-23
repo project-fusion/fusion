@@ -209,33 +209,20 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-/**
- * A string as the formatter would write one.
- *
- * Single quotes per `biome.json`, except where the value contains one and no
- * double quote: the formatter switches quotes rather than escaping, because the
- * result is shorter and easier to read. Emitting the escaped form instead is a
- * file that fails `biome ci` the moment a description contains an apostrophe,
- * which the twelfth page was the first to do.
- */
-const quoted = (value) => {
-  if (value.includes("'") && !value.includes('"')) {
-    return `"${value.replace(/\\/g, '\\\\')}"`
-  }
-  return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
-}
+/** A string literal. The formatter decides which quote it ends up in. */
+const quoted = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 
 /** A page, as the source lines that reproduce it. */
 const literal = (page) =>
   [
     '  {',
-    raw('description', quoted(page.description)),
+    `    description: ${quoted(page.description)},`,
     page.order === undefined ? undefined : `    order: ${page.order},`,
-    page.parent === undefined ? undefined : raw('parent', quoted(page.parent)),
+    page.parent === undefined ? undefined : `    parent: ${quoted(page.parent)},`,
     page.pinned ? '    pinned: true,' : undefined,
-    raw('section', quoted(page.section)),
-    raw('slug', quoted(page.slug)),
-    raw('title', quoted(page.title)),
+    `    section: ${quoted(page.section)},`,
+    `    slug: ${quoted(page.slug)},`,
+    `    title: ${quoted(page.title)},`,
     '  },',
   ]
     .filter((line) => line !== undefined)
@@ -255,7 +242,7 @@ ${pages.map(literal).join('\n')}
 
 if (check) {
   const existing = readFileSync(OUT, 'utf8')
-  if (existing !== generated) {
+  if (existing !== formatted(generated, 'pages.generated.ts')) {
     console.error('docs: pages.generated.ts is stale. Run `bun run docs`')
     process.exit(1)
   }
@@ -263,6 +250,6 @@ if (check) {
     `docs: ${pages.length} pages across ${sections.length} sections, every one derived from its own frontmatter`,
   )
 } else {
-  writeFileSync(OUT, generated)
+  writeFileSync(OUT, formatted(generated, 'pages.generated.ts'))
   console.log(`docs: wrote ${pages.length} pages across ${sections.length} sections`)
 }
