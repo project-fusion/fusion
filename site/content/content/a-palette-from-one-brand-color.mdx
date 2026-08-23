@@ -1,0 +1,45 @@
+---
+description: A spreadsheet of hexes is a set of decisions nobody can check. Deriving the palette makes contrast a property of the system rather than a review step.
+kicker: Insights
+kind: Essay
+path: /insights/a-palette-from-one-brand-color
+title: A palette from one brand color
+topic: Design
+---
+
+Most design systems ship a palette as a spreadsheet: eleven steps of grey,
+eleven of the brand, a handful of status colors, each one a hex somebody picked
+and nobody can check. The file is authoritative because it is the file, not
+because anything about it is true.
+
+The problem is not that the numbers are wrong. It is that there is no procedure
+by which they could be found wrong. A contrast failure in step 400 against step
+50 is discovered by a person running an audit, at which point the fix is a new
+hex, which is another number nobody can check. Accessibility becomes a review
+step that happens after the design, and review steps get skipped under deadline.
+
+## Deriving instead
+
+Helix takes one brand color and computes the rest. Every step is a
+transformation in a perceptual color space, so lightness means the same thing at
+every hue, and the contrast between any two steps is a consequence of how far
+apart they are rather than a coincidence somebody has to verify.
+
+What that buys is not a prettier palette. It is that the palette cannot drift. A
+designer who wants a warmer brand changes one value and the whole system moves
+with it, still accessible, because accessibility was never a property of the
+individual hexes. It was a property of the derivation.
+
+The second thing it buys is smaller and matters more day to day: there is
+nothing to choose. A component asks for `--helix-color-foreground-muted` and
+gets the right value in light mode, dark mode, and against whatever brand the
+consumer set. Consistency stops being a thing the team maintains and becomes a
+thing the system cannot avoid.
+
+## The cost
+
+Derivation is worse than hand-picking at exactly one job, which is hitting a
+specific color a brand guideline names. If your brand book says the disabled
+state is this grey and no other, a derived system will fight you. We think that
+trade is correct for a design system and would not be correct for a brand
+identity, which is a different artifact with a different purpose.

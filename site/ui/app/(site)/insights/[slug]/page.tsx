@@ -1,8 +1,9 @@
+import { sitePageSources } from '@fusion-io/site-content'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { findInsight, formatDate, INSIGHTS } from '../../../../lib/insights'
-import { BODIES } from '../../../../lib/insights/bodies'
+import { renderMdx } from '../../../../lib/mdx'
 import styles from '../insights.module.css'
 import { PublishedOn, ReadingProgress } from './reading'
 
@@ -47,9 +48,9 @@ export async function generateMetadata({
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const insight = findInsight(slug)
-  const Body = insight ? BODIES[insight.slug] : undefined
+  const source = insight ? sitePageSources[insight.slug] : undefined
 
-  if (!insight || !Body) {
+  if (!insight || !source) {
     notFound()
   }
 
@@ -145,7 +146,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       {/* `data-prose` because this is the one place on the site rendering prose
           the design system did not lay out. */}
       <article className={styles.insightBody} data-prose>
-        <Body />
+        {await renderMdx(source)}
       </article>
 
       <helix-flex class="insightMore" direction="column" gap="lg">

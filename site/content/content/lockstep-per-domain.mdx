@@ -1,0 +1,45 @@
+---
+description: Full-repo lockstep would publish a Cortex fix as a new version of the Helix docs. Per-domain keeps the only property that matters.
+kicker: Insights
+kind: Decision
+path: /insights/lockstep-per-domain
+title: Lockstep versioning, one domain at a time
+topic: Engineering
+---
+
+Every package inside a domain shares one version. Domains move independently.
+Helix goes to 1.4.0 as a set; Cortex is on whatever number Cortex is on.
+
+The obvious alternative is full-repo lockstep, one version for everything, which
+is simpler to explain and simpler to automate. It is wrong here for a specific
+reason: the docs packages carry the version of the thing they document.
+Publishing a Cortex fix under full-repo lockstep would bump `@helix-io/docs` to
+a version in which nothing about Helix changed, and a reader landing on those
+docs would be reading a version number that describes an unrelated repair to an
+unrelated product.
+
+Per-domain keeps the property that actually matters, which is that
+`@helix-io/headless@x` works with `@helix-io/web@x`. That is the guarantee a
+consumer needs. Everything else about the numbering is bookkeeping.
+
+## The version lives in the tag
+
+Every manifest in the repository holds `0.0.0-dev`. The release stamps the real
+number in CI seconds before packing, and never commits it back.
+
+Committing it back would require a bot whose push access outranks branch
+protection, in order to record something `git tag` already holds. The tag is the
+record. `helix-v1.4.0` means a release that promoted, and `helix-attempt-v1.4.0`
+means a number that was spent and did not, so version computation reads both. A
+failed release burns a number rather than poisoning the next one.
+
+## The split that has not happened yet
+
+The Rust workspace holds only Cortex crates today, which means
+`[workspace.package] version` is the Cortex version by accident of there being
+nothing else in it. The day Helix gains a Rust crate, that has to split, or the
+two domains are silently back in full lockstep with nothing reporting it.
+
+Writing this down is most of the mitigation. A constraint that holds because of
+a current absence is not a constraint, it is a coincidence, and coincidences do
+not survive the commit that ends them.

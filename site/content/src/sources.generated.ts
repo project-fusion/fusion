@@ -4,6 +4,291 @@
  * module and they disagree.
  */
 export const sitePageSources: Record<string, string> = {
+  'a-palette-from-one-brand-color': `---
+description: A spreadsheet of hexes is a set of decisions nobody can check. Deriving the palette makes contrast a property of the system rather than a review step.
+kicker: Insights
+kind: Essay
+path: /insights/a-palette-from-one-brand-color
+title: A palette from one brand color
+topic: Design
+---
+
+Most design systems ship a palette as a spreadsheet: eleven steps of grey,
+eleven of the brand, a handful of status colors, each one a hex somebody picked
+and nobody can check. The file is authoritative because it is the file, not
+because anything about it is true.
+
+The problem is not that the numbers are wrong. It is that there is no procedure
+by which they could be found wrong. A contrast failure in step 400 against step
+50 is discovered by a person running an audit, at which point the fix is a new
+hex, which is another number nobody can check. Accessibility becomes a review
+step that happens after the design, and review steps get skipped under deadline.
+
+## Deriving instead
+
+Helix takes one brand color and computes the rest. Every step is a
+transformation in a perceptual color space, so lightness means the same thing at
+every hue, and the contrast between any two steps is a consequence of how far
+apart they are rather than a coincidence somebody has to verify.
+
+What that buys is not a prettier palette. It is that the palette cannot drift. A
+designer who wants a warmer brand changes one value and the whole system moves
+with it, still accessible, because accessibility was never a property of the
+individual hexes. It was a property of the derivation.
+
+The second thing it buys is smaller and matters more day to day: there is
+nothing to choose. A component asks for \`--helix-color-foreground-muted\` and
+gets the right value in light mode, dark mode, and against whatever brand the
+consumer set. Consistency stops being a thing the team maintains and becomes a
+thing the system cannot avoid.
+
+## The cost
+
+Derivation is worse than hand-picking at exactly one job, which is hitting a
+specific color a brand guideline names. If your brand book says the disabled
+state is this grey and no other, a derived system will fight you. We think that
+trade is correct for a design system and would not be correct for a brand
+identity, which is a different artifact with a different purpose.
+`,
+  'helix-ships-as-one-open-tier': `---
+description: No pro components and no paywalled API surface. The architectural reason is stronger than the economic one.
+kicker: Insights
+kind: Decision
+path: /insights/helix-ships-as-one-open-tier
+title: Helix ships as one open tier
+topic: Design
+---
+
+Decided 18 August 2026. Helix ships as one open tier: no pro components, no
+paywalled API surface, no enterprise build with three extra things in it.
+
+The economic argument for a paid tier is real and we are not pretending
+otherwise. The free-versus-pro component libraries monetize the two or three
+components a team cannot afford to build, sold across a distribution base large
+enough that a low conversion rate is still real money. Helix has neither the
+components nor the base, and acquiring both is a different company than this
+one.
+
+## The architectural reason is stronger
+
+Under cheap generation, a design system's value is being the constraint that
+generated interface code converges on. One vocabulary of names, tokens, and
+types, legible to whatever is writing against it. That mechanism is the whole
+asset.
+
+A paywalled component is a component those agents do not know about. Split the
+API surface and you have not created a revenue line with a small cost attached:
+you have damaged the thing that makes the system worth adopting at all. The
+generated code routes around the paid components, badly, using the free ones,
+and the output is worse than if the paid ones had never existed.
+
+There is a version of this that only bites at scale, and it is worth being
+precise about why we think it bites immediately. An agent writing against a
+partial vocabulary does not report that the vocabulary is partial. It produces
+something plausible from what it has. The failure is silent, it looks like the
+system being merely mediocre, and by the time anyone traces it back to the tier
+split the adoption decision is already made.
+
+## Where payment lives
+
+In the engagement. Helix is the credential that makes a design system sprint
+sellable, and the sprint is the thing with a price on it. That keeps the
+incentive pointed the right way: we are paid for applying the system, so making
+the system easier to apply is aligned with revenue rather than opposed to it.
+
+Open core is not ruled out forever. It is ruled out for Helix, and kept for a
+later product whose paid layer is not its API surface.
+`,
+  'lockstep-per-domain': `---
+description: Full-repo lockstep would publish a Cortex fix as a new version of the Helix docs. Per-domain keeps the only property that matters.
+kicker: Insights
+kind: Decision
+path: /insights/lockstep-per-domain
+title: Lockstep versioning, one domain at a time
+topic: Engineering
+---
+
+Every package inside a domain shares one version. Domains move independently.
+Helix goes to 1.4.0 as a set; Cortex is on whatever number Cortex is on.
+
+The obvious alternative is full-repo lockstep, one version for everything, which
+is simpler to explain and simpler to automate. It is wrong here for a specific
+reason: the docs packages carry the version of the thing they document.
+Publishing a Cortex fix under full-repo lockstep would bump \`@helix-io/docs\` to
+a version in which nothing about Helix changed, and a reader landing on those
+docs would be reading a version number that describes an unrelated repair to an
+unrelated product.
+
+Per-domain keeps the property that actually matters, which is that
+\`@helix-io/headless@x\` works with \`@helix-io/web@x\`. That is the guarantee a
+consumer needs. Everything else about the numbering is bookkeeping.
+
+## The version lives in the tag
+
+Every manifest in the repository holds \`0.0.0-dev\`. The release stamps the real
+number in CI seconds before packing, and never commits it back.
+
+Committing it back would require a bot whose push access outranks branch
+protection, in order to record something \`git tag\` already holds. The tag is the
+record. \`helix-v1.4.0\` means a release that promoted, and \`helix-attempt-v1.4.0\`
+means a number that was spent and did not, so version computation reads both. A
+failed release burns a number rather than poisoning the next one.
+
+## The split that has not happened yet
+
+The Rust workspace holds only Cortex crates today, which means
+\`[workspace.package] version\` is the Cortex version by accident of there being
+nothing else in it. The day Helix gains a Rust crate, that has to split, or the
+two domains are silently back in full lockstep with nothing reporting it.
+
+Writing this down is most of the mitigation. A constraint that holds because of
+a current absence is not a constraint, it is a coincidence, and coincidences do
+not survive the commit that ends them.
+`,
+  'sovereignty-at-every-scale': `---
+description: Cheap intelligence and cheap energy are arriving together. That pairing is what moves sovereignty from a principle you agree with to a thing you can run.
+kicker: Insights
+kind: Essay
+path: /insights/sovereignty-at-every-scale
+title: Sovereignty at every scale
+topic: Sovereignty
+---
+
+Two things forced a person to depend on an institution: the cost of thinking at
+scale and the cost of power. Both are falling, fast, at the same time. That is
+the whole thesis, and everything else we do is downstream of it.
+
+Neither halving is interesting alone. Cheap intelligence without cheap energy is
+a rented capability that runs in somebody else's building. Cheap energy without
+cheap intelligence is a lower utility bill. Together they are the first moment
+where the full stack a person or an organization needs in order to not depend on
+anyone can actually be owned and run.
+
+## The ladder
+
+The same argument runs at three scales, and it is the same stack each time.
+
+**Personal.** Your own keys, your own data, your own hardware. The model runs
+where you put it and the memory it accumulates is a file you hold. Nothing about
+your working life is recoverable by a company that changes its pricing.
+
+**Organizational.** The same properties, with more people and an audit trail. A
+company that cannot be held hostage by a vendor's roadmap, because the substrate
+is one it runs and the data is one it holds.
+
+**National.** The same properties again, with the stakes that follow from a
+country's capability living on infrastructure it does not control. This rung is
+a written thesis and not a product, and we say so.
+
+## What we are actually building
+
+Two substrates, and neither is a product you buy. Helix is the design system,
+the DNA every interface is built from. Cortex is memory and provenance, what a
+system knows and where it learned it. Products build on top of them.
+
+The reason to start at the substrate rather than at a product is that the
+sovereignty property has to be true all the way down. A sovereign application on
+a rented substrate is not sovereign, it is a nicely worded dependency. Building
+the bottom first is slower and it is the only order that produces the thing we
+said we would produce.
+
+We are one person, and the stages on this site say exactly where each piece is.
+That is not modesty. It is the same honesty the constraint demands, applied to
+ourselves.
+`,
+  'stage-labels-are-honest': `---
+description: Active ships with users. Building is real work with nothing shipped. Declared is committed direction with no work started. Why we refuse to soften them.
+kicker: Insights
+kind: Note
+path: /insights/stage-labels-are-honest
+title: Stage labels are honest
+topic: Business
+---
+
+Three labels, and they mean what they say.
+
+**Active** ships with users. **Building** is real work with nothing shipped.
+**Declared** is committed direction with no work started.
+
+Most of what we have is Building. Two of the four verticals are Declared, which
+means there is a thesis and a name and no code. Both of those appear on the site
+anyway, with the label on them, because a roadmap that shows only the parts
+going well is a brochure.
+
+## The pressure to soften
+
+The instinct while pre-launch is to blur this. Call Declared something like
+Exploring, call Building something like Early access, and the map suddenly reads
+as a company with four things in flight rather than two things being built and
+two things written down.
+
+We are not going to, and the reason is not principle for its own sake. Our
+entire pitch is that a user can trust what we hand them and can leave whenever
+they want. A company that will not tell you which of its products exist has
+already answered the question about whether it will tell you anything else.
+
+Visible honesty about maturity is a product demonstration. It costs a little
+credibility with someone skimming for momentum and buys the only kind of
+credibility that matters with someone deciding whether to depend on us.
+
+## What it does to the roadmap
+
+The useful side effect is internal. A stage label that cannot be softened is a
+label that has to be earned, so moving something from Building to Active is a
+real event with a real precondition rather than a decision made in a planning
+document. It puts a floor under what shipping means.
+`,
+  'the-sovereignty-constraint': `---
+description: No Fusion product may create a dependency its user cannot exit. One sentence, and it forecloses most of the business models available to us.
+kicker: Insights
+kind: Essay
+path: /insights/the-sovereignty-constraint
+title: The Sovereignty Constraint
+topic: Sovereignty
+---
+
+> No Fusion product may create a dependency its user cannot exit. The user holds their own keys, data, and hardware. Fusion may operate a control plane, never a chokepoint.
+
+That is the whole rule. It is short because it has to be usable during an
+argument about a feature, and it is a law rather than a value because values
+lose to quarterly pressure and laws do not.
+
+## The test
+
+Every proposal gets one question: *what happens to the user if Fusion shuts down
+tomorrow?* If the answer is that they lose the thing, it is not a Fusion
+product. Not a risky Fusion product, not a Fusion product with a migration path
+on the roadmap. Not one.
+
+The test is deliberately brutal because the failure mode it guards against is
+gradual. Very few companies decide to build a chokepoint. They build a
+convenience, then a second convenience that assumes the first, and four years
+later the export button produces a file nothing can read. Each step was
+reasonable. The test is what makes the first step visible.
+
+## What it forecloses
+
+This is expensive and we should say what it costs rather than presenting it as
+free principle. The constraint rules out lock-in, data moats, and usage rent.
+Those are not marginal business models, they are most of the good ones in
+software.
+
+What is left, and what we have actually committed to: services now, which is the
+only thing that pays this year. A hosted control plane later, sold as
+convenience and never as dependency. Hardware margin eventually, which is the
+one model fully native to sovereignty, because you sell it and they own it.
+
+A control plane is allowed and a chokepoint is not, and the line between them is
+exactly the exit test. If our control plane goes dark and your system keeps
+running on your hardware with your keys, it was a control plane. If it goes dark
+and you are stopped, it was never the thing we said it was.
+
+## Why write it down
+
+Because a constraint that lives in someone's head is a preference. Written down,
+with a test attached, it survives the meeting where it is inconvenient, which is
+the only meeting where it does any work.
+`,
   thesis: `---
 description: Sovereignty at every scale, and the mechanism that makes it practical.
 kicker: Thesis

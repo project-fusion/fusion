@@ -38,7 +38,16 @@ export interface SitePage {
   title: string
 }
 
-/** Every page whose prose lives in this package. */
+/**
+ * The pages of the site whose prose lives here.
+ *
+ * **The six essays are not in this list, and their sources are.** Their
+ * metadata already has a home in `site/ui/lib/insights`, which carries what a
+ * card needs and crosses into the client bundle so the gallery can filter;
+ * repeating a title here would be a second copy of it. What this package owns
+ * for an essay is the words, which is what `sitePageSources` is keyed by slug
+ * for.
+ */
 export const sitePages: SitePage[] = [
   {
     description: 'Sovereignty at every scale, and the mechanism that makes it practical.',

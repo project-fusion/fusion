@@ -162,8 +162,7 @@ for (const page of docPages) {
  * stale parallel site the whole arrangement exists to prevent. */
 const { routes } = await import('../../site/ui/lib/routes.ts')
 const { renderCopy, copyFor } = await import('../../site/ui/lib/copy-markdown.ts')
-const { insightMarkdown } = await import('../../site/ui/lib/insight-markdown.ts')
-const { INSIGHTS } = await import('../../site/ui/lib/insights/index.ts')
+const { findSitePage, sitePageSources } = await import('../../site/content/src/index.ts')
 let prose = 0
 
 for (const route of routes()) {
@@ -173,37 +172,15 @@ for (const route of routes()) {
   const file = route.path === '/' ? 'index.md' : `${route.path.slice(1)}.md`
   mkdirSync(dirname(join(PUBLIC, file)), { recursive: true })
 
-  /* An insight is an essay, so its document is the essay rather than a summary
-     of one. The body is a React component and this is a serialization of what
-     it actually renders, which is why there is no second copy to keep in step:
-     the page and the `.md` come out of one render path. */
-  if (route.kind === 'insight') {
-    const post = INSIGHTS.find((entry) => `/insights/${entry.slug}` === route.path)
-    const essay = post && insightMarkdown(post.slug)
-    if (post && essay) {
-      writeFileSync(
-        join(PUBLIC, file),
-        [
-          '---',
-          `title: ${post.title}`,
-          `description: ${post.summary}`,
-          `path: ${route.path}`,
-          `topic: ${post.topic}`,
-          `kind: ${post.kind}`,
-          'source: the essay component this page also renders',
-          '---',
-          '',
-          `# ${post.title}`,
-          '',
-          post.summary,
-          '',
-          essay,
-          '',
-        ].join('\n'),
-      )
-      prose += 1
-      continue
-    }
+  /* A page whose prose is MDX serves the file. Nothing is rendered, nothing is
+     serialized, and there is no second copy to keep in step: the document a
+     reader gets is the document the writer wrote. */
+  const slug = route.path.split('/').at(-1) ?? ''
+  const written = findSitePage(route.path) ?? (sitePageSources[slug] ? { slug } : undefined)
+  if (written) {
+    writeFileSync(join(PUBLIC, file), sitePageSources[written.slug] ?? '')
+    prose += 1
+    continue
   }
 
   const copy = copyFor(route.path)

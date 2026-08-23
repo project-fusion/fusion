@@ -1,0 +1,48 @@
+---
+description: No pro components and no paywalled API surface. The architectural reason is stronger than the economic one.
+kicker: Insights
+kind: Decision
+path: /insights/helix-ships-as-one-open-tier
+title: Helix ships as one open tier
+topic: Design
+---
+
+Decided 18 August 2026. Helix ships as one open tier: no pro components, no
+paywalled API surface, no enterprise build with three extra things in it.
+
+The economic argument for a paid tier is real and we are not pretending
+otherwise. The free-versus-pro component libraries monetize the two or three
+components a team cannot afford to build, sold across a distribution base large
+enough that a low conversion rate is still real money. Helix has neither the
+components nor the base, and acquiring both is a different company than this
+one.
+
+## The architectural reason is stronger
+
+Under cheap generation, a design system's value is being the constraint that
+generated interface code converges on. One vocabulary of names, tokens, and
+types, legible to whatever is writing against it. That mechanism is the whole
+asset.
+
+A paywalled component is a component those agents do not know about. Split the
+API surface and you have not created a revenue line with a small cost attached:
+you have damaged the thing that makes the system worth adopting at all. The
+generated code routes around the paid components, badly, using the free ones,
+and the output is worse than if the paid ones had never existed.
+
+There is a version of this that only bites at scale, and it is worth being
+precise about why we think it bites immediately. An agent writing against a
+partial vocabulary does not report that the vocabulary is partial. It produces
+something plausible from what it has. The failure is silent, it looks like the
+system being merely mediocre, and by the time anyone traces it back to the tier
+split the adoption decision is already made.
+
+## Where payment lives
+
+In the engagement. Helix is the credential that makes a design system sprint
+sellable, and the sprint is the thing with a price on it. That keeps the
+incentive pointed the right way: we are paid for applying the system, so making
+the system easier to apply is aligned with revenue rather than opposed to it.
+
+Open core is not ruled out forever. It is ruled out for Helix, and kept for a
+later product whose paid layer is not its API surface.
