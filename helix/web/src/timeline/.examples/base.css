@@ -89,6 +89,30 @@ helix-base-timeline-item::part(connector) {
   min-block-size: 0.75rem;
 }
 
+/* The mark's box, and it needs one because two different things go in it.
+   An entry that slots nothing gets the component's own dot; one that slots an
+   icon gets that instead, and with no rule here the span was inline, so the
+   dot came out 0.75rem and the icons came out at the text's own size and sat
+   on its baseline. A fixed square that centres whatever it holds is what makes
+   the four marks line up on one rail. */
+helix-base-timeline-item::part(marker) {
+  align-items: center;
+  block-size: 0.75rem;
+  display: flex;
+  flex: none;
+  inline-size: 0.75rem;
+  justify-content: center;
+}
+
+/* A slotted mark fills that square rather than following the type around it.
+   `helix-base-icon` is sized in `em` further up, which is the right default
+   for an icon beside words and the wrong one for a mark on a rail. */
+helix-base-timeline-item > [slot="marker"],
+helix-base-timeline-item > [slot="marker"]::part(svg) {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
 helix-base-timeline-item::part(time) {
   color: var(--_gray-muted);
   font-size: 0.875em;
