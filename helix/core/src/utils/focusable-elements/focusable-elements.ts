@@ -28,13 +28,26 @@ const NATIVE_FOCUSABLE = [
  * exactly that, so the `offsetParent` test excluded every control in the thing
  * being trapped.
  */
-export const focusableElements = (root: HTMLElement): HTMLElement[] => {
-  const native = [...root.querySelectorAll<HTMLElement>(NATIVE_FOCUSABLE)]
-  const delegating = [...root.querySelectorAll<HTMLElement>('*')].filter(
-    (node) => node.shadowRoot?.delegatesFocus === true,
+export const focusableElements = (root: HTMLElement): HTMLElement[] =>
+  /* One pass asking both questions, rather than two passes concatenated.
+   *
+   * Two lists joined end to end is not document order, and this said "in
+   * document order" while returning every native element followed by every
+   * delegating host: measured, `b d a c` for a tree holding `a b c d`. The
+   * trap reads `items[0]` and `items.at(-1)` as its boundaries, so a surface
+   * whose last control is a plain `<button>` and whose first is a Helix
+   * component had a last that was not last, and forward Tab off the real end
+   * did not wrap. Focus left the dialog.
+   *
+   * It is invisible in a set that is all one kind, which is what every example
+   * and every spec had. A single filtered walk cannot express the fault, and
+   * dedup comes free with it: a delegating host that also matches the native
+   * selector is visited once because it is one node. */
+  [...root.querySelectorAll<HTMLElement>('*')].filter(
+    (node) =>
+      (node.matches(NATIVE_FOCUSABLE) || node.shadowRoot?.delegatesFocus === true) &&
+      node.getClientRects().length > 0,
   )
-  return [...new Set([...native, ...delegating])].filter((node) => node.getClientRects().length > 0)
-}
 
 /**
  * The truly focused element, following shadow roots down.
