@@ -33,7 +33,8 @@ export const docPages: DocPage[] = [
     title: 'Composition',
   },
   {
-    description: 'Real form participation, labels that resolve across a shadow root, and the disabled trap.',
+    description:
+      'Real form participation, labels that resolve across a shadow root, and the disabled trap.',
     section: 'Essentials',
     slug: 'forms',
     title: 'Forms and validation',

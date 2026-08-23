@@ -195,17 +195,31 @@ if (problems.length > 0) {
  */
 const quoted = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 
+/**
+ * A `key: value` line, broken the way the formatter would break it.
+ *
+ * `biome.json` sets a line width of 100, and a long description pushes past it.
+ * The generated file is checked by `biome ci`, so a line this script writes one
+ * way and the formatter would write another fails `bun run check` and
+ * `bun run verify` together. Matching the break here is cheaper than teaching
+ * either side to tolerate the other.
+ */
+const field = (key, value) => {
+  const single = `    ${key}: ${value},`
+  return single.length <= 100 ? single : `    ${key}:\n      ${value},`
+}
+
 /** A page, as the source lines that reproduce it. */
 const literal = (page) =>
   [
     '  {',
-    `    description: ${quoted(page.description)},`,
+    field('description', quoted(page.description)),
     page.order === undefined ? undefined : `    order: ${page.order},`,
-    page.parent === undefined ? undefined : `    parent: ${quoted(page.parent)},`,
+    page.parent === undefined ? undefined : field('parent', quoted(page.parent)),
     page.pinned ? '    pinned: true,' : undefined,
-    `    section: ${quoted(page.section)},`,
-    `    slug: ${quoted(page.slug)},`,
-    `    title: ${quoted(page.title)},`,
+    field('section', quoted(page.section)),
+    field('slug', quoted(page.slug)),
+    field('title', quoted(page.title)),
     '  },',
   ]
     .filter((line) => line !== undefined)
