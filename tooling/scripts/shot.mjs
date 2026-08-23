@@ -88,7 +88,7 @@ if (target === undefined || target.startsWith('--')) {
       '  --scheme <light|dark>\n' +
       '  --full              the whole scrollable page\n' +
       '  --out <name.png>    default is built from the path\n' +
-      '  --wait <ms>         extra settling time after load (default 400)\n' +
+      '  --wait <ms>         settling time before --eval and before the shot (default 400)\n' +
       '  --frame <substring> resolve everything against the iframe whose URL contains this\n' +
       '  --click <css>       click it before shooting, to open what is closed\n' +
       '  --hover <css>       hover it before shooting\n' +
@@ -196,6 +196,22 @@ try {
       await page.keyboard.press(key)
     }
   }
+  /* Settle before measuring, and again before shooting.
+   *
+   * **`--eval` used to run on the frame the interaction landed**, so anything
+   * reading a transitioned property read the value it was transitioning away
+   * from. It cost three consecutive readings of one fix: a button whose hover
+   * fill had just been repaired measured at its resting colour twice, which
+   * reads as a change that did nothing. The same ordering would have made a
+   * broken fix look fine, which is the worse direction.
+   *
+   * So the wait is taken here as well. The flag reads as "settle the page
+   * before you look at it", and an `--eval` that measures is looking at it. The
+   * second wait below stays, because a script may click, type or mutate, and
+   * the photograph needs the same settling the measurement did. */
+  const settle = () => page.waitForTimeout(Number(flag('wait', '400')))
+  await settle()
+
   const script = flag('eval')
   if (script !== undefined) {
     /* An expression first, then the same text as a function body.
@@ -224,7 +240,7 @@ try {
     }
   }
 
-  await page.waitForTimeout(Number(flag('wait', '400')))
+  await settle()
 
   const file = join(out, name)
   if (select !== undefined) {
