@@ -491,9 +491,27 @@ helix-app-header {
   }
 }
 
+/* Opacity alone, and the missing `translateY` is the point.
+ *
+ * The incoming content slid up into place from `--helix-space-sm` below, which
+ * on a full-bleed region uncovers a strip at its top edge for as long as the
+ * slide lasts. Nothing is behind `main` but the document ground, so the strip
+ * paints pure white, and the header above it is translucent glass, so the
+ * white shows *through* the header rather than below it: it reads as a hairline
+ * framing the masthead rather than as content arriving.
+ *
+ * Measured by freezing the transition's animations at a chosen progress rather
+ * than by catching a frame: at 30% the top three rows were `255,255,255` where
+ * both pages settle at `251,253,255`, and dropping the transform alone removed
+ * them. Holding the outgoing snapshot at full opacity did not, because the
+ * page underneath is white there too.
+ *
+ * No amount of translation is safe here, only less visible: any offset on a
+ * region that starts at the top of the viewport uncovers one of its edges. The
+ * fade carries the change on its own, and the sections beneath already have
+ * their scroll-driven reveal. */
 @keyframes site-fade-in {
   from {
     opacity: 0;
-    transform: translateY(var(--helix-space-sm));
   }
 }

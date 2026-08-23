@@ -1,4 +1,4 @@
-import { type CSSResultOrNative, css, LitElement } from 'lit'
+import { type CSSResultOrNative, css, LitElement, type PropertyValues } from 'lit'
 import { type StaticValue, unsafeStatic } from 'lit/static-html.js'
 import { helixEventNames } from '../events/events.js'
 
@@ -52,6 +52,54 @@ const BOX_SIZING = css`
 const HIDDEN = css`
   :host([hidden]:not([hidden='until-found'])) {
     display: none;
+  }
+`
+
+/**
+ * Stops a component animating its own arrival.
+ *
+ * A shadow root's stylesheets are adopted when the element upgrades, which is
+ * after the element has already had a computed style. So the first resolution
+ * that sees a component's own sheet is a *change*, from whatever the property's
+ * initial value is to whatever the sheet says, and any `transition` the sheet
+ * declares on that property runs against it. Nothing was interacted with and
+ * nothing changed state: the component is animating the fact that its CSS
+ * arrived.
+ *
+ * It shows wherever the initial value and the resting value differ visibly, and
+ * `border-color` is the worst case, because its initial value is `currentColor`.
+ * App Header reserves its border box and paints it `transparent` by default, so
+ * on every load and every cross-document navigation it faded a one pixel
+ * `currentColor` hairline out over `--helix-duration-normal`: near-black in
+ * light mode, which reads as an intentional rule under the bar, and near-white
+ * in dark mode, which reads as a bright sliver under the masthead. Measured on
+ * the landing page with nothing touched and no pointer in the window, two
+ * families ran five such transitions: App Header's bottom border and all four
+ * of Card's.
+ *
+ * Here rather than in those two sheets, for the reason `box-sizing` and
+ * `hidden` are here. It is a fact about every component that declares a
+ * transition, the count of those grows, and a sheet cannot see the problem: the
+ * rule that is wrong is the one that looks most ordinary.
+ *
+ * **`!important`, because specificity cannot be relied on.** A component's own
+ * transition can be declared on `:host` (0,1,0) or on a part under a host
+ * condition (0,3,0), and this rule has to beat both without knowing which. From
+ * inside the shadow tree it is also the only weight that outranks a consumer's
+ * document rule, which would otherwise re-introduce the flash from outside.
+ *
+ * The attribute is set a frame after the first update rather than in
+ * `firstUpdated`, and that is the whole mechanism rather than a detail. Lit's
+ * upgrade, render and `firstUpdated` all run in one microtask checkpoint, so an
+ * attribute set there lands in the same style resolution as the adopted sheets
+ * and the transition runs anyway. A frame later, the resting value has already
+ * been resolved with transitions off, so enabling them changes nothing and
+ * there is nothing left to animate.
+ */
+const SETTLED = css`
+  :host(:not([data-settled])),
+  :host(:not([data-settled])) * {
+    transition: none !important;
   }
 `
 
@@ -401,6 +449,22 @@ export class HelixElement extends LitElement {
   protected static override finalizeStyles(
     styles?: CSSResultOrNative | CSSResultOrNative[],
   ): CSSResultOrNative[] {
-    return [BOX_SIZING, HIDDEN, ...LitElement.finalizeStyles(styles)]
+    return [BOX_SIZING, HIDDEN, SETTLED, ...LitElement.finalizeStyles(styles)]
+  }
+
+  /**
+   * Marks the component's first style resolution as done, so `SETTLED` stops
+   * suppressing transitions.
+   *
+   * A frame later, not now: see `SETTLED` for why `firstUpdated` itself is too
+   * early. SSR never calls this, which is correct, because the attribute
+   * describes something that happened in a browser and the server has no frame
+   * to wait for.
+   */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    requestAnimationFrame(() => {
+      this.setAttribute('data-settled', '')
+    })
   }
 }
