@@ -34,14 +34,28 @@
    * margin would have doubled that and made the punctuation worse. */
   background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
   border-radius: var(--helix-radii-sm);
-  /* The prose's own ink, one step quieter, and not a syntax colour.
+  /* The prose's own ink, pulled back towards it, and not a syntax colour.
    *
    * It was `syntax-name`, which is blue: a fragment of code inside a sentence
    * is one word of that sentence, and a coloured word in running text reads as
-   * a link. Nothing here is being highlighted either, so borrowing a highlighter
-   * colour was saying a thing that is not true. The fill and the face already
-   * say it is code; the ink only has to stay readable. */
-  color: var(--helix-color-foreground-muted);
+   * a link. Nothing here is being highlighted either, so borrowing a
+   * highlighter colour was saying a thing that is not true. The fill and the
+   * face already say it is code, so the ink only has to be read.
+   *
+   * **It was `foreground-muted` alone and that was too far back.** Measured
+   * against the chip it sits on, 5.27 in light and 7.42 in dark, where the
+   * prose beside it runs at 21. Quieter than its sentence is right; a third of
+   * it is a word the reader has to lean into, and the two modes disagreeing by
+   * two points meant the light one was the worse of them.
+   *
+   * The ramp has nothing between `muted` and the full ink, so this is the two
+   * of them mixed: 30% measures 9.98 light and 10.20 dark, which is the same
+   * word on both grounds and still visibly a step down from the prose. */
+  color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 30%,
+    var(--helix-color-foreground-muted)
+  );
   font-family: var(--helix-font-mono);
   /* A hook defaulting to a semantic token, which `check:tokens` is right to
      insist on. The first draft was `0.9em` so the fragment tracked whatever

@@ -120,7 +120,7 @@ export interface Product {
  * count tidy would be softening them by omission, which is the one thing the
  * stage labels exist to prevent.
  *
- * Cortex carries one destination and Helix carries three, and the asymmetry is
+ * Cortex carries one destination and Helix carries four, and the asymmetry is
  * the honest reporting rather than a gap to fill. Engram, Trace and Recall are
  * named in `CLAUDE.md` and none of them is built, so none of them is a row
  * here. The day one is, it is a row.
@@ -139,20 +139,27 @@ export const PRODUCTS: Product[] = [
          masthead would be the last place still pointing at the old front page
          the day the order changes.
 
-         **`Docs` rather than `Guides`, and Components is not a row here.**
-         Both were one change. Components had its own row because the docs
-         sidebar had no Components section, so the panel was the only place the
-         two halves of the documentation met, and `Guides` was the honest name
-         for a destination that reached only the prose half. The sidebar carries
-         both now, which makes this one destination and makes `Docs` true of it:
-         a reader lands in the prose and every component is a branch away.
+         **`Docs` rather than `Guides`.** It was `Guides` while the docs sidebar
+         had no Components section and the destination reached only the prose
+         half. The sidebar carries both now, so the name can be the true one.
 
-         What is left in this column are three things that are genuinely
-         different to open, rather than three views of the documentation. */
+         **Components keeps a row of its own, beside it rather than inside it.**
+         It was removed when the sidebar learned to carry both, on the reasoning
+         that one navigation should be one destination. That is a fact about the
+         sidebar and not about what a reader arrives wanting: an alphabetical
+         list of every family is the single most asked-for thing here, and
+         putting it one level down behind a word that does not say "components"
+         makes a reader hunt for the thing they came for. A panel is for the
+         destinations people want, not for a tidy model of the routes. */
       {
         href: '/helix/docs',
-        summary: 'Install it, theme it, every component, and the ideas underneath.',
+        summary: 'Install it, theme it, and the ideas underneath.',
         title: 'Docs',
+      },
+      {
+        href: '/helix',
+        summary: 'Every family, with its API and a live example.',
+        title: 'Components',
       },
       {
         href: '/helix/sandbox',
