@@ -168,7 +168,7 @@ export const contentArt: Record<string, ReactNode> = {
     <>
       <g className="artMotion artLift">
         <path
-          className="artOn artStroke"
+          className="artStroke"
           d="M138 92l-12 8 12 8"
           fill="none"
           strokeLinecap="round"
@@ -183,7 +183,7 @@ export const contentArt: Record<string, ReactNode> = {
           strokeWidth="2.5"
         />
         <path
-          className="artOn artStroke"
+          className="artStroke"
           d="M182 92l12 8-12 8"
           fill="none"
           strokeLinecap="round"
@@ -456,14 +456,19 @@ export const contentArt: Record<string, ReactNode> = {
    */
   'line-chart': (
     <>
-      <path
-        className="artStroke"
-        d="M64 128L108 104L152 116L196 76L240 88"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeOpacity="0.55"
-        strokeWidth="2.5"
-      />
+      {/* Only the leading line answers the pointer. The whole drawing used to,
+          which moved the baseline and the second series with it and read as the
+          chart sliding rather than as a reading changing. */}
+      <g className="artMotion artLift">
+        <path
+          className="artStroke"
+          d="M64 128L108 104L152 116L196 76L240 88"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeOpacity="0.55"
+          strokeWidth="2.5"
+        />
+      </g>
       <path
         className="artStroke"
         d="M64 92L108 118L152 100L196 126L240 118"
@@ -748,7 +753,9 @@ export const contentArt: Record<string, ReactNode> = {
         strokeOpacity="0.55"
         strokeWidth="2.5"
       />
-      <circle className="artSolid" cx="240" cy="72" r="5" />
+      {/* The terminus presses, and the line does not move. A sparkline is one
+          line, so swelling the body was swelling the only thing on the card. */}
+      <circle className="artSolid artMotion artOn" cx="240" cy="72" r="5" />
     </>
   ),
 
@@ -924,18 +931,17 @@ export const contentArt: Record<string, ReactNode> = {
    */
   trend: (
     <>
-      <path className="artInk" d="M58 60l-7.5 7.5L52 69l6-6 6 6 1.5-1.5z" fillOpacity="0.55" />
-      <rect className="artInk" fillOpacity="0.55" height="14" rx="1" width="2" x="57" y="64" />
+      {/* One reading rather than two. Two of them said "here are two trends";
+          the component says which way a number went, and an arrow that turns
+          says that. */}
+      <g className="artMotion artTurn">
+        <path className="artInk" d="M58 60l-7.5 7.5L52 69l6-6 6 6 1.5-1.5z" fillOpacity="0.55" />
+        <rect className="artInk" fillOpacity="0.55" height="14" rx="1" width="2" x="57" y="64" />
+      </g>
       <rect className="artInk" fillOpacity="0.55" height="12" rx="6" width="64" x="76" y="64" />
       <rect className="artInk" fillOpacity="0.12" height="6" rx="3" width="88" x="76" y="84" />
-
-      <path className="artInk" d="M58 128l-7.5-7.5L52 119l6 6 6-6 1.5 1.5z" fillOpacity="0.55" />
-      <rect className="artInk" fillOpacity="0.55" height="14" rx="1" width="2" x="57" y="110" />
-      <rect className="artInk" fillOpacity="0.55" height="12" rx="6" width="64" x="76" y="112" />
-      <rect className="artInk" fillOpacity="0.12" height="6" rx="3" width="72" x="76" y="132" />
     </>
   ),
-
   video: (
     <>
       <rect className="artInk" fillOpacity="0.12" height="128" rx="4" width="208" x="56" y="36" />

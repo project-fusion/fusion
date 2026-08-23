@@ -308,7 +308,7 @@ export const formsArt: Record<string, ReactNode> = {
       <g className="artMotion artLift">
         <rect className="artEdge" fill="none" height="40" rx="5" width="40" x="140" y="80" />
         <rect className="artEdge" fill="none" height="20" rx="3" width="16" x="152" y="90" />
-        <path className="artOn artStroke" d="M154 88h12" strokeLinecap="round" strokeWidth="2" />
+        <path className="artStroke" d="M154 88h12" strokeLinecap="round" strokeWidth="2" />
       </g>
       <path
         className="artOn artStroke"

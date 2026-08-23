@@ -518,6 +518,25 @@
   }
 }
 
+/* turn — a mark that reverses, for a reading whose whole subject is direction.
+ *
+ * Trend drew two readings, one rising and one falling, which says "here are two
+ * of them" where the component says "here is which way it went". One reading
+ * that turns says the second thing, and it is the only card where the motion is
+ * the meaning rather than a replay of an entrance.
+ *
+ * Out and back like everything else here: no `from`, so it leaves the resting
+ * arrow, reaches the other direction halfway, and returns. */
+:has(> .componentArt):hover .artTurn {
+  animation: helixArtTurn var(--art-sustain) var(--art-curve) infinite;
+}
+
+@keyframes helixArtTurn {
+  50% {
+    rotate: 180deg;
+  }
+}
+
 /* lift — the same rise the `data-card` recipe performs, then a slow float. */
 .artLift {
   transition: transform var(--art-lift) var(--art-curve);
@@ -609,7 +628,8 @@
   :has(> .componentArt):hover .artRow,
   :has(> .componentArt):hover .artTravel,
   :has(> .componentArt):hover .artFill,
-  :has(> .componentArt):hover .artLift {
+  :has(> .componentArt):hover .artLift,
+  :has(> .componentArt):hover .artTurn {
     animation: none;
   }
 
