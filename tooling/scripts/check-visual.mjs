@@ -131,6 +131,27 @@ const origin = `http://127.0.0.1:${server.address().port}`
 const browser = await chromium.launch()
 const tab = await browser.newPage({ viewport: { height: 800, width: 640 } })
 
+/* Nothing leaves this machine, and that is a correctness rule rather than a
+ * courtesy.
+ *
+ * Three base examples name assets on other people's servers: `image` and
+ * `video` load a photograph from Unsplash, and `video` and `video-playlist`
+ * load clips from MDN. Left open, a baseline records whatever those hosts
+ * happened to return, so the check goes red the day one of them is slow, is
+ * down, or re-encodes a picture, none of which is a fact about this library.
+ * The first run proved it: the poster arrived over the network and the clip did
+ * not, because Playwright's Chromium ships without the proprietary codecs, so
+ * the picture recorded a photograph and an error message together.
+ *
+ * Blocked, all three render the same missing-media state everywhere, which is
+ * deterministic and is still the thing under test: what a baseline guards on
+ * these families is the component's own frame, controls and layout, and the
+ * poster was never more than what happened to be behind them. */
+await tab.route('**/*', (route) => {
+  const url = route.request().url()
+  return url.startsWith(origin) ? route.continue() : route.abort()
+})
+
 const changed = []
 const written = []
 let compared = 0
