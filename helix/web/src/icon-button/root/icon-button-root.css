@@ -18,6 +18,22 @@
   --_icon-button-edge: var(--helix-color-border);
   --_icon-button-ink: var(--helix-color-foreground-muted);
   --_icon-button-ink-hover: var(--helix-color-foreground);
+  /* The solid fill, separate from the tone, and it has to be separate.
+   *
+   * The same split `Button` made and for the same reason. `--_icon-button-tone`
+   * is the colour of the *ink* on every emphasis but `solid`: an outlined or
+   * subtle primary draws its glyph with it, and in dark mode that is
+   * deliberately the lighter brand so the mark is legible on a dark page. A
+   * solid control wants the opposite, a fill dark enough to carry white.
+   *
+   * Pointing one variable at both is what 107 measured across the whole accent
+   * ramp, and what put this control's glyph at 3.20 against its own fill on the
+   * contact page while the `Button` sharing its edge sat at 6.44.
+   *
+   * Defaulted to the tone, which is what neutral wants and what this rule did
+   * before there were two of them, so nothing untoned moves. */
+  --_icon-button-fill: var(--_icon-button-tone);
+  --_icon-button-fill-hover: var(--_icon-button-tone-hover);
   --_icon-button-on-tone: var(--helix-color-background);
   --_icon-button-tone: var(--helix-color-foreground);
   --_icon-button-tone-hover: color-mix(
@@ -30,6 +46,8 @@
   --_icon-button-edge: var(--helix-color-primary);
   --_icon-button-ink: var(--helix-color-primary);
   --_icon-button-ink-hover: var(--helix-color-primary);
+  --_icon-button-fill: var(--helix-color-primary-surface);
+  --_icon-button-fill-hover: var(--helix-color-primary-surface-hover);
   --_icon-button-on-tone: var(--helix-color-foreground-on-accent);
   --_icon-button-tone: var(--helix-color-primary);
   --_icon-button-tone-hover: var(--helix-color-primary-hover);
@@ -49,6 +67,8 @@
   --_icon-button-edge: var(--helix-color-accent);
   --_icon-button-ink: var(--helix-color-accent);
   --_icon-button-ink-hover: var(--helix-color-accent);
+  --_icon-button-fill: var(--helix-color-accent-surface);
+  --_icon-button-fill-hover: var(--helix-color-accent-surface-hover);
   --_icon-button-on-tone: var(--helix-color-foreground-on-accent);
   --_icon-button-tone: var(--helix-color-accent);
   --_icon-button-tone-hover: var(--helix-color-accent-hover);
@@ -58,6 +78,8 @@
   --_icon-button-edge: var(--helix-color-danger);
   --_icon-button-ink: var(--helix-color-danger);
   --_icon-button-ink-hover: var(--helix-color-danger);
+  --_icon-button-fill: var(--helix-color-danger-surface);
+  --_icon-button-fill-hover: var(--helix-color-danger-surface-hover);
   --_icon-button-on-tone: var(--helix-color-foreground-on-accent);
   --_icon-button-tone: var(--helix-color-danger);
   --_icon-button-tone-hover: color-mix(
@@ -172,12 +194,12 @@
  * touches it. Both notes below were written the first time that happened here.
  */
 :host([emphasis="solid"]) [part="button"] {
-  background-color: var(--_icon-button-tone);
+  background-color: var(--_icon-button-fill);
   border-color: transparent;
   color: var(--_icon-button-on-tone);
 }
 :host(:not(:disabled)[emphasis="solid"]) [part="button"]:hover {
-  background-color: var(--_icon-button-tone-hover);
+  background-color: var(--_icon-button-fill-hover);
   color: var(--_icon-button-on-tone);
 }
 
