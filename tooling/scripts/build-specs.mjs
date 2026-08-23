@@ -158,6 +158,20 @@ if (!result.success) {
 
 await rm(entries, { force: true, recursive: true })
 
+/**
+ * The families, written down rather than left to be guessed from filenames.
+ *
+ * The runner used to take every `.js` that did not look like a hashed chunk,
+ * `-[a-z0-9]{8}.js`, and that is a guess a family name can satisfy by accident:
+ * `video-playlist.js` ends in eight lowercase alphanumerics, so it was read as
+ * a chunk and skipped. Its specs had never run in a browser and nothing said so,
+ * because a suite that silently covers 87 of 88 families reports a clean pass.
+ */
+await writeFile(
+  join(out, 'families.json'),
+  `${JSON.stringify([...found.keys()].sort(), null, 2)}\n`,
+)
+
 const bytes = result.outputs.reduce((total, output) => total + output.size, 0)
 const specCount = [...found.values()].reduce((total, specs) => total + specs.length, 0)
 console.log(

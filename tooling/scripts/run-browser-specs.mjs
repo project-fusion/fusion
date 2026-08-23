@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readdir, readFile } from 'node:fs/promises'
+import { readFile } from 'node:fs/promises'
 /**
  * Runs the DOM specs in a real browser, and reports what happened.
  *
@@ -75,12 +75,16 @@ const server = createServer(async (request, response) => {
 await new Promise((done) => server.listen(0, '127.0.0.1', done))
 const origin = `http://127.0.0.1:${server.address().port}`
 
-/* Only the family entry points. `Bun.build` with splitting also emits shared
-   chunks, which are named with a hash and are imports rather than entries:
-   loading one directly runs nothing and reports nothing. */
+/* The families the builder wrote down, rather than every `.js` that does not
+   look like a hashed chunk. That test was a guess and a family name could
+   satisfy it: `video-playlist.js` ends in eight lowercase alphanumerics, the
+   same shape as a hash, so it was skipped and its specs had never run here.
+   Nothing reported it, because a suite covering 87 of 88 families still says
+   it passed. */
 const only = process.argv[2]
-const families = (await readdir(specs))
-  .filter((file) => file.endsWith('.js') && !/-[a-z0-9]{8}\.js$/.test(file))
+const named = JSON.parse(await readFile(join(specs, 'families.json'), 'utf8'))
+const families = named
+  .map((name) => `${name}.js`)
   .filter((file) => only === undefined || file === `${only}.js`)
   .sort()
 
