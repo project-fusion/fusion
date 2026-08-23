@@ -146,7 +146,7 @@ export function ThemedPage() {
             <helix-button emphasis="solid" tone="primary">
               Start free
             </helix-button>
-            <helix-button emphasis="outlined">
+            <helix-button command="--show" commandfor="walkthrough" emphasis="outlined">
               Book a walkthrough
               <helix-icon name="arrow-right" slot="end"></helix-icon>
             </helix-button>
@@ -369,6 +369,53 @@ export function ThemedPage() {
           </helix-flex>
         </helix-flex>
       </footer>
+
+      {/* **The second thing on this page that opens, and the one that shows all
+          three axes at once.** The menu above moves on `motion` and nothing
+          else; a dialog is the only surface here that is floating, scrimmed and
+          translucent together, so `separation.floating`, `material` and the
+          motion character each change something visible in it. Material had no
+          control at all until this session, which is part of why the preview had
+          nothing that would have shown one.
+
+          Opened from the hero rather than from a button of its own, because a
+          control that exists to be demonstrated reads as a demo and the rest of
+          this page is a page somebody would ship.
+
+          **It covers the builder and not just the preview, and that is the top
+          layer rather than a mistake.** `showModal` paints outside every
+          ancestor, so a modal opened inside a pane is a modal over the window.
+          Custom properties still inherit down the DOM, so it is themed by the
+          preview's scope and not by the site around it: checked, its primary
+          button takes the palette being built. The alternative is a surface that
+          is not modal, and then there is nothing on this page that draws a
+          scrim, which is half of what `separation.floating` and `material` do. */}
+      <helix-dialog id="walkthrough" label="Book a walkthrough">
+        <helix-text as="h2" slot="header">
+          Book a walkthrough
+        </helix-text>
+        <helix-flex direction="column" gap="md">
+          <helix-text>
+            Thirty minutes with someone who runs {COMPANY} day to day. Bring a route you are unhappy
+            with and we will look at it together.
+          </helix-text>
+          <helix-input label="Work email" name="email" placeholder="you@company.com" />
+        </helix-flex>
+        <helix-flex gap="sm" slot="footer">
+          <helix-button
+            command="--close"
+            commandfor="walkthrough"
+            emphasis="solid"
+            tone="primary"
+            width="standard"
+          >
+            Request a time
+          </helix-button>
+          <helix-button command="--close" commandfor="walkthrough" width="standard">
+            Not now
+          </helix-button>
+        </helix-flex>
+      </helix-dialog>
     </div>
   )
 }

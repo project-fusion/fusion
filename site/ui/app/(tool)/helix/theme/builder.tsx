@@ -113,6 +113,10 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
   const [textScale, setTextScale] = useState(132)
   const [surface, setSurface] = useState<Mechanism>('border')
   const [floating, setFloating] = useState<Mechanism>('shadow')
+  /* The shipped policy, so the sliders start where the stylesheet already is and
+     moving one is a departure a reader can see rather than a jump. */
+  const [blur, setBlur] = useState(16)
+  const [translucency, setTranslucency] = useState(100)
 
   /* Compared against the values the engine and the stylesheet ship with, so
      "pristine" means the reader has changed nothing rather than that they have
@@ -148,6 +152,8 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     setHarmony(50)
     setSurface('border')
     setFloating('shadow')
+    setBlur(16)
+    setTranslucency(100)
     setBodyFace('')
     setDisplayFace('')
     setMonoFace('')
@@ -171,6 +177,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
         ...(displayFace ? { display: stack(displayFace, 'system-ui, sans-serif') } : {}),
         ...(monoFace ? { mono: stack(monoFace, 'ui-monospace, monospace') } : {}),
       },
+      material: { blur, opacity: translucency / 100 },
       radius: radius / 100,
       scheme,
       separation: { floating: floating as 'border' | 'fill' | 'shadow', surface },
@@ -179,6 +186,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     [
       accentHue,
       allowance,
+      blur,
       bodyFace,
       brand,
       chromaScale,
@@ -194,6 +202,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       radius,
       scheme,
       surface,
+      translucency,
     ],
   )
 
@@ -607,6 +616,44 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               <helix-toggle value="border">Border</helix-toggle>
               <helix-toggle value="fill">Fill</helix-toggle>
             </helix-toggle-group>
+
+            {/* **Material was an axis the engine took and this could not reach.**
+              `ThemeIntent.material` is two numbers and the builder wrote neither,
+              so a theme made here could say how its surfaces separate and not
+              what they are made of. The header, the menu and the dialog all move
+              on these, which is why they are the three things the preview opens.
+
+              Two sliders rather than a character, because unlike motion the pair
+              does not have to move together: a heavy blur behind a nearly opaque
+              pane is a real look and so is a clear pane with none.
+
+              **And this is the one control that can cost the guarantee.**
+              Anything below full stops being a known ground, so a pair over it
+              comes back `unverifiable` rather than measured, which the pairings
+              panel says out loud when it happens. */}
+            <helix-slider
+              hint="Pixels behind a translucent surface. Zero is flat."
+              label="Material blur"
+              max={40}
+              min={0}
+              name="material-blur"
+              onhelix-input={(event) => setBlur(Number(event.detail.value))}
+              show-value
+              step={2}
+              value={String(blur)}
+            ></helix-slider>
+
+            <helix-slider
+              hint="How opaque those surfaces are. Below 100 they stop being a known ground."
+              label="Material opacity"
+              max={100}
+              min={40}
+              name="material-opacity"
+              onhelix-input={(event) => setTranslucency(Number(event.detail.value))}
+              show-value
+              step={4}
+              value={String(translucency)}
+            ></helix-slider>
           </helix-flex>
         </section>
 
