@@ -1,15 +1,31 @@
 import { cssLanguage } from '@codemirror/lang-css'
 import { htmlLanguage } from '@codemirror/lang-html'
-import { javascriptLanguage } from '@codemirror/lang-javascript'
+import { javascriptLanguage, tsxLanguage, typescriptLanguage } from '@codemirror/lang-javascript'
 import { classHighlighter, highlightCode } from '@lezer/highlight'
 
-/** The languages an example can be written in, which is the sandbox's set. */
-export type HighlightLanguage = 'css' | 'html' | 'js'
+/**
+ * The languages a snippet can be written in.
+ *
+ * **`ts` and `tsx` are here because the documentation is mostly written in
+ * them**, and the base JavaScript grammar reads both wrongly rather than
+ * partially. Measured on a `tsx` fence highlighted as `js`: `<helix-input` came
+ * out as the variable `helix`, the operator `-` and the variable `input`, which
+ * is the parser doing arithmetic on a tag name and colouring the result
+ * confidently. A grammar that does not know the dialect does not degrade, it
+ * lies.
+ *
+ * `tsx` covers JSX as well, since the dialect is a superset: there is no `jsx`
+ * member because a JSX file that is not TypeScript still parses under it, and
+ * a fourth entry would be a distinction with no consequence.
+ */
+export type HighlightLanguage = 'css' | 'html' | 'js' | 'ts' | 'tsx'
 
 const PARSERS = {
   css: cssLanguage,
   html: htmlLanguage,
   js: javascriptLanguage,
+  ts: typescriptLanguage,
+  tsx: tsxLanguage,
 } as const
 
 const escapeHtml = (text: string): string =>

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import * as runtime from 'react/jsx-runtime'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
+import { PROSE_COMPONENTS } from './prose'
 
 /**
  * MDX, compiled to React at build time.
@@ -29,11 +30,17 @@ import remarkGfm from 'remark-gfm'
  * `remark-gfm` is here for tables. The thesis stack is one, and a table is the
  * shape that data always had: it was a grid of components before, which is the
  * same table with more machinery around it.
+ *
+ * **`PROSE_COMPONENTS` is passed here rather than per call site**, so that
+ * every MDX surface renders the same way. It shipped without one, which meant a
+ * fenced block came out as an unhighlighted `<pre>` on all five of them; that
+ * module says which elements map and, at more length, which deliberately do
+ * not.
  */
 export const renderMdx = async (source: string): Promise<ReactNode> => {
   const { default: Content } = await evaluate(source, {
     ...runtime,
     remarkPlugins: [remarkFrontmatter, remarkGfm],
   })
-  return Content({})
+  return Content({ components: PROSE_COMPONENTS })
 }

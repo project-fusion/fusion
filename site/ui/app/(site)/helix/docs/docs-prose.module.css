@@ -8,7 +8,13 @@
  * `[data-prose]` in the base layer carries the type scale, the measure, links
  * and inline code, so what is left is the rhythm between blocks and the tables
  * these pages are full of. A rule here that turns out to be true of every prose
- * document belongs in the base layer instead. */
+ * document belongs in the base layer instead.
+ *
+ * There was a `pre` rule here giving fenced code its own overflow. It is gone
+ * with the element: `PROSE_COMPONENTS` renders every fence as a
+ * `helix-code-block`, which owns its scrolling, its copy button and its name
+ * bar, and whose own `pre` is in a shadow root a descendant selector cannot
+ * reach. */
 
 .prose > * + * {
   margin-block-start: var(--helix-space-md);
@@ -51,8 +57,4 @@
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   padding-block: var(--helix-space-sm);
   padding-inline-end: var(--helix-space-lg);
-}
-
-.prose pre {
-  overflow-x: auto;
 }
