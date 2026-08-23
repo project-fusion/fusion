@@ -139,8 +139,7 @@ for (const tier of TIERS) {
         }
       }
       const inSeam =
-        owner !== undefined &&
-        owner.name.startsWith('render') &&
+        owner?.name.startsWith('render') &&
         owner.name !== 'render' &&
         owner.visibility === 'protected'
       if (inSeam) {

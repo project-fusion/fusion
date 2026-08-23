@@ -205,14 +205,9 @@ for (const theme of oracle.themes) {
   }
 
   for (const field of ['collisions', 'seeds', 'violations']) {
-    same(
-      JSON.stringify(derived[field]),
-      JSON.stringify(theme[field]),
-      `${theme.label}: ${field}`,
-    )
+    same(JSON.stringify(derived[field]), JSON.stringify(theme[field]), `${theme.label}: ${field}`)
   }
 }
-
 
 /* **The hex reader is checked against the oracle's own parse table**, which is
    the one place the boundary carries a value the theme comparison never touches:

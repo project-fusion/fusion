@@ -554,12 +554,12 @@ export function ThemeBuilder({
               className="themeChannel"
               label="Saturation"
               max={100}
-              style={{ '--slider-track-image': ramps.saturation ?? '' }}
               min={0}
               name="chroma"
               onhelix-input={(event) => setChromaScale(Number(event.detail.value))}
               show-value
               step={5}
+              style={{ '--slider-track-image': ramps.saturation ?? '' }}
               value={String(chromaScale)}
             ></helix-slider>
 
@@ -569,12 +569,12 @@ export function ThemeBuilder({
               className="themeChannel"
               label="Accent angle"
               max={360}
-              style={{ '--slider-track-image': ramps.accent ?? '' }}
               min={0}
               name="accent"
               onhelix-input={(event) => setAccentHue(Number(event.detail.value))}
               show-value
               step={15}
+              style={{ '--slider-track-image': ramps.accent ?? '' }}
               value={String(accentHue)}
             ></helix-slider>
 

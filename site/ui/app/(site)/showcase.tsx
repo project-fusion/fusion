@@ -1,8 +1,8 @@
 'use client'
 
 import { initTheme, type ThemeEngine, type ThemeIntent } from '@helix-io/theme'
-import { THEME_ENGINE } from '../../lib/theme-engine'
 import { useEffect, useRef, useState } from 'react'
+import { THEME_ENGINE } from '../../lib/theme-engine'
 import styles from './landing.module.css'
 
 /**
