@@ -109,6 +109,13 @@ export const docPages: DocPage[] = [
     title: 'Localization and RTL',
   },
   {
+    description: 'What Helix costs a page, measured rather than claimed.',
+    order: 7,
+    section: 'Getting started',
+    slug: 'metrics',
+    title: 'Metrics',
+  },
+  {
     description:
       'Four durations, five curves, and the rule every animating component has to answer.',
     section: 'Foundations',
