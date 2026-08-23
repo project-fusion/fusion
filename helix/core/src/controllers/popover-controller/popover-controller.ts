@@ -205,14 +205,6 @@ export class PopoverController implements ReactiveController {
     }
   }
 
-  /*
-   * Leaves the top layer when the host does.
-   *
-   * An element removed while its popover is showing is removed from the top
-   * layer by the platform, but the controllers watching it are this host's to
-   * stop, and `autoUpdate` in particular holds listeners on every scrolling
-   * ancestor of something no longer in the document.
-   */
   /**
    * Places the surface again, for an anchor that moved without the page moving.
    *
@@ -226,6 +218,19 @@ export class PopoverController implements ReactiveController {
     this.floating.update()
   }
 
+  /*
+   * Forgets that it was showing, and nothing more, which is the whole job.
+   *
+   * An element removed while its popover is showing is taken out of the top
+   * layer by the platform. The two controllers watching it stop themselves:
+   * both were constructed against this same host and registered with it, so Lit
+   * calls each one's own `hostDisconnected`, and `autoUpdate` in particular
+   * releases the listeners it holds on every scrolling ancestor there.
+   *
+   * Stopping them from here as well would be the same call twice. What is left
+   * is the flag, which nothing else owns, and which has to be cleared or a host
+   * reconnected to the page believes it is still open and refuses to show.
+   */
   hostDisconnected(): void {
     this.shown = false
   }

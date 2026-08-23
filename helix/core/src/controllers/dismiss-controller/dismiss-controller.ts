@@ -46,6 +46,17 @@ export interface DismissOptions {
 }
 
 /**
+ * Every overlay currently listening, so one press can be settled by asking.
+ *
+ * Module-level because that is the scope the question has: "which open overlay
+ * is innermost" is about the page, and no single controller can answer it from
+ * what it holds. Membership is exactly `activate`/`deactivate`, and
+ * `hostDisconnected` calls the second, so an overlay torn down rather than
+ * closed leaves too.
+ */
+const listening = new Set<DismissController>()
+
+/**
  * Closes an overlay on Escape or on a pointer press outside it.
  *
  * Both, because they are different intentions with the same meaning: Escape is
@@ -64,17 +75,6 @@ export interface DismissOptions {
  * cannot see. Leaving the browser altogether blurs the window too, so what took
  * focus is the part that distinguishes them.
  */
-/**
- * Every overlay currently listening, so one press can be settled by asking.
- *
- * Module-level because that is the scope the question has: "which open overlay
- * is innermost" is about the page, and no single controller can answer it from
- * what it holds. Membership is exactly `activate`/`deactivate`, and
- * `hostDisconnected` calls the second, so an overlay torn down rather than
- * closed leaves too.
- */
-const listening = new Set<DismissController>()
-
 export class DismissController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
   private readonly boundary:
