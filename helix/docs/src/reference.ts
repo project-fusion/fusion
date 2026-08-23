@@ -22,6 +22,7 @@
  * Picker` says about its three modes.
  */
 import type { Documented, HelixDeclaration, HelixManifest, HelixMember } from '@helix-io/cem'
+import { startCase } from './naming.js'
 
 /** What to put above the reference, for a caller that generates a file. */
 export interface ReferenceOptions {
@@ -82,13 +83,6 @@ export const place = (path: string | undefined): { family: string; part: string 
   return { family, part }
 }
 
-/** A slug as a heading: `button-group` reads `Button Group`. */
-export const title = (slug: string): string =>
-  slug
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-
 /** One family's declarations, in the order a reference prints them. */
 export interface ReferenceFamily {
   family: string
@@ -141,7 +135,7 @@ const element = (declaration: HelixDeclaration, part: string): string[] => {
     tagName,
   } = declaration
 
-  const lines = [`### ${title(part)} (\`${tagName}\`)`, '']
+  const lines = [`### ${startCase(part)} (\`${tagName}\`)`, '']
   if (summary) {
     lines.push(summary, '')
   }
@@ -220,7 +214,7 @@ const element = (declaration: HelixDeclaration, part: string): string[] => {
 export const reference = (manifest: HelixManifest, options: ReferenceOptions = {}): string => {
   const lines = [`# ${options.title ?? 'Component reference'}`, '', ...(options.lede ?? [])]
   for (const { family, parts } of referenceFamilies(manifest)) {
-    lines.push(`## ${title(family)}`, '')
+    lines.push(`## ${startCase(family)}`, '')
     for (const { declaration, part } of parts) {
       lines.push(...element(declaration, part))
     }

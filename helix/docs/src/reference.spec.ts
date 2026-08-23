@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import type { HelixManifest } from '@helix-io/cem'
-import { place, reference, referenceFamilies, title } from './reference.js'
+import { place, reference, referenceFamilies } from './reference.js'
 
 /**
  * A manifest small enough to read, carrying one of everything the renderer
@@ -69,13 +69,6 @@ describe('place', () => {
   })
 })
 
-describe('title', () => {
-  test('a slug becomes a heading', () => {
-    expect(title('button-group')).toBe('Button Group')
-    expect(title('root')).toBe('Root')
-  })
-})
-
 describe('referenceFamilies', () => {
   test('groups by family and puts the root first', () => {
     const families = referenceFamilies(manifest)
@@ -139,6 +132,21 @@ describe('reference', () => {
   test('the title and lede come from the caller', () => {
     const withLede = reference(manifest, { lede: ['Read me first.', ''], title: 'Elements' })
     expect(withLede).toStartWith('# Elements\n\nRead me first.\n')
+  })
+
+  // One title-caser, so the reference and the site agree. They did not: this
+  // file had its own, and spelled the family `Qr Code` where the site said
+  // `QR Code`.
+  test('a heading knows an initialism', () => {
+    const initialism: HelixManifest = {
+      modules: [
+        {
+          declarations: [{ name: 'HelixQrCode', tagName: 'helix-qr-code' }],
+          path: 'src/qr-code/root/qr-code-root.ts',
+        },
+      ],
+    }
+    expect(reference(initialism)).toContain('## QR Code')
   })
 
   test('renders nothing but a heading for an empty manifest', () => {

@@ -3786,7 +3786,7 @@ thing advancing.
 | `--progress-ring-width` | Thickness of its stroke. |
 | `--progress-fraction` | The value as a fraction of the range, 0 to 1. Absent while indeterminate. |
 
-## Qr Code
+## QR Code
 
 ### Root (`helix-qr-code`)
 

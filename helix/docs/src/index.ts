@@ -15,7 +15,6 @@ export {
   type ReferenceOptions,
   reference,
   referenceFamilies,
-  title,
 } from './reference.js'
 export {
   contentPath,
