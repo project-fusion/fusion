@@ -114,3 +114,12 @@ jobs:
       # because the half not on screen is the half that fails: every finding
       # this caught on its first green run was in dark.
       - run: bun run check:contrast
+
+      # Every base example, pixel for pixel against a committed baseline. This
+      # is the one fault class the rest of `verify` cannot reach: everything
+      # else reads source or asserts a fact somebody thought to assert, and a
+      # chevron drawn at 233 pixels breaks nothing anybody wrote down. Here
+      # rather than in `verify` because it wants a browser and a baseline taken
+      # on this runner: the comparison never crosses platforms, so on a
+      # contributor's Mac the check says so and exits clean. See 148.
+      - run: bun run check:visual

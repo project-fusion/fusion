@@ -60,3 +60,8 @@ site/ui/public/sandbox
 
 # Measurement scratch: pages written to probe layout and paint, never shipped.
 site/ui/public/.probe/
+
+# The artifact a failed visual comparison leaves behind, marked with the pixels
+# that moved. What belongs in the history is the baseline a reviewer approved,
+# not the picture of a run that disagreed with it.
+*.diff.png
