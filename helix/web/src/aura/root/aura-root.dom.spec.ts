@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion-io/testing/dom'
+import { mount, registerDom } from '@helix-io/testing/dom'
 import { exitOf, tiltFor } from './aura-axis.js'
 
 /* Registered before the module is evaluated, and the import is dynamic for

@@ -67,7 +67,14 @@ helix-base-icon::part(svg) {
   inline-size: 1em;
 }
 
-helix-base-meter::part(track) {
+helix-base-meter::part(indicator) {
+  background-color: var(--_gray-strong);
+  block-size: 100%;
+  display: block;
+  inline-size: calc(var(--meter-fraction, 0) * 100%);
+}
+
+helix-base-meter:is([shape="ring"], [shape="arc"])::part(track) {
   background-color: transparent;
   block-size: auto;
   fill: none;

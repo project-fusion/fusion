@@ -136,7 +136,9 @@ helix-base-rating::part(track) {
 
 helix-base-rating::part(fill) {
   inline-size: calc(
-    (var(--rating-full, 0) + var(--rating-part, 0)) / var(--rating-steps, 1) * 100%
+    (var(--rating-full, 0) + var(--rating-part, 0)) /
+    var(--rating-steps, 1) *
+    100%
   );
   inset-block-start: 0;
   inset-inline-start: 0;

@@ -103,6 +103,24 @@ helix-base-tree-item::part(group) {
   padding-inline-start: 1rem;
 }
 
+/* And closed still means closed.
+   
+   A group carries the hidden attribute when its item is shut, and that rule is
+   the UA's own: an author display outranks it, so giving the group a column
+   took the collapse away and every branch stood open with no way to shut it.
+   The area notes say this outright, that a sheet setting display
+   unconditionally is what costs a component its hidden, and this is that
+   mistake made in a stylesheet whose whole job is to demonstrate the tier.
+   
+   Keyed off data-open rather than the hidden attribute, because ::part() takes
+   a pseudo-class after it and not a compound: ::part(group)[hidden] is not a
+   selector, so the first attempt at this matched nothing and the branch stayed
+   open while reporting itself shut. MixinControllerOpen mirrors the resolved
+   state onto the host for exactly this, open itself not reflecting. */
+helix-base-tree-item:not([data-open])::part(group) {
+  display: none;
+}
+
 /* The chevron is the toggle itself, not a glyph inside one. */
 helix-base-tree-item::part(toggle) {
   block-size: 1em;

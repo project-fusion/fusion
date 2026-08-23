@@ -41,9 +41,62 @@
  * `bun run verify`. Drift is the ordinary case rather than a hypothetical: edit
  * a styled example and its base twin is stale until this runs again.
  */
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 import { format } from './lib/format-open-tags.mjs'
+
+/**
+ * Runs the generated stylesheets through Biome, which is what breaks the
+ * deadlock this script was one half of.
+ *
+ * The markup has been formatted here since the day it was written, for the
+ * reason given at the write site: leaving it to `format-examples.mjs` would
+ * rewrite it a moment later and report every file as drifted. The stylesheet
+ * was never given the same treatment, and nothing noticed until a generated
+ * sheet contained something Biome has an opinion about.
+ *
+ * `rating`'s did, a `calc()` past the hundred column line, and the two tools
+ * then wanted different files: `biome ci` failed with "File content differs
+ * from formatting output", `bun run check` obligingly rewrapped it, and this
+ * script's `--check` then failed because the wrapped form is not what
+ * `sheetFor` emits. Neither state passed `bun run verify`, and running the
+ * repository's own fixer moved the failure rather than clearing it.
+ *
+ * So the same rule the markup follows: one implementation, run by both. The
+ * canonical sheet is Biome's formatting of what this script generates, which
+ * makes `bun run check` a no-op on these files rather than a saboteur.
+ *
+ * **One pass rather than eighty.** Formatting through `--stdin-file-path`
+ * costs about 53ms a file, which is four seconds on a check that runs in
+ * `verify`. A directory of them costs one spawn. It sits in the system temp
+ * directory and Biome still applies this repository's settings, because the
+ * configuration is found from the working directory rather than from the files:
+ * verified against the wrapping above, which is a `lineWidth: 100` decision and
+ * happens there exactly as it happens here.
+ */
+const formatSheets = (written) => {
+  const sheets = written.filter((entry) => entry.name.endsWith('.css'))
+  if (sheets.length === 0) {
+    return
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'helix-base-examples-'))
+  try {
+    /* Named by position, not by family. A slug is a filename here and the only
+       thing read back is this array, so the shorter name cannot collide. */
+    for (const [at, sheet] of sheets.entries()) {
+      writeFileSync(join(dir, `${at}.css`), sheet.text)
+    }
+    execFileSync('node_modules/.bin/biome', ['format', '--write', dir], { stdio: 'ignore' })
+    for (const [at, sheet] of sheets.entries()) {
+      sheet.text = readFileSync(join(dir, `${at}.css`), 'utf8')
+    }
+  } finally {
+    rmSync(dir, { force: true, recursive: true })
+  }
+}
 
 const manifest = JSON.parse(readFileSync('helix/headless/custom-elements.json', 'utf8'))
 const BASE = new Map()
@@ -631,7 +684,25 @@ helix-base-loader::part(indicator) {
   stroke: var(--_gray-strong);
   stroke-width: 4;
 }`,
-  meter: `helix-base-meter::part(track) {
+  /* Scoped to the shapes it draws, which it was not.
+   
+     `ring` and `arc` draw their track as an SVG stroke, so the rule strips the
+     fill and the height a bar needs. Unscoped it applied to the bar as well and
+     was the last word on it: the default meter came out with a transparent
+     track of no height, so a reading of 42 percent rendered as the characters
+     and nothing to read them against. */
+  /* The filled part of the bar, which no branch wrote a rule for: `indicator`
+     matched nothing, so it measured 640 by 0 and the track showed empty at
+     every value. The component publishes the reading as `--meter-fraction`,
+     zero to one, which is what a consumer scales the fill by. */
+  meter: `helix-base-meter::part(indicator) {
+  background-color: var(--_gray-strong);
+  block-size: 100%;
+  display: block;
+  inline-size: calc(var(--meter-fraction, 0) * 100%);
+}
+
+helix-base-meter:is([shape="ring"], [shape="arc"])::part(track) {
   background-color: transparent;
   block-size: auto;
   fill: none;
@@ -759,11 +830,6 @@ helix-base-rating::part(fill) {
 }`,
   select: `helix-base-select::part(indicator) {
   ${GLYPH}
-}`,
-  skeleton: `helix-base-skeleton::part(skeleton) {
-  background-color: var(--_gray-fill);
-  display: block;
-  min-block-size: 1em;
 }`,
   /* The grid the component measured for itself.
      `table` names its own columns in `--table-template` and nothing read it, so
@@ -988,6 +1054,24 @@ helix-base-tree-item::part(group) {
   padding-inline-start: 1rem;
 }
 
+/* And closed still means closed.
+   
+   A group carries the hidden attribute when its item is shut, and that rule is
+   the UA's own: an author display outranks it, so giving the group a column
+   took the collapse away and every branch stood open with no way to shut it.
+   The area notes say this outright, that a sheet setting display
+   unconditionally is what costs a component its hidden, and this is that
+   mistake made in a stylesheet whose whole job is to demonstrate the tier.
+   
+   Keyed off data-open rather than the hidden attribute, because ::part() takes
+   a pseudo-class after it and not a compound: ::part(group)[hidden] is not a
+   selector, so the first attempt at this matched nothing and the branch stayed
+   open while reporting itself shut. MixinControllerOpen mirrors the resolved
+   state onto the host for exactly this, open itself not reflecting. */
+helix-base-tree-item:not([data-open])::part(group) {
+  display: none;
+}
+
 /* The chevron is the toggle itself, not a glyph inside one. */
 helix-base-tree-item::part(toggle) {
   ${GLYPH}
@@ -1144,6 +1228,8 @@ const wanted = only.length > 0 ? families.filter((f) => only.includes(f)) : fami
 const checking = process.argv.includes('--check')
 const made = []
 const stale = []
+/** Every file this run produces, in family order, before the sheets are formatted. */
+const written = []
 const HAND_WRITTEN = new Set(['accordion', 'checkbox', 'dialog'])
 
 for (const slug of wanted) {
@@ -1184,19 +1270,26 @@ ${linked.trim()}\n`)
     html.includes('class="row"'),
     html.includes('class="stack"'),
   )
-  for (const [name, written] of [
-    [`helix/web/src/${slug}/.examples/base.html`, html],
-    [`helix/web/src/${slug}/.examples/base.css`, sheet],
-  ]) {
-    if (checking) {
-      if (!existsSync(name) || readFileSync(name, 'utf8') !== written) {
-        stale.push(name)
-      }
-    } else {
-      writeFileSync(name, written)
-    }
-  }
+  /* Collected rather than written here, because the stylesheets are formatted
+     together and a file cannot be compared until it is in its final form. The
+     pairs stay in family order, so a stale list still reads family by family. */
+  written.push(
+    { name: `helix/web/src/${slug}/.examples/base.html`, text: html },
+    { name: `helix/web/src/${slug}/.examples/base.css`, text: sheet },
+  )
   made.push(slug)
+}
+
+formatSheets(written)
+
+for (const { name, text } of written) {
+  if (checking) {
+    if (!existsSync(name) || readFileSync(name, 'utf8') !== text) {
+      stale.push(name)
+    }
+  } else {
+    writeFileSync(name, text)
+  }
 }
 
 if (checking) {
