@@ -1,3 +1,9 @@
+---
+description: Why no control has a size, and what to write instead.
+section: Theming
+title: Size and density
+---
+
 # Size and density
 
 **A control has no size. It takes its height from the region it is in.**
@@ -36,7 +42,7 @@ Save and Cancel. An icon button beside a text button. An input and its submit.
 The two halves of a split button. In every case the answer is no.
 
 So a per-instance size is only ever used to say something about the **region**,
-one element at a time — which is exactly how a row ends up with one member the
+one element at a time, which is exactly how a row ends up with one member the
 wrong height. Said once on the region, a ragged row is not discouraged. It is
 unwritable.
 
@@ -61,8 +67,8 @@ is never written.
 the toolbar and the announcement all do, so a control put in one is already the
 right height without anybody deciding.
 
-It works through custom properties — `--helix-size-control`,
-`--helix-size-checkbox`, `--helix-size-switch`, `--helix-size-tag` — which is
+It works through custom properties (`--helix-size-control`,
+`--helix-size-checkbox`, `--helix-size-switch`, `--helix-size-tag`), which is
 why it costs no component any API and crosses every shadow boundary on its own.
 
 The `-sm` / `-md` / `-lg` tokens are the scale and never move. The unsuffixed

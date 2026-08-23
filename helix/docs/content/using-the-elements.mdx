@@ -1,7 +1,14 @@
+---
+description: Binding events, registering elements, and the traps in both.
+pinned: true
+section: Essentials
+title: Using the elements
+---
+
 # Using the elements
 
 Write `<helix-card>` in your JSX. They are plain custom elements: no wrapper, no
-patched React, and no React package — there is not one.
+patched React, and no React package: there is not one.
 
 ```tsx
 export default function Page() {
@@ -75,7 +82,7 @@ export function HelixElements(): null {
 }
 ```
 
-Render it once in your layout. **Your pages stay server components** — an
+Render it once in your layout. **Your pages stay server components.** An
 unregistered tag is just an unknown element in the HTML that upgrades when the
 definition lands. Asking you to mark every page `'use client'` to use a button
 would not be a design system.
@@ -113,5 +120,5 @@ absence is not mistaken for something missing.
 
 The short version of why: DSD cannot activate for script-inserted nodes, a
 server component's output is replayed from the flight payload through DOM APIs
-rather than re-run, and the patch that made it work hooked webpack — which
+rather than re-run, and the patch that made it work hooked webpack, which
 Turbopack ignores, silently.

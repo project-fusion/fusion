@@ -1,3 +1,9 @@
+---
+description: Families, parts and groups, and which to reach for.
+section: Essentials
+title: Composition
+---
+
 # Composition
 
 Helix has families, parts and groups, and they are not stylistic choices. Each
@@ -37,7 +43,7 @@ all.
 The test is whether the group reports a form value.
 
 **`Radio.Group` and `Toggle.Group` do.** They own the `name`, the `value` and
-the validity, and a lone radio is not a control at all — it is an answer to one.
+the validity, and a lone radio is not a control at all: it is an answer to one.
 The group is what the family is *about*, so it is a part of it, and the member
 has nowhere else to be.
 
@@ -53,7 +59,7 @@ holds buttons, dropdowns and inputs, and is about none of them.
 ## A content property is its slot's fallback
 
 Where a property carries content rather than configuration, it is the fallback
-content of a slot of the same name — never a second thing rendered beside it.
+content of a slot of the same name, never a second thing rendered beside it.
 
 ```html
 <!-- The property -->
@@ -61,7 +67,7 @@ content of a slot of the same name — never a second thing rendered beside it.
 
 <!-- The slot, which replaces it -->
 <helix-tooltip>
-  <strong>Save</strong> — or press <helix-kbd>⌘S</helix-kbd>
+  <strong>Save</strong>, or press <helix-kbd>⌘S</helix-kbd>
 </helix-tooltip>
 ```
 
@@ -108,7 +114,7 @@ instinct is to look for a property that turns that off.
 
 **A fixed width is a different question, and it belongs to your site.** A
 marketing page whose hero buttons are all the same width is a real and reusable
-practice — but the number is a fact about that page's design, not about buttons.
+practice, but the number is a fact about that page's design, not about buttons.
 Name it once where your other page constants live:
 
 ```css
@@ -135,8 +141,8 @@ Every field control names itself the same way, and there are exactly two cases.
 ```
 
 `label` means a label. `aria-label` means a name. Neither means a control a
-screen reader announces as "edit text", which is almost never what you want —
-if the page already makes the purpose plain, that is the `aria-label` case, not
+screen reader announces as "edit text", which is almost never what you want.
+If the page already makes the purpose plain, that is the `aria-label` case, not
 the empty case.
 
 **`aria-label` works here because the component forwards it**, and that is worth
@@ -161,7 +167,7 @@ keyboard, the filtering, the multi-select rules and the active-item tracking
 should be written once. `Select` renders a `Listbox` internally; a future
 combobox will; a command palette would.
 
-The same reasoning made `DrilldownController` — `Menu` had held a page stack and
+The same reasoning made `DrilldownController`: `Menu` had held a page stack and
 derived its rows since it was written, and none of that was about menus. `Menu`
 and `Drilldown` share it now.
 

@@ -1,3 +1,10 @@
+---
+description: The two layers, the surface ladder, and what is enforced.
+pinned: true
+section: Theming
+title: Tokens
+---
+
 # Tokens
 
 Two layers. You see the second.
@@ -22,16 +29,16 @@ Depth is distance from the page, in whichever direction there is room. The page
 is white in light and black in dark, so in light there is nothing above white to
 be lifted into: a raised surface goes *down* the ramp, not up.
 
-- **`background`** — the page.
-- **`surface`** — a plane on the page. A card, a panel you own.
-- **`surface-raised`** — something lifted while still *lying on* the page: a
+- **`background`**: the page.
+- **`surface`**: a plane on the page. A card, a panel you own.
+- **`surface-raised`**: something lifted while still *lying on* the page: a
   selected tab's pill, a hovered row, an option under the pointer. It has the
   page on all sides, so it is told apart by its fill, which on white has to be a
   step darker.
-- **`surface-overlay`** — something *over* the page rather than on it: a menu, a
+- **`surface-overlay`**: something *over* the page rather than on it: a menu, a
   popover, a dialog, and the thumb of a switch or a segmented control. It is
   told apart by its shadow and by what it covers, so on white it is white.
-- **`surface-sunken`** — a well you put a value into: an input's fill, a track, a
+- **`surface-sunken`**: a well you put a value into, an input's fill, a track, a
   groove.
 
 **`raised` and `overlay` are the pair worth learning.** They land on the same
@@ -74,7 +81,7 @@ Both modes live in one declaration:
 
 Which half resolves is decided by `color-scheme` and nothing else, so the colour
 mode is a single attribute and no token is restated to honour it. Set
-`data-color-mode="light"` or `"dark"` on any element to theme that subtree —
+`data-color-mode="light"` or `"dark"` on any element to theme that subtree.
 `color-scheme` inherits, so a light preview inside a dark page is one attribute.
 
 Absent, it follows the operating system.

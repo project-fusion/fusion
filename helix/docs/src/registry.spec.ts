@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import { readdirSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { contentPath, findPage, pages, sections } from './registry.js'
+import { contentPath, type DocPage, findPage, navigation, pages, sections } from './registry.js'
+import { findSection } from './sections.js'
 
 const ROOT = join(import.meta.dir, '..')
 
@@ -17,14 +18,63 @@ describe('registry', () => {
     expect(findPage('nope')).toBeUndefined()
   })
 
-  test('sections order their pages', () => {
-    for (const { pages: grouped, section } of sections()) {
-      const orders = grouped.map((page) => page.order)
+  test('every page is in a declared section', () => {
+    expect(pages.filter((page) => findSection(page.section) === undefined)).toEqual([])
+  })
+})
+
+// The ordering rule is the one thing here a reader cannot see by looking at a
+// page: a section is alphabetical unless it says it is a path, and a pinned
+// entry sits above the alphabet rather than inside it. Every one of these is a
+// silent failure, a sidebar that renders in a plausible wrong order.
+describe('navigation orders each section', () => {
+  const titles = (entries: DocPage[]) => entries.map((entry) => entry.title.toLowerCase())
+
+  test('a path renders in its declared order', () => {
+    for (const section of navigation().filter((entry) => entry.path)) {
+      const orders = section.pages.map((page) => page.order ?? 0)
       expect(
         [...orders].sort((a, b) => a - b),
-        `${section} is unordered`,
+        `${section.title} is unordered`,
       ).toEqual(orders)
     }
+  })
+
+  test('everything else is alphabetical below its pinned entry', () => {
+    for (const section of navigation().filter((entry) => !entry.path)) {
+      const pinned = section.pages.filter((page) => page.pinned)
+      expect(pinned.length, `${section.title} has more than one entry page`).toBeLessThan(2)
+      expect(section.pages.slice(0, pinned.length)).toEqual(pinned)
+
+      const rest = titles(section.pages.slice(pinned.length))
+      expect([...rest].sort(), `${section.title} is not alphabetical`).toEqual(rest)
+    }
+  })
+
+  test('children are alphabetical, and every parent resolves', () => {
+    for (const section of navigation()) {
+      for (const page of section.pages) {
+        const names = titles(page.children)
+        expect([...names].sort(), `${page.slug} orders its children`).toEqual(names)
+        for (const child of page.children) {
+          expect(child.parent).toBe(page.slug)
+        }
+      }
+    }
+  })
+
+  test('no section renders empty, because a heading is an existence claim', () => {
+    for (const section of navigation()) {
+      expect(section.pages.length, `${section.title} has no pages`).toBeGreaterThan(0)
+    }
+    expect(navigation().length).toBe(sections.length)
+  })
+
+  test('every page reaches the navigation exactly once', () => {
+    const reached = navigation().flatMap((section) =>
+      section.pages.flatMap((page) => [page.slug, ...page.children.map((child) => child.slug)]),
+    )
+    expect(reached.sort()).toEqual(pages.map((page) => page.slug).sort())
   })
 })
 
@@ -50,6 +100,18 @@ describe('registry matches content on disk', () => {
     for (const page of pages) {
       expect(contentPath(page)).toBe(`content/${page.slug}.mdx`)
       expect(files).toContain(page.slug)
+    }
+  })
+
+  // The generated module is only worth having if it says what the frontmatter
+  // says. `bun run check:docs` is what enforces that in CI; this is what
+  // catches it in the two seconds after somebody edits a title by hand.
+  test('title and description come from the frontmatter', () => {
+    for (const page of pages) {
+      const source = readFileSync(join(ROOT, contentPath(page)), 'utf8')
+      expect(source, `${page.slug} has no frontmatter`).toStartWith('---\n')
+      expect(source).toContain(`\ntitle: ${page.title}\n`)
+      expect(source).toContain(`\ndescription: ${page.description}\n`)
     }
   })
 })
