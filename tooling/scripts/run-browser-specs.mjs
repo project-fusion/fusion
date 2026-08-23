@@ -97,6 +97,9 @@ if (families.length === 0) {
   process.exit(1)
 }
 
+/** How long one family may block the page before the run gives up on it. */
+const STUCK = 60_000
+
 const browser = await chromium.launch()
 const crashes = []
 
@@ -128,17 +131,39 @@ for (const family of families) {
      seeing, since it means the component does not load in a browser. */
   let results
   try {
-    results = await page.evaluate(async (url) => {
-      try {
-        const module = await import(url)
-        if (typeof module.run !== 'function') {
-          return [{ error: 'the bundle exports no run()', name: 'load', passed: false, suite: '' }]
+    /* A wall clock on this side, because the one inside the page cannot always
+       fire.
+     *
+       Every test is already raced against a 2000ms `setTimeout` in the harness,
+       and that is enough for a test that merely waits too long. It is no use
+       against one that pegs the main thread: a timer cannot run when nothing
+       yields, so the page never comes back, `page.evaluate` never settles, and
+       the run stops with no output and no name to blame. `virtual-list` does
+       exactly that, and it cost several runs that read as the suite hanging
+       rather than as one family failing.
+     *
+       Sixty seconds is thirty times the slowest family measured, so this can
+       only ever catch something genuinely stuck. */
+    results = await Promise.race([
+      page.evaluate(async (url) => {
+        try {
+          const module = await import(url)
+          if (typeof module.run !== 'function') {
+            return [
+              { error: 'the bundle exports no run()', name: 'load', passed: false, suite: '' },
+            ]
+          }
+          return await module.run()
+        } catch (error) {
+          return [{ error: String(error), name: 'load', passed: false, suite: '' }]
         }
-        return await module.run()
-      } catch (error) {
-        return [{ error: String(error), name: 'load', passed: false, suite: '' }]
-      }
-    }, `${origin}/${family}`)
+      }, `${origin}/${family}`),
+      new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`blocked the page for ${STUCK / 1000}s, so the run gave up on it`))
+        }, STUCK)
+      }),
+    ])
   } catch (error) {
     /* The `try` inside the page cannot catch this one: the context it would
        have run in is gone. A family navigates the page, or crashes the
