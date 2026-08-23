@@ -79,15 +79,22 @@ export interface Product {
    * in the parent's construction: one rounded body with material removed, two
    * notches for Helix and one slot for Cortex.
    *
-   * **The tile, and the letter painted rather than cut out.** A mask makes the
-   * letter a real hole, which is the same thing only while the mark sits on
-   * white: on the panel's own surface, and everywhere in dark mode, a hole
-   * fills with the ground behind it and the letter goes grey. It is painted, so
-   * the mark is one mark on every surface.
+   * **A monotone tile, and the letter is a real hole.** The field takes
+   * `currentColor` and the letter shows whatever the mark sits on, so one asset
+   * is a dark tile on a light panel and a light tile on a dark one with no
+   * second drawing and no media query. `site.css` gives it `foreground` rather
+   * than letting it inherit the heading's `foreground-subtle`, which is the
+   * colour a label is quiet in and not a colour a mark should be.
    *
-   * The tile carries its own padding, so its letter is 58% of its box: at
-   * `icon-sm` that is 9.3px against a 12px heading whose cap height is about
-   * 8.6px, which is why it needs no size of its own here.
+   * The brand tile is the other way round and is not this asset: its letter is
+   * painted white rather than cut out, because a hole there would take the
+   * ground behind it and a product mark on a coloured field has to stay white
+   * on any of them. It is drawn and is not in the icon set, nothing on the site
+   * using it yet.
+   *
+   * The tile carries its own padding, so its letter is 58% of its box, which is
+   * why `site.css` sizes it `icon-md` where the base layer says `icon-sm`: a
+   * bare glyph fills its own box and this does not.
    */
   mark: string
   /**

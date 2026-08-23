@@ -1,13 +1,10 @@
 <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" fill="none" role="img" aria-label="Helix">
   <title>Helix</title>
-  <rect width="256" height="256" rx="56" fill="url(#helix-tile-grad)" />
-  <g transform="translate(54.2 39.9) scale(2.05)">
-    <path d="M0 22A22 22 0 0 1 22 0H22V22.5A11 11 0 0 0 33 33.5H39A11 11 0 0 0 50 22.5V0H50A22 22 0 0 1 72 22V62A22 22 0 0 1 50 84H50V61.5A11 11 0 0 0 39 50.5H33A11 11 0 0 0 22 61.5V84H22A22 22 0 0 1 0 62Z" fill="var(--logo-color-knockout, #fff)" />
-  </g>
-  <defs>
-    <linearGradient gradientUnits="userSpaceOnUse" id="helix-tile-grad" x1="0" x2="256" y1="0" y2="256">
-      <stop stop-color="var(--logo-color-from, var(--helix-color-primary))" />
-      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
-    </linearGradient>
-  </defs>
+  <mask id="helix-mono-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
+    <rect width="256" height="256" fill="white" />
+    <g transform="translate(54.2 39.9) scale(2.05)">
+      <path d="M0 22A22 22 0 0 1 22 0H22V22.5A11 11 0 0 0 33 33.5H39A11 11 0 0 0 50 22.5V0H50A22 22 0 0 1 72 22V62A22 22 0 0 1 50 84H50V61.5A11 11 0 0 0 39 50.5H33A11 11 0 0 0 22 61.5V84H22A22 22 0 0 1 0 62Z" fill="black" />
+    </g>
+  </mask>
+  <rect width="256" height="256" rx="56" fill="currentColor" mask="url(#helix-mono-mask)" />
 </svg>
