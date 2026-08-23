@@ -69,7 +69,7 @@ const claimed = (event: KeyboardEvent): boolean => {
  * including a consumer's own elements.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Actions, Action bar
  * @documentation https://helix.fusion.dev/components/toolbar

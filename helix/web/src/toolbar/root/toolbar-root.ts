@@ -11,7 +11,7 @@ import { styles } from './toolbar-root.css.js'
  * them would be a second frame inside whatever already frames the bar.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Actions, Action bar
  * @documentation https://helix.fusion.dev/components/toolbar

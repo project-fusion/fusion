@@ -1100,7 +1100,7 @@
           "helix": {
             "category": "feedback",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/announcement",
             "aliases": [
               "Banner",
@@ -10786,7 +10786,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/code-block",
             "tier": "styled",
             "group": "CodeBlock",
@@ -70196,7 +70196,7 @@
           "helix": {
             "category": "layout",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/toolbar",
             "aliases": [
               "Actions",

@@ -28,7 +28,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * `helix-dismiss` is a refusal.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Banner, Notification bar, Alert bar
  * @documentation https://helix.fusion.dev/components/announcement

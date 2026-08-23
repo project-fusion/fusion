@@ -13,7 +13,7 @@ import '../../copy-button/index.js'
  * of a snippet a reader is most likely to be reading.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @documentation https://helix.fusion.dev/components/code-block
  *

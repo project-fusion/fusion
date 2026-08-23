@@ -27,7 +27,7 @@ import '../../copy-button/index.js'
  * flows with prose and the other is a figure.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Code block, Snippet, Pre
  * @documentation https://helix.fusion.dev/components/code-block

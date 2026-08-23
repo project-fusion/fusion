@@ -12,7 +12,7 @@ import { styles } from './announcement-root.css.js'
  * band across the top of the page, not a box that happens to be wide.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Banner, Notification bar, Alert bar
  * @documentation https://helix.fusion.dev/components/announcement
