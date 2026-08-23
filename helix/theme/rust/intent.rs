@@ -275,6 +275,25 @@ impl ThemeIntent {
     }
 }
 
+impl Status {
+    /// The seed for one status by name, in the order [`STATUS_NAMES`] gives.
+    ///
+    /// By name because the derivation walks the four in declaration order and
+    /// that order is load bearing: a status rotated clear of the brand must not
+    /// land on one already decided, so the set it clears against accumulates as
+    /// the loop runs.
+    #[must_use]
+    pub fn seed(&self, name: &str) -> Option<&StatusSeed> {
+        match name {
+            "danger" => self.danger.as_ref(),
+            "info" => self.info.as_ref(),
+            "success" => self.success.as_ref(),
+            "warning" => self.warning.as_ref(),
+            _ => None,
+        }
+    }
+}
+
 /// The four statuses, in the order the TypeScript declares them.
 pub const STATUS_NAMES: [&str; 4] = ["danger", "info", "success", "warning"];
 

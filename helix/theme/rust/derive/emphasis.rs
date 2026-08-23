@@ -71,10 +71,14 @@ pub fn emphasis(base: Oklch, ctx: &Deriving) -> Emphasis {
     construction, and a card filled with it carries dark text. A filled brand
     panel with light text needs the opposite: dark enough that the ink clears it.
 
-    Against a fixed near-white rather than against the page, and in both schemes:
-    the ink this ground has to carry is `foreground-on-accent`, which is near
-    white whatever the scheme, so the ground is solved for the ink it holds
-    rather than for the page it sits on. */
+    **The fixed 0.98 ground is not explained in the TypeScript**, so the reading
+    is mine and is marked as one: the ink this ground carries is
+    `foreground-on-accent`, which the fills phase later solves as one near-white
+    for every filled ground there is, so solving the ground against a near-white
+    is solving it against the ink it will hold rather than against the page it
+    sits on. That would also be why it does not follow the scheme, where
+    everything else here does. Asserted either way, `color-primary-surface`
+    failing on the hex when the 0.98 is moved. */
     let filled = lightness_for_contrast(
         base.chroma,
         base.hue,

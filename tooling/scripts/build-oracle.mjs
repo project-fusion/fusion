@@ -116,6 +116,11 @@ const INTENTS = [
   { intent: { brand: '#3b82f6', contrastTarget: 7 }, label: 'aaa' },
   { intent: { brand: '#c1272d' }, label: 'red' },
   { intent: { brand: '#f59e0b' }, label: 'amber' },
+  /* Quiet enough that the status floor binds and the chroma is still non-zero.
+     `monotone` binds the floor too and cannot show it: its ceiling of 0 zeroes
+     the status chroma, so the floor is multiplied into nothing. Measured before
+     adding this: pull 0.525 against a floor of 0.55, danger chroma 0.0058. */
+  { intent: { brand: '#3b82f6', chroma: { scale: 0.05 } }, label: 'quiet' },
   { intent: { brand: '#3b82f6', neutral: { chroma: 0.01, hue: 250 } }, label: 'cast' },
 ]
 

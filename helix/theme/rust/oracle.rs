@@ -51,6 +51,7 @@ use crate::derive::emphasis::emphasis;
 use crate::derive::inks::neutral_inks;
 use crate::derive::resolve::{brand_and_neutral, default_pairings, resolve, Policy};
 use crate::derive::solve::solve_against;
+use crate::derive::status::{repair_hue, statuses};
 use crate::derive::surfaces::{ladder, surfaces};
 use crate::derive::{perceptual_distance, token, Cast, DerivedToken, Deriving, Origin};
 use crate::intent::{
@@ -812,6 +813,12 @@ fn intent_for(label: &str) -> ThemeIntent {
         "aaa" => intent.contrast_target = Some(7.0),
         "red" => intent.brand = Color::Hex("#c1272d".to_owned()),
         "amber" => intent.brand = Color::Hex("#f59e0b".to_owned()),
+        "quiet" => {
+            intent.chroma = Some(Chroma {
+                ceiling: None,
+                scale: Some(0.05),
+            });
+        }
         "cast" => {
             intent.neutral = Some(crate::intent::Neutral {
                 chroma: Some(0.01),
@@ -1013,4 +1020,86 @@ fn the_primary_role_lands_where_the_typescript_lands() {
             assert_token(&mine, token_of(theme, name), &format!("{label}/{name}"));
         }
     }
+}
+
+/// The statuses, which is the first phase where `perceptual_distance` and its
+/// `hypot3` do real work: the hue repair branches on
+/// `distance >= COLLISION_DISTANCE`, so a last-place difference there is a
+/// different hue and a different palette rather than a different digit.
+///
+/// `red` and `amber` are in the oracle for this phase. A brand that *is* a
+/// status colour is the case twenty degrees of allowance cannot fully answer,
+/// so those two exercise the search running its full width and giving up, where
+/// the blue clears on the first or second step.
+#[test]
+fn the_statuses_land_where_the_typescript_lands() {
+    let data = oracle();
+    for theme in data["themes"].as_array().expect("themes is an array") {
+        let label = theme["label"].as_str().expect("label");
+        let (resolved, ctx, brand) = deriving_for(label);
+        let primary = emphasis(brand, &ctx);
+        let resolved_statuses = statuses(&resolved.status, brand.chroma, primary.raw, &ctx);
+
+        assert_eq!(resolved_statuses.len(), 4, "{label}: four statuses");
+        for status in resolved_statuses {
+            let name = format!("color-{}", status.name);
+            let origin = if status.pinned {
+                Origin::Pinned
+            } else {
+                Origin::Derived
+            };
+            let mine = token(
+                &name,
+                status.color,
+                origin,
+                Some(ctx.surfaces.raw_background),
+            );
+            assert_token(&mine, token_of(theme, &name), &format!("{label}/{name}"));
+        }
+    }
+}
+
+/// The hue search, asserted directly because no output can show it.
+///
+/// Planting the flipped order in `repair_hue` and running the whole suite
+/// changes nothing: the order only decides anything when both directions clear
+/// at the same step, and none of the eleven themes does that. So the four things
+/// the search promises are stated here instead.
+#[test]
+fn the_hue_repair_widens_outward_and_gives_up_rather_than_settling() {
+    /* Asked for, and available: nothing moves. */
+    assert_eq!(
+        repair_hue(75.0, 20.0, |_| true).to_bits(),
+        75.0_f64.to_bits()
+    );
+
+    /* Taken, so it widens. `+step` is tried before `-step`, which is only
+    visible when both would clear, so both do here. */
+    let taken = |candidate: f64| (candidate - 75.0).abs() > 1e-9;
+    assert_eq!(repair_hue(75.0, 20.0, taken).to_bits(), 76.0_f64.to_bits());
+
+    /* And it spends only what it needs: five degrees away when four will not do. */
+    let far = |candidate: f64| (candidate - 75.0).abs() >= 5.0;
+    assert_eq!(repair_hue(75.0, 20.0, far).to_bits(), 80.0_f64.to_bits());
+
+    /* Nothing clears inside the bound, so the hue asked for stands rather than a
+    half-rotation that is neither the convention nor distinguishable. */
+    assert_eq!(
+        repair_hue(75.0, 20.0, |_| false).to_bits(),
+        75.0_f64.to_bits()
+    );
+
+    /* And it wraps, since a hue is an angle: two degrees minus four is 358. */
+    let only_358 = |candidate: f64| (candidate - 358.0).abs() < 1e-9;
+    assert_eq!(
+        repair_hue(2.0, 20.0, only_358).to_bits(),
+        358.0_f64.to_bits()
+    );
+
+    /* An allowance of zero is the loop running once at step 0, which is the
+    caller's guard made explicit: a status holds its hue and reports. */
+    assert_eq!(
+        repair_hue(75.0, 0.0, |_| false).to_bits(),
+        75.0_f64.to_bits()
+    );
 }

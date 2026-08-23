@@ -31,6 +31,7 @@ pub mod emphasis;
 pub mod inks;
 pub mod resolve;
 pub mod solve;
+pub mod status;
 pub mod surfaces;
 
 use crate::oklch::{fit_to_gamut, oklch_to_hex, shipped_contrast_ratio, Oklch};
@@ -171,8 +172,13 @@ fn hypot3(x: f64, y: f64, z: f64) -> f64 {
 /// `emphasis` reaches for six things that happen to be in scope: the chroma
 /// policy, the scheme, the surface base lightness, the fitted surface list, the
 /// contrast target, and `solveAgainst`. Nothing says so, because a closure does
-/// not have to. Passing it as one value is what lets the phase move to its own
-/// file and be read without the four hundred lines above it.
+/// not have to.
+///
+/// Five of the six are values and are the fields below, `surfaces` carrying two
+/// of them. The sixth is not here at all: `solveAgainst` was in that list only
+/// because a closure captures whatever is in scope, and it turned out to take
+/// everything it needs as arguments, so it is a free function. Writing the
+/// capture down is what made that visible.
 #[derive(Clone, Copy, Debug)]
 pub struct Deriving {
     pub contrast_target: f64,
