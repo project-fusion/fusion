@@ -27,6 +27,12 @@ export const docPages: DocPage[] = [
     title: 'Browser support',
   },
   {
+    description: 'The data channel nobody expects, and why it is a real table.',
+    section: 'Essentials',
+    slug: 'charting',
+    title: 'Charting',
+  },
+  {
     description: 'The roles, the ramps, and why the palette is solved rather than picked.',
     section: 'Foundations',
     slug: 'color',
@@ -51,6 +57,18 @@ export const docPages: DocPage[] = [
     title: 'Elevation and material',
   },
   {
+    description: 'Twenty-one events, why every name is prefixed, and which ones bubble.',
+    section: 'Essentials',
+    slug: 'events',
+    title: 'Events',
+  },
+  {
+    description: 'Every surface here is readable by a machine, and where each one is.',
+    section: 'Tooling',
+    slug: 'for-coding-agents',
+    title: 'For coding agents',
+  },
+  {
     description:
       'Real form participation, labels that resolve across a shadow root, and the disabled trap.',
     section: 'Essentials',
@@ -71,11 +89,23 @@ export const docPages: DocPage[] = [
     title: 'Installation',
   },
   {
+    description: 'Every input the theme engine takes, and what each one decides.',
+    section: 'Theming',
+    slug: 'intent-reference',
+    title: 'Intent reference',
+  },
+  {
     description: 'What Helix is, and the five tiers it ships as.',
     order: 1,
     section: 'Getting started',
     slug: 'introduction',
     title: 'Introduction',
+  },
+  {
+    description: 'Locale-aware controls, translatable strings, and a layout that already flips.',
+    section: 'Essentials',
+    slug: 'localization',
+    title: 'Localization and RTL',
   },
   {
     description:
@@ -90,6 +120,12 @@ export const docPages: DocPage[] = [
     section: 'Getting started',
     slug: 'other-frameworks',
     title: 'Other frameworks',
+  },
+  {
+    description: 'The top layer, what dismisses what, and where focus goes.',
+    section: 'Essentials',
+    slug: 'overlays',
+    title: 'Overlays and layering',
   },
   {
     description: 'The three ways in past a shadow root, and which one to reach for.',
@@ -115,6 +151,12 @@ export const docPages: DocPage[] = [
     section: 'Essentials',
     slug: 'routing',
     title: 'Routing and navigation',
+  },
+  {
+    description: 'The editor beside the preview, and the isolation that makes it safe.',
+    section: 'Tooling',
+    slug: 'sandbox',
+    title: 'Sandbox',
   },
   {
     description: 'What renders without a DOM, and what has to wait for one.',
@@ -161,6 +203,12 @@ export const docPages: DocPage[] = [
     title: 'Svelte',
   },
   {
+    description: 'The tool that turns intent inputs into a token set you can see.',
+    section: 'Tooling',
+    slug: 'theme-builder',
+    title: 'Theme builder',
+  },
+  {
     description: 'Deriving an accessible token set from intent inputs.',
     section: 'Theming',
     slug: 'theming',
@@ -192,6 +240,20 @@ export const docPages: DocPage[] = [
     section: 'Essentials',
     slug: 'using-the-elements',
     title: 'Using the elements',
+  },
+  {
+    description: 'What a version number means here, and which packages move together.',
+    order: 5,
+    section: 'Getting started',
+    slug: 'versioning',
+    title: 'Versioning',
+  },
+  {
+    description:
+      'Four words with fixed vocabularies, one escape hatch, and the word that is refused.',
+    section: 'Theming',
+    slug: 'visual-axes',
+    title: 'Visual axes',
   },
   {
     description: 'The one compiler setting Vue needs, and why props and events already work.',

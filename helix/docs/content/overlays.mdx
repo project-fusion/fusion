@@ -1,0 +1,102 @@
+---
+description: The top layer, what dismisses what, and where focus goes.
+section: Essentials
+title: Overlays and layering
+---
+
+# Overlays and layering
+
+`Dialog`, `Drawer`, `Popover`, `Menu`, `Select`, `Combobox`, `Tooltip`,
+`Megamenu`, `Speed Dial`, `Command` and `Tour` are all overlays, and they all
+work the same way underneath. Knowing that way saves you from most of the
+problems overlays cause.
+
+## They render in the top layer
+
+Every one uses the popover API, so the browser draws it in the top layer: above
+everything, regardless of `z-index`, `overflow: hidden`, `transform` or a
+stacking context somewhere up the tree.
+
+**This is the fix for the oldest bug in the category.** A menu inside a
+scrolling panel does not get clipped. A tooltip inside a `transform`ed card does
+not get trapped in its stacking context. There is no portal to configure and no
+`appendTo` to pass, because the platform is doing it.
+
+The consequence for your CSS: **do not try to raise an overlay with `z-index`.**
+It has no effect on a top-layer element, and reaching for it means something
+else is wrong.
+
+## Positioning is JavaScript, deliberately
+
+Placement uses `@floating-ui/dom` rather than CSS anchor positioning: flip when
+there is no room below, shift to stay on screen, size to the available space.
+Anchor positioning would be the platform answer and is not yet available
+everywhere the rest of the library's requirements are. See [Browser
+support](./browser-support).
+
+That means an overlay's position is recomputed while it is open, on scroll and
+resize, and stops when it closes.
+
+## Dismissal, and the order it happens in
+
+Light dismiss is the platform's: click outside, or press `Escape`. What Helix
+adds is making that correct across shadow boundaries.
+
+**`document.activeElement` stops at the outermost host.** Focus inside a shadow
+tree is reported as the element containing that tree, so a naive "is focus still
+inside me" check never matches and closes the overlay the moment anything inside
+it is focused. Every dismissal path here walks through the roots instead.
+
+**Nesting works because lifecycle events do not bubble.** `helix-open` and
+`helix-close` are neither bubbling nor composed, so a menu closing inside a
+dialog is not the dialog closing. `Escape` closes the innermost overlay and
+leaves the rest.
+
+## Focus
+
+A modal overlay traps `Tab` inside itself while open and returns focus to
+whatever opened it. `Dialog` and `Drawer` do this; `Popover` does it in its
+modal mode and not otherwise.
+
+**A tooltip never takes focus**, which is the one to remember: it is
+described-by rather than interactive, so it cannot contain a button. If you want
+something with a button in it, that is a `Popover`.
+
+## Refusing to close
+
+The close is announced before it happens:
+
+```ts
+dialog.addEventListener('helix-close', (event) => {
+  if (unsaved) {
+    event.preventDefault()
+  }
+})
+```
+
+That covers `Escape`, the backdrop click and the close button together, because
+all three go through the same request. See [State and
+control](./state-and-control).
+
+## Entry and exit animation
+
+Overlays animate in with `@starting-style` and out with a transition on the
+`overlay` and `display` properties, which is what allows an exit animation on an
+element the browser is about to remove from the top layer. Every one answers
+`prefers-reduced-motion`.
+
+## Which one to reach for
+
+| | |
+|---|---|
+| `Dialog` | A task that blocks the page |
+| `Drawer` | The same, from an edge, usually larger |
+| `Popover` | A surface anchored to a control, possibly interactive |
+| `Tooltip` | A description of a control. Never interactive |
+| `Menu` | A list of commands |
+| `Select`, `Combobox` | A value chosen from a list, in a form |
+| `Command` | A palette over the whole application |
+| `Megamenu` | Navigation, anchored to a header |
+
+A `Dialog` used for a tooltip's job traps focus for no reason. A `Tooltip` used
+for a popover's job silently drops the button you put in it.

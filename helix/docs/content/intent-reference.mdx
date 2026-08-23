@@ -1,0 +1,107 @@
+---
+description: Every input the theme engine takes, and what each one decides.
+section: Theming
+title: Intent reference
+---
+
+# Intent reference
+
+[Deriving a theme](./theming) is the argument. This is the surface: everything
+`ThemeIntent` accepts, and what changes when you set it.
+
+```ts
+import { derive } from '@helix-io/theme'
+
+const theme = derive({ brand: '#2563eb' })
+```
+
+**`brand` is the only required input.** Everything else has a default that is
+derived from it or from the design language, and a theme that sets one field is
+a valid theme.
+
+## Colour
+
+| Field | Decides |
+|---|---|
+| `brand` | The one colour most consumers care about. Required |
+| `accent` | The second emphasis. Defaults to the complement, `{ from: 'brand', rotate: 180 }` |
+| `neutral` | The grey ramp, which can be tinted toward the brand |
+| `status` | `info`, `success`, `warning`, `danger`. A colour pins one; an object nudges its hue within the meaning it already carries |
+| `chroma` | How saturated the palette is, independent of hue |
+| `scheme` | `'light'` or `'dark'`, for a theme that is only one |
+| `tokens` | Literal overrides, by token name, for the cases nothing else reaches |
+
+**`accent` may be a relation and `status` may not**, and the asymmetry is
+deliberate: a `danger` that rotates with the brand is a warning a reader has to
+re-learn per product.
+
+**`chroma` is the axis a brand's feel lives on.** Monotone, muted, restrained
+and vivid are all chroma statements and none of them is a hue. `ceiling` clamps,
+so 0 is monotone and roughly 0.10 is muted; `scale` multiplies what the brand
+supplies. Both apply to every derived colour including the brand itself, because
+a monotone theme is one where the brand is grey too. Never applied to a value
+you pinned: a pinned colour is a fact.
+
+## The guarantee
+
+| Field | Decides |
+|---|---|
+| `contrastTarget` | Target contrast for body text. 4.5 is WCAG AA, 7 is AAA |
+| `pairings` | Extra foreground and background pairs to solve for, beyond the model's own |
+
+4.5 is the default because the European Accessibility Act points at WCAG 2.1 AA,
+so it is the figure with legal weight.
+
+## Shape and space
+
+| Field | Decides |
+|---|---|
+| `radius` | Corner rounding across the system |
+| `density` | Scales spacing and control heights. 1 is default, 0.875 is compact |
+| `separation` | Whether a surface is told apart by an edge or by a lift |
+
+`separation` is the policy pair described in [Surfaces and
+separation](./surfaces-and-separation).
+
+## Type and motion
+
+| Field | Decides |
+|---|---|
+| `font` | The families, and the half of the type system that is a scale |
+| `motion` | `character` and `scale` |
+
+**`motion.character` sets the curve every component reaches for and carries a
+duration multiplier with it**, because the two are one decision: a spring over
+120ms is a twitch, and a soft curve over 120ms is a fade. `scale` multiplies on
+top for a theme that wants the character and not the pace.
+
+`instant` is not scaled. It is 0 and means "do not animate", which is a
+statement rather than a duration, and it emits no curves at all: three easings
+for transitions of zero length is a contradiction.
+
+`precise` is the one character that is not physical. The other three accelerate,
+settle or overshoot; linear reads as moved by a mechanism, and it is the only
+curve legible on a short travel, because constancy shows in the timing where an
+overshoot shows in the distance.
+
+## Material
+
+| Field | Decides |
+|---|---|
+| `material` | `blur` in pixels and `opacity` from 0 to 1 |
+
+**This is the one choice that can invalidate the contrast guarantee.** Contrast
+is measured against a known ground, and a translucent surface does not have one,
+so a pair over it comes back `unverifiable` rather than measured. That is
+reported rather than hidden: a theme with heavy material is making a trade and
+should be able to see it.
+
+## Output
+
+| Field | Decides |
+|---|---|
+| `namespace` | The token prefix. Defaults to `helix` |
+
+`namespace` is for a product shipping its own token layer built on this engine.
+Everything else in the library reads `--helix-*`, so changing it is a decision
+about your own surface rather than about Helix's.

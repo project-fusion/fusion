@@ -1,0 +1,93 @@
+---
+description: Locale-aware controls, translatable strings, and a layout that already flips.
+section: Essentials
+title: Localization and RTL
+---
+
+# Localization and RTL
+
+## Right-to-left already works
+
+Set `dir` and the layout flips:
+
+```html
+<html
+  dir="rtl"
+  lang="ar"
+>
+```
+
+Every component is written in logical properties, `inline-start` rather than
+`left`, `margin-block` rather than `margin-top`, across sixty-one stylesheets.
+Nothing infers the direction for you and nothing needs to: the document says it
+and the components follow.
+
+The same is true of anything you write on top. Use logical properties and your
+layout flips with ours; use `left` and `right` and it will not.
+
+## Locale-aware controls
+
+Six families format numbers or dates and take a `locale`:
+
+| | |
+|---|---|
+| `Date Input`, `Date Picker` | Date formats and first day of week |
+| `Time Input`, `Time Picker` | 12 or 24 hour, and separators |
+| `Pagination` | Grouped thousands in page numbers |
+| `File Input` | File sizes |
+
+```html
+<helix-pagination
+  locale="de-DE"
+  pages="1200"
+></helix-pagination>
+```
+
+Left unset, they use the browser's own locale, which is usually right. Set it
+when your application's language is a choice the reader made rather than the one
+their operating system is in.
+
+Formatting goes through `Intl`, so there is no locale data bundled and nothing
+to keep up to date.
+
+## Translatable strings
+
+Forty-nine properties across the headless tier are strings a reader sees, and
+every one is a property rather than a hardcoded word. The ones that combine
+values are format templates:
+
+```html
+<helix-pagination-summary
+  format="{from} bis {to} von {total}"
+  locale="de-DE"
+  page="2"
+  page-size="10"
+  total="1500"
+></helix-pagination-summary>
+```
+
+The placeholders are named rather than positional, so a translation can reorder
+them, which some languages require and a positional format cannot express.
+
+**Pass these from your own translation system.** Helix ships English defaults
+and no translation machinery: a design system that owned the string catalogue
+would be a second one to keep in step with yours.
+
+## What to check when adding a language
+
+- **Long strings.** German and Finnish will find every control that assumed a
+  short label. Controls take their width from the layout rather than carrying
+  one, which helps, but a toolbar that fitted six buttons may now fit four.
+- **The `lang` attribute, not just the strings.** Hyphenation, quotation marks
+  and font fallback all key off it.
+- **Numerals.** `Intl` handles the digits; a hardcoded `%` or a currency symbol
+  in your own markup will not move to the right side.
+- **Icons that point.** A chevron meaning "forward" is mirrored by the logical
+  properties; one baked into an SVG path is not.
+
+## What is not covered
+
+There is no message catalogue, no pluralization helper and no date-range
+formatter beyond what the controls do for themselves. Those belong to your
+application's i18n layer, and every one of these properties is designed to be
+fed from it.

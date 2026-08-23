@@ -1,0 +1,69 @@
+---
+description: The editor beside the preview, and the isolation that makes it safe.
+section: Tooling
+title: Sandbox
+---
+
+# Sandbox
+
+Every example on a component's page is editable. Change the markup and the
+preview redraws; change the stylesheet beside it and the preview restyles.
+
+That is `@helix-io/sandbox`, and it is worth one page for two reasons: the
+isolation is a security decision worth understanding, and the same elements are
+what you would reach for to build a playground of your own.
+
+## The frame is sandboxed, and that is not packaging
+
+The preview runs in a sandboxed iframe with an opaque origin, and the script
+that drives it is served as a static classic script rather than rendered by a
+route.
+
+**What that buys:** markup typed into the sandbox runs in the frame, and an
+`<img onerror>` in it cannot read the surrounding page's cookies, its
+`localStorage`, or the editor's contents. Before the frame was isolated, it
+could. Measured.
+
+The classic script is the part that looks like packaging and is not: from an
+opaque origin, a module import or a `fetch` back to the site's origin is
+cross-origin and fails without CORS headers. A classic `<script src>` is not
+CORS-checked, so it is the one shape that can carry the component library into a
+document the page cannot reach into and which cannot reach back out.
+
+## Coordination is by event
+
+A source pane dispatches `SourceChange`, which bubbles, and the sandbox hands
+the value to whatever preview is slotted into it. Neither child knows the other
+exists, so either can be replaced or used alone.
+
+The event carries the pane's `name`, which is what lets one sandbox hold several
+panes without the root identifying senders by reference: `html` is the preview's
+markup and `css` is its stylesheet. A pane named anything else is showing
+something rather than driving it, and is ignored.
+
+```html
+<helix-sandbox>
+  <helix-sandbox-source name="html" slot="source">…</helix-sandbox-source>
+  <helix-sandbox-source name="css" slot="source">…</helix-sandbox-source>
+  <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+</helix-sandbox>
+```
+
+## The console is patched in the frame
+
+Logs from the example reach the page's console panel; logs from the page around
+it do not. That is deliberate and is the point of doing the patching in the
+frame rather than in the sandbox: it catches what the example itself logs and
+nothing else.
+
+## The package is private
+
+`@helix-io/sandbox` does not publish. It is the editor and spec runner for this
+repository, and it is Helix tooling rather than a Helix product: the elements
+assume the frame, the frame assumes the build, and the build assumes this
+repository's layout.
+
+If you want an editable example in your own documentation, the honest answer
+today is that you would build it, and the manifest and the `.examples` files are
+what you would build it from. That is a gap rather than a policy, and worth
+telling us about.

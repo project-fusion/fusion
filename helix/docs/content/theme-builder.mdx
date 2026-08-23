@@ -1,0 +1,65 @@
+---
+description: The tool that turns intent inputs into a token set you can see.
+section: Tooling
+title: Theme builder
+---
+
+# Theme builder
+
+A theme is derived rather than picked, which is a strong claim and an abstract
+one until you have moved a slider and watched every surface in the library
+resolve around it. That is what the builder is for.
+
+## What it does
+
+You give it the intent inputs, the same ones `derive()` takes: a brand colour, a
+chroma ceiling, a radius, a density, a contrast target, a motion character. It
+runs the real derivation, not an approximation of it, and shows you the complete
+token set plus the library rendered in it.
+
+Light and dark at once, because `[data-color-mode]` works on any element and the
+two previews are two subtrees of one document. See [Color modes](./color-modes).
+
+## The contrast column is the part to read
+
+Every pairing the engine solved is listed with its measured ratio against the
+ground it is actually painted on. Three states:
+
+- **Met.** The pair reaches the target.
+- **Unverifiable.** The ground is translucent, so there is no known colour to
+  measure against. Not a failure, and not a pass either: it is what a material
+  choice costs you, reported rather than hidden.
+- **Pinned.** You supplied the colour outright, so the engine did not solve for
+  it and cannot promise anything about it.
+
+A theme with a column of `unverifiable` is a theme making a trade. It should be
+possible to see that you made it.
+
+## What comes out
+
+The token block, as CSS, to paste into your own stylesheet:
+
+```css
+:root {
+  --helix-color-primary: oklch(…);
+  …
+}
+```
+
+Or the intent object, to keep in your repository and re-derive from:
+
+```ts
+export const theme = { brand: '#2563eb', chroma: { ceiling: 0.1 }, radius: 2 }
+```
+
+**Keep the intent, not the tokens.** The tokens are the output of a solver, and
+the solver improves: a theme stored as its inputs picks up a better derivation,
+and a theme stored as 176 literal values is frozen at the version that produced
+it. The tokens are for pasting into a system that cannot run the engine.
+
+## What it does not do
+
+It shows you numbers and swatches, not components in your product. A contrast
+matrix is a grid with three states, which a terminal or a table renders better
+than a picture does, and the components beside it are there to sanity-check the
+result rather than to be a design surface.

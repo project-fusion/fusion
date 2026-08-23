@@ -46,6 +46,7 @@ export const docSections: DocSection[] = [
   { title: 'Foundations' },
   { title: 'Theming' },
   { title: 'Essentials' },
+  { title: 'Tooling' },
 ]
 
 /** The section of a given name, if it is declared. */

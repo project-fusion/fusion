@@ -1,0 +1,104 @@
+---
+description: Twenty-one events, why every name is prefixed, and which ones bubble.
+section: Essentials
+title: Events
+---
+
+# Events
+
+Every Helix event is a named class with a typed `detail`, dispatched under a
+`helix-` prefixed name. Twenty-one of them.
+
+```ts
+element.addEventListener('helix-change', (event) => {
+  // `event` is a HelixChangeEvent. The detail is typed.
+})
+```
+
+The class exists rather than a bare `CustomEvent` for three reasons, all about
+the type reaching you: the class name is in the manifest, which is what lets the
+framework typings emit a typed callback instead of `(detail: unknown)`; the
+package augments `HTMLElementEventMap`, which types `addEventListener` for
+people writing plain HTML; and the name lives on the class, so a dispatch and a
+listener cannot disagree about the string.
+
+## The prefix earns its place three times
+
+**Retargeting.** An event dispatched inside a shadow root is retargeted to look
+like it came from the host, so a bare `input` from a `<helix-input>` is
+indistinguishable from the inner control's own. Prefixed, it cannot be mistaken
+for either.
+
+**React's claimed verbs.** React's synthetic system owns `change`, `input`,
+`submit`, `copy`, `focus` and the rest, and a prop matching one of those is
+wired to the native event instead. `onhelix-change` matches none of them and
+reaches us.
+
+**The type map is global.** `HTMLElementEventMap` is shared with every element
+in your application. Our classes extend `Event`, so an entry named `select`
+would not fail to compile: it would silently retype
+`textarea.addEventListener('select', …)` as carrying our detail, which at
+runtime is `undefined`. Measured. An unprefixed name is not a collision we would
+notice, it is one you would.
+
+## Propagation follows the event's role
+
+**Lifecycle does not bubble and is not composed.** `helix-open` and
+`helix-close`. Overlays nest, and an inner one's lifecycle must never reach the
+outer one that contains it: a menu closing inside a dialog is not the dialog
+closing.
+
+**Coordination bubbles and is composed.** `helix-select`, `helix-dismiss`,
+`helix-change`. A parent, or a router, can intercept one across a shadow
+boundary, which is what makes a `Tree` usable as navigation.
+
+If you are listening on a container and hearing nothing, the event is probably a
+lifecycle one and the listener belongs on the element itself.
+
+## Cancelling
+
+The events that precede a state change are cancelable, and that is the only way
+to refuse one:
+
+```ts
+dialog.addEventListener('helix-close', (event) => {
+  if (unsaved) {
+    event.preventDefault()
+  }
+})
+```
+
+`bun run check:events` exists partly because this went undocumented: `Tabs` and
+`Toggle.Group` each dispatched the cancelable `helix-change` that is the only
+refusal path, and neither declared it, so the path was undiscoverable. The check
+holds every dispatched event to a declaration and every declaration to a
+dispatch.
+
+## The set
+
+| Event | Roughly |
+|---|---|
+| `helix-open`, `helix-close` | An element's open state, before it moves |
+| `helix-change` | A committed value |
+| `helix-input` | An edit in progress |
+| `helix-select` | An item chosen from a set |
+| `helix-toggle` | A two-state control flipped |
+| `helix-dismiss` | The reader asked for something to go away |
+| `helix-next`, `helix-previous` | Movement through a sequence |
+| `helix-filter` | A query changed in a filtering control |
+| `helix-navigate` | A component is about to navigate |
+| `helix-copy` | Something was copied |
+| `helix-caret` | The cursor moved in a text control |
+| `helix-load`, `helix-error`, `helix-complete` | Media and async lifecycle |
+| `helix-create` | A new item was made from a query |
+| `helix-console` | The sandbox relaying a log |
+| `helix-tour-ask`, `helix-sample-start`, `helix-sample-end` | Tour and colour sampling |
+
+Each component's page lists the events it actually dispatches, with the class
+and the detail.
+
+## In a framework
+
+The prop is `on` and the event name, verbatim: `onhelix-change`. Nothing strips
+the prefix and nothing camel-cases it. See [React](./react), [Vue](./vue) and
+[Svelte](./svelte).

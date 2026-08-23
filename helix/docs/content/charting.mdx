@@ -1,0 +1,93 @@
+---
+description: The data channel nobody expects, and why it is a real table.
+section: Essentials
+title: Charting
+---
+
+# Charting
+
+Six chart families: `Bar Chart`, `Line Chart`, `Donut Chart`, `Sparkline`,
+`Trend` and the shared `Legend`. Their API is on their own pages. This page is
+about the one thing those pages cannot tell you, which is how the data gets in.
+
+## The data is a table in the document
+
+```html
+<table id="revenue">
+  <caption>Revenue by quarter</caption>
+  <thead>
+    <tr><th>Quarter</th><th>Direct</th><th>Partner</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>Q1</th><td>120</td><td>80</td></tr>
+    <tr><th>Q2</th><td>150</td><td>95</td></tr>
+  </tbody>
+</table>
+
+<helix-bar-chart for="revenue"></helix-bar-chart>
+```
+
+`for` points at a real `<table>` by id, and the chart reads its series from it.
+That is unlike every other component in the library and it is worth
+understanding, because it is not a convenience.
+
+**A property cannot survive hydration.** A framework's server render emits
+markup, and a property is not markup: an array assigned to `items` exists only
+after JavaScript has run, so the server has nothing to send and the first paint
+has nothing to draw. Text in the document is the one channel that both a server
+and a client can see.
+
+**And the table is not a workaround, it is the accessible version.** A chart is
+a picture of numbers, and a screen reader cannot read a picture. The table is
+the numbers, in the document, navigable, and the chart is the drawing of them.
+Hide the table visually if it should not be seen, and the data is still there:
+
+```html
+<table
+  data-hidden-visually
+  id="revenue"
+>…</table>
+```
+
+The caption becomes the chart's accessible name unless you set `label`, which is
+usually the right words and is already written.
+
+## Series colours
+
+Twenty-four `--helix-color-series-*` tokens, in order. A chart with three series
+uses the first three. They are ordered to stay distinguishable in that order
+rather than to look good as a full set of twenty-four.
+
+The palette wraps, and where it wraps is one number in one place. It used to be
+four: four families held the same `const PALETTE = 24` and the legend held a
+fifth, so when the palette went from eight to twenty-four one of them was missed
+and drew every ninth series in the first colour while the legend beside it named
+the ninth correctly. A number two files have to agree on is a number that will
+stop agreeing.
+
+**A chart's mark carries its own series colour as a custom property**, because a
+chart knows which series a bar belongs to and CSS cannot count it. That is what
+lets you restyle a series from outside without knowing the drawing order.
+
+## Legends
+
+```html
+<helix-legend for="revenue"></helix-legend>
+<helix-bar-chart for="revenue"></helix-bar-chart>
+```
+
+The legend reads the same table, so the names and the colours cannot disagree
+with the chart's. Pointing them at two different tables is the only way to make
+them disagree, and it is not something to do by accident.
+
+## Reduced motion
+
+Charts animate on entry and on data change, and every one of them answers
+`prefers-reduced-motion`. See [Motion](./motion).
+
+## What these are not
+
+**Not a charting library.** There is no axis configuration language, no plugin
+system, and no chart type you build by composing scales. Six drawings that read
+a table, styled by the token system, with an accessible representation by
+construction. When you need a grammar of graphics, use one.
