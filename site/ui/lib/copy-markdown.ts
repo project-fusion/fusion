@@ -8,7 +8,7 @@ import { VERTICALS } from '../app/verticals'
 import { INSIGHTS } from './insights'
 import type { Route } from './routes'
 
-/**
+/*
  * A page's copy, as the markdown its `.md` serves.
  *
  * **The same object the page renders as Helix markup.** That is the whole

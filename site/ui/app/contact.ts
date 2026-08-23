@@ -1,6 +1,6 @@
 import type { PageCopy } from './copy'
 
-/**
+/*
  * The contact page, as data.
  *
  * Two lists, and both are the substance rather than decoration: what to put in
