@@ -42,6 +42,23 @@ pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
         .hint("helix theme audit"));
     }
 
+    /* **A forced build says what it forced.** Exit 0 is right, `--force` being a
+    request rather than a mistake, but a file that does not meet the contrast it
+    claims must not be produced in silence: the flag is typed once and the file
+    is read for years. To stderr, so it never lands in the artifact. */
+    if !theme.violations.is_empty() {
+        eprintln!(
+            "helix: forced past {} failing {}, starting with {}",
+            theme.violations.len(),
+            if theme.violations.len() == 1 {
+                "pair"
+            } else {
+                "pairs"
+            },
+            theme.violations.first().map_or("", String::as_str)
+        );
+    }
+
     let css = to_css(&theme, &args.selector);
     let written = match &args.out {
         None => None,

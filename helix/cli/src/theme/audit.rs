@@ -101,7 +101,7 @@ fn matrix(theme: &Theme, source: &str, paint: Paint) {
             .ratio
             .map_or_else(|| "  -  ".to_owned(), |ratio| format!("{ratio:5.2}"));
         println!(
-            "  {mark:>2}  {:ink$}  on  {:ground$}  {measured} / {:.1}",
+            "  {mark}  {:ink$}  on  {:ground$}  {measured} / {:.1}",
             pairing.foreground, pairing.background, pairing.target
         );
     }

@@ -31,6 +31,17 @@ impl Paint {
         if std::env::var_os("NO_COLOR").is_some_and(|value| !value.is_empty()) {
             return Self(false);
         }
+        /* **A way to force it on, and it exists for one reason.** The alignment
+        of a coloured column cannot be checked from a pipe, because a pipe is not
+        a terminal and the branch never runs; the bug it protects against is
+        therefore invisible to every test and to all of CI. Named as an
+        environment variable rather than a flag because it is not a thing to
+        offer a reader: `NO_COLOR` and a tty are how this is decided, and a third
+        public knob would be a third thing to keep true. */
+
+        if std::env::var_os("HELIX_FORCE_COLOR").is_some_and(|value| !value.is_empty()) {
+            return Self(true);
+        }
         Self(std::io::stdout().is_terminal())
     }
 
@@ -72,11 +83,22 @@ impl Paint {
 ///
 /// ASCII, because a terminal that cannot render a box-drawing character renders
 /// a replacement glyph that looks like a third state.
+///
+/// **Padded here, to the width of the widest**, and that is not cosmetic. A
+/// terminal counts an escape sequence as characters, so `{:>2}` applied to an
+/// already-coloured `x` sees a string of twelve and adds nothing, while the same
+/// format applied to an uncoloured one adds a space. The column was therefore
+/// straight with `NO_COLOR` set and ragged by exactly one character without it,
+/// which is the shape of bug that survives every run in CI, CI not being a
+/// terminal.
+///
+/// The rule is general: pad before colouring, never after. Anything formatting to
+/// a width has to be looking at the text.
 #[must_use]
 pub fn glyph(outcome: helix_theme::derive::report::Outcome) -> &'static str {
     use helix_theme::derive::report::Outcome::{Fail, Pass, Unverifiable};
     match outcome {
-        Fail => "x",
+        Fail => " x",
         Pass => "ok",
         /* **Its own glyph, not a blank.** An unmeasured pair is not a quiet pass,
         and a column of `ok` with gaps in it reads as one. */

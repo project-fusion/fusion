@@ -28,12 +28,25 @@ fn binary() -> PathBuf {
 }
 
 fn run(directory: &Path, args: &[&str]) -> Output {
-    Command::new(binary())
-        .args(args)
-        .current_dir(directory)
-        .env("NO_COLOR", "1")
-        .output()
-        .expect("the binary runs")
+    coloured(directory, args, false)
+}
+
+/// **The same command with colour forced on**, which is the only way one class of
+/// bug is visible. See [`the_matrix_stays_aligned_when_it_is_coloured`].
+fn coloured(directory: &Path, args: &[&str], paint: bool) -> Output {
+    let mut command = Command::new(binary());
+    command.args(args).current_dir(directory);
+    if paint {
+        command.env_remove("NO_COLOR");
+        /* The binary decides on `stdout().is_terminal()`, which is false for a
+        pipe, so the flag is what forces the branch. There is no `--color`, so the
+        test asks for the absence of the thing that turns it off and supplies the
+        rest through the environment the process actually reads. */
+        command.env("HELIX_FORCE_COLOR", "1");
+    } else {
+        command.env("NO_COLOR", "1");
+    }
+    command.output().expect("the binary runs")
 }
 
 fn out(output: &Output) -> String {
@@ -282,4 +295,80 @@ fn an_explicit_path_wins_over_the_search() {
 
     let explicit = run(&sandbox.0, &["theme", "check", "other.json"]);
     assert_eq!(code(&explicit), 1, "the explicit path was ignored");
+}
+
+/// **A coloured column is padded before it is coloured, never after.**
+///
+/// A terminal counts an escape sequence as characters, so a width format applied
+/// to an already-coloured one-character glyph sees a string of twelve and adds
+/// nothing, while the same format on an uncoloured one adds a space. The matrix
+/// was straight with `NO_COLOR` set and ragged by exactly one character without
+/// it, which is a bug that survives every run in CI: CI is not a terminal.
+///
+/// Asserted on the visible text with the escapes stripped, which is what a reader
+/// sees and what the format is for.
+#[test]
+fn the_matrix_stays_aligned_when_it_is_coloured() {
+    let sandbox = Sandbox::new("aligned", Some(FAILING));
+    let output = coloured(&sandbox.0, &["theme", "audit"], true);
+    assert_eq!(code(&output), 1);
+
+    /* **The output has to actually be coloured, or this test is about the other
+    branch.** Without the check, breaking the thing that turns colour on makes
+    the assertions below run against plain text, where the alignment has never
+    been in question: the test would go on passing while covering nothing.
+    Measured by removing the force, which is how the hole was found. */
+    let printed = out(&output);
+    assert!(
+        printed.contains('\u{1b}'),
+        "nothing was coloured, so the alignment below is about the plain branch"
+    );
+
+    let rows: Vec<String> = printed
+        .lines()
+        .filter(|line| line.contains("  on  "))
+        .map(strip)
+        .collect();
+    assert!(
+        rows.len() > 10,
+        "not enough rows to compare: {}",
+        rows.len()
+    );
+
+    /* Every row's ink name starts in the same column, whatever its glyph. */
+    let columns: Vec<usize> = rows
+        .iter()
+        .map(|row| row.find("color-").expect("a row names a token"))
+        .collect();
+    let first = columns[0];
+    assert!(
+        columns.iter().all(|column| *column == first),
+        "the glyph column is ragged: {columns:?}"
+    );
+    /* And at least two different glyphs are present, or the assertion above is
+    about one case and proves nothing. */
+    assert!(
+        rows.iter().any(|row| row.trim_start().starts_with('x'))
+            && rows.iter().any(|row| row.trim_start().starts_with("ok")),
+        "the theme under test did not produce both a pass and a fail"
+    );
+}
+
+/// Drops ANSI escapes, so an assertion is about what a reader sees.
+fn strip(line: &str) -> String {
+    let mut visible = String::with_capacity(line.len());
+    let mut characters = line.chars();
+    while let Some(character) = characters.next() {
+        if character != '\u{1b}' {
+            visible.push(character);
+            continue;
+        }
+        /* CSI runs to a letter, which is the only terminator this emits. */
+        for inside in characters.by_ref() {
+            if inside.is_ascii_alphabetic() {
+                break;
+            }
+        }
+    }
+    visible
 }
