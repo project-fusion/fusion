@@ -27,7 +27,7 @@
  *
  * Run with `bun run check:routes`, after `bun run catalog`.
  */
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -108,12 +108,65 @@ for (const route of components) {
   }
 }
 
+/* Every address this site has ever served, and whether it still resolves.
+ *
+ * **A slug is the name of a file, so it is stable by default**: retitling a
+ * post edits frontmatter and the address does not move. What can still move it
+ * is a `git mv`, which is a deliberate act and is exactly what this checks.
+ *
+ * The record is `site/content/published.json`, written by this check the first
+ * time it runs and appended to as pages appear. It is not a source of identity
+ * (the file name is) and nothing reads it at runtime: it is a memory of what
+ * has been published, which is the one thing a filesystem cannot tell you,
+ * because a deleted file leaves nothing behind to notice.
+ *
+ * **A path that leaves has to have somewhere to go.** `next.config.ts` already
+ * carries the machinery, permanent and wildcarded, from when `/design` became
+ * `/helix`. A rename without a redirect is a link that was published and now
+ * 404s, and `llms.txt` means a machine may hold it too. */
+const PUBLISHED = join(ROOT, 'site/content/published.json')
+const CONFIG = join(ROOT, 'site/ui/next.config.ts')
+
+const published = existsSync(PUBLISHED)
+  ? JSON.parse(readFileSync(PUBLISHED, 'utf8'))
+  : { paths: [] }
+const live = new Set(all.map((route) => route.path))
+
+/* Sources rather than destinations: a redirect answers for the address that
+   left, and the wildcard forms answer for everything beneath one. */
+const redirected = [...readFileSync(CONFIG, 'utf8').matchAll(/source:\s*'([^']+)'/g)].map(
+  (match) => match[1],
+)
+const answers = (path) =>
+  redirected.some(
+    (source) =>
+      source === path ||
+      (source.includes(':path*') && path.startsWith(source.replace('/:path*', '/'))),
+  )
+
+for (const path of published.paths) {
+  if (!live.has(path) && !answers(path)) {
+    problems.push(
+      `${path}: was published and no longer resolves. Add a redirect in next.config.ts, or restore it`,
+    )
+  }
+}
+
 if (problems.length > 0) {
   console.error(`routes: ${problems.length} problem${problems.length === 1 ? '' : 's'}`)
   for (const problem of problems) {
     console.error(`  ${problem}`)
   }
   process.exit(1)
+}
+
+/* Recorded only when everything passed, so a failing run never writes a path
+   into the record it is about to be judged against. */
+if (problems.length === 0) {
+  const merged = [...new Set([...published.paths, ...live])].sort()
+  if (merged.join() !== published.paths.join()) {
+    writeFileSync(PUBLISHED, `${JSON.stringify({ paths: merged }, undefined, 2)}\n`)
+  }
 }
 
 const kinds = all.reduce((counts, route) => {

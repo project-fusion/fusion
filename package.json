@@ -82,7 +82,8 @@
     "check:oracle": "bun tooling/scripts/build-oracle.mjs --check",
     "probe:stuck": "bun tooling/scripts/probe-stuck-spec.mjs",
     "content": "bun tooling/scripts/build-content.mjs",
-    "check:content": "bun tooling/scripts/build-content.mjs --check"
+    "check:content": "bun tooling/scripts/build-content.mjs --check",
+    "insight": "bun tooling/scripts/new-insight.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",

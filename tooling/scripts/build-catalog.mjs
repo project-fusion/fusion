@@ -102,6 +102,27 @@ rmSync(DOCS, { force: true, recursive: true })
 mkdirSync(COMPONENTS, { recursive: true })
 mkdirSync(DOCS, { recursive: true })
 
+/* The prose documents, cleared by file rather than by folder.
+ *
+ * Those two directories hold nothing but generated markdown, so removing them
+ * whole is safe. These do not: `public/` is the site's asset root and
+ * `public/insights/` holds the pictures the cards use. Deleting either would
+ * take real files with it.
+ *
+ * Clearing at all is not tidiness. Without it a deleted page leaves its `.md`
+ * behind, still served, still linked from nothing, and `check:routes` reports
+ * it as a document no route points at. Found exactly that way. */
+for (const dir of [PUBLIC, join(PUBLIC, 'insights')]) {
+  if (!existsSync(dir)) {
+    continue
+  }
+  for (const entry of readdirSync(dir)) {
+    if (entry.endsWith('.md')) {
+      rmSync(join(dir, entry))
+    }
+  }
+}
+
 const styled = manifests[0] ?? { modules: [] }
 for (const family of families) {
   writeFileSync(join(COMPONENTS, `${family.slug}.json`), `${JSON.stringify(family, null, 2)}\n`)
