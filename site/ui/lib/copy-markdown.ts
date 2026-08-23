@@ -4,9 +4,7 @@ import { LANDING } from '../app/landing'
 import { PRODUCTS } from '../app/products'
 import { SERVICES } from '../app/services'
 import { SERVICES_COPY } from '../app/services-copy'
-import { THESIS } from '../app/thesis'
 import { AURA, SANDBOX, THEME_BUILDER } from '../app/tools'
-import { TRUST } from '../app/trust'
 import { VERTICALS } from '../app/verticals'
 import { INSIGHTS } from './insights'
 import type { Route } from './routes'
@@ -49,8 +47,6 @@ const COPY: Record<string, PageCopy> = {
   '/helix/sandbox': SANDBOX,
   '/helix/theme': THEME_BUILDER,
   '/services': SERVICES_COPY,
-  '/thesis': THESIS,
-  '/trust': TRUST,
 }
 
 /**

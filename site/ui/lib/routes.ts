@@ -1,3 +1,4 @@
+import { findSitePage } from '@fusion-io/site-content'
 import { pages as docPages, navigation } from '@helix-io/docs'
 import { LANDING } from '../app/landing'
 import { getFamilies } from './catalog'
@@ -61,7 +62,7 @@ const PROSE: Route[] = [
     title: 'Fusion Development Group',
   },
   {
-    description: 'Sovereignty at every scale, and the mechanism that makes it practical.',
+    description: findSitePage('/thesis')?.description ?? '',
     kind: 'page',
     path: '/thesis',
     priority: 0.8,
@@ -69,7 +70,7 @@ const PROSE: Route[] = [
     title: 'Thesis',
   },
   {
-    description: 'What we operate, what you hold, and what happens if we stop.',
+    description: findSitePage('/trust')?.description ?? '',
     kind: 'page',
     path: '/trust',
     priority: 0.8,

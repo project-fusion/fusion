@@ -1,5 +1,9 @@
+import { findSitePage, sitePageSources } from '@fusion-io/site-content'
+import { renderMdx } from '../../../lib/mdx'
+import styles from './trust.module.css'
+
 /**
- * The bar, published as a finite list.
+ * The trust bar, rendered from `@fusion-io/site-content`.
  *
  * **The point is that it is finite.** `the internal plan` names the risk
  * this page exists to answer: a trust bar that is never defined can never be
@@ -7,102 +11,40 @@
  * one. Written down and counted, it converts an internal gate that can be moved
  * forever into a public commitment that can actually be reached.
  *
+ * The six are `##` headings in the file rather than an array of six objects,
+ * which is the same count expressed in the form a person adding a seventh would
+ * actually be editing. The numbering is a CSS counter for the same reason: the
+ * count is a fact about the document, so the document should carry it.
+ *
  * The second half is the part most companies leave out and the reason this page
  * is worth having at all: none of it has been exercised yet, because nothing
  * has shipped. Saying so is the same discipline the stage labels are.
  */
-import { BAR, TRUST } from '../../trust'
+const page = findSitePage('/trust')
 
-export const metadata = {
-  description:
-    'The finite checklist every Fusion product clears before it ships, and an honest account of what has been tested so far.',
-  title: 'Trust',
-}
+export const metadata = { description: page?.description, title: 'Trust' }
 
-export default function Page() {
+export default async function Page() {
+  if (!page) {
+    return null
+  }
+  const source = sitePageSources[page.slug]
   return (
     <>
+      {/* One band, because it is one document. The hero and the prose under it
+          were two, which put a whole band ofspace between a title and its
+          own first sentence. */}
       <section data-band>
         <helix-flex data-shell direction="column" gap="lg">
           <helix-text tone="subtle" variant="label">
-            Trust
+            {page.kicker}
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
-            {TRUST.title}
+            {page.title}
           </helix-text>
-          <helix-text as="p" data-measure tone="muted">
-            Six things. The number matters more than the contents: a bar that is never written down
-            can be raised forever, and a company that keeps raising one never launches. Counted and
-            published, it becomes something that can actually be met, and something you can hold us
-            to.
-          </helix-text>
-        </helix-flex>
-      </section>
-
-      <section data-band data-reveal>
-        <helix-flex data-shell direction="column" gap="xl">
-          <helix-flex direction="column">
-            {BAR.map((item, index) => (
-              <helix-flex align="start" data-row gap="lg" key={item.name} wrap>
-                {/* Numbered, because the count is the commitment. A list that
-                    can grow quietly is the thing this page exists to prevent. */}
-                <helix-text tone="subtle" variant="label">
-                  {String(index + 1).padStart(2, '0')}
-                </helix-text>
-                <helix-flex direction="column" gap="2xs">
-                  <helix-text as="h2" data-row-name>
-                    {item.name}
-                  </helix-text>
-                  <helix-text data-measure tone="muted">
-                    {item.body}
-                  </helix-text>
-                </helix-flex>
-              </helix-flex>
-            ))}
-          </helix-flex>
-        </helix-flex>
-      </section>
-
-      {/* The half that makes the rest credible. */}
-      <section data-band data-reveal>
-        <helix-flex class={`statement`} data-shell direction="column" gap="lg">
-          <helix-text tone="subtle" variant="label">
-            {TRUST.blocks[1]?.kicker}
-          </helix-text>
-          <helix-text as="p" data-statement>
-            {TRUST.blocks[1]?.title}
-          </helix-text>
-          <helix-text as="p" data-measure tone="muted">
-            Helix is Building and Cortex is Building, which means there is no product yet that has
-            had to clear this list. Publishing the bar before there is anything to hold against it
-            is the point: written first, it is a commitment. Written afterwards, it is a description
-            of whatever we happened to do.
-          </helix-text>
-        </helix-flex>
-      </section>
-
-      <section data-band data-closing data-reveal>
-        <helix-flex align="center" data-shell direction="column" gap="lg">
-          <helix-text as="h2" data-section-title>
-            Hold us to it
-          </helix-text>
-          <helix-text as="p" data-measure tone="muted">
-            If something we ship does not clear one of these, that is worth telling us about, and
-            the list is short enough that the check is a real one.
-          </helix-text>
-          <helix-flex data-density="lg" gap="sm" wrap>
-            <a
-              data-button="solid"
-              data-button-tone="primary"
-              data-button-width="standard"
-              href="mailto:hello@fusion.dev"
-            >
-              hello@fusion.dev
-            </a>
-            <a data-button data-button-width="standard" href="/thesis">
-              Read the thesis
-            </a>
-          </helix-flex>
+          <div className={styles.prose} data-measure data-prose>
+            {source ? await renderMdx(source) : null}
+          </div>
         </helix-flex>
       </section>
     </>
