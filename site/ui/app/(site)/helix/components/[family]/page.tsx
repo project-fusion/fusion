@@ -268,12 +268,39 @@ function tokens(member: string) {
   )
 }
 
+/**
+ * What a column heading means, where one word cannot say it.
+ *
+ * **A button rather than a bare glyph.** `Tooltip` shows on hover and on focus,
+ * so a mark that is not focusable is a mark only a pointer ever reads, and this
+ * is the case where that matters most: the heading is one invented word and a
+ * keyboard reader has no other way to find out what it means. It does nothing
+ * when pressed, which is the accessible pattern for a hint rather than a
+ * control, and it carries the sentence as its own name so a screen reader hears
+ * the explanation rather than the word "info".
+ *
+ * Only `Read` has one today. `Prop`, `Type`, `Slot` and `Event` are words a
+ * reader arrives already knowing; `Read` is ours, and it is what somebody asked
+ * about.
+ */
+function ColumnHint({ hint, label }: { hint: string; label: string }) {
+  return (
+    <helix-tooltip content={hint} placement="top">
+      <button aria-label={`${label}: ${hint}`} className={styles.apiHint} type="button">
+        <helix-icon name="info" />
+      </button>
+    </helix-tooltip>
+  )
+}
+
 /** Name, type, description. Slots and parts pass no type and get two columns. */
 function MemberTable({
+  hint,
   label,
   rows,
   typed = true,
 }: {
+  hint?: string
   label: string
   rows: ApiMember[]
   typed?: boolean
@@ -284,7 +311,10 @@ function MemberTable({
   return (
     <div className={styles.apiTable}>
       <helix-table label={label}>
-        <helix-table-column>{label}</helix-table-column>
+        <helix-table-column>
+          {label}
+          {hint && <ColumnHint hint={hint} label={label} />}
+        </helix-table-column>
         {typed && <helix-table-column width={TYPE}>Type</helix-table-column>}
         <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
         {byName(rows).map((row) => (
@@ -433,6 +463,7 @@ function ElementApi({ element }: { element: Element }) {
           also do not want the column. */}
       <PropertyTable rows={element.properties.filter((row) => !row.readonly)} />
       <MemberTable
+        hint="Read-only. These report something the element worked out, and assigning to one throws, which is why they have no default."
         label="Read"
         rows={element.properties
           .filter((row) => row.readonly)

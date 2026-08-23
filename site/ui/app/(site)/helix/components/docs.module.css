@@ -308,6 +308,31 @@
   --icon-size: 1em;
 }
 
+/* The same mark on a column heading, which wants none of the row version's
+   placement. It sits beside the word rather than at the end of a line, so there
+   is no `auto` margin; and it is a `<button>`, because `Tooltip` opens on focus
+   and a glyph nothing can focus is a hint only a pointer reads, so the browser's
+   own button chrome has to come off. `all: unset` takes `box-sizing` with it,
+   which is the trap written up in the area notes, and this element has padding,
+   so it is restored in the same rule. */
+.apiHint {
+  all: unset;
+  --icon-size: 1em;
+
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: help;
+  display: inline-flex;
+  margin-inline-start: var(--helix-space-2xs);
+  vertical-align: middle;
+}
+
+.apiHint:hover,
+.apiHint:focus-visible {
+  color: var(--helix-color-foreground);
+}
+
 .apiName {
   color: var(--helix-color-syntax-name);
   /* A property name is one identifier and breaking it is worse than a wider
