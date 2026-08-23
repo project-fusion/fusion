@@ -48,7 +48,7 @@ const linkFrom = (event: { nativeEvent: Event }): HTMLAnchorElement | undefined 
 
 /** The path, or nothing where the link leaves the site or opens elsewhere. */
 const internal = (link: HTMLAnchorElement | undefined): string | undefined => {
-  if (!link || link.target !== '') {
+  if (link?.target !== '') {
     return undefined
   }
   const url = new URL(link.href)

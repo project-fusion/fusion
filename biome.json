@@ -43,6 +43,12 @@
   "linter": {
     "enabled": true,
     "rules": {
+      "correctness": {
+        "noUnusedFunctionParameters": "error",
+        "noUnusedImports": "error",
+        "noUnusedPrivateClassMembers": "error",
+        "noUnusedVariables": "error"
+      },
       "preset": "recommended",
       "style": {
         "useBlockStatements": "error"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
- * Collects the manifests and the example files into one catalog the site
- * imports rather than reads.
+ * Collects the manifests and the example files into the catalog the site
+ * imports, and into one `.md` and one `.json` per family.
  *
  * **This exists to close a build warning, and the warning was right.** The site
  * used to reach out of its own project with `join(process.cwd(), '..', '..')`
@@ -27,13 +27,15 @@
  * `bun run dev:watch` does. That is the trade the warning asks for, and it is
  * worth naming rather than discovering.
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { catalog } from '../../helix/docs/src/catalog.ts'
+import { reference } from '../../helix/docs/src/reference.ts'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const OUT = join(ROOT, 'site/ui/lib/catalog.generated.json')
+const PUBLIC = join(ROOT, 'site/ui/public/components')
 
 const MANIFESTS = [
   'helix/web/custom-elements.json',
@@ -74,7 +76,37 @@ const families = catalog(manifests, examples)
 mkdirSync(dirname(OUT), { recursive: true })
 writeFileSync(OUT, `${JSON.stringify(families)}\n`)
 
+/* One `.md` and one `.json` per family, as files in the build output.
+ *
+ * Static text on our own domain, generated from the repository, which is what
+ * `13-site-architecture.md` means by layer 0: a route handler would put the
+ * same bytes behind a running server, and the point of this surface is that it
+ * survives one not running. `/components/<family>.md` is a file.
+ *
+ * The `.json` is the catalog entry verbatim rather than a second shape of it.
+ * It is what the page renders from, so anything else would be a third source
+ * for a component's API. */
+rmSync(PUBLIC, { force: true, recursive: true })
+mkdirSync(PUBLIC, { recursive: true })
+
+const styled = manifests[0] ?? { modules: [] }
+for (const family of families) {
+  writeFileSync(join(PUBLIC, `${family.slug}.json`), `${JSON.stringify(family, null, 2)}\n`)
+
+  const lede = [family.summary, ''].filter((line, index) => index === 0 && line !== '')
+  writeFileSync(
+    join(PUBLIC, `${family.slug}.md`),
+    reference(styled, {
+      examples: { [family.slug]: family.examples },
+      families: [family.slug],
+      lede: lede.length > 0 ? [...lede, ''] : [],
+      title: family.label,
+    }),
+  )
+}
+
 const elements = families.reduce((total, family) => total + family.elements.length, 0)
 console.log(
-  `catalog: ${families.length} families, ${elements} elements, ${examples.length} examples`,
+  `catalog: ${families.length} families, ${elements} elements, ${examples.length} examples, ` +
+    `${families.length * 2} files in public/components`,
 )

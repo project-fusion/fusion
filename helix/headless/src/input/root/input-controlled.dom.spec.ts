@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, registerDom } from '@helix-io/testing/dom'
+import { mount, registerDom } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -16,7 +16,7 @@ const input = async (extra = ''): Promise<Input> =>
   (await mount(`<helix-base-input label="Name" ${extra}></helix-base-input>`)) as Input
 
 /** The real input inside, which is where a caret lives. */
-const control = (host: Input): HTMLInputElement =>
+const _control = (host: Input): HTMLInputElement =>
   host.shadowRoot?.querySelector<HTMLInputElement>('[part="control"]') as HTMLInputElement
 
 /**

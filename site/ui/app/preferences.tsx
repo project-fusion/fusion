@@ -1,7 +1,5 @@
 'use client'
-
-import type { HelixDrawer, HelixToggleGroup } from '@helix-io/web'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ApiTier } from '../lib/use-api-tier'
 
 type ColorMode = 'system' | 'light' | 'dark'

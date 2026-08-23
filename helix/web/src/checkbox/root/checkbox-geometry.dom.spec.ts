@@ -13,10 +13,10 @@ type Checkbox = HTMLElement & {
   updateComplete: Promise<unknown>
 }
 
-const checkbox = async (attrs = ''): Promise<Checkbox> =>
+const _checkbox = async (attrs = ''): Promise<Checkbox> =>
   (await mount(`<helix-checkbox ${attrs}>Terms</helix-checkbox>`)) as Checkbox
 
-const control = (box: Checkbox): HTMLInputElement => part(box, 'control') as HTMLInputElement
+const _control = (box: Checkbox): HTMLInputElement => part(box, 'control') as HTMLInputElement
 
 /* Where the box, its mark and its message sit, which is this tier's arrangement.
 

@@ -52,7 +52,7 @@ for (const name of checks) {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
     })
-  } catch (error) {
+  } catch (_error) {
     // The check itself failed, which is its own report to make and not this one's.
     continue
   }

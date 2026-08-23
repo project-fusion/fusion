@@ -92,7 +92,7 @@ describe('toggle group in a form', () => {
   }
 
   test('reports the chosen value', async () => {
-    const { form, group } = await inForm('default-value="light"')
+    const { group } = await inForm('default-value="light"')
     expect(formValue(group)).toBe('light')
 
     ;(group as Updatable & { value: string }).value = 'dark'
@@ -103,7 +103,7 @@ describe('toggle group in a form', () => {
   test('a reset returns it to the choice the markup declared', async () => {
     // `default-value` and `value` are separate for the reason `defaultChecked`
     // and `checked` are: where it started is gone the moment anything is picked.
-    const { form, group } = await inForm('default-value="light"')
+    const { group } = await inForm('default-value="light"')
     ;(group as Updatable & { value: string }).value = 'dark'
     await group.updateComplete
 
@@ -113,7 +113,7 @@ describe('toggle group in a form', () => {
   })
 
   test('the browser can put back a choice it restored', async () => {
-    const { form, group } = await inForm('default-value="light"')
+    const { group } = await inForm('default-value="light"')
     ;(
       group as Updatable & { formStateRestoreCallback: (s: string | null) => void }
     ).formStateRestoreCallback('dark')
@@ -124,7 +124,7 @@ describe('toggle group in a form', () => {
   test('nothing chosen reports nothing, rather than a blank', async () => {
     // `null` and `''` are different answers: one submits no field at all, the
     // other submits the field with an empty value.
-    const { form, group } = await inForm()
+    const { group } = await inForm()
     expect(formValue(group)).toBeNull()
   })
 

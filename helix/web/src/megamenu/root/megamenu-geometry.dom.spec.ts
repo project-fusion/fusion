@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom, role, settled } from '@helix-io/testing/dom'
+import { hasLayout, mount, part, registerDom, settled } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 type Section = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
 
-const section = async (label = 'Products'): Promise<Section> => {
+const _section = async (label = 'Products'): Promise<Section> => {
   const host = (await mount(
     `<helix-megamenu label="${label}"><a href="/one">One</a></helix-megamenu>`,
   )) as Section
@@ -33,7 +33,7 @@ const press = (host: Section, pointerType: string, detail = 1): void => {
   trigger(host).dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
 }
 
-const settle = (ms: number): Promise<void> =>
+const _settle = (ms: number): Promise<void> =>
   new Promise((done) => {
     setTimeout(done, ms)
   })

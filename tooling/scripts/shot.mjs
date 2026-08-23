@@ -242,7 +242,16 @@ try {
       )
       process.exit(1)
     }
-    await element.scrollIntoViewIfNeeded()
+    /* Playwright's scroll refuses an element with no scrollable box, and a
+       custom element laying out as `display: contents` is exactly that: it
+       waited thirty seconds on a `helix-table-row` and then threw. The element
+       is on the page either way, so scrolling is an improvement on the shot
+       rather than a precondition for it. */
+    await element.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(async () => {
+      await element.evaluate((node) => {
+        node.scrollIntoView({ behavior: 'instant', block: 'center' })
+      })
+    })
     const box = await element.boundingBox()
     if (box === null) {
       console.error(`shot: \`${select}\` has no box to shoot.`)

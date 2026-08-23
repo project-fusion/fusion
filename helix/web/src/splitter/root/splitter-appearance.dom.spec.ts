@@ -6,8 +6,6 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-type Splitter = HTMLElement & { position: number; updateComplete: Promise<unknown> }
-
 /* The one assertion about Splitter that is the stylesheet's: which of two
    rules comes last. It reads `customElements.get('helix-splitter').styles`,
    so it is about the styled element by construction and cannot follow the

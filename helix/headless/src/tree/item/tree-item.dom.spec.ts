@@ -19,7 +19,7 @@ const items = (host: HTMLElement): HTMLElement[] => [
   ...host.querySelectorAll<HTMLElement>('helix-base-tree-item'),
 ]
 
-const labelLeft = (item: HTMLElement): number =>
+const _labelLeft = (item: HTMLElement): number =>
   (part(item, 'label') as HTMLElement).getBoundingClientRect().left
 
 describe('tree item structure', () => {

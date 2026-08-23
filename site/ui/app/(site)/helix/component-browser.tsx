@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixInput, HelixSelect } from '@helix-io/web'
+import type { HelixInput } from '@helix-io/web'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
@@ -342,7 +342,7 @@ export function ComponentBrowser({
                 That is also why neither is `primary`: a group welds its members
                 into one shape, and one filled half beside one outlined half
                 reads as a control that is half broken rather than as a choice.
-                `data-button-fill="standard"` keeps both at
+                `data-button-width="standard"` keeps both at
                 `--helix-size-button`, so the halves are equal rather than sized
                 by how long their words happen to be.
 
@@ -356,11 +356,11 @@ export function ComponentBrowser({
                   "onward" and nothing else, which is what the button's own
                   position already says; put one on a hero button and it is
                   decoration that happens to point right. */}
-              <Link data-button data-button-fill="standard" href="/helix/components/button">
+              <Link data-button data-button-width="standard" href="/helix/components/button">
                 <helix-icon name="flag-banner-fold"></helix-icon>
                 Start
               </Link>
-              <Link data-button data-button-fill="standard" href="/helix/sandbox">
+              <Link data-button data-button-width="standard" href="/helix/sandbox">
                 <helix-icon name="microscope"></helix-icon>
                 Sandbox
               </Link>

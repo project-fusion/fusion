@@ -6,7 +6,7 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-const spark = async (attributes: string): Promise<HTMLElement> =>
+const _spark = async (attributes: string): Promise<HTMLElement> =>
   mount(`<helix-sparkline ${attributes}></helix-sparkline>`)
 
 const path = (host: HTMLElement): string | null => part(host, 'line')?.getAttribute('d') ?? null
@@ -22,7 +22,7 @@ const path = (host: HTMLElement): string | null => part(host, 'line')?.getAttrib
  * whatever command drew the segment, which is the same point in both shapes and
  * is the only one that is a reading rather than a means of getting to it.
  */
-const heights = (host: HTMLElement): number[] =>
+const _heights = (host: HTMLElement): number[] =>
   [...(path(host) ?? '').matchAll(/([MLC])([^MLCHVZ]*)/g)].map((command) => {
     const pairs = (command[2] ?? '').trim().split(/\s+/)
     return Number((pairs.at(-1) ?? '').split(',')[1])

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -13,7 +13,7 @@ type Carousel = HTMLElement & {
   internals?: ElementInternals
 }
 
-const carousel = async (attrs = ''): Promise<Carousel> =>
+const _carousel = async (attrs = ''): Promise<Carousel> =>
   (await mount(`<helix-carousel label="Verticals" ${attrs}>
     <div>Design</div>
     <div>Mind</div>

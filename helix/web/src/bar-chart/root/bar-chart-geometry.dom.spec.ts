@@ -25,11 +25,11 @@ const chart = async (table: string, attributes: string): Promise<HTMLElement> =>
   return host
 }
 
-const bars = (host: HTMLElement): Element[] => [
+const _bars = (host: HTMLElement): Element[] => [
   ...(host.shadowRoot?.querySelectorAll('[part="bar"]') ?? []),
 ]
 
-const labels = (host: HTMLElement): string[] =>
+const _labels = (host: HTMLElement): string[] =>
   [...(host.shadowRoot?.querySelectorAll('[part="label"]') ?? [])].map(
     (one) => one.textContent?.trim() ?? '',
   )

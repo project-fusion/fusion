@@ -1,13 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import {
-  formValue,
-  hasLayout,
-  mount,
-  part,
-  registerDom,
-  role,
-  type Updatable,
-} from '@helix-io/testing/dom'
+import { hasLayout, mount, part, registerDom, type Updatable } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -20,7 +12,7 @@ const markup = `<helix-toggle-group label="Color mode" default-value="light">
   <helix-toggle value="dark">Dark</helix-toggle>
 </helix-toggle-group>`
 
-const items = (group: HTMLElement) =>
+const _items = (group: HTMLElement) =>
   [...group.querySelectorAll('helix-toggle')] as (HTMLElement & {
     selected: boolean
     value: string

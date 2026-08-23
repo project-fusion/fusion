@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 type Area = HTMLElement & { updateComplete: Promise<unknown> }
 
-const area = async (attrs = '', body = '<p>One</p>'): Promise<Area> => {
+const _area = async (attrs = '', body = '<p>One</p>'): Promise<Area> => {
   const host = (await mount(`<helix-scroll-area ${attrs}>${body}</helix-scroll-area>`)) as Area
   await host.updateComplete
   return host

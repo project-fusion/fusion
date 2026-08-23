@@ -19,7 +19,7 @@ const options = (host: HTMLElement): string[] =>
 /* What `Select` dispatches when a reader chooses. Bubbling and composed, which
    is the half of this worth asserting on: left alone it would cross this
    element's shadow boundary and be retargeted to look like its own. */
-const choose = (host: HTMLElement, value: string): CustomEvent =>
+const choose = (_host: HTMLElement, value: string): CustomEvent =>
   new CustomEvent('helix-change', {
     bubbles: true,
     cancelable: true,

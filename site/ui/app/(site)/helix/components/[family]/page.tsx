@@ -1,11 +1,12 @@
 /* Server only, which is what makes this free. The highlighter is a Lezer parse
    and a tree walk, so it runs during the build and the page ships coloured
    markup with no client JavaScript spent on it. `helix/web` never sees it. */
+
+import { startCase } from '@helix-io/docs'
 import { highlight } from '@helix-io/sandbox/highlight'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Fragment } from 'react'
-import { startCase } from '@helix-io/docs'
 import {
   type ApiMember,
   type Element,
@@ -538,7 +539,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
     notFound()
   }
 
-  const root = family.elements.find((entry) => entry.tagName === `helix-${family.slug}`)
+  const _root = family.elements.find((entry) => entry.tagName === `helix-${family.slug}`)
   /* The one-liner, not the reasoning. `@description` is an essay: it argues
      with itself, cites measurements and names components that are not this one,
      which is right in a source file and wrong as the first thing under a

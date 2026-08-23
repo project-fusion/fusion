@@ -195,6 +195,7 @@ describe('combobox holding several', () => {
   }
 
   const tags = (host: Updatable): HTMLElement[] => [
+    // biome-ignore lint/style/noNonNullAssertion: spreading an optional chain throws when it yields undefined, which is what this rule's own automatic fix produced here. A mounted host has a shadow root and the spec has just mounted it.
     ...(host as HTMLElement).shadowRoot!.querySelectorAll<HTMLElement>('[part="tag"]'),
   ]
 
@@ -289,7 +290,7 @@ describe('combobox that takes an answer it was not given', () => {
   }
 
   const row = (host: Updatable): HTMLElement | null =>
-    (host as HTMLElement).shadowRoot!.querySelector<HTMLElement>('[part="create"]')
+    (host as HTMLElement).shadowRoot?.querySelector<HTMLElement>('[part="create"]')
 
   test('the row is offered beside near misses, not only when nothing matches', async () => {
     // A reader typing "Ruby on Rails" with "Ruby" in the list wants the one
@@ -464,6 +465,7 @@ if (hasLayout()) {
     }
 
     const tagsOf = (host: Updatable): HTMLElement[] => [
+      // biome-ignore lint/style/noNonNullAssertion: spreading an optional chain throws when it yields undefined, which is what this rule's own automatic fix produced here. A mounted host has a shadow root and the spec has just mounted it.
       ...(host as HTMLElement).shadowRoot!.querySelectorAll<HTMLElement>('[part="tag"]'),
     ]
 

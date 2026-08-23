@@ -9,8 +9,6 @@ import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type {
   HelixChangeEvent,
   HelixDialog,
-  HelixDrawer,
-  HelixInput,
   HelixInputEvent,
   HelixMenu,
   HelixSandbox,
@@ -125,7 +123,7 @@ const resolve = (families: Family[], familySlug: string | null, exampleSlug: str
 
 export function SandboxWorkbench({ families, findable = [] }: Props) {
   const preview = useRef<HelixSandboxPreview>(null)
-  const files = useRef<HelixToggleGroup>(null)
+  const _files = useRef<HelixToggleGroup>(null)
   /* Held as state, not as a ref: an effect observes the splitter's width and a
      memo reads the tree's rows, and both have to run when the element arrives,
      which a `RefObject` cannot announce. */
@@ -139,7 +137,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      cannot say that its `.current` moved. */
   const sandbox = useRef<HelixSandbox>(null)
   const panelTabs = useRef<HelixTabs>(null)
-  const settings = useRef<HelixMenu>(null)
+  const _settings = useRef<HelixMenu>(null)
   const [layout, setLayout] = useState<'padded' | 'centered' | 'fullscreen'>('padded')
   const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
   const [showEditor, setShowEditor] = useState(true)

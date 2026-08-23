@@ -211,7 +211,7 @@ describe('a tree used as navigation follows its links', () => {
   const itemNamed = (tree: HTMLElement, value: string): HTMLElement =>
     tree.querySelector(`helix-tree-item[value="${value}"]`) as HTMLElement
 
-  const clicksOn = (tree: HTMLElement, value: string): string[] => {
+  const clicksOn = (tree: HTMLElement, _value: string): string[] => {
     const seen: string[] = []
     for (const link of tree.querySelectorAll('a')) {
       link.addEventListener('click', (event) => {

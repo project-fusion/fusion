@@ -381,8 +381,10 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
     let message = ''
     if (value !== '' && !isTime(value)) {
       message = 'Enter a time as HH:mm.'
+      // biome-ignore lint/style/noNonNullAssertion: guarded by the `value !== ''` beside it, and an optional chain here would compare `undefined` and take the branch.
     } else if (value !== '' && toMinutes(value)! < (toMinutes(this.min) ?? 0)) {
       message = `Choose a time at or after ${writeTime(this.min, this.locale)}.`
+      // biome-ignore lint/style/noNonNullAssertion: guarded by the `value !== ''` beside it, and an optional chain here would compare `undefined` and take the branch.
     } else if (value !== '' && toMinutes(value)! > (toMinutes(this.max) ?? 1439)) {
       message = `Choose a time at or before ${writeTime(this.max, this.locale)}.`
     }
