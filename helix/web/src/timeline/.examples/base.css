@@ -64,41 +64,37 @@ helix-base-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* Rail then content, side by side. Without a row the marker lands
-   wherever the text ends, which is the right-hand edge. */
 helix-base-timeline-item {
   display: grid;
-  gap: 0.5rem;
+  gap: 0 0.75rem;
   grid-template-columns: auto 1fr;
 }
 
-/* The rail runs down beside the entries, and the generic rule drew it
-   as a full-width bar across each one: measured 394 by 8, which is a band. */
 helix-base-timeline-item::part(rail) {
+  align-items: center;
   background-color: transparent;
   block-size: auto;
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
   inline-size: auto;
 }
 
 helix-base-timeline-item::part(connector) {
-  background-color: var(--_gray-fill);
+  background-color: var(--_gray-line);
   flex: 1;
   inline-size: 1px;
-  margin-inline: auto;
-  min-block-size: 0.75rem;
+  min-block-size: 1rem;
 }
 
-helix-base-timeline-item::part(marker) {
-  align-items: center;
+helix-base-timeline-item::part(content) {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding-block-end: 1rem;
 }
 
-helix-base-timeline-item::part(dot) {
-  background-color: var(--_gray-mark);
-  block-size: 0.5rem;
-  border-radius: 50%;
-  inline-size: 0.5rem;
+helix-base-timeline-item::part(time) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
 }

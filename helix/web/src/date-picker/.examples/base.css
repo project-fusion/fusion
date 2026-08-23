@@ -89,3 +89,28 @@ helix-base-icon::part(svg) {
   flex: none;
   inline-size: 1em;
 }
+
+helix-base-date-picker::part(grid) {
+  display: grid;
+  gap: 0.125rem;
+  grid-template-columns: repeat(7, 2rem);
+}
+
+helix-base-date-picker::part(week) {
+  display: contents;
+}
+
+helix-base-date-picker::part(weekday),
+helix-base-date-picker::part(day) {
+  display: block;
+  padding: 0.25rem 0;
+  text-align: center;
+}
+
+helix-base-date-picker::part(header) {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  padding-block-end: 0.5rem;
+}

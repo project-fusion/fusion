@@ -58,6 +58,12 @@ helix-base-icon {
   inline-size: 1em;
 }
 
+helix-base-sparkline {
+  block-size: 3rem;
+  display: block;
+  inline-size: 12rem;
+}
+
 helix-base-sparkline::part(area) {
   fill: var(--chart-series, var(--chart-series-1));
   opacity: 0.25;

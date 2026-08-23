@@ -43,6 +43,13 @@ helix-base-icon {
   inline-size: 1em;
 }
 
+helix-base-stat {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin-inline-end: 2rem;
+}
+
 helix-base-icon::part(svg) {
   block-size: 1em;
   flex: none;

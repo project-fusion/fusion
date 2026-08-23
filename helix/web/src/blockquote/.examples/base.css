@@ -48,3 +48,16 @@ helix-base-icon::part(svg) {
   flex: none;
   inline-size: 1em;
 }
+
+helix-base-blockquote::part(blockquote) {
+  border-inline-start: 2px solid var(--_gray-line);
+  display: block;
+  margin: 0;
+  padding-inline-start: 0.75rem;
+}
+
+helix-base-blockquote::part(attribution) {
+  color: var(--_gray-muted);
+  display: block;
+  margin-block-start: 0.5rem;
+}

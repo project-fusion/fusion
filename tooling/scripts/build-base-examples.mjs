@@ -485,6 +485,14 @@ helix-base-divider[orientation="vertical"] {
   display: block;
   min-block-size: 1em;
 }`,
+  /* Bounded, because a sparkline is a glance and not a chart.
+     Its svg fills whatever contains it, so with no height on the host two of
+     them took the whole frame and read as area charts. */
+  sparkline: `helix-base-sparkline {
+  block-size: 3rem;
+  display: block;
+  inline-size: 12rem;
+}`,
   splitter: `helix-base-splitter {
   block-size: 8rem;
   border: 1px solid var(--_gray-line);
@@ -495,6 +503,15 @@ helix-base-divider[orientation="vertical"] {
    anything else here matters. */
 helix-base-splitter::part(divider) {
   background-color: var(--_gray-line);
+}`,
+  /* A row with air between the readings, and each one a column.
+     Stat has no parts at all, so the generator wrote nothing and three figures
+     came out crushed together with their labels riding above them. */
+  stat: `helix-base-stat {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin-inline-end: 2rem;
 }`,
   table: `/* The column tracks are the component's arithmetic, published as
    \`--table-template\` because only it has counted the columns. */
@@ -604,6 +621,21 @@ helix-base-app-header::part(content) {
   position: absolute;
   text-align: center;
 }`,
+  /* A rule down the side, which is how a quotation is set.
+     The quote and its attribution ran together as one paragraph, so nothing
+     said where the quotation stopped and who said it began. */
+  blockquote: `helix-base-blockquote::part(blockquote) {
+  border-inline-start: 2px solid var(--_gray-line);
+  display: block;
+  margin: 0;
+  padding-inline-start: 0.75rem;
+}
+
+helix-base-blockquote::part(attribution) {
+  color: var(--_gray-muted);
+  display: block;
+  margin-block-start: 0.5rem;
+}`,
   /* A control with edges. The branch that undresses triggers and buttons is
      right that the platform should not paint them, and it leaves a button as
      bare text: the example rendered the word "Button" and nothing else, which
@@ -649,6 +681,34 @@ helix-base-command::part(listbox) {
   'copy-button': `helix-base-copy-button::part(button) {
   border: 1px solid var(--_gray-line);
   padding: 0.375rem;
+}`,
+  /* Seven columns, which is the one thing a calendar is.
+     The weekday headings ran together as SunMonTueWedThuFriSat and the numbers
+     under them fell wherever the flow put them, so the month read as a
+     paragraph of digits rather than a grid anybody could scan down. */
+  'date-picker': `helix-base-date-picker::part(grid) {
+  display: grid;
+  gap: 0.125rem;
+  grid-template-columns: repeat(7, 2rem);
+}
+
+helix-base-date-picker::part(week) {
+  display: contents;
+}
+
+helix-base-date-picker::part(weekday),
+helix-base-date-picker::part(day) {
+  display: block;
+  padding: 0.25rem 0;
+  text-align: center;
+}
+
+helix-base-date-picker::part(header) {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  padding-block-end: 0.5rem;
 }`,
   'icon-button': `helix-base-icon-button::part(button) {
   border: 1px solid var(--_gray-line);
@@ -1015,6 +1075,44 @@ helix-base-timeline-item::part(dot) {
   block-size: 0.5rem;
   border-radius: 50%;
   inline-size: 0.5rem;
+}`,
+  /* A rail down the left and the entry beside it.
+     Nothing laid the rail against the content, so the mark, the time and what
+     happened landed in whatever order the flow gave them and the times drifted
+     off to the right of their own entries. */
+  timeline: `helix-base-timeline-item {
+  display: grid;
+  gap: 0 0.75rem;
+  grid-template-columns: auto 1fr;
+}
+
+helix-base-timeline-item::part(rail) {
+  align-items: center;
+  background-color: transparent;
+  block-size: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  inline-size: auto;
+}
+
+helix-base-timeline-item::part(connector) {
+  background-color: var(--_gray-line);
+  flex: 1;
+  inline-size: 1px;
+  min-block-size: 1rem;
+}
+
+helix-base-timeline-item::part(content) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding-block-end: 1rem;
+}
+
+helix-base-timeline-item::part(time) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
 }`,
   /* A stack of messages, each one a row inside a box.
      Left alone the tone mark, the message and the dismiss ran together and the

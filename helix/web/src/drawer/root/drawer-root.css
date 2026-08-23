@@ -281,7 +281,21 @@
 [part="content"] {
   flex: 1 1 auto;
   min-block-size: 0;
+  /* **Room for a focus ring, taken back the moment it is given.** Asking for
+     `overflow-y: auto` and nothing else makes this a horizontal clipper too:
+     CSS computes a `visible` axis to `auto` when the other one is not visible,
+     so a scroller nobody asked to scroll sideways still clips there. A child
+     filling the width then loses the left and right of its ring while keeping
+     the top and bottom, which reads as a drawing fault rather than as focus.
+     Measured on a full width button in this component: `outline` 2px at 2px
+     offset, and zero room either side of it.
+
+     The padding widens the scrollport by exactly what the ring reaches and the
+     negative margin puts the region back where it was, so nothing inside moves
+     and the content still lines up with the header above it. */
+  margin-inline: calc(var(--helix-size-focus-reach) * -1);
   overflow-y: auto;
+  padding-inline: var(--helix-size-focus-reach);
 }
 
 /* Both things that move, named one at a time so neither loses on specificity.
