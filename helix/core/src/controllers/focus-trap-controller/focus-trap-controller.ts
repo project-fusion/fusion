@@ -19,6 +19,10 @@ import {
  */
 export class FocusTrapController implements ReactiveController {
   private container: HTMLElement | null = null
+
+  /** The frame waiting to take focus, so a release can call it off. */
+  private frame: number | undefined
+
   private previous: HTMLElement | null = null
 
   constructor(host: ReactiveControllerHost) {
@@ -72,8 +76,17 @@ export class FocusTrapController implements ReactiveController {
     this.container = container
     this.previous = deepActiveElement() as HTMLElement | null
     document.addEventListener('keydown', this.handleKeydown, true)
-    // After render, so the container has something to focus.
-    requestAnimationFrame(() => {
+    /* After render, so the container has something to focus, and *held*, so a
+       release before the frame runs can cancel it.
+     *
+       Unheld, an overlay opened and closed inside one frame pulled focus into
+       itself a frame after it had gone: the reader is looking at the page, the
+       surface is not on it, and their next key goes somewhere they cannot see.
+       That is not a contrived sequence. A menu that closes on the same
+       activation that opened it does exactly this, and so does any consumer
+       toggling `open` twice in one task. */
+    this.frame = requestAnimationFrame(() => {
+      this.frame = undefined
       const items = focusableElements(container)
       ;(items[0] ?? container).focus()
     })
@@ -81,6 +94,10 @@ export class FocusTrapController implements ReactiveController {
 
   /** Stops trapping and returns focus to wherever it was. */
   deactivate(): void {
+    if (this.frame !== undefined) {
+      cancelAnimationFrame(this.frame)
+      this.frame = undefined
+    }
     document.removeEventListener('keydown', this.handleKeydown, true)
     this.container = null
     this.previous?.focus()

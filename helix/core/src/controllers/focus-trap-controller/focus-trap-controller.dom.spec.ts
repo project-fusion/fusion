@@ -178,6 +178,20 @@ describe('taking the trap', () => {
     expect(id()).toBe('a')
   })
 
+  /* Released before the frame runs, which an overlay opened and closed inside
+     one task does: a menu that closes on the same activation that opened it,
+     or a consumer toggling `open` twice. Unheld, the frame ran anyway and put
+     focus inside a surface that is no longer on the page, so the reader is
+     looking at the document and their next key goes somewhere invisible. */
+  test('and not after a release, however fast the open and the close were', async () => {
+    const { container, outside, trap } = scene('<button id="a">a</button>')
+    outside.focus()
+    trap.activate(container)
+    trap.deactivate()
+    await new Promise((done) => requestAnimationFrame(done))
+    expect(id()).toBe('outside')
+  })
+
   /* A container with nothing in it still has to take focus, or the reader is
      left on the page behind a surface they cannot see. */
   test('or to the container itself where there is nothing in it', async () => {
