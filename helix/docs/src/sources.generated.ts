@@ -370,7 +370,7 @@ title: Color
 
 Seventy-four of the library's 176 tokens are colour, which is most of what a
 theme is. They are roles rather than values: nothing in Helix is named after
-what it looks like, because a name like \`--helix-blue-500\` stops being true the
+what it looks like, because a name like \`--brand-blue-500\` stops being true the
 moment anybody rethemes.
 
 ## The roles
@@ -722,9 +722,17 @@ title: Elevation and material
 
 ## Layers
 
-\`\`\`
---helix-layer-base  raised  sticky  overlay  toast
-\`\`\`
+[//]: # (tokens:layer)
+
+| Token | Value |
+| --- | --- |
+| \`--helix-layer-base\` | \`0\` |
+| \`--helix-layer-raised\` | \`10\` |
+| \`--helix-layer-sticky\` | \`100\` |
+| \`--helix-layer-overlay\` | \`1000\` |
+| \`--helix-layer-toast\` | \`1200\` |
+
+[//]: # (/tokens)
 
 Five, named after what lives at each rather than numbered. A numbered scale
 invites \`z-index: 1001\`, and the number nobody can justify is how stacking
@@ -745,11 +753,18 @@ your own dragged element, and anything that has to sit between two of ours.
 
 ## Shadows
 
-\`\`\`
---helix-shadow-none  sm  md  lg
---helix-shadow-surface     the policy for a surface in the flow
---helix-shadow-floating    the policy for a surface over content
-\`\`\`
+[//]: # (tokens:shadow)
+
+| Token | Value |
+| --- | --- |
+| \`--helix-shadow-none\` | \`none\` |
+| \`--helix-shadow-sm\` | \`0 1px 2px var(--_helix-shadow-ink-sm)\` |
+| \`--helix-shadow-md\` | \`0 4px 12px var(--_helix-shadow-ink-md)\` |
+| \`--helix-shadow-lg\` | \`0 12px 32px var(--_helix-shadow-ink-lg)\` |
+| \`--helix-shadow-surface\` | \`var(--helix-shadow-none)\` |
+| \`--helix-shadow-floating\` | \`var(--helix-shadow-lg)\` |
+
+[//]: # (/tokens)
 
 The first four are the values. The last two are the *decision*, and they are
 what a theme sets to make the system shadow-first or border-first. See [Surfaces
@@ -1617,10 +1632,28 @@ title: Motion
 
 ## The tokens
 
-\`\`\`
---helix-duration-instant  fast  normal  slow
---helix-easing-standard  emphasized  decelerate  accelerate  spring
-\`\`\`
+[//]: # (tokens:duration)
+
+| Token | Value |
+| --- | --- |
+| \`--helix-duration-instant\` | \`0ms\` |
+| \`--helix-duration-fast\` | \`120ms\` |
+| \`--helix-duration-normal\` | \`200ms\` |
+| \`--helix-duration-slow\` | \`320ms\` |
+
+[//]: # (/tokens)
+
+[//]: # (tokens:easing)
+
+| Token | Value |
+| --- | --- |
+| \`--helix-easing-standard\` | \`cubic-bezier(0.2, 0, 0, 1)\` |
+| \`--helix-easing-emphasized\` | \`cubic-bezier(0.3, 0, 0, 1.2)\` |
+| \`--helix-easing-decelerate\` | \`cubic-bezier(0, 0, 0, 1)\` |
+| \`--helix-easing-accelerate\` | \`cubic-bezier(0.3, 0, 1, 1)\` |
+| \`--helix-easing-spring\` | \`linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )\` |
+
+[//]: # (/tokens)
 
 Four durations and five curves. \`standard\` for most things, \`decelerate\` for
 something arriving, \`accelerate\` for something leaving, \`emphasized\` for a
@@ -2548,7 +2581,7 @@ shadow root either, which is why a field's label is rendered *inside* the
 control rather than by anything wrapping it, and why a wrapping "form field"
 component cannot own the label without handing it down as a property. It is also
 why \`aria-label\` on a host has to be forwarded rather than left where it was
-written. See [Composition](/docs/composition).
+written. See [Composition](./composition).
 
 Where an id genuinely cannot reach, **element references can**, and they resolve
 outward: an element in a shadow root may point at one in the light DOM.
@@ -2592,9 +2625,17 @@ title: Shape and borders
 
 ## Radii
 
-\`\`\`
---helix-radii-none  sm  md  lg  full
-\`\`\`
+[//]: # (tokens:radii)
+
+| Token | Value |
+| --- | --- |
+| \`--helix-radii-none\` | \`0\` |
+| \`--helix-radii-sm\` | \`calc(var(--helix-seed-radii, 0.5rem) * 0.5)\` |
+| \`--helix-radii-md\` | \`var(--helix-seed-radii, 0.5rem)\` |
+| \`--helix-radii-lg\` | \`calc(var(--helix-seed-radii, 0.5rem) * 1.5)\` |
+| \`--helix-radii-full\` | \`9999px\` |
+
+[//]: # (/tokens)
 
 \`full\` is \`9999px\` rather than \`50%\`, which matters for anything that is not
 square: a percentage radius on a wide element gives an ellipse, and a pill is
@@ -2619,12 +2660,16 @@ directly and are unaffected by a theme that squares everything else off.
 
 ## Border widths
 
-\`\`\`
---helix-border-thin      the default hairline
---helix-border-thick     an emphasised edge
---helix-border-surface   the policy for a surface in the flow
---helix-border-floating  the policy for a surface over content
-\`\`\`
+[//]: # (tokens:border)
+
+| Token | Value |
+| --- | --- |
+| \`--helix-border-thin\` | \`1px\` |
+| \`--helix-border-thick\` | \`2px\` |
+| \`--helix-border-surface\` | \`var(--helix-border-thin)\` |
+| \`--helix-border-floating\` | \`0\` |
+
+[//]: # (/tokens)
 
 The first two are values you pick. **The second two are a decision**, and they
 belong to [Surfaces and separation](./surfaces-and-separation): they are what a
@@ -2752,9 +2797,22 @@ up with a button that is one step of padding taller than the input beside it.
 
 ## Space
 
-\`\`\`
---helix-space-none  2xs  xs  sm  md  lg  xl  2xl  3xl
-\`\`\`
+[//]: # (tokens:space)
+
+| Token | Value |
+| --- | --- |
+| \`--helix-space-none\` | \`0rem\` |
+| \`--helix-space-2xs\` | \`calc(0.25rem * var(--helix-seed-density, 1))\` |
+| \`--helix-space-xs\` | \`calc(0.5rem * var(--helix-seed-density, 1))\` |
+| \`--helix-space-sm\` | \`calc(0.75rem * var(--helix-seed-density, 1))\` |
+| \`--helix-space-md\` | \`calc(1rem * var(--helix-seed-density, 1))\` |
+| \`--helix-space-lg\` | \`calc(1.5rem * var(--helix-seed-density, 1))\` |
+| \`--helix-space-xl\` | \`calc(2rem * var(--helix-seed-density, 1))\` |
+| \`--helix-space-2xl\` | \`calc(3rem * var(--helix-seed-density, 1))\` |
+| \`--helix-space-3xl\` | \`calc(4rem * var(--helix-seed-density, 1))\` |
+| \`--helix-space-control\` | \`var(--helix-space-md)\` |
+
+[//]: # (/tokens)
 
 Nine steps, t-shirt named rather than numbered. A numbered scale invites
 arithmetic (\`space-4\` is twice \`space-2\`) which stops being true the moment the
@@ -2783,8 +2841,9 @@ Thirty-four tokens, and almost all of them name a specific thing:
 
 Most come in a \`-sm\`, \`-md\` and \`-lg\` set beside the unsuffixed one. **The
 unsuffixed token is the live one** and the suffixed ones are the values the
-density axis picks between. \`--helix-size-loader\` is the exception and has only
-the three, because nothing reads a loader's size off the density. So a component reads \`--helix-size-control\` and the
+density axis picks between. The loader is the exception: it has \`-sm\`, \`-md\`
+and \`-lg\` and no unsuffixed token above them, because nothing reads a loader's
+size off the density. So a component reads \`--helix-size-control\` and the
 region's \`[data-density]\` decides which of \`-sm\`, \`-md\` or \`-lg\` that resolves
 to.
 

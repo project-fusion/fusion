@@ -35,6 +35,46 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const CONTENT = join(ROOT, 'helix/docs/content')
 const OUT = join(ROOT, 'helix/docs/src/pages.generated.ts')
 const SOURCES = join(ROOT, 'helix/docs/src/sources.generated.ts')
+const REGISTRY = join(ROOT, 'helix/styles/tokens.json')
+const PRIMITIVES = join(ROOT, 'helix/styles/src/primitives.css')
+
+/**
+ * The token tables the Foundations pages carry, filled from the registry.
+ *
+ * **Written into the file rather than rendered by a component.** A
+ * `<Tokens category="color" />` would be childless, which this same script
+ * refuses two hundred lines below, and for the reason that applies exactly
+ * here: the content would exist only in the rendered page and
+ * `/helix/docs/color.md` would have a hole where the table was. A generated
+ * region in the file is complete markdown on both surfaces and cannot drift,
+ * which is the arrangement `tokens.css` already uses.
+ *
+ * The marker is a link reference definition that nothing links to, which is
+ * markdown's own way of writing a comment: it renders as nothing, in the page
+ * and in the document alike. Verified through the real MDX pipeline rather than
+ * assumed, because `{/* *``/}` would have been the MDX-native way and leaves its
+ * braces in the `.md`.
+ */
+const OPEN = /^\[\/\/\]: # \(tokens:([a-z-]+)\)$/
+
+/**
+ * A token's value with the primitives resolved out of it.
+ *
+ * A Foundations page showing `var(--_helix-scale-2)` is showing a reader the one
+ * layer they are told never to touch, and telling them nothing: the point of the
+ * table is what the token is worth. Resolved, `--helix-space-xs` reads as a
+ * length and `--helix-color-background` as the two colours it actually is.
+ */
+const resolve = (value, primitives, depth = 0) => {
+  if (depth > 6) {
+    return value
+  }
+  const next = value.replace(
+    /var\((--_helix-[a-z0-9-]+)(?:,\s*([^()]*))?\)/g,
+    (whole, name, fallback) => (primitives.has(name) ? primitives.get(name) : (fallback ?? whole)),
+  )
+  return next === value ? value : resolve(next, primitives, depth + 1)
+}
 const SECTIONS = join(ROOT, 'helix/docs/src/sections.ts')
 
 const check = process.argv.includes('--check')
@@ -90,20 +130,112 @@ const declaredSections = () => {
 const sections = declaredSections()
 const sectionTitles = new Set(sections.map((section) => section.title))
 
+/* The registry, and the primitive map the values resolve against. Both are
+   read once: 41 pages would otherwise parse the same two files 41 times. */
+const registry = JSON.parse(readFileSync(REGISTRY, 'utf8'))
+/** Every token name, for the check that a page does not invent one. */
+const tokenNames = new Set(registry.tokens.map((token) => token.name))
+
+const primitives = new Map(
+  [...readFileSync(PRIMITIVES, 'utf8').matchAll(/^\s*(--_helix-[a-z0-9-]+):\s*([^;]+);/gm)].map(
+    ([, name, value]) => [name, value.replace(/\s+/g, ' ').trim()],
+  ),
+)
+
+/** One category, as the markdown table a Foundations page carries. */
+const table = (category) => {
+  const rows = registry.tokens.filter((token) => token.category === category)
+  if (rows.length === 0) {
+    throw new Error(`tokens:${category} names a category the registry does not have`)
+  }
+  return [
+    '| Token | Value |',
+    '| --- | --- |',
+    ...rows.map((token) => `| \`${token.name}\` | \`${resolve(token.value, primitives)}\` |`),
+  ].join('\n')
+}
+
+/**
+ * A page with its generated regions filled.
+ *
+ * Everything between a `tokens:<category>` marker and the `/tokens` that closes
+ * it is replaced. The markers stay, so the region is visible to whoever edits
+ * the file and the next run knows where to write.
+ */
+const filled = (source) => {
+  const lines = source.split('\n')
+  const out = []
+  let inside = false
+  for (const line of lines) {
+    const open = OPEN.exec(line)
+    if (open) {
+      out.push(line, '', table(open[1]), '')
+      inside = true
+      continue
+    }
+    if (line === '[//]: # (/tokens)') {
+      out.push(line)
+      inside = false
+      continue
+    }
+    if (!inside) {
+      out.push(line)
+    }
+  }
+  if (inside) {
+    throw new Error('a `tokens:` region is never closed by `[//]: # (/tokens)`')
+  }
+  return out.join('\n')
+}
+
 const slugs = readdirSync(CONTENT)
   .filter((file) => file.endsWith('.mdx'))
   .map((file) => file.replace(/\.mdx$/, ''))
   .sort()
 
 const pages = []
+const refilled = []
 for (const slug of slugs) {
-  const source = readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8')
+  const onDisk = readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8')
+
+  /* Filled before anything else reads it, so the em dash rule, the childless
+     component rule and the inlined sources all see the page a reader will. */
+  const source = filled(onDisk)
+  if (source !== onDisk) {
+    refilled.push(slug)
+  }
 
   /* The rule is stated in CLAUDE.md and nothing else enforces it in prose. It
      is checked here rather than in a sweep of its own because this is the one
      script that already reads every page. */
   if (source.includes('—')) {
     fail(slug, 'contains an em dash, which this repository does not use')
+  }
+
+  /* Every token a page names has to exist.
+   *
+   * **This is the check the Foundations pages needed and did not have.** Ten of
+   * them were written with their token lists typed by hand, and two names in
+   * them were invented: `--helix-color-border-strong` in a code sample a reader
+   * would copy, and `--helix-size-loader` in a sentence claiming the loader
+   * follows a rule it is the sole exception to. A one-line diff found both,
+   * hours after they shipped, and nothing in the repository would have.
+   *
+   * It covers prose, which is more than generating the tables does: a table can
+   * be filled from the registry and a paragraph beside it can still name
+   * something that does not exist.
+   *
+   * `--helix-seed-*` is exempt because `derive()` emits it at runtime and it
+   * appears in no stylesheet, which is the same split `check:seeds` exists for.
+   * A trailing hyphen is a wildcard a sentence wrote, as in
+   * `--helix-color-series-*`. */
+  for (const [, named] of source.matchAll(/(--helix-[a-z0-9-]+)/g)) {
+    if (named.startsWith('--helix-seed-') || named.endsWith('-')) {
+      continue
+    }
+    if (!tokenNames.has(named)) {
+      fail(slug, `names \`${named}\`, which is not a token`)
+    }
   }
 
   /* A component in content is allowed, and a childless one is not.
@@ -245,6 +377,19 @@ ${pages.map(literal).join('\n')}
    its own: a page that reads the file at request time is the filesystem access
    that traced this repository into a server bundle, and a content package must
    not be the thing that puts it back. */
+/* Written back, because the file is the source of both surfaces: the page
+   renders it and `/helix/docs/<slug>.md` serves it. A table that existed only
+   in a generated module would leave the document with a hole in it, which is
+   the whole reason these are regions in the file rather than a component. */
+if (!check && refilled.length > 0) {
+  for (const slug of refilled) {
+    writeFileSync(
+      join(CONTENT, `${slug}.mdx`),
+      filled(readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8')),
+    )
+  }
+}
+
 const sources = `/**
  * Every page's MDX, inlined by \`bun run docs\`. Do not edit: the files in
  * \`content/\` are the source, and \`bun run check:docs\` fails when this module
@@ -253,7 +398,7 @@ const sources = `/**
 export const docSources: Record<string, string> = {
 ${slugs
   .map((slug) => {
-    const body = readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8')
+    const body = filled(readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8'))
       .replace(/\\/g, '\\\\')
       .replace(/`/g, '\\`')
       .replace(/\$\{/g, '\\${')
@@ -266,6 +411,10 @@ ${slugs
 
 if (check) {
   const existing = readFileSync(OUT, 'utf8')
+  if (refilled.length > 0) {
+    console.error(`docs: a token table is stale in ${refilled.join(', ')}. Run \`bun run docs\``)
+    process.exit(1)
+  }
   if (
     existing !== formatted(generated, 'pages.generated.ts') ||
     readFileSync(SOURCES, 'utf8') !== formatted(sources, 'sources.generated.ts')

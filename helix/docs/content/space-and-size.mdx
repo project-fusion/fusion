@@ -12,9 +12,22 @@ up with a button that is one step of padding taller than the input beside it.
 
 ## Space
 
-```
---helix-space-none  2xs  xs  sm  md  lg  xl  2xl  3xl
-```
+[//]: # (tokens:space)
+
+| Token | Value |
+| --- | --- |
+| `--helix-space-none` | `0rem` |
+| `--helix-space-2xs` | `calc(0.25rem * var(--helix-seed-density, 1))` |
+| `--helix-space-xs` | `calc(0.5rem * var(--helix-seed-density, 1))` |
+| `--helix-space-sm` | `calc(0.75rem * var(--helix-seed-density, 1))` |
+| `--helix-space-md` | `calc(1rem * var(--helix-seed-density, 1))` |
+| `--helix-space-lg` | `calc(1.5rem * var(--helix-seed-density, 1))` |
+| `--helix-space-xl` | `calc(2rem * var(--helix-seed-density, 1))` |
+| `--helix-space-2xl` | `calc(3rem * var(--helix-seed-density, 1))` |
+| `--helix-space-3xl` | `calc(4rem * var(--helix-seed-density, 1))` |
+| `--helix-space-control` | `var(--helix-space-md)` |
+
+[//]: # (/tokens)
 
 Nine steps, t-shirt named rather than numbered. A numbered scale invites
 arithmetic (`space-4` is twice `space-2`) which stops being true the moment the
@@ -43,8 +56,9 @@ Thirty-four tokens, and almost all of them name a specific thing:
 
 Most come in a `-sm`, `-md` and `-lg` set beside the unsuffixed one. **The
 unsuffixed token is the live one** and the suffixed ones are the values the
-density axis picks between. `--helix-size-loader` is the exception and has only
-the three, because nothing reads a loader's size off the density. So a component reads `--helix-size-control` and the
+density axis picks between. The loader is the exception: it has `-sm`, `-md`
+and `-lg` and no unsuffixed token above them, because nothing reads a loader's
+size off the density. So a component reads `--helix-size-control` and the
 region's `[data-density]` decides which of `-sm`, `-md` or `-lg` that resolves
 to.
 

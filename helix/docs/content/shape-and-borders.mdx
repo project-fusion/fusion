@@ -8,9 +8,17 @@ title: Shape and borders
 
 ## Radii
 
-```
---helix-radii-none  sm  md  lg  full
-```
+[//]: # (tokens:radii)
+
+| Token | Value |
+| --- | --- |
+| `--helix-radii-none` | `0` |
+| `--helix-radii-sm` | `calc(var(--helix-seed-radii, 0.5rem) * 0.5)` |
+| `--helix-radii-md` | `var(--helix-seed-radii, 0.5rem)` |
+| `--helix-radii-lg` | `calc(var(--helix-seed-radii, 0.5rem) * 1.5)` |
+| `--helix-radii-full` | `9999px` |
+
+[//]: # (/tokens)
 
 `full` is `9999px` rather than `50%`, which matters for anything that is not
 square: a percentage radius on a wide element gives an ellipse, and a pill is
@@ -35,12 +43,16 @@ directly and are unaffected by a theme that squares everything else off.
 
 ## Border widths
 
-```
---helix-border-thin      the default hairline
---helix-border-thick     an emphasised edge
---helix-border-surface   the policy for a surface in the flow
---helix-border-floating  the policy for a surface over content
-```
+[//]: # (tokens:border)
+
+| Token | Value |
+| --- | --- |
+| `--helix-border-thin` | `1px` |
+| `--helix-border-thick` | `2px` |
+| `--helix-border-surface` | `var(--helix-border-thin)` |
+| `--helix-border-floating` | `0` |
+
+[//]: # (/tokens)
 
 The first two are values you pick. **The second two are a decision**, and they
 belong to [Surfaces and separation](./surfaces-and-separation): they are what a
