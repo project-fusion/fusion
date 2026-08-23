@@ -17,7 +17,10 @@
     "build": {
       "dependsOn": ["^build", "^analyze", "icons", "styles"],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      // `wasm/**` is `@helix-io/theme`'s other half: the engine is Rust and this
+      // is what a browser reaches it through, built by the same script the
+      // package's `build` runs. Declared so a cached build restores both.
+      "outputs": ["dist/**", "wasm/**", ".next/**", "!.next/cache/**"]
     },
     // The fourth layer is `helix/web/elements.css` and it was not in `inputs`,
     // so editing any component stylesheet did not invalidate this. `dependsOn`

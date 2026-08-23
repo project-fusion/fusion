@@ -96,6 +96,50 @@ const near = (ours, theirs, at) => {
   }
 }
 
+/**
+ * **A hue is only meaningful in proportion to its chroma**, so the arc is
+ * compared rather than the angle.
+ *
+ * `#808080` is a pure grey: its chroma is 2.2e-8, so its hue is `atan2` of two
+ * values near zero and is not a direction so much as the residue of three cube
+ * roots. Measured, the two libms put it 1.43e-7 degrees apart while agreeing on
+ * the chroma to 1.11e-16, and at that chroma the whole angle moves the colour by
+ * about 1e-15 in Oklab. Comparing the angle asks a question the number cannot
+ * answer.
+ *
+ * The arc, `chroma * Δθ` in radians, is how far the point actually travelled,
+ * which is the quantity a rendered colour is made of. It is also *stricter* than
+ * the angle wherever chroma is real: a tenth of a degree at chroma 0.2 is a
+ * visible move and would fail here.
+ */
+const arc = (ours, theirs, chroma, at) => {
+  if (ours === undefined && theirs === undefined) {
+    return
+  }
+  compared += 1
+  if (ours === theirs) {
+    return
+  }
+  if (typeof ours !== 'number' || typeof theirs !== 'number') {
+    wrong.push(`${at}: ${JSON.stringify(ours)} against ${JSON.stringify(theirs)}`)
+    return
+  }
+  differing += 1
+  /* Around the short way, so 359.9 against 0.1 is a fifth of a degree rather
+     than very nearly the whole circle. */
+  const degrees = Math.abs(((ours - theirs + 540) % 360) - 180)
+  const apart = Math.abs(chroma) * ((degrees * Math.PI) / 180)
+  if (apart > worst.apart) {
+    worst = { apart, at }
+  }
+  if (apart > TOLERANCE) {
+    wrong.push(
+      `${at}: ${ours} against ${theirs}, ${degrees.toExponential(2)} degrees at chroma ` +
+        `${chroma.toExponential(2)}, an arc of ${apart.toExponential(2)}`,
+    )
+  }
+}
+
 const same = (ours, theirs, at) => {
   if (ours !== theirs) {
     wrong.push(`${at}: ${JSON.stringify(ours)} against ${JSON.stringify(theirs)}`)
@@ -110,8 +154,10 @@ for (const theme of oracle.themes) {
   }
   const source = JSON.stringify(intent)
 
+  const derived = JSON.parse(engine.derive(source, JSON.stringify([':root'])))
+
   /* The block is a file a consumer pastes, so it is asserted as bytes. */
-  const css = engine.deriveCss(source, ':root')
+  const css = derived.css[':root']
   if (css !== theme.css) {
     const ours = css.split('\n')
     const theirs = theme.css.split('\n')
@@ -122,8 +168,6 @@ for (const theme of oracle.themes) {
         : `${theme.label}: emits \`${ours[at]}\` where the engine emits \`${theirs[at]}\``,
     )
   }
-
-  const derived = JSON.parse(engine.deriveTheme(source))
 
   same(derived.tokens.length, theme.tokens.length, `${theme.label}: token count`)
   for (const [index, token] of derived.tokens.entries()) {
@@ -139,9 +183,10 @@ for (const theme of oracle.themes) {
        schema that separates optional from nullable. */
     same('contrast' in token, 'contrast' in theirs, `${at}: contrast is present`)
     near(token.contrast, theirs.contrast, `${at}: contrast`)
-    for (const part of ['chroma', 'hue', 'lightness']) {
+    for (const part of ['chroma', 'lightness']) {
       near(token.value[part], theirs.value?.[part], `${at}: ${part}`)
     }
+    arc(token.value.hue, theirs.value?.hue, token.value.chroma, `${at}: hue`)
   }
 
   same(derived.pairings.length, theme.pairings.length, `${theme.label}: pairing count`)
@@ -168,6 +213,26 @@ for (const theme of oracle.themes) {
   }
 }
 
+
+/* **The hex reader is checked against the oracle's own parse table**, which is
+   the one place the boundary carries a value the theme comparison never touches:
+   the site reads a colour input with it before an intent exists. Held to the
+   same tolerance for the same reason, `cbrt` and `atan2` being where the two
+   libms part company. */
+{
+  const hexes = oracle.hexes ?? []
+  for (const entry of hexes) {
+    const ours = JSON.parse(engine.hexToOklch(entry.hex))
+    for (const part of ['chroma', 'lightness']) {
+      near(ours[part], entry[part], `hexToOklch(${entry.hex}): ${part}`)
+    }
+    arc(ours.hue, entry.hue, ours.chroma, `hexToOklch(${entry.hex}): hue`)
+  }
+  if (hexes.length === 0) {
+    wrong.push('the oracle records no hexes, so the reader is checked against nothing')
+  }
+}
+
 if (wrong.length > 0) {
   console.error(`wasm: ${wrong.length} disagreements with the oracle:\n  ${wrong.join('\n  ')}`)
   process.exit(1)
@@ -177,5 +242,6 @@ console.log(
   `wasm: ${oracle.themes.length} themes derive identically through the browser distribution. ` +
     'Every emitted block byte for byte, every hex, origin and status exact. ' +
     `Of ${compared} intermediates, ${differing} differ in the last place, worst ` +
-    `${worst.apart.toExponential(2)} at ${worst.at}, against a tolerance of ${TOLERANCE}`,
+    `${worst.apart.toExponential(2)} at ${worst.at}, against a tolerance of ${TOLERANCE}. ` +
+    'Hues are compared as arcs, since an angle at chroma zero is not a direction',
 )

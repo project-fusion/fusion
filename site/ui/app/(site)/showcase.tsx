@@ -1,6 +1,7 @@
 'use client'
 
-import { deriveTheme, hexToOklch, type ThemeIntent } from '@helix-io/theme'
+import { initTheme, type ThemeEngine, type ThemeIntent } from '@helix-io/theme'
+import { THEME_ENGINE } from '../../lib/theme-engine'
 import { useEffect, useRef, useState } from 'react'
 import styles from './landing.module.css'
 
@@ -86,8 +87,13 @@ const BRAND = '#3b82f6'
  * Scoped to the panel rather than the document, because the rest of the page is
  * not the demonstration.
  */
-const restyle = (node: HTMLElement, hex: string, scheme: ThemeIntent['scheme']): void => {
-  const theme = deriveTheme({ brand: hexToOklch(hex), scheme })
+const restyle = (
+  engine: ThemeEngine,
+  node: HTMLElement,
+  hex: string,
+  scheme: ThemeIntent['scheme'],
+): void => {
+  const theme = engine.derive({ brand: engine.hexToOklch(hex), scheme })
 
   node.dataset.helixTheme = ''
   for (const token of theme.tokens) {
@@ -95,6 +101,44 @@ const restyle = (node: HTMLElement, hex: string, scheme: ThemeIntent['scheme']):
   }
   for (const [name, value] of Object.entries(theme.seeds)) {
     node.style.setProperty(`--helix-${name}`, value)
+  }
+}
+
+/**
+ * Paints the panel, and again whenever the colour mode moves. Returns its own
+ * teardown.
+ *
+ * Lifted out of the effect that used to hold it, because that effect is now
+ * about *when the engine is ready* and this is about what to do once it is.
+ */
+const listen = (engine: ThemeEngine, node: HTMLElement, brand: string): (() => void) => {
+  /* **Two signals, because the preference has three states.** The drawer
+     writes `data-color-mode` for an explicit choice and *deletes* it for
+     "system", so the media query alone answers only the third of them. Watched
+     rather than read once: the drawer is on this page, so the mode can change
+     while the panel is on screen.
+
+     Left unwatched, the panel kept the tokens it was painted with and the page
+     around it changed: measured at `#030407` behind text the page had turned
+     black, which is not a section that failed to follow the mode so much as
+     one that cannot be read. */
+  const root = document.documentElement
+  const query = window.matchMedia('(prefers-color-scheme: dark)')
+  const scheme = (): ThemeIntent['scheme'] => {
+    const chosen = root.dataset.colorMode
+    if (chosen === 'dark' || chosen === 'light') {
+      return chosen
+    }
+    return query.matches ? 'dark' : 'light'
+  }
+  const paint = (): void => restyle(engine, node, brand, scheme())
+  paint()
+  query.addEventListener('change', paint)
+  const modes = new MutationObserver(paint)
+  modes.observe(root, { attributeFilter: ['data-color-mode'], attributes: true })
+  return () => {
+    query.removeEventListener('change', paint)
+    modes.disconnect()
   }
 }
 
@@ -119,40 +163,34 @@ export function Showcase(): React.ReactElement {
   const [brand, setBrand] = useState(BRAND)
   const stage = useRef<HTMLDivElement>(null)
 
-  /* Derived on the client only. The server has no reader and no preference, so
-     it renders the page's own tokens and this arrives afterwards. */
+  /* **Derived on the client only, which is why the engine arriving late costs
+     nothing here.** The server has no reader and no preference, so it renders
+     the page's own tokens and this has always arrived afterwards. The engine is
+     WebAssembly now and instantiates asynchronously, so "afterwards" is a
+     fraction later; what the panel shows in the meantime is the page's own
+     palette, which is what it showed before this ran at all. No state to add and
+     nothing to show a reader.
+
+     `stop` rather than a plain flag, because the teardown has two jobs depending
+     on when it runs: before the engine lands it has to stop the listeners being
+     wired at all, and after it has to unwire them. One mutable holder does both,
+     and a reader clicking two swatches quickly has two loads in flight where
+     only the second should end up listening. */
   useEffect(() => {
     const node = stage.current
     if (!node) {
       return
     }
-    /* **Two signals, because the preference has three states.** The drawer
-       writes `data-color-mode` for an explicit choice and *deletes* it for
-       "system", so the media query alone answers only the third of them. Watched
-       rather than read once: the drawer is on this page, so the mode can change
-       while the panel is on screen.
-
-       Left unwatched, the panel kept the tokens it was painted with and the page
-       around it changed: measured at `#030407` behind text the page had turned
-       black, which is not a section that failed to follow the mode so much as
-       one that cannot be read. */
-    const root = document.documentElement
-    const query = window.matchMedia('(prefers-color-scheme: dark)')
-    const scheme = (): ThemeIntent['scheme'] => {
-      const chosen = root.dataset.colorMode
-      if (chosen === 'dark' || chosen === 'light') {
-        return chosen
+    let stop: (() => void) | undefined
+    let live = true
+    void initTheme(THEME_ENGINE).then((engine) => {
+      if (live) {
+        stop = listen(engine, node, brand)
       }
-      return query.matches ? 'dark' : 'light'
-    }
-    const paint = (): void => restyle(node, brand, scheme())
-    paint()
-    query.addEventListener('change', paint)
-    const watch = new MutationObserver(paint)
-    watch.observe(root, { attributeFilter: ['data-color-mode'], attributes: true })
+    })
     return () => {
-      query.removeEventListener('change', paint)
-      watch.disconnect()
+      live = false
+      stop?.()
     }
   }, [brand])
 

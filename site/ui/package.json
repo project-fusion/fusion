@@ -6,13 +6,14 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "bun run catalog && bun run frame && bun run specs && next build",
+    "build": "bun run wasm && bun run catalog && bun run frame && bun run specs && next build",
     "catalog": "bun ../../tooling/scripts/build-catalog.mjs",
-    "dev": "bun run catalog && bun run frame && bun run specs && next dev --port 3000",
+    "dev": "bun run wasm && bun run catalog && bun run frame && bun run specs && next dev --port 3000",
     "frame": "bun ../../tooling/scripts/build-frame.mjs",
     "specs": "bun ../../tooling/scripts/build-specs.mjs",
     "start": "next start --port 3000",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "wasm": "node ../../tooling/scripts/build-wasm.mjs"
   },
   "dependencies": {
     "@fusion-io/site-content": "workspace:*",

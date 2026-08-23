@@ -26,31 +26,63 @@ use crate::css::to_css;
 use crate::derive::theme::derive_theme;
 use crate::intent::ThemeIntent;
 
-/// Derives a theme and returns it as JSON.
+/// Derives a theme, and renders it under every selector asked for.
+///
+/// **One call, because a derivation is the expensive part and rendering is not.**
+/// Measured in this build: 17ms to derive and a fraction of a millisecond to
+/// render a block. The theme builder wants the same theme under two selectors,
+/// one for the preview and one for the block a reader copies, so an
+/// intent-in-CSS-out function would have it deriving twice for one keystroke.
+/// The result carries `css` keyed by selector, empty when none were asked for.
+///
+/// For reference, the TypeScript engine this replaces took 39ms for the
+/// derivation alone, so the builder does less work than it did rather than more.
+///
+/// `selectors` is a JSON array, keeping the boundary uniformly JSON in and JSON
+/// out rather than mixing in a bound array type for one argument.
 ///
 /// # Errors
 ///
-/// When the intent is not readable JSON, or when the engine refuses it.
-#[wasm_bindgen(js_name = deriveTheme)]
-pub fn derive_theme_json(intent: &str) -> Result<String, JsError> {
+/// When either argument is not the JSON it should be, or when the engine refuses
+/// the intent.
+#[wasm_bindgen(js_name = derive)]
+pub fn derive(intent: &str, selectors: &str) -> Result<String, JsError> {
     let intent: ThemeIntent = serde_json::from_str(intent)?;
+    let selectors: Vec<String> = serde_json::from_str(selectors)?;
     let theme = derive_theme(&intent)?;
-    Ok(serde_json::to_string(&report(&theme))?)
+
+    let mut report = report(&theme);
+    let blocks = selectors
+        .into_iter()
+        .map(|selector| {
+            let block = to_css(&theme, &selector);
+            (selector, serde_json::Value::String(block))
+        })
+        .collect::<serde_json::Map<_, _>>();
+    report["css"] = serde_json::Value::Object(blocks);
+    Ok(serde_json::to_string(&report)?)
 }
 
-/// Derives a theme and returns the CSS block alone.
+/// Reads a hex colour into its OKLCH components, as JSON.
 ///
-/// **Both, rather than one and a helper on the JavaScript side**, because a
-/// caller who only wants the block should not pay to serialise every token and
-/// every pairing to get it. The theme builder calls both, on different keystrokes.
+/// **Throws where the TypeScript returned `NaN`**, which is a deliberate change
+/// and the same one `resolve` makes for a brand: `Number.parseInt` of something
+/// that is not hex gives `NaN`, every comparison against which is false, so a
+/// colour that could not be read travelled onward looking like a colour. A
+/// caller passing the value of a colour input never sees this.
 ///
 /// # Errors
 ///
-/// As [`derive_theme_json`].
-#[wasm_bindgen(js_name = deriveCss)]
-pub fn derive_css(intent: &str, selector: &str) -> Result<String, JsError> {
-    let intent: ThemeIntent = serde_json::from_str(intent)?;
-    Ok(to_css(&derive_theme(&intent)?, selector))
+/// When the string is not a hex colour.
+#[wasm_bindgen(js_name = hexToOklch)]
+pub fn hex_to_oklch_json(hex: &str) -> Result<String, JsError> {
+    let color = crate::oklch::hex_to_oklch(hex)
+        .ok_or_else(|| JsError::new(&format!("`{hex}` is not a hex colour")))?;
+    Ok(serde_json::to_string(&serde_json::json!({
+        "chroma": color.chroma,
+        "hue": color.hue,
+        "lightness": color.lightness,
+    }))?)
 }
 
 /// The theme as the JavaScript shape, which is the TypeScript engine's shape.

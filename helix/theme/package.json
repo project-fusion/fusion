@@ -18,11 +18,12 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "wasm"
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node ../../tooling/scripts/build-wasm.mjs && tsc -p tsconfig.json",
     "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

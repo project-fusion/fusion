@@ -73,3 +73,4 @@ site/ui/public/helix/docs/
 site/ui/public/*.md
 site/ui/public/insights/
 helix/theme/wasm/
+site/ui/public/helix/theme.wasm
