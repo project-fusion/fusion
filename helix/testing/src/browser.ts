@@ -202,6 +202,7 @@ interface Matchers {
   toBe: (expected: unknown) => void
   toBeCloseTo: (expected: number, digits?: number) => void
   toBeDefined: () => void
+  toBeFalsy: () => void
   toBeTruthy: () => void
   toBeUndefined: () => void
   toBeGreaterThan: (expected: number) => void
@@ -214,6 +215,7 @@ interface Matchers {
   toEqual: (expected: unknown) => void
   toHaveLength: (expected: number) => void
   toMatch: (expected: RegExp | string) => void
+  toMatchObject: (expected: Record<string, unknown>) => void
   toThrow: (expected?: RegExp | string) => void
 }
 
@@ -251,6 +253,7 @@ const build = (actual: unknown, negated: boolean): Matchers => {
         `to be within ${10 ** -digits / 2} of ${expected}`,
       ),
     toBeDefined: () => check(actual !== undefined, 'to be defined'),
+    toBeFalsy: () => check(!actual, 'to be falsy'),
     toBeGreaterThan: (expected) => check(number > expected, `to be greater than ${expected}`),
     toBeGreaterThanOrEqual: (expected) => check(number >= expected, `to be at least ${expected}`),
     /* The class is named in the message, because the failure this replaces said
@@ -279,6 +282,31 @@ const build = (actual: unknown, negated: boolean): Matchers => {
     toMatch: (expected) => {
       const pattern = typeof expected === 'string' ? new RegExp(expected) : expected
       check(typeof actual === 'string' && pattern.test(actual), `to match ${show(expected)}`)
+    },
+    /* The named keys and no others, which is the difference from `toEqual` and
+       the whole reason a spec reaches for it: an element's geometry is written
+       as four properties and a test about two of them should not have to
+       restate the other two to say so.
+     *
+       Recursive through `same` for a nested object, and deliberately *not*
+       recursive into a partial one: `bun:test` matches a nested object
+       partially too, and matching it wholly here would make a spec mean
+       something different in the two runners, which is the one thing this
+       harness must never do. So a nested expectation descends by the same rule
+       rather than falling through to whole-value equality. */
+    toMatchObject: (expected) => {
+      const partial = (value: unknown, shape: Record<string, unknown>): boolean => {
+        if (typeof value !== 'object' || value === null) {
+          return false
+        }
+        const held = value as Record<string, unknown>
+        return Object.entries(shape).every(([key, wanted]) =>
+          typeof wanted === 'object' && wanted !== null && !Array.isArray(wanted)
+            ? partial(held[key], wanted as Record<string, unknown>)
+            : same(held[key], wanted),
+        )
+      }
+      check(partial(actual, expected), `to match ${show(expected)}`)
     },
     /* The thunk is called here rather than by the spec, which is the whole
        point of it: a spec that called it would throw before reaching the
