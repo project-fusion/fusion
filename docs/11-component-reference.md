@@ -639,10 +639,10 @@ ring is declared here rather than inherited, because the base layer's
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `fill` | `fill` | `'auto' \| 'full' \| 'standard' \| undefined` | - | - | How much of the space available to it the button takes. |
 | `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -1504,11 +1504,11 @@ it for reassurance reads as a second, accidental press.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
 | `copiedLabel` | `copied-label` | `string` | `'Copied'` | `HelixBaseCopyButton` | What it is called, and says, after one. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
@@ -2359,10 +2359,10 @@ common way a toolbar becomes unusable without sight.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
@@ -5470,7 +5470,7 @@ Labels content with a short piece of metadata.
 
 Extends `HelixBaseTag`.
 
-Five appearances. The fill is a tint of the status color, mixed with
+Five tones. The fill is a tint of the status color, mixed with
 `color-mix` rather than held as a token per status, so a theme that changes
 the status colors gets the tints with them.
 
@@ -5478,9 +5478,9 @@ the status colors gets the tints with them.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much of the tone the tag wears. |
 | `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
+| `emphasis` | `emphasis` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much of the tone the tag wears. |
 | `tone` | `tone` | `'accent' \| 'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | - | Which status the tag reports. |
 
 #### Methods
@@ -6081,7 +6081,6 @@ corner radius, which is worse than the exception.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'filled' \| 'plain' \| undefined` | - | - | How much chrome the group carries around its items. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
@@ -6094,6 +6093,7 @@ corner radius, which is worse than the exception.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `separation` | `separation` | `'outlined' \| 'plain' \| undefined` | - | - | How the group separates itself from the page. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
@@ -6565,7 +6565,6 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'plain' \| 'solid' \| undefined` | - | - | Whether the bar floats on the picture or sits on its own ground. |
 | `controls` | `controls` | `boolean` | `false` | `HelixBaseVideo` | Whether the browser draws the controls instead of this element. |
 | `errorLabel` | `error-label` | `string` | `'This video could not be played'` | `HelixBaseVideo` | And what they are told when it will not play at all. |
 | `extraControls` | `extra-controls` | `string` | `''` | `HelixBaseVideo` | Controls beyond the ones every player has, named in the order they appear. |
@@ -6580,6 +6579,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `playsInline` | `plays-inline` | `boolean` | `true` | `HelixBaseVideo` | Whether it plays where it sits rather than taking over the screen. |
 | `poster` | `poster` | `string` | `''` | `HelixBaseVideo` | A still shown before it plays, which the platform draws itself. |
 | `preload` | `preload` | `'auto' \| 'metadata' \| 'none'` | `'metadata'` | `HelixBaseVideo` | How much to fetch before anything is asked for. |
+| `separation` | `separation` | `'filled' \| 'plain' \| undefined` | - | - | Whether the bar floats on the picture or sits on its own ground. |
 | `speeds` | `speeds` | `string` | `'0.5 1 1.5 2'` | `HelixBaseVideo` | The speeds offered, slowest first, as multipliers of normal. |
 | `src` | `src` | `string` | `''` | `HelixBaseVideo` | Where the video is, for the common case of one file. |
 | `startControl` | `start-control` | `'none' \| undefined` | - | `HelixBaseVideo` | The big mark over the picture before anything has played, or `none`. |

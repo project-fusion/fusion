@@ -18,7 +18,7 @@
 
   --_tag-height: var(--helix-size-tag);
 
-  /* Every appearance is one status color, tinted for the fill and used at full
+  /* Every tone is one status color, tinted for the fill and used at full
      strength for the label. Deriving beats a token per status: the alternative
      was eight tokens whose only job was to be a lighter version of one that
      already existed, re-derived by every theme. */
@@ -27,7 +27,7 @@
   --_tag-inset: var(--helix-space-xs);
 
   /* The default treatment, `subtle`, written here rather than behind an
-     attribute selector so a tag with no `appearance` needs no second rule.
+     attribute selector so a tag with no `emphasis` needs no second rule.
    *
    * The label is the tone mixed *towards the foreground* rather than the tone
    * itself. At full strength on a wash of the same hue, four of the five tones
@@ -48,7 +48,7 @@
    label, under the 4.5 that 12px text needs; every other tone cleared it. One
    value short is still a failure, and darkening the fill fixes it for all of
    them without a per-tone exception. */
-:host([appearance="solid"]) {
+:host([emphasis="solid"]) {
   --_tag-fill: color-mix(in oklab, var(--_tag-color) 82%, var(--helix-color-foreground));
   --_tag-edge: var(--_tag-fill);
   --_tag-label: var(--helix-color-foreground-inverse);
@@ -56,7 +56,7 @@
 
 /* The tone at its edge only. No fill, so a dense set of them stays a list
    rather than becoming a mosaic. */
-:host([appearance="outlined"]) {
+:host([emphasis="outlined"]) {
   --_tag-fill: transparent;
   --_tag-edge: color-mix(in oklab, var(--_tag-color) 45%, var(--helix-color-background));
 }

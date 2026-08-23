@@ -8,14 +8,14 @@ import { property } from 'lit/decorators.js'
 type Constructor<T> = new (...args: any[]) => T
 
 /**
- * How a control is drawn and what it means, for the three that are buttons.
+ * How much ink a control claims and what it means, for the three that are buttons.
  *
  * **The first mixin in `helix/web`, and it belongs here rather than in core.**
  * `helix/core` is consumed by the headless tier, which must never take styling,
  * and these two properties are purely presentational: they carry no behaviour,
  * no ARIA and no form participation, only which rules a stylesheet applies.
- * Declaring them in core would put an appearance on the tier whose whole
- * purpose is not having one.
+ * Declaring them in core would put a treatment on the tier whose whole purpose
+ * is not having one.
  *
  * **Why a mixin rather than inheritance.** `Button`, `IconButton` and
  * `CopyButton` all want this pair, and the styled tier cannot get it by
@@ -27,7 +27,7 @@ type Constructor<T> = new (...args: any[]) => T
  */
 export declare class MixinControlSurfaceInterface {
   /** How filled it is drawn. Absent is the control's own resting treatment. */
-  appearance?: 'ghost' | 'outlined' | 'solid' | 'subtle'
+  emphasis?: 'ghost' | 'outlined' | 'solid' | 'subtle'
   /** What it means. Absent is `neutral`, which is the resting case. */
   tone?: 'accent' | 'danger' | 'neutral' | 'primary'
 }
@@ -40,6 +40,13 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
     /**
      * How filled it is drawn.
      *
+     * **This was `appearance`, and the docstring above it always said what it
+     * really was.** "How filled it is drawn", sitting beside `tone`, "What it
+     * means": the axis was named correctly in prose and filed under the word
+     * four axes shared. A Card's `outlined` says where a surface ends and this
+     * one says how much ink a control claims, and one word cannot keep saying
+     * both. `check:axes` holds the vocabulary now.
+     *
      * Reflected because the stylesheet selects on it, and undefaulted because
      * it reflects: a reflected property with a default writes its attribute
      * onto every host anybody renders. The resting treatment is the attribute's
@@ -47,7 +54,7 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
      * `ghost` on `IconButton`.
      */
     @property({ reflect: true })
-    appearance?: 'ghost' | 'outlined' | 'solid' | 'subtle'
+    emphasis?: 'ghost' | 'outlined' | 'solid' | 'subtle'
 
     /**
      * What it means.

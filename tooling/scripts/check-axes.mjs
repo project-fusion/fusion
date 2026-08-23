@@ -66,17 +66,18 @@ const AXES = {
  * `appearance` is refused outright.
  */
 const UNSWEPT = {
+  /* **Two of these were classified from their value names and both were
+     wrong**, which is worth leaving here because it is the same mistake that
+     built the drawer. `toggle-group` was `filled | plain` and `video` was
+     `plain | solid`, and `filled` and `solid` read as fill weight, so the first
+     pass filed both under emphasis. Their stylesheets say otherwise: what
+     Toggle Group's `plain` drops is the background *and* the border, and all
+     three of Video's states describe what the control bar sits on. Both are
+     separation, and both moved with it. Classify by what a value does. */
   badge: 'tone, misfiled: danger and neutral are meanings, not treatments',
-  /* Three families, one declaration: they take it from `MixinControlSurface`,
-     whose own docstring already calls it "How filled it is drawn" and sits it
-     beside `tone`, "What it means". The axis was named correctly and filed
-     under the wrong word. */
-  button: 'emphasis: the control surface',
   'button-group': 'variant: joined and spaced are a layout',
   checkbox: 'variant: `card` gives the option a description and a price, not a border',
   'color-input': 'variant: a swatch is a different control',
-  'copy-button': 'emphasis: the control surface',
-  'icon-button': 'emphasis: the control surface',
   loader: 'variant: pulse is which animation, not which surface',
   megamenu: 'variant: `full` is a layout, which is why glass had to be a hook',
   radio: 'variant: as checkbox, plus `chip` as a third layout',
@@ -84,12 +85,9 @@ const UNSWEPT = {
   splitter: 'variant: grip and line are which handle',
   steps: 'variant: numeric is which marker',
   tabs: 'variant: segmented and underlined are two different widgets',
-  tag: 'emphasis: outlined, solid and subtle are ink, the same as a button',
   text: 'a type ramp, which is its own axis and not one of these',
   'time-input': 'variant: list and wheels are two different controls',
   'time-picker': 'variant: as time-input',
-  toggle: 'emphasis: filled and plain are ink, on the group rather than the item',
-  video: 'emphasis: plain and solid are ink',
 }
 
 /**

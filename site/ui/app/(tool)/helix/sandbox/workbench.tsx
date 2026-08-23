@@ -898,7 +898,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             is missing. */}
         <helix-tooltip content={allOpen ? 'Collapse all' : 'Expand all'} placement="bottom">
           <helix-icon-button
-            appearance="outlined"
+            emphasis="outlined"
             label={allOpen ? 'Collapse all' : 'Expand all'}
             onClick={toggleAll}
           >
@@ -1020,7 +1020,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           <SiteFind findable={findable} />
 
           {narrow && (
-            <helix-button appearance="ghost" onClick={() => setRailOpen(true)}>
+            <helix-button emphasis="ghost" onClick={() => setRailOpen(true)}>
               Examples
             </helix-button>
           )}
@@ -1063,9 +1063,9 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                 component's own note is that pointing at nothing is worse than
                 not pointing. This is a choice among files, and it says so. */}
               <helix-toggle-group
-                appearance="plain"
                 aria-label="Files"
                 onhelix-change={paneChosen}
+                separation="plain"
                 value={pane}
               >
                 <helix-toggle value="source">{current.file}</helix-toggle>
@@ -1316,7 +1316,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             You have edited this example.
             <helix-flex gap="sm" slot="footer">
               <helix-button
-                appearance="solid"
+                emphasis="solid"
                 fill="standard"
                 onClick={() => {
                   const next = pendingSyntax

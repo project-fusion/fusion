@@ -193,7 +193,6 @@ export function AuraLab(): React.ReactElement {
                 sized to its content instead of the full width so the pointer
                 group has somewhere to sit. */}
             <helix-toggle-group
-              appearance="filled"
               class="auraShapes"
               label="Shape"
               label-placement="start"
@@ -203,6 +202,7 @@ export function AuraLab(): React.ReactElement {
                   setShape(next)
                 }
               }}
+              separation="outlined"
               value={current?.name}
             >
               {SHAPES.map((entry) => (
@@ -213,7 +213,6 @@ export function AuraLab(): React.ReactElement {
             </helix-toggle-group>
 
             <helix-toggle-group
-              appearance="filled"
               label="Pointer"
               label-placement="start"
               onhelix-change={(event: CustomEvent<{ value: string }>) => {
@@ -222,6 +221,7 @@ export function AuraLab(): React.ReactElement {
                   setInteraction(next)
                 }
               }}
+              separation="outlined"
               value={interaction}
             >
               {INTERACTIONS.map((one) => (
@@ -237,7 +237,6 @@ export function AuraLab(): React.ReactElement {
                 one appearing beside a control the element has stopped
                 reading. */}
             <helix-toggle-group
-              appearance="filled"
               label="Aim"
               label-placement="start"
               onhelix-change={(event: CustomEvent<{ value: string }>) => {
@@ -246,6 +245,7 @@ export function AuraLab(): React.ReactElement {
                   setAim(next)
                 }
               }}
+              separation="outlined"
               value={aim}
             >
               {AIMS.map((one) => (

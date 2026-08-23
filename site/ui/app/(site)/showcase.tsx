@@ -232,19 +232,19 @@ export function Showcase(): React.ReactElement {
             each one is checked against the ground it lands on.
           </helix-text>
           <helix-flex>
-            <helix-button appearance="solid">Read the derivation</helix-button>
+            <helix-button emphasis="solid">Read the derivation</helix-button>
           </helix-flex>
         </helix-flex>
       </helix-card>
 
       <helix-toggle-group
-        appearance="filled"
         class={styles.showcaseSwitch}
         label="Showing"
         label-placement="start"
         onhelix-change={(event: CustomEvent<{ value: string }>) => {
           setView(event.detail.value as View)
         }}
+        separation="outlined"
         value={view}
       >
         {VIEWS.map((one) => (
@@ -321,11 +321,11 @@ export function Showcase(): React.ReactElement {
           <helix-card class="showcaseCard" separation="outlined">
             <helix-flex direction="column" gap="md">
               <helix-flex align="center" gap="sm" wrap>
-                <helix-button appearance="solid" tone="primary">
+                <helix-button emphasis="solid" tone="primary">
                   Primary
                 </helix-button>
                 <helix-button>Secondary</helix-button>
-                <helix-button appearance="subtle">Subtle</helix-button>
+                <helix-button emphasis="subtle">Subtle</helix-button>
               </helix-flex>
               <helix-flex align="center" gap="sm" wrap>
                 <helix-kbd>Cmd K</helix-kbd>

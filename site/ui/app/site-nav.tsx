@@ -317,7 +317,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
         </helix-tooltip>
 
         {narrow && (
-          <helix-button appearance="ghost" onClick={() => setOpen(true)} slot="end">
+          <helix-button emphasis="ghost" onClick={() => setOpen(true)} slot="end">
             Menu
           </helix-button>
         )}

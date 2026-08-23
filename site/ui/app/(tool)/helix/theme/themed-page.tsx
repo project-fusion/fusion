@@ -119,8 +119,8 @@ export function ThemedPage() {
         </div>
 
         <helix-flex align="center" gap="xs" slot="end">
-          <helix-button appearance="ghost">Sign in</helix-button>
-          <helix-button appearance="solid" tone="primary">
+          <helix-button emphasis="ghost">Sign in</helix-button>
+          <helix-button emphasis="solid" tone="primary">
             Book a walkthrough
           </helix-button>
         </helix-flex>
@@ -129,7 +129,7 @@ export function ThemedPage() {
       <section className="themedHero">
         <helix-flex direction="column" gap="md">
           <helix-flex align="center" gap="xs">
-            <helix-tag appearance="subtle" tone="accent">
+            <helix-tag emphasis="subtle" tone="accent">
               New
             </helix-tag>
             <helix-text appearance="caption">Live berth windows, in twelve more ports</helix-text>
@@ -143,10 +143,10 @@ export function ThemedPage() {
             it.
           </helix-text>
           <helix-flex gap="sm">
-            <helix-button appearance="solid" tone="primary">
+            <helix-button emphasis="solid" tone="primary">
               Start free
             </helix-button>
-            <helix-button appearance="outlined">
+            <helix-button emphasis="outlined">
               Book a walkthrough
               <helix-icon name="arrow-right" slot="end"></helix-icon>
             </helix-button>
@@ -285,7 +285,7 @@ export function ThemedPage() {
                   <helix-table-cell>{row.lane}</helix-table-cell>
                   <helix-table-cell>{row.window}</helix-table-cell>
                   <helix-table-cell>
-                    <helix-tag appearance="subtle" tone={row.state}>
+                    <helix-tag emphasis="subtle" tone={row.state}>
                       {row.status}
                     </helix-tag>
                   </helix-table-cell>
@@ -322,10 +322,10 @@ export function ThemedPage() {
             ></helix-input>
             <helix-checkbox name="terms">Send me the monthly reliability report</helix-checkbox>
             <helix-flex gap="sm">
-              <helix-button appearance="solid" tone="primary">
+              <helix-button emphasis="solid" tone="primary">
                 Create account
               </helix-button>
-              <helix-button appearance="ghost">Talk to sales</helix-button>
+              <helix-button emphasis="ghost">Talk to sales</helix-button>
             </helix-flex>
           </helix-flex>
         </helix-card>
@@ -344,7 +344,7 @@ export function ThemedPage() {
               Two weeks of your history, loaded before the call.
             </helix-text>
           </helix-flex>
-          <helix-button appearance="solid">Book a walkthrough</helix-button>
+          <helix-button emphasis="solid">Book a walkthrough</helix-button>
         </helix-flex>
       </section>
 

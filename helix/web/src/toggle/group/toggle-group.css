@@ -74,7 +74,7 @@
 
   /* Inset even where nothing is drawn around it.
    *
-   * The framed appearances get this from their own padding, and `plain` had
+   * The framed separations get this from their own padding, and `plain` had
    * none, so its items were the full forty and the control was the item: a
    * selected tab's thumb ran edge to edge and the group read as one tall block
    * rather than as a marker inside a strip. Measured, 40 against the framed
@@ -86,7 +86,7 @@
   padding: var(--helix-space-2xs);
   /* And no groove either, which decides the thumb's color. Without a track the
      marker is a pill lying *on* whatever surface the group was put on, so it
-     has to be darker than it: that is `raised`. The grooved appearances below
+     has to be darker than it: that is `raised`. The grooved separations below
      take `overlay` instead, because a thumb in a groove has to be lighter than
      the groove, and on a white page those are opposite directions. Reported as
      a selected file tab that had gone too light, which is this case exactly:
@@ -99,8 +99,8 @@
    marker is a lone shape floating on the page and scans as a stray rectangle
    whatever its corner radius; inside a bordered, sunken track it reads as a
    thumb sitting in a groove, which is the thing a segmented control is. */
-:host(:not([appearance])) [part="track"],
-:host([appearance="filled"]) [part="track"] {
+:host(:not([separation])) [part="track"],
+:host([separation="outlined"]) [part="track"] {
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
@@ -150,7 +150,7 @@
    color, which stays reserved for state. One step rounder than nothing and one
    step tighter than the track it sits in, so the two are concentric. */
 [part="indicator"] {
-  /* Whichever the appearance declared, because the two look different for a
+  /* Whichever the separation declared, because the two look different for a
      reason: the token is decided by what is behind the thumb, and `plain` has
      no track behind it. See `:host` above. */
   background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));

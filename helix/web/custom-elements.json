@@ -6085,12 +6085,12 @@
             },
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
-              "attribute": "appearance",
+              "description": "How filled it is drawn.\n\n**This was `appearance`, and the docstring above it always said what it\nreally was.** \"How filled it is drawn\", sitting beside `tone`, \"What it\nmeans\": the axis was named correctly in prose and filed under the word\nfour axes shared. A Card's `outlined` says where a surface ends and this\none says how much ink a control claims, and one word cannot keep saying\nboth. `check:axes` holds the vocabulary now.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "attribute": "emphasis",
               "reflects": true,
               "inheritedFrom": {
                 "name": "MixinControlSurface",
@@ -6516,12 +6516,12 @@
               "fieldName": "fill"
             },
             {
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
-              "fieldName": "appearance",
+              "description": "How filled it is drawn.\n\n**This was `appearance`, and the docstring above it always said what it\nreally was.** \"How filled it is drawn\", sitting beside `tone`, \"What it\nmeans\": the axis was named correctly in prose and filed under the word\nfour axes shared. A Card's `outlined` says where a surface ends and this\none says how much ink a control claims, and one word cannot keep saying\nboth. `check:axes` holds the vocabulary now.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "fieldName": "emphasis",
               "inheritedFrom": {
                 "name": "MixinControlSurface",
                 "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
@@ -16351,12 +16351,12 @@
             },
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
-              "attribute": "appearance",
+              "description": "How filled it is drawn.\n\n**This was `appearance`, and the docstring above it always said what it\nreally was.** \"How filled it is drawn\", sitting beside `tone`, \"What it\nmeans\": the axis was named correctly in prose and filed under the word\nfour axes shared. A Card's `outlined` says where a surface ends and this\none says how much ink a control claims, and one word cannot keep saying\nboth. `check:axes` holds the vocabulary now.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "attribute": "emphasis",
               "reflects": true,
               "inheritedFrom": {
                 "name": "MixinControlSurface",
@@ -16949,12 +16949,12 @@
           "customElement": true,
           "attributes": [
             {
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
-              "fieldName": "appearance",
+              "description": "How filled it is drawn.\n\n**This was `appearance`, and the docstring above it always said what it\nreally was.** \"How filled it is drawn\", sitting beside `tone`, \"What it\nmeans\": the axis was named correctly in prose and filed under the word\nfour axes shared. A Card's `outlined` says where a surface ends and this\none says how much ink a control claims, and one word cannot keep saying\nboth. `check:axes` holds the vocabulary now.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "fieldName": "emphasis",
               "inheritedFrom": {
                 "name": "MixinControlSurface",
                 "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
@@ -26093,12 +26093,12 @@
             },
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
-              "attribute": "appearance",
+              "description": "How filled it is drawn.\n\n**This was `appearance`, and the docstring above it always said what it\nreally was.** \"How filled it is drawn\", sitting beside `tone`, \"What it\nmeans\": the axis was named correctly in prose and filed under the word\nfour axes shared. A Card's `outlined` says where a surface ends and this\none says how much ink a control claims, and one word cannot keep saying\nboth. `check:axes` holds the vocabulary now.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "attribute": "emphasis",
               "reflects": true,
               "inheritedFrom": {
                 "name": "MixinControlSurface",
@@ -26533,12 +26533,12 @@
               "fieldName": "raised"
             },
             {
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
-              "fieldName": "appearance",
+              "description": "How filled it is drawn.\n\n**This was `appearance`, and the docstring above it always said what it\nreally was.** \"How filled it is drawn\", sitting beside `tone`, \"What it\nmeans\": the axis was named correctly in prose and filed under the word\nfour axes shared. A Card's `outlined` says where a surface ends and this\none says how much ink a control claims, and one word cannot keep saying\nboth. `check:axes` holds the vocabulary now.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "fieldName": "emphasis",
               "inheritedFrom": {
                 "name": "MixinControlSurface",
                 "module": "src/mixins/mixin-control-surface/mixin-control-surface.ts"
@@ -37068,12 +37068,12 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "How a control is drawn and what it means, for the three that are buttons.\n\n**The first mixin in `helix/web`, and it belongs here rather than in core.**\n`helix/core` is consumed by the headless tier, which must never take styling,\nand these two properties are purely presentational: they carry no behaviour,\nno ARIA and no form participation, only which rules a stylesheet applies.\nDeclaring them in core would put an appearance on the tier whose whole\npurpose is not having one.\n\n**Why a mixin rather than inheritance.** `Button`, `IconButton` and\n`CopyButton` all want this pair, and the styled tier cannot get it by\nextending: each styled class extends its own base, which is what keeps a\ncontrol's behaviour and its presentation in one branch. `CopyButton` already\ncomposes `IconButton`'s stylesheet, `[HelixIconButton.styles, styles]`, which\nis the same move for CSS; this is that move for API. Redeclared instead, the\nthree drift the first time one gains a value.",
+          "description": "How much ink a control claims and what it means, for the three that are buttons.\n\n**The first mixin in `helix/web`, and it belongs here rather than in core.**\n`helix/core` is consumed by the headless tier, which must never take styling,\nand these two properties are purely presentational: they carry no behaviour,\nno ARIA and no form participation, only which rules a stylesheet applies.\nDeclaring them in core would put a treatment on the tier whose whole purpose\nis not having one.\n\n**Why a mixin rather than inheritance.** `Button`, `IconButton` and\n`CopyButton` all want this pair, and the styled tier cannot get it by\nextending: each styled class extends its own base, which is what keeps a\ncontrol's behaviour and its presentation in one branch. `CopyButton` already\ncomposes `IconButton`'s stylesheet, `[HelixIconButton.styles, styles]`, which\nis the same move for CSS; this is that move for API. Redeclared instead, the\nthree drift the first time one gains a value.",
           "name": "MixinControlSurfaceInterface",
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
@@ -37097,12 +37097,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
-              "attribute": "appearance",
+              "description": "How filled it is drawn.\n\n**This was `appearance`, and the docstring above it always said what it\nreally was.** \"How filled it is drawn\", sitting beside `tone`, \"What it\nmeans\": the axis was named correctly in prose and filed under the word\nfour axes shared. A Card's `outlined` says where a surface ends and this\none says how much ink a control claims, and one word cannot keep saying\nboth. `check:axes` holds the vocabulary now.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "attribute": "emphasis",
               "reflects": true
             },
             {
@@ -37118,12 +37118,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How filled it is drawn.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
-              "fieldName": "appearance"
+              "description": "How filled it is drawn.\n\n**This was `appearance`, and the docstring above it always said what it\nreally was.** \"How filled it is drawn\", sitting beside `tone`, \"What it\nmeans\": the axis was named correctly in prose and filed under the word\nfour axes shared. A Card's `outlined` says where a surface ends and this\none says how much ink a control claims, and one word cannot keep saying\nboth. `check:axes` holds the vocabulary now.\n\nReflected because the stylesheet selects on it, and undefaulted because\nit reflects: a reflected property with a default writes its attribute\nonto every host anybody renders. The resting treatment is the attribute's\nabsence, which each control names for itself, `outlined` on `Button` and\n`ghost` on `IconButton`.",
+              "fieldName": "emphasis"
             },
             {
               "name": "tone",
@@ -61732,7 +61732,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Five appearances. The fill is a tint of the status color, mixed with\n`color-mix` rather than held as a token per status, so a theme that changes\nthe status colors gets the tints with them.",
+          "description": "Five tones. The fill is a tint of the status color, mixed with\n`color-mix` rather than held as a token per status, so a theme that changes\nthe status colors gets the tints with them.",
           "name": "HelixTag",
           "cssProperties": [
             {
@@ -61803,18 +61803,18 @@
               "type": {
                 "text": "'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic color, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
+              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. `tone` is semantic\ncolor, which is what these are and what `helix-text` already calls them.\nOne axis was wearing the other's name, and the axis it should have held did\nnot exist.\n\n**Written before there was a registry, and it turned out to be the first\ninstance of a general fault rather than a local one.** `appearance` was not\na treatment either: it held four different questions across 21 components,\nand this file found one of them the hard way. The rest is `check:axes`.",
               "attribute": "tone",
               "reflects": true
             },
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because color and fill were welded together.",
-              "attribute": "appearance",
+              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because color and fill were welded together. Which is the same\ntest the whole axis registry answers to, arrived at here first and one\ncomponent at a time.",
+              "attribute": "emphasis",
               "reflects": true
             },
             {
@@ -62005,16 +62005,16 @@
               "type": {
                 "text": "'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic color, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
+              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. `tone` is semantic\ncolor, which is what these are and what `helix-text` already calls them.\nOne axis was wearing the other's name, and the axis it should have held did\nnot exist.\n\n**Written before there was a registry, and it turned out to be the first\ninstance of a general fault rather than a local one.** `appearance` was not\na treatment either: it held four different questions across 21 components,\nand this file found one of them the hard way. The rest is `check:axes`.",
               "fieldName": "tone"
             },
             {
-              "name": "appearance",
+              "name": "emphasis",
               "type": {
                 "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because color and fill were welded together.",
-              "fieldName": "appearance"
+              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because color and fill were welded together. Which is the same\ntest the whole axis registry answers to, arrived at here first and one\ncomponent at a time.",
+              "fieldName": "emphasis"
             },
             {
               "name": "dismissible",
@@ -68230,12 +68230,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "separation",
               "type": {
-                "text": "'filled' | 'plain' | undefined"
+                "text": "'outlined' | 'plain' | undefined"
               },
-              "description": "How much chrome the group carries around its items.",
-              "attribute": "appearance",
+              "description": "How the group separates itself from the page.\n\n**Classified by what it does rather than by what its values were called.**\nThese were `filled` and `plain` under `appearance`, and `filled` reads like\na fill weight, which is how it came to be listed as emphasis when the axes\nwere first sorted. The stylesheet settles it: what `plain` drops is the\nbackground *and* the border, so this is where the group ends, not how much\nink it claims. `outlined` because the frame is a border over the group's\nown ground, exactly as a Card's is; the track's sunken fill stays either\nway, being a groove for the thumb to sit in rather than a way of being\nseen.",
+              "attribute": "separation",
               "reflects": true
             },
             {
@@ -68992,12 +68992,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "separation",
               "type": {
-                "text": "'filled' | 'plain' | undefined"
+                "text": "'outlined' | 'plain' | undefined"
               },
-              "description": "How much chrome the group carries around its items.",
-              "fieldName": "appearance"
+              "description": "How the group separates itself from the page.\n\n**Classified by what it does rather than by what its values were called.**\nThese were `filled` and `plain` under `appearance`, and `filled` reads like\na fill weight, which is how it came to be listed as emphasis when the axes\nwere first sorted. The stylesheet settles it: what `plain` drops is the\nbackground *and* the border, so this is where the group ends, not how much\nink it claims. `outlined` because the frame is a border over the group's\nown ground, exactly as a Card's is; the track's sunken fill stays either\nway, being a groove for the thumb to sit in rather than a way of being\nseen.",
+              "fieldName": "separation"
             },
             {
               "name": "default-value",
@@ -75677,12 +75677,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "separation",
               "type": {
-                "text": "'plain' | 'solid' | undefined"
+                "text": "'filled' | 'plain' | undefined"
               },
               "description": "Whether the bar floats on the picture or sits on its own ground.",
-              "attribute": "appearance",
+              "attribute": "separation",
               "reflects": true
             },
             {
@@ -76851,12 +76851,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "separation",
               "type": {
-                "text": "'plain' | 'solid' | undefined"
+                "text": "'filled' | 'plain' | undefined"
               },
               "description": "Whether the bar floats on the picture or sits on its own ground.",
-              "fieldName": "appearance"
+              "fieldName": "separation"
             },
             {
               "name": "src",
@@ -77114,6 +77114,10 @@
                 "slug": "extra-controls"
               },
               {
+                "description": "A filled frame around the picture.",
+                "slug": "filled"
+              },
+              {
                 "description": "The browser's own controls instead of these, which is what `controls` means.",
                 "slug": "native"
               },
@@ -77130,12 +77134,8 @@
                 "slug": "playlist-controls"
               },
               {
-                "description": "The player lifted off the page.",
-                "slug": "shadow"
-              },
-              {
-                "description": "A filled frame around the picture.",
-                "slug": "solid"
+                "description": "Controls floating on a gradient, which is what a player does by default.",
+                "slug": "scrim"
               },
               {
                 "description": "Several encodings of one clip, the browser taking the first it can play.",

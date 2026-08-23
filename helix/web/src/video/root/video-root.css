@@ -103,20 +103,20 @@
 
 /* A bar with a ground of its own, for a video embedded in a document rather
    than a video that is the page. The gradient goes with it: two grounds is one
-   too many, and the point of this appearance is that the controls are a bar and
+   too many, and the point of this separation is that the controls are a bar and
    not a wash over the picture. */
-:host([appearance="solid"]) [part="controls"] {
+:host([separation="filled"]) [part="controls"] {
   background-color: var(--helix-color-surface);
   color: var(--helix-color-foreground);
 }
 
-:host([appearance="solid"]) [part="stage"]::before {
+:host([separation="filled"]) [part="stage"]::before {
   content: none;
 }
 
 /* And it stays. A bar that is part of the frame does not come and go: hiding it
    would leave a strip of the well behind it, which is worse than the bar. */
-:host([appearance="solid"][data-idle]:not(:focus-within)) [part="controls"] {
+:host([separation="filled"][data-idle]:not(:focus-within)) [part="controls"] {
   opacity: 1;
 }
 
@@ -152,7 +152,7 @@
 
 /* Nothing to shade where the browser draws its own bar, or where the consumer
    asked for no ground at all. */
-:host([appearance="plain"]) [part="stage"]::before,
+:host([separation="plain"]) [part="stage"]::before,
 :host([controls]) [part="stage"]::before {
   content: none;
 }
@@ -250,7 +250,7 @@
   margin: var(--helix-space-none);
 }
 
-/* The groove is a wash of the ink, on every appearance, and the solid bar is
+/* The groove is a wash of the ink, on every separation, and the filled bar is
    not an exception to it.
  *
  * It was one, reaching for `surface-raised` on the grounds that a bar with a
@@ -308,7 +308,7 @@
   /* The gap the level stands off the speaker, and the lift derived from it.
      One number, because three things need it: the track, the ground behind the
      track, and the bridge that keeps the gap hoverable. Written separately they
-     drifted, and on the solid appearance the ground ended up sixteen pixels
+     drifted, and on the filled separation the ground ended up sixteen pixels
      above the track, all of its slack above the thumb and none below. */
   --_video-level-gap: var(--helix-space-2xs);
   --_video-level-lift: calc(100% + var(--_video-level-gap));
@@ -366,7 +366,7 @@
  *
  * The level opens on hovering the speaker and lives above it with a gap
  * between, so reaching for it left the speaker and shut it before it could be
- * touched. Wider on the solid appearance, where the gap is bigger to clear the
+ * touched. Wider on the filled separation, where the gap is bigger to clear the
  * bar, which is where it became impossible rather than merely fiddly.
  *
  * Invisible and only while open, so it never eats a press meant for the
@@ -430,11 +430,11 @@
 /* On a solid bar the level has to clear the bar itself, not just the speaker.
  *
  * The popup is offset from the sound group, which sits inside the bar's own
- * padding, so on the transparent appearances it lands right at the bar's top
+ * padding, so on the transparent separations it lands right at the bar's top
  * edge and nobody notices. Given a bar with a ground, four pixels of the slider
  * sat on it. Lifted by the bar's own top padding, which is the number that
  * created the overlap. */
-:host([appearance="solid"]) [part="sound"] {
+:host([separation="filled"]) [part="sound"] {
   --_video-level-gap: calc(var(--helix-space-xs) * 2);
 }
 

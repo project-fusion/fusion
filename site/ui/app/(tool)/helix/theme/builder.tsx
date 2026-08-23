@@ -645,21 +645,21 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                 look for the same thing. */}
             <helix-sandbox-toolbar slot="toolbar">
               <helix-flex align="center" gap="xs">
-                <helix-tag appearance="subtle" tone={failures.length > 0 ? 'danger' : 'success'}>
+                <helix-tag emphasis="subtle" tone={failures.length > 0 ? 'danger' : 'success'}>
                   {counts.pass ?? 0} pass
                 </helix-tag>
                 {failures.length > 0 ? (
-                  <helix-tag appearance="subtle" tone="danger">
+                  <helix-tag emphasis="subtle" tone="danger">
                     {failures.length} fail
                   </helix-tag>
                 ) : null}
                 {unmeasured.length > 0 ? (
-                  <helix-tag appearance="subtle" tone="neutral">
+                  <helix-tag emphasis="subtle" tone="neutral">
                     {unmeasured.length} unverifiable
                   </helix-tag>
                 ) : null}
                 {theme.collisions.length > 0 ? (
-                  <helix-tag appearance="subtle" tone="warning">
+                  <helix-tag emphasis="subtle" tone="warning">
                     {theme.collisions.length} collision
                     {theme.collisions.length === 1 ? '' : 's'}
                   </helix-tag>

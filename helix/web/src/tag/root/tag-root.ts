@@ -8,7 +8,7 @@ import { styles } from './tag-root.css.js'
  * @summary Labels content with a short piece of metadata.
  *
  * @description
- * Five appearances. The fill is a tint of the status color, mixed with
+ * Five tones. The fill is a tint of the status color, mixed with
  * `color-mix` rather than held as a token per status, so a theme that changes
  * the status colors gets the tints with them.
  *
@@ -34,11 +34,15 @@ export class HelixTag extends HelixBaseTag {
   /**
    * Which status the tag reports.
    *
-   * This was called `appearance`, and it never was one. Everywhere else in the
-   * library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
-   * `tone` is semantic color, which is what these five are and what
-   * `helix-text` already calls them. One axis was wearing the other's name, and
-   * the axis it should have held did not exist.
+   * This was called `appearance`, and it never was one. `tone` is semantic
+   * color, which is what these are and what `helix-text` already calls them.
+   * One axis was wearing the other's name, and the axis it should have held did
+   * not exist.
+   *
+   * **Written before there was a registry, and it turned out to be the first
+   * instance of a general fault rather than a local one.** `appearance` was not
+   * a treatment either: it held four different questions across 21 components,
+   * and this file found one of them the hard way. The rest is `check:axes`.
    */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
@@ -55,10 +59,12 @@ export class HelixTag extends HelixBaseTag {
    *
    * Independent of `tone` on purpose: an outlined danger tag and a solid danger
    * tag are both sensible, and until these were two properties you could ask
-   * for neither, because color and fill were welded together.
+   * for neither, because color and fill were welded together. Which is the same
+   * test the whole axis registry answers to, arrived at here first and one
+   * component at a time.
    */
   @property({ reflect: true })
-  appearance?: 'outlined' | 'solid' | 'subtle'
+  emphasis?: 'outlined' | 'solid' | 'subtle'
 
   static override styles: CSSResultGroup = styles
 }

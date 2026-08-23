@@ -456,7 +456,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                       resolves from Phosphor at build time. */}
                   {/* `outlined`, the same as View Source beside it. The two are
                       one row of controls and were two appearances. */}
-                  <helix-icon-button appearance="outlined" label="More" slot="trigger">
+                  <helix-icon-button emphasis="outlined" label="More" slot="trigger">
                     <helix-icon name="dots-three-vertical"></helix-icon>
                   </helix-icon-button>
                   {/* A link, not a handler. `Menu.Item` renders an `<a>` when

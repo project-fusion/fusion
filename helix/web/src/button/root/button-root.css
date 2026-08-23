@@ -24,9 +24,9 @@
   display: inline-flex;
 }
 
-/* Two axes, and the colour is the one the appearances read.
+/* Two axes, and the colour is the one the emphases read.
  *
- * `appearance` is the fill (solid, outlined, subtle, ghost) and `tone` is what
+ * `emphasis` is the fill (solid, outlined, subtle, ghost) and `tone` is what
  * the button means (neutral, primary, danger). They were one property, and it
  * held a rank ladder with a colour wedged into it: `primary`, `secondary` and
  * `tertiary` say how much a button matters, and `danger` says what it does. So
@@ -35,7 +35,7 @@
  * filled neutral. `Tag` made this same split first and its note carries the
  * argument.
  *
- * Every appearance below is written once against these four, so a tone is four
+ * Every emphasis below is written once against these four, so a tone is four
  * declarations rather than four rules, and adding one is one block.
  *
  * The neutral values are chosen so the resting button does not move: neutral's
@@ -46,7 +46,7 @@
   --_button-edge: var(--helix-color-border);
   /* The solid fill, separate from the tone, and it has to be separate.
    *
-   * `--_button-tone` is the colour of the *ink* on every appearance but this
+   * `--_button-tone` is the colour of the *ink* on every emphasis but this
    * one: an outlined or ghost primary draws its label with it, and in dark mode
    * that is deliberately the lighter brand so the text is legible on a dark
    * page. A solid button wants the opposite, a fill dark enough to carry white,
@@ -204,24 +204,24 @@
  *
  * **Every one of them names its own hover, including the ones whose fill does
  * not change.** The generic hover above is `:host(:not(:disabled))
- * [part="button"]:hover`, four class-equivalents, and an appearance rule is
- * three, so without a hover of its own an appearance loses its fill the moment
+ * [part="button"]:hover`, four class-equivalents, and an emphasis rule is
+ * three, so without a hover of its own an emphasis loses its fill the moment
  * a pointer touches it. Measured on the old `danger`, which had no hover rule:
  * a red button that turned neutral grey under the pointer, in every build since
  * it was written. */
-:host([appearance="solid"]) [part="button"] {
+:host([emphasis="solid"]) [part="button"] {
   background-color: var(--button-background-color, var(--_button-fill));
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-on-tone));
 }
-:host(:not(:disabled)[appearance="solid"]) [part="button"]:hover {
+:host(:not(:disabled)[emphasis="solid"]) [part="button"]:hover {
   background-color: var(--button-background-color, var(--_button-fill-hover));
   border-color: transparent;
 }
 
 /* A wash with no line, for a button that should read as coloured without
    reading as the one thing to press. */
-:host([appearance="subtle"]) [part="button"] {
+:host([emphasis="subtle"]) [part="button"] {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 14%, transparent)
@@ -230,14 +230,14 @@
   color: var(--button-foreground-color, var(--_button-tone));
 }
 
-:host(:not(:disabled)[appearance="subtle"]) [part="button"]:hover {
+:host(:not(:disabled)[emphasis="subtle"]) [part="button"]:hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 22%, transparent)
   );
   border-color: transparent;
 }
-:host([appearance="ghost"]) [part="button"] {
+:host([emphasis="ghost"]) [part="button"] {
   background-color: var(--button-background-color, transparent);
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-tone));
@@ -253,7 +253,7 @@
  * where the token was chosen, the step is 1.11 and correct. A translucent mix
  * composites against whatever is behind it, so one value is right on every
  * surface and there is nothing to keep in sync. */
-:host(:not(:disabled)[appearance="ghost"]) [part="button"]:hover {
+:host(:not(:disabled)[emphasis="ghost"]) [part="button"]:hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 8%, transparent)

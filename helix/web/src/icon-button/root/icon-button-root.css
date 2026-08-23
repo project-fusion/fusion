@@ -8,7 +8,7 @@
  * where the two rest: a text button rests outlined, because a button with words
  * in it is a thing you are meant to see, and an icon button rests as a ghost,
  * because a toolbar of framed squares is a toolbar of boxes. So the resting
- * appearance here is `ghost` and the resting ink is muted, lifting to the full
+ * emphasis here is `ghost` and the resting ink is muted, lifting to the full
  * foreground under a pointer, which is what the old bare rules did.
  *
  * A tone replaces both inks with itself: a danger icon button is red at rest
@@ -167,16 +167,16 @@
  * own; written out it selects nothing and lands on the block above.
  *
  * Every one names its own hover, including where the fill does not move. The
- * generic hover is four class-equivalents and an appearance rule is three, so
- * an appearance without a hover of its own loses its fill the moment a pointer
+ * generic hover is four class-equivalents and an emphasis rule is three, so
+ * an emphasis without a hover of its own loses its fill the moment a pointer
  * touches it. Both notes below were written the first time that happened here.
  */
-:host([appearance="solid"]) [part="button"] {
+:host([emphasis="solid"]) [part="button"] {
   background-color: var(--_icon-button-tone);
   border-color: transparent;
   color: var(--_icon-button-on-tone);
 }
-:host(:not(:disabled)[appearance="solid"]) [part="button"]:hover {
+:host(:not(:disabled)[emphasis="solid"]) [part="button"]:hover {
   background-color: var(--_icon-button-tone-hover);
   color: var(--_icon-button-on-tone);
 }
@@ -191,23 +191,23 @@
  * border and radius, so a row holding one of each read as two kinds of control.
  * A percentage of the ink is a step away from whatever it sits on in either
  * mode, where a fixed neutral is not. */
-:host([appearance="outlined"]) [part="button"] {
+:host([emphasis="outlined"]) [part="button"] {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 6%, transparent);
   border-color: var(--_icon-button-edge);
   color: var(--_icon-button-tone);
 }
-:host(:not(:disabled)[appearance="outlined"]) [part="button"]:hover {
+:host(:not(:disabled)[emphasis="outlined"]) [part="button"]:hover {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 12%, transparent);
   color: var(--_icon-button-tone);
 }
 
-:host([appearance="subtle"]) [part="button"] {
+:host([emphasis="subtle"]) [part="button"] {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 14%, transparent);
   border-color: transparent;
   color: var(--_icon-button-tone);
 }
 
-:host(:not(:disabled)[appearance="subtle"]) [part="button"]:hover {
+:host(:not(:disabled)[emphasis="subtle"]) [part="button"]:hover {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 22%, transparent);
   color: var(--_icon-button-tone);
 }

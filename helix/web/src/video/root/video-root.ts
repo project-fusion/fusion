@@ -32,7 +32,7 @@ import { styles } from './video-root.css.js'
  * @category content
  * @documentation https://helix.fusion.dev/components/video
  *
- * @property appearance - Whether the bar floats on the picture or sits on its own ground.
+ * @property separation - Whether the bar floats on the picture or sits on its own ground.
  *
  * @cssproperty --video-aspect-ratio - The shape of the box. Defaults to the
  * video's own once known, and `16 / 9` until then.
@@ -49,12 +49,21 @@ export class HelixVideo extends HelixBaseVideo {
   /**
    * How the control bar sits on the picture.
    *
-   * `shadow` is the default and is what a player looks like, and what the
+   * **Classified by what it does rather than by what its values were called.**
+   * These were `solid` and `plain` under `appearance`, and `solid` reads like a
+   * fill weight, which is how this came to be listed as emphasis when the axes
+   * were first sorted. It is not: all three states say what the bar sits on,
+   * which is where it separates from the picture.
+   *
+   * Absent is the default and is what a player looks like, and what the
    * platform's own controls do: they float on a gradient that fades up into the
    * picture, dark enough to read them against a bright frame and gone entirely
-   * a little higher up. The picture runs edge to edge behind them.
+   * a little higher up. The picture runs edge to edge behind them. It has no
+   * name because it is the resting treatment, and `shadow` was never a declared
+   * value even while an example wrote it: the attribute matched no selector and
+   * fell through to this rule, which is why it appeared to work.
    *
-   * `solid` gives the controls a bar of their own, which is what a video
+   * `filled` gives the controls a bar of their own, which is what a video
    * embedded in a document usually wants, where the player is a component on a
    * page rather than the page itself. It stays put rather than fading, because
    * a bar that is part of the frame would leave a strip of the well behind it.
@@ -74,7 +83,7 @@ export class HelixVideo extends HelixBaseVideo {
    * only the departure has to be named.
    */
   @property({ reflect: true })
-  appearance?: 'plain' | 'solid'
+  separation?: 'filled' | 'plain'
 
   static override tier = 'helix-'
 

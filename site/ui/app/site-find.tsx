@@ -193,8 +193,8 @@ export function SiteFind({
           still works because the palette listens on the document. */}
       {trigger && (
         <helix-button
-          appearance="outlined"
           class={styles.siteFind}
+          emphasis="outlined"
           onClick={() => setOpen(true)}
           slot={slot}
         >

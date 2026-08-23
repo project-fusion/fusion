@@ -755,12 +755,19 @@ most was the one place it did not hold. */
   fill?: HelixButton["fill"];
   /** How filled it is drawn.
 
+**This was `appearance`, and the docstring above it always said what it
+really was.** "How filled it is drawn", sitting beside `tone`, "What it
+means": the axis was named correctly in prose and filed under the word
+four axes shared. A Card's `outlined` says where a surface ends and this
+one says how much ink a control claims, and one word cannot keep saying
+both. `check:axes` holds the vocabulary now.
+
 Reflected because the stylesheet selects on it, and undefaulted because
 it reflects: a reflected property with a default writes its attribute
 onto every host anybody renders. The resting treatment is the attribute's
 absence, which each control names for itself, `outlined` on `Button` and
 `ghost` on `IconButton`. */
-  appearance?: HelixButton["appearance"];
+  emphasis?: HelixButton["emphasis"];
   /** What it means.
 
 Three and an accent, not the full status set. A tag reports a state and a
@@ -1870,12 +1877,19 @@ export type HelixCopyButtonHelixCopyElementEvent =
 export type HelixCopyButtonVueProps = {
   /** How filled it is drawn.
 
+**This was `appearance`, and the docstring above it always said what it
+really was.** "How filled it is drawn", sitting beside `tone`, "What it
+means": the axis was named correctly in prose and filed under the word
+four axes shared. A Card's `outlined` says where a surface ends and this
+one says how much ink a control claims, and one word cannot keep saying
+both. `check:axes` holds the vocabulary now.
+
 Reflected because the stylesheet selects on it, and undefaulted because
 it reflects: a reflected property with a default writes its attribute
 onto every host anybody renders. The resting treatment is the attribute's
 absence, which each control names for itself, `outlined` on `Button` and
 `ghost` on `IconButton`. */
-  appearance?: HelixCopyButton["appearance"];
+  emphasis?: HelixCopyButton["emphasis"];
   /** What it means.
 
 Three and an accent, not the full status set. A tag reports a state and a
@@ -2757,12 +2771,19 @@ the page and a line drawn on the page is not the same as being above it. */
   raised?: HelixIconButton["raised"];
   /** How filled it is drawn.
 
+**This was `appearance`, and the docstring above it always said what it
+really was.** "How filled it is drawn", sitting beside `tone`, "What it
+means": the axis was named correctly in prose and filed under the word
+four axes shared. A Card's `outlined` says where a surface ends and this
+one says how much ink a control claims, and one word cannot keep saying
+both. `check:axes` holds the vocabulary now.
+
 Reflected because the stylesheet selects on it, and undefaulted because
 it reflects: a reflected property with a default writes its attribute
 onto every host anybody renders. The resting treatment is the attribute's
 absence, which each control names for itself, `outlined` on `Button` and
 `ghost` on `IconButton`. */
-  appearance?: HelixIconButton["appearance"];
+  emphasis?: HelixIconButton["emphasis"];
   /** What it means.
 
 Three and an accent, not the full status set. A tag reports a state and a
@@ -5845,11 +5866,15 @@ export type HelixTagHelixDismissElementEvent =
 export type HelixTagVueProps = {
   /** Which status the tag reports.
 
-This was called `appearance`, and it never was one. Everywhere else in the
-library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
-`tone` is semantic color, which is what these five are and what
-`helix-text` already calls them. One axis was wearing the other's name, and
-the axis it should have held did not exist. */
+This was called `appearance`, and it never was one. `tone` is semantic
+color, which is what these are and what `helix-text` already calls them.
+One axis was wearing the other's name, and the axis it should have held did
+not exist.
+
+**Written before there was a registry, and it turned out to be the first
+instance of a general fault rather than a local one.** `appearance` was not
+a treatment either: it held four different questions across 21 components,
+and this file found one of them the hard way. The rest is `check:axes`. */
   tone?: HelixTag["tone"];
   /** How much of the tone the tag wears.
 
@@ -5862,8 +5887,10 @@ the axis it should have held did not exist. */
 
 Independent of `tone` on purpose: an outlined danger tag and a solid danger
 tag are both sensible, and until these were two properties you could ask
-for neither, because color and fill were welded together. */
-  appearance?: HelixTag["appearance"];
+for neither, because color and fill were welded together. Which is the same
+test the whole axis registry answers to, arrived at here first and one
+component at a time. */
+  emphasis?: HelixTag["emphasis"];
   /** Whether it offers a control to take it away. */
   dismissible?: HelixTag["dismissible"];
   /** Accessible name for that control.
@@ -6420,8 +6447,18 @@ export type HelixToggleGroupHelixSelectElementEvent =
   HelixToggleGroupElementEvent<HelixSelectEvent>;
 
 export type HelixToggleGroupVueProps = {
-  /** How much chrome the group carries around its items. */
-  appearance?: HelixToggleGroup["appearance"];
+  /** How the group separates itself from the page.
+
+**Classified by what it does rather than by what its values were called.**
+These were `filled` and `plain` under `appearance`, and `filled` reads like
+a fill weight, which is how it came to be listed as emphasis when the axes
+were first sorted. The stylesheet settles it: what `plain` drops is the
+background *and* the border, so this is where the group ends, not how much
+ink it claims. `outlined` because the frame is a border over the group's
+own ground, exactly as a Card's is; the track's sunken fill stays either
+way, being a groove for the thumb to sit in rather than a way of being
+seen. */
+  separation?: HelixToggleGroup["separation"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixToggleGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -7077,7 +7114,7 @@ export type HelixVideoHelixPreviousElementEvent =
 
 export type HelixVideoVueProps = {
   /** Whether the bar floats on the picture or sits on its own ground. */
-  appearance?: HelixVideo["appearance"];
+  separation?: HelixVideo["separation"];
   /** Where the video is, for the common case of one file. */
   src?: HelixVideo["src"];
   /** A still shown before it plays, which the platform draws itself. */
@@ -8599,7 +8636,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixTabsTabVueProps,
     HelixTabsTabVueEvents
   >;
-  /** Five appearances. The fill is a tint of the status color, mixed with 'color-mix' rather than held as a token per status, so a theme that changes the status colors gets the tints with them. */
+  /** Five tones. The fill is a tint of the status color, mixed with 'color-mix' rather than held as a token per status, so a theme that changes the status colors gets the tints with them. */
   "helix-tag": DefineCustomElement<
     HelixTag,
     HelixTagVueProps,

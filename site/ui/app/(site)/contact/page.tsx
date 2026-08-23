@@ -89,8 +89,8 @@ export default function Page() {
                 hello@fusion.dev
               </a>
               <helix-copy-button
-                appearance="solid"
                 copied-label="Address copied"
+                emphasis="solid"
                 label="Copy the address"
                 tone="primary"
                 value="hello@fusion.dev"
