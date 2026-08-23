@@ -1038,44 +1038,6 @@ helix-base-time-picker::part(items) {
   max-block-size: 12rem;
   overflow-y: auto;
 }`,
-  timeline: `/* Rail then content, side by side. Without a row the marker lands
-   wherever the text ends, which is the right-hand edge. */
-helix-base-timeline-item {
-  display: grid;
-  gap: 0.5rem;
-  grid-template-columns: auto 1fr;
-}
-
-/* The rail runs down beside the entries, and the generic rule drew it
-   as a full-width bar across each one: measured 394 by 8, which is a band. */
-helix-base-timeline-item::part(rail) {
-  background-color: transparent;
-  block-size: auto;
-  display: flex;
-  flex-direction: column;
-  inline-size: auto;
-}
-
-helix-base-timeline-item::part(connector) {
-  background-color: var(--_gray-fill);
-  flex: 1;
-  inline-size: 1px;
-  margin-inline: auto;
-  min-block-size: 0.75rem;
-}
-
-helix-base-timeline-item::part(marker) {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-}
-
-helix-base-timeline-item::part(dot) {
-  background-color: var(--_gray-mark);
-  block-size: 0.5rem;
-  border-radius: 50%;
-  inline-size: 0.5rem;
-}`,
   /* A rail down the left and the entry beside it.
      Nothing laid the rail against the content, so the mark, the time and what
      happened landed in whatever order the flow gave them and the times drifted
