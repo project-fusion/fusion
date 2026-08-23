@@ -211,12 +211,22 @@ describe('a press inside a frame', () => {
     await new Promise((done) => setTimeout(done, 0))
   }
 
+  /* **Put back afterwards, and the whole suite is why.** `activeElement` is a
+     getter on the prototype, so this shadows it with an own property, and bun
+     runs every DOM spec in one process: left in place it answers a fixed
+     `<iframe>` for every file that runs after this one. Each of these passed
+     alone and six focus-trap tests failed in the full run, which is the one
+     shape of failure a per-file run can never show. */
   const focused = (tagName: string | null): void => {
     Object.defineProperty(document, 'activeElement', {
       configurable: true,
       value: tagName === null ? null : document.createElement(tagName),
     })
   }
+
+  afterEach(() => {
+    delete (document as unknown as Record<string, unknown>).activeElement
+  })
 
   test('closes the overlay, being the one press the document cannot see', async () => {
     document.body.innerHTML = ''
