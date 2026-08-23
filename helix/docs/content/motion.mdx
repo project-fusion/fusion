@@ -39,7 +39,7 @@ overshoot reads as responsive rather than as a bug.
 The theme engine takes a `motion` intent input, so a product can be uniformly
 quicker or slower without every component being retuned.
 
-## Reduced motion is per component, and this is why
+## Reduced motion is per component
 
 The base layer has a global rule capping animation and transition duration for a
 reader who asked not to be moved. **It does not reach a single component.**
@@ -51,8 +51,8 @@ reader who asked not to be moved. **It does not reach a single component.**
 `*` does not cross a shadow boundary. So that rule reaches your prose, your
 layout and the base layer's own recipes, and none of the fifty-odd components
 that draw inside a shadow root. Each one answers `prefers-reduced-motion` in its
-own stylesheet, and fifty-nine of them do; `bun run check:motion` fails a
-component that animates without one.
+own stylesheet, and fifty-nine of them do, and a component that animates
+without one fails the build.
 
 **The same is true of yours.** If you write a component with a shadow root, the
 global rule will not cover it either. That is not a Helix behaviour, it is how

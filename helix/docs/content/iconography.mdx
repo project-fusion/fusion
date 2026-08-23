@@ -57,9 +57,9 @@ import { trash } from '@helix-io/icons'
 ```
 
 Each glyph is an exported string, so you can put one in your own markup, in a
-canvas, or anywhere an element is not what you want. `bun run check:icons` holds
-every `name` used anywhere in the repository to the set of glyphs that actually
-exist, in 1,189 files, so a typo is a build failure rather than an empty box.
+canvas, or anywhere an element is not what you want. Every `name` the library
+uses is held to the set of glyphs that actually exist, so a typo is a build
+failure rather than an empty box.
 
 ## Adding one
 
@@ -70,7 +70,7 @@ hand-transcribing a path into a TypeScript object.
 Keep to the same geometry: 256 box, stroke-width 16, no fill. A glyph drawn at a
 different weight is visible immediately when it sits beside one that was not.
 
-## Icons this set deliberately does not have
+## Icons this set does not have
 
 Product marks. Helix and Cortex have marks and they live in the icon package,
 but a mark is not an icon: it identifies a product and does not mean an action.

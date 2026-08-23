@@ -26,7 +26,7 @@ The consequence for your CSS: **do not try to raise an overlay with `z-index`.**
 It has no effect on a top-layer element, and reaching for it means something
 else is wrong.
 
-## Positioning is JavaScript, deliberately
+## Positioning is JavaScript
 
 Placement uses `@floating-ui/dom` rather than CSS anchor positioning: flip when
 there is no room below, shift to stay on screen, size to the available space.
@@ -37,7 +37,7 @@ support](./browser-support).
 That means an overlay's position is recomputed while it is open, on scroll and
 resize, and stops when it closes.
 
-## Dismissal, and the order it happens in
+## Dismissal
 
 Light dismiss is the platform's: click outside, or press `Escape`. What Helix
 adds is making that correct across shadow boundaries.

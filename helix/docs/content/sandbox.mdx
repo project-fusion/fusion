@@ -1,19 +1,20 @@
 ---
-description: The editor beside the preview, and the isolation that makes it safe.
+description: The editor beside the preview, and how to build one of your own.
 section: Tooling
 title: Sandbox
 ---
 
 # Sandbox
 
+[Open the sandbox](/helix/sandbox).
+
 Every example on a component's page is editable. Change the markup and the
 preview redraws; change the stylesheet beside it and the preview restyles.
 
-That is `@helix-io/sandbox`, and it is worth one page for two reasons: the
-isolation is a security decision worth understanding, and the same elements are
-what you would reach for to build a playground of your own.
+The same elements are what you would reach for to build a playground of your
+own, and the isolation below is what makes running someone else's markup safe.
 
-## The frame is sandboxed, and that is not packaging
+## The frame is sandboxed
 
 The preview runs in a sandboxed iframe with an opaque origin, and the script
 that drives it is served as a static classic script rather than rendered by a

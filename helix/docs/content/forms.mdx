@@ -131,8 +131,8 @@ Measured: a `helix-input` in one accepted text, reported `disabled` as false,
 and carried no `aria-disabled`, while the form's entry list correctly left it
 out. Interactive and unsubmittable is the worst of both.
 
-**The consequence for your own CSS is a rule worth knowing.** Style disabled
-controls with `:disabled`, never `[disabled]`:
+**For your own CSS this means one rule.** Style disabled controls with
+`:disabled`, never `[disabled]`:
 
 ```css
 /* Right: matches the attribute and the ancestor fieldset. */
@@ -147,8 +147,8 @@ inside a disabled fieldset, which sets no attribute on anything. A component
 styled with the attribute selector refuses interaction from the fieldset,
 because the platform disables it either way, and paints itself as live. That
 reads as a control that is simply broken, and it is invisible in every example
-that does not happen to use a fieldset. `bun run check:disabled` holds the
-library to this; the same reasoning applies to yours.
+that does not happen to use a fieldset. The library holds itself to this, and
+the same reasoning applies to yours.
 
 `disabled` is mirrored to `aria-disabled` rather than removing the control from
 the accessibility tree, so a screen reader can still announce that the control

@@ -23,7 +23,7 @@ The leading underscore is the whole convention: `--_helix-` is private and may
 be renamed or re-spaced without notice. Reaching past the semantic layer is the
 one thing that will break under you.
 
-## The surfaces, which are the ones people get wrong
+## The surfaces
 
 Depth is distance from the page, in whichever direction there is room. The page
 is white in light and black in dark, so in light there is nothing above white to
@@ -61,11 +61,11 @@ them to nudge one component; use the semantic tokens to move everything.
 
 ## What is enforced
 
-`bun run check:tokens` fails the build on three things:
+Three things fail the build:
 
-1. **A raw value where a token exists.** `#e5e5e5` when a neutral is right there.
-2. **A primitive referenced from outside `@helix-io/styles`.**
-3. **A reference to a token that does not exist.**
+1. **A raw value where a token exists.** `#e5e5e5` when a neutral is right
+   there. 2. **A primitive referenced from outside `@helix-io/styles`.** 3. **A
+   reference to a token that does not exist.**
 
 The third earns its keep on its own: a renamed token resolves to nothing, the
 property silently falls back to a browser default, and the code looks correct

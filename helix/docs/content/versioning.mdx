@@ -19,7 +19,7 @@ bun add @helix-io/web@1.4.0 @helix-io/styles@1.4.0
 Pin them to the same number or pin none of them. A range that lets one drift
 ahead of another is the one configuration this scheme does not defend against.
 
-## Why lockstep, and why only within Helix
+## Why lockstep
 
 Cortex moves independently. Full-repo lockstep would be wrong here because the
 documentation packages carry the version of what they document: publishing a
@@ -34,8 +34,8 @@ packages of the same version are the pair that was tested together.
 Every manifest in the repository holds `0.0.0-dev`. The real number is stamped
 in CI, seconds before packing.
 
-That is worth knowing if you ever read the source: a manifest saying `0.0.0-dev`
-is not an unreleased package, it is every package. Committing the number back
+If you read the source: a manifest saying `0.0.0-dev` is not an unreleased
+package, it is every package. Committing the number back
 would need a bot whose push access outranks branch protection, to record
 something `git tag` already holds.
 

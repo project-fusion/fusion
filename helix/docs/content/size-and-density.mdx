@@ -18,9 +18,9 @@ title: Size and density
 ```
 
 There is no `size` prop on a button, an input, a select or a checkbox. That
-looks like a restriction and is not one, so it is worth saying why.
+looks like a restriction and is not one.
 
-## Size is asked to do three jobs, and only one belongs to the control
+## Size does three jobs
 
 **Emphasis.** `appearance` carries it. A filled primary button says "this one
 matters" far louder than eight more pixels ever will.
@@ -74,7 +74,7 @@ why it costs no component any API and crosses every shadow boundary on its own.
 The `-sm` / `-md` / `-lg` tokens are the scale and never move. The unsuffixed
 ones are the current step, and `data-density` is what moves them.
 
-## Two things that are not this
+## What this is not
 
 **`data-link-size` stays.** A text link has no control height: its size is
 typography, and it follows the text around it.

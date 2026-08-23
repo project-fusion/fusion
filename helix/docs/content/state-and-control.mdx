@@ -19,13 +19,11 @@ about this library most likely to look like a bug.
 <helix-input label="Name" value="Ada"></helix-input>
 ```
 
-A `text` fence rather than an `html` one, deliberately: `bun run check:examples`
-refuses a declared `value` inside fenced HTML anywhere in this documentation,
-on the grounds that a reader copies what is in front of them and an HTML fence
-is markup with no script by definition. It is right, and this page is the one
-place that has to show the mistake in order to name it.
+It is written as plain text rather than as HTML on purpose: a reader copies what
+is in front of them, and this is the one page that has to show the mistake in
+order to name it. Do not paste it.
 
-## The two modes, and when each is decided
+## The two modes
 
 Every controlled property comes in a pair.
 
@@ -69,7 +67,7 @@ four shapes.
 The event is what carries the request. Answer it by moving your own state, and
 the element renders what you hand back.
 
-## Uncontrolled, which is usually what you want
+## Uncontrolled
 
 ```html
 <helix-input
@@ -87,7 +85,7 @@ two controls that have to agree, a value that comes from a route, a dialog whose
 open state is in a store. Not by default, and not because it feels more
 explicit.
 
-## The state is on the host as `data-`, not as the attribute
+## State is on the host as `data-`
 
 ```css
 helix-accordion-item[data-open] { … }
@@ -117,10 +115,8 @@ item.addEventListener('helix-open', (event) => {
 ```
 
 `preventDefault()` refuses the change and nothing moves. This is the only way to
-refuse one, and it went undocumented long enough that `bun run check:events` was
-written partly because of it: `Tabs` and `Toggle.Group` each dispatched the
-cancelable `helix-change` that is the only refusal path, and neither declared
-it, so the path was undiscoverable from the documentation.
+refuse one. Which events are cancelable is on each component's page, and every
+one that is says so.
 
 The imperative form reports the same thing:
 
@@ -136,8 +132,8 @@ answered yet.
 **In TypeScript, the constraint is a compile error.** The types intersect every
 controlled tag with a union that requires an answering handler, so `<helix-input
 value="Ada" />` does not compile. That constraint is generated several steps
-from anything a person edits, so `bun run check:controlled` runs `tsc` over a
-fixture and compares the diagnostics in both directions: a constraint that
+from anything a person edits, so it is compiled against a fixture and
+compared in both directions: a constraint that
 stopped constraining and one that grew too strict are the same kind of silent,
 and the second reaches you as "the library will not let me write correct code".
 

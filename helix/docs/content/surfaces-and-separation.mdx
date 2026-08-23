@@ -8,8 +8,9 @@ title: Surfaces and separation
 
 **A surface is told apart from what is behind it by exactly one of four things:
 a fill, an edge, a lift, or space.** A design language leads with one of them.
-This is the page about which one, and about the ladder that decides what a
-surface sits on.
+Helix leads with the edge on the page and with the lift above it: a card takes a
+hairline and no shadow, a menu takes a shadow and no hairline. The ladder below
+decides what a surface sits on.
 
 ## The four mechanisms
 
@@ -39,11 +40,11 @@ Helix expresses the choice in two pairs of policy tokens:
 
 Set the border pair to zero and the shadow pair to something, and the whole
 library goes shadow-first. Reverse them and it goes border-first. Every surface
-in the library is themeable in both directions, which `bun run check:separation`
-holds: a surface that hooks its shadow and hardcodes `border: none` themes
-perfectly for anyone going shadow-first and cannot be made border-first at all,
-and nothing in the file says so. A half-converted surface is the failure worth
-catching, because it reads as done.
+in the library is themeable in both directions, and held to it: a surface that
+hooks its shadow and hardcodes `border: none` themes perfectly for anyone going
+shadow-first and cannot be made border-first at all, and nothing in the file
+says so. A half-converted surface is the failure worth catching, because it
+reads as done.
 
 ## The ladder
 
@@ -67,7 +68,7 @@ page on every side, so they are told apart by their fill, and on a white page a
 fill has to be a step *darker* to be seen. `overlay` is the opposite: it is told
 apart by its shadow and by covering something, so on white it is white.
 
-## The rule that catches people
+## The common mistake
 
 **`--helix-color-background` is the page, and your component is not the page.**
 
@@ -89,10 +90,10 @@ a panel or a photograph, and none of those is where a component gets built.
 
 **What to do instead:** put the colour behind a hook that defaults to the page,
 so a consumer whose component is not on the page can correct it. That is what
-`bun run check:grounds` requires, and the same reasoning applies to anything you
+the library requires of itself, and the same reasoning applies to anything you
 build on top.
 
-## Contrast follows from this
+## Contrast
 
 The theme engine measures an ink against the ground it is *really* painted on,
 which is why the ladder is a model rather than a naming convention: the engine

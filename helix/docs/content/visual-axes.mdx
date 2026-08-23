@@ -26,7 +26,7 @@ vocabularies. You cannot invent a value, and a component may take a subset.
 <helix-megamenu material="glass">…</helix-megamenu>
 ```
 
-## Why this exists
+## Why two axes
 
 **The library had four axes and one word for all of them.** Counted across both
 tiers, `appearance` held 21 declarations describing at least four different
@@ -41,10 +41,9 @@ ink. Same word, two questions, and no way to ask one without answering the
 other.
 
 **`appearance` is refused outright now.** It is not a word this library uses,
-and a component reintroducing it fails `bun run check:axes` rather than being
-asked to explain itself.
+and a component reintroducing it fails the build.
 
-## Two things that can be true at once are two axes
+## Two axes, not one
 
 This is the test, and the library found it before the registry existed.
 `megamenu-root.css` reads: a consumer can make the panel glass, which is not an

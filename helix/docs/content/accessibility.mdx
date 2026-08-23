@@ -6,10 +6,10 @@ title: Accessibility
 
 # Accessibility
 
-This page is about the division of labour. Some of accessibility is structural
-and a component can own it; some of it is about your content and no component
-can. Knowing which is which is the difference between a page that is accessible
-and a page built out of accessible parts.
+Some of accessibility is structural, and a component can own it. Some of it is
+about your content, and no component can. Knowing which is which is the
+difference between a page that is accessible and a page built out of accessible
+parts.
 
 ## What the library owns
 
@@ -24,16 +24,16 @@ open and returns it to whatever opened it. So do `Drawer` and the modal path of
 
 **Contrast, by construction rather than by review.** The theme engine measures
 every foreground against the ground it is really painted on and solves for the
-target rather than checking afterwards. `bun run check:contrast` re-measures the
-whole library, including the two thirds of rules that set an ink or a ground
-but not both, so a pairing nobody thought of is still measured.
-See [Surfaces and separation](./surfaces-and-separation).
+target rather than checking afterwards. Every pairing is re-measured, including
+the two thirds of rules that set an ink or a ground but not both, so a pairing
+nobody thought of is still checked. See [Surfaces and
+separation](./surfaces-and-separation).
 
 **Reduced motion, per component.** Fifty-nine stylesheets answer
 `prefers-reduced-motion` individually, because they have to: the base layer's
 global rule is `*, *::before, *::after` in the document, and `*` does not cross
 a shadow boundary, so it reaches your prose and none of the components.
-`bun run check:motion` fails a component that animates without answering.
+A component that animates without answering fails the build.
 
 **Disabled without disappearing.** `disabled` is mirrored to `aria-disabled`
 rather than removing the control from the accessibility tree, so a screen reader
@@ -87,8 +87,8 @@ document and is read where it sits. Neither is a variant of the other.
 **IDREFs do not cross it.** `aria-labelledby` and `aria-describedby` inside a
 shadow root cannot resolve to an id in your document, and the reference is
 dropped silently rather than erroring. This is why every control renders its own
-label instead of being wrapped by one, and it is worth knowing before you try to
-wire two components together by id. See [Forms and validation](./forms).
+label instead of being wrapped by one, and why wiring two components together by
+id does not work. See [Forms and validation](./forms).
 
 **`<label for>` cannot reach in either.** A `<label>` in your markup will not
 name a Helix control. Use the control's own `label`.
@@ -109,11 +109,9 @@ The base layer's `[data-hidden-visually]` clips rather than using
 the accessibility tree entirely, which is the opposite of what visually-hidden
 text is for.
 
-## What we do not claim
+## What is not covered
 
 The library is tested in Chromium, by automated specs and by pixel baselines. It
 is not run through a screen reader on every release, and the components'
 patterns follow the ARIA authoring practices rather than being certified against
-them. Where you find a real failure, it is a bug and worth reporting as one: the
-constraint machinery in this repository exists because we would rather a check
-found it than a user did.
+them. Where you find a real failure, it is a bug: report it.

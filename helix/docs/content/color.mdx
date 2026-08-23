@@ -49,7 +49,7 @@ distinguishable in that order rather than to look good as a full set.
 `keyword`, `name`, `string`, `tag`. Deliberately fewer than a full editor theme,
 because a code block in documentation is read rather than edited.
 
-## OKLCH, and why it matters here
+## OKLCH
 
 Every colour is authored in OKLCH. Equal numeric steps in sRGB are not equal
 perceptual steps, which makes both ramp generation and contrast arithmetic
@@ -60,17 +60,17 @@ Concretely, this is what lets the theme engine take a brand colour and *solve*
 for a palette rather than have someone pick one. See [Deriving a
 theme](./theming).
 
-## Contrast is a guarantee, not a review step
+## Contrast is a guarantee
 
 The engine measures every ink against the ground it will really be painted on
 and searches for the lightness that meets the target, rather than proposing a
 value and checking it afterwards. Every pairing it produces meets the target by
 construction.
 
-That guarantee is only as good as the list of pairs somebody thought of, which
-is why two checks exist rather than one. `bun run check:pairings` holds the
-engine's declared surface model against what components actually paint. `bun run
-check:contrast` measures the two thirds that check cannot see: of the rules in
+That guarantee is only as good as the list of pairs somebody thought of, so two
+things are checked rather than one. The engine's declared surface model is held
+against what components actually paint, and every pairing is then measured,
+which covers the two thirds the first cannot see: of the rules in
 the library, eleven set an ink and a ground together, where 165 set only an ink
 and 112 only a ground, and a pairing assembled by the cascade is still a pairing
 a reader has to be able to read.

@@ -13,7 +13,7 @@ page.
 
 Three doors are open, and they are in the order you should try them.
 
-## 1. Tokens, when the change is not about one component
+## 1. Tokens
 
 ```css
 :root {
@@ -31,7 +31,7 @@ smaller change and the one that stays consistent.
 
 See [Tokens](./tokens) and [Deriving a theme](./theming).
 
-## 2. Per-component hooks, when the change is about one component
+## 2. Per-component hooks
 
 ```css
 helix-card {
@@ -48,17 +48,17 @@ semantic token, so leaving it alone gets you the themed value, and setting it
 changes that component and nothing else.
 
 **They are API, not tokens**, and the distinction is enforced. A hook is named
-after the component (`--card-padding`, `--drawer-radii`), a token is named
-`--helix-*`, and `bun run check:hooks` holds every documented hook to a rule
-that actually reads it, in both directions. Declared and never read is a promise
-with nothing behind it; read and never declared is a working feature nobody is
-told about. Three of `Button`'s four hooks had been inert for a refactor's worth
-of time while the reference went on listing them, which is how that check came
+after the component (`--card-padding`, `--drawer-radii`) and a token is named
+`--helix-*`. Every documented hook is held to a rule that actually reads it, in
+both directions: declared and never read is a promise with nothing behind it,
+and read and never declared is a working feature nobody is told about. Three of
+`Button`'s four hooks were inert for a refactor's worth of time while the
+reference went on listing them, which is how that check came
 to exist.
 
 Each component's page lists its hooks under Custom properties.
 
-## 3. Parts, when you need at the box itself
+## 3. Parts
 
 ```css
 helix-select::part(trigger) {
@@ -75,7 +75,7 @@ declaration you like on it. It is the most powerful door and the one to try
 last, because it is the one that couples your stylesheet to a component's
 internal structure.
 
-**A published part is a promise**, and `bun run check:parts` holds it both ways:
+**A published part is a promise**, held both ways:
 a documented part that nothing renders, and a rendered part nobody was told
 about. The second is the worse of the two, because a `::part()` that resolves to
 nothing is valid CSS that matches nothing and reports nothing. `Breadcrumbs`

@@ -10,7 +10,7 @@ Helix has families, parts and groups, and they are not stylistic choices. Each
 answers a different question, and knowing which you are looking at tells you
 what to import and what to write.
 
-## A namespace means composition, never variation
+## Namespaces mean composition
 
 `Card.Root` contains `Card.Header`. The namespace says *this goes inside that*.
 
@@ -23,7 +23,7 @@ A button that is filled instead of outlined is the same component with a
 different `appearance`. A button that holds only an icon has a different
 accessible-name requirement and a different shape, so it is its own component.
 
-## A region becomes an element only when it has behaviour, state or API
+## When a region becomes an element
 
 Otherwise it is a slot.
 
@@ -38,7 +38,7 @@ Measured on Card with identical content: wrappers present but empty rendered
 85px against an ideal of 53px. Bare slots rendered 53px with no hiding logic at
 all.
 
-## A group is a part when it is the control, and a family when it arranges them
+## When a group is a part
 
 The test is whether the group reports a form value.
 
@@ -75,11 +75,11 @@ Text stays an attribute, because that is what most tooltips and most avatars
 hold. Anything richer replaces it by being slotted. Both can never show at once,
 and no component has to detect which you did.
 
-One trap worth knowing: **a whitespace-only text node is assigned to the default
-slot and defeats its fallback.** A newline between the tags is enough. That is
+One trap: **a whitespace-only text node is assigned to the default slot and
+defeats its fallback.** A newline between the tags is enough. That is
 why some examples close on the same line they open.
 
-## Width comes from the layout, not the control
+## Width comes from the layout
 
 There is no `width` or `fill` property on a button, for the same reason there is
 no `size` one: how wide a control is says something about the region it is in.
@@ -108,9 +108,8 @@ To make one hug its label instead, tell the layout:
 <helix-button class="hug">Hugs its label</helix-button>
 ```
 
-That is the whole of it, and it is worth saying out loud because the default
-surprises people: dropping a button into a column makes it full width, and the
-instinct is to look for a property that turns that off.
+The default surprises people: dropping a button into a column makes it full
+width, and the instinct is to look for a property that turns that off.
 
 **A fixed width is a different question, and it belongs to your site.** A
 marketing page whose hero buttons are all the same width is a real and reusable
@@ -130,7 +129,7 @@ Name it once where your other page constants live:
 The same reasoning puts a hero's type size outside the component scale: a
 marketing hero is not a component, so its measurements are the site's own.
 
-## One property per intent, including labels
+## One property per intent
 
 Every field control names itself the same way, and there are exactly two cases.
 
@@ -160,7 +159,7 @@ There used to be a `hide-label` boolean beside `label`. It is gone: one
 attribute supplying a label and a second saying not to show it is the absence of
 the first, spelled twice.
 
-## When one behaviour serves several components, it becomes its own family
+## Shared behaviour becomes its own family
 
 `Option`, `Listbox` and `Select` are three families rather than one because the
 keyboard, the filtering, the multi-select rules and the active-item tracking

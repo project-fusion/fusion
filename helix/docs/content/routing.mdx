@@ -40,7 +40,7 @@ Before `href` existed, the docs sidebar put a `<Link>` inside each row. The
 anchor was 57px of a 240px row, so five sixths of every row did nothing, and
 Enter did nothing at all: the tree announced a selection and no anchor heard it.
 
-## `href` and a framework's `<Link>` are alternatives, not layers
+## `href` and a framework's `<Link>`
 
 You cannot give a component's internal anchor to `next/link`. `<Link>` renders
 *its own* `<a>` and attaches its own handlers to it, and there is no way to hand
@@ -71,7 +71,7 @@ query rather than by looking at its children. What it costs:
   one puts every descendant anchor inside an ancestor anchor. That is invalid,
   and browsers rearrange it.
 
-## Some roles cannot contain a link, and the fix is to move the role
+## Some roles cannot contain a link
 
 `treeitem` and `tab` are the two in this library. You cannot nest an anchor in
 either, and the answer is not to give up the anchor.
@@ -102,10 +102,9 @@ the shape of the markup rather than only adding an attribute. Without an `href`
 nothing moves: the wrapper stays the `treeitem` and holds its group, which is
 what an `<li>` holding a `<ul>` is.
 
-Tabs have no equivalent published pattern, which is worth knowing before you
-reach for one. Web Awesome hit the same wall and answered it the other way,
-telling consumers to drop the anchor and navigate in JavaScript. That works, and
-it costs every item in the list above.
+Tabs have no equivalent published pattern. Web Awesome hit the same wall and
+answered it the other way, telling consumers to drop the anchor and navigate in
+JavaScript. That works, and it costs every item in the list above.
 
 ## Getting client-side routing back
 
@@ -174,7 +173,7 @@ Anything else that should navigate is a gap. Slot a link into it, and press the
 row rather than the words: `Tree.Item` follows a slotted anchor from anywhere in
 the row and from the keyboard, which covers the case without an `href`.
 
-## `Option` cannot take one, and a command palette is where that shows
+## `Option` cannot take one
 
 The obvious place to want a link in a list is a command palette, whose entries
 are usually half commands and half destinations. It is the one place this
@@ -205,8 +204,8 @@ role onto the anchor, is exactly the one thing that cannot be done here.
 Two constraints pointing opposite ways, and no arrangement satisfies both.
 
 **So a palette routes through its event.** Listen for `helix-select` on
-`helix-command` and call the router. That is what a palette is for, entries being
-commands and "go to Settings" being a command that navigates, and it is what
-every palette a reader has used already does. What it costs is the gestures only
-a real anchor has: middle-click, a modified click, and the destination in the
-status bar.
+`helix-command` and call the router. That is what a palette is for, entries
+being commands and "go to Settings" being a command that navigates, and it is
+what every palette a reader has used already does. What it costs is the gestures
+only a real anchor has: middle-click, a modified click, and the destination in
+the status bar.

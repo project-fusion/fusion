@@ -29,7 +29,7 @@ The prop is `on` and the event name, verbatim. Not `onHelixOpen`, not `onOpen`.
 React 19 forwards an unknown `on*` prop to `addEventListener` using the name as
 written, so the casing is the event's own.
 
-## The bridge, and why it exists
+## The bridge
 
 React has a hydration bug with custom events: handlers attached during hydration
 are stashed on the DOM node but never bound, so an event fired before the next
@@ -38,11 +38,11 @@ stash off the node and calling what it finds, so a handler works from the first
 paint rather than from the first re-render.
 
 That is runtime code you already have, in `@helix-io/core`, and nothing to
-configure. It is worth knowing about for one reason: it reads a React internal,
-the per-page key React stores props under, so `bun run check:react-bridge`
-exists in this repository to fail loudly if a React release renames it. The
-failure direction is safe, since finding nothing returns the pre-hydration
-behaviour, but it is silent, which is why it is checked rather than trusted.
+configure. One thing to know about it: it reads a React
+internal, the per-page key React stores props under. If a React release renames
+that key the bridge stops repairing and your handlers go back to needing a
+commit before they fire. Helix pins the React version it was measured against
+and fails its own build when React moves past it, so this cannot go unnoticed.
 
 ## A declared property is a claim of ownership
 
@@ -72,10 +72,9 @@ Two ways to write it, depending on which you meant:
 ```
 
 The constraint is generated from the manifest and covers every controlled
-property in the library, which `bun run check:controlled` holds to a fixture in
-both directions: a constraint that stopped constraining and one that grew too
-strict are the same kind of silent, and the second reaches you as "the library
-will not let me write correct code".
+property in the library, checked in both directions: a constraint that stopped
+constraining and one that grew too strict are the same kind of silent, and the
+second reaches you as "the library will not let me write correct code".
 
 See [State and control](./state-and-control) for what the two modes actually do.
 

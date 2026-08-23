@@ -7,8 +7,8 @@ title: Charting
 # Charting
 
 Six chart families: `Bar Chart`, `Line Chart`, `Donut Chart`, `Sparkline`,
-`Trend` and the shared `Legend`. Their API is on their own pages. This page is
-about the one thing those pages cannot tell you, which is how the data gets in.
+`Trend` and the shared `Legend`. Each has its own API page. Here is how the data
+gets in, which is the same for all of them.
 
 ## The data is a table in the document
 
@@ -28,8 +28,8 @@ about the one thing those pages cannot tell you, which is how the data gets in.
 ```
 
 `for` points at a real `<table>` by id, and the chart reads its series from it.
-That is unlike every other component in the library and it is worth
-understanding, because it is not a convenience.
+That is unlike every other component in the library, and it is not a
+convenience.
 
 **A property cannot survive hydration.** A framework's server render emits
 markup, and a property is not markup: an array assigned to `items` exists only

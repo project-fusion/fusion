@@ -22,7 +22,7 @@ package augments `HTMLElementEventMap`, which types `addEventListener` for
 people writing plain HTML; and the name lives on the class, so a dispatch and a
 listener cannot disagree about the string.
 
-## The prefix earns its place three times
+## Why events are prefixed
 
 **Retargeting.** An event dispatched inside a shadow root is retargeted to look
 like it came from the host, so a bare `input` from a `<helix-input>` is
@@ -68,11 +68,8 @@ dialog.addEventListener('helix-close', (event) => {
 })
 ```
 
-`bun run check:events` exists partly because this went undocumented: `Tabs` and
-`Toggle.Group` each dispatched the cancelable `helix-change` that is the only
-refusal path, and neither declared it, so the path was undiscoverable. The check
-holds every dispatched event to a declaration and every declaration to a
-dispatch.
+Every dispatched event is held to a declaration and every declaration to a
+dispatch, so an event you can listen for is an event that is documented.
 
 ## The set
 

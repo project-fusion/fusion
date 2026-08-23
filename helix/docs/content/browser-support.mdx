@@ -7,10 +7,9 @@ title: Browser support
 
 # Browser support
 
-Helix is built on the platform rather than on a compatibility layer, which makes
-this page short and specific: there is no polyfill story, no transpiled
-fallback, and no configuration that trades features for reach. What the library
-needs is what the browser has to have.
+Helix is built on the platform rather than on a compatibility layer. There is no
+polyfill story, no transpiled fallback, and no configuration that trades
+features for reach: what the library needs is what your browser has to have.
 
 ## What is tested
 
@@ -41,7 +40,7 @@ deliberate choice and the one place the library takes a dependency instead of
 the platform: anchor positioning is not yet available everywhere the rest of
 this list is.
 
-## The two that decide your floor
+## What decides your floor
 
 **`light-dark()` and the Popover API.** Everything else on that list has been
 available longer. If you need to know whether a browser can run Helix, those are
@@ -67,8 +66,8 @@ Nothing else in the library reads it.
 
 ## No IE, no polyfills, no build flag
 
-There is no `browserslist` in this repository and no transpilation target, which
-is a decision rather than an oversight. A design system whose components are
+There is no `browserslist` and no transpilation target, which is a decision
+rather than an oversight. A design system whose components are
 custom elements cannot be shipped to a browser without custom elements, and
 everything else on the list above arrived in the same generation of browsers
 that shipped those.

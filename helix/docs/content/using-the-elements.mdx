@@ -34,13 +34,14 @@ There is a real bug underneath this, and the elements work around it for you.
 **React attaches no custom element listener while hydrating**, so on a
 server-rendered page every one of these props is dead until React commits an
 update for some other reason, at which point it silently starts working. Nothing
-is logged. It is [facebook/react#35446](https://github.com/facebook/react/issues/35446),
-open and unfixed.
+is logged. It is
+[facebook/react#35446](https://github.com/facebook/react/issues/35446), open and
+unfixed.
 
 Every Helix element binds the handler itself, immediately before it announces
 anything, using the function React is already holding for it. Measured in Chrome
-against React 19.2.8: on a hydrated page the first event reaches the handler, and
-it is never delivered twice once React binds its own listener.
+against React 19.2.8: on a hydrated page the first event reaches the handler,
+and it is never delivered twice once React binds its own listener.
 
 Nothing is required of you, and nothing changes once React fixes it.
 
@@ -52,7 +53,7 @@ that do not bubble (`load` and `error` on Avatar, `ended`, `play` and `pause` on
 Video) reach nothing React sets up. The elements bind those for you, so
 `onError` on a `<helix-avatar>` works like the rest.
 
-## The prop is `on` and the event name, verbatim
+## The prop is `on` plus the event name
 
 React slices `on` off the prop and listens for exactly what is left, without
 inspecting it.
