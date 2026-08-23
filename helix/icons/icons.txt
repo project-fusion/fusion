@@ -12,7 +12,6 @@ arrow-square-out
 arrow-up
 arrows-in-line-vertical
 arrows-out-line-vertical
-atom
 bell
 book-open-text
 briefcase
@@ -35,6 +34,7 @@ compass
 copy
 corners-in
 corners-out
+cortex
 cube
 dots-three
 dots-three-vertical
@@ -51,6 +51,7 @@ fusion
 gauge
 gear
 github-logo
+helix
 house
 html5
 info

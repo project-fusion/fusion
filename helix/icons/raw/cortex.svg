@@ -1,0 +1,14 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" fill="none" role="img" aria-label="Cortex">
+  <title>Cortex</title>
+  <rect width="256" height="256" rx="56" fill="url(#cortex-tile-grad)" />
+  <g transform="translate(54.2 39.9) scale(2.05)">
+    <path d="M72 62A22 22 0 0 1 50 84H22A22 22 0 0 1 0 62V22A22 22 0 0 1 22 0H50A22 22 0 0 1 72 22H54V22A4 4 0 0 0 50 18H22A4 4 0 0 0 18 22V62A4 4 0 0 0 22 66H50A4 4 0 0 0 54 62V62Z" fill="var(--logo-color-knockout, #fff)" />
+      <path d="M33 35H39A4 4 0 0 1 43 39V45A4 4 0 0 1 39 49H33A4 4 0 0 1 29 45V39A4 4 0 0 1 33 35Z" fill="var(--logo-color-knockout, #fff)" />
+  </g>
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" id="cortex-tile-grad" x1="0" x2="256" y1="0" y2="256">
+      <stop stop-color="var(--logo-color-from, var(--helix-color-primary))" />
+      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
+    </linearGradient>
+  </defs>
+</svg>

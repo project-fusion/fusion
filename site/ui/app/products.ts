@@ -13,19 +13,6 @@ export interface Destination {
    */
   href: string
   /**
-   * The mark down the side of the row, from the curated set in `helix/icons`.
-   *
-   * A utility glyph, deliberately, and the set of them reads as one idea:
-   * Helix is the DNA, so what you do to it is looked at through instruments.
-   * An atom for the components and a microscope for the sandbox rather than a
-   * cube and a rectangle, which were two shapes with nothing in common.
-   *
-   * Bespoke product marks were tried in place of these and are not good enough
-   * to ship. `brain`, `dna` and `test-tube` are in Phosphor too, for the Cortex
-   * row when it settles into whatever replaces `Overview`.
-   */
-  icon: string
-  /**
    * The sentence under the name, which is what the panel is for.
    */
   summary: string
@@ -77,6 +64,33 @@ export interface Product {
    */
   license?: string
   /**
+   * The product's own mark, from `helix/icons`.
+   *
+   * One mark per column and none on the rows beneath it. Rows carried Phosphor
+   * glyphs before, and three instruments stacked under a fourth mark read as a
+   * panel of icons rather than a panel of destinations: the marks stopped
+   * meaning anything the moment everything had one. The base layer already
+   * expects this, and its row grid keeps the mark's column at `auto`, so a row
+   * with nothing in it starts where the heading does.
+   *
+   * These are the first bespoke product marks to ship. `adcce07c` removed three
+   * earlier attempts because each was a pictogram of the product's metaphor
+   * standing beside a parent that is a geometric monogram. These are monograms
+   * in the parent's construction: one rounded body with material removed, two
+   * notches for Helix and one slot for Cortex.
+   *
+   * **The tile, and the letter painted rather than cut out.** A mask makes the
+   * letter a real hole, which is the same thing only while the mark sits on
+   * white: on the panel's own surface, and everywhere in dark mode, a hole
+   * fills with the ground behind it and the letter goes grey. It is painted, so
+   * the mark is one mark on every surface.
+   *
+   * The tile carries its own padding, so its letter is 58% of its box: at
+   * `icon-sm` that is 9.3px against a 12px heading whose cap height is about
+   * 8.6px, which is why it needs no size of its own here.
+   */
+  mark: string
+  /**
    * The evocative name, which is what the masthead says.
    */
   name: string
@@ -117,22 +131,16 @@ export const PRODUCTS: Product[] = [
     destinations: [
       {
         href: '/helix',
-        icon: 'atom',
         summary: 'Every family, with its API and an example.',
         title: 'Components',
       },
       {
         href: '/helix/sandbox',
-        icon: 'microscope',
         summary: 'Edit an example with the source beside it.',
         title: 'Sandbox',
       },
       {
         href: '/helix/theme',
-        /* The instrument set the other two rows read as: an atom for the
-           components, a microscope for the sandbox, a palette for the thing
-           that mixes one. */
-        icon: 'palette',
         summary: 'Derive a palette and see every pair measured.',
         title: 'Theme builder',
       },
@@ -140,6 +148,7 @@ export const PRODUCTS: Product[] = [
     href: '/helix',
     install: 'bun add @helix-io/web',
     license: 'MIT',
+    mark: 'helix',
     name: 'Helix',
     role: 'The DNA',
     stage: 'Building',
@@ -151,12 +160,12 @@ export const PRODUCTS: Product[] = [
     destinations: [
       {
         href: '/cortex',
-        icon: 'pulse',
         summary: 'What a system knows, and how far to trust it.',
         title: 'Overview',
       },
     ],
     href: '/cortex',
+    mark: 'cortex',
     name: 'Cortex',
     role: 'The mind',
     stage: 'Building',
