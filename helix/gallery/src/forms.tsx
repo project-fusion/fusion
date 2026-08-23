@@ -305,14 +305,19 @@ export const formsArt: Record<string, ReactNode> = {
    */
   'copy-button': (
     <>
-      <g className="artMotion artLift">
-        <rect className="artEdge" fill="none" height="40" rx="5" width="40" x="140" y="80" />
-        <rect className="artEdge" fill="none" height="20" rx="3" width="16" x="152" y="90" />
-        <path className="artStroke" d="M154 88h12" strokeLinecap="round" strokeWidth="2" />
-      </g>
+      {/* Centred as a pair. The clipboard sat at 140 to 180 and the tick at 186
+          to 200, so the two together spanned 140 to 200 and centred on 170 in a
+          card whose middle is 160, and the tick rode six units high of the
+          clipboard's own centre. They are 130 to 190 now, centred on both. */}
+      <rect className="artEdge" fill="none" height="40" rx="5" width="40" x="130" y="80" />
+      <rect className="artEdge" fill="none" height="20" rx="3" width="16" x="142" y="90" />
+      <path className="artStroke" d="M144 88h12" strokeLinecap="round" strokeWidth="2" />
+      {/* Only the tick moves, which is the half of this that is the component:
+          a button that says it copied. The clipboard is what it acted on and
+          floating it as well said the whole card had happened. */}
       <path
-        className="artOn artStroke"
-        d="M186 96l5 5 9-9"
+        className="artStroke artMotion artOn"
+        d="M176 100l5 5 9-9"
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -320,7 +325,6 @@ export const formsArt: Record<string, ReactNode> = {
       />
     </>
   ),
-
   'date-input': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />

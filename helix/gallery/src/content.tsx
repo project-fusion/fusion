@@ -166,31 +166,32 @@ export const contentArt: Record<string, ReactNode> = {
 
   code: (
     <>
-      <g className="artMotion artLift">
-        <path
-          className="artStroke"
-          d="M138 92l-12 8 12 8"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2.5"
-        />
-        <path
-          className="artStroke"
-          d="M154 86l12 28"
-          fill="none"
-          strokeLinecap="round"
-          strokeWidth="2.5"
-        />
-        <path
-          className="artStroke"
-          d="M182 92l12 8-12 8"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2.5"
-        />
-      </g>
+      <path
+        className="artStroke"
+        d="M138 92l-12 8 12 8"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.5"
+      />
+      {/* Only the slash moves. Lifting the whole glyph moved the two chevrons
+          that hold it, which reads as the card breathing rather than as the one
+          mark that makes this a fragment of code. */}
+      <path
+        className="artStroke artMotion artOn"
+        d="M154 86l12 28"
+        fill="none"
+        strokeLinecap="round"
+        strokeWidth="2.5"
+      />
+      <path
+        className="artStroke"
+        d="M182 92l12 8-12 8"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.5"
+      />
     </>
   ),
 
