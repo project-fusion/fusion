@@ -14,6 +14,15 @@ use crate::exit::Code;
 pub fn run(args: &Init, from: &Path, json: bool) -> Outcome<Code> {
     let path = args.out.clone().unwrap_or_else(|| from.join(FILE));
 
+    /* A directory is refused on its own terms. `--force` would not help and
+    saying "already exists" about one sends a reader looking for a file. */
+    if path.is_dir() {
+        return Err(Failure::input(
+            format!("cannot write {}", path.display()),
+            "is a directory, and --out names the file to write",
+        ));
+    }
+
     /* **Refusing to overwrite is not politeness.** This file is the only record
     of what a consumer decided; the CSS beside it is derived and can be rebuilt,
     and the intent cannot. */
