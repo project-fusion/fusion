@@ -64,15 +64,6 @@ const SECTIONS = [
 const DESCRIPTION = '26rem'
 
 /**
- * A floor under the Type column, because its members must not break.
- *
- * A union member is `white-space: nowrap`, so a wrap can only happen between
- * members and the bar always starts the line. The cost is that a member wider
- * than the column overflows instead of breaking, and `minmax(0, 1fr)`, the
- * default track, is allowed to be arbitrarily narrow. Six rems fits the longest
- * literal the library has, `"transparent"`, at the size this table sets.
- */
-/**
  * The name column, which may never be narrower than the name in it.
  *
  * A column with no width falls back to `minmax(0, 1fr)`, and `0` is a floor
