@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import styles from '../workbench.module.css'
 
 /**
  * The theme builder owns the whole viewport, as the sandbox does.
@@ -9,5 +10,5 @@ import type { ReactNode } from 'react'
  * tools is what goes in the panes, which is not a layout question.
  */
 export default function ThemeLayout({ children }: { children: ReactNode }) {
-  return <div className="sandboxShell">{children}</div>
+  return <div className={styles.sandboxShell}>{children}</div>
 }

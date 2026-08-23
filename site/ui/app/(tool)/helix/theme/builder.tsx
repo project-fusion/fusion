@@ -8,6 +8,7 @@ import { Wordmark } from '../../../wordmark'
 import '@helix-io/sandbox/editor'
 import { ThemedPage } from './themed-page'
 import './theme.css'
+import styles from '../workbench.module.css'
 
 /** Where a reader starts, and what the reset goes back to. */
 const BRAND = '#3b82f6'
@@ -288,7 +289,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
           class, so the height, the density and the full bleed come from one
           place: two tools under the same roof that differ in their chrome are
           two tools a reader has to learn twice. */}
-      <helix-app-header class="workbenchHeader">
+      <helix-app-header class={styles.workbenchHeader}>
         <a data-link="quiet" href="/" slot="start">
           <Wordmark />
         </a>
@@ -311,7 +312,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
           panel, the toolbar row and the separators a keyboard can move, and all
           of that was going to be rebuilt here badly. What it does not carry is
           file tabs, because a theme has one artifact and not four. */}
-      <helix-splitter className="workbenchBody" default-position={24}>
+      <helix-splitter className={styles.workbenchBody} default-position={24}>
         <section className="themeControls" slot="start" style={channelRamps}>
           <helix-flex direction="column" gap="lg">
             <helix-flex direction="column" gap="xs">

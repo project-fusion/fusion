@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import styles from '../workbench.module.css'
 
 /**
  * The sandbox owns the whole viewport.
@@ -7,5 +8,5 @@ import type { ReactNode } from 'react'
  * around it is a row taken from the thing being examined.
  */
 export default function SandboxLayout({ children }: { children: ReactNode }) {
-  return <div className="sandboxShell">{children}</div>
+  return <div className={styles.sandboxShell}>{children}</div>
 }

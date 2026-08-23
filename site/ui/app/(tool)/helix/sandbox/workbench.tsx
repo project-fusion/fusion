@@ -30,6 +30,7 @@ import { useElementRef } from '../../../../lib/use-element-ref'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
 import { Wordmark } from '../../../wordmark'
+import styles from '../workbench.module.css'
 import { readHashState, writeHashState } from './hash-state'
 import { DEFAULTS, readUrlState, type Section, writeUrlState } from './url-state'
 
@@ -879,10 +880,10 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
   const examplesPane = (
     <>
-      <helix-flex align="center" class="examplesHeader" data-density="sm" gap="2xs">
+      <helix-flex align="center" class={styles.examplesHeader} data-density="sm" gap="2xs">
         <helix-input
           aria-label="Filter examples"
-          class="examplesFilter"
+          class={styles.examplesFilter}
           onhelix-input={filterChanged}
           placeholder="Filter"
           type="search"
@@ -911,7 +912,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
         </helix-tooltip>
       </helix-flex>
 
-      <div className="examplesScroll" ref={scroller}>
+      <div className={styles.examplesScroll} ref={scroller}>
         {shown.length === 0 ? (
           <helix-text appearance="caption" tone="subtle">
             Nothing matches {filter}.
@@ -939,7 +940,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                 <helix-tooltip content={`${entry.label} documentation`} slot="end">
                   <a
                     aria-label={`${entry.label} documentation`}
-                    className="docsJump"
+                    className={styles.docsJump}
                     href={`/helix/components/${entry.slug}`}
                   >
                     <helix-icon name="book-open-text" />
@@ -980,7 +981,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           instead of being restated here. The class only makes it full bleed:
           this is a tool, so the row runs to the window rather than to the
           site's text column. */}
-      <helix-app-header class="workbenchHeader">
+      <helix-app-header class={styles.workbenchHeader}>
         {/* The mark and the name, and the way out. No trail beside them: the
             rail already says which component and which example, and a
             breadcrumb repeating it is a second answer to a question nobody
@@ -1039,13 +1040,13 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           wrapping the sandbox conditionally would unmount it at the breakpoint,
           and the preview is an iframe that reloads when it does. */}
       <helix-splitter
-        className="workbenchBody"
+        className={styles.workbenchBody}
         default-position={railHome}
         onhelix-change={railMoved}
         position={railPosition}
         ref={setRailSplitter}
       >
-        <div className="workbenchMain" slot="start">
+        <div className={styles.workbenchMain} slot="start">
           <helix-sandbox
             onhelix-change={(event) => {
               sandboxChanged(event)
@@ -1188,7 +1189,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                   placement="bottom"
                 >
                   <helix-icon-button
-                    class="railToggle"
+                    class={styles.railToggle}
                     label={showRail ? 'Hide examples' : 'Show examples'}
                     onClick={() => setShowRail((open) => !open)}
                   >
@@ -1201,7 +1202,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             {/* Both stay mounted, so switching files does not discard what was
               typed in the other, and they share one cell so the hidden one
               costs no height. */}
-            <div className="sourceFiles" slot="source">
+            <div className={styles.sourceFiles} slot="source">
               {/* One editor, keyed on the syntax so a change of environment
                 rebuilds it rather than reconfiguring a document in place. What
                 is on screen is what runs: an edit here is read back into the
@@ -1304,7 +1305,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             ref={confirmSyntax}
             size="sm"
           >
-            <helix-icon className="dialogWarning" name="warning-fill" slot="icon"></helix-icon>
+            <helix-icon
+              className={styles.dialogWarning}
+              name="warning-fill"
+              slot="icon"
+            ></helix-icon>
             <helix-text as="h2" slot="header">
               Change environment?
             </helix-text>
@@ -1339,7 +1344,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
              something the keyboard cannot reach and a screen reader does not
              read: a pane closed to nothing takes it off the screen and leaves it
              in the page. */
-          <aside className="examplesRail" inert={!showRail} slot="end">
+          <aside className={styles.examplesRail} inert={!showRail} slot="end">
             {examplesPane}
           </aside>
         )}

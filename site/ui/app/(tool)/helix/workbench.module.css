@@ -1,0 +1,255 @@
+/* The two tools: the sandbox workbench and the theme builder.
+ *
+ * One module for both, because they are one shell with different middles.
+ * `sandboxShell`, `workbenchHeader` and `workbenchBody` are applied by each of
+ * them, which is the whole reason this is not two files.
+ *
+ * `(tool)` rather than `(site)`: these are the editor and the palette bench,
+ * and nothing under `(site)` reads a line of it.
+ */
+
+/* The way out of the sandbox rail and into a family's own docs page.
+ *
+ * The reference sidebar had one of these too, going up to the index, and it is
+ * a row in the list now rather than a mark on the branch: a destination among
+ * destinations belongs in the list, where it is legible without hovering and in
+ * the tab order without a rule saying so. What is left here is the case that
+ * genuinely is a mark, one per row against eighty-eight rows, where rows would
+ * double the length of the rail to say the same thing.
+ *
+ * **Hover and focus-within, not hover alone.** A control revealed only by a
+ * pointer is one a keyboard reader never finds, and this is a link in a
+ * navigation rather than an embellishment. `:focus-within` on the row is what
+ * puts it on screen when the link itself takes focus, since the link is the
+ * thing inside the row that can hold it.
+ *
+ * `opacity` rather than `display`, so the row's width does not change as a
+ * pointer crosses it: the label would shift under the reader at the moment
+ * they are aiming at it. The box is always there and only the ink arrives.
+ *
+ * Not `visibility: hidden`, which takes it out of the accessibility tree and
+ * would hide from a screen reader a link that is genuinely there. */
+.docsJump {
+  align-items: center;
+  block-size: 1.5rem;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  inline-size: 1.5rem;
+  justify-content: center;
+  /* **On hover, as asked, and it took fixing the reasons it could not be seen
+     first.** Revealed-on-hover was reported as simply absent, and the cause was
+     not the gate: a 16 square glyph 4px from a chevron of the same size in the
+     same grey is invisible whenever it is shown. A 24 square target, twelve
+     pixels of air, and it reads. So the gate goes back.
+
+     `opacity` and not `display`, so the row's width does not change as a
+     pointer crosses it and the label does not shift under the reader at the
+     moment they are aiming at it. Not `visibility: hidden` either, which takes
+     it out of the accessibility tree and would hide a link that is there. */
+  opacity: 0;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+
+  /* Off the chevron, which sits 4px away and is the same size and the same
+     grey. Reported as not being there at all: two 16px marks that close
+     together read as one smudge rather than as a control beside a control. */
+  margin-inline-end: var(--helix-space-xs);
+
+  --icon-size: var(--helix-size-icon-sm);
+}
+
+/* A surface, not the accent.
+ *
+ * This painted `--helix-color-primary` and should never have: `tree-item.css`
+ * states the rule one file away, that the accent is reserved for state and
+ * using it for emphasis made the current page the loudest thing on screen. A
+ * link inside that tree does not get to disagree with the tree. The surface
+ * does the work and the ink goes to full strength, which is what the row's own
+ * hover does. */
+.docsJump:hover,
+.docsJump:focus-visible {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}
+
+/* Named one selector at a time, for the reason `check:motion` exists: a reduce
+   rule written looser than the rule it answers loses on specificity. */
+@media (prefers-reduced-motion: reduce) {
+  .docsJump {
+    transition: none;
+  }
+}
+
+/* ============================================================ sandbox ==== */
+
+/* The tool owns the viewport. One header, then everything else fills what is
+   left, and nothing on this screen scrolls the page: the panes scroll inside
+   themselves so the chrome never moves. */
+.sandboxShell {
+  block-size: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.workbenchHeader {
+  --app-header-inset: var(--helix-space-md);
+  --app-header-max-inline-size: none;
+
+  border-block-end-color: var(--helix-color-border);
+  flex: 0 0 auto;
+}
+
+/* Editor and preview take what is left; the examples keep a fixed rail on the
+   right, which is where they were asked for and where a list you scan while
+   working belongs. */
+/* The rail closes by its own track narrowing, which is the accordion's trick
+   turned on its side: a grid track can be interpolated where the presence of a
+   track cannot. This dropped to one column before, and two tracks to one is not
+   a change any browser can animate, so the rail vanished between frames. Two
+   tracks always, and the second one goes to nothing. */
+.workbenchBody {
+  flex: 1 1 auto;
+  min-block-size: 0;
+}
+
+/* **The rail opens and closes without a transition, and that is not an
+   oversight.** It was `transition: flex-basis` on the pane, to keep the reveal
+   the old grid animated. Measured, it did not slow the change down, it stopped
+   it happening: the inline style went to `--_splitter-position: 100%` and the
+   computed `flex-basis` stayed at `60%` for good, with the pane frozen at its
+   old width. A transition on a property whose value is substituted from an
+   unregistered custom property has nothing it can interpolate, and it holds the
+   start value rather than declining to run.
+
+   Animating it needs `@property` registration for the splitter's own position,
+   which is the splitter's to declare rather than something to reach in and
+   register from here. Left instant until then, which is correct if abrupt. */
+
+.workbenchMain {
+  block-size: 100%;
+  min-inline-size: 0;
+}
+
+.workbenchMain helix-sandbox {
+  block-size: 100%;
+  min-inline-size: 0;
+}
+
+/* Mirrored, because the glyph draws its panel against the leading edge and the
+   rail it switches is against the trailing one. An icon of a thing that has a
+   side is a picture of that side, so pointing at the wrong one is the same
+   mistake as a chevron facing the wrong way.
+
+   Here rather than in the icon, which is a picture and has no opinion about
+   which way round it should be shown. If a second one of these turns up it
+   earns a property; one does not. */
+.railToggle helix-icon {
+  scale: -1 1;
+}
+
+/* The header holds still and the list moves under it. Two rows rather than one
+   scrolling box: a filter that scrolls away is a filter you have to scroll back
+   to in order to change, which is the moment you most want it. */
+.examplesRail {
+  block-size: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 0;
+  /* What makes the narrowing a reveal rather than a squeeze. */
+  overflow: hidden;
+}
+
+/* The contents hold the width the rail has when it is open, so the column
+   closes over them and clips. Left to fill the track they would reflow the
+   whole way: the filter field shrinking, every label rewrapping, the tree
+   reflowing on each frame. That is the accordion's lesson, which is that
+   whatever is inside a box being animated has to hold still.
+
+   A minimum rather than a fixed size now the rail can be dragged: it holds
+   still while the column closes over it, and grows with the pane when a reader
+   makes the rail wider than it opened. */
+.examplesRail > * {
+  min-inline-size: var(--rail-open, 17rem);
+}
+
+.examplesHeader {
+  /* The toolbar's surface, not the page's. These two bars are the same height
+     and sit either side of the split, so the same fill is what makes them read
+     as one strip across the window rather than two bars that happen to line
+     up. */
+  background-color: var(--helix-color-background);
+  block-size: var(--helix-size-control-lg);
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block: var(--helix-space-none);
+  padding-inline: var(--helix-space-md);
+}
+
+.examplesScroll {
+  min-block-size: 0;
+  overflow-y: auto;
+  padding: var(--helix-space-sm);
+}
+
+/* The field takes the room and the button keeps its size. */
+.examplesFilter {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+/* The files share one cell, so the one that is hidden costs no height and the
+   one that shows fills the pane. `minmax(0, 1fr)` rather than `1fr`, because a
+   `1fr` track keeps an automatic minimum and refuses to shrink under its
+   content: the editor would push the pane taller instead of scrolling in it. */
+.sourceFiles {
+  block-size: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+.sourceFiles [data-file] {
+  display: grid;
+  grid-area: 1 / 1;
+  grid-template-rows: minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+.sourceFiles [data-file][hidden] {
+  display: none;
+}
+
+.sourceFiles helix-sandbox-editor {
+  min-block-size: 0;
+}
+
+/* Below the rail's width the examples move into a drawer, so the editor keeps
+   the whole screen rather than sharing it with a list. */
+@media (max-width: 60rem) {
+  .workbenchBody {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Chrome density, so the marks in a row come down with the type.
+ *
+ * The children are indented again, which the chevron moving to the end is what
+ * allows. At the start it took a gutter every row had to reserve, so a child
+ * carried both that and its indent and sat two steps from its parent's name;
+ * aligning the two meant no indent at all. At the end there is no gutter, a
+ * label starts at its row's own inset, and one step of indent is one step.
+ */
+.examplesRail,
+.examplesRail helix-tree {
+  --helix-size-icon: var(--helix-size-icon-sm);
+}
+
+/* The mark on the sandbox's confirmation. The dialog sizes it; the color is the
+   product's to say, and this one warns rather than destroys: changing the
+   environment converts what was written, it does not throw it away. */
+.dialogWarning {
+  color: var(--helix-color-warning);
+}
