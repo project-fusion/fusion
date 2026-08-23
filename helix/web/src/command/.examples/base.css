@@ -63,6 +63,12 @@ helix-base-command::part(items) {
   gap: 0.25rem;
 }
 
+helix-base-command::part(filter-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-option::part(item) {
   background-color: transparent;
   border: 0;

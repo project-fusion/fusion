@@ -73,6 +73,7 @@ const parse = (hotkey: string) => {
  * @csspart listbox - The list inside it.
  * @csspart items - The scrolling box of commands, forwarded from the listbox.
  * @csspart empty - What shows where the filter has hidden everything.
+ * @csspart filter-mark - The glyph beside the field, forwarded from the listbox.
  * @csspart search - The region holding the field that narrows the list.
  * @csspart search-field - The field itself.
  * @csspart footer - The row under the list.
@@ -311,7 +312,7 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
     >
       <${this.tag('listbox')}
         part="listbox"
-        exportparts="items, empty, search, search-field"
+        exportparts="empty, filter-mark, items, search, search-field"
         aria-label=${this.label}
         empty-text=${this.emptyText}
         filter-label=${this.placeholder}
