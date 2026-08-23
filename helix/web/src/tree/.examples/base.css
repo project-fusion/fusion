@@ -86,6 +86,23 @@ helix-base-tree-item::part(item):focus-visible {
   outline-offset: 2px;
 }
 
+/* Down and indented, which is what nesting means.
+   
+   Both tree and group matched the branch that lays a group out along a line, so
+   a parent and its children ran across the page: Item One, then Item Two and
+   Item Three beside it, then Item Four, with nothing saying which contained
+   which. A tree that reads left to right is a breadcrumb. */
+helix-base-tree::part(tree),
+helix-base-tree-item::part(group) {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+helix-base-tree-item::part(group) {
+  padding-inline-start: 1rem;
+}
+
 /* The chevron is the toggle itself, not a glyph inside one. */
 helix-base-tree-item::part(toggle) {
   block-size: 1em;

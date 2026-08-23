@@ -43,6 +43,11 @@ helix-base-icon {
   inline-size: 1em;
 }
 
+helix-base-badge {
+  display: inline-flex;
+  position: relative;
+}
+
 helix-base-icon-button::part(button) {
   all: unset;
   box-sizing: border-box;
@@ -61,4 +66,18 @@ helix-base-icon::part(svg) {
 helix-base-icon-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+helix-base-badge::part(indicator) {
+  background-color: var(--_gray-strong);
+  border-radius: 999px;
+  color: var(--_gray-surface);
+  font-size: 0.6875rem;
+  inset-block-start: -0.25rem;
+  inset-inline-end: -0.5rem;
+  line-height: 1;
+  min-inline-size: 1rem;
+  padding: 0.125rem 0.25rem;
+  position: absolute;
+  text-align: center;
 }

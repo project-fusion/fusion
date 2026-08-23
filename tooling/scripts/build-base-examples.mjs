@@ -325,6 +325,24 @@ const rulesFor = (part, slug) => {
  * stylesheet can move a box there.
  */
 const HOST = {
+  /* A row with the message at one end and the way out at the other.
+     Undirected, the dismiss dropped under the text, which reads as a second
+     paragraph rather than as a control. */
+  announcement: `helix-base-announcement {
+  align-items: center;
+  border-block-end: 1px solid var(--_gray-line);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}`,
+  /* A bar, which is the one thing this component is.
+     Its regions are named start, content and end, and with nothing laying them
+     out they stacked: a logo, then the nav, then the actions, three lines down
+     the page where every app header ever built is one line across. */
+  'app-header': `helix-base-app-header {
+  border-block-end: 1px solid var(--_gray-line);
+  display: block;
+}`,
   avatar: `helix-base-avatar {
   align-items: center;
   background-color: var(--_gray-fill);
@@ -337,6 +355,14 @@ const HOST = {
   justify-content: center;
   overflow: hidden;
 }`,
+  /* A mark on the corner of what it counts, which is what makes it a badge.
+     The count sat inline after the bell, reading as the word "3" beside an
+     icon rather than as a number on it. The host is the positioning context
+     and the indicator hangs off it, below. */
+  badge: `helix-base-badge {
+  display: inline-flex;
+  position: relative;
+}`,
   divider: `helix-base-divider {
   background-color: var(--_gray-line);
   block-size: 1px;
@@ -348,6 +374,17 @@ helix-base-divider[orientation="vertical"] {
   align-self: stretch;
   block-size: auto;
   inline-size: 1px;
+}`,
+  /* Stacked and centred, because an empty state is a small notice and not a
+     sentence: the heading, the line under it and the action ran together on
+     one line, reading as prose with a link in it. */
+  empty: `helix-base-empty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
 }`,
   image: `helix-base-image {
   background-color: var(--_gray-fill);
@@ -449,6 +486,35 @@ const GLYPH = `block-size: 1em;
   inline-size: 1em;`
 
 const EXTRA = {
+  announcement: `helix-base-announcement::part(content) {
+  flex: 1;
+}`,
+  'app-header': `helix-base-app-header::part(row) {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  min-block-size: 3rem;
+  padding: 0 0.75rem;
+}
+
+helix-base-app-header::part(content) {
+  flex: 1;
+}`,
+  /* Off the corner, and small enough to be a count rather than a label. */
+  badge: `helix-base-badge::part(indicator) {
+  background-color: var(--_gray-strong);
+  border-radius: 999px;
+  color: var(--_gray-surface);
+  font-size: 0.6875rem;
+  inset-block-start: -0.25rem;
+  inset-inline-end: -0.5rem;
+  line-height: 1;
+  min-inline-size: 1rem;
+  padding: 0.125rem 0.25rem;
+  position: absolute;
+  text-align: center;
+}`,
   carousel: `helix-base-carousel::part(track) {
   background-color: transparent;
   block-size: auto;
@@ -493,6 +559,12 @@ helix-base-command::part(listbox) {
   border: 1px solid var(--_gray-line);
   padding: 0.375rem;
 }`,
+  /* A column, the options having matched the branch that lays a group out
+     along a line: four options ran across the page as a sentence. */
+  listbox: `helix-base-listbox::part(items) {
+  align-items: stretch;
+  flex-direction: column;
+}`,
   loader: `helix-base-loader::part(svg) {
   block-size: 100%;
   inline-size: 100%;
@@ -520,6 +592,17 @@ helix-base-loader::part(indicator) {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+}`,
+  /* No markers, and a row. The run of pages is an <ol>, so every page carried
+     the browser's own numbering beside its own: "1. 1  2. 2  3. 3" down the
+     control, which reads as two paginations interleaved. */
+  pagination: `helix-base-pagination::part(list) {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }`,
   /* A box, because a cell here is an `<input>` and the branch that matched it
      undresses its subjects on purpose.
@@ -760,7 +843,24 @@ helix-base-timeline-item::part(dot) {
   border-radius: 50%;
   inline-size: 0.5rem;
 }`,
-  tree: `/* The chevron is the toggle itself, not a glyph inside one. */
+  tree: `/* Down and indented, which is what nesting means.
+   
+   Both tree and group matched the branch that lays a group out along a line, so
+   a parent and its children ran across the page: Item One, then Item Two and
+   Item Three beside it, then Item Four, with nothing saying which contained
+   which. A tree that reads left to right is a breadcrumb. */
+helix-base-tree::part(tree),
+helix-base-tree-item::part(group) {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+helix-base-tree-item::part(group) {
+  padding-inline-start: 1rem;
+}
+
+/* The chevron is the toggle itself, not a glyph inside one. */
 helix-base-tree-item::part(toggle) {
   ${GLYPH}
   cursor: pointer;

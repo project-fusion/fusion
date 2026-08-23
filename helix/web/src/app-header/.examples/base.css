@@ -43,6 +43,11 @@ helix-base-icon {
   inline-size: 1em;
 }
 
+helix-base-app-header {
+  border-block-end: 1px solid var(--_gray-line);
+  display: block;
+}
+
 helix-base-app-header::part(row) {
   background-color: transparent;
   border: 0;
@@ -67,4 +72,17 @@ helix-base-icon::part(svg) {
 helix-base-icon-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+helix-base-app-header::part(row) {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  min-block-size: 3rem;
+  padding: 0 0.75rem;
+}
+
+helix-base-app-header::part(content) {
+  flex: 1;
 }

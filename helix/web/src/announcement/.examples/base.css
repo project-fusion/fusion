@@ -43,6 +43,14 @@ helix-base-icon {
   inline-size: 1em;
 }
 
+helix-base-announcement {
+  align-items: center;
+  border-block-end: 1px solid var(--_gray-line);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
 helix-base-announcement::part(actions) {
   align-items: center;
   display: flex;
@@ -65,4 +73,8 @@ helix-base-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+helix-base-announcement::part(content) {
+  flex: 1;
 }
