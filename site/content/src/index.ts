@@ -27,10 +27,32 @@
 export { sitePageSources } from './sources.generated'
 
 export interface SitePage {
+  /**
+   * A registry whose contents belong in this page's document but not in its
+   * prose.
+   *
+   * `/services` is the case and the only one so far. The three offers are
+   * structured data with a price, a duration and an includes list, read by this
+   * page and by the landing page, so they stay in `services.ts` where several
+   * consumers already find them. Writing them into the MDX would be a second
+   * copy of a price list, which is the worst possible thing to have two of.
+   *
+   * So the document is the file plus the registry, which is not a third way of
+   * producing markdown: it is the two that already exist, one after the other.
+   */
+  appends?: 'services'
   /** One-line summary, for the route registry and the document's frontmatter. */
   description: string
   /** The small line above the title, where the page has one. */
   kicker?: string
+  /**
+   * The paragraph under the title, where the page shows one before its body.
+   *
+   * In frontmatter rather than as the body's first paragraph, because this
+   * page puts its offers between the two and a document cannot be rendered
+   * into two places.
+   */
+  lede?: string
   /** Path as served, with a leading slash. */
   path: string
   /** File name without its extension. */
@@ -55,6 +77,15 @@ export const sitePages: SitePage[] = [
     path: '/thesis',
     slug: 'thesis',
     title: 'Sovereignty is the goal. Abundance is the mechanism.',
+  },
+  {
+    appends: 'services',
+    description: 'What we take on, and what it costs.',
+    kicker: 'Services',
+    lede: 'Everything else on this site is being built. This is the work we take on now: interface and intelligence work the substrates make faster to do well. Three offers, in the order they usually happen. Most start with the audit, which is two weeks at a fixed price, and the rest is scoped from what it finds.',
+    path: '/services',
+    slug: 'services',
+    title: 'The part of this you can buy today',
   },
   {
     description:

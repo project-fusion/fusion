@@ -3,7 +3,6 @@ import type { CopyBlock, PageCopy } from '../app/copy'
 import { LANDING } from '../app/landing'
 import { PRODUCTS } from '../app/products'
 import { SERVICES } from '../app/services'
-import { SERVICES_COPY } from '../app/services-copy'
 import { AURA, SANDBOX, THEME_BUILDER } from '../app/tools'
 import { VERTICALS } from '../app/verticals'
 import { INSIGHTS } from './insights'
@@ -46,7 +45,6 @@ const COPY: Record<string, PageCopy> = {
   '/helix/aura': AURA,
   '/helix/sandbox': SANDBOX,
   '/helix/theme': THEME_BUILDER,
-  '/services': SERVICES_COPY,
 }
 
 /**

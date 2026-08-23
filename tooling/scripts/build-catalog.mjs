@@ -163,6 +163,7 @@ for (const page of docPages) {
 const { routes } = await import('../../site/ui/lib/routes.ts')
 const { renderCopy, copyFor } = await import('../../site/ui/lib/copy-markdown.ts')
 const { findSitePage, sitePageSources } = await import('../../site/content/src/index.ts')
+const { SERVICES } = await import('../../site/ui/app/services.ts')
 let prose = 0
 
 for (const route of routes()) {
@@ -178,7 +179,27 @@ for (const route of routes()) {
   const slug = route.path.split('/').at(-1) ?? ''
   const written = findSitePage(route.path) ?? (sitePageSources[slug] ? { slug } : undefined)
   if (written) {
-    writeFileSync(join(PUBLIC, file), sitePageSources[written.slug] ?? '')
+    /* The file, and then whatever registry the page says belongs in its
+       document. `/services` is the only one: its three offers are a price list
+       several pages read, so they stay in `services.ts` and the document is the
+       prose plus a table of them. Not a third way of producing markdown, but
+       the two that already exist, one after the other. */
+    const appended =
+      written.appends === 'services'
+        ? [
+            '',
+            '## What we take on',
+            '',
+            '| Offer | Duration | Price | What it leaves you |',
+            '| --- | --- | --- | --- |',
+            ...SERVICES.map(
+              (service) =>
+                `| ${service.name} | ${service.duration} | ${service.price} | ${service.outcome} |`,
+            ),
+            '',
+          ].join('\n')
+        : ''
+    writeFileSync(join(PUBLIC, file), `${sitePageSources[written.slug] ?? ''}${appended}`)
     prose += 1
     continue
   }

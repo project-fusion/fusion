@@ -1,5 +1,6 @@
+import { findSitePage, sitePageSources } from '@fusion-io/site-content'
+import { renderMdx } from '../../../lib/mdx'
 import { SERVICES } from '../../services'
-import { SERVICES_COPY } from '../../services-copy'
 import styles from './services.module.css'
 
 export const metadata = {
@@ -30,22 +31,22 @@ export const metadata = {
  * A server component with no client boundary of its own. Elements upgrade from
  * the single registration in the root layout.
  */
-export default function Page() {
+const page = findSitePage('/services')
+
+export default async function Page() {
+  const source = page ? sitePageSources[page.slug] : undefined
   return (
     <>
       <section data-band>
         <helix-flex data-shell direction="column" gap="lg">
           <helix-text tone="subtle" variant="label">
-            Services
+            {page?.kicker}
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
-            {SERVICES_COPY.title}
+            {page?.title}
           </helix-text>
           <helix-text as="p" data-measure tone="muted">
-            Everything else on this site is being built. This is the work we take on now: interface
-            and intelligence work the substrates make faster to do well. Three offers, in the order
-            they usually happen. Most start with the audit, which is two weeks at a fixed price, and
-            the rest is scoped from what it finds.
+            {page?.lede}
           </helix-text>
         </helix-flex>
       </section>
@@ -120,54 +121,24 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      {/* How an engagement runs, where the constraint used to be stated.
+      {/* The prose, from `@fusion-io/site-content`.
           
-          It was the Sovereignty Constraint quoted at a buyer mid-page, which
-          asks them to care about a governance rule at the moment they are
-          working out what they are committing to. The same commitment said as
-          terms is the thing they actually wanted to know. The rule itself is on
-          `/trust`, one link away. */}
+          Two sections that used to be JSX with their sentences inside it. The
+          buttons stay here: a call to action is chrome around a document rather
+          than a paragraph in one, and neither belongs in a `.md`. */}
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="lg">
-          <helix-text tone="subtle" variant="label">
-            How it runs
-          </helix-text>
-          <helix-text as="h2" data-measure data-section-title>
-            {SERVICES_COPY.blocks[1]?.title}
-          </helix-text>
-          <helix-text as="p" data-measure tone="muted">
-            Your repository, your license, your infrastructure. Handover is a condition of the work
-            rather than a phase at the end of it, and the architecture decisions are written down
-            with their trade-offs rather than just made. If an engagement would leave you unable to
-            continue without us on a retainer, it is not one we will take.
-          </helix-text>
-          <helix-flex data-density="lg">
+          <div data-measure data-prose>
+            {source ? await renderMdx(source) : null}
+          </div>
+          <helix-flex data-density="lg" gap="sm" wrap>
             <a data-button href="/trust">
               The trust bar
             </a>
+            <a data-button="solid" data-button-tone="primary" href="mailto:hello@fusion.dev">
+              hello@fusion.dev
+            </a>
           </helix-flex>
-        </helix-flex>
-      </section>
-
-      <section data-band data-closing data-reveal>
-        <helix-flex align="center" data-shell direction="column" gap="lg">
-          <helix-text as="h2" data-section-title>
-            {SERVICES_COPY.blocks[2]?.title}
-          </helix-text>
-          <helix-text as="p" data-measure tone="muted">
-            Two weeks and a fixed price, and the honest answer at the end of it may be that you do
-            not need the larger engagement. Say plainly what you are trying to do and we will tell
-            you whether we are the right people.
-          </helix-text>
-          <a
-            data-button="solid"
-            data-button-tone="primary"
-            data-button-width="standard"
-            data-density="lg"
-            href="mailto:hello@fusion.dev"
-          >
-            hello@fusion.dev
-          </a>
         </helix-flex>
       </section>
     </>
