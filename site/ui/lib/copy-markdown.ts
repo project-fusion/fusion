@@ -5,6 +5,7 @@ import { PRODUCTS } from '../app/products'
 import { SERVICES } from '../app/services'
 import { SERVICES_COPY } from '../app/services-copy'
 import { THESIS } from '../app/thesis'
+import { AURA, SANDBOX, THEME_BUILDER } from '../app/tools'
 import { TRUST } from '../app/trust'
 import { VERTICALS } from '../app/verticals'
 import { INSIGHTS } from './insights'
@@ -44,13 +45,77 @@ const LISTS = {
 const COPY: Record<string, PageCopy> = {
   '/': LANDING,
   '/contact': CONTACT,
+  '/helix/aura': AURA,
+  '/helix/sandbox': SANDBOX,
+  '/helix/theme': THEME_BUILDER,
   '/services': SERVICES_COPY,
   '/thesis': THESIS,
   '/trust': TRUST,
 }
 
+/**
+ * A vertical's page, which is already nothing but its registry entry.
+ *
+ * `VerticalPage` renders a name, a stage and a body, and takes all three from
+ * `verticals.ts` and `products.ts`. There is no copy module for these and there
+ * should not be: writing one would be a second copy of two registries that
+ * several consumers already read. The markdown derives from the same place the
+ * page does.
+ *
+ * **The product wins the title where a product fills the vertical**, which is
+ * the rule the page follows: a reader who clicks Cortex and lands on a page
+ * headed Fusion Mind has been handed a division when they asked for a product.
+ */
+const verticalCopy = (path: string): PageCopy | undefined => {
+  const vertical = VERTICALS.find((entry) => entry.href === path)
+  if (!vertical) {
+    return undefined
+  }
+  const product = PRODUCTS.find((entry) => entry.href === path)
+  return {
+    blocks: [
+      {
+        body: [
+          `**Stage: ${vertical.stage}.** ${STAGES[vertical.stage]}`,
+          ...(product ? [`It is the ${vertical.name} vertical.`] : []),
+        ],
+        title: 'Where this stands',
+      },
+    ],
+    lede: product ? product.body : vertical.body,
+    source: 'verticals.ts and products.ts, which the page also renders from',
+    title: product ? product.name : vertical.name,
+  }
+}
+
+/** What a stage label means, stated rather than left to a reader to infer. */
+const STAGES: Record<string, string> = {
+  Active: 'It ships with users.',
+  Building: 'Real work, with nothing shipped.',
+  Declared: 'Committed direction, with no work started.',
+}
+
+/**
+ * The insights index, which is the registry with a sentence over it.
+ *
+ * The posts themselves are not here. Their bodies are TSX in `bodies.tsx` and
+ * turning those into markdown needs a pipeline this app does not have yet, so
+ * they keep the stub and `check:routes` keeps counting them.
+ */
+const insightsCopy = (): PageCopy => ({
+  blocks: [{ from: 'insights', title: 'Everything published so far' }],
+  lede: 'Short pieces on what we are building and why. Arguments rather than announcements.',
+  source: 'the insight registry, which the page also renders from',
+  title: 'Insights',
+})
+
 /** The copy module for a path, where one exists. */
-export const copyFor = (path: string): PageCopy | undefined => COPY[path]
+export const copyFor = (path: string): PageCopy | undefined => {
+  if (path === '/insights') {
+    return insightsCopy()
+  }
+  return COPY[path] ?? verticalCopy(path)
+}
 
 /**
  * One band, as its heading, its paragraphs, and its cards.
@@ -97,7 +162,7 @@ export const renderCopy = (route: Route, copy: PageCopy): string => {
     `title: ${copy.title}`,
     `description: ${copy.lede}`,
     `path: ${route.path}`,
-    'source: the typed copy module this page also renders from',
+    `source: ${copy.source ?? 'the typed copy module this page also renders from'}`,
     '---',
     '',
     `# ${copy.title}`,

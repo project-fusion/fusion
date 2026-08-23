@@ -64,6 +64,15 @@ export interface PageCopy {
   blocks: CopyBlock[]
   /** The sentence under the title. */
   lede: string
+  /**
+   * Where the words came from, for the document's frontmatter.
+   *
+   * Stated per page rather than assumed, because it is not the same answer
+   * everywhere and a document that claims the wrong one is worse than a
+   * document that claims nothing. Most of these are rendered by their page as
+   * well; the tool pages are not, and say so.
+   */
+  source?: string
   /** The `h1`, and the page's name in the route registry. */
   title: string
 }

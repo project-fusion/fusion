@@ -104,6 +104,27 @@ for (const slug of slugs) {
     fail(slug, 'contains an em dash, which this repository does not use')
   }
 
+  /* A component in content is allowed, and a childless one is not.
+   *
+   * **The docs `.md` is the MDX source, served as it is**, which is lossless
+   * today because no page here has live JSX in it. The question that decides
+   * whether it stays lossless is not whether a component is complicated, it is
+   * whether its text is inside it.
+   *
+   * `<Callout tone="warning">The thing to know</Callout>` degrades on its own:
+   * a reader, human or otherwise, gets the sentence and an obvious wrapper, and
+   * loses only the styling. `<Verticals />` degrades to nothing at all, because
+   * the content was never in the file: the `.md` gets a tag and a hole where
+   * the substance was, and nothing about the file says so.
+   *
+   * So the rule is narrower than "every component needs a markdown renderer",
+   * which is the protocol `12-ai-native-web.md` calls the most fragile idea in
+   * it. A component that carries its own children passes through. One that does
+   * not has to be given a renderer or taken out. */
+  for (const [, tag] of source.matchAll(/<([A-Z][A-Za-z0-9]*)[^>]*\/>/g)) {
+    fail(slug, `renders <${tag} /> with no children, which is a hole in its \`.md\``)
+  }
+
   const fields = frontmatter(slug, source)
   if (!fields) {
     continue
