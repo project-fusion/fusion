@@ -59,7 +59,13 @@ Rust for backend and substrate cores. TypeScript for frontend.
   `@custom-elements-manifest/analyzer` pins `typescript ~5.4.2` and resolves its
   own nested 5.4.5, which is what keeps `bun run analyze` working at all: it is
   a library consumer of the API that 7 no longer has. Upgrading the root does
-  not touch it, and nothing should try to dedupe them.
+  not touch it, and nothing should try to dedupe them. **A cem plugin must never
+  import `typescript` itself.** The analyzer re-exports it and hands the module
+  to each plugin as `analyzePhase({ node, ts })`, so the AST a plugin sees is
+  5.4's. Taking `ts` off the callback is what keeps `@helix-io/cem` compiling
+  under 7, and an import would pull 7's types onto 5.4's nodes. This floor is
+  the analyzer's own. The Node one above it is ours, and belongs to the config
+  format rather than to the analyzer.
 - Config files are TypeScript (`*.config.ts`), so they are type-checked rather
   than failing at runtime on a typo. **Not all of them run under bun, and the
   exception has a floor.** `cem analyze` is a Node CLI with its own shebang, so
