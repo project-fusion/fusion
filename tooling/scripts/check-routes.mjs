@@ -121,6 +121,22 @@ const kinds = all.reduce((counts, route) => {
   return counts
 }, {})
 
+/* How many prose pages still serve the stub.
+ *
+ * **Counted rather than failed on**, because a stub is the honest state of a
+ * page whose copy has not moved into a typed module yet, and failing on it
+ * would only pressure someone into writing the parallel prose this arrangement
+ * exists to prevent. What a count does is stop the remaining work from going
+ * quiet: a number that does not fall is a piece of work nobody is doing, and
+ * that is visible here rather than in somebody's memory. */
+const stubs = all.filter((route) => {
+  if (route.kind !== 'page' && route.kind !== 'insight') {
+    return false
+  }
+  const file = join(PUBLIC, documentOf(route.path))
+  return existsSync(file) && readFileSync(file, 'utf8').includes('renders from a typed module')
+})
+
 console.log(
   `routes: ${all.length} routes, every one with a document that says something ` +
     `(${Object.entries(kinds)
@@ -128,3 +144,12 @@ console.log(
       .map(([kind, count]) => `${count} ${kind}`)
       .join(', ')})`,
 )
+if (stubs.length > 0) {
+  console.log(
+    `  ${stubs.length} of those are still a stub, their copy not yet in a module: ` +
+      stubs
+        .map((route) => route.path)
+        .sort()
+        .join(', '),
+  )
+}

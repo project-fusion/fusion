@@ -14,6 +14,7 @@
  */
 import Link from 'next/link'
 import { INSIGHTS } from '../../lib/insights'
+import { INSTALL, LANDING } from '../landing'
 import { PRODUCTS } from '../products'
 import { SERVICES } from '../services'
 import { stageAppearance } from '../verticals'
@@ -21,26 +22,6 @@ import { HeroCopy } from './hero-copy'
 import { InsightCard } from './insight-card'
 import styles from './landing.module.css'
 import { Showcase } from './showcase'
-
-/** Why choose this over an agency starting from a blank file. */
-const REASONS = [
-  {
-    body: 'A token layer, two tiers, generated framework wrappers, a sandbox and the checks that keep it honest. We are not learning this on your project.',
-    name: 'The system already exists',
-  },
-  {
-    body: 'Four weeks, two days a week, because the hard part is behind us. Starting from nothing, the same deliverable is quoted in months.',
-    name: 'It is faster because of that',
-  },
-  {
-    body: 'Your repository, your license. Handover is a condition of the work rather than a phase at the end, and no engagement should leave you needing us on a retainer.',
-    name: 'You keep all of it',
-  },
-  {
-    body: 'Active ships with users. Building is real work with nothing shipped. Declared is a direction. Nothing here is described as further along than it is.',
-    name: 'We tell you what is not done',
-  },
-]
 
 export default function Home() {
   return (
@@ -90,10 +71,7 @@ export default function Home() {
           <helix-flex align="center" data-density="sm" gap="sm" wrap>
             <helix-tag>Fusion Development Group</helix-tag>
           </helix-flex>
-          <HeroCopy
-            lede={<>Take Helix and go, or hire us to build with it.</>}
-            title={<>The interface layer, already built</>}
-          />
+          <HeroCopy lede={LANDING.lede} title={LANDING.title} />
           <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
             <Link
               data-button="solid"
@@ -120,11 +98,11 @@ export default function Home() {
               because the whole line is the payload and the copy is the only
               interaction it has. */}
           <helix-flex align="center" class={styles.heroInstall} gap="2xs">
-            <code>bun add @helix-io/web</code>
+            <code>{INSTALL}</code>
             <helix-copy-button
               copied-label="Copied"
               label="Copy the install command"
-              value="bun add @helix-io/web"
+              value={INSTALL}
             ></helix-copy-button>
           </helix-flex>
         </helix-flex>
@@ -151,8 +129,7 @@ export default function Home() {
                 before: whether a package is MIT matters to about one reader in
                 fifty and to none of them first. */}
             <helix-text as="p" data-measure tone="muted">
-              Two substrates, both in production. They install from npm and ship as custom elements,
-              so the framework above them stays your choice.
+              {LANDING.blocks[0]?.body?.[0]}
             </helix-text>
           </helix-flex>
 
@@ -227,14 +204,13 @@ export default function Home() {
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text tone="subtle" variant="label">
-              Services
+              {LANDING.blocks[1]?.kicker}
             </helix-text>
             <helix-text as="h2" data-measure data-section-title>
-              The part you can buy today
+              {LANDING.blocks[1]?.title}
             </helix-text>
             <helix-text as="p" data-measure tone="muted">
-              It starts with a two week audit, and every price is published: an offer you cannot
-              compare is not an offer.
+              {LANDING.blocks[1]?.body?.[0]}
             </helix-text>
           </helix-flex>
 
@@ -312,15 +288,13 @@ export default function Home() {
         <div className={styles.showcaseSplit} data-shell>
           <helix-flex class={styles.showcaseProse} direction="column" gap="sm">
             <helix-text tone="subtle" variant="label">
-              Helix
+              {LANDING.blocks[2]?.kicker}
             </helix-text>
             <helix-text as="h2" data-section-title>
-              Drawn by the thing it documents
+              {LANDING.blocks[2]?.title}
             </helix-text>
             <helix-text as="p" tone="muted">
-              Every control beside this is a custom element from the library, rendered here rather
-              than pictured. The palette under them is derived from one brand colour, which is why
-              nothing had to be chosen twice.
+              {LANDING.blocks[2]?.body?.[0]}
             </helix-text>
             <helix-flex data-density="lg">
               <Link data-button href="/helix">
@@ -346,12 +320,12 @@ export default function Home() {
                 answer: the system exists, that makes it faster, you keep it,
                 and we say what is not done. */}
             <helix-text as="h2" data-measure data-section-title>
-              How the work goes
+              {LANDING.blocks[3]?.title}
             </helix-text>
           </helix-flex>
 
           <helix-grid gap="xl" min="18rem">
-            {REASONS.map((reason) => (
+            {(LANDING.blocks[3]?.items ?? []).map((reason) => (
               <helix-flex data-substrate direction="column" gap="sm" key={reason.name}>
                 <helix-text as="h3" data-substrate-name>
                   {reason.name}
@@ -370,10 +344,10 @@ export default function Home() {
           <helix-flex align="center" gap="md" justify="between" wrap>
             <helix-flex direction="column" gap="sm">
               <helix-text tone="subtle" variant="label">
-                Insights
+                {LANDING.blocks[4]?.kicker}
               </helix-text>
               <helix-text as="h2" data-measure data-section-title>
-                The arguments, written down
+                {LANDING.blocks[4]?.title}
               </helix-text>
             </helix-flex>
             <Link data-button href="/insights">
@@ -417,10 +391,10 @@ export default function Home() {
       <section data-band data-closing data-reveal>
         <helix-flex align="center" data-shell direction="column" gap="lg">
           <helix-text as="h2" data-section-title>
-            Take on the work
+            {LANDING.blocks[5]?.title}
           </helix-text>
           <helix-text as="p" data-measure tone="muted">
-            Tell us what you need built. We will say plainly whether we are the right people for it.
+            {LANDING.blocks[5]?.body?.[0]}
           </helix-text>
           {/* `/contact` rather than the mail client. The address is still the
               action and is on that page; what a `mailto:` cannot carry is what

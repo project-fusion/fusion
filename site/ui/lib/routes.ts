@@ -1,4 +1,5 @@
 import { pages as docPages, navigation } from '@helix-io/docs'
+import { LANDING } from '../app/landing'
 import { getFamilies } from './catalog'
 import { INSIGHTS } from './insights'
 
@@ -47,8 +48,12 @@ export interface Route {
  */
 const PROSE: Route[] = [
   {
-    description:
-      'Intelligence and energy are collapsing in cost at the same moment. Fusion builds the stack that makes sovereignty practical.',
+    /* The one route whose words are not written here. The landing page's copy
+       module is the source for its title and its lede, and a second wording in
+       this file would be exactly the drift the module exists to remove. The
+       site's own name stays the title, because that is what a sitemap and a
+       search result want and the page's headline is not it. */
+    description: LANDING.lede,
     kind: 'page',
     path: '/',
     priority: 1,

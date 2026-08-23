@@ -150,15 +150,18 @@ for (const page of docPages) {
   writeFileSync(join(DOCS, `${page.slug}.md`), source)
 }
 
-/* The prose pages, as what the registry knows plus a pointer.
+/* The prose pages.
  *
- * Honest rather than empty. These render from typed modules in the app and are
- * markdown nowhere, so until that content moves into a source this can read,
- * the `.md` carries the title and the summary and says where the page is. An
- * `.md` that invented prose would be the stale parallel site this whole
- * arrangement exists to prevent, and is the failure mode of every
- * documentation-for-models project that has one. */
+ * A page whose copy lives in a typed module renders that module as markdown,
+ * from the same object the page renders as Helix markup. Neither is the source
+ * and neither can drift: there is one set of words.
+ *
+ * A page that has not moved its copy yet gets the title, the summary and a
+ * pointer, which is honest and close to useless. That is the remaining half of
+ * this work rather than a design: an `.md` that invented the prose would be the
+ * stale parallel site the whole arrangement exists to prevent. */
 const { routes } = await import('../../site/ui/lib/routes.ts')
+const { renderCopy, copyFor } = await import('../../site/ui/lib/copy-markdown.ts')
 let prose = 0
 
 for (const route of routes()) {
@@ -167,23 +170,26 @@ for (const route of routes()) {
   }
   const file = route.path === '/' ? 'index.md' : `${route.path.slice(1)}.md`
   mkdirSync(dirname(join(PUBLIC, file)), { recursive: true })
+  const copy = copyFor(route.path)
   writeFileSync(
     join(PUBLIC, file),
-    [
-      '---',
-      `title: ${route.title}`,
-      `description: ${route.description}`,
-      `path: ${route.path}`,
-      '---',
-      '',
-      `# ${route.title}`,
-      '',
-      route.description,
-      '',
-      'This page renders from a typed module rather than from markdown.',
-      `Read it at ${route.path}.`,
-      '',
-    ].join('\n'),
+    copy
+      ? renderCopy(route, copy)
+      : [
+          '---',
+          `title: ${route.title}`,
+          `description: ${route.description}`,
+          `path: ${route.path}`,
+          '---',
+          '',
+          `# ${route.title}`,
+          '',
+          route.description,
+          '',
+          'This page renders from a typed module rather than from markdown.',
+          `Read it at ${route.path}.`,
+          '',
+        ].join('\n'),
   )
   prose += 1
 }
