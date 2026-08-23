@@ -5,6 +5,8 @@
  */
 export const sitePageSources: Record<string, string> = {
   'a-palette-from-one-brand-color': `---
+author: Ross Sheppard
+date: 2026-08-11
 description: A spreadsheet of hexes is a set of decisions nobody can check. Deriving the palette makes contrast a property of the system rather than a review step.
 kicker: Insights
 kind: Essay
@@ -51,6 +53,8 @@ trade is correct for a design system and would not be correct for a brand
 identity, which is a different artifact with a different purpose.
 `,
   'helix-ships-as-one-open-tier': `---
+author: Ross Sheppard
+date: 2026-08-18
 description: No pro components and no paywalled API surface. The architectural reason is stronger than the economic one.
 kicker: Insights
 kind: Decision
@@ -100,6 +104,8 @@ Open core is not ruled out forever. It is ruled out for Helix, and kept for a
 later product whose paid layer is not its API surface.
 `,
   'lockstep-per-domain': `---
+author: Ross Sheppard
+date: 2026-07-14
 description: Full-repo lockstep would publish a Cortex fix as a new version of the Helix docs. Per-domain keeps the only property that matters.
 kicker: Insights
 kind: Decision
@@ -169,6 +175,8 @@ you do not need the larger engagement. Say plainly what you are trying to do and
 we will tell you whether we are the right people.
 `,
   'sovereignty-at-every-scale': `---
+author: Ross Sheppard
+date: 2026-06-16
 description: Cheap intelligence and cheap energy are arriving together. That pairing is what moves sovereignty from a principle you agree with to a thing you can run.
 kicker: Insights
 kind: Essay
@@ -220,6 +228,8 @@ That is not modesty. It is the same honesty the constraint demands, applied to
 ourselves.
 `,
   'stage-labels-are-honest': `---
+author: Ross Sheppard
+date: 2026-07-29
 description: Active ships with users. Building is real work with nothing shipped. Declared is committed direction with no work started. Why we refuse to soften them.
 kicker: Insights
 kind: Note
@@ -262,6 +272,8 @@ real event with a real precondition rather than a decision made in a planning
 document. It puts a floor under what shipping means.
 `,
   'the-sovereignty-constraint': `---
+author: Ross Sheppard
+date: 2026-06-30
 description: No Fusion product may create a dependency its user cannot exit. One sentence, and it forecloses most of the business models available to us.
 kicker: Insights
 kind: Essay

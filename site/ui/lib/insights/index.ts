@@ -1,3 +1,4 @@
+import { essays } from '@fusion-io/site-content'
 /**
  * What an insight is about. One per post, and the filter bar reads the set off
  * the posts rather than from a list kept beside them.
@@ -89,15 +90,16 @@ export interface Insight {
    */
   kind: Kind
   /**
-   * Reading time in minutes.
+   * Reading time in minutes, counted from the body at build.
    *
-   * Authored rather than derived. The bodies are JSX, so counting their words
-   * would mean walking a React tree at build time to save an integer, and the
-   * number is a courtesy rather than a measurement. Keep it roughly true.
+   * It used to be authored, on the reasoning that the bodies were JSX and
+   * counting their words would mean walking a React tree to save an integer.
+   * They are markdown now, so the reason went and so did the number nobody was
+   * maintaining.
    */
   minutes: number
   /**
-   * The URL segment, matched against `[a-z0-9-]` before it reaches a route.
+   * The URL segment, which is the name of the post's own file.
    */
   slug: string
   /**
@@ -125,78 +127,39 @@ export interface Insight {
  * follows: the argument on the site and the argument in the plan are the same
  * argument, so neither can drift into being marketing for the other.
  */
-export const INSIGHTS: Insight[] = [
-  {
-    author: 'Ross Sheppard',
-    date: '2026-08-18',
-    kind: 'Decision',
-    minutes: 4,
-    slug: 'helix-ships-as-one-open-tier',
-    summary:
-      'No pro components and no paywalled API surface. The architectural reason is stronger than the economic one.',
-    title: 'Helix ships as one open tier',
-    topic: 'Design',
-  },
-  {
-    author: 'Ross Sheppard',
-    date: '2026-08-11',
-    kind: 'Essay',
-    minutes: 5,
-    slug: 'a-palette-from-one-brand-color',
-    summary:
-      'A spreadsheet of hexes is a set of decisions nobody can check. Deriving the palette makes contrast a property of the system rather than a review step.',
-    title: 'A palette from one brand color',
-    topic: 'Design',
-  },
-  {
-    author: 'Ross Sheppard',
-    date: '2026-07-29',
-    kind: 'Note',
-    minutes: 3,
-    slug: 'stage-labels-are-honest',
-    summary:
-      'Active ships with users. Building is real work with nothing shipped. Declared is committed direction with no work started. Why we refuse to soften them.',
-    title: 'Stage labels are honest',
-    topic: 'Business',
-  },
-  {
-    author: 'Ross Sheppard',
-    date: '2026-07-14',
-    kind: 'Decision',
-    minutes: 4,
-    slug: 'lockstep-per-domain',
-    summary:
-      'Full-repo lockstep would publish a Cortex fix as a new version of the Helix docs. Per-domain keeps the only property that matters.',
-    title: 'Lockstep versioning, one domain at a time',
-    topic: 'Engineering',
-  },
-  {
-    author: 'Ross Sheppard',
-    date: '2026-06-30',
-    kind: 'Essay',
-    minutes: 6,
-    slug: 'the-sovereignty-constraint',
-    summary:
-      'No Fusion product may create a dependency its user cannot exit. One sentence, and it forecloses most of the business models available to us.',
-    title: 'The Sovereignty Constraint',
-    topic: 'Sovereignty',
-  },
-  {
-    author: 'Ross Sheppard',
-    date: '2026-06-16',
-    kind: 'Essay',
-    minutes: 7,
-    slug: 'sovereignty-at-every-scale',
-    summary:
-      'Cheap intelligence and cheap energy are arriving together. That pairing is what moves sovereignty from a principle you agree with to a thing you can run.',
-    title: 'Sovereignty at every scale',
-    topic: 'Sovereignty',
-  },
-]
-
 /**
- * One post by slug, for the detail route's params.
+ * Every post, newest first, derived from the frontmatter of its own file.
+ *
+ * **There is no hand-written registry any more, and the slug is the file's
+ * name.** A post is one `.mdx` in `@fusion-io/site-content`: creating one is
+ * naming a file, two posts cannot silently take the same URL because two files
+ * cannot take the same name, and retitling is editing frontmatter rather than
+ * moving an address. A deliberate rename is a `git mv`, which is visible in
+ * review and is where `check:routes` asks for a redirect.
+ *
+ * Shaped here rather than consumed raw, because a card wants an `image` object
+ * and frontmatter is flat.
  */
+export const INSIGHTS: Insight[] = essays.map((essay) => ({
+  author: essay.author,
+  date: essay.date,
+  ...(essay.image
+    ? {
+        image: {
+          alt: essay.imageAlt ?? '',
+          ...(essay.imageCredit ? { credit: essay.imageCredit } : {}),
+          src: essay.image,
+        },
+      }
+    : {}),
+  kind: essay.kind as Kind,
+  minutes: essay.minutes,
+  slug: essay.slug,
+  summary: essay.description,
+  title: essay.title,
+  topic: essay.topic as Topic,
+}))
+
 export const findInsight = (slug: string): Insight | undefined =>
   INSIGHTS.find((insight) => insight.slug === slug)
 

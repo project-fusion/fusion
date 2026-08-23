@@ -24,7 +24,44 @@
  * check and serve.
  */
 
+export { generatedEssays as essays, generatedPages as sitePages } from './pages.generated'
 export { sitePageSources } from './sources.generated'
+
+import { generatedEssays, generatedPages } from './pages.generated'
+
+/**
+ * One essay.
+ *
+ * **Every field is frontmatter.** There is no hand-written registry any more:
+ * a post is one file, its slug is that file's name, and everything a card or a
+ * byline needs is at the top of it. `minutes` is the exception in the other
+ * direction, counted from the body rather than typed, which only became
+ * possible when the bodies stopped being JSX.
+ */
+export interface SiteEssay {
+  author: string
+  date: string
+  description: string
+  /** Path under `public/`, for a post that has a picture. */
+  image?: string
+  imageAlt?: string
+  /**
+   * Where the picture came from, as a note to us rather than to a reader.
+   *
+   * Nothing renders it. Recorded because the licence that made the picture free
+   * is a fact about the file, and a year from now the only way to answer
+   * whether it can stay is to know where it came from.
+   */
+  imageCredit?: string
+  kind: string
+  /** Reading time in minutes, counted from the body at build. */
+  minutes: number
+  path: string
+  /** The URL segment, which is the file's own name. */
+  slug: string
+  title: string
+  topic: string
+}
 
 export interface SitePage {
   /**
@@ -60,46 +97,13 @@ export interface SitePage {
   title: string
 }
 
-/**
- * The pages of the site whose prose lives here.
- *
- * **The six essays are not in this list, and their sources are.** Their
- * metadata already has a home in `site/ui/lib/insights`, which carries what a
- * card needs and crosses into the client bundle so the gallery can filter;
- * repeating a title here would be a second copy of it. What this package owns
- * for an essay is the words, which is what `sitePageSources` is keyed by slug
- * for.
- */
-export const sitePages: SitePage[] = [
-  {
-    description: 'Sovereignty at every scale, and the mechanism that makes it practical.',
-    kicker: 'Thesis',
-    path: '/thesis',
-    slug: 'thesis',
-    title: 'Sovereignty is the goal. Abundance is the mechanism.',
-  },
-  {
-    appends: 'services',
-    description: 'What we take on, and what it costs.',
-    kicker: 'Services',
-    lede: 'Everything else on this site is being built. This is the work we take on now: interface and intelligence work the substrates make faster to do well. Three offers, in the order they usually happen. Most start with the audit, which is two weeks at a fixed price, and the rest is scoped from what it finds.',
-    path: '/services',
-    slug: 'services',
-    title: 'The part of this you can buy today',
-  },
-  {
-    description:
-      'The finite checklist every Fusion product clears before it ships, and an honest account of what has been tested so far.',
-    kicker: 'Trust',
-    path: '/trust',
-    slug: 'trust',
-    title: 'What has to be true before anything ships',
-  },
-]
-
 /** The page served at a path, if this package holds one. */
 export const findSitePage = (path: string): SitePage | undefined =>
-  sitePages.find((page) => page.path === path)
+  generatedPages.find((page) => page.path === path)
+
+/** The essay of a given slug. */
+export const findEssay = (slug: string): SiteEssay | undefined =>
+  generatedEssays.find((essay) => essay.slug === slug)
 
 /** Path to a page's MDX, relative to the package root. */
 export const sitePagePath = (page: SitePage): string => `content/${page.slug}.mdx`

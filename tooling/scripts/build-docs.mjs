@@ -29,6 +29,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { formatted } from './lib/formatted.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const CONTENT = join(ROOT, 'helix/docs/content')
@@ -224,31 +225,17 @@ const quoted = (value) => {
   return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 }
 
-/**
- * A `key: value` line, broken the way the formatter would break it.
- *
- * `biome.json` sets a line width of 100, and a long description pushes past it.
- * The generated file is checked by `biome ci`, so a line this script writes one
- * way and the formatter would write another fails `bun run check` and
- * `bun run verify` together. Matching the break here is cheaper than teaching
- * either side to tolerate the other.
- */
-const field = (key, value) => {
-  const single = `    ${key}: ${value},`
-  return single.length <= 100 ? single : `    ${key}:\n      ${value},`
-}
-
 /** A page, as the source lines that reproduce it. */
 const literal = (page) =>
   [
     '  {',
-    field('description', quoted(page.description)),
+    raw('description', quoted(page.description)),
     page.order === undefined ? undefined : `    order: ${page.order},`,
-    page.parent === undefined ? undefined : field('parent', quoted(page.parent)),
+    page.parent === undefined ? undefined : raw('parent', quoted(page.parent)),
     page.pinned ? '    pinned: true,' : undefined,
-    field('section', quoted(page.section)),
-    field('slug', quoted(page.slug)),
-    field('title', quoted(page.title)),
+    raw('section', quoted(page.section)),
+    raw('slug', quoted(page.slug)),
+    raw('title', quoted(page.title)),
     '  },',
   ]
     .filter((line) => line !== undefined)
