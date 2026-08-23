@@ -39,12 +39,12 @@ Use them for gap, padding and margin:
 Thirty-four tokens, and almost all of them name a specific thing:
 `--helix-size-control`, `--helix-size-checkbox`, `--helix-size-switch`,
 `--helix-size-avatar`, `--helix-size-icon`, `--helix-size-tag`,
-`--helix-size-header`, `--helix-size-loader`, `--helix-size-progress`,
-`--helix-size-meter`.
+`--helix-size-header`, `--helix-size-progress`, `--helix-size-meter`.
 
 Most come in a `-sm`, `-md` and `-lg` set beside the unsuffixed one. **The
 unsuffixed token is the live one** and the suffixed ones are the values the
-density axis picks between. So a component reads `--helix-size-control` and the
+density axis picks between. `--helix-size-loader` is the exception and has only
+the three, because nothing reads a loader's size off the density. So a component reads `--helix-size-control` and the
 region's `[data-density]` decides which of `-sm`, `-md` or `-lg` that resolves
 to.
 
