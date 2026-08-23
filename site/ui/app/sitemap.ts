@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { routes } from '@/lib/routes'
+import { SITE } from '@/lib/site'
 
 /**
  * Every page, from the route registry.
@@ -13,8 +14,6 @@ import { routes } from '@/lib/routes'
  * sitemap that listed both would claim the site is twice its size.
  */
 export const dynamic = 'force-static'
-
-const SITE = 'https://fusion.dev'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return routes().map((route) => ({

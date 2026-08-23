@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { SITE } from '@/lib/site'
 
 /**
  * Open, and pointing at the index.
@@ -8,8 +9,6 @@ import type { MetadataRoute } from 'next'
  * without a rendering engine does not then ask machines not to read it.
  */
 export const dynamic = 'force-static'
-
-const SITE = 'https://fusion.dev'
 
 export default function robots(): MetadataRoute.Robots {
   return {

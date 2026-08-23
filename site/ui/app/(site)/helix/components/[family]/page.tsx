@@ -17,6 +17,7 @@ import {
 } from '../../../../../lib/catalog'
 import { sourceUrl } from '../../../../../lib/source'
 import styles from '../docs.module.css'
+import { DocumentActions } from './document-actions'
 import { ComponentPreview } from './preview'
 
 /**
@@ -574,40 +575,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                 <a data-button="" href={source} rel="noreferrer" target="_blank">
                   View Source
                 </a>
-                <helix-menu label="Document actions">
-                  {/* `dots-three-vertical` did not exist in the icon set and
-                      `dots-three` was never a name: the trigger rendered an
-                      empty 40px square, present in the DOM and invisible on the
-                      page. Icons are a line in `helix/icons/icons.txt`, which
-                      resolves from Phosphor at build time. */}
-                  {/* `outlined`, the same as View Source beside it. The two are
-                      one row of controls and were two appearances. */}
-                  <helix-icon-button emphasis="outlined" label="More" slot="trigger">
-                    <helix-icon name="dots-three-vertical"></helix-icon>
-                  </helix-icon-button>
-                  {/* A link, not a handler. `Menu.Item` renders an `<a>` when
-                      given an `href`, so this needs no client component, no
-                      listener, and no router: middle click and open-in-new-tab
-                      work, and it is the only one of these five that is not
-                      still a stub.
-
-                      "Edit" rather than "View", because the reference page
-                      already shows the example running. What the sandbox adds
-                      is that changes are kept, which is the whole reason to go
-                      there. */}
-                  {headline && (
-                    <helix-menu-item
-                      href={`/helix/sandbox?e=${family.slug}.${headline.slug}`}
-                      value="edit-sandbox"
-                    >
-                      Edit in Sandbox
-                    </helix-menu-item>
-                  )}
-                  <helix-menu-item value="view-markdown">View Markdown</helix-menu-item>
-                  <helix-menu-item value="copy-markdown">Copy Markdown</helix-menu-item>
-                  <helix-menu-item value="open-cursor">Open in Cursor</helix-menu-item>
-                  <helix-menu-item value="open-claude">Open in Claude</helix-menu-item>
-                </helix-menu>
+                <DocumentActions family={family.slug} headline={headline?.slug} />
               </helix-flex>
             </helix-flex>
 
