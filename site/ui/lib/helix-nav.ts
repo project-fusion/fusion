@@ -1,7 +1,7 @@
 import { navigation } from '@helix-io/docs'
 import { getFamilies } from './catalog'
 
-/**
+/*
  * The Helix documentation sidebar: prose and reference in one tree.
  *
  * **There were two of these, and a reader in either one could not see the

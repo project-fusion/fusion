@@ -1,7 +1,7 @@
 import { type HighlightLanguage, highlight } from '@helix-io/sandbox/highlight'
 import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
 
-/**
+/*
  * What MDX renders its elements as, for every prose surface on this site.
  *
  * **MDX was rendering bare HTML and nothing was mapping it.** `renderMdx` took
@@ -122,7 +122,7 @@ const TableRow = ({ children }: { children?: ReactNode }) => {
   return heading ? children : <helix-table-row>{children}</helix-table-row>
 }
 
-/**
+/*
  * The table itself, and nothing around it.
  *
  * **It had a wrapper carrying `overflow-x: auto`, copied from `.apiTable` on the

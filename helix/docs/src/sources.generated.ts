@@ -1984,7 +1984,7 @@ because they ship and no page downloads them.
 | Package | Unpacked | Files | Of which source maps | Runtime dependencies |
 |---|---|---|---|---|
 | \`@helix-io/core\` | 915,757 | 205 | 138,513 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
-| \`@helix-io/headless\` | 7,838,613 | 776 | 610,256 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
+| \`@helix-io/headless\` | 7,838,339 | 776 | 610,241 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 84,047 | 17 | 19,847 | none |
 | \`@helix-io/styles\` | 265,019 | 5 | 0 | none |
 | \`@helix-io/theme\` | 612,739 | 28 | 47,851 | none |

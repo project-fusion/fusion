@@ -3,7 +3,7 @@ import { StreamLanguage } from '@codemirror/language'
 import { shell } from '@codemirror/legacy-modes/mode/shell'
 import { tags } from '@lezer/highlight'
 
-/**
+/*
  * Shell, with the command named.
  *
  * **The stock mode colours nothing in the commands this documentation actually

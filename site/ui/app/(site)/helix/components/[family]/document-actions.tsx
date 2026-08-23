@@ -4,7 +4,7 @@ import type { HelixMenu } from '@helix-io/web'
 import { useEffect, useRef, useState } from 'react'
 import { absolute } from '@/lib/site'
 
-/**
+/*
  * The ellipsis beside a component's title, wired.
  *
  * **Everything in here is about the document rather than about the component**,

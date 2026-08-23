@@ -94,7 +94,7 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
     return this.copied ? this.copiedLabel : this.label
   }
 
-  /**
+  /*
    * Whether the confirmation is showing.
    *
    * `@state`, so it is the component's and not API: a consumer setting this
