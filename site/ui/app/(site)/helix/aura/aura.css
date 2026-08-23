@@ -152,8 +152,24 @@
    size with a drawer over it, and a copyright line below that is a strip of
    page furniture stapled to the bottom of a picture. Written here rather than
    by moving the route out of the group, because everything else the layout
-   gives this page is wanted. */
-:root:has(.auraStage) .siteFooter {
+   gives this page is wanted.
+ *
+ * **`[data-site-footer]`, because the class could never have matched.** This
+ * asked for `.siteFooter`, which is the *source* name of a rule in
+ * `chrome.module.css`. A CSS module rewrites its class names, so the element
+ * carries `chrome-module__sKhELq__siteFooter` and the only thing that can
+ * select it is `styles.siteFooter` from inside a module. From a plain
+ * stylesheet the selector matched nothing, and it had never once hidden the
+ * footer: measured on this route, `display: block`, 84 pixels tall, below a
+ * stage that is already `100svh`.
+ *
+ * That is the same failure as a `[part=]` selector for a part nothing renders,
+ * and it is worse here because the module boundary makes it invisible: the rule
+ * reads correctly, the name is spelled correctly, and there is no error, no
+ * warning and no clue beyond the feature not happening. Any rule reaching a
+ * module-styled element from outside its module needs a hook the bundler cannot
+ * rename, so the layout marks the element and this asks for the mark. */
+:root:has(.auraStage) [data-site-footer] {
   display: none;
 }
 

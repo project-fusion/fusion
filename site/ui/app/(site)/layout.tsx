@@ -47,7 +47,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       />
       <main style={{ viewTransitionName: 'site-content' }}>{children}</main>
 
-      <footer className={styles.siteFooter}>
+      <footer className={styles.siteFooter} data-site-footer>
         <helix-flex align="center" data-shell gap="md" justify="between" wrap>
           <helix-flex align="center" gap="xs">
             <helix-icon
