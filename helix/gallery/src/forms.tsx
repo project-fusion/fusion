@@ -305,13 +305,20 @@ export const formsArt: Record<string, ReactNode> = {
    */
   'copy-button': (
     <>
-      {/* The clipboard holds the centre, not the pair's bounding box.
-      
-          Balancing the box put the clipboard at 130 to 170 and the tick beyond
-          it, which centres the ink and reads left-heavy: the clipboard is the
-          object and the tick is a mark beside it, so the eye centres on the
-          clipboard and finds it off to one side. It is back on 140 to 180,
-          which is the card's own middle, with the tick to its right. */}
+      {/* The button holds the centre and everything it holds is inside it.
+       *
+       * Balancing the pair's bounding box put the clipboard at 130 to 170 and
+       * the tick beyond it, which centres the ink and reads left-heavy: the
+       * clipboard is the object and the tick is a mark beside it, so the eye
+       * centres on the clipboard and finds it off to one side. The button is
+       * back on 140 to 180, which is the card's own middle.
+       *
+       * **The tick came with it and it had not.** It stayed at 186 to 200,
+       * which is past the button's own right edge: a control with a check
+       * floating outside it, and the one thing this component never does is put
+       * its confirmation somewhere other than where its clipboard was. Both
+       * marks are on 160,100 now, which is the paragraph above this one and was
+       * always what it claimed. */}
       <rect className="artEdge" fill="none" height="40" rx="5" width="40" x="140" y="80" />
       <rect className="artEdge" fill="none" height="20" rx="3" width="16" x="152" y="90" />
       <path className="artStroke" d="M154 88h12" strokeLinecap="round" strokeWidth="2" />
@@ -320,7 +327,7 @@ export const formsArt: Record<string, ReactNode> = {
           gesture for a mark, at 0.72 with a fade under it. */}
       <path
         className="artStroke artMotion artMark"
-        d="M186 100l5 5 9-9"
+        d="M153 99.5l5 5 9-9"
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"

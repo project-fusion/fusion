@@ -174,13 +174,19 @@ export const contentArt: Record<string, ReactNode> = {
         strokeLinejoin="round"
         strokeWidth="2.5"
       />
-      {/* Only the slash moves. Lifting the whole glyph moved the two chevrons
-          that hold it, which reads as the card breathing rather than as the one
-          mark that makes this a fragment of code. */}
+      {/* Only the slash moves, and it is written rather than pressed.
+       *
+       * Lifting the whole glyph moved the two chevrons that hold it, which
+       * reads as the card breathing rather than as the one mark that makes this
+       * a fragment of code. `artMark` fixed the subject and not the verb: a
+       * scale is a mark being pressed, and this mark is a stroke. It is drawn
+       * now, upper left to lower right, which is both the order the `d` states
+       * and the order a hand writes it in. */}
       <path
-        className="artStroke artMotion artMark"
+        className="artStroke artMotion artDraw"
         d="M154 86l12 28"
         fill="none"
+        pathLength="1"
         strokeLinecap="round"
         strokeWidth="2.5"
       />
@@ -457,26 +463,37 @@ export const contentArt: Record<string, ReactNode> = {
    */
   'line-chart': (
     <>
-      {/* Only the leading line answers the pointer. The whole drawing used to,
-          which moved the baseline and the second series with it and read as the
-          chart sliding rather than as a reading changing. */}
-      <g className="artMotion artLift">
-        <path
-          className="artStroke"
-          d="M64 128L108 104L152 116L196 76L240 88"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeOpacity="0.55"
-          strokeWidth="2.5"
-        />
-      </g>
+      {/* Both series plot themselves, back one first, and the baseline holds.
+       *
+       * The leading line used to lift on a pointer, which is the whole chart
+       * translating upward: a reading does not move, and a chart that slides is
+       * a picture being nudged rather than a series being drawn. `artDraw`
+       * writes each path from its first point to its last, which is the one
+       * gesture a line chart actually performs.
+       *
+       * Staggered so the emphasised series lands last. Drawn together they
+       * cross in the same instant and the crossing is the fact this card exists
+       * to show; one behind the other, the second one crosses something that is
+       * already there. */}
       <path
-        className="artStroke"
+        className="artStroke artMotion artDraw"
         d="M64 92L108 118L152 100L196 126L240 118"
+        pathLength="1"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeOpacity="0.28"
         strokeWidth="2.5"
+        style={{ '--art-i': 0 } as CSSProperties}
+      />
+      <path
+        className="artStroke artMotion artDraw"
+        d="M64 128L108 104L152 116L196 76L240 88"
+        pathLength="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeOpacity="0.55"
+        strokeWidth="2.5"
+        style={{ '--art-i': 1 } as CSSProperties}
       />
       <rect className="artRule" height="1" width="224" x="48" y="144" />
     </>
@@ -747,16 +764,27 @@ export const contentArt: Record<string, ReactNode> = {
   sparkline: (
     <>
       <path
-        className="artStroke"
+        className="artStroke artMotion artDraw"
         d="M80 120L107 96L133 132L160 100L187 112L213 88L240 72"
+        pathLength="1"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeOpacity="0.55"
         strokeWidth="2.5"
       />
-      {/* The terminus presses, and the line does not move. A sparkline is one
-          line, so swelling the body was swelling the only thing on the card. */}
-      <circle className="artSolid artMotion artOn" cx="240" cy="72" r="5" />
+      {/* The line writes itself and the terminus goes with it.
+       *
+       * The line used to hold still while the dot pressed, on the argument that
+       * a sparkline is one line and swelling it swells the only thing on the
+       * card. That is an argument against a swell, not against motion: `artDraw`
+       * moves the line's *end* rather than its size, which is the one thing a
+       * series does.
+       *
+       * `artMark` on the dot rather than `artOn`, for the fade. The dot marks
+       * where the series ended, so it cannot sit out in the field at full
+       * strength while the line that ended there has withdrawn. Both are lowest
+       * around a third of the way in and both come back together. */}
+      <circle className="artSolid artMotion artMark" cx="240" cy="72" r="5" />
     </>
   ),
 
@@ -935,9 +963,28 @@ export const contentArt: Record<string, ReactNode> = {
       {/* One reading rather than two. Two of them said "here are two trends";
           the component says which way a number went, and an arrow that turns
           says that. */}
+      {/* One path, head and shaft together, because two shapes left a notch
+       *
+       * The head was a chevron whose inner apex sat at y 63 and the shaft was a
+       * rect starting at y 64, so along the shaft's own two units the head fell
+       * away to a point one unit above where the shaft began: a triangular gap
+       * at the top of the arrow, widest exactly on its centre line. Meeting them
+       * by dropping the apex would put the inner edges off 45 degrees against
+       * outer edges that are on it, and overlapping them would darken the
+       * overlap, both shapes being ink at the same alpha.
+       *
+       * The outline is the union of the two and is otherwise the same arrow.
+       * Everything a reader could measure is unchanged: the apex at 58,60, the
+       * 45 degree edges, the 2 unit shaft, and the foot still ends in the same
+       * semicircle, which is now an arc of radius 1 rather than the rect's `rx`.
+       * Only the top of the shaft had to change, and it had to change into the
+       * head. */}
       <g className="artMotion artTurn">
-        <path className="artInk" d="M58 60l-7.5 7.5L52 69l6-6 6 6 1.5-1.5z" fillOpacity="0.55" />
-        <rect className="artInk" fillOpacity="0.55" height="14" rx="1" width="2" x="57" y="64" />
+        <path
+          className="artInk"
+          d="M58 60l7.5 7.5L64 69l-5-5v13a1 1 0 0 1-2 0V64l-5 5-1.5-1.5z"
+          fillOpacity="0.55"
+        />
       </g>
       <rect className="artInk" fillOpacity="0.55" height="12" rx="6" width="64" x="76" y="64" />
       <rect className="artInk" fillOpacity="0.12" height="6" rx="3" width="88" x="76" y="84" />

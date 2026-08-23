@@ -526,14 +526,82 @@
  * the meaning rather than a replay of an entrance.
  *
  * Out and back like everything else here: no `from`, so it leaves the resting
- * arrow, reaches the other direction halfway, and returns. */
+ * arrow, reaches the other direction halfway, and returns.
+ *
+ * **The angle is a variable, because a half turn is not the only reversal.**
+ * Trend's arrow flips, which is 180. A speed dial's plus becomes its own close,
+ * which is 45, and that is the same statement about the same kind of mark: this
+ * glyph is one press away from meaning the opposite. A second keyframe for it
+ * would be two names for one gesture, and the default keeps every existing
+ * caller saying nothing. */
 :has(> .componentArt):hover .artTurn {
   animation: helixArtTurn var(--art-sustain) var(--art-curve) infinite;
 }
 
 @keyframes helixArtTurn {
   50% {
-    rotate: 180deg;
+    rotate: var(--art-turn, 180deg);
+  }
+}
+
+/* draw — a stroke retracing itself, for the cards whose subject is a line.
+ *
+ * Three drawings are a path and nothing else: a code fragment's slash, a
+ * sparkline, and a line chart's two series. Every archetype above moves a shape
+ * that is already complete, so all three were saying the wrong thing about
+ * themselves. The chart translated its leading series upward, which is a chart
+ * sliding rather than a reading being plotted, and the slash scaled, which is a
+ * mark being pressed rather than a stroke being written.
+ *
+ * Out and back like the rest, and here that reads as the gesture rather than as
+ * a concession to it: the stroke withdraws toward its own start and is written
+ * back out. The withdrawal takes the first third and the writing takes the
+ * remaining two, so what the eye follows is the slow half, which is the line
+ * arriving from its first point to its last. The slash runs upper left to lower
+ * right because that is the order its `d` states it in, and every path in the
+ * set is already authored in reading order.
+ *
+ * **`pathLength="1"` is required on anything wearing this**, and it is the one
+ * way to get it wrong. The dash pattern is in path units, so a path that has
+ * not normalised its length takes a one-unit dash and renders as a dotted line.
+ * That is loud rather than silent, which is why it is a note and not a check.
+ *
+ * **This is the one animation in the file that is not composited**, against the
+ * rule stated at the top of the motion section, and the departure is not free.
+ * There is no transform that lengthens a polyline: a scale from one end takes
+ * the stroke width with it, and it cannot follow a path that changes direction
+ * at all. What it costs is a repaint of one stroke, in the single card under
+ * the pointer, for the length of one arrival. That is the whole of it, and it
+ * is why the gate stays on hover rather than on rest. */
+.artDraw {
+  stroke-dasharray: 1;
+}
+
+:has(> .componentArt):hover .artDraw {
+  animation: helixArtDraw var(--art-arrive) var(--art-curve);
+  animation-delay: calc(var(--art-i, 0) * var(--art-stagger));
+}
+
+/* The withdrawal carries its own curve, and it has to.
+ *
+ * `--art-curve` is an ease-out: nine tenths of its travel is spent in the first
+ * tenth of the interval. That is right for a mark arriving and wrong for both
+ * halves of this one. Measured at 80ms of 1100, on the ease-out, the chart's two
+ * series had already pulled back to a quarter of their length and then sat
+ * blank until the keyframe, which is the flash this file's motion section
+ * exists to forbid, held for three hundred milliseconds instead of one frame.
+ *
+ * An ease-in-out over the withdrawal means the line leaves slowly, touches
+ * nothing at 38 percent for exactly one instant, and is written back out under
+ * the file's own curve. The blank is a point the gesture passes through rather
+ * than a state it rests in. */
+@keyframes helixArtDraw {
+  0% {
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  38% {
+    stroke-dashoffset: 1;
   }
 }
 
@@ -629,7 +697,8 @@
   :has(> .componentArt):hover .artTravel,
   :has(> .componentArt):hover .artFill,
   :has(> .componentArt):hover .artLift,
-  :has(> .componentArt):hover .artTurn {
+  :has(> .componentArt):hover .artTurn,
+  :has(> .componentArt):hover .artDraw {
     animation: none;
   }
 
