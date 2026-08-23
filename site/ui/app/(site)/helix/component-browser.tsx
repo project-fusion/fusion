@@ -262,7 +262,7 @@ export function ComponentBrowser({
 
   return (
     <>
-      <section className={`pageHero ${styles.designHero}`}>
+      <section className={`${browser.pageHero} ${styles.designHero}`}>
         {/* One masked field, not twenty-four loose elements.
             
             The mask is the lattice's own, shared through a custom property, so
