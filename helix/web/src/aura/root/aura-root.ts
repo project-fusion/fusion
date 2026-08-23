@@ -427,6 +427,21 @@ export class HelixAura extends HelixElement {
     if (this.gl && this.program) {
       this.gl.deleteProgram(this.program)
     }
+    /* **And the context itself, which deleting the program does not release.**
+     * A browser caps live WebGL contexts at about sixteen and drops the oldest
+     * when a seventeenth is asked for, so a page that mounts and unmounts auras
+     * kills the ones still on screen: the symptom is an aura elsewhere going
+     * blank, which looks like a fault in that element and is this one.
+     *
+     * `WEBGL_lose_context` is the only way to give a context back. Dropping the
+     * reference does not: the context belongs to the canvas, and the canvas is
+     * held by the shadow root until the element is collected, which is a moment
+     * nothing here controls and which is far too late for a cap of sixteen.
+     *
+     * `start()` builds a fresh context on reconnect, so losing this one costs
+     * nothing: an aura that comes back gets a new canvas context the same way
+     * it got the first. */
+    this.gl?.getExtension('WEBGL_lose_context')?.loseContext()
     this.program = null
     this.gl = null
   }
