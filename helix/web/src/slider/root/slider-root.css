@@ -58,10 +58,33 @@
   grid-template-columns: 1fr auto;
 }
 
+/* Above the marks, so the thumb is never crossed by one. */
+[part="control"] {
+  /* The raised step rather than a bare 1, for the reason `ButtonGroup`
+     records: a number of its own cannot be reasoned about against the scale. */
+  z-index: var(--helix-layer-raised);
+
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
 [part="field"][data-markers] [part="control"],
 [part="field"][data-markers] [part="markers"] {
   grid-column: 1;
   grid-row: 1;
+}
+
+/* Tabular, so the row does not shift as the digits change under the thumb. */
+[part="output"] {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-variant-numeric: tabular-nums;
+  min-inline-size: 3ch;
+  text-align: end;
 }
 
 [part="field"][data-markers] [part="output"] {
@@ -100,18 +123,6 @@
 /* The native range, stripped to its track. The thumb is styled separately
    below, per engine, because the pseudo-elements that name it are not shared
    and a selector list containing an unknown one is dropped whole. */
-/* Above the marks, so the thumb is never crossed by one. */
-[part="control"] {
-  /* The raised step rather than a bare 1, for the reason `ButtonGroup`
-     records: a number of its own cannot be reasoned about against the scale. */
-  z-index: var(--helix-layer-raised);
-
-  appearance: none;
-  background: transparent;
-  cursor: pointer;
-  flex: 1 1 auto;
-  min-inline-size: 0;
-}
 
 /* Over the track rather than behind it. Behind was the first attempt and the
    marks did not appear at all: the native track paints an opaque background,
@@ -121,6 +132,7 @@
    Inset by half a thumb at each end, because that is where the thumb's center
    can actually reach: a mark at the very edge of the track would be a mark the
    thumb can never sit on, which is the one thing a mark must not be. */
+/* biome-ignore lint/style/noDescendingSpecificity: the rule above it places `control` and `markers` in the same grid cell in one selector list, which is one decision about one layout. Reordering to satisfy this would split that pair so a single-part rule could sit between them, and the pair is the thing worth keeping together. Specificity decides here either way. */
 [part="markers"] {
   align-self: center;
   block-size: var(--_slider-track);
@@ -180,6 +192,7 @@
  *
  * `currentColor` rather than a colour: only the alpha of a mask is read, and it
  * saves inventing a token for a value nobody sees. */
+/* biome-ignore lint/style/noDescendingSpecificity: the rule above it places `control` and `markers` in the same grid cell in one selector list, which is one decision about one layout. Reordering to satisfy this would split that pair so a single-part rule could sit between them, and the pair is the thing worth keeping together. Specificity decides here either way. */
 [part="markers"] {
   --_slider-hole: calc(var(--_slider-thumb) / 2 + var(--helix-border-thin));
 
@@ -401,16 +414,6 @@
 [part="control"]:focus-visible::-moz-range-thumb {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
-}
-
-/* Tabular, so the row does not shift as the digits change under the thumb. */
-[part="output"] {
-  color: var(--helix-color-foreground);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  font-variant-numeric: tabular-nums;
-  min-inline-size: 3ch;
-  text-align: end;
 }
 
 /* Wrong, and the handle says so.

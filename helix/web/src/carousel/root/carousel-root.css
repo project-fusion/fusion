@@ -293,15 +293,6 @@
   scroll-snap-type: y mandatory;
 }
 
-/* Sized on the block axis instead, by the same arithmetic. */
-:host([orientation="vertical"]) [part="track"] ::slotted(*) {
-  flex: 0 0
-    calc(
-      (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
-      var(--_carousel-per-view)
-    );
-}
-
 [part="track"] ::slotted(*) {
   flex: 0 0
     calc(
@@ -309,6 +300,15 @@
       var(--_carousel-per-view)
     );
   scroll-snap-align: start;
+}
+
+/* Sized on the block axis instead, by the same arithmetic. */
+:host([orientation="vertical"]) [part="track"] ::slotted(*) {
+  flex: 0 0
+    calc(
+      (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
+      var(--_carousel-per-view)
+    );
 }
 
 :host([per-view="2"]) {

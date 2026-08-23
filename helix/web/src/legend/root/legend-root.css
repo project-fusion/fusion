@@ -2,19 +2,6 @@
   display: block;
 }
 
-/* Beside a chart rather than under it, so the entries stack and the row does
-   not wrap. `start` and `end` name which side the consumer put it on, which is
-   what decides how the entries align against the drawing. */
-:host([placement="start"]) [part="list"],
-:host([placement="end"]) [part="list"] {
-  flex-direction: column;
-}
-
-:host([placement="end"]) [part="entry"] {
-  flex-direction: row-reverse;
-  text-align: end;
-}
-
 [part="list"] {
   display: flex;
   flex-direction: var(--legend-direction, row);
@@ -34,6 +21,19 @@
   font-size: var(--helix-text-sm);
   gap: var(--helix-space-2xs);
   line-height: var(--helix-leading-tight);
+}
+
+/* Beside a chart rather than under it, so the entries stack and the row does
+   not wrap. `start` and `end` name which side the consumer put it on, which is
+   what decides how the entries align against the drawing. */
+:host([placement="start"]) [part="list"],
+:host([placement="end"]) [part="list"] {
+  flex-direction: column;
+}
+
+:host([placement="end"]) [part="entry"] {
+  flex-direction: row-reverse;
+  text-align: end;
 }
 
 [part="swatch"] {

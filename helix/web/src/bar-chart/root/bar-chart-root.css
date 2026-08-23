@@ -478,6 +478,27 @@
   grid-row: 1;
 }
 
+/* **A series colour is a graphic, and these ticks are text.** The series ramp is
+   built to be told apart at 3:1, which is what 1.4.11 asks of a bar. A tick is a
+   number, which 1.4.3 puts at 4.5:1, and the gap is not theoretical: series 2 on
+   the page measured 3.37:1.
+
+   Mixing toward the page's own foreground keeps the axis legibly *that series'*
+   while landing it on a text ink, and it moves the right way in both modes
+   without a second arm, because the foreground already does. The mix is written
+   into a property of its own so the neutral case stays untouched: with no series
+   colour to fold in, `color-mix` has nothing to resolve, the property is invalid
+   at computed-value time, and `var()` takes the fallback. */
+[part="axis"][data-axis="secondary"] {
+  --_bar-chart-axis-ink: color-mix(
+    in oklab,
+    var(--bar-chart-secondary) 45%,
+    var(--helix-color-foreground)
+  );
+
+  color: var(--_bar-chart-axis-ink, var(--helix-color-foreground-subtle));
+}
+
 :host([secondary]) [part="axis"][data-axis="secondary"] {
   grid-column: 3;
   grid-row: 1;
@@ -560,26 +581,6 @@
    describe honestly. Two series sharing a second axis get the neutral, because
    picking one of their colours would say the axis belongs to that one. The tier
    below writes the property only in the lone case. */
-/* **A series colour is a graphic, and these ticks are text.** The series ramp is
-   built to be told apart at 3:1, which is what 1.4.11 asks of a bar. A tick is a
-   number, which 1.4.3 puts at 4.5:1, and the gap is not theoretical: series 2 on
-   the page measured 3.37:1.
-
-   Mixing toward the page's own foreground keeps the axis legibly *that series'*
-   while landing it on a text ink, and it moves the right way in both modes
-   without a second arm, because the foreground already does. The mix is written
-   into a property of its own so the neutral case stays untouched: with no series
-   colour to fold in, `color-mix` has nothing to resolve, the property is invalid
-   at computed-value time, and `var()` takes the fallback. */
-[part="axis"][data-axis="secondary"] {
-  --_bar-chart-axis-ink: color-mix(
-    in oklab,
-    var(--bar-chart-secondary) 45%,
-    var(--helix-color-foreground)
-  );
-
-  color: var(--_bar-chart-axis-ink, var(--helix-color-foreground-subtle));
-}
 
 /* **Emphasis, which is how much ink a column claims.** Two knobs rather than a
    rule per combination: `--_bar-chart-area` is what emphasis draws and

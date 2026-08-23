@@ -193,6 +193,7 @@
   outline: none;
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: the rule above it names the grip and non-grip separators together, which is one focus treatment written once. Moving this above it would separate the two halves of that so the shared case could sit between them. Specificity decides here either way. */
 [part="separator"]:focus-visible::before {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);

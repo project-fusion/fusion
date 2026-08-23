@@ -62,34 +62,6 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* No hairline once it is on: the thumb is white on the accent, which separates
-   it further than a border would, and a border there reads as an outline drawn
-   around something already distinct. */
-:host([data-checked]) [part="thumb"] {
-  border-color: transparent;
-}
-
-/* Color, and this is the one control that needs it. A checkbox says "on" with
-   a tick, which is legible without color; a switch has no mark at all, so the
-   fill is the whole difference between the two states. */
-:host([data-checked]) [part="track"] {
-  background-color: var(--switch-on-color, var(--helix-color-primary));
-  border-color: var(--switch-on-color, var(--helix-color-primary));
-}
-
-/* The input is the track: stretched over it, invisible, and still the thing
-   that takes the press and the focus. Drawing our own and hiding the real one
-   somewhere else would mean forwarding both by hand. */
-[part="control"] {
-  appearance: none;
-  block-size: 100%;
-  cursor: inherit;
-  grid-area: 1 / 1;
-  inline-size: 100%;
-  margin: var(--helix-space-none);
-  opacity: 0;
-}
-
 /* Travelling rather than appearing, which is the whole of what a switch says:
    the same thing moved rather than a different thing shown.
  
@@ -133,6 +105,34 @@
   position: absolute;
   translate: 0 -50%;
   transition: translate var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+/* No hairline once it is on: the thumb is white on the accent, which separates
+   it further than a border would, and a border there reads as an outline drawn
+   around something already distinct. */
+:host([data-checked]) [part="thumb"] {
+  border-color: transparent;
+}
+
+/* Color, and this is the one control that needs it. A checkbox says "on" with
+   a tick, which is legible without color; a switch has no mark at all, so the
+   fill is the whole difference between the two states. */
+:host([data-checked]) [part="track"] {
+  background-color: var(--switch-on-color, var(--helix-color-primary));
+  border-color: var(--switch-on-color, var(--helix-color-primary));
+}
+
+/* The input is the track: stretched over it, invisible, and still the thing
+   that takes the press and the focus. Drawing our own and hiding the real one
+   somewhere else would mean forwarding both by hand. */
+[part="control"] {
+  appearance: none;
+  block-size: 100%;
+  cursor: inherit;
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  margin: var(--helix-space-none);
+  opacity: 0;
 }
 
 :host([data-checked]) [part="thumb"] {

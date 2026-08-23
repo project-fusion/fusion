@@ -51,6 +51,24 @@
   position: relative;
 }
 
+/* And it turns over as the panel opens, saying which way the panel is going.
+ *
+ * Both selectors, for the reason Select's block records at length and was fixed
+ * for: the default caret is the slot's *fallback* content, `::slotted()` matches
+ * assigned nodes only, and fallback content is never assigned. One half is the
+ * fallback, the other the consumer's replacement.
+ *
+ * A flip across the x-axis rather than a rotation: the two end in the same
+ * place for a symmetric caret and take different routes, and a rotation spends
+ * the middle of the movement pointing at nothing.
+ *
+ * `data-open` and not `[open]`: the resolved state, so a controlled combobox
+ * whose consumer has not applied the change yet does not turn early. */
+[part="indicator"],
+::slotted([slot="indicator"]) {
+  transition: scale var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
 /* And the caret comes out of the wrap.
  *
  * Measured with eight tags: it is the last flex item, so it wrapped with the
@@ -102,12 +120,6 @@
   white-space: nowrap;
 }
 
-/* The text field keeps a usable width once tags share the line with it, and
-   wraps to its own line rather than shrinking to nothing when they fill it. */
-[part="field"]:has([part="tags"]) [part="control"] {
-  flex: 1 1 var(--combobox-control-size, 4ch);
-}
-
 /* Stripped rather than replaced, so the caret, the selection and the keyboard a
    phone chooses are all the platform's. `all: unset` takes `box-sizing` with
    it, back to `content-box`, and the `border-box` every shadow root is given
@@ -121,6 +133,12 @@
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
   min-inline-size: 0;
+}
+
+/* The text field keeps a usable width once tags share the line with it, and
+   wraps to its own line rather than shrinking to nothing when they fill it. */
+[part="field"]:has([part="tags"]) [part="control"] {
+  flex: 1 1 var(--combobox-control-size, 4ch);
 }
 
 [part="control"]::placeholder {
@@ -164,24 +182,6 @@
   color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon);
-}
-
-/* And it turns over as the panel opens, saying which way the panel is going.
- *
- * Both selectors, for the reason Select's block records at length and was fixed
- * for: the default caret is the slot's *fallback* content, `::slotted()` matches
- * assigned nodes only, and fallback content is never assigned. One half is the
- * fallback, the other the consumer's replacement.
- *
- * A flip across the x-axis rather than a rotation: the two end in the same
- * place for a symmetric caret and take different routes, and a rotation spends
- * the middle of the movement pointing at nothing.
- *
- * `data-open` and not `[open]`: the resolved state, so a controlled combobox
- * whose consumer has not applied the change yet does not turn early. */
-[part="indicator"],
-::slotted([slot="indicator"]) {
-  transition: scale var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 :host([data-open]) [part="indicator"],

@@ -110,16 +110,6 @@
   color: var(--helix-color-foreground);
 }
 
-:host([separation="filled"]) [part="stage"]::before {
-  content: none;
-}
-
-/* And it stays. A bar that is part of the frame does not come and go: hiding it
-   would leave a strip of the well behind it, which is worse than the bar. */
-:host([separation="filled"][data-idle]:not(:focus-within)) [part="controls"] {
-  opacity: 1;
-}
-
 /* The shading reaches higher than the bar does.
  *
  * It is what makes light controls legible over a bright frame, and it needs
@@ -143,6 +133,16 @@
   pointer-events: none;
   position: absolute;
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host([separation="filled"]) [part="stage"]::before {
+  content: none;
+}
+
+/* And it stays. A bar that is part of the frame does not come and go: hiding it
+   would leave a strip of the well behind it, which is worse than the bar. */
+:host([separation="filled"][data-idle]:not(:focus-within)) [part="controls"] {
+  opacity: 1;
 }
 
 /* And it goes with the bar it is there for. */
