@@ -1546,7 +1546,25 @@ helix-toast:not([data-color-mode]) {
  * part is why the row is still here", which the eye takes from a wash; changing
  * the ink as well would restate it and take the option's own foreground away,
  * including whatever the consumer put inside it. The same wash a hovered option
- * takes, one step lighter, so a hovered match still reads as hovered. */
+ * takes, one step lighter, so a hovered match still reads as hovered.
+ *
+ * **Turbopack warns on this rule and the warning is wrong.** Its CSS parser
+ * does not know `::highlight()`, the Custom Highlight API's pseudo-element, and
+ * reports "'highlight' is not recognized as a valid pseudo-element. Did you
+ * mean ':highlight'". Checked rather than assumed: the rule is in the built
+ * stylesheet, selector intact and `light-dark()` correctly split into the two
+ * values, so the parser recovers and passes it through. It is noise, not a
+ * dropped rule.
+ *
+ * **And it is not ours to silence.** `@supports selector(::highlight(x))` was
+ * tried and does not help, the parser validating the inner selector regardless
+ * and the gate then risking a browser that supports the feature and not the
+ * query. What is left is moving the rule out of the bundled stylesheet, and
+ * that is the consumer-level patch: this rule belongs to `@helix-io/styles`,
+ * a highlight can only be styled from the document the text lives in, and
+ * relocating it into the site to quiet one build would take it away from every
+ * other consumer to fix nothing. It goes when Turbopack's parser learns the
+ * selector. */
 ::highlight(helix-filter-match) {
   background-color: light-dark(
     color-mix(in oklab, var(--helix-color-primary) 22%, transparent),

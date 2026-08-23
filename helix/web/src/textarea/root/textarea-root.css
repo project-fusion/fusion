@@ -81,9 +81,21 @@
   opacity: 0.5;
 }
 
-/* Still readable, and still submitted. */
+/* Flush with its ground, which is what `transparent` says and no colour can.
+ *
+ * This named `surface` while the resting fill named `surface-sunken`, so the
+ * pair was two absolute steps and only the resting one was corrected by 154.
+ * Absolute was wrong here for the same reason and one rung further: on a card,
+ * `surface` *is* the card, so read-only was flush by coincidence; on a raised
+ * panel it came out lighter than the thing it sat on, which is a field rising
+ * out of the surface it belongs to.
+ *
+ * The resting field is a recess now, a percentage of the foreground over
+ * whatever is behind it. So read-only is the absence of that recess rather than
+ * a second colour: no fill, the ground showing through, distinct from the
+ * resting state on every ground and needing no token to stay that way. */
 :host([read-only]) [part="field"] {
-  background-color: var(--helix-color-surface);
+  background-color: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {

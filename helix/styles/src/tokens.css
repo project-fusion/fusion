@@ -925,6 +925,28 @@
      the strength it was drawn at and the theme moves all of them together: 1 is
      what ships, below 1 is more see-through, above 1 more solid. */
   --helix-material-opacity: 1;
+  /* **Two facts about glass that no token can express, written where the
+   * blurs are because they are what a consumer needs before reaching for one.**
+   * Both were found building a masthead and a menu that share an edge, and
+   * neither is anything to do with either component.
+   *
+   * **A `backdrop-filter` is clipped to its own element's box, so two of them
+   * meeting on a line do not agree.** The filter samples only what is behind
+   * that element, so a short box has less to average and clamps a large radius
+   * at both edges: measured, a 57 pixel bar took a 32 pixel blur and came out a
+   * flat wash, while a tall panel hanging off its bottom edge kept the
+   * structure of what was behind it. The two were then measured meeting exactly,
+   * 57 against 57, and the seam was still plainly visible. Adjacency does not
+   * fix it and neither does matching the radius. Two surfaces that have to read
+   * as one sheet of glass have to *be* one element, painted under both.
+   *
+   * **And two translucent layers cannot hand over by fading.** Coverage is not
+   * additive: at 72%, which is what `--helix-material-translucent` carries, the
+   * pair measured 92% while both were held, 59% crossed halfway, and 45% when
+   * the first was released early. Every arrangement passes through a value that
+   * is neither, so a cross-fade between two glass surfaces reads as a flash. The
+   * way out is for one of them never to have had any, so there is nothing to
+   * hand over. */
   --helix-material-blur-sm: 8px;
   --helix-material-blur-md: 16px;
   --helix-material-blur-lg: 32px;

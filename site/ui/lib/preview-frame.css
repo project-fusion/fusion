@@ -12,12 +12,32 @@
   padding: var(--helix-space-lg);
 }
 
+/* `grid` rather than `flex`, and the difference is the whole of 122.
+ *
+ * This centres an example, which is a thing made of blocks; as a flex container
+ * it centred the example's *children*, one per line, laid out along the inline
+ * axis. `tour/nested` reported it: a bar of two buttons and a third control
+ * under it came out as three on one line with the odd one dropped, because
+ * `align-items: center` was centring boxes of different heights against each
+ * other. The example was right. Every example separating blocks with a
+ * `margin-block-end` was, and in this one mode none of them worked, because a
+ * block margin says nothing along an inline axis.
+ *
+ * A single-column grid stacks its children the way the document would and
+ * places the whole track in the middle, so `place-content` centres the example
+ * rather than rearranging it. Measured on `tour/nested`: as flex the bar and
+ * the button shared a line, as grid the button sits a full `space-xl` below the
+ * bar, which is what its own sheet asks for.
+ *
+ * The fix is here rather than in the examples for the reason 122 gives: if the
+ * container restructures what it is given, every example that separates blocks
+ * with a block margin is wrong in one preview mode and right everywhere else,
+ * and there are a hundred and sixty of them. */
 #preview-root[data-layout="centered"] {
-  align-items: center;
-  display: flex;
-  justify-content: center;
+  display: grid;
   min-block-size: 100dvh;
   padding: var(--helix-space-lg);
+  place-content: center;
 }
 
 #preview-root[data-layout="fullscreen"] {

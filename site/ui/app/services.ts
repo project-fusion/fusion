@@ -60,10 +60,18 @@ export interface Service {
  * `the internal plan` is the reconciliation and is the authority where
  * the two disagree. Settled 20 Aug 2026: the sprint is four weeks, and the price does not move.
  *
- * **The sprint states the commitment and not only the elapsed time**, which is
+ * **Every offer states the commitment and not only the elapsed time**, which is
  * section 5.2 of that document and the highest-value line in it. Four weeks with
  * no shape given invites a full-time reading, and the price then reads as something it is not. Four weeks at two days a week is what it is costed against, and that is what it is. The
  * number was never the problem: what it was divided by was.
+ *
+ * **The sprint said it and the other two did not, which left the hole half
+ * open.** The commitment is not a fact about the sprint: every offer is costed against the same part-time commitment,
+ * so every offer is scoped the same way, and both were
+ * published as elapsed weeks with the divisor missing. A buyer reading "six to
+ * eight weeks" beside a sprint that says "two days a week" has been told the
+ * build is something else, which is the one reading that is worse than saying
+ * nothing at all. All three say it now.
  *
  * **Finance is deliberately absent.** The old site sold it and the plan drops
  * it: advising on securities for compensation implicates investment-adviser
@@ -71,7 +79,7 @@ export interface Service {
  */
 export const SERVICES: Service[] = [
   {
-    duration: 'One to two weeks',
+    duration: 'One to two weeks, two days a week',
     icon: 'magnifying-glass',
     includes: [
       'A written map of where the work actually is, and where it only looks like it is',
@@ -103,7 +111,7 @@ export const SERVICES: Service[] = [
       'Shipped software in your repository, not a component library in a design tool. Helix applied to your product, pointed at your components and your constraints.',
   },
   {
-    duration: 'Six to eight weeks',
+    duration: 'Six to eight weeks, two days a week',
     icon: 'users',
     includes: [
       'Building alongside your team rather than beside it',

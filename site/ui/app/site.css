@@ -112,6 +112,23 @@ helix-megamenu {
   --megamenu-background: transparent;
 }
 
+/* One step up the icon scale for the product marks in the column headings.
+ *
+ * The base layer sizes a heading's mark at `icon-sm`, which is right for what
+ * it was written for: a bare glyph, whose drawing fills its own box. These are
+ * tiles, and a tile spends most of its box on the field around the letter. At
+ * `icon-sm` that leaves a 9.3px letter, which matches the 12px heading's cap
+ * height but gives the mark nothing beyond it; at `icon-md` the letter is
+ * 11.6px and the mark reads as a mark rather than as a coloured square.
+ *
+ * Here rather than in `base.css` because the difference is a property of these
+ * two marks and not of megamenus. `icon-lg` was the other candidate and is too
+ * far: at 24px the tile is twice the label it sits beside, and it grows the
+ * heading enough to push every row in the panel down. */
+[data-megamenu-heading] > helix-icon {
+  --icon-size: var(--helix-size-icon-md);
+}
+
 helix-app-header {
   --app-header-inset: var(--helix-space-2xl);
   --app-header-max-inline-size: none;
@@ -119,27 +136,25 @@ helix-app-header {
 
 /* **The masthead never paints. One sheet does, for both of its jobs.**
  *
- * `backdrop-filter` is clipped to its own element's box, so two of them meeting
- * on a line do not agree: a 57 pixel bar clamps a 32 pixel blur at both edges
- * and averages to a flat wash, while the panel hanging off its bottom edge is
- * tall enough to keep the structure of whatever is behind it. Adjacency does
- * not help. The two were measured meeting exactly, 57 against 57, and the
- * division was still plainly visible, worse scrolled and still there at the top
- * of a hero.
+ * Why one sheet rather than two is not this site's to explain, and no longer
+ * does: a `backdrop-filter` is clipped to its own box so two of them sharing an
+ * edge cannot agree, and two translucent layers cannot hand over by fading.
+ * Both are facts about glass rather than about a masthead, and both are written
+ * beside `--helix-material-blur-*` in `helix/styles`, where a consumer meets
+ * them before reaching for a blur. This comment used to carry them, which put
+ * the library's findings in the one place no other consumer would look.
  *
- * A single element cannot span them from inside either component: the panel is
- * a popover in the top layer so it cannot sit behind the bar, and the bar
- * cannot grow to cover a panel whose height it does not know. So the app paints
- * one sheet *under* both, at `raised`: the bar's content is above it at
- * `sticky` and the panel's is above it in the top layer, and one blur serves
- * the pair.
+ * What is this site's is the arrangement. A single element cannot span the two
+ * from inside either component: the panel is a popover in the top layer so it
+ * cannot sit behind the bar, and the bar cannot grow to cover a panel whose
+ * height it does not know. So the app paints one sheet *under* both, at
+ * `raised`, with the bar's content above it at `sticky` and the panel's above
+ * it in the top layer, and one blur serves the pair.
  *
- * **The sheet does the scrolled state too, and that is what removes the
- * handover.** Painted only while a panel was down, it had to trade places with
- * the bar's own glass twice per interaction, and two translucent layers cannot
- * trade by fading: one glass is 72% coverage and every arrangement passes
- * through something else, 92% held, 59% crossed, 45% released early. Give the
- * sheet both jobs and the bar has nothing to hand over, because it never had
+ * The sheet does the scrolled state too, and that is the same fact applied
+ * rather than a second decision: painted only while a panel was down, it had to
+ * trade places with the bar's own glass twice per interaction. Give the sheet
+ * both jobs and the bar has nothing to hand over, because it never had
  * anything. */
 helix-app-header {
   --app-header-backdrop: none;

@@ -133,11 +133,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
      a fill of its own would cut a strip of flat background across the top of
      the light. `transparent` takes the fill back once anything scrolls under
      it, which is the state a hero is guaranteed not to still be in. */
-  const onHero =
-    pathname === '/' ||
-    pathname === '/helix' ||
-    pathname === '/insights' ||
-    pathname === '/preview/scale'
+  const onHero = pathname === '/' || pathname === '/helix' || pathname === '/insights'
 
   /* Products is current wherever a product or a vertical is, which is what the
      panel actually contains. Checked against the verticals rather than the
@@ -159,7 +155,6 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
       />
 
       <helix-app-header
-        data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
         /* Describes the page it is over, and nothing more. The sheet under it
          * does the painting in both states, so this no longer decides whether
          * the bar has glass: the hooks in `site.css` hold it clear at all
@@ -244,7 +239,13 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
               </button>
               {PRODUCTS.map((product) => (
                 <div data-megamenu-group key={product.name}>
+                  {/* The mark sits with the name and nowhere else in the
+                      column. `helix-icon` carries no label here: the words
+                      beside it are the accessible reading, so the mark is
+                      decoration rather than a second reading of the same
+                      word. */}
                   <h3 data-megamenu-heading>
+                    <helix-icon name={product.mark}></helix-icon>
                     {product.name}. {product.role}
                   </h3>
                   {product.destinations.map((destination) => (
@@ -259,8 +260,13 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                           of names into a paragraph to read before choosing, and
                           the wrap is what made the panel long. Kept short
                           enough to fit, and held to one line so a narrow panel
-                          truncates rather than reflows. */}
-                      <helix-icon name={destination.icon}></helix-icon>
+                          truncates rather than reflows.
+                       
+                          No mark down the side. One is on the column's heading
+                          now, and a glyph on every row under it made the panel
+                          read as a set of icons rather than a set of places to
+                          go. The row grid leaves that column at `auto`, so
+                          these start where the heading does. */}
                       <strong>{destination.title}</strong>
                       <span>{destination.summary}</span>
                     </Link>
