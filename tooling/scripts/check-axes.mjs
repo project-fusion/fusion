@@ -61,7 +61,25 @@ const AXES = {
      the same test `UNSWEPT` applies to itself. */
   material: ['frosted', 'glass', 'transparent'],
   separation: ['elevated', 'filled', 'outlined', 'plain'],
-  tone: ['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'surface', 'warning'],
+  /* `muted` and `subtle` are the neutral role's own quiet inks rather than an
+     emphasis axis fused into this one, which was the reading until it was
+     measured. Every *other* tone is already solved to the least extreme value
+     that clears its target and so sits on the AA floor: headroom over 4.5 runs
+     0.17 for `primary` down to zero for `success` and `warning`, against 2.70
+     for `foreground`. A quieter danger has nowhere to go, so the cross product
+     `base.css` feared has one populated column and these two are values here. */
+  tone: [
+    'accent',
+    'danger',
+    'info',
+    'muted',
+    'neutral',
+    'primary',
+    'subtle',
+    'success',
+    'surface',
+    'warning',
+  ],
   /* Geometry rather than paint, and registered because it is cross-cutting:
      anything that lets a consumer say how much of its container it takes says
      it with this word and these three values. It was `fill` on `Button`, whose
@@ -92,14 +110,14 @@ const UNSWEPT = {}
  * Values off the registry that another row already owns, so this check names the
  * work rather than blocking on it. Same contract as `UNSWEPT`: an entry nothing
  * needs is refused below.
+ *
+ * **Empty, and both entries were cleared by deciding rather than by deferring.**
+ * `helix-bar-chart.material` held `gradient`, which is a way of distributing a
+ * fill rather than a thing a bar is made of: it is `wash` now, local to charts.
+ * `helix-text.tone` held `muted` and `subtle`, which turned out to be tone
+ * values after all once the headroom was measured.
  */
-const PENDING = {
-  'helix-bar-chart.material': '#156, the wash is a chart-domain axis and not a material',
-  /* Blocked on the palette rather than on the rename: there is a quiet step for
-     the neutral ink and none for any other tone, so a muted danger has nothing
-     to be made of and three of the four combinations would be unsayable. */
-  'helix-text.tone': '#141, `muted` and `subtle` want a quiet step per tone first',
-}
+const PENDING = {}
 
 /**
  * Components whose `width` is a length rather than a policy.

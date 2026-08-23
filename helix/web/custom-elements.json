@@ -3896,7 +3896,7 @@
               "name": "--bar-chart-gap"
             },
             {
-              "description": "The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material=\"gradient\"` asks for it.",
+              "description": "The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash=\"gradient\"` asks for it.",
               "name": "--chart-bar-wash",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
@@ -3925,10 +3925,20 @@
               "kind": "field",
               "name": "material",
               "type": {
-                "text": "'glass' | 'gradient' | undefined"
+                "text": "'glass' | undefined"
               },
-              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page. `gradient` fades each column toward its base, into\nthe wash the headless tier draws whether or not anything points at it.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.",
+              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page.\n\n**`gradient` was here and is `wash` now, which is #156.** The two set\ndifferent properties, `fill-opacity` against `fill`, and a chart forced into\nboth renders as a translucent gradient that is distinct from either: one\nenum was holding two independent things, which is the mistake `Card`'s own\ndoc warns about arriving on the component that borrowed the word.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.",
               "attribute": "material",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "wash",
+              "type": {
+                "text": "'gradient' | undefined"
+              },
+              "description": "How a column's fill is distributed across it.\n\n`gradient` fades each column toward its base, into the wash the headless\ntier draws whether or not anything points at it.\n\n**A chart-domain axis and deliberately not a library one.** It lives on this\nfamily alone, and here it is a way of encoding data rather than a way of\nexpressing a theme: promoted to the registry it would put an attribute on\neighty-eight components that means nothing on eighty-seven. `wash` because\nthat is what the tier below already calls it, in `--chart-bar-wash` and in\nthe `bar-wash-start` and `bar-wash-end` stops.",
+              "attribute": "wash",
               "reflects": true
             },
             {
@@ -4551,10 +4561,18 @@
             {
               "name": "material",
               "type": {
-                "text": "'glass' | 'gradient' | undefined"
+                "text": "'glass' | undefined"
               },
-              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page. `gradient` fades each column toward its base, into\nthe wash the headless tier draws whether or not anything points at it.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.",
+              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page.\n\n**`gradient` was here and is `wash` now, which is #156.** The two set\ndifferent properties, `fill-opacity` against `fill`, and a chart forced into\nboth renders as a translucent gradient that is distinct from either: one\nenum was holding two independent things, which is the mistake `Card`'s own\ndoc warns about arriving on the component that borrowed the word.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.",
               "fieldName": "material"
+            },
+            {
+              "name": "wash",
+              "type": {
+                "text": "'gradient' | undefined"
+              },
+              "description": "How a column's fill is distributed across it.\n\n`gradient` fades each column toward its base, into the wash the headless\ntier draws whether or not anything points at it.\n\n**A chart-domain axis and deliberately not a library one.** It lives on this\nfamily alone, and here it is a way of encoding data rather than a way of\nexpressing a theme: promoted to the registry it would put an attribute on\neighty-eight components that means nothing on eighty-seven. `wash` because\nthat is what the tier below already calls it, in `--chart-bar-wash` and in\nthe `bar-wash-start` and `bar-wash-end` stops.",
+              "fieldName": "wash"
             },
             {
               "name": "emphasis",

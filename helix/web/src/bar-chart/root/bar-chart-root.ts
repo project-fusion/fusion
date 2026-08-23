@@ -42,8 +42,13 @@ export class HelixBarChart extends HelixBaseBarChart {
    *
    * `glass` lets the gridlines read through the columns, which is what puts a
    * chart in the same language as a glass header rather than leaving it the one
-   * opaque slab on the page. `gradient` fades each column toward its base, into
-   * the wash the headless tier draws whether or not anything points at it.
+   * opaque slab on the page.
+   *
+   * **`gradient` was here and is `wash` now, which is #156.** The two set
+   * different properties, `fill-opacity` against `fill`, and a chart forced into
+   * both renders as a translucent gradient that is distinct from either: one
+   * enum was holding two independent things, which is the mistake `Card`'s own
+   * doc warns about arriving on the component that borrowed the word.
    *
    * Absent is solid, per the rule that a reflected property takes no default,
    * so the stylesheet describes only the departure. The strength is the
@@ -55,7 +60,23 @@ export class HelixBarChart extends HelixBaseBarChart {
    * is drawn below, which is an element and therefore that tier's business.
    */
   @property({ reflect: true })
-  material?: 'glass' | 'gradient'
+  material?: 'glass'
+
+  /**
+   * How a column's fill is distributed across it.
+   *
+   * `gradient` fades each column toward its base, into the wash the headless
+   * tier draws whether or not anything points at it.
+   *
+   * **A chart-domain axis and deliberately not a library one.** It lives on this
+   * family alone, and here it is a way of encoding data rather than a way of
+   * expressing a theme: promoted to the registry it would put an attribute on
+   * eighty-eight components that means nothing on eighty-seven. `wash` because
+   * that is what the tier below already calls it, in `--chart-bar-wash` and in
+   * the `bar-wash-start` and `bar-wash-end` stops.
+   */
+  @property({ reflect: true })
+  wash?: 'gradient'
 
   /**
    * How much ink the columns claim.

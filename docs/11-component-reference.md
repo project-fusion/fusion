@@ -454,7 +454,7 @@ it is measured against.
 | `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixBaseBarChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `lines` | `lines` | `string \| undefined` | - | `HelixBaseBarChart` | Which series are drawn as a line instead of as columns, by name. |
-| `material` | `material` | `'glass' \| 'gradient' \| undefined` | - | - | What the columns are made of. |
+| `material` | `material` | `'glass' \| undefined` | - | - | What the columns are made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `outlined` | `outlined` | `string \| undefined` | - | - | Which series are drawn as an outline rather than a fill, by name. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
@@ -463,6 +463,7 @@ it is measured against.
 | `secondary` | `secondary` | `string \| undefined` | - | `HelixBaseBarChart` | Which series are measured against a scale of their own, by name. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 | `subtle` | `subtle` | `string \| undefined` | - | - | Which series are drawn as a wash of their colour, by name. Matched as `outlined` is. |
+| `wash` | `wash` | `'gradient' \| undefined` | - | - | How a column's fill is distributed across it. |
 
 #### Parts
 
@@ -502,7 +503,7 @@ it is measured against.
 | `--bar-chart-bar-stroke` | Width of the edge an `outlined` or `subtle` column is drawn with. |
 | `--bar-chart-block-size` | Height of the drawing. |
 | `--bar-chart-gap` | Space between the drawing and its labels. |
-| `--chart-bar-wash` | The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. |
+| `--chart-bar-wash` | The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. |
 | `--bar-chart-axis` | The colour of a single-series axis, taken from that series. |
 | `--bar-chart-secondary` | The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. |
 

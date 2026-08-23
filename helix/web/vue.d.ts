@@ -587,8 +587,13 @@ addresses, so the choice belongs here and reaches every column at once.
 
 `glass` lets the gridlines read through the columns, which is what puts a
 chart in the same language as a glass header rather than leaving it the one
-opaque slab on the page. `gradient` fades each column toward its base, into
-the wash the headless tier draws whether or not anything points at it.
+opaque slab on the page.
+
+**`gradient` was here and is `wash` now, which is #156.** The two set
+different properties, `fill-opacity` against `fill`, and a chart forced into
+both renders as a translucent gradient that is distinct from either: one
+enum was holding two independent things, which is the mistake `Card`'s own
+doc warns about arriving on the component that borrowed the word.
 
 Absent is solid, per the rule that a reflected property takes no default,
 so the stylesheet describes only the departure. The strength is the
@@ -599,6 +604,18 @@ Styled rather than headless, because what a bar is filled with is a
 treatment and this tier is where treatments live. The gradient it points at
 is drawn below, which is an element and therefore that tier's business. */
   material?: HelixBarChart["material"];
+  /** How a column's fill is distributed across it.
+
+`gradient` fades each column toward its base, into the wash the headless
+tier draws whether or not anything points at it.
+
+**A chart-domain axis and deliberately not a library one.** It lives on this
+family alone, and here it is a way of encoding data rather than a way of
+expressing a theme: promoted to the registry it would put an attribute on
+eighty-eight components that means nothing on eighty-seven. `wash` because
+that is what the tier below already calls it, in `--chart-bar-wash` and in
+the `bar-wash-start` and `bar-wash-end` stops. */
+  wash?: HelixBarChart["wash"];
   /** How much ink the columns claim.
 
 The chart's treatment, which every series takes unless `outlined` or
@@ -7458,7 +7475,7 @@ export type CustomCssProperties = {
   "--bar-chart-block-size"?: string;
   /** Space between the drawing and its labels. */
   "--bar-chart-gap"?: string;
-  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. */
+  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
   "--chart-bar-wash"?: string;
   /** The colour of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;

@@ -60,7 +60,7 @@ const HEIGHT = 100
  * @csspart baseline - The rule the columns stand on.
  * @cssproperty --chart-bar-wash - The gradient a bar would take, named per bar so the
  *   styled tier can point `fill` at it. Drawn whatever the treatment and used only where
- *   `material="gradient"` asks for it.
+ *   `wash="gradient"` asks for it.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart group - One category's columns, together.
  * @csspart label - One category's name.
@@ -346,7 +346,20 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     const columns = series
       .map((one, index) => ({ one, tone: index }))
       .filter(({ one }) => !lined.has(one.name.trim().toLowerCase()))
-    const thickness = (slot * 0.72) / Math.max(columns.length, 1)
+    /* **The stride is what the columns share and the thickness is what they
+       draw**, and the difference between them is why they had none. Back to
+       back, two columns meet on one coordinate and each one's edge is the
+       other's: an outlined chart showed a single line between them rather than
+       two, and a bar looked as though it were missing a side. A gap is also just
+       the right way to draw a group, which is why the split stays whether
+       anything is outlined or not.
+
+       Centred in the stride rather than flush against it, so the gap between two
+       columns is the same size everywhere and the group sits where it did. One
+       series has no neighbour to be separated from and keeps the full stride. */
+    const stride = (slot * 0.72) / Math.max(columns.length, 1)
+    const gap = columns.length > 1 ? stride * 0.08 : 0
+    const thickness = stride - gap
 
     /* **The geometry is computed for the axis it is drawn on, not rotated onto
        it.** The first version turned the whole plot with `rotate: 90deg`, which
@@ -368,7 +381,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
       const at = scale(value)
       const along = Math.min(floor, at)
       const size = Math.abs(floor - at)
-      const across = index * slot + slot * 0.14 + depth * thickness
+      const across = index * slot + slot * 0.14 + depth * stride + gap / 2
       return sideways
         ? svg`<rect
             data-series=${seriesIndex(tone)}
@@ -405,7 +418,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
           /* **One gradient per series, rendered whether or not anything points
              at it.** A `<defs>` entry draws nothing on its own, and this tier's
              business is elements while which fill a bar takes is the styled
-             tier's: `material="gradient"` there switches `fill` to
+             tier's: `wash="gradient"` there switches `fill` to
              `--chart-bar-wash` and this is what it would find.
 
              Coloured through the series property rather than an attribute, so

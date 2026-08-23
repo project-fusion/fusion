@@ -69,12 +69,12 @@
   fill: var(--_bar-chart-series);
 
   --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0;
-  --_bar-chart-base: 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) * -1) 0;
+  --_bar-chart-base: 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2) 0;
 }
 
 :host([direction="horizontal"]) [part="bar"] {
   --_bar-chart-corners: 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0;
-  --_bar-chart-base: 0 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) * -1);
+  --_bar-chart-base: 0 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2);
 }
 
 [part="labels"] {
@@ -582,7 +582,7 @@
 }
 
 /* **Emphasis, which is how much ink a column claims.** Two knobs rather than a
-   rule per combination: `--_bar-chart-wash` is what emphasis draws and
+   rule per combination: `--_bar-chart-area` is what emphasis draws and
    `--_bar-chart-through` is how much of it material lets past, and the paint
    multiplies them. Written as properties because the alternative is a rule for
    every pairing of the two axes, which is the cross product a second axis
@@ -594,7 +594,7 @@
    material was a no-op and said nothing about it. Glass thins whatever emphasis
    put there, so an outlined series goes see-through at its edge. */
 [part="bar"] {
-  fill-opacity: calc(var(--_bar-chart-wash, 1) * var(--_bar-chart-through, 1));
+  fill-opacity: calc(var(--_bar-chart-area, 1) * var(--_bar-chart-through, 1));
   stroke-opacity: var(--_bar-chart-through, 1);
 }
 
@@ -642,9 +642,15 @@
      against the rule there, which this file already says where it rounds the far
      end only: "a rounded foot would lift it off the rule it is measured
      against". An edge across the base does that twice over, drawing a second
-     rule a stroke inside the real one. The clip runs past it so the stroke falls
-     outside, and which side that is comes from `--_bar-chart-base` rather than
-     from this rule, so a horizontal bar loses its leading edge and not its
+     rule a stroke inside the real one.
+
+     **Inward by half the stroke, and the first version had the sign backwards.**
+     A stroke straddles the edge it is drawn on, so `inset(0)` already clips the
+     outer half and leaves the inner one; taking that away is a *positive* inset
+     of half the width. Written negative, the clip expanded past the box instead
+     and showed the half that had been hidden, which is a heavier line than
+     doing nothing at all. Which side it comes off is `--_bar-chart-base` rather
+     than this rule, so a horizontal bar loses its leading edge and not its
      bottom one. */
   --_bar-chart-foot: var(--_bar-chart-base);
 }
@@ -657,7 +663,7 @@
   stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thick));
   vector-effect: non-scaling-stroke;
 
-  --_bar-chart-wash: 0.2;
+  --_bar-chart-area: 0.2;
 
   /* The base, for the reason `outlined` gives above it. */
   --_bar-chart-foot: var(--_bar-chart-base);
@@ -686,8 +692,17 @@
 /* **Gradient, into the wash the headless tier already draws.** One per series,
    coloured through `--chart-series` so the stops read a token that tier never
    names, and pointed at per bar because CSS cannot build a fragment id from a
-   variable. */
-:host([material="gradient"]) [part="bar"] {
+   variable.
+
+   **On `wash` rather than on `material`, which is #156.** A gradient is not what
+   a bar is made of: `glass` and `gradient` set different properties, `fill-opacity`
+   against `fill`, and a chart forced into both renders as a translucent gradient,
+   distinct from either. One enum holding two independent things is the mistake
+   `Card`'s own doc warns about, failing on the component that borrowed the word.
+   And it stays local rather than joining the registry: it lives on one family and
+   there it encodes data rather than expressing a theme, so promoted it would put
+   an attribute on eighty-eight components that means nothing on eighty-seven. */
+:host([wash="gradient"]) [part="bar"] {
   fill: var(--chart-bar-wash);
 }
 

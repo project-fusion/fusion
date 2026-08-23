@@ -12795,7 +12795,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. (default: `undefined`)
+   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
    * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
    * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
@@ -24029,7 +24029,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. (default: `undefined`)
+   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
    * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
    * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
@@ -34959,7 +34959,7 @@ export type CustomElementsSolidJs = {
 };
 
 export type CustomCssProperties = {
-  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. */
+  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
   "--chart-bar-wash"?: string;
   /** The colour of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;

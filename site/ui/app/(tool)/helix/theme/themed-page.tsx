@@ -248,7 +248,7 @@ export function ThemedPage() {
               for="arrivals"
               gridlines="value"
               label="On-time arrivals by month"
-              material="gradient"
+              wash="gradient"
             ></helix-bar-chart>
           </helix-flex>
         </helix-card>
