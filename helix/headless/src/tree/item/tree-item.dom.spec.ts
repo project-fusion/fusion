@@ -61,14 +61,3 @@ describe('tree item structure', () => {
     expect([row.hasAttribute('target'), row.hasAttribute('rel')]).toEqual([false, false])
   })
 })
-
-/**
- * Geometry, which is the half of this component that kept breaking.
- *
- * Every one of these was a real bug found by measuring in a browser, and not one
- * of them was reachable from `bun test`: a leaf that started 20px left of the
- * branch beside it, a link 57px wide inside a 240px row, and a chevron that
- * came to rest halfway along because two auto margins split the free space.
- * They are guarded rather than deleted so the same file is honest in both
- * harnesses.
- */

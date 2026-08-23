@@ -36,6 +36,17 @@ const labelLeft = (item: HTMLElement): number =>
  */
 const geometry = hasLayout() ? test : (): void => {}
 
+/**
+ * Geometry, which is the half of this component that kept breaking.
+ *
+ * Every one of these was a real bug found by measuring in a browser, and not one
+ * of them was reachable from `bun test`: a leaf that started 20px left of the
+ * branch beside it, a link 57px wide inside a 240px row, and a chevron that
+ * came to rest halfway along because two auto margins split the free space.
+ * They are guarded rather than deleted so the same file is honest in both
+ * harnesses.
+ */
+
 /* Where a row's label sits and how much of it a slotted link covers, both of
    which this tier's stylesheet decides. On the base tier there is no gutter to
    indent by, so parent and child measure the same left edge, and the row has no

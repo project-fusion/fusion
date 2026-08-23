@@ -169,12 +169,20 @@ export class HelixFormElement extends HelixElement {
   })
   name = ''
 
-  /** The form this control belongs to, if any. */
+  /**
+   * The form this control belongs to, if any.
+   *
+   * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements Form-associated custom elements
+   */
   get form(): HTMLFormElement | null {
     return this.internals.form
   }
 
-  /** Labels associated with this control. */
+  /**
+   * Labels associated with this control.
+   *
+   * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements Form-associated custom elements
+   */
   get labels(): NodeList {
     return this.internals.labels
   }
