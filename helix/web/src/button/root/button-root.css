@@ -188,8 +188,8 @@
  * attribute never sees. */
 :host(:not(:disabled)) [part="button"]:hover {
   background-color: var(
-    --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 12%, transparent)
+    --button-background-color-hover,
+    var(--button-background-color, color-mix(in oklab, var(--_button-tone) 12%, transparent))
   );
 }
 
@@ -215,7 +215,10 @@
   color: var(--button-foreground-color, var(--_button-on-tone));
 }
 :host(:not(:disabled)[emphasis="solid"]) [part="button"]:hover {
-  background-color: var(--button-background-color, var(--_button-fill-hover));
+  background-color: var(
+    --button-background-color-hover,
+    var(--button-background-color, var(--_button-fill-hover))
+  );
   border-color: transparent;
 }
 
@@ -232,8 +235,8 @@
 
 :host(:not(:disabled)[emphasis="subtle"]) [part="button"]:hover {
   background-color: var(
-    --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 22%, transparent)
+    --button-background-color-hover,
+    var(--button-background-color, color-mix(in oklab, var(--_button-tone) 22%, transparent))
   );
   border-color: transparent;
 }
@@ -255,8 +258,8 @@
  * surface and there is nothing to keep in sync. */
 :host(:not(:disabled)[emphasis="ghost"]) [part="button"]:hover {
   background-color: var(
-    --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 8%, transparent)
+    --button-background-color-hover,
+    var(--button-background-color, color-mix(in oklab, var(--_button-tone) 8%, transparent))
   );
   border-color: transparent;
 }

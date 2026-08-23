@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseButton } from '@helix-io/headless'
+import { HelixBaseButton } from '@helix-io/headless/button'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { MixinControlSurface } from '../../mixins/mixin-control-surface/mixin-control-surface.js'
@@ -28,7 +28,8 @@ import { styles } from './button-root.css.js'
  *
  * @csspart button - The inner control.
  *
- * @cssproperty --button-background-color - Fill behind the button.
+ * @cssproperty --button-background-color - Fill behind the button, in every state.
+ * @cssproperty --button-background-color-hover - Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover.
  * @cssproperty --button-foreground-color - Label and icon color.
  * @cssproperty --button-inline-size - Width taken by `width="standard"`.
  * @cssproperty --button-radii - Corner radius of the control.

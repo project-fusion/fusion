@@ -52,6 +52,47 @@
 
   --_helix-mode: light;
   --_helix-mode-inverted: dark;
+
+  /* **The shadow ink is per mode, because the two modes are not the same
+   * problem.**
+   *
+   * One value served both, and it could not: a shadow is a dark ink at low
+   * alpha, which is the whole idea in light mode and close to nothing in dark.
+   * Measured on an elevated card, the `md` ink over white composites to rgb(230)
+   * and separates the card at 1.248; over black it composites to rgb(1) and
+   * separates it at 1.006.
+   *
+   * So the light values come down, since that is the mode where the shadow is
+   * doing the work and where too much of it reads as a drop rather than a lift.
+   * The dark values are left where they are: they already show almost nothing,
+   * and lowering them further would be tuning a thing nobody can see. Dark mode
+   * separating by *lift* at all is a real gap, and it needs a light ink rather
+   * than a smaller dark one, which is a bigger change than a number.
+   *
+   * `light-dark()` on the ink rather than on the shadow, because it takes
+   * colors and a shadow is a length list with a color in it.
+   *
+   * **Here rather than in the generated block, which is where they were and is
+   * what deleted them.** `tokens.ts` is a list of semantic tokens and emits
+   * every entry as `--helix-<name>`; these are private, so there was no entry
+   * they could be, and the first run of the generator replaced the region they
+   * were sitting in. Every shadow in the library resolved to nothing for eight
+   * hours. They are not primitives either: `primitives.css` is raw values with
+   * no meaning attached and no mode in them, and these are a mode decision. So
+   * they sit beside `--_helix-mode`, which is the same kind of thing for the
+   * same reason. */
+  --_helix-shadow-ink-sm: light-dark(
+    color-mix(in oklab, var(--_helix-neutral-950) 5%, transparent),
+    color-mix(in oklab, var(--_helix-neutral-950) 8%, transparent)
+  );
+  --_helix-shadow-ink-md: light-dark(
+    color-mix(in oklab, var(--_helix-neutral-950) 6%, transparent),
+    color-mix(in oklab, var(--_helix-neutral-950) 10%, transparent)
+  );
+  --_helix-shadow-ink-lg: light-dark(
+    color-mix(in oklab, var(--_helix-neutral-950) 9%, transparent),
+    color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent)
+  );
 }
 
 /* **`[data-helix-theme]` re-derives the whole ramp at a subtree, and it has to

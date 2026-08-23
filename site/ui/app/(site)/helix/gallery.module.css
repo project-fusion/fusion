@@ -7,7 +7,58 @@
  * is global and this is not.
  */
 
+/* The controls on the field get an opaque ground, and the field is the reason.
+ *
+ * `Input` and the `data-button` recipe both fill with a percentage of the
+ * foreground mixed toward *transparent*, which is deliberate and is the right
+ * default: a translucent wash is a step away from whatever is behind it in
+ * either mode, where a fixed neutral is only correct on the one ground it was
+ * designed against. `tokens.css` measures that at length on `--helix-color-well`
+ * and, in the same paragraph, names the case it does not cover: a field over a
+ * picture is tinted by the picture rather than legible against it, and that case
+ * wants an opaque ground through the control's own background hook.
+ *
+ * This hero is that case. The lattice runs under the search and under both
+ * links, so the dots read straight through all three, and two dozen of those
+ * dots go primary for a couple of seconds each: left alone, a lit one surfaces
+ * *inside* the search box as a blue speck in a form control.
+ *
+ * The value is the same wash composited against the page instead of against
+ * transparency, so nothing about the controls changes where the field is plain.
+ * It is not the page's own colour, which was tried here once and removed: the
+ * page colour is a hole cut through the band, and these are recesses in it.
+ *
+ * Scoped to this section, and it has to stay scoped. A background hook set on a
+ * container reaches every control inside it, so a solid button put in this hero
+ * would be flattened to a six percent wash. There are two links and one search
+ * here and they are all of one kind; a hero that grows an emphasised control
+ * wants the hooks moved onto the two selectors that need them. */
 .designHero {
+  --button-background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 6%,
+    var(--helix-color-background)
+  );
+  /* And the hover, because setting the fill takes the hover with it.
+   *
+   * Every state's rule reads `--button-background-color`, which is what makes it
+   * a fill rather than a resting colour, so a hero that set one had two controls
+   * that did not move under the pointer at all. Measured: rest and hover both
+   * `oklab(0.94 0 0)`, the same value to the last digit.
+   *
+   * The step is the same one the library takes for a resting wash of six, twice
+   * it, so these deepen by the amount any other button of this kind would. */
+  --button-background-color-hover: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 12%,
+    var(--helix-color-background)
+  );
+  --input-background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 5%,
+    var(--helix-color-background)
+  );
+
   /* One falloff, named once, because two surfaces wear it: the lattice itself
      and the layer of shines that light up dots within it. Written twice they
      would drift, and a shine that outlives the field it belongs to is a stray

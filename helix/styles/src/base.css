@@ -550,8 +550,8 @@ helix-text[tone="danger"] {
 /* Hover deepens the wash rather than drawing a line that was not there. */
 [data-button]:not(:disabled):hover {
   background-color: var(
-    --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 12%, transparent)
+    --button-background-color-hover,
+    var(--button-background-color, color-mix(in oklab, var(--_button-tone) 12%, transparent))
   );
 }
 
@@ -608,7 +608,10 @@ helix-text[tone="danger"] {
   color: var(--button-foreground-color, var(--_button-on-tone));
 }
 [data-button="solid"]:not(:disabled):hover {
-  background-color: var(--button-background-color, var(--_button-fill-hover));
+  background-color: var(
+    --button-background-color-hover,
+    var(--button-background-color, var(--_button-fill-hover))
+  );
   border-color: transparent;
 }
 
@@ -622,8 +625,8 @@ helix-text[tone="danger"] {
 
 [data-button="subtle"]:not(:disabled):hover {
   background-color: var(
-    --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 22%, transparent)
+    --button-background-color-hover,
+    var(--button-background-color, color-mix(in oklab, var(--_button-tone) 22%, transparent))
   );
   border-color: transparent;
 }
@@ -670,8 +673,8 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
  * earlier for the same reason. 8% wherever the resting state is transparent. */
 [data-button="ghost"]:not(:disabled):hover {
   background-color: var(
-    --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 8%, transparent)
+    --button-background-color-hover,
+    var(--button-background-color, color-mix(in oklab, var(--_button-tone) 8%, transparent))
   );
   border-color: transparent;
 }

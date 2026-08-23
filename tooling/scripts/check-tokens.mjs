@@ -187,12 +187,31 @@ const root = process.argv[2] ?? process.cwd()
  * cannot drift from what actually ships.
  */
 const defined = new Set()
+/**
+ * The private half, which had no check at all.
+ *
+ * `unknown-token` matches `--helix-` and therefore never sees a `--_helix-`
+ * name, so a semantic token could be built on a primitive that did not exist
+ * and nothing said so. `--helix-shadow-lg` was `0 12px 32px
+ * var(--_helix-shadow-ink-lg)` for eight hours with that ink defined nowhere,
+ * which makes the whole declaration invalid at computed-value time: every
+ * shadow in the library resolved to none, in a build where all 177 tokens were
+ * present and every check passed.
+ *
+ * A dangling primitive is worse than a dangling semantic token, because the
+ * component that goes unstyled is not the file that names it.
+ */
+const privates = new Set()
 for (const file of walk(root)) {
   if (!OWNS_PRIMITIVES.test(relative(root, file)) || !file.endsWith('.css')) {
     continue
   }
-  for (const [, name] of readFileSync(file, 'utf8').matchAll(/^\s*(--helix-[\w-]+)\s*:/gm)) {
+  const source = readFileSync(file, 'utf8')
+  for (const [, name] of source.matchAll(/^\s*(--helix-[\w-]+)\s*:/gm)) {
     defined.add(name)
+  }
+  for (const [, name] of source.matchAll(/^\s*(--_helix-[\w-]+)\s*:/gm)) {
+    privates.add(name)
   }
 }
 
@@ -230,11 +249,45 @@ for (const file of walk(root)) {
 
     for (const [index, rawLine] of text.split('\n').entries()) {
       const line = rawLine.trim()
+      const at = `${rel}:${lineOf(source, block.offset) + index}`
+
+      /* A primitive named and defined nowhere, checked before the skip below,
+         because a definition line is the only place this can happen.
+         
+         Only inside the styles package: everywhere else `no-primitive-access`
+         refuses the reference outright, and reporting both would say the name
+         is wrong when what is wrong is reaching for it at all.
+         
+         The skip exists so that a token definition may hold a raw value, which
+         is true and is about the right-hand side being a colour rather than a
+         `var()`. Applied to the whole line it also skipped every reference one
+         token makes to another, which is where `--helix-shadow-lg` sat naming
+         an ink that did not exist. Written after the skip, this check passed on
+         the exact bug it was written for.
+         
+         **A bare reference only.** `var(--x, y)` is not dropped, it resolves to
+         `y`, so an undefined name behind a fallback is the idiom for a primitive
+         a theme may supply and this library need not: `--helix-font-display`
+         asks for `--_helix-family-display` and settles for the sans stack. The
+         first version of this flagged that line, which is the check telling a
+         working declaration it is broken. */
+      if (ownsPrimitives) {
+        for (const [, name] of line.matchAll(/var\(\s*(--_helix-[\w-]+)\s*\)/g)) {
+          if (!privates.has(name)) {
+            violations.push({
+              at,
+              line,
+              message: `${name} is referenced and defined nowhere, so this declaration is dropped.`,
+              rule: 'unknown-primitive',
+            })
+          }
+        }
+      }
+
       if (line === '' || line.startsWith('--')) {
         // Token definitions themselves may hold raw values.
         continue
       }
-      const at = `${rel}:${lineOf(source, block.offset) + index}`
 
       if (!ownsPrimitives && /var\(\s*--_helix-/.test(line)) {
         violations.push({
@@ -345,7 +398,9 @@ for (const name of declared) {
 }
 
 if (violations.length === 0) {
-  console.log('tokens: no raw values, no primitive access, no dead component tokens')
+  console.log(
+    'tokens: no raw values, no primitive access, no dangling primitives, no dead component tokens',
+  )
   process.exit(0)
 }
 
