@@ -1054,6 +1054,27 @@ helix-toggle[disabled]::part(item) {
   --icon-size: var(--helix-size-icon-sm);
 
   flex: 0 0 auto;
+  /* Hung back into the heading's own inset, so the name starts where the rows
+     under it start.
+   
+     The two are laid out by different mechanisms and were never going to agree
+     by accident. A heading is a flex row, so its mark pushes the name along by
+     the mark plus the gap; a row is a grid whose mark column is `auto` and
+     therefore zero when empty, but a column gap applies beside an empty track
+     just as it does beside a full one. Measured at 1440: the name sat at 116
+     and the first row's title at 104, twelve apart, which reads as a heading
+     indented from its own list.
+   
+     Pulling the mark by the heading's inline padding puts the name on 104 with
+     the rows and the mark on the group's own edge, which is where a hanging
+     mark belongs. It is the mark that moves rather than the rows, because the
+     rows are the column a reader's eye runs down and the heading is the label
+     on it.
+   
+     Coupled to the `padding-inline` three rules above, deliberately and in
+     sight of it: the pull is that inset and nothing else, so the two move
+     together or the alignment is visibly wrong the moment they do not. */
+  margin-inline-start: calc(var(--helix-space-sm) * -1);
 }
 
 /* A destination with a name and a sentence about it.
