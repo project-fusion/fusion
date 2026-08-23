@@ -22,4 +22,6 @@ export {
   oklchToHex,
   oklchToLinearRgb,
   relativeLuminance,
+  shippedContrastRatio,
+  shippedLuminance,
 } from './oklch.js'

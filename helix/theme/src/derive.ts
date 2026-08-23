@@ -9,7 +9,13 @@ import {
   toOklch,
 } from './intent.js'
 import { GROUNDS, INKS, STATUSES } from './model.js'
-import { contrastRatio, fitToGamut, lightnessForContrast, type Oklch, oklchToHex } from './oklch.js'
+import {
+  fitToGamut,
+  lightnessForContrast,
+  type Oklch,
+  oklchToHex,
+  shippedContrastRatio,
+} from './oklch.js'
 
 export type { Color, PairingRequest, Relation, Seed, StatusSeed, ThemeIntent } from './intent.js'
 
@@ -156,7 +162,7 @@ const token = (
     name,
     origin,
     value,
-    ...(against ? { contrast: contrastRatio(value, fitToGamut(against)) } : {}),
+    ...(against ? { contrast: shippedContrastRatio(value, fitToGamut(against)) } : {}),
   }
 }
 
@@ -383,7 +389,7 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     target: number,
   ): Oklch => {
     const worstCase = (candidate: Oklch): number =>
-      Math.min(...grounds.map((g) => contrastRatio(fitToGamut(candidate), g)))
+      Math.min(...grounds.map((g) => shippedContrastRatio(fitToGamut(candidate), g)))
 
     return grounds
       .map((g) => lightnessForContrast(sample, g, target))
@@ -644,7 +650,7 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     )
     .reduce((best, candidate) => {
       const worst = (ink: Oklch): number =>
-        Math.min(...filledGrounds.map((g) => contrastRatio(fitToGamut(ink), fitToGamut(g))))
+        Math.min(...filledGrounds.map((g) => shippedContrastRatio(fitToGamut(ink), fitToGamut(g))))
       return worst(candidate) > worst(best) ? candidate : best
     })
 
@@ -681,7 +687,9 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   const brandMark = ((): Oklch => {
     const sample = { chroma: brand.chroma, hue: brand.hue }
     const clears = (lightness: number): boolean =>
-      surfaces.every((ground) => contrastRatio(fitToGamut({ ...sample, lightness }), ground) >= 3)
+      surfaces.every(
+        (ground) => shippedContrastRatio(fitToGamut({ ...sample, lightness }), ground) >= 3,
+      )
 
     const asked = brand.lightness
     for (let step = 0; step <= 100; step += 1) {
@@ -772,7 +780,7 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
       if (!ink || !ground || unbounded.has(bg)) {
         return { background: bg, foreground: fg, status: 'unverifiable' as const, target }
       }
-      const ratio = contrastRatio(fitToGamut(ink), fitToGamut(ground))
+      const ratio = shippedContrastRatio(fitToGamut(ink), fitToGamut(ground))
       return {
         background: bg,
         foreground: fg,

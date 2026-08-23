@@ -306,7 +306,21 @@
   --_helix-brand-500: var(--_helix-seed-brand);
   --_helix-brand-600: oklch(from var(--_helix-seed-brand) calc(l - 0.05) c h);
   --_helix-brand-700: oklch(from var(--_helix-seed-brand) calc(l - 0.1) c h);
-  --_helix-brand-400: oklch(from var(--_helix-seed-brand) calc(l + 0.12) c h);
+  /* **`0.13`, and the tenth of a step is the difference between passing and
+     not.** This rung is `--helix-color-primary` in dark mode, and at `+ 0.12`
+     it measured 4.431:1 against `surface-raised` and `surface-overlay`, the two
+     lightest grounds a dark page has. Under AA, on the pair a dark theme uses
+     most, and shipped that way because nothing looked: `check:contrast` reads
+     what the examples render and no example puts primary text on either of
+     them, which is the same blind spot that hid the engine's own rounding.
+     Measured in a browser by walking the lightness: 0.664 gives 4.48 and 0.669
+     gives 4.572, so the step is 0.13 and the margin is real rather than a
+     rounding away.
+
+     Exact for the seed that ships and approximate for any other, which is what
+     `tokens.css` already says about this whole path. A theme that wants the
+     guarantee rather than the approximation takes `deriveTheme`. */
+  --_helix-brand-400: oklch(from var(--_helix-seed-brand) calc(l + 0.13) c h);
   --_helix-brand-50: oklch(from var(--_helix-seed-brand) 0.95 calc(c * 0.25) h);
   --_helix-brand-900: oklch(from var(--_helix-seed-brand) 0.28 calc(c * 0.5) h);
 

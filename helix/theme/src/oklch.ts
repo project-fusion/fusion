@@ -142,6 +142,39 @@ export const contrastRatio = (a: Oklch, b: Oklch): number => {
 }
 
 /**
+ * Relative luminance of the color as it will actually ship.
+ *
+ * **The float is solved and the hex is delivered, and they are not the same
+ * color.** `oklchToHex` rounds each channel to a byte, and a byte of rounding
+ * moves the luminance: solved in continuous space and measured after rounding,
+ * three of the emitted inks came out at 4.4885, 4.4891 and 4.4905 against a
+ * target of 4.5. The engine was reporting a figure for a value it does not
+ * ship, which is the same fault as any other two derivations of one input with
+ * nothing holding them together, arriving here by a rounding mode.
+ *
+ * Nothing caught it. `check:contrast` measures rendered pixels and would have,
+ * but the failing pair is an ink on `surface-sunken`, the hardest of the four
+ * and the one no example happened to put it on.
+ *
+ * The quantisation is `oklchToHex`'s own, byte for byte, so this is what the
+ * browser will compute rather than an approximation of it.
+ */
+export const shippedLuminance = (color: Oklch): number => {
+  const { b, g, r } = oklchToLinearRgb(color)
+  const quantise = (channel: number): number =>
+    srgbToLinear(Math.round(linearToSrgb(channel) * 255) / 255)
+  return 0.2126 * quantise(r) + 0.7152 * quantise(g) + 0.0722 * quantise(b)
+}
+
+/** WCAG contrast ratio between two colors as they will be written to hex. */
+export const shippedContrastRatio = (a: Oklch, b: Oklch): number => {
+  const la = shippedLuminance(a)
+  const lb = shippedLuminance(b)
+  const [lighter, darker] = la > lb ? [la, lb] : [lb, la]
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
+/**
  * Reduces chroma until the color falls inside the sRGB gamut, preserving
  * lightness and hue.
  *
@@ -186,7 +219,7 @@ const searchDirection = (
     const mid = (low + high) / 2
     const candidate: Oklch = { ...sample, lightness: mid }
 
-    if (contrastRatio(fitToGamut(candidate), background) >= target) {
+    if (shippedContrastRatio(fitToGamut(candidate), background) >= target) {
       best = candidate
       // Contrast grows with distance from the background, so pull back toward
       // it to find the least extreme lightness that still passes.

@@ -2,11 +2,13 @@ import { describe, expect, test } from 'bun:test'
 import { defaultPairings, deriveTheme, toCss } from './derive.js'
 import {
   contrastRatio,
+  fitToGamut,
   hexToOklch,
   isOutOfGamut,
   lightnessForContrast,
   type Oklch,
   oklchToHex,
+  shippedContrastRatio,
 } from './oklch.js'
 
 const BRAND: Oklch = { chroma: 0.19, hue: 258, lightness: 0.58 }
@@ -32,19 +34,39 @@ describe('lightnessForContrast', () => {
   const light: Oklch = { chroma: 0, hue: 0, lightness: 0.985 }
   const dark: Oklch = { chroma: 0, hue: 0, lightness: 0.15 }
 
+  /* **The contract is about the hex, not about the float**, so the assertions
+     are too. These three asserted `contrastRatio` on the solved colour, which
+     is the value before `oklchToHex` rounds each channel to a byte, and a byte
+     of rounding moves the luminance: solved that way, three shipped inks
+     measured 4.4885, 4.4891 and 4.4905 against a target of 4.5. Now that the
+     search optimises what ships, the continuous ratio of the colour it returns
+     can sit a hair under while the colour a browser paints clears, and a spec
+     reading the float would fail on the fix. */
+  const shipped = (solved: Oklch, ground: Oklch): number =>
+    shippedContrastRatio(fitToGamut(solved), ground)
+
   test('solves for AA against a light background', () => {
     const solved = lightnessForContrast({ chroma: 0.19, hue: 258 }, light, 4.5)
-    expect(contrastRatio(solved, light)).toBeGreaterThanOrEqual(4.5)
+    expect(shipped(solved, light)).toBeGreaterThanOrEqual(4.5)
   })
 
   test('solves for AA against a dark background', () => {
     const solved = lightnessForContrast({ chroma: 0.19, hue: 258 }, dark, 4.5)
-    expect(contrastRatio(solved, dark)).toBeGreaterThanOrEqual(4.5)
+    expect(shipped(solved, dark)).toBeGreaterThanOrEqual(4.5)
   })
 
   test('solves for AAA when asked', () => {
     const solved = lightnessForContrast({ chroma: 0, hue: 0 }, light, 7)
-    expect(contrastRatio(solved, light)).toBeGreaterThanOrEqual(7)
+    expect(shipped(solved, light)).toBeGreaterThanOrEqual(7)
+  })
+
+  test('and the hex it emits is what clears, which the float alone did not', () => {
+    /* The regression stated as itself. Solved against the hardest page surface,
+       the emitted colour is re-read from its own hex and measured again. */
+    const sunken: Oklch = { chroma: 0, hue: 0, lightness: 0.95 }
+    const solved = fitToGamut(lightnessForContrast({ chroma: 0, hue: 0 }, sunken, 4.5))
+    expect(contrastRatio(hexToOklch(oklchToHex(solved)), sunken)).toBeGreaterThanOrEqual(4.49)
+    expect(shippedContrastRatio(solved, sunken)).toBeGreaterThanOrEqual(4.5)
   })
 
   test('returns the least extreme lightness that still passes', () => {
