@@ -10141,39 +10141,9 @@ one thing a mark must not be, so the spacing gives way rather than the
 step, and marks may come out unevenly spaced when the two disagree. That
 is the honest picture of the range being offered. */
   markers?: HelixSlider["markers"];
-  /** Mirrors "there are marks" for the stylesheet.
-
-The whole marker layout hung off `:host([markers])` and `markers` does not
-reflect, so `slider.markers = 5` drew nothing at all: only the attribute
-written in the markup ever worked, and the property that is the documented
-API silently did not.
-
-Reflecting the count instead would put `markers="0"` on every slider, an
-attribute the server's markup does not have and one that selector would
-match, drawing the layout for no marks. So the boolean fact is mirrored to
-a `data-` name, which is the rule this library already follows for state:
-the stylesheet wants to know whether there are marks, not how many. How
-many is what `markerValues` answers, and `< 2` is where it already draws
-the line.
-
-/** Whether each mark says which value it stands at. */
+  /** Whether each mark says which value it stands at. */
   "marker-labels"?: HelixSlider["markerLabels"];
-  /** Mirrors "there are marks" for the stylesheet.
-
-The whole marker layout hung off `:host([markers])` and `markers` does not
-reflect, so `slider.markers = 5` drew nothing at all: only the attribute
-written in the markup ever worked, and the property that is the documented
-API silently did not.
-
-Reflecting the count instead would put `markers="0"` on every slider, an
-attribute the server's markup does not have and one that selector would
-match, drawing the layout for no marks. So the boolean fact is mirrored to
-a `data-` name, which is the rule this library already follows for state:
-the stylesheet wants to know whether there are marks, not how many. How
-many is what `markerValues` answers, and `< 2` is where it already draws
-the line.
-
-/** Whether each mark says which value it stands at. */
+  /** Whether each mark says which value it stands at. */
   markerLabels?: HelixSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
   step?: HelixSlider["step"];
@@ -10277,39 +10247,9 @@ one thing a mark must not be, so the spacing gives way rather than the
 step, and marks may come out unevenly spaced when the two disagree. That
 is the honest picture of the range being offered. */
   "prop:markers"?: HelixSlider["markers"];
-  /** Mirrors "there are marks" for the stylesheet.
-
-The whole marker layout hung off `:host([markers])` and `markers` does not
-reflect, so `slider.markers = 5` drew nothing at all: only the attribute
-written in the markup ever worked, and the property that is the documented
-API silently did not.
-
-Reflecting the count instead would put `markers="0"` on every slider, an
-attribute the server's markup does not have and one that selector would
-match, drawing the layout for no marks. So the boolean fact is mirrored to
-a `data-` name, which is the rule this library already follows for state:
-the stylesheet wants to know whether there are marks, not how many. How
-many is what `markerValues` answers, and `< 2` is where it already draws
-the line.
-
-/** Whether each mark says which value it stands at. */
+  /** Whether each mark says which value it stands at. */
   "bool:marker-labels"?: HelixSlider["markerLabels"];
-  /** Mirrors "there are marks" for the stylesheet.
-
-The whole marker layout hung off `:host([markers])` and `markers` does not
-reflect, so `slider.markers = 5` drew nothing at all: only the attribute
-written in the markup ever worked, and the property that is the documented
-API silently did not.
-
-Reflecting the count instead would put `markers="0"` on every slider, an
-attribute the server's markup does not have and one that selector would
-match, drawing the layout for no marks. So the boolean fact is mirrored to
-a `data-` name, which is the rule this library already follows for state:
-the stylesheet wants to know whether there are marks, not how many. How
-many is what `markerValues` answers, and `< 2` is where it already draws
-the line.
-
-/** Whether each mark says which value it stands at. */
+  /** Whether each mark says which value it stands at. */
   "prop:markerLabels"?: HelixSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
   "prop:step"?: HelixSlider["step"];
@@ -12721,7 +12661,17 @@ export type HelixToastProps = {
 
 Named here rather than on each message, because where a page puts its
 toasts is a fact about the page: a stack whose members disagreed about
-where they were would not be a stack. */
+where they were would not be a stack.
+
+**Optional, and bottom-end is the absence of it.** It reflected *and*
+defaulted, which is the pair that writes onto a host: every toast region
+anybody rendered gained a `placement="bottom-end"` nobody typed, and a
+React consumer's server markup does not have it. The styled sheet carries
+the resting arrangement in its own `:host` rule now and the selectors
+describe only the departures, which is what `orientation` has always done.
+
+The SSR spec could never have caught it: it passed a placement explicitly,
+so the attribute it asserted was one the consumer had written. */
   placement?: HelixToast["placement"];
 };
 
@@ -12732,7 +12682,17 @@ export type HelixToastSolidJsProps = {
 
 Named here rather than on each message, because where a page puts its
 toasts is a fact about the page: a stack whose members disagreed about
-where they were would not be a stack. */
+where they were would not be a stack.
+
+**Optional, and bottom-end is the absence of it.** It reflected *and*
+defaulted, which is the pair that writes onto a host: every toast region
+anybody rendered gained a `placement="bottom-end"` nobody typed, and a
+React consumer's server markup does not have it. The styled sheet carries
+the resting arrangement in its own `:host` rule now and the selectors
+describe only the departures, which is what `orientation` has always done.
+
+The SSR spec could never have caught it: it passed a placement explicitly,
+so the attribute it asserted was one the consumer had written. */
   "prop:placement"?: HelixToast["placement"];
 
   /** Set the innerHTML of the element */
@@ -13250,8 +13210,23 @@ export type HelixTourHelixCloseElementEvent =
 export type HelixTourProps = {
   /** Whether the tour is running. */
   open?: HelixTour["open"];
-  /** Which stop the reader is on. */
+  /** Which stop the reader is on.
+
+**It said `@controlled` for two days and honoured none of it.** The tag is
+a claim that a consumer may own the value, and `index` was a plain property
+the tour wrote to directly: `move` assigned it and *then* announced, so
+`preventDefault` on the change arrived after the move it was refusing, and
+a consumer who declared `index` had it overwritten on the next press.
+
+The shape is `Carousel`'s, which is the nearest thing in the library: a
+`default-index` for markup that only seeds, a held state that is
+`undefined` until somebody sets one, and a mode decided once at the first
+update so a later assignment cannot take the tour over. */
   index?: HelixTour["index"];
+  /** Stop to start on, where nothing declared one. */
+  "default-index"?: HelixTour["defaultIndex"];
+  /** Stop to start on, where nothing declared one. */
+  defaultIndex?: HelixTour["defaultIndex"];
   /** Accessible name for the run, such as "Getting started". */
   label?: HelixTour["label"];
   /** Space left around the target when it is lit, in pixels. */
@@ -13286,8 +13261,23 @@ export type HelixTourProps = {
 export type HelixTourSolidJsProps = {
   /** Whether the tour is running. */
   "prop:open"?: HelixTour["open"];
-  /** Which stop the reader is on. */
+  /** Which stop the reader is on.
+
+**It said `@controlled` for two days and honoured none of it.** The tag is
+a claim that a consumer may own the value, and `index` was a plain property
+the tour wrote to directly: `move` assigned it and *then* announced, so
+`preventDefault` on the change arrived after the move it was refusing, and
+a consumer who declared `index` had it overwritten on the next press.
+
+The shape is `Carousel`'s, which is the nearest thing in the library: a
+`default-index` for markup that only seeds, a held state that is
+`undefined` until somebody sets one, and a mode decided once at the first
+update so a later assignment cannot take the tour over. */
   "prop:index"?: HelixTour["index"];
+  /** Stop to start on, where nothing declared one. */
+  "attr:default-index"?: HelixTour["defaultIndex"];
+  /** Stop to start on, where nothing declared one. */
+  "prop:defaultIndex"?: HelixTour["defaultIndex"];
   /** Accessible name for the run, such as "Getting started". */
   "prop:label"?: HelixTour["label"];
   /** Space left around the target when it is lit, in pixels. */
@@ -15619,7 +15609,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--button-background-color`: Fill behind the button. (default: `undefined`)
+   * - `--button-background-color`: Fill behind the button, in every state. (default: `undefined`)
+   * - `--button-background-color-hover`: Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover. (default: `undefined`)
    * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
    * - `--button-inline-size`: Width taken by `width="standard"`. (default: `undefined`)
    * - `--button-radii`: Corner radius of the control. (default: `undefined`)
@@ -22284,22 +22275,7 @@ export type CustomElements = {
    * one thing a mark must not be, so the spacing gives way rather than the
    * step, and marks may come out unevenly spaced when the two disagree. That
    * is the honest picture of the range being offered.
-   * - `marker-labels`/`markerLabels`: Mirrors "there are marks" for the stylesheet.
-   *
-   * The whole marker layout hung off `:host([markers])` and `markers` does not
-   * reflect, so `slider.markers = 5` drew nothing at all: only the attribute
-   * written in the markup ever worked, and the property that is the documented
-   * API silently did not.
-   *
-   * Reflecting the count instead would put `markers="0"` on every slider, an
-   * attribute the server's markup does not have and one that selector would
-   * match, drawing the layout for no marks. So the boolean fact is mirrored to
-   * a `data-` name, which is the rule this library already follows for state:
-   * the stylesheet wants to know whether there are marks, not how many. How
-   * many is what `markerValues` answers, and `< 2` is where it already draws
-   * the line.
-   *
-   * /** Whether each mark says which value it stands at.
+   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
    * - `step`: How far one press of an arrow key moves it.
    * - `orientation`: Which way the track runs, `vertical` standing it on end.
    *
@@ -24485,6 +24461,16 @@ export type CustomElements = {
    * toasts is a fact about the page: a stack whose members disagreed about
    * where they were would not be a stack.
    *
+   * **Optional, and bottom-end is the absence of it.** It reflected *and*
+   * defaulted, which is the pair that writes onto a host: every toast region
+   * anybody rendered gained a `placement="bottom-end"` nobody typed, and a
+   * React consumer's server markup does not have it. The styled sheet carries
+   * the resting arrangement in its own `:host` rule now and the selectors
+   * describe only the departures, which is what `orientation` has always done.
+   *
+   * The SSR spec could never have caught it: it passed a placement explicitly,
+   * so the attribute it asserted was one the consumer had written.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -24918,6 +24904,18 @@ export type CustomElements = {
    *
    * - `open`: Whether the tour is running.
    * - `index`: Which stop the reader is on.
+   *
+   * **It said `@controlled` for two days and honoured none of it.** The tag is
+   * a claim that a consumer may own the value, and `index` was a plain property
+   * the tour wrote to directly: `move` assigned it and *then* announced, so
+   * `preventDefault` on the change arrived after the move it was refusing, and
+   * a consumer who declared `index` had it overwritten on the next press.
+   *
+   * The shape is `Carousel`'s, which is the nearest thing in the library: a
+   * `default-index` for markup that only seeds, a held state that is
+   * `undefined` until somebody sets one, and a mode decided once at the first
+   * update so a later assignment cannot take the tour over.
+   * - `default-index`/`defaultIndex`: Stop to start on, where nothing declared one.
    * - `label`: Accessible name for the run, such as "Getting started".
    * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
    * - `back-label`/`backLabel`: Label for the control that goes back, handed to every stop.
@@ -24948,6 +24946,10 @@ export type CustomElements = {
    * - `next() => void`: Goes on, and finishes the run on the last stop.
    * - `back() => void`: Goes back, and does nothing on the first stop.
    * - `skip() => void`: Leaves the run early, which is a close rather than a completion.
+   *
+   * Announced before it is applied, and cancelable because of it. Both closes
+   * wrote `open` first and dispatched after, so a consumer calling
+   * `preventDefault` was refusing something that had already happened.
    *
    * ## CSS Custom Properties
    *
@@ -26983,7 +26985,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--button-background-color`: Fill behind the button. (default: `undefined`)
+   * - `--button-background-color`: Fill behind the button, in every state. (default: `undefined`)
+   * - `--button-background-color-hover`: Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover. (default: `undefined`)
    * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
    * - `--button-inline-size`: Width taken by `width="standard"`. (default: `undefined`)
    * - `--button-radii`: Corner radius of the control. (default: `undefined`)
@@ -33847,22 +33850,7 @@ export type CustomElementsSolidJs = {
    * one thing a mark must not be, so the spacing gives way rather than the
    * step, and marks may come out unevenly spaced when the two disagree. That
    * is the honest picture of the range being offered.
-   * - `marker-labels`/`markerLabels`: Mirrors "there are marks" for the stylesheet.
-   *
-   * The whole marker layout hung off `:host([markers])` and `markers` does not
-   * reflect, so `slider.markers = 5` drew nothing at all: only the attribute
-   * written in the markup ever worked, and the property that is the documented
-   * API silently did not.
-   *
-   * Reflecting the count instead would put `markers="0"` on every slider, an
-   * attribute the server's markup does not have and one that selector would
-   * match, drawing the layout for no marks. So the boolean fact is mirrored to
-   * a `data-` name, which is the rule this library already follows for state:
-   * the stylesheet wants to know whether there are marks, not how many. How
-   * many is what `markerValues` answers, and `< 2` is where it already draws
-   * the line.
-   *
-   * /** Whether each mark says which value it stands at.
+   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
    * - `step`: How far one press of an arrow key moves it.
    * - `orientation`: Which way the track runs, `vertical` standing it on end.
    *
@@ -36122,6 +36110,16 @@ export type CustomElementsSolidJs = {
    * toasts is a fact about the page: a stack whose members disagreed about
    * where they were would not be a stack.
    *
+   * **Optional, and bottom-end is the absence of it.** It reflected *and*
+   * defaulted, which is the pair that writes onto a host: every toast region
+   * anybody rendered gained a `placement="bottom-end"` nobody typed, and a
+   * React consumer's server markup does not have it. The styled sheet carries
+   * the resting arrangement in its own `:host` rule now and the selectors
+   * describe only the departures, which is what `orientation` has always done.
+   *
+   * The SSR spec could never have caught it: it passed a placement explicitly,
+   * so the attribute it asserted was one the consumer had written.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -36572,6 +36570,18 @@ export type CustomElementsSolidJs = {
    *
    * - `open`: Whether the tour is running.
    * - `index`: Which stop the reader is on.
+   *
+   * **It said `@controlled` for two days and honoured none of it.** The tag is
+   * a claim that a consumer may own the value, and `index` was a plain property
+   * the tour wrote to directly: `move` assigned it and *then* announced, so
+   * `preventDefault` on the change arrived after the move it was refusing, and
+   * a consumer who declared `index` had it overwritten on the next press.
+   *
+   * The shape is `Carousel`'s, which is the nearest thing in the library: a
+   * `default-index` for markup that only seeds, a held state that is
+   * `undefined` until somebody sets one, and a mode decided once at the first
+   * update so a later assignment cannot take the tour over.
+   * - `default-index`/`defaultIndex`: Stop to start on, where nothing declared one.
    * - `label`: Accessible name for the run, such as "Getting started".
    * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
    * - `back-label`/`backLabel`: Label for the control that goes back, handed to every stop.
@@ -36602,6 +36612,10 @@ export type CustomElementsSolidJs = {
    * - `next() => void`: Goes on, and finishes the run on the last stop.
    * - `back() => void`: Goes back, and does nothing on the first stop.
    * - `skip() => void`: Leaves the run early, which is a close rather than a completion.
+   *
+   * Announced before it is applied, and cancelable because of it. Both closes
+   * wrote `open` first and dispatched after, so a consumer calling
+   * `preventDefault` was refusing something that had already happened.
    *
    * ## CSS Custom Properties
    *
@@ -37489,8 +37503,10 @@ export type CustomCssProperties = {
   "--breadcrumbs-gap"?: string;
   /** Space between the buttons, when `spaced`. */
   "--button-group-gap"?: string;
-  /** Fill behind the button. */
+  /** Fill behind the button, in every state. */
   "--button-background-color"?: string;
+  /** Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover. */
+  "--button-background-color-hover"?: string;
   /** Label and icon color. */
   "--button-foreground-color"?: string;
   /** Width taken by `width="standard"`. */

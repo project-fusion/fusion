@@ -464,6 +464,27 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/highlight/shell.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "shellLanguage",
+          "description": "The shell grammar, with `command` mapped into the palette."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "shellLanguage",
+          "declaration": {
+            "name": "shellLanguage",
+            "module": "src/highlight/shell.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/index.ts",
       "declarations": [],
       "exports": [
