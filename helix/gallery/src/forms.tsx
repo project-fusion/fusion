@@ -306,12 +306,12 @@ export const formsArt: Record<string, ReactNode> = {
   'copy-button': (
     <>
       <g className="artMotion artLift">
-        <rect className="artLine" fill="none" height="40" rx="5" width="40" x="140" y="80" />
-        <rect className="artLine" fill="none" height="20" rx="3" width="16" x="152" y="90" />
-        <path className="artOn" d="M154 88h12" strokeLinecap="round" strokeWidth="2" />
+        <rect className="artEdge" fill="none" height="40" rx="5" width="40" x="140" y="80" />
+        <rect className="artEdge" fill="none" height="20" rx="3" width="16" x="152" y="90" />
+        <path className="artOn artStroke" d="M154 88h12" strokeLinecap="round" strokeWidth="2" />
       </g>
       <path
-        className="artOn artFade"
+        className="artOn artStroke"
         d="M186 96l5 5 9-9"
         fill="none"
         strokeLinecap="round"
@@ -724,7 +724,7 @@ export const formsArt: Record<string, ReactNode> = {
       <rect className="artInk" fillOpacity="0.4" height="8" rx="4" width="56" x="64" y="76" />
       {/* The clock: a ring with two hands, at the size the calendar mark takes on
           its own card. */}
-      <circle className="artRule" cx="247" cy="80" fill="none" r="7" strokeWidth="1.5" />
+      <circle className="artEdge" cx="247" cy="80" fill="none" r="7" strokeWidth="1.5" />
       <rect className="artInk" fillOpacity="0.55" height="4" width="1" x="247" y="76" />
       <rect className="artInk" fillOpacity="0.55" height="1" width="4" x="247" y="79" />
       {/* The list, and the row that is landed on. */}

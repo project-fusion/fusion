@@ -217,11 +217,61 @@ for (const file of ['index.tsx', 'core.tsx']) {
   }
 }
 
+/* And every stroked shape has something that strokes it.
+ *
+ * **The count was checked and the ink never was.** A card with an entry passes
+ * the check above whatever that entry draws, and `code` drew nothing at all: its
+ * three paths carried `artOn`, which is a hover animation and not a colour, so
+ * the whole card was an empty field. Four families were doing it, and one of
+ * them, `code-block`, rendered part of its drawing and looked merely sparse.
+ *
+ * A shape with `fill="none"` and a stroke width has no paint of its own, so it
+ * takes one from a class or it is invisible. The classes that supply one are
+ * below, and the two that were being reached for, `artLine` and `artFade`, were
+ * not classes at all: eight usages across two files, defined nowhere, styling
+ * nothing. That is the shape of this fault, a name that looks like paint.
+ *
+ * Read off the stylesheet rather than listed here, so a new paint class works
+ * the day it is written and a renamed one fails the same day. */
+const painted = new Set(
+  [...readFileSync(join(ART, 'gallery.css'), 'utf8').matchAll(/^\.(art[A-Za-z]+)\s*\{([^}]*)\}/gm)]
+    .filter(([, , body]) => /(^|[\s;])stroke:/.test(body))
+    .map(([, name]) => name),
+)
+
+for (const file of readdirSync(ART).filter((one) => one.endsWith('.tsx'))) {
+  const text = readFileSync(join(ART, file), 'utf8')
+  for (const [, tag, attrs] of text.matchAll(
+    /<(path|circle|rect|line|polyline|polygon|ellipse)\b([^>]*)>/gs,
+  )) {
+    if (!attrs.includes('fill="none"') || !/strokeWidth/.test(attrs)) {
+      continue
+    }
+    /* An inline `stroke` is paint as much as a class is, and one drawing uses
+       it: Menu's ellipsis ring strokes `currentColor` at a fixed opacity, which
+       is a fact about that shape rather than about the palette. Reading only
+       the class called it invisible when it is on screen. */
+    if (/(^|\s)stroke="/.test(attrs)) {
+      continue
+    }
+    const names = /className="([^"]*)"/.exec(attrs)?.[1].split(/\s+/) ?? []
+    if (names.some((one) => painted.has(one))) {
+      continue
+    }
+    problems.push(
+      `${ART}/${file}: a <${tag}> is drawn with a stroke and carries ` +
+        `${names.length > 0 ? `\`${names.join(' ')}\`` : 'no class'}, none of which sets one. ` +
+        'It renders as nothing. The classes that stroke are ' +
+        `${[...painted].map((one) => `\`${one}\``).join(', ')}.`,
+    )
+  }
+}
+
 if (problems.length > 0) {
   console.error(`Gallery art out of step (${problems.length}):\n\n  ${problems.join('\n  ')}\n`)
   process.exit(1)
 }
 
 console.log(
-  `art: ${families.size} families, every one drawn, and ${compared} number words in the prose agree`,
+  `art: ${families.size} families, every one drawn and every stroke painted, and ${compared} number words in the prose agree`,
 )

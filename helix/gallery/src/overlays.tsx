@@ -539,7 +539,7 @@ export const overlaysArt: Record<string, ReactNode> = {
             is not a shadow of the others. */}
         <circle className="artOn" cx="212" cy="152" r="16" />
         <path
-          className="artSurface"
+          className="artStrokeOnSolid"
           d="M212 145v14M205 152h14"
           fill="none"
           strokeLinecap="round"

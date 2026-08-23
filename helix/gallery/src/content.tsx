@@ -168,7 +168,7 @@ export const contentArt: Record<string, ReactNode> = {
     <>
       <g className="artMotion artLift">
         <path
-          className="artOn"
+          className="artOn artStroke"
           d="M138 92l-12 8 12 8"
           fill="none"
           strokeLinecap="round"
@@ -176,14 +176,14 @@ export const contentArt: Record<string, ReactNode> = {
           strokeWidth="2.5"
         />
         <path
-          className="artLine"
+          className="artStroke"
           d="M154 86l12 28"
           fill="none"
           strokeLinecap="round"
           strokeWidth="2.5"
         />
         <path
-          className="artOn"
+          className="artOn artStroke"
           d="M182 92l12 8-12 8"
           fill="none"
           strokeLinecap="round"
@@ -196,14 +196,14 @@ export const contentArt: Record<string, ReactNode> = {
 
   'code-block': (
     <>
-      <rect className="artLine" fill="none" height="72" rx="5" width="112" x="104" y="64" />
+      <rect className="artEdge" fill="none" height="72" rx="5" width="112" x="104" y="64" />
       <path className="artEdge" d="M104 84h112" />
       <g className="artMotion artLift">
         <rect className="artSolid" height="3" rx="1.5" width="30" x="118" y="98" />
-        <rect className="artLine" height="3" rx="1.5" width="52" x="118" y="110" />
-        <rect className="artLine" height="3" rx="1.5" width="38" x="118" y="122" />
+        <rect className="artInk" height="3" rx="1.5" width="52" x="118" y="110" />
+        <rect className="artInk" height="3" rx="1.5" width="38" x="118" y="122" />
       </g>
-      <circle className="artOn artFade" cx="204" cy="74" r="3" />
+      <circle className="artOn artInk" cx="204" cy="74" r="3" />
     </>
   ),
 

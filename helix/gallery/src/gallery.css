@@ -157,6 +157,17 @@
   fill: var(--helix-color-foreground-inverse);
 }
 
+/* The stroked counterpart, which did not exist and was needed.
+ *
+ * `artOnSolid` fills, and a mark drawn as a stroke on a filled control takes
+ * nothing from it: Speed Dial's plus is a path over a solid circle and reached
+ * for `artSurface`, which sets a fill and no stroke, so the control rendered as
+ * a dark disc with nothing on it. */
+.artStrokeOnSolid {
+  fill: none;
+  stroke: var(--helix-color-foreground-inverse);
+}
+
 /* The measured field every drawing sits on, rendered once in the wrapper.
  *
  * A 16 unit lattice at `space-md`, so the grid is the spacing scale rather than
