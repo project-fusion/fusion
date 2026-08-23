@@ -128,8 +128,8 @@ helix-megamenu {
 [data-megamenu-heading] > helix-icon {
   --icon-size: var(--helix-size-icon-md);
 
-  /* The mark as a dark tile with the letter cut out of it in a light brand
-   * step, rather than the brand's own mid blue running to its active one.
+  /* The mark as a near-black tile with the letter cut out of it in near-white,
+   * rather than the brand's own mid blue running to its active one.
    *
    * Nothing about the drawing changes to do this. Both marks declare their tile
    * as a gradient between `--logo-color-from` and `--logo-color-to`, and the
@@ -137,27 +137,32 @@ helix-megamenu {
    * uses; `chrome.module.css` already sets the same three for the wordmark, so
    * this is the second consumer of a hook that was built for exactly this.
    *
-   * `primary-surface` and its hover are the two rungs solved to carry near-white
-   * ink, which is what #107 measured them for and why they do not vary by mode:
-   * a fill carrying a light letter has to be dark in both.
+   * **Neutral rather than brand, and the panel is why.** A blue tile beside a
+   * blue wordmark, above rows whose only accent is where the reader currently
+   * is, spends the one colour a navigation has on saying which column a name
+   * belongs to. Near-black says the same thing and spends nothing.
    *
-   * **The letter is mixed rather than taken, because the library has no light
-   * brand step that holds in both modes.** `primary-subtle` is the obvious
-   * reach and is `light-dark(brand-50, brand-900)`, so in dark mode it becomes a
-   * *dark* blue on a tile that did not move: measured at 2.28 against the tile
-   * and 1.85 against its far stop, which is a letter nobody can read. The only
-   * ink solved for these fills is `foreground-on-accent`, and that is white.
+   * **It turns over with the mode, and it has to.** `surface-media` was the
+   * first reach, being the one pair that does not turn over, on the reasoning
+   * that carried the brand version: a fill holding a light letter has to be
+   * dark in both. That reasoning was about a *blue* fill, which is visible on
+   * either ground. A near-black one is not: measured on the dark panel it came
+   * out at 1.00 against the ground behind it, so the tile disappeared and left
+   * a bare white letter, and the mark changed silhouette between the modes
+   * rather than changing colour. `surface-inverse` is the opposite of the page
+   * by construction, with `foreground-inverse` as its ink, so the tile is
+   * near-black on a light panel, near-white on a dark one, and a tile in both.
+   * Both stops take the same value, a monotone tile being the ask and a
+   * two-rung ramp across neutrals having nothing to show.
    *
-   * So the light step is made from two things that do not vary, white and the
-   * tile's own fill, which keeps it a tint of the brand rather than plain white
-   * and keeps it the same tint in both modes. */
-  --logo-color-from: var(--helix-color-primary-surface);
-  --logo-color-knockout: color-mix(
-    in oklab,
-    var(--helix-color-foreground-on-accent) 86%,
-    var(--helix-color-primary-surface)
-  );
-  --logo-color-to: var(--helix-color-primary-surface-hover);
+   * **The brand version left one finding worth keeping.** `primary-subtle` is
+   * the obvious reach for a light letter and is `light-dark(brand-50,
+   * brand-900)`, so in dark mode it becomes a *dark* blue on a tile that did
+   * not move: measured at 2.28 against the tile and 1.85 against its far stop,
+   * which is a letter nobody can read. */
+  --logo-color-from: var(--helix-color-surface-inverse);
+  --logo-color-knockout: var(--helix-color-foreground-inverse);
+  --logo-color-to: var(--helix-color-surface-inverse);
 }
 
 helix-app-header {
