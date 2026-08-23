@@ -8,36 +8,46 @@
 //! a byte, which moves the luminance, which moves the side of 4.5 the search
 //! lands on.
 //!
-//! **The hex is exact and the floats are not, which was measured rather than
-//! assumed.** Bit equality was the first assertion written, on the reasoning
-//! that both engines are IEEE-754 doubles doing the same operations in the same
-//! order. It very nearly holds, and where it fails it fails in the last place:
+//! **The port is bit-exact almost everywhere, and finding that out took
+//! correcting the harness twice.**
+//!
+//! Bit equality was the first assertion written, on the reasoning that both
+//! engines are IEEE-754 doubles doing the same operations in the same order. It
+//! appeared to fail widely, and the reported divergence was recorded as V8's
+//! libm differing from Rust's in the last place. That was wrong: `serde_json`
+//! without `float_roundtrip` takes a fast path that is not correctly rounded,
+//! and it was parsing the oracle's own numbers an ulp out. The harness was
+//! corrupting its reference and reporting the port for it.
+//!
+//! With the parser fixed, measured:
 //!
 //! ```text
 //! rendered hex          0 of 480 differ
-//! parsed hex            0 of  15 differ, and all 15 round trip identically
 //! gamut membership      0 of 480 differ
+//! fitted chroma         0 of 480 differ
+//! relative luminance    0 of 480 differ
+//! shipped luminance     0 of 480 differ
+//! contrast ratio        0 of 300 differ
+//! shipped contrast      0 of 300 differ
+//! solved lightness      0 of 405 differ
 //! search emitted hex    0 of 405 differ
-//! relative luminance   47 of 480 differ, worst by 1.11e-16
-//! contrast ratio       37 of 300 differ, worst by 3.55e-15
-//! solved lightness     24 of 405 differ, worst by 1.11e-16
+//! perceptual distance   0 of 240 differ
+//! parsed hex            6 of  45 differ, worst by 5.55e-17
 //! ```
 //!
-//! The arithmetic is identical; the transcendentals are not. `cos`, `sin`,
-//! `powf`, `cbrt` and `atan2` are each allowed a last-place difference between
-//! V8's libm and Rust's, and that is what these are.
+//! So everything is asserted to the bit except the three components
+//! `hex_to_oklch` returns, which go through `cbrt` and `atan2` and are the only
+//! place the two libms actually part company. That one tolerance carries its
+//! measurement; every other assertion is exact and stays exact, which is what
+//! makes a future regression in the solver visible rather than absorbed.
 //!
-//! **So the artifact is asserted exactly and the intermediates to a tolerance.**
-//! A byte is 1/255, about 3.9e-3, which is eleven orders of magnitude above the
-//! worst divergence above: nothing at this scale can move a rounded channel
-//! unless a value sits exactly on a half, and the exact hex assertions are what
-//! would catch that if it ever did. The tolerance is a statement about two
-//! libms, not a way of admitting a wrong answer, and it is deliberately far
-//! tighter than the byte it protects. Widening it is a decision to be argued in
-//! this comment, never a way to make the suite go green.
+//! **Twice now the harness has been the bug**, after the `NaN` that compared
+//! equal to everything. A differential check is a measuring instrument, and an
+//! instrument that reads its own scale wrong reports the specimen.
 
 use serde_json::Value;
 
+use crate::derive::perceptual_distance;
 use crate::intent::{
     is_relation, status_seed, to_oklch, Color, From, Relation, Seed, STATUS_CHROMA, STATUS_HUE,
     STATUS_NAMES,
@@ -49,8 +59,15 @@ use crate::oklch::{
     CONTRAST_STEPS, GAMUT_STEPS,
 };
 
-/// Comfortably above the 3.55e-15 measured above and comfortably below a byte.
-const TOLERANCE: f64 = 1e-12;
+/// Exact. Everything that can agree to the bit is held to it.
+const EXACT: f64 = 0.0;
+
+/// The one place two libms genuinely part company: `hex_to_oklch` goes through
+/// `cbrt` and `atan2`, and 6 of 45 components come back a last place out, by at
+/// most 5.55e-17. Eleven orders below the byte those components are rounded
+/// into, and the exact hex assertions are what would catch it if it ever reached
+/// one.
+const PARSE_TOLERANCE: f64 = 1e-15;
 
 fn oracle() -> Value {
     serde_json::from_str(include_str!("oracle.json")).expect("oracle.json is valid JSON")
@@ -112,9 +129,9 @@ impl Divergence {
         }
     }
 
-    fn assert(&self, what: &str, total: usize) {
+    fn assert(&self, what: &str, total: usize, tolerance: f64) {
         assert!(
-            self.worst <= TOLERANCE,
+            self.worst <= tolerance,
             "{what}: {} of {total} disagree with the TypeScript engine, worst by {:e}.\n  {}",
             self.count,
             self.worst,
@@ -171,8 +188,8 @@ fn gamut_and_luminance_match_for_every_colour() {
             &format!("{subject:?}"),
         );
     }
-    luminance.assert("relative luminance", colors.len());
-    shipped.assert("shipped luminance", colors.len());
+    luminance.assert("relative luminance", colors.len(), EXACT);
+    shipped.assert("shipped luminance", colors.len(), EXACT);
 }
 
 #[test]
@@ -200,7 +217,7 @@ fn hex_parses_the_way_the_typescript_parses_it() {
             "{text} does not round trip the way the TypeScript does"
         );
     }
-    apart.assert("hex parsing", hexes.len() * 3);
+    apart.assert("hex parsing", hexes.len() * 3, PARSE_TOLERANCE);
 }
 
 #[test]
@@ -224,8 +241,8 @@ fn contrast_matches_for_every_pair() {
             &at,
         );
     }
-    plain.assert("contrast ratio", pairs.len());
-    shipped.assert("shipped contrast ratio", pairs.len());
+    plain.assert("contrast ratio", pairs.len(), EXACT);
+    shipped.assert("shipped contrast ratio", pairs.len(), EXACT);
 }
 
 /// The one that matters most: a bisection agreeing to the last bit means every
@@ -261,7 +278,7 @@ fn the_contrast_search_lands_where_the_typescript_lands() {
             wrong_hex.push(format!("{at}: rust {mine} against typescript {theirs}"));
         }
     }
-    lightness.assert("solved lightness", searches.len());
+    lightness.assert("solved lightness", searches.len(), EXACT);
     assert!(
         wrong_hex.is_empty(),
         "{} of {} searches emit a different hex:\n  {}",
@@ -296,7 +313,7 @@ fn fitting_to_gamut_lands_where_the_typescript_lands() {
             "{at} is still outside the gamut after fitting"
         );
     }
-    chroma.assert("fitted chroma", colors.len());
+    chroma.assert("fitted chroma", colors.len(), EXACT);
     assert!(
         wrong_hex.is_empty(),
         "{} of {} fitted colours render to a different hex:\n  {}",
@@ -451,4 +468,84 @@ fn a_seed_says_what_it_is_or_how_it_relates() {
     });
     assert!(is_relation(&relation));
     assert!(!is_relation(&Seed::Color(Color::Hex("#3b82f6".to_owned()))));
+}
+
+/// `Math.hypot` of three arguments is not the square root of the sum of the
+/// squares, and this is where that matters: the distance feeds
+/// `>= COLLISION_DISTANCE`, and that comparison decides which hue a status takes
+/// when it rotates clear of the brand. A flipped branch is a different palette,
+/// not a last-place difference in a reported number, so this one is asserted to
+/// the bit rather than to the tolerance.
+#[test]
+fn perceptual_distance_matches_the_typescript_to_the_bit() {
+    let data = oracle();
+    let distances = data["distances"].as_array().expect("distances is an array");
+    let mut wrong = Vec::new();
+    for entry in distances {
+        let a = color(&entry["a"]);
+        let b = color(&entry["b"]);
+        let mine = perceptual_distance(a, b);
+        let theirs = number(entry, "distance");
+        if mine.to_bits() != theirs.to_bits() {
+            wrong.push(format!(
+                "{a:?} to {b:?}: rust {mine:?} against typescript {theirs:?}"
+            ));
+        }
+    }
+    assert!(
+        wrong.is_empty(),
+        "{} of {} distances differ, and a naive sqrt is why:\n  {}",
+        wrong.len(),
+        distances.len(),
+        wrong.join("\n  ")
+    );
+}
+
+/// Isolates the disagreement above: is `hypot3` wrong, or is `cos` an ulp out
+/// upstream of it? Fed the TypeScript's own lab triples, `hypot3` should be
+/// exact, which localises any residual to the trigonometry.
+#[test]
+fn hypot_is_exact_when_it_is_given_the_same_three_numbers() {
+    let data = oracle();
+    let distances = data["distances"].as_array().expect("distances is an array");
+    let triple = |value: &Value| {
+        let parts = value.as_array().expect("a lab triple is an array");
+        [
+            parts[0].as_f64().expect("l"),
+            parts[1].as_f64().expect("a"),
+            parts[2].as_f64().expect("b"),
+        ]
+    };
+    let mut wrong = 0;
+    let mut lab_wrong = 0;
+    for entry in distances {
+        let [l1, a1, b1] = triple(&entry["labA"]);
+        let [l2, a2, b2] = triple(&entry["labB"]);
+        let mine = crate::derive::hypot3_for_test(l1 - l2, a1 - a2, b1 - b2);
+        let theirs = number(entry, "distance");
+        if mine.to_bits() != theirs.to_bits() {
+            wrong += 1;
+            if wrong <= 3 {
+                println!(
+                    "  a={:?} b={:?}\n    labA={:?} labB={:?}\n    rust {mine:?} ts {theirs:?}",
+                    color(&entry["a"]),
+                    color(&entry["b"]),
+                    [l1, a1, b1],
+                    [l2, a2, b2]
+                );
+            }
+        }
+        /* And whether our own lab triples match theirs, which is the other half
+        of the question. */
+        let mine = crate::derive::to_lab_for_test(color(&entry["a"]));
+        if mine[1].to_bits() != a1.to_bits() || mine[2].to_bits() != b1.to_bits() {
+            lab_wrong += 1;
+        }
+    }
+    println!(
+        "hypot3 given identical inputs: {wrong} of {} differ; our lab triples: {lab_wrong} of {} differ",
+        distances.len(),
+        distances.len()
+    );
+    assert_eq!(wrong, 0, "hypot3 differs given identical inputs");
 }

@@ -134,8 +134,16 @@ const DEFAULTS = {
  */
 const COLLISION_DISTANCE = 0.08
 
-/** Euclidean distance in OKLab, which is what OKLCH exists to make meaningful. */
-const perceptualDistance = (a: Oklch, b: Oklch): number => {
+/**
+ * Euclidean distance in OKLab, which is what OKLCH exists to make meaningful.
+ *
+ * Exported for the Rust port's oracle and for nothing else: `Math.hypot` of
+ * three arguments is not the square root of the sum of the squares, measured as
+ * differing on 37 per cent of inputs at these magnitudes, and this feeds the
+ * threshold the status hue search branches on. The export goes when this file
+ * does.
+ */
+export const perceptualDistance = (a: Oklch, b: Oklch): number => {
   const toLab = ({ chroma, hue, lightness }: Oklch): [number, number, number] => {
     const rad = (hue * Math.PI) / 180
     return [lightness, chroma * Math.cos(rad), chroma * Math.sin(rad)]

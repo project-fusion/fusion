@@ -30,6 +30,7 @@
  * `bun run check:oracle` and part of `bun run verify`.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { perceptualDistance } from '../../helix/theme/src/derive.ts'
 import { STATUS_CHROMA, STATUS_HUE } from '../../helix/theme/src/intent.ts'
 import { GROUNDS, INKS } from '../../helix/theme/src/model.ts'
 import {
@@ -112,6 +113,23 @@ const oracle = {
       shippedLuminance: shippedLuminance(color),
     }
   }),
+  /* `perceptualDistance` in the derivation, whose `Math.hypot` of three is not
+     the square root of the sum of the squares: measured, a naive port differs on
+     37 per cent of inputs. It feeds a threshold the status hue search branches
+     on, so a flipped comparison is a different palette rather than a last-place
+     difference. */
+  distances: colors.slice(0, 80).flatMap((a, at) =>
+    colors.slice(at + 1, at + 4).map((b) => {
+      /* The lab triples as well as the distance, so a disagreement can be
+           localised: `Math.hypot` fed the same three numbers, or `cos` and `sin`
+           an ulp out upstream of it. Two very different answers. */
+      const toLab = ({ chroma, hue, lightness }) => {
+        const rad = (hue * Math.PI) / 180
+        return [lightness, chroma * Math.cos(rad), chroma * Math.sin(rad)]
+      }
+      return { a, b, distance: perceptualDistance(a, b), labA: toLab(a), labB: toLab(b) }
+    }),
+  ),
   /* The model is data, so it cannot drift by a float. It drifts by a typo in a
      token name, which solves a pair against a ground nobody paints and which no
      compiler on either side would mention. */

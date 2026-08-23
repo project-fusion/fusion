@@ -24,7 +24,14 @@ path = "rust/lib.rs"
 [dev-dependencies]
 # Only the oracle test reads JSON. The library stays dependency-free, which is
 # what keeps the WASM wrapper small and its build boring.
-serde_json.workspace = true
+#
+# **`float_roundtrip` is not optional here, it is the whole point.** Without it
+# serde_json takes a fast path that is not correctly rounded, and it parsed
+# `-0.014142135623730949` out of the oracle as `-0.014142135623730947`: one ulp,
+# in the file the port is being measured against. That is the harness corrupting
+# its own reference, which reports as the port being wrong and had 53 of 240
+# distances "differing" when the port was right and the reader was not.
+serde_json = { workspace = true, features = ["float_roundtrip"] }
 
 [lints]
 workspace = true
