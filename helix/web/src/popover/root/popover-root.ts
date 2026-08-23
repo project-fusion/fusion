@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBasePopover } from '@helix-io/headless'
+import { HelixBasePopover } from '@helix-io/headless/popover'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './popover-root.css.js'
@@ -19,7 +19,7 @@ import { styles } from './popover-root.css.js'
  * time.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @aliases Popper, Flyout, Overlay
  * @documentation https://helix.fusion.dev/components/popover

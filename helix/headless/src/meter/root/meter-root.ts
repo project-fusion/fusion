@@ -39,7 +39,7 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * without measuring anything itself.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Gauge, Level, Capacity
  * @documentation https://helix.fusion.dev/components/meter

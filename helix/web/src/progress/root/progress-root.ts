@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseProgress } from '@helix-io/headless'
+import { HelixBaseProgress } from '@helix-io/headless/progress'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './progress-root.css.js'
 
@@ -18,7 +18,7 @@ import { styles } from './progress-root.css.js'
  * thing advancing.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Progress bar, Loading bar
  * @documentation https://helix.fusion.dev/components/progress

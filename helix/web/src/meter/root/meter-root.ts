@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseMeter } from '@helix-io/headless'
+import { HelixBaseMeter } from '@helix-io/headless/meter'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './meter-root.css.js'
 
@@ -37,7 +37,7 @@ import { styles } from './meter-root.css.js'
  * reading are what say how far past.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Gauge, Level, Capacity
  * @documentation https://helix.fusion.dev/components/meter

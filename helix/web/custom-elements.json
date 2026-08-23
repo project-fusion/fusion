@@ -455,7 +455,7 @@
           ],
           "superclass": {
             "name": "HelixBaseAccordionItem",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/accordion"
           },
           "summary": "One collapsible section of an accordion.",
           "helix": {
@@ -762,7 +762,7 @@
           ],
           "superclass": {
             "name": "HelixBaseAccordion",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/accordion"
           },
           "summary": "Groups collapsible sections, one open at a time by default.",
           "helix": {
@@ -1094,7 +1094,7 @@
           ],
           "superclass": {
             "name": "HelixBaseAnnouncement",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/announcement"
           },
           "summary": "A page-level message above the masthead, which can be dismissed.",
           "helix": {
@@ -1606,7 +1606,7 @@
           ],
           "superclass": {
             "name": "HelixBaseAppHeader",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/app-header"
           },
           "summary": "Page-level banner holding brand, navigation, and actions.",
           "helix": {
@@ -2918,7 +2918,7 @@
           ],
           "superclass": {
             "name": "HelixBaseAvatarGroup",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/avatar"
           },
           "summary": "Overlapping avatars, with a count for the ones not shown.",
           "helix": {
@@ -3346,7 +3346,7 @@
           ],
           "superclass": {
             "name": "HelixBaseAvatar",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/avatar"
           },
           "summary": "Represents a person or entity with an image or their initials.",
           "helix": {
@@ -3734,7 +3734,7 @@
           ],
           "superclass": {
             "name": "HelixBaseBadge",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/badge"
           },
           "summary": "Attaches a count or a presence mark to another element.",
           "helix": {
@@ -4692,7 +4692,7 @@
           ],
           "superclass": {
             "name": "HelixBaseBarChart",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/bar-chart"
           },
           "summary": "Categories as columns, read from a table.",
           "helix": {
@@ -5138,7 +5138,7 @@
           ],
           "superclass": {
             "name": "HelixBaseBlockquote",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/blockquote"
           },
           "summary": "A passage set off from the prose around it.",
           "helix": {
@@ -5526,7 +5526,7 @@
           ],
           "superclass": {
             "name": "HelixBaseBreadcrumb",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/breadcrumbs"
           },
           "summary": "One step in a breadcrumb trail.",
           "helix": {
@@ -5806,7 +5806,7 @@
           ],
           "superclass": {
             "name": "HelixBaseBreadcrumbs",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/breadcrumbs"
           },
           "summary": "Shows the path to the current page.",
           "helix": {
@@ -6087,7 +6087,7 @@
           ],
           "superclass": {
             "name": "HelixBaseButtonGroup",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/button-group"
           },
           "summary": "Groups related buttons into one control.",
           "helix": {
@@ -6192,8 +6192,12 @@
           "name": "HelixButton",
           "cssProperties": [
             {
-              "description": "Fill behind the button.",
+              "description": "Fill behind the button, in every state.",
               "name": "--button-background-color"
+            },
+            {
+              "description": "Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover.",
+              "name": "--button-background-color-hover"
             },
             {
               "description": "Label and icon color.",
@@ -6809,7 +6813,7 @@
           ],
           "superclass": {
             "name": "HelixBaseButton",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/button"
           },
           "summary": "Triggers an action, submits a form, or navigates.",
           "helix": {
@@ -7147,7 +7151,7 @@
           ],
           "superclass": {
             "name": "HelixBaseCallout",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/callout"
           },
           "summary": "Sets a passage apart as information, a warning, or an error.",
           "helix": {
@@ -7526,7 +7530,7 @@
           ],
           "superclass": {
             "name": "HelixBaseCard",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/card"
           },
           "summary": "Groups related content and actions into a single surface.",
           "helix": {
@@ -8373,7 +8377,7 @@
           ],
           "superclass": {
             "name": "HelixBaseCarousel",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/carousel"
           },
           "summary": "Shows one slide of several, with controls to move between them.",
           "helix": {
@@ -9314,7 +9318,7 @@
           ],
           "superclass": {
             "name": "HelixBaseCheckboxGroup",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/checkbox-group"
           },
           "summary": "Groups related checkboxes, and reports them as one set.",
           "helix": {
@@ -10410,7 +10414,7 @@
           ],
           "superclass": {
             "name": "HelixBaseCheckbox",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/checkbox"
           },
           "summary": "A box that is ticked, or not, or neither.",
           "helix": {
@@ -10780,7 +10784,7 @@
           ],
           "superclass": {
             "name": "HelixBaseCodeBlock",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/code-block"
           },
           "summary": "A block of code, with somewhere to put its name and a way to take it.",
           "helix": {
@@ -11079,7 +11083,7 @@
           ],
           "superclass": {
             "name": "HelixBaseCode",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/code"
           },
           "summary": "A fragment of code inside a line of prose.",
           "helix": {
@@ -12263,7 +12267,7 @@
           ],
           "superclass": {
             "name": "HelixBaseColorInput",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/color-input"
           },
           "summary": "A color, typed in any syntax or picked from a panel.",
           "helix": {
@@ -13563,7 +13567,7 @@
           ],
           "superclass": {
             "name": "HelixBaseColorPicker",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/color-picker"
           },
           "summary": "Picks a color, from a square and two ramps.",
           "helix": {
@@ -15266,7 +15270,7 @@
           ],
           "superclass": {
             "name": "HelixBaseCombobox",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/combobox"
           },
           "summary": "A field that filters a list as it is typed into.",
           "helix": {
@@ -16236,13 +16240,13 @@
           ],
           "superclass": {
             "name": "HelixBaseCommand",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/command"
           },
           "summary": "A list of commands, opened from anywhere and filtered by typing.",
           "helix": {
             "category": "navigation",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/command",
             "tier": "styled",
             "group": "Command",
@@ -16641,13 +16645,11 @@
             },
             {
               "kind": "field",
-              "name": "copied",
-              "type": {
-                "text": "boolean"
-              },
+              "name": "clipboard",
               "privacy": "private",
-              "default": "false",
-              "description": "Whether the confirmation is showing.\n\n`@state`, so it is the component's and not API: a consumer setting this\nwould be claiming a copy happened, which is the one thing this element\nexists to be honest about.",
+              "readonly": true,
+              "default": "new CopyController(this, { after: CONFIRM })",
+              "description": "The write, the confirmation, the timer and the event, all of them shared.\n\n**This was a second implementation of `CopyController` with the hard half\nleft out.** It reached straight for `navigator.clipboard.writeText` and had\nno `execCommand` fallback, so it was inert in a sandboxed iframe without\n`allow-same-origin`, which is the sandbox every example on the docs site\nruns in: the guard on the API existing does not help there, because the\nobject exists and the write rejects. A copy button that does nothing is\nindistinguishable from a broken one, and this one was doing nothing in the\none place a reader is most likely to try it.\n\nThe controller also carries the two things this had wrong on its own terms:\nit checks the host is still connected after the await, because writing is\nasynchronous and `hostDisconnected` clears a timer that does not exist yet,\nand it registers itself so the timer is released without an override here.",
               "inheritedFrom": {
                 "name": "HelixBaseCopyButton",
                 "module": "src/copy-button/root/copy-button-root.ts"
@@ -16655,11 +16657,12 @@
             },
             {
               "kind": "field",
-              "name": "timer",
+              "name": "copied",
               "type": {
-                "text": "ReturnType<typeof setTimeout> | undefined"
+                "text": "boolean"
               },
               "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseCopyButton",
                 "module": "src/copy-button/root/copy-button-root.ts"
@@ -16670,7 +16673,6 @@
               "name": "handleCopy",
               "privacy": "private",
               "readonly": true,
-              "description": "The write, and the only place the confirmation is allowed to come from.\n\nGuarded on the API existing, because `navigator.clipboard` is undefined on\nan insecure origin rather than throwing, and reaching straight for\n`writeText` there is a TypeError on the press instead of a copy that\nquietly did not happen.",
               "inheritedFrom": {
                 "name": "HelixBaseCopyButton",
                 "module": "src/copy-button/root/copy-button-root.ts"
@@ -17131,7 +17133,7 @@
           ],
           "superclass": {
             "name": "HelixBaseCopyButton",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/copy-button"
           },
           "summary": "A button that puts a string on the clipboard and says it did.",
           "helix": {
@@ -18686,7 +18688,7 @@
           ],
           "superclass": {
             "name": "HelixBaseDateInput",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/date-input"
           },
           "summary": "A date, typed or picked from a calendar.",
           "helix": {
@@ -20210,7 +20212,7 @@
           ],
           "superclass": {
             "name": "HelixBaseDatePicker",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/date-picker"
           },
           "summary": "Shows a month, and takes a date from it.",
           "helix": {
@@ -21184,13 +21186,13 @@
           ],
           "superclass": {
             "name": "HelixBaseDialog",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/dialog"
           },
           "summary": "A modal window, on the platform's own dialog.",
           "helix": {
             "category": "overlays",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/dialog",
             "aliases": [
               "Modal",
@@ -21568,7 +21570,7 @@
           ],
           "superclass": {
             "name": "HelixBaseDivider",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/divider"
           },
           "summary": "Separates content into groups with a rule.",
           "helix": {
@@ -22113,7 +22115,7 @@
           ],
           "superclass": {
             "name": "HelixBaseDonutChart",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/donut-chart"
           },
           "summary": "Parts of a whole as a ring, read from a table.",
           "helix": {
@@ -22906,7 +22908,7 @@
           ],
           "superclass": {
             "name": "HelixBaseDrawer",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/drawer"
           },
           "summary": "A panel that slides in from an edge.",
           "helix": {
@@ -23241,7 +23243,7 @@
           ],
           "superclass": {
             "name": "HelixBaseDrilldownItem",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/drilldown"
           },
           "summary": "One row of a drill-down, which may hold a page of its own.",
           "helix": {
@@ -23840,7 +23842,7 @@
           ],
           "superclass": {
             "name": "HelixBaseDrilldown",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/drilldown"
           },
           "summary": "A stack of pages, one showing at a time, with a way back.",
           "helix": {
@@ -24200,7 +24202,7 @@
           ],
           "superclass": {
             "name": "HelixBaseEmpty",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/empty"
           },
           "summary": "Says that a region has nothing in it, and what to do about it.",
           "helix": {
@@ -25192,13 +25194,13 @@
           ],
           "superclass": {
             "name": "HelixBaseFileInput",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/file-input"
           },
           "summary": "A control for choosing files, by pointer or by dropping them on it.",
           "helix": {
             "category": "forms",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/file-input",
             "aliases": [
               "FileUpload",
@@ -26860,7 +26862,7 @@
           ],
           "superclass": {
             "name": "HelixBaseIconButton",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/icon-button"
           },
           "summary": "A square button whose content is an icon.",
           "helix": {
@@ -27141,7 +27143,7 @@
           ],
           "superclass": {
             "name": "HelixBaseIcon",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/icon"
           },
           "summary": "Renders a named icon from the Helix set.",
           "helix": {
@@ -27668,7 +27670,7 @@
           ],
           "superclass": {
             "name": "HelixBaseImage",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/image"
           },
           "summary": "A picture that says whether it arrived.",
           "helix": {
@@ -29503,7 +29505,7 @@
           ],
           "superclass": {
             "name": "HelixBaseInput",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/input"
           },
           "summary": "A single line of text a reader types into.",
           "helix": {
@@ -30066,7 +30068,7 @@
           ],
           "superclass": {
             "name": "HelixBaseKbd",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/kbd"
           },
           "summary": "A keyboard key or chord, set inline with text.",
           "helix": {
@@ -30405,7 +30407,7 @@
           ],
           "superclass": {
             "name": "HelixBaseLegend",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/legend"
           },
           "summary": "The names a chart draws, each beside the colour it is drawn in.",
           "helix": {
@@ -31102,7 +31104,7 @@
           ],
           "superclass": {
             "name": "HelixBaseLineChart",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/line-chart"
           },
           "summary": "A series over time as a line, read from a table.",
           "helix": {
@@ -31612,7 +31614,7 @@
           ],
           "superclass": {
             "name": "HelixBaseListItem",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/list"
           },
           "summary": "One row of a list.",
           "helix": {
@@ -31960,7 +31962,7 @@
           ],
           "superclass": {
             "name": "HelixBaseList",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/list"
           },
           "summary": "A set of rows, read as a set.",
           "helix": {
@@ -33293,7 +33295,7 @@
           ],
           "superclass": {
             "name": "HelixBaseListbox",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/listbox"
           },
           "summary": "A list of options, one or several of which are the answer.",
           "helix": {
@@ -33935,7 +33937,7 @@
           ],
           "superclass": {
             "name": "HelixBaseLoader",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/loader"
           },
           "summary": "Says that something indeterminate is in progress.",
           "helix": {
@@ -34728,7 +34730,7 @@
           ],
           "superclass": {
             "name": "HelixBaseMegamenu",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/megamenu"
           },
           "summary": "A section of a navigation that opens a panel of destinations.",
           "helix": {
@@ -35378,7 +35380,7 @@
           ],
           "superclass": {
             "name": "HelixBaseMenuItem",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/menu"
           },
           "summary": "One row in a menu: a command, a choice, or a way into a submenu.",
           "helix": {
@@ -36261,7 +36263,7 @@
           ],
           "superclass": {
             "name": "HelixBaseMenu",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/menu"
           },
           "summary": "A menu of commands, opened from a trigger.",
           "helix": {
@@ -37068,13 +37070,13 @@
           ],
           "superclass": {
             "name": "HelixBaseMeter",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/meter"
           },
           "summary": "A measurement in a known range, and whether it is where you want it.",
           "helix": {
             "category": "feedback",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/meter",
             "aliases": [
               "Gauge",
@@ -37627,7 +37629,7 @@
           ],
           "superclass": {
             "name": "HelixBaseNavigation",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/navigation"
           },
           "summary": "A set of destinations, with a marker on the current one.",
           "helix": {
@@ -38891,7 +38893,7 @@
           ],
           "superclass": {
             "name": "HelixBaseNumberInput",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/number-input"
           },
           "summary": "A number a reader types or steps to.",
           "helix": {
@@ -39365,7 +39367,7 @@
           ],
           "superclass": {
             "name": "HelixBaseOptionGroup",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/option"
           },
           "summary": "A named run of options inside a listbox.",
           "helix": {
@@ -39752,7 +39754,7 @@
           ],
           "superclass": {
             "name": "HelixBaseOption",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/option"
           },
           "summary": "One choice in a listbox.",
           "helix": {
@@ -40396,7 +40398,7 @@
           ],
           "superclass": {
             "name": "HelixBaseOutline",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/outline"
           },
           "summary": "Links to the headings on this page, marking the one being read.",
           "helix": {
@@ -41401,7 +41403,7 @@
           ],
           "superclass": {
             "name": "HelixBasePagination",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/pagination"
           },
           "summary": "Moves between pages of a longer result.",
           "helix": {
@@ -42089,7 +42091,7 @@
           ],
           "superclass": {
             "name": "HelixBasePaginationSize",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/pagination"
           },
           "summary": "Chooses how many items a page holds.",
           "helix": {
@@ -42431,7 +42433,7 @@
           ],
           "superclass": {
             "name": "HelixBasePaginationSummary",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/pagination"
           },
           "summary": "Reads out which items of how many are on show.",
           "helix": {
@@ -43529,13 +43531,13 @@
           ],
           "superclass": {
             "name": "HelixBasePinInput",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/pin-input"
           },
           "summary": "A short code, one character to a box.",
           "helix": {
             "category": "forms",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/pin-input",
             "aliases": [
               "PinField",
@@ -44331,13 +44333,13 @@
           ],
           "superclass": {
             "name": "HelixBasePopover",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/popover"
           },
           "summary": "A panel that opens against a trigger and holds anything.",
           "helix": {
             "category": "overlays",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/popover",
             "aliases": [
               "Popper",
@@ -44754,13 +44756,13 @@
           ],
           "superclass": {
             "name": "HelixBaseProgress",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/progress"
           },
           "summary": "Shows how far along a task is, when that is known.",
           "helix": {
             "category": "feedback",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/progress",
             "aliases": [
               "Progress bar",
@@ -45220,7 +45222,7 @@
           ],
           "superclass": {
             "name": "HelixBaseQrCode",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/qr-code"
           },
           "summary": "Encodes a short piece of text as a scannable square.",
           "helix": {
@@ -45562,7 +45564,7 @@
           ],
           "superclass": {
             "name": "HelixBaseQuote",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/quote"
           },
           "summary": "A short quotation, set inline with the text around it.",
           "helix": {
@@ -46389,7 +46391,7 @@
           ],
           "superclass": {
             "name": "HelixBaseRadioGroup",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/radio"
           },
           "summary": "A set of choices where exactly one is the answer.",
           "helix": {
@@ -46972,7 +46974,7 @@
           ],
           "superclass": {
             "name": "HelixBaseRadio",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/radio"
           },
           "summary": "One choice in a radio group.",
           "helix": {
@@ -48351,7 +48353,7 @@
           ],
           "superclass": {
             "name": "HelixBaseRating",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/rating"
           },
           "summary": "A score out of a few marks, given or shown.",
           "helix": {
@@ -50987,7 +50989,7 @@
           ],
           "superclass": {
             "name": "HelixBaseScrollArea",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/scroll-area"
           },
           "summary": "A scrolling box that says there is more.",
           "helix": {
@@ -52090,7 +52092,7 @@
           ],
           "superclass": {
             "name": "HelixBaseSelect",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/select"
           },
           "summary": "A closed list that opens to be chosen from.",
           "helix": {
@@ -52729,7 +52731,7 @@
           ],
           "superclass": {
             "name": "HelixBaseSkeleton",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/skeleton"
           },
           "summary": "Stands in for content that has not arrived.",
           "helix": {
@@ -53347,7 +53349,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Mirrors \"there are marks\" for the stylesheet.\n\nThe whole marker layout hung off `:host([markers])` and `markers` does not\nreflect, so `slider.markers = 5` drew nothing at all: only the attribute\nwritten in the markup ever worked, and the property that is the documented\nAPI silently did not.\n\nReflecting the count instead would put `markers=\"0\"` on every slider, an\nattribute the server's markup does not have and one that selector would\nmatch, drawing the layout for no marks. So the boolean fact is mirrored to\na `data-` name, which is the rule this library already follows for state:\nthe stylesheet wants to know whether there are marks, not how many. How\nmany is what `markerValues` answers, and `< 2` is where it already draws\nthe line.\n\n/** Whether each mark says which value it stands at.",
+              "description": "Whether each mark says which value it stands at.",
               "attribute": "marker-labels",
               "reflects": true,
               "inheritedFrom": {
@@ -53790,7 +53792,7 @@
           ],
           "superclass": {
             "name": "HelixBaseSlider",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/slider"
           },
           "summary": "A value chosen from a range by dragging.",
           "helix": {
@@ -53992,7 +53994,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Mirrors \"there are marks\" for the stylesheet.\n\nThe whole marker layout hung off `:host([markers])` and `markers` does not\nreflect, so `slider.markers = 5` drew nothing at all: only the attribute\nwritten in the markup ever worked, and the property that is the documented\nAPI silently did not.\n\nReflecting the count instead would put `markers=\"0\"` on every slider, an\nattribute the server's markup does not have and one that selector would\nmatch, drawing the layout for no marks. So the boolean fact is mirrored to\na `data-` name, which is the rule this library already follows for state:\nthe stylesheet wants to know whether there are marks, not how many. How\nmany is what `markerValues` answers, and `< 2` is where it already draws\nthe line.\n\n/** Whether each mark says which value it stands at.",
+              "description": "Whether each mark says which value it stands at.",
               "fieldName": "markerLabels",
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
@@ -54550,7 +54552,7 @@
           ],
           "superclass": {
             "name": "HelixBaseSparkline",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/sparkline"
           },
           "summary": "A line with no axes, for the shape of a series beside the number it belongs to.",
           "helix": {
@@ -54965,7 +54967,7 @@
           ],
           "superclass": {
             "name": "HelixBaseSpeedDialItem",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/speed-dial"
           },
           "summary": "One action in a speed dial: a mark, and a name beside it.",
           "helix": {
@@ -55520,7 +55522,7 @@
           ],
           "superclass": {
             "name": "HelixBaseSpeedDial",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/speed-dial"
           },
           "summary": "A button that fans out the few actions a screen is for.",
           "helix": {
@@ -56520,7 +56522,7 @@
                   "text": "void"
                 }
               },
-              "description": "Announces this splitter to the one it is nested in, if they cross.\n\nClient only. The server has no tree to walk, and a parent that has not\nupgraded has no `orientation` to compare against, so this waits for\n`firstUpdated`. That is what the corner is allowed to be: an affordance\nrather than content, absent from the served markup and appearing at\nhydration, with two working dividers in the meantime.\n\n`parentElement` before `closest`, so a splitter does not find itself.",
+              "description": "Announces this splitter to the one it is nested in, if they cross.\n\nClient only. The server has no tree to walk, and a parent that has not\nupgraded has no `orientation` to compare against, so this waits for\n`firstUpdated`. That is what the corner is allowed to be: an affordance\nrather than content, absent from the served markup and appearing at\nhydration, with two working dividers in the meantime.\n\n`parentElement` first, so a splitter does not find itself.\n\n**By identity rather than by tag, which `closestInstance` exists for and\ncounts this file in its own documentation.** It matched\n`'helix-splitter, helix-base-splitter'`, and only `@helix-io/web` registers\nthe first of those: a headless package naming a styled one by string. Under\nany third tag, which is exactly what subclassing a base element is for and\nwhat `helix/web` itself does, the lookup returned null and a nested\nsplitter had no corner, with no error anywhere.\n\nIt also crosses shadow boundaries, which `closest` does not: a splitter\nslotted into another component's shadow root has a `parentNode` chain\nending at a `ShadowRoot`, and nesting through a slot is the ordinary case\nfor anything composable.",
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",
                 "module": "src/splitter/root/splitter-root.ts"
@@ -56849,7 +56851,7 @@
           ],
           "superclass": {
             "name": "HelixBaseSplitter",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/splitter"
           },
           "summary": "Two panes and a divider the reader can move.",
           "helix": {
@@ -57159,7 +57161,7 @@
           ],
           "superclass": {
             "name": "HelixBaseStatGroup",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/stat"
           },
           "summary": "A row of related measurements.",
           "helix": {
@@ -57391,7 +57393,7 @@
           ],
           "superclass": {
             "name": "HelixBaseStat",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/stat"
           },
           "summary": "One measurement, with the word for what it measures.",
           "helix": {
@@ -57887,7 +57889,7 @@
           ],
           "superclass": {
             "name": "HelixBaseSteps",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/steps"
           },
           "summary": "A sequence of stages, and where the reader is in it.",
           "helix": {
@@ -58291,7 +58293,7 @@
           ],
           "superclass": {
             "name": "HelixBaseStep",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/steps"
           },
           "summary": "One stage in a sequence.",
           "helix": {
@@ -59247,7 +59249,7 @@
           ],
           "superclass": {
             "name": "HelixBaseSwitch",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/switch"
           },
           "summary": "A control that turns something on or off.",
           "helix": {
@@ -59670,7 +59672,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTableCell",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/table"
           },
           "summary": "One cell of a table.",
           "helix": {
@@ -59886,7 +59888,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTableColumn",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/table"
           },
           "summary": "One column of a table: its heading, and how wide it is.",
           "helix": {
@@ -60407,7 +60409,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTable",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/table"
           },
           "summary": "Tabular data laid out on a grid.",
           "helix": {
@@ -60674,7 +60676,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTableRow",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/table"
           },
           "summary": "One row of a table.",
           "helix": {
@@ -60941,7 +60943,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTabsPanel",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/tabs"
           },
           "summary": "The content shown for one tab.",
           "helix": {
@@ -61478,7 +61480,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTabs",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/tabs"
           },
           "summary": "A row of tabs and the panel each one shows.",
           "helix": {
@@ -61869,7 +61871,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTabsTab",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/tabs"
           },
           "summary": "One tab in a tab list.",
           "helix": {
@@ -62314,7 +62316,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTag",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/tag"
           },
           "summary": "Labels content with a short piece of metadata.",
           "helix": {
@@ -63555,7 +63557,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTextarea",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/textarea"
           },
           "summary": "Several lines of text a reader types into.",
           "helix": {
@@ -65146,7 +65148,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTimeInput",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/time-input"
           },
           "summary": "A time, typed or picked from a list.",
           "helix": {
@@ -66530,7 +66532,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTimePicker",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/time-picker"
           },
           "summary": "Picks a time, from a list of them.",
           "helix": {
@@ -67055,7 +67057,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTimelineItem",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/timeline"
           },
           "summary": "One event on a timeline: when it happened, and what it was.",
           "helix": {
@@ -67358,7 +67360,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTimeline",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/timeline"
           },
           "summary": "A record of what happened, in the order it happened.",
           "helix": {
@@ -67915,7 +67917,7 @@
           ],
           "superclass": {
             "name": "HelixBaseToastItem",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/toast"
           },
           "summary": "One message in the toast region.",
           "helix": {
@@ -68190,10 +68192,9 @@
               "kind": "field",
               "name": "placement",
               "type": {
-                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start'"
+                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start' | undefined"
               },
-              "default": "'bottom-end'",
-              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.",
+              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.\n\n**Optional, and bottom-end is the absence of it.** It reflected *and*\ndefaulted, which is the pair that writes onto a host: every toast region\nanybody rendered gained a `placement=\"bottom-end\"` nobody typed, and a\nReact consumer's server markup does not have it. The styled sheet carries\nthe resting arrangement in its own `:host` rule now and the selectors\ndescribe only the departures, which is what `orientation` has always done.\n\nThe SSR spec could never have caught it: it passed a placement explicitly,\nso the attribute it asserted was one the consumer had written.",
               "attribute": "placement",
               "reflects": true,
               "inheritedFrom": {
@@ -68310,7 +68311,7 @@
           ],
           "superclass": {
             "name": "HelixBaseToast",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/toast"
           },
           "summary": "The region messages arrive in, and the only thing that announces them.",
           "helix": {
@@ -68393,10 +68394,9 @@
             {
               "name": "placement",
               "type": {
-                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start'"
+                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start' | undefined"
               },
-              "default": "'bottom-end'",
-              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.",
+              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.\n\n**Optional, and bottom-end is the absence of it.** It reflected *and*\ndefaulted, which is the pair that writes onto a host: every toast region\nanybody rendered gained a `placement=\"bottom-end\"` nobody typed, and a\nReact consumer's server markup does not have it. The styled sheet carries\nthe resting arrangement in its own `:host` rule now and the selectors\ndescribe only the departures, which is what `orientation` has always done.\n\nThe SSR spec could never have caught it: it passed a placement explicitly,\nso the attribute it asserted was one the consumer had written.",
               "fieldName": "placement",
               "inheritedFrom": {
                 "name": "HelixBaseToast",
@@ -69398,7 +69398,7 @@
           ],
           "superclass": {
             "name": "HelixBaseToggleGroup",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/toggle"
           },
           "summary": "A row of options with the selection marked by a moving indicator.",
           "helix": {
@@ -69738,7 +69738,7 @@
           ],
           "superclass": {
             "name": "HelixBaseToggle",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/toggle"
           },
           "summary": "One option in a toggle group.",
           "helix": {
@@ -70190,7 +70190,7 @@
           ],
           "superclass": {
             "name": "HelixBaseToolbar",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/toolbar"
           },
           "summary": "A group of controls that share one tab stop.",
           "helix": {
@@ -70999,7 +70999,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTooltip",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/tooltip"
           },
           "summary": "A short description that appears beside what it describes.",
           "helix": {
@@ -71347,14 +71347,68 @@
               "type": {
                 "text": "number"
               },
-              "default": "0",
-              "description": "Which stop the reader is on.",
+              "description": "Which stop the reader is on.\n\n**It said `@controlled` for two days and honoured none of it.** The tag is\na claim that a consumer may own the value, and `index` was a plain property\nthe tour wrote to directly: `move` assigned it and *then* announced, so\n`preventDefault` on the change arrived after the move it was refusing, and\na consumer who declared `index` had it overwritten on the next press.\n\nThe shape is `Carousel`'s, which is the nearest thing in the library: a\n`default-index` for markup that only seeds, a held state that is\n`undefined` until somebody sets one, and a mode decided once at the first\nupdate so a later assignment cannot take the tour over.",
               "attribute": "index",
               "helix": {
                 "controlled": [
                   "helix-change"
                 ]
               },
+              "inheritedFrom": {
+                "name": "HelixBaseTour",
+                "module": "src/tour/root/tour-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultIndex",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Stop to start on, where nothing declared one.",
+              "attribute": "default-index",
+              "inheritedFrom": {
+                "name": "HelixBaseTour",
+                "module": "src/tour/root/tour-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "indexState",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The stop being shown, whoever set it, and `undefined` until somebody has.",
+              "inheritedFrom": {
+                "name": "HelixBaseTour",
+                "module": "src/tour/root/tour-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "indexMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the stop, decided once and then fixed.",
+              "inheritedFrom": {
+                "name": "HelixBaseTour",
+                "module": "src/tour/root/tour-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "indexIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseTour",
                 "module": "src/tour/root/tour-root.ts"
@@ -71537,7 +71591,7 @@
                   "text": "void"
                 }
               },
-              "description": "Leaves the run early, which is a close rather than a completion.",
+              "description": "Leaves the run early, which is a close rather than a completion.\n\nAnnounced before it is applied, and cancelable because of it. Both closes\nwrote `open` first and dispatched after, so a consumer calling\n`preventDefault` was refusing something that had already happened.",
               "type": {
                 "text": "skip() => void"
               },
@@ -71751,7 +71805,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTour",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/tour"
           },
           "summary": "A guided run through an interface, one stop at a time.",
           "helix": {
@@ -71827,9 +71881,21 @@
               "type": {
                 "text": "number"
               },
-              "default": "0",
-              "description": "Which stop the reader is on.",
+              "description": "Which stop the reader is on.\n\n**It said `@controlled` for two days and honoured none of it.** The tag is\na claim that a consumer may own the value, and `index` was a plain property\nthe tour wrote to directly: `move` assigned it and *then* announced, so\n`preventDefault` on the change arrived after the move it was refusing, and\na consumer who declared `index` had it overwritten on the next press.\n\nThe shape is `Carousel`'s, which is the nearest thing in the library: a\n`default-index` for markup that only seeds, a held state that is\n`undefined` until somebody sets one, and a mode decided once at the first\nupdate so a later assignment cannot take the tour over.",
               "fieldName": "index",
+              "inheritedFrom": {
+                "name": "HelixBaseTour",
+                "module": "src/tour/root/tour-root.ts"
+              }
+            },
+            {
+              "name": "default-index",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Stop to start on, where nothing declared one.",
+              "fieldName": "defaultIndex",
               "inheritedFrom": {
                 "name": "HelixBaseTour",
                 "module": "src/tour/root/tour-root.ts"
@@ -72330,7 +72396,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTourStop",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/tour"
           },
           "summary": "One stop on a tour: what it points at, and a panel to say it in.",
           "helix": {
@@ -73204,7 +73270,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTreeItem",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/tree"
           },
           "summary": "One node in a tree.",
           "helix": {
@@ -74057,7 +74123,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTree",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/tree"
           },
           "summary": "A tree of items, navigable entirely from the keyboard.",
           "helix": {
@@ -74316,7 +74382,7 @@
           ],
           "superclass": {
             "name": "HelixBaseTrend",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/trend"
           },
           "summary": "Which way a measurement moved, and whether that is good news.",
           "helix": {
@@ -74722,7 +74788,7 @@
           ],
           "superclass": {
             "name": "HelixBaseVideoPlaylistItem",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/video-playlist"
           },
           "summary": "One entry in a video playlist.",
           "helix": {
@@ -75177,7 +75243,7 @@
           ],
           "superclass": {
             "name": "HelixBaseVideoPlaylistMenu",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/video-playlist"
           },
           "summary": "The playlist's entries, as a menu inside the player's control bar.",
           "helix": {
@@ -75699,7 +75765,7 @@
           ],
           "superclass": {
             "name": "HelixBaseVideoPlaylist",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/video-playlist"
           },
           "summary": "A set of clips and the one player they take turns in.",
           "helix": {
@@ -77362,7 +77428,7 @@
           ],
           "superclass": {
             "name": "HelixBaseVideo",
-            "package": "@helix-io/headless"
+            "package": "@helix-io/headless/video"
           },
           "summary": "Plays a video, with controls this library draws rather than the\nbrowser's.",
           "helix": {

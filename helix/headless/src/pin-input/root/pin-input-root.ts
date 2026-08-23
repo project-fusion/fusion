@@ -37,7 +37,7 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * places to put one code.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
  * @documentation https://helix.fusion.dev/components/pin-input

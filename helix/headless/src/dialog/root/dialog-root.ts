@@ -47,7 +47,7 @@ import { property } from 'lit/decorators.js'
  * nothing when pointed at a custom one.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @aliases Modal, Lightbox, Sheet
  * @documentation https://helix.fusion.dev/components/dialog

@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseDialog } from '@helix-io/headless'
+import { HelixBaseDialog } from '@helix-io/headless/dialog'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './dialog-root.css.js'
@@ -14,7 +14,7 @@ import { styles } from './dialog-root.css.js'
  * dialog rather than being a div somebody positioned.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @aliases Modal, Lightbox, Sheet
  * @documentation https://helix.fusion.dev/components/dialog

@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseCommand } from '@helix-io/headless'
+import { HelixBaseCommand } from '@helix-io/headless/command'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect imports: this renders both, and a custom element registers on
    import, so a consumer importing this family alone would otherwise get two
@@ -19,7 +19,7 @@ import { styles } from './command-root.css.js'
  * otherwise walk up and down the screen under the words being typed.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @documentation https://helix.fusion.dev/components/command
  *

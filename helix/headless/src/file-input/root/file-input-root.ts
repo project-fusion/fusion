@@ -93,7 +93,7 @@ const kind = (file: File): string => {
  * carries the way to take it back out.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases FileUpload, FilePicker, Dropzone, InputFile
  * @documentation https://helix.fusion.dev/components/file-input

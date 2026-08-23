@@ -11877,7 +11877,7 @@
           "helix": {
             "category": "navigation",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/command",
             "aliases": [
               "Command palette",
@@ -15717,7 +15717,7 @@
           "helix": {
             "category": "overlays",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/dialog",
             "aliases": [
               "Modal",
@@ -18968,7 +18968,7 @@
           "helix": {
             "category": "forms",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/file-input",
             "aliases": [
               "FileUpload",
@@ -27676,7 +27676,7 @@
           "helix": {
             "category": "feedback",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/meter",
             "aliases": [
               "Gauge",
@@ -32763,7 +32763,7 @@
           "helix": {
             "category": "forms",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/pin-input",
             "aliases": [
               "PinField",
@@ -33250,7 +33250,7 @@
           "helix": {
             "category": "overlays",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/popover",
             "aliases": [
               "Popper",
@@ -33595,7 +33595,7 @@
           "helix": {
             "category": "feedback",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/progress",
             "aliases": [
               "Progress bar",

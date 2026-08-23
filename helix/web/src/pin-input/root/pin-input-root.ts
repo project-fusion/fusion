@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBasePinInput } from '@helix-io/headless'
+import { HelixBasePinInput } from '@helix-io/headless/pin-input'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
@@ -22,7 +22,7 @@ import { styles } from './pin-input-root.css.js'
  * breathe as a code is typed into it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
  * @documentation https://helix.fusion.dev/components/pin-input

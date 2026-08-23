@@ -37,7 +37,7 @@ import { property } from 'lit/decorators.js'
  * without measuring anything itself.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Progress bar, Loading bar
  * @documentation https://helix.fusion.dev/components/progress

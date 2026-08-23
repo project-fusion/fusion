@@ -61,7 +61,7 @@ const parse = (hotkey: string) => {
  * palette is used far more often than either.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Command palette, Quick open, Spotlight
  * @documentation https://helix.fusion.dev/components/command

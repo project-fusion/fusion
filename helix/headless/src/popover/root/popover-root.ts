@@ -37,7 +37,7 @@ import { property } from 'lit/decorators.js'
  * slotted into it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @aliases Popper, Flyout, Overlay
  * @documentation https://helix.fusion.dev/components/popover
