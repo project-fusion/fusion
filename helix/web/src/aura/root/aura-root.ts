@@ -2,6 +2,7 @@ import { customElement, HelixElement, type TokenColor, TokenColorController } fr
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
+import { tiltFor } from './aura-axis.js'
 import { styles } from './aura-root.css.js'
 import { FRAGMENT, INTERACTIONS, SHAPES, VERTEX } from './aura-shader.js'
 
@@ -674,43 +675,23 @@ export class HelixAura extends HelixElement {
   /**
    * The angle actually drawn, which is `terminus` resolved against the box.
    *
-   * `atan` of the run over the rise, the run being the fraction of the width
-   * the exit is asked for and the rise the box's own height. A getter rather
-   * than a stored value because the box changes and this has no business
-   * knowing when: it is read once per frame from numbers that are already
+   * A getter rather than a stored value because the box changes and this has no
+   * business knowing when: it is read once per frame from numbers already
    * there.
+   *
+   * The solve is `tiltFor` in `aura-axis.ts` rather than an expression here,
+   * and that is the fix for how this went wrong twice. Both times the
+   * arithmetic sat inside this getter next to a sentence describing different
+   * arithmetic, and nothing in the repository could tell they disagreed. It is
+   * callable now, and `aura-root.dom.spec.ts` runs it against a model of the
+   * shader in both directions. See 155.
    */
   private get bearing(): number {
     if (this.terminus === undefined) {
       return this.tilt
     }
     const { height, width } = this.box
-    const aspect = width / Math.max(height, 1)
-    /* Solved against where the shader actually puts the axis, which is not
-       where `terminus * width / height` put it.
-    
-       The fragment shader stretches `p.x` by the aspect *before* it rotates, so
-       the tilt it takes is a slope in the unstretched, box-normalized frame,
-       and the exit it produces on screen is
-    
-         0.5 + tan(tilt) / (2 * aspect^2)
-    
-       as a fraction of the width. The aspect appears squared because it is paid
-       twice: once turning the asked-for screen angle into the rotation applied
-       in the stretched space, and again turning the resulting offset back into
-       screen x.
-    
-       The old expression corrected for the aspect once, in the wrong direction,
-       and never subtracted the centre. So the number behaved as an offset from
-       the middle rather than a position across the width, and one that moved
-       with the box: on a 1440 by 1800 hero, `0.5` landed the axis at 81.3% of
-       the width and `0` was the only value that reached the middle, while the
-       docstring promised the middle at `0.5` and an edge at `1`.
-    
-       Inverting the shader's own expression is what makes those two agree:
-       `0` is the left edge, `0.5` the middle and `1` the right edge, at every
-       box, which is what the property was added to be able to say. */
-    return (Math.atan(2 * (this.terminus - 0.5) * aspect * aspect) * 180) / Math.PI
+    return tiltFor(this.terminus, width / Math.max(height, 1))
   }
 
   private drifted(base: number, span: number, seed: number): number {
