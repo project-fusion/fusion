@@ -26,22 +26,22 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 60 |
+| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 63 |
 | `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 27 |
-| `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 18 |
+| `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 17 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 21 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 42 |
 | `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | 10 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 12 |
-| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 156 |
+| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 161 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 96 |
-| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 69 |
+| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 68 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 26 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 11 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 3 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 4 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 123 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 122 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 73 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 5 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
@@ -110,7 +110,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-none` | `var(--_helix-scale-0)` | 114 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 146 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 132 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 130 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 129 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 80 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 68 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 36 |
@@ -152,7 +152,7 @@ Font size.
 | `--helix-text-lg` | `var(--_helix-size-18)` | 11 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 11 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 6 |
-| `--helix-text-3xl` | `var(--_helix-size-44)` | 8 |
+| `--helix-text-3xl` | `var(--_helix-size-44)` | 7 |
 | `--helix-text-control` | `var(--helix-text-sm)` | 3 |
 
 ## weight
@@ -162,7 +162,7 @@ The three weights.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-weight-regular` | `400` | 11 |
-| `--helix-weight-medium` | `500` | 70 |
+| `--helix-weight-medium` | `500` | 69 |
 | `--helix-weight-semibold` | `600` | 29 |
 
 ## leading
@@ -174,7 +174,7 @@ Line height. The three steps are unitless and scale with the size; the heading o
 | `--helix-leading-tight` | `1.2` | 20 |
 | `--helix-leading-normal` | `1.5` | 24 |
 | `--helix-leading-loose` | `1.7` | 0 |
-| `--helix-leading-heading` | `calc(0.99em + 0.5rem)` | 10 |
+| `--helix-leading-heading` | `calc(0.99em + 0.5rem)` | 9 |
 
 ## tracking
 
@@ -182,7 +182,7 @@ Letter spacing.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-tracking-tight` | `-0.01em` | 20 |
+| `--helix-tracking-tight` | `-0.01em` | 19 |
 | `--helix-tracking-normal` | `0` | 13 |
 | `--helix-tracking-wide` | `0.02em` | 9 |
 
@@ -192,7 +192,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 125 |
+| `--helix-border-thin` | `1px` | 124 |
 | `--helix-border-thick` | `2px` | 35 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 1 |
 | `--helix-border-floating` | `0` | 10 |
@@ -246,7 +246,7 @@ The shape of the curve it takes it along.
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 33 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 30 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 1 |
-| `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 3 |
+| `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 2 |
 
 ## size
 
