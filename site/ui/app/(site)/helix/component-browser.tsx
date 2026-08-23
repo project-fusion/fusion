@@ -100,6 +100,22 @@ const titleCase = (word: string): string => word.charAt(0).toUpperCase() + word.
  * Slugs are checked against `[a-z0-9-]` before they reach that stylesheet.
  * Nothing here is reader-supplied today, since they come from the manifest, but
  * a value interpolated into CSS is a value interpolated into CSS.
+ *
+ * **The rule is scoped by an attribute this component writes, never by a class
+ * the page does.** It said `.familyGrid`, which is a CSS module identifier: the
+ * page renders that grid as `gallery-module__uieGra__familyGrid`, so the
+ * emitted selector matched nothing and every card stayed on screen. Everything
+ * else worked, which is what made it invisible. The URL took `?q=`, the live
+ * region announced "1 of 89 components", the empty state stood ready, and the
+ * one line that does the hiding was addressed to a class that has never existed
+ * in the document. Measured on the running page:
+ * `document.querySelectorAll('.familyGrid > [data-slug]')` returned 0 while the
+ * grid held 89 of them.
+ *
+ * `data-filtered-grid` sits on the band below, four lines from the rule that
+ * reads it, and both are written here. That is the whole of the fix: a
+ * generated class name cannot be named from a template string, and the only way
+ * not to want to is to have nothing outside this file to name.
  */
 export function ComponentBrowser({
   children,
@@ -478,12 +494,12 @@ export function ComponentBrowser({
         <style>
           {hidden
             .filter((slug) => /^[a-z0-9-]+$/.test(slug))
-            .map((slug) => `.familyGrid > [data-slug="${slug}"]{display:none}`)
+            .map((slug) => `[data-filtered-grid] [data-slug="${slug}"]{display:none}`)
             .join('')}
         </style>
       )}
 
-      <div className={browser.gridBand} data-shell>
+      <div className={browser.gridBand} data-filtered-grid data-shell>
         {shown === 0 ? (
           <helix-empty>
             <helix-text as="h2" slot="heading">

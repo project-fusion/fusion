@@ -44,6 +44,14 @@ const titleCase = (word: string): string => word.charAt(0).toUpperCase() + word.
  * stylesheet: nothing here is reader-supplied today, since they come from the
  * registry, but a value interpolated into CSS is a value interpolated into CSS.
  *
+ * **Scoped by an attribute this file writes, never by a class the page does.**
+ * It said `.insightGrid`, which is a CSS module identifier and reaches the
+ * document as `insights-module__AoKrvW__insightGrid`, so the rule matched
+ * nothing and every card stayed up. The same line was wrong on the component
+ * gallery in the same way, and both were silent for the same reason: the URL,
+ * the count and the empty state are all computed from `hidden`, so everything
+ * downstream of the filter agreed it had run.
+ *
  * No lattice and no shines. Those belong to a page whose cards are drawings on
  * that same field, and repeating them here would be decoration quoting a reason
  * that does not apply.
@@ -273,12 +281,12 @@ export function InsightBrowser({
         <style>
           {hidden
             .filter((slug) => /^[a-z0-9-]+$/.test(slug))
-            .map((slug) => `.insightGrid > [data-slug="${slug}"]{display:none}`)
+            .map((slug) => `[data-filtered-grid] [data-slug="${slug}"]{display:none}`)
             .join('')}
         </style>
       )}
 
-      <div className={browser.gridBand} data-shell>
+      <div className={browser.gridBand} data-filtered-grid data-shell>
         {shown === 0 ? (
           <helix-empty>
             <helix-text as="h2" slot="heading">
