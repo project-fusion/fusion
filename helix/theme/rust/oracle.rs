@@ -38,6 +38,11 @@
 
 use serde_json::Value;
 
+use crate::intent::{
+    is_relation, status_seed, to_oklch, Color, From, Relation, Seed, STATUS_CHROMA, STATUS_HUE,
+    STATUS_NAMES,
+};
+use crate::model::{GROUNDS, INKS};
 use crate::oklch::{
     contrast_ratio, fit_to_gamut, hex_to_oklch, is_out_of_gamut, lightness_for_contrast,
     oklch_to_hex, relative_luminance, shipped_contrast_ratio, shipped_luminance, Oklch,
@@ -321,4 +326,129 @@ fn a_hex_that_is_not_one_is_refused_rather_than_carried() {
     ] {
         assert!(hex_to_oklch(text).is_none(), "{text} should not parse");
     }
+}
+
+/// The model is data, so it cannot drift by a float. It drifts by a typo in a
+/// token name, which solves a pair against a ground nobody paints or emits an
+/// ink nobody reads, and neither compiler would say a word. Name for name,
+/// order included, since the order is what `defaultPairings` walks.
+#[test]
+fn the_surface_model_is_the_one_the_typescript_declares() {
+    let data = oracle();
+    let grounds = data["grounds"].as_array().expect("grounds is an array");
+    assert_eq!(
+        GROUNDS.len(),
+        grounds.len(),
+        "a different number of grounds"
+    );
+    for (mine, theirs) in GROUNDS.iter().zip(grounds) {
+        assert_eq!(
+            mine.name,
+            theirs["name"].as_str().expect("name is a string")
+        );
+        assert_eq!(
+            mine.bounded,
+            theirs["bounded"].as_bool().expect("bounded is a bool"),
+            "{} disagrees about whether its ground is knowable",
+            mine.name
+        );
+    }
+
+    let inks = data["inks"].as_array().expect("inks is an array");
+    assert_eq!(INKS.len(), inks.len(), "a different number of inks");
+    for (mine, theirs) in INKS.iter().zip(inks) {
+        assert_eq!(
+            mine.name,
+            theirs["name"].as_str().expect("name is a string")
+        );
+        assert_eq!(
+            mine.contrast.as_str(),
+            theirs["contrast"].as_str().expect("contrast is a string"),
+            "{} answers to a different target",
+            mine.name
+        );
+        let theirs_grounds: Vec<&str> = theirs["grounds"]
+            .as_array()
+            .expect("grounds is an array")
+            .iter()
+            .map(|name| name.as_str().expect("a ground name is a string"))
+            .collect();
+        assert_eq!(
+            mine.grounds, theirs_grounds,
+            "{} lands on different grounds",
+            mine.name
+        );
+    }
+}
+
+/// Every ink names grounds that exist. The TypeScript cannot check this either,
+/// its ground list being strings, so a rename in one list and not the other is a
+/// pair solved against nothing.
+#[test]
+fn every_ground_an_ink_names_is_a_ground() {
+    let known: Vec<&str> = GROUNDS.iter().map(|ground| ground.name.as_str()).collect();
+    for ink in INKS.iter() {
+        for ground in &ink.grounds {
+            assert!(
+                known.contains(&ground.as_str()),
+                "{} names `{ground}`, which is not a ground",
+                ink.name
+            );
+        }
+    }
+}
+
+#[test]
+fn the_status_tables_are_the_ones_the_typescript_declares() {
+    let data = oracle();
+    for (at, name) in STATUS_NAMES.iter().enumerate() {
+        let (hue, chroma) = status_seed(name).expect("a named status has a seed");
+        assert_eq!(
+            hue.to_bits(),
+            number(&data["statuses"]["hue"], name).to_bits(),
+            "{name} hue"
+        );
+        assert_eq!(
+            chroma.to_bits(),
+            number(&data["statuses"]["chroma"], name).to_bits(),
+            "{name} chroma"
+        );
+        /* By bits, like everything else here: these are the same literal twice
+        and clippy is right that `==` on a float is usually a question rather
+        than an answer. */
+        assert_eq!(hue.to_bits(), STATUS_HUE[at].to_bits());
+        assert_eq!(chroma.to_bits(), STATUS_CHROMA[at].to_bits());
+    }
+    assert!(
+        status_seed("nonsense").is_none(),
+        "an unknown status has no seed"
+    );
+}
+
+#[test]
+fn a_colour_is_a_triple_however_it_was_written() {
+    let hex = Color::Hex("#3b82f6".to_owned());
+    let triple = to_oklch(&hex).expect("a valid hex converts");
+    assert_eq!(
+        to_oklch(&Color::Oklch(triple)),
+        Some(triple),
+        "a triple is returned as it came"
+    );
+    assert_eq!(
+        to_oklch(&Color::Hex("nonsense".to_owned())),
+        None,
+        "a bad hex is refused"
+    );
+}
+
+#[test]
+fn a_seed_says_what_it_is_or_how_it_relates() {
+    let relation = Seed::Relation(Relation {
+        allowance: None,
+        chroma: None,
+        from: From::Brand,
+        rotate: 180.0,
+    });
+    assert!(is_relation(&relation));
+    assert!(!is_relation(&Seed::Color(Color::Hex("#3b82f6".to_owned()))));
 }

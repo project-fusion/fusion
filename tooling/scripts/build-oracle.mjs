@@ -30,7 +30,8 @@
  * `bun run check:oracle` and part of `bun run verify`.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-
+import { STATUS_CHROMA, STATUS_HUE } from '../../helix/theme/src/intent.ts'
+import { GROUNDS, INKS } from '../../helix/theme/src/model.ts'
 import {
   contrastRatio,
   fitToGamut,
@@ -111,10 +112,15 @@ const oracle = {
       shippedLuminance: shippedLuminance(color),
     }
   }),
+  /* The model is data, so it cannot drift by a float. It drifts by a typo in a
+     token name, which solves a pair against a ground nobody paints and which no
+     compiler on either side would mention. */
+  grounds: GROUNDS,
   hexes: HEXES.map((hex) => {
     const color = hexToOklch(hex)
     return { ...color, hex, roundTrip: oklchToHex(color) }
   }),
+  inks: INKS,
   pairs: BACKGROUNDS.flatMap((background) =>
     colors.slice(0, 60).map((color) => ({
       background,
@@ -145,6 +151,8 @@ const oracle = {
     ),
   ),
 }
+
+oracle.statuses = { chroma: STATUS_CHROMA, hue: STATUS_HUE }
 
 const written = `${JSON.stringify(oracle, null, 2)}\n`
 

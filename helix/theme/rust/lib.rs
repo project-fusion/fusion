@@ -12,6 +12,8 @@
 //! by `bun run oracle` and asserted here byte for byte, so agreement is measured
 //! on every `cargo test` rather than assumed from a reading of both files. The
 //! TypeScript goes when the crate answers for all of it.
+pub mod intent;
+pub mod model;
 pub mod oklch;
 
 #[cfg(test)]
