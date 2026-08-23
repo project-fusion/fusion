@@ -68,6 +68,23 @@ export class HelixFormElement extends HelixElement {
    *
    * What a component should bind to rather than `disabled`, which is only the
    * half of it the consumer wrote.
+   *
+   * @internal Read by the component itself and by nothing outside it: every
+   * call in the library is `this.isDisabled`. Public, it printed a row on
+   * twenty-four families in both tiers, forty-eight in all, on every form
+   * control's reference page, and it is the largest single entry in those
+   * tables.
+   *
+   * **A consumer loses nothing, which was measured rather than assumed.**
+   * `element.matches(':disabled')` answers the same question, is the platform's
+   * own, and works on a native control too. Checked in a browser across the
+   * three cases: a control disabled by its own attribute, one inside a
+   * `<fieldset>` before and after that fieldset is disabled, and one that is
+   * neither. `:disabled` agreed with `isDisabled` in every one, including the
+   * inheritance case that is the only reason this getter exists.
+   *
+   * Documented away rather than made `protected`, because a subclass in
+   * `helix/web` binds to it and that is exactly what it is for.
    */
   get isDisabled(): boolean {
     return this.disabled || this.formDisabled
