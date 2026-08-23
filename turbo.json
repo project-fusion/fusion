@@ -5,10 +5,14 @@
   // watches for undeclared environment access stays meaningful.
   "globalPassThroughEnv": ["GITHUB_OUTPUT", "NODE_AUTH_TOKEN"],
   "tasks": {
+    // `cem analyze` writes three files and this used to claim one. The manifest
+    // is the obvious output; `jsx.d.ts` and `vue.d.ts` are written beside it by
+    // the JSX and Vue plugins, and an output a task does not declare is one a
+    // cache hit does not restore.
     "analyze": {
       "dependsOn": ["^build", "build"],
       "inputs": ["src/**", "custom-elements-manifest.config.ts"],
-      "outputs": ["custom-elements.json"]
+      "outputs": ["custom-elements.json", "jsx.d.ts", "vue.d.ts"]
     },
     "build": {
       "dependsOn": ["^build", "^analyze", "icons", "styles"],
@@ -19,6 +23,12 @@
       "cache": false,
       "persistent": true
     },
+    // The fourth layer is `helix/web/elements.css` and it was not in `inputs`,
+    // so editing any component stylesheet did not invalidate this. `dependsOn`
+    // orders the two tasks and ordering is not invalidation: the sandbox
+    // stylesheet, which is also what the browser spec runner serves as its
+    // whole token layer, could sit a build behind the components it is meant to
+    // paint.
     "frame": {
       "dependsOn": ["^build"],
       "inputs": [
@@ -26,6 +36,7 @@
         "lib/preview-frame.css",
         "app/fonts/**",
         "$TURBO_ROOT$/helix/styles/src/*.css",
+        "$TURBO_ROOT$/helix/web/elements.css",
         "$TURBO_ROOT$/tooling/scripts/build-frame.mjs"
       ],
       "outputs": ["public/sandbox/**"]
@@ -34,13 +45,20 @@
       "inputs": ["icons.txt", "raw/**", "$TURBO_ROOT$/tooling/scripts/build-icons.mjs"],
       "outputs": ["src/generated.ts"]
     },
+    // Two generators, two outputs. `build-styles.mjs` writes the `.css.ts`
+    // mirrors and `build-elements-css.mjs` writes `elements.css` at the package
+    // root, and only the first was declared. Measured: delete `elements.css`
+    // with a warm cache and `bun run styles` prints "2 successful, 2 total"
+    // while the file stays missing, because a cache hit restores what a task
+    // claims and nothing else. The next thing to read it fails, which is how
+    // this was found: `build-frame.mjs` on ENOENT.
     "styles": {
       "inputs": [
         "src/**/*.css",
         "$TURBO_ROOT$/tooling/scripts/build-styles.mjs",
         "$TURBO_ROOT$/tooling/scripts/build-elements-css.mjs"
       ],
-      "outputs": ["src/**/*.css.ts"]
+      "outputs": ["src/**/*.css.ts", "elements.css"]
     },
     "test": {
       "dependsOn": ["^build"],
