@@ -88,11 +88,42 @@ export interface Window {
  * between scroll offset and index, which never disagrees with itself. Rows of
  * genuinely different heights are a different component and a harder one.
  */
+/**
+ * How many times an update this asked for may change the answer again.
+ *
+ * **A measurement that its own render moves has no fixed point, and nothing
+ * here could previously stop looking for one.** `clientHeight` is meant to be a
+ * fact about the box, true of any real scroller, and false of a box with no
+ * height: there it is a function of the rows just drawn, so `measure` renders,
+ * the render changes the height, and the next measurement disagrees.
+ *
+ * It does not even diverge, which is what made it hard to see. Measured on the
+ * headless tier with 500 rows and no height on the viewport, it converged
+ * toward a non-integer and then oscillated between 378 and 379 rows forever,
+ * 2505 passes in eight seconds. The loop runs on microtasks, so timers never
+ * fire, and every deadline written to catch this, the harness's 2000ms race and
+ * the spec's own bounded `settle`, is a `setTimeout` that cannot run. The page
+ * simply stops.
+ *
+ * Ten, because a legitimate settling is two or three: nothing, then the real
+ * height, then agreement.
+ */
+const UNSTABLE = 10
+
 export class VirtualizeController implements ReactiveController {
   private readonly host: ReactiveControllerHost
   private readonly options: VirtualizeOptions
   private observer: ResizeObserver | undefined
   private watching = false
+
+  /** Consecutive measurements that moved the window with nothing outside asking. */
+  private settling = 0
+
+  /** Whether the consumer has been told their box cannot be measured. */
+  private warned = false
+
+  /** The host's own inputs, so a change in them is not read as a runaway. */
+  private last: { count: number; estimate: number } | undefined
 
   /** The slice to render, recomputed on scroll and on resize. */
   window: Window = { after: 0, before: 0, first: 0, last: 0 }
@@ -110,6 +141,16 @@ export class VirtualizeController implements ReactiveController {
        element. `CollapseController` shipped exactly that bug and it was
        invisible: the first measurement was right, so the only symptom was a
        window that never moved again. */
+    /* **The count is deliberately not cleared here, and clearing it was the
+       first attempt.** A resize looks like an outside cause and is not one when
+       the box has no height of its own: the render this controller asked for is
+       what changed the size, so the observer fires on every pass and resets the
+       very counter meant to notice that. Measured: the guard made no difference
+       at all, 7776 passes in twenty-five seconds, identical to having none.
+
+       Nothing is lost by leaving it. A genuine resize changes the window once
+       and the next measurement agrees, which clears the count through `same`. A
+       runaway never agrees, which is the whole distinction. */
     this.observer = new ResizeObserver(() => {
       this.measure()
     })
@@ -139,6 +180,8 @@ export class VirtualizeController implements ReactiveController {
   /* `passive`, because this never calls `preventDefault` and saying so lets the
      browser scroll without waiting to find out. */
   private readonly handleScroll = (): void => {
+    // A reader moved, which is the one input this exists to answer.
+    this.settling = 0
     this.measure()
   }
 
@@ -167,15 +210,60 @@ export class VirtualizeController implements ReactiveController {
       first,
       last,
     }
+    /* The host's own numbers changing is an outside cause, the same as a scroll
+       or a resize: a set that grew is not this controller chasing itself. */
+    if (this.last?.count !== total || this.last.estimate !== size) {
+      this.last = { count: total, estimate: size }
+      this.settling = 0
+    }
+
     const same =
       next.first === this.window.first &&
       next.last === this.window.last &&
       next.before === this.window.before &&
       next.after === this.window.after
     if (same) {
+      // It settled, so nothing that came before it was a runaway either.
+      this.settling = 0
       return
     }
+
+    if (this.settling >= UNSTABLE) {
+      /* Hold what is *rendered*, which is `this.window`, rather than adopting a
+         reading nothing will draw. Refusing the update and keeping `next` would
+         leave the two disagreeing with no way back: the next measurement would
+         find them the same and do nothing. */
+      this.report()
+      return
+    }
+
+    this.settling += 1
     this.window = next
     this.host.requestUpdate()
+  }
+
+  /**
+   * Says once that the box cannot be measured, and why.
+   *
+   * A warning rather than a throw, because the list still works: it holds a
+   * window, it draws rows, and a reader can scroll. What it cannot do is choose
+   * the window well, and that is the consumer's stylesheet to fix, not
+   * something this can decide on their behalf.
+   *
+   * Once per controller, for the reason `requestControlledChange` gives about
+   * its own audit: a warning per frame is one people filter out.
+   */
+  private report(): void {
+    if (this.warned) {
+      return
+    }
+    this.warned = true
+    console.warn(
+      `VirtualizeController: the window did not settle in ${UNSTABLE} passes, so it is holding ` +
+        'the last one. That happens when the scrolling box has no height of its own: its ' +
+        '`clientHeight` is then a function of the rows just drawn, so measuring moves what is ' +
+        'being measured and the two never agree. Give the container a block size and an ' +
+        'overflow, which is what the styled tier does and what a headless consumer has to.',
+    )
   }
 }

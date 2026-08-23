@@ -79,7 +79,8 @@
     "check:routes": "bun tooling/scripts/check-routes.mjs",
     "catalog": "bun tooling/scripts/build-catalog.mjs",
     "oracle": "bun tooling/scripts/build-oracle.mjs",
-    "check:oracle": "bun tooling/scripts/build-oracle.mjs --check"
+    "check:oracle": "bun tooling/scripts/build-oracle.mjs --check",
+    "probe:stuck": "bun tooling/scripts/probe-stuck-spec.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",

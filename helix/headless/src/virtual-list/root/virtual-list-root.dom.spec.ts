@@ -1,9 +1,35 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, mount, part, registerDom, type Updatable } from '@helix-io/testing/dom'
 
+/**
+ * The box the headless tier does not draw, and the list cannot work without.
+ *
+ * **A virtual list needs a scroller, and on this tier the consumer provides
+ * one.** The styled tier's sheet gives `[part="viewport"]` a `block-size` and
+ * `overflow-y: auto`; `helix/headless` ships no CSS at all, so a base list
+ * standing alone is a box with no height that does not scroll. `scrollTop` is
+ * then always zero and `clientHeight` is whatever was just drawn.
+ *
+ * This spec did not do it, and that is the whole of why the family could not be
+ * run in a browser: measuring moved what was being measured, the two settled
+ * into a 378/379 oscillation, and the loop runs on microtasks so no timer could
+ * interrupt it. The base example next door has carried these two rules since it
+ * was written, which is where the shape of this came from.
+ *
+ * `::part()` because it is the published door into a shadow root, and a
+ * document rule beats a shadow one, so nothing here is fighting the component.
+ */
+const VIEWPORT = `helix-base-virtual-list::part(viewport) {
+  block-size: 12rem;
+  overflow-y: auto;
+}`
+
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  const sheet = document.createElement('style')
+  sheet.textContent = VIEWPORT
+  document.head.append(sheet)
 })
 
 /**

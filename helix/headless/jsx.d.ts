@@ -23313,6 +23313,30 @@ export type CustomElements = {
    * which is the same client-side enhancement rule every tree-reading component
    * here follows.
    *
+   * **On this tier the consumer gives the viewport its box**, and the component
+   * cannot do it for them: `helix/headless` ships no stylesheet, and a height is a
+   * decision rather than a fact this could publish. So a base list wants two rules
+   * before it is a list at all:
+   *
+   * ```css
+   * helix-base-virtual-list::part(viewport) {
+   *   block-size: 12rem;
+   *   overflow-y: auto;
+   * }
+   * ```
+   *
+   * **Without them it is not a scroller**, and the failure is worse than it
+   * sounds. `scrollTop` is always zero, so nothing ever windows; and the box has
+   * no height of its own, so `clientHeight` is a function of the rows just drawn.
+   * Measuring then moves what is being measured, and the two need not converge:
+   * measured in Chromium at 500 rows, it settled into a two-cycle between 378 and
+   * 379 rows and stayed there, at two and a half thousand passes in eight seconds.
+   * `VirtualizeController` gives up after ten passes and says so, so this now
+   * draws a bad window rather than stopping the page, but a bad window is still
+   * the answer until the rules are written.
+   *
+   * The styled tier writes them for you, with `--virtual-list-block-size`.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -23327,7 +23351,7 @@ export type CustomElements = {
    *
    * - `after`: The space standing in for rows below the window.
    * - `before`: The space standing in for rows above the window.
-   * - `viewport`: The scrolling box.
+   * - `viewport`: The scrolling box. Needs a block size and an overflow on this tier.
    */
   "helix-base-virtual-list": Partial<
     HelixBaseVirtualListProps & BaseProps<HelixBaseVirtualList> & BaseEvents
@@ -34744,6 +34768,30 @@ export type CustomElementsSolidJs = {
    * which is the same client-side enhancement rule every tree-reading component
    * here follows.
    *
+   * **On this tier the consumer gives the viewport its box**, and the component
+   * cannot do it for them: `helix/headless` ships no stylesheet, and a height is a
+   * decision rather than a fact this could publish. So a base list wants two rules
+   * before it is a list at all:
+   *
+   * ```css
+   * helix-base-virtual-list::part(viewport) {
+   *   block-size: 12rem;
+   *   overflow-y: auto;
+   * }
+   * ```
+   *
+   * **Without them it is not a scroller**, and the failure is worse than it
+   * sounds. `scrollTop` is always zero, so nothing ever windows; and the box has
+   * no height of its own, so `clientHeight` is a function of the rows just drawn.
+   * Measuring then moves what is being measured, and the two need not converge:
+   * measured in Chromium at 500 rows, it settled into a two-cycle between 378 and
+   * 379 rows and stayed there, at two and a half thousand passes in eight seconds.
+   * `VirtualizeController` gives up after ten passes and says so, so this now
+   * draws a bad window rather than stopping the page, but a bad window is still
+   * the answer until the rules are written.
+   *
+   * The styled tier writes them for you, with `--virtual-list-block-size`.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -34758,7 +34806,7 @@ export type CustomElementsSolidJs = {
    *
    * - `after`: The space standing in for rows below the window.
    * - `before`: The space standing in for rows above the window.
-   * - `viewport`: The scrolling box.
+   * - `viewport`: The scrolling box. Needs a block size and an overflow on this tier.
    */
   "helix-base-virtual-list": Partial<
     HelixBaseVirtualListProps &
