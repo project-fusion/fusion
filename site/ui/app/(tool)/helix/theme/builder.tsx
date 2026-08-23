@@ -656,18 +656,43 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               mechanism. `instant` is neither a pace nor a curve but the absence
               of both, and it emits no easings at all, three curves for
               transitions of zero length being a contradiction. */}
-            <helix-toggle-group
+            {/* **A select, and it is the one of the three that has to be.** Six
+              characters do not fit a form this narrow: measured, the track
+              wanted 420px against a 312px host, so `Instant` sat 79px past the
+              panel's right edge with nothing on screen to say a value was
+              missing. Toggle Group wraps now rather than losing a segment, which
+              is the right thing for it to do everywhere and the wrong thing
+              here, where four across and two below reads as a control that ran
+              out of room. The two separation groups keep their segments, because
+              four and three fit at the widths this pane actually takes and the
+              wrap is there for the extreme.
+
+              What is lost is worth naming: a segmented control shows the whole
+              set, and trying characters on is the one thing a reader does here
+              repeatedly. Six labels they cannot read is not a better version of
+              that. */}
+            {/* **The placeholder is the resting state's name, not an invitation.**
+              Select shows the chosen options' words or its placeholder, and an
+              option whose value is the empty string contributes no word, so the
+              default character rendered as `Choose`: a control reporting that
+              nothing had been picked, for a theme that does have a pace, the
+              stylesheet's own. The option stays in the list so there is a way
+              back to it, and both states now read `Default`. */}
+            <helix-select
               label="Motion"
+              name="motion"
               onhelix-change={(event) => setMotion(event.detail.value as Character)}
+              placeholder="Default"
               value={motion}
             >
-              <helix-toggle value="">Default</helix-toggle>
-              <helix-toggle value="snappy">Snappy</helix-toggle>
-              <helix-toggle value="gentle">Gentle</helix-toggle>
-              <helix-toggle value="springy">Springy</helix-toggle>
-              <helix-toggle value="precise">Precise</helix-toggle>
-              <helix-toggle value="instant">Instant</helix-toggle>
-            </helix-toggle-group>
+              <helix-icon name="caret-down" slot="indicator"></helix-icon>
+              <helix-option value="">Default</helix-option>
+              <helix-option value="snappy">Snappy</helix-option>
+              <helix-option value="gentle">Gentle</helix-option>
+              <helix-option value="springy">Springy</helix-option>
+              <helix-option value="precise">Precise</helix-option>
+              <helix-option value="instant">Instant</helix-option>
+            </helix-select>
 
             {/* Two policies rather than one, because the two kinds of surface are
               not the same problem: a card sits on a ground the theme knows and a
