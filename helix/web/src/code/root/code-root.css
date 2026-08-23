@@ -8,7 +8,31 @@
  * in, because its x-height and its stems are heavier, so it is set a step down
  * the scale. See the note on `--code-size` below. */
 [part="code"] {
-  background-color: var(--helix-color-surface-raised);
+  /* A wash of the ink, not a surface, and the two modes are why.
+   *
+   * `--helix-color-surface-raised` is an absolute lightness and the page it
+   * sits on is not, so one token gave two very different chips: measured
+   * against the page by rasterising both, the step was 1.09 in light and 1.48
+   * in dark. That is the same chip reading as a tint in one mode and a solid
+   * block in the other, and it is what makes a fragment of code look crowded by
+   * the words beside it on a dark page while looking settled on a light one.
+   *
+   * A translucent mix composites against whatever is behind it, so one value is
+   * right everywhere. 6% measures 1.14 light and 1.10 dark: within four points
+   * of the light chip this replaces, and a third of the weight of the dark one.
+   * Tuned by measuring rather than by eye, 5 through 10, because the whole
+   * point is a number that means the same thing on both grounds.
+   *
+   * The same trade the ghost button's hover already makes for the same reason,
+   * and unlike a button this one is inline in a sentence, where a surface token
+   * is answering a question about planes that a run of text does not have.
+   *
+   * **The spacing was the suspected cause and was not.** The chip carries 4px
+   * either side against a 3.5px word space, so the gap next to a word is the
+   * ordinary space between any two words; next to punctuation the padding is
+   * already slightly too much, which is why `(` before a chip reads detached. A
+   * margin would have doubled that and made the punctuation worse. */
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
   border-radius: var(--helix-radii-sm);
   /* The prose's own ink, one step quieter, and not a syntax colour.
    *
