@@ -23,19 +23,30 @@ pub struct NeutralInks {
 
 /// Solves the three against the page ladder.
 ///
-/// **`foreground` is solved at 1.6 times the target rather than at it**, which
-/// is the one figure here that is not a specification. `muted` is the ink that
-/// answers to `contrastTarget` exactly, being the quietest thing on the page
-/// that still has to be read; body text sits well clear of the floor so there is
-/// somewhere quieter to stand that is still legible. Solving both at the same
-/// number would leave the two indistinguishable, which is #124's finding one
-/// step earlier: the readable range holds one quiet step, not two.
+/// **Three figures, and the TypeScript records a reason for none of them.**
+/// `foreground` is solved at 1.6 times the target, `muted` at the target
+/// exactly, and `border` at a flat 1.4 against the page alone rather than
+/// against the ladder. Those are three bare lines with no comment above them,
+/// so what follows is a reading rather than a record, and is marked as one
+/// because a comment in this repository is usually the second.
 ///
-/// **`border` answers to 1.4 and to no specification at all.** WCAG has nothing
-/// to say about a hairline between two surfaces: it is not text and it is not a
-/// control boundary, so 1.4 is a number chosen to be visible without drawing the
-/// eye, and it is solved against the page alone rather than the ladder, a border
-/// being drawn on the ground it separates rather than on every ground at once.
+/// The reading: `muted` is the quietest thing that still has to be read, so it
+/// is the ink that answers to `contrastTarget`, and body text standing well
+/// clear of the floor is what leaves somewhere quieter to stand. That much is
+/// consistent with #124, which measured the readable range as holding one quiet
+/// step and not two, and is recorded in the model's `NOT_EMITTED`. `border` is
+/// neither text nor a control boundary, so no WCAG figure applies to it at all,
+/// which is presumably why 1.4 is a number rather than a citation: the three
+/// places this engine *does* cite one all say 3:1 under 1.4.11 and say so out
+/// loud.
+///
+/// **What is worth checking before trusting any of that** is the one thing the
+/// port can check: the numbers themselves are asserted against the oracle, so a
+/// reader who disagrees with the reading can still rely on the behaviour.
+///
+/// `1.6` is not unique to `foreground`, which is a fact rather than a reading:
+/// the inverse pair uses the same multiplier, so whatever it is for, it is for
+/// body text on any ground rather than for the page in particular.
 #[must_use]
 pub fn neutral_inks(surfaces: Surfaces, neutral: Cast, contrast_target: f64) -> NeutralInks {
     let grounds = surfaces.solved_against();

@@ -47,11 +47,12 @@
 
 use serde_json::Value;
 
+use crate::derive::emphasis::emphasis;
 use crate::derive::inks::neutral_inks;
 use crate::derive::resolve::{brand_and_neutral, default_pairings, resolve, Policy};
 use crate::derive::solve::solve_against;
 use crate::derive::surfaces::{ladder, surfaces};
-use crate::derive::{perceptual_distance, token, Cast, DerivedToken, Origin};
+use crate::derive::{perceptual_distance, token, Cast, DerivedToken, Deriving, Origin};
 use crate::intent::{
     is_relation, status_seed, to_oklch, Chroma, Color, From, Mechanism, Relation, Scheme, Seed,
     Separation, Status, ThemeIntent, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
@@ -581,6 +582,16 @@ fn assert_token(mine: &DerivedToken, theirs: &Value, at: &str) {
         theirs["chromaReduced"].as_bool().expect("chromaReduced"),
         "{at}: chromaReduced"
     );
+    /* **The hex above is exact and the triple under it is not, and the difference
+    in kind is the point.** The hex is what ships; the triple is an intermediate,
+    and it inherits the one divergence this port has: `cbrt` and `atan2` in
+    `hex_to_oklch` differ from V8's by a last place on 6 of 45 components, so a
+    brand parsed an ulp out carries that ulp into every colour derived from it.
+    Traced rather than assumed: `#c1272d` parses to chroma 0.189192543111386 in
+    V8 and 0.18919254311138597 here, and `red`'s `color-primary` differs by
+    exactly that while emitting the same six hex digits. Held to the parse
+    tolerance, so a difference that is *not* the parse, a search taking a
+    different branch, still fails here, and would fail on the hex regardless. */
     for (label, mine, theirs) in [
         (
             "chroma",
@@ -594,9 +605,8 @@ fn assert_token(mine: &DerivedToken, theirs: &Value, at: &str) {
             number(&theirs["value"], "lightness"),
         ),
     ] {
-        assert_eq!(
-            mine.to_bits(),
-            theirs.to_bits(),
+        assert!(
+            (mine - theirs).abs() <= PARSE_TOLERANCE,
             "{at}: {label} is {mine:?} against {theirs:?}"
         );
     }
@@ -609,9 +619,8 @@ fn assert_token(mine: &DerivedToken, theirs: &Value, at: &str) {
         theirs.get("contrast").and_then(Value::as_f64),
     ) {
         (None, None) => {}
-        (Some(mine), Some(theirs)) => assert_eq!(
-            mine.to_bits(),
-            theirs.to_bits(),
+        (Some(mine), Some(theirs)) => assert!(
+            (mine - theirs).abs() <= PARSE_TOLERANCE,
             "{at}: contrast is {mine:?} against {theirs:?}"
         ),
         (mine, theirs) => {
@@ -949,4 +958,59 @@ fn the_solver_maximises_the_weakest_pairing() {
         "no input here distinguishes best-worst-case from best-best-case, so this test \
          would pass with the rule inverted"
     );
+}
+
+/// Builds the shared capture every phase after the ladder takes.
+fn deriving_for(label: &str) -> (crate::derive::resolve::Resolved, Deriving, Oklch) {
+    let intent = intent_for(label);
+    let resolved = resolve(&intent).expect("the oracle's intents all resolve");
+    let policy = Policy::new(resolved.chroma);
+    let (_raw, brand, neutral) = brand_and_neutral(&resolved, policy);
+    let built = surfaces(
+        resolved.scheme,
+        neutral,
+        ladder(resolved.separation.surface),
+    );
+    let ctx = Deriving {
+        contrast_target: resolved.contrast_target,
+        policy,
+        scheme: resolved.scheme,
+        surfaces: built,
+    };
+    (resolved, ctx, brand)
+}
+
+/// The emphasis role, which is the first phase that genuinely exercises the
+/// best-worst-case rule: it solves against the surfaces *and* the tint, and the
+/// tint is the ground that made the rule necessary.
+#[test]
+fn the_primary_role_lands_where_the_typescript_lands() {
+    let data = oracle();
+    for theme in data["themes"].as_array().expect("themes is an array") {
+        let label = theme["label"].as_str().expect("label");
+        let (_resolved, ctx, brand) = deriving_for(label);
+        let primary = emphasis(brand, &ctx);
+
+        /* `color-primary` reports against the page; the other four report
+        against nothing, which `assert_token` holds them to. */
+        assert_token(
+            &token(
+                "color-primary",
+                primary.raw,
+                Origin::Derived,
+                Some(ctx.surfaces.raw_background),
+            ),
+            token_of(theme, "color-primary"),
+            &format!("{label}/color-primary"),
+        );
+        for (name, raw) in [
+            ("color-primary-hover", primary.hover),
+            ("color-primary-active", primary.active),
+            ("color-primary-subtle", primary.subtle),
+            ("color-primary-surface", primary.filled),
+        ] {
+            let mine = token(name, raw, Origin::Derived, None);
+            assert_token(&mine, token_of(theme, name), &format!("{label}/{name}"));
+        }
+    }
 }

@@ -27,6 +27,7 @@
 //! reader tells a decision from a computation by, and the two things the audit
 //! turns on. The phases follow.
 
+pub mod emphasis;
 pub mod inks;
 pub mod resolve;
 pub mod solve;
@@ -162,6 +163,30 @@ fn hypot3(x: f64, y: f64, z: f64) -> f64 {
         sum = preliminary;
     }
     max * sum.sqrt()
+}
+
+/// What every phase after the ladder needs, named rather than captured.
+///
+/// **This is the closure's capture list, written down.** In the TypeScript
+/// `emphasis` reaches for six things that happen to be in scope: the chroma
+/// policy, the scheme, the surface base lightness, the fitted surface list, the
+/// contrast target, and `solveAgainst`. Nothing says so, because a closure does
+/// not have to. Passing it as one value is what lets the phase move to its own
+/// file and be read without the four hundred lines above it.
+#[derive(Clone, Copy, Debug)]
+pub struct Deriving {
+    pub contrast_target: f64,
+    pub policy: resolve::Policy,
+    pub scheme: crate::intent::Scheme,
+    pub surfaces: surfaces::Surfaces,
+}
+
+impl Deriving {
+    /// The page ladder, which is what an ink with no ground of its own sits on.
+    #[must_use]
+    pub fn solve_for_all(&self, sample: Cast, target: f64) -> Oklch {
+        solve::solve_against(&self.surfaces.solved_against(), sample, target)
+    }
 }
 
 /// Builds a token, fitting the colour into the sRGB gamut first so that both the
