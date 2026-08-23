@@ -36,6 +36,18 @@ describe('toast server output', () => {
     ).toEqual(['label', 'placement'])
   })
 
+  /* **The test above passes a placement, so it could never catch the fault it
+     looks like it is about.** `placement` reflected *and* defaulted, which is
+     the pair that writes: every toast region anybody rendered gained a
+     `placement="bottom-end"` nobody typed, and a React consumer's server markup
+     does not have it. Asserting the attributes of a host that was given one
+     says nothing about the host that was not. */
+  test('and nothing at all where the consumer wrote nothing', () => {
+    expect(
+      hostAttributes(ssr(html`<helix-base-toast></helix-base-toast>`), 'helix-base-toast'),
+    ).toEqual([])
+  })
+
   test('a message serves its dismiss control, so it works before hydration', () => {
     expect(
       hasPart(

@@ -18,6 +18,27 @@
   z-index: var(--helix-layer-toast);
 }
 
+/* The resting arrangement, which is bottom-end and used to be a default on the
+   property. A reflected property with a default writes its attribute onto every
+   host, including the ones nobody configured, so the placement lives here and
+   `placement` is optional.
+ *
+   Behind `:not([placement])` rather than on `:host`, which is where it was
+   first written and was wrong: `inset-block-end` and `inset-block-start` are
+   different properties, so a `top-*` toast would have taken both and stretched
+   the region down the whole viewport. A resting arrangement has to be scoped to
+   the resting state, not left for the departures to undo one declaration at a
+   time. */
+:host(:not([placement])) {
+  inset-block-end: var(--_toast-inset);
+
+  --_toast-enter: var(--helix-space-lg);
+}
+
+:host(:not([placement])) [part="region"] {
+  align-items: flex-end;
+}
+
 [part="region"] {
   display: flex;
   flex-direction: column;

@@ -186,7 +186,16 @@ export class HelixBaseSpeedDial extends MixinControllerOpen(HelixElement) {
          again. */
       this.updateComplete.then(() => {
         if (this.open) {
-          this.items[0]?.focusItem()
+          /* The first action that can *take* focus, not the first action. A
+             dial whose first item is disabled opened onto a row that refuses
+             focus, so the reader landed nowhere and their first arrow key
+             started from nothing.
+
+             `KeyboardNavigationController` has always filtered disabled items,
+             which is why the arrows were fine and this was not: the audit read
+             the fault into `items` and it was only ever here, at the one place
+             that reaches past the controller and indexes the list itself. */
+          this.items.find((one) => !one.disabled)?.focusItem()
         }
       })
     } else {

@@ -38329,7 +38329,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Mirrors \"there are marks\" for the stylesheet.\n\nThe whole marker layout hung off `:host([markers])` and `markers` does not\nreflect, so `slider.markers = 5` drew nothing at all: only the attribute\nwritten in the markup ever worked, and the property that is the documented\nAPI silently did not.\n\nReflecting the count instead would put `markers=\"0\"` on every slider, an\nattribute the server's markup does not have and one that selector would\nmatch, drawing the layout for no marks. So the boolean fact is mirrored to\na `data-` name, which is the rule this library already follows for state:\nthe stylesheet wants to know whether there are marks, not how many. How\nmany is what `markerValues` answers, and `< 2` is where it already draws\nthe line.\n\n/** Whether each mark says which value it stands at.",
+              "description": "Whether each mark says which value it stands at.",
               "attribute": "marker-labels",
               "reflects": true
             },
@@ -39149,7 +39149,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Mirrors \"there are marks\" for the stylesheet.\n\nThe whole marker layout hung off `:host([markers])` and `markers` does not\nreflect, so `slider.markers = 5` drew nothing at all: only the attribute\nwritten in the markup ever worked, and the property that is the documented\nAPI silently did not.\n\nReflecting the count instead would put `markers=\"0\"` on every slider, an\nattribute the server's markup does not have and one that selector would\nmatch, drawing the layout for no marks. So the boolean fact is mirrored to\na `data-` name, which is the rule this library already follows for state:\nthe stylesheet wants to know whether there are marks, not how many. How\nmany is what `markerValues` answers, and `< 2` is where it already draws\nthe line.\n\n/** Whether each mark says which value it stands at.",
+              "description": "Whether each mark says which value it stands at.",
               "fieldName": "markerLabels"
             },
             {
@@ -50405,10 +50405,9 @@
               "kind": "field",
               "name": "placement",
               "type": {
-                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start'"
+                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start' | undefined"
               },
-              "default": "'bottom-end'",
-              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.",
+              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.\n\n**Optional, and bottom-end is the absence of it.** It reflected *and*\ndefaulted, which is the pair that writes onto a host: every toast region\nanybody rendered gained a `placement=\"bottom-end\"` nobody typed, and a\nReact consumer's server markup does not have it. The styled sheet carries\nthe resting arrangement in its own `:host` rule now and the selectors\ndescribe only the departures, which is what `orientation` has always done.\n\nThe SSR spec could never have caught it: it passed a placement explicitly,\nso the attribute it asserted was one the consumer had written.",
               "attribute": "placement",
               "reflects": true
             },
@@ -50532,10 +50531,9 @@
             {
               "name": "placement",
               "type": {
-                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start'"
+                "text": "| 'bottom-center'\n    | 'bottom-end'\n    | 'bottom-start'\n    | 'top-center'\n    | 'top-end'\n    | 'top-start' | undefined"
               },
-              "default": "'bottom-end'",
-              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.",
+              "description": "Which corner or edge the stack sits at.\n\nNamed here rather than on each message, because where a page puts its\ntoasts is a fact about the page: a stack whose members disagreed about\nwhere they were would not be a stack.\n\n**Optional, and bottom-end is the absence of it.** It reflected *and*\ndefaulted, which is the pair that writes onto a host: every toast region\nanybody rendered gained a `placement=\"bottom-end\"` nobody typed, and a\nReact consumer's server markup does not have it. The styled sheet carries\nthe resting arrangement in its own `:host` rule now and the selectors\ndescribe only the departures, which is what `orientation` has always done.\n\nThe SSR spec could never have caught it: it passed a placement explicitly,\nso the attribute it asserted was one the consumer had written.",
               "fieldName": "placement"
             }
           ],

@@ -122,22 +122,6 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
   @property({ type: Number })
   markers = 0
 
-  /**
-   * Mirrors "there are marks" for the stylesheet.
-   *
-   * The whole marker layout hung off `:host([markers])` and `markers` does not
-   * reflect, so `slider.markers = 5` drew nothing at all: only the attribute
-   * written in the markup ever worked, and the property that is the documented
-   * API silently did not.
-   *
-   * Reflecting the count instead would put `markers="0"` on every slider, an
-   * attribute the server's markup does not have and one that selector would
-   * match, drawing the layout for no marks. So the boolean fact is mirrored to
-   * a `data-` name, which is the rule this library already follows for state:
-   * the stylesheet wants to know whether there are marks, not how many. How
-   * many is what `markerValues` answers, and `< 2` is where it already draws
-   * the line.
-
   /** Whether each mark says which value it stands at. */
   @property({ attribute: 'marker-labels', reflect: true, type: Boolean })
   markerLabels = false
@@ -393,6 +377,27 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
         @change=${this.handleChange}
       />`
 
+    /* `data-markers` mirrors "there are marks" for the stylesheet.
+     *
+     * The whole marker layout hung off `:host([markers])` and `markers` does
+     * not reflect, so `slider.markers = 5` drew nothing at all: only the
+     * attribute written in the markup ever worked, and the property that is the
+     * documented API silently did not.
+     *
+     * Reflecting the count instead would put `markers="0"` on every slider, an
+     * attribute the server's markup does not have and one that selector would
+     * match, drawing the layout for no marks. So the boolean fact is mirrored
+     * to a `data-` name, which is the rule this library already follows for
+     * state: the stylesheet wants to know whether there are marks, not how
+     * many. How many is what `markerValues` answers, and `< 2` is where it
+     * already draws the line.
+     *
+     * A `/*` and written here, because it describes this binding and not a
+     * member. As a `/**` above `markerLabels` it never closed, so it swallowed
+     * that property's one-line description and the manifest shipped this whole
+     * argument as the text for "whether each mark says which value it stands
+     * at". `check:orphans` cannot see an unclosed block, only one sitting on
+     * another. */
     return html`${this.renderLabel()}
     <div
       part="field"

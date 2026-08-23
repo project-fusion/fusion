@@ -684,7 +684,8 @@ ring is declared here rather than inherited, because the base layer's
 
 | Property | Description |
 | --- | --- |
-| `--button-background-color` | Fill behind the button. |
+| `--button-background-color` | Fill behind the button, in every state. |
+| `--button-background-color-hover` | Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover. |
 | `--button-foreground-color` | Label and icon color. |
 | `--button-inline-size` | Width taken by `width="standard"`. |
 | `--button-radii` | Corner radius of the control. |
@@ -4633,7 +4634,7 @@ the thumb being dragged.
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `markerLabels` | `marker-labels` | `boolean` | `false` | `HelixBaseSlider` | Mirrors "there are marks" for the stylesheet. |
+| `markerLabels` | `marker-labels` | `boolean` | `false` | `HelixBaseSlider` | Whether each mark says which value it stands at. |
 | `markers` | `markers` | `number` | `0` | `HelixBaseSlider` | How many marks to draw along the track, evenly spaced, ends included. |
 | `max` | `max` | `number` | `100` | `HelixBaseSlider` | The largest value the reader can choose. |
 | `min` | `min` | `number` | `0` | `HelixBaseSlider` | The smallest value the reader can choose. |
@@ -5911,7 +5912,7 @@ into the top layer.
     \| 'bottom-start'
     \| 'top-center'
     \| 'top-end'
-    \| 'top-start'` | `'bottom-end'` | `HelixBaseToast` | Which corner or edge the stack sits at. |
+    \| 'top-start' \| undefined` | - | `HelixBaseToast` | Which corner or edge the stack sits at. |
 
 #### Slots
 

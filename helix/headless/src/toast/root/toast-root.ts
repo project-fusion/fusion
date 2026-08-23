@@ -53,15 +53,25 @@ export class HelixBaseToast extends HelixElement {
    * Named here rather than on each message, because where a page puts its
    * toasts is a fact about the page: a stack whose members disagreed about
    * where they were would not be a stack.
+   *
+   * **Optional, and bottom-end is the absence of it.** It reflected *and*
+   * defaulted, which is the pair that writes onto a host: every toast region
+   * anybody rendered gained a `placement="bottom-end"` nobody typed, and a
+   * React consumer's server markup does not have it. The styled sheet carries
+   * the resting arrangement in its own `:host` rule now and the selectors
+   * describe only the departures, which is what `orientation` has always done.
+   *
+   * The SSR spec could never have caught it: it passed a placement explicitly,
+   * so the attribute it asserted was one the consumer had written.
    */
   @property({ reflect: true })
-  placement:
+  placement?:
     | 'bottom-center'
     | 'bottom-end'
     | 'bottom-start'
     | 'top-center'
     | 'top-end'
-    | 'top-start' = 'bottom-end'
+    | 'top-start'
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
