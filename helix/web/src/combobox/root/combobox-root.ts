@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseCombobox } from '@helix-io/headless'
+import { HelixBaseCombobox } from '@helix-io/headless/combobox'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect import, because the tier below renders `<helix-listbox>` and a
    custom element registers on import. Inherited from the base along with the

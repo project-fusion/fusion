@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseBadge } from '@helix-io/headless'
+import { HelixBaseBadge } from '@helix-io/headless/badge'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './badge-root.css.js'

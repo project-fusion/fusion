@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseToolbar } from '@helix-io/headless'
+import { HelixBaseToolbar } from '@helix-io/headless/toolbar'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './toolbar-root.css.js'
 

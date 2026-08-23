@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseList } from '@helix-io/headless'
+import { HelixBaseList } from '@helix-io/headless/list'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './list-root.css.js'

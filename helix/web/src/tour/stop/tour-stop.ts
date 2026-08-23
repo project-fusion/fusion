@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseTourStop } from '@helix-io/headless'
+import { HelixBaseTourStop } from '@helix-io/headless/tour'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './tour-stop.css.js'
 import '../../button/index.js'

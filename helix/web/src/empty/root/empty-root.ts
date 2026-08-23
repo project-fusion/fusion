@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseEmpty } from '@helix-io/headless'
+import { HelixBaseEmpty } from '@helix-io/headless/empty'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './empty-root.css.js'
 

@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseRadio } from '@helix-io/headless'
+import { HelixBaseRadio } from '@helix-io/headless/radio'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './radio-root.css.js'

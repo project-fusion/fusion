@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseLegend } from '@helix-io/headless'
+import { HelixBaseLegend } from '@helix-io/headless/legend'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../chart/series.css.js'

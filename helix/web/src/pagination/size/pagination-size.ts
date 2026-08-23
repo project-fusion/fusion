@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBasePaginationSize } from '@helix-io/headless'
+import { HelixBasePaginationSize } from '@helix-io/headless/pagination'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect imports, for the reason `Select` gives about the listbox it
    renders: this renders `<helix-select>` and `<helix-option>` in its own shadow

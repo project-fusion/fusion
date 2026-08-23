@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseSteps } from '@helix-io/headless'
+import { HelixBaseSteps } from '@helix-io/headless/steps'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './steps-root.css.js'
 

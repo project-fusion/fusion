@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseLineChart } from '@helix-io/headless'
+import { HelixBaseLineChart } from '@helix-io/headless/line-chart'
 import type { CSSResultGroup } from 'lit'
 import { styles as seriesStyles } from '../../chart/series.css.js'
 import { styles } from './line-chart-root.css.js'

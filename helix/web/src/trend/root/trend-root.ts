@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseTrend } from '@helix-io/headless'
+import { HelixBaseTrend } from '@helix-io/headless/trend'
 import type { CSSResultGroup } from 'lit'
 import '../../icon/index.js'
 import { styles as glyphStyles } from '../../icon/glyph.css.js'

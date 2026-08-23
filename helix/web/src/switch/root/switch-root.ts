@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseSwitch } from '@helix-io/headless'
+import { HelixBaseSwitch } from '@helix-io/headless/switch'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldInlineStyles } from '../../field/field-inline.css.js'

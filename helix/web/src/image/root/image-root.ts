@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseImage } from '@helix-io/headless'
+import { HelixBaseImage } from '@helix-io/headless/image'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './image-root.css.js'

@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseTooltip } from '@helix-io/headless'
+import { HelixBaseTooltip } from '@helix-io/headless/tooltip'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './tooltip-root.css.js'
 

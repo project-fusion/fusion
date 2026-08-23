@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseToggle } from '@helix-io/headless'
+import { HelixBaseToggle } from '@helix-io/headless/toggle'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './toggle-root.css.js'
 

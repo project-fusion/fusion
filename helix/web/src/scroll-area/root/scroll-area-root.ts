@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseScrollArea } from '@helix-io/headless'
+import { HelixBaseScrollArea } from '@helix-io/headless/scroll-area'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './scroll-area-root.css.js'
 

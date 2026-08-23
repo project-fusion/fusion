@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseIconButton } from '@helix-io/headless'
+import { HelixBaseIconButton } from '@helix-io/headless/icon-button'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { MixinControlSurface } from '../../mixins/mixin-control-surface/mixin-control-surface.js'

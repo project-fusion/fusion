@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseVideoPlaylistItem } from '@helix-io/headless'
+import { HelixBaseVideoPlaylistItem } from '@helix-io/headless/video-playlist'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './video-playlist-item.css.js'
 

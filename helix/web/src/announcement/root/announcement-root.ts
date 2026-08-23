@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseAnnouncement } from '@helix-io/headless'
+import { HelixBaseAnnouncement } from '@helix-io/headless/announcement'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './announcement-root.css.js'
 

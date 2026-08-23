@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseBlockquote } from '@helix-io/headless'
+import { HelixBaseBlockquote } from '@helix-io/headless/blockquote'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './blockquote-root.css.js'
 

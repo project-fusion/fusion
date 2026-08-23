@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseTableColumn } from '@helix-io/headless'
+import { HelixBaseTableColumn } from '@helix-io/headless/table'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './table-column.css.js'
 

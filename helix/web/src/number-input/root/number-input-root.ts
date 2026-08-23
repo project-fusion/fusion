@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseNumberInput } from '@helix-io/headless'
+import { HelixBaseNumberInput } from '@helix-io/headless/number-input'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'

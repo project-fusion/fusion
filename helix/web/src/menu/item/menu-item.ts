@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseMenuItem } from '@helix-io/headless'
+import { HelixBaseMenuItem } from '@helix-io/headless/menu'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './menu-item.css.js'
 

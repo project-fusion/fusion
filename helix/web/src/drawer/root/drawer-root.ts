@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseDrawer } from '@helix-io/headless'
+import { HelixBaseDrawer } from '@helix-io/headless/drawer'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './drawer-root.css.js'

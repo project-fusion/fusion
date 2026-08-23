@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseBreadcrumbs } from '@helix-io/headless'
+import { HelixBaseBreadcrumbs } from '@helix-io/headless/breadcrumbs'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './breadcrumbs-root.css.js'
 

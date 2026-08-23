@@ -1,5 +1,5 @@
 import { customElement, seriesIndex } from '@helix-io/core'
-import { HelixBaseBarChart } from '@helix-io/headless'
+import { HelixBaseBarChart } from '@helix-io/headless/bar-chart'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../chart/series.css.js'

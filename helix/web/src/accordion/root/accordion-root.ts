@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseAccordion } from '@helix-io/headless'
+import { HelixBaseAccordion } from '@helix-io/headless/accordion'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './accordion-root.css.js'

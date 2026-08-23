@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBasePagination } from '@helix-io/headless'
+import { HelixBasePagination } from '@helix-io/headless/pagination'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './pagination-root.css.js'
 

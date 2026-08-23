@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseSplitter } from '@helix-io/headless'
+import { HelixBaseSplitter } from '@helix-io/headless/splitter'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './splitter-root.css.js'

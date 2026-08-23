@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseTimeline } from '@helix-io/headless'
+import { HelixBaseTimeline } from '@helix-io/headless/timeline'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './timeline-root.css.js'
 

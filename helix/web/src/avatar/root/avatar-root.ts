@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseAvatar } from '@helix-io/headless'
+import { HelixBaseAvatar } from '@helix-io/headless/avatar'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './avatar-root.css.js'

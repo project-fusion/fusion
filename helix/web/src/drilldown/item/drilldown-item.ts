@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseDrilldownItem } from '@helix-io/headless'
+import { HelixBaseDrilldownItem } from '@helix-io/headless/drilldown'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './drilldown-item.css.js'
 

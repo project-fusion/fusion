@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseDivider } from '@helix-io/headless'
+import { HelixBaseDivider } from '@helix-io/headless/divider'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './divider-root.css.js'
 

@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseCard } from '@helix-io/headless'
+import { HelixBaseCard } from '@helix-io/headless/card'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './card-root.css.js'

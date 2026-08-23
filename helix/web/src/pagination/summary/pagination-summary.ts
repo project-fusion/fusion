@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBasePaginationSummary } from '@helix-io/headless'
+import { HelixBasePaginationSummary } from '@helix-io/headless/pagination'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './pagination-summary.css.js'
 

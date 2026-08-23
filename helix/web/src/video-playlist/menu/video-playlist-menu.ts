@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseVideoPlaylistMenu } from '@helix-io/headless'
+import { HelixBaseVideoPlaylistMenu } from '@helix-io/headless/video-playlist'
 import type { CSSResultGroup } from 'lit'
 import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './video-playlist-menu.css.js'

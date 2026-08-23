@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseKbd } from '@helix-io/headless'
+import { HelixBaseKbd } from '@helix-io/headless/kbd'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './kbd-root.css.js'
 

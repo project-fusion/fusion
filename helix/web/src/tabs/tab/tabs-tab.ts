@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseTabsTab } from '@helix-io/headless'
+import { HelixBaseTabsTab } from '@helix-io/headless/tabs'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './tabs-tab.css.js'
 

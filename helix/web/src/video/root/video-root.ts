@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseVideo } from '@helix-io/headless'
+import { HelixBaseVideo } from '@helix-io/headless/video'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../icon/index.js'

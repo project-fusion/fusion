@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseTimePicker } from '@helix-io/headless'
+import { HelixBaseTimePicker } from '@helix-io/headless/time-picker'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect imports, because the tier below renders both of these and a custom
    element registers on import. Inherited from the base along with the template,

@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseMegamenu } from '@helix-io/headless'
+import { HelixBaseMegamenu } from '@helix-io/headless/megamenu'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './megamenu-root.css.js'
 

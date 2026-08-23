@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseOption } from '@helix-io/headless'
+import { HelixBaseOption } from '@helix-io/headless/option'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './option-root.css.js'
 

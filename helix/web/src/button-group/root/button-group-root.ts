@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseButtonGroup } from '@helix-io/headless'
+import { HelixBaseButtonGroup } from '@helix-io/headless/button-group'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './button-group-root.css.js'

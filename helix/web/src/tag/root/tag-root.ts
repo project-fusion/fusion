@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseTag } from '@helix-io/headless'
+import { HelixBaseTag } from '@helix-io/headless/tag'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './tag-root.css.js'

@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseTreeItem } from '@helix-io/headless'
+import { HelixBaseTreeItem } from '@helix-io/headless/tree'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './tree-item.css.js'
 

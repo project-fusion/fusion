@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseSpeedDialItem } from '@helix-io/headless'
+import { HelixBaseSpeedDialItem } from '@helix-io/headless/speed-dial'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './speed-dial-item.css.js'
 

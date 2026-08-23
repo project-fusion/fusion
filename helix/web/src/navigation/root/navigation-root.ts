@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseNavigation } from '@helix-io/headless'
+import { HelixBaseNavigation } from '@helix-io/headless/navigation'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './navigation-root.css.js'
 

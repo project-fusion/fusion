@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseSkeleton } from '@helix-io/headless'
+import { HelixBaseSkeleton } from '@helix-io/headless/skeleton'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './skeleton-root.css.js'

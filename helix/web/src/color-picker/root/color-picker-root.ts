@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseColorPicker } from '@helix-io/headless'
+import { HelixBaseColorPicker } from '@helix-io/headless/color-picker'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect import, because the tier below renders `<helix-slider>` and a
    custom element registers on import. Inherited from the base along with the

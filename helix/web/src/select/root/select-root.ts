@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseSelect } from '@helix-io/headless'
+import { HelixBaseSelect } from '@helix-io/headless/select'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'

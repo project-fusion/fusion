@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseCodeBlock } from '@helix-io/headless'
+import { HelixBaseCodeBlock } from '@helix-io/headless/code-block'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './code-block-root.css.js'
 import '../../copy-button/index.js'

@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseCheckboxGroup } from '@helix-io/headless'
+import { HelixBaseCheckboxGroup } from '@helix-io/headless/checkbox-group'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
