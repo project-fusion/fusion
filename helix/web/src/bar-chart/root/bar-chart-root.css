@@ -588,25 +588,43 @@
   stroke-opacity: var(--_bar-chart-through, 1);
 }
 
-/* The mark as its edge alone, for a series that is not a measurement: a
-   forecast, a target, a budget. Hairline width from the border scale rather
-   than a literal, so a theme that thickens its rules thickens this with them. */
+/* **The edge, and the fill stays under it.** `outlined` on a button is a border
+   *instead of* a fill, because a control's fill is the loud part. On a column
+   the fill is the mark: its area is what encodes the value, so removing it
+   removes the reading rather than quietening it. The value adapts to the medium
+   the way `outlined` already means one thing on a Card's boundary and another
+   on a Button's ink.
+
+   A shade of the column rather than a neutral line, mixed toward the page's own
+   foreground so it darkens in light and lightens in dark without a second arm.
+   At full strength the edge reads as a second series; mixed, it reads as the
+   same colour with a defined boundary.
+
+   **`vector-effect`, for the reason two other rules in this file already give**:
+   the view box is `0 0 100 H` under `preserveAspectRatio="none"`, so a stroke in
+   user units is stretched by however wide the element happens to be. Written
+   without it, a 1.5 came out as a band several pixels thick and uneven between
+   the vertical edges and the horizontal ones. */
 [part="bar"][data-emphasis="outlined"],
 :host([emphasis="outlined"]) [part="bar"]:not([data-emphasis]) {
-  fill: none;
-  stroke: var(--_bar-chart-series);
-  stroke-width: var(--bar-chart-bar-stroke, 1.5);
+  stroke: var(--_bar-chart-edge);
+  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thin));
+  vector-effect: non-scaling-stroke;
 }
 
-/* A wash with its own edge on it, which is the reading between filled and
-   outlined and the one that keeps a column's area legible while saying it is
-   not the point. */
+/* A wash under the same edge, which is the quiet end of the axis: the column
+   keeps its area and its boundary and stops claiming to be the point. */
 [part="bar"][data-emphasis="subtle"],
 :host([emphasis="subtle"]) [part="bar"]:not([data-emphasis]) {
-  stroke: var(--_bar-chart-series);
-  stroke-width: var(--bar-chart-bar-stroke, 1.5);
+  stroke: var(--_bar-chart-edge);
+  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thin));
+  vector-effect: non-scaling-stroke;
 
-  --_bar-chart-wash: 0.16;
+  --_bar-chart-wash: 0.2;
+}
+
+[part="bar"] {
+  --_bar-chart-edge: oklch(from var(--_bar-chart-series) calc(l - 0.2) c h);
 }
 
 /* **Glass, so a chart is in the same language as the page around it.** A glass

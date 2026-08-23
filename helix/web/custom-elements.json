@@ -4682,7 +4682,7 @@
                 "slug": "base"
               },
               {
-                "description": "A forecast beside three measurements, told apart by its outline rather than by a note.",
+                "description": "Columns drawn with an edge of their own colour, for a dense chart or a busy ground.",
                 "slug": "emphasis"
               },
               {
@@ -4696,6 +4696,10 @@
               {
                 "description": "The same columns as glass and as gradient, over a ground that shows the difference.",
                 "slug": "material"
+              },
+              {
+                "description": "One series outlined among the measured ones, for a target that is not a measurement.",
+                "slug": "per-series"
               },
               {
                 "description": "Two series as columns and a third as a line, all measured against one axis.",
