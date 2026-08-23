@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process'
 /**
- * Writes `docs/16-token-reference.md` from `tokens.css`.
+ * Writes `docs/16-token-reference.md` from the token registry.
+ *
+ * It read `tokens.css` and matched declarations out of it with a regular
+ * expression, which worked and was the only reader that source had. The tokens
+ * are TypeScript now and `helix/styles/tokens.json` is what they emit, so this
+ * reads the map rather than re-deriving it: one fewer parser, and the same
+ * names an agent and a Foundations page get.
  *
  * Generated for the reason the component reference is: a list of tokens
  * transcribed by hand is a second source of truth for something that already
@@ -28,7 +34,7 @@ import { execFileSync } from 'node:child_process'
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const SOURCE = 'helix/styles/src/tokens.css'
+const SOURCE = 'helix/styles/tokens.json'
 const OUTPUT = 'docs/16-token-reference.md'
 const ROOTS = ['helix', 'site']
 
@@ -143,7 +149,16 @@ for (const root of ROOTS) {
     if (ignored.has(path)) {
       continue
     }
-    if (path.endsWith('tokens.css') || path.endsWith('primitives.css')) {
+    /* The layer's own sources, which declare tokens rather than reading them.
+       `tokens.ts` joined this list when it became the source: a semantic token
+       whose value references another, as `shadow-surface` does `shadow-none`,
+       otherwise counts its own declaration as a use and the token stops being
+       reported as unread. Two were, immediately. */
+    if (
+      path.endsWith('tokens.css') ||
+      path.endsWith('tokens.ts') ||
+      path.endsWith('primitives.css')
+    ) {
       continue
     }
     for (const [, name] of readFileSync(path, 'utf8').matchAll(/var\((--helix-[a-z0-9-]+)/g)) {
@@ -152,10 +167,8 @@ for (const root of ROOTS) {
   }
 }
 
-const source = readFileSync(SOURCE, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
-const declared = [...source.matchAll(/^\s*(--helix-[a-z0-9-]+):\s*([^;]+);/gm)].map(
-  ([, name, value]) => [name, value.replace(/\s+/g, ' ').trim()],
-)
+const registry = JSON.parse(readFileSync(SOURCE, 'utf8'))
+const declared = registry.tokens.map((token) => [token.name, token.value])
 
 const grouped = new Map(CATEGORIES.map((one) => [one, []]))
 const stray = []
@@ -185,7 +198,7 @@ const unread = declared.filter(([name]) => !reads.has(name))
 const lines = [
   '# Token reference',
   '',
-  '*Generated from [`helix/styles/src/tokens.css`](../helix/styles/src/tokens.css) by',
+  '*Generated from [`helix/styles/src/tokens.ts`](../helix/styles/src/tokens.ts) by',
   '`bun run tokens`. Do not edit.*',
   '',
   `${declared.length} semantic tokens in ${CATEGORIES.length} categories, every one in exactly`,

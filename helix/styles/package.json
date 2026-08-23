@@ -12,10 +12,12 @@
   "exports": {
     "./base.css": "./src/base.css",
     "./primitives.css": "./src/primitives.css",
-    "./tokens.css": "./src/tokens.css"
+    "./tokens.css": "./src/tokens.css",
+    "./tokens.json": "./tokens.json"
   },
   "files": [
-    "src"
+    "src",
+    "tokens.json"
   ],
   "sideEffects": true,
   "scripts": {},
