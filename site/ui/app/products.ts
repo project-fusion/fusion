@@ -79,18 +79,19 @@ export interface Product {
    * in the parent's construction: one rounded body with material removed, two
    * notches for Helix and one slot for Cortex.
    *
-   * **A monotone tile, and the letter is a real hole.** The field takes
-   * `currentColor` and the letter shows whatever the mark sits on, so one asset
-   * is a dark tile on a light panel and a light tile on a dark one with no
-   * second drawing and no media query. `site.css` gives it `foreground` rather
-   * than letting it inherit the heading's `foreground-subtle`, which is the
-   * colour a label is quiet in and not a colour a mark should be.
+   * **A tile, and the letter is painted rather than cut out.** A mask would
+   * make it a real hole, which is the same thing only while the mark sits on
+   * white: anywhere else the hole takes the ground behind it, and a letter on a
+   * coloured field has to stay light on every ground it lands on.
    *
-   * The brand tile is the other way round and is not this asset: its letter is
-   * painted white rather than cut out, because a hole there would take the
-   * ground behind it and a product mark on a coloured field has to stay white
-   * on any of them. It is drawn and is not in the icon set, nothing on the site
-   * using it yet.
+   * **The drawing carries no colour decision.** The tile is a gradient between
+   * `--logo-color-from` and `--logo-color-to` and the letter is
+   * `--logo-color-knockout`, each falling back to what the wordmark uses, which
+   * is why the panel can render these as a dark tile with a near-white letter
+   * without a second asset: `site.css` sets the three hooks and the drawing
+   * never moves. A monotone variant taking `currentColor` was built first and
+   * is the wrong shape of solution, because it answers in the drawing a
+   * question the hooks already answer in the stylesheet.
    *
    * The tile carries its own padding, so its letter is 58% of its box, which is
    * why `site.css` sizes it `icon-md` where the base layer says `icon-sm`: a
