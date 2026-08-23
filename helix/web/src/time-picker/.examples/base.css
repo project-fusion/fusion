@@ -74,3 +74,12 @@ helix-base-time-picker::part(option):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
+
+helix-base-time-picker::part(list),
+helix-base-time-picker::part(items) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  max-block-size: 12rem;
+  overflow-y: auto;
+}

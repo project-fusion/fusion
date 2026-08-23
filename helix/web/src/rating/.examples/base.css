@@ -82,19 +82,68 @@ helix-base-rating::part(option):focus-visible {
 }
 
 /* The mark ships with no glyph, deliberately, so the example draws one.
-   A square rotated forty-five degrees is a diamond and needs no asset. */
+   A square rotated forty-five degrees is a diamond and needs no asset.
+   
+   display is the load-bearing line and was the missing one. A mark is an inline
+   box, and width and height do not apply to those, so a rule giving it three
+   quarters of a rem left ten marks at zero by zero with their fill set and
+   nothing on screen at all. */
 helix-base-rating::part(mark) {
-  background-color: var(--_gray-fill);
+  background-color: currentColor;
   block-size: 0.75rem;
+  display: block;
   inline-size: 0.75rem;
   rotate: 45deg;
 }
 
+/* Two layers in one place, which is what this component is.
+   
+   Both track and fill hold every mark, and the fill is a clip of the whole row
+   rather than a subset of it, so they have to be stacked and not laid side by
+   side. Left to the name-matching, marks became a row, track became a progress
+   groove painted over the marks it is made of, and fill was a block: the
+   component rendered as half a rem of flat grey, and with the groove removed it
+   rendered as nothing.
+   
+   The width of the clip is the component's own arithmetic, published as
+   --rating-full, --rating-part and --rating-steps on the container so a sheet
+   can say this without knowing the score. */
 helix-base-rating::part(marks) {
+  display: inline-block;
+  position: relative;
+}
+
+/* Coloured through currentColor, because a consumer cannot reach inside.
+   
+   A filled mark is a mark inside the fill layer, and ::part(fill) [part="mark"]
+   selects nothing: ::part() reaches the part and no further, so descendants of a
+   part are unreachable from outside the tree. The styled tier writes exactly
+   that selector and it works there, its sheet being inside the shadow root.
+   Colour inherits across the boundary where a selector does not, so the layers
+   set it and the marks take it. */
+helix-base-rating::part(track),
+helix-base-rating::part(fill) {
+  background-color: transparent;
+  block-size: auto;
   display: flex;
   gap: 0.25rem;
+  inline-size: auto;
+}
+
+helix-base-rating::part(track) {
+  color: var(--_gray-fill);
 }
 
 helix-base-rating::part(fill) {
-  background-color: var(--_gray-strong);
+  inline-size: calc(
+    (var(--rating-full, 0) + var(--rating-part, 0)) / var(--rating-steps, 1) * 100%
+  );
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  overflow: hidden;
+  position: absolute;
+}
+
+helix-base-rating::part(fill) {
+  color: var(--_gray-strong);
 }

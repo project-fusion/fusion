@@ -464,6 +464,25 @@ helix-base-loader::part(indicator) {
   flex-direction: column;
   gap: 0.25rem;
 }`,
+  /* A box, because a cell here is an `<input>` and the branch that matched it
+     undresses its subjects on purpose.
+   
+     That branch is right about the rows and tabs it was written for, several of
+     which are `button`s the platform would otherwise paint. Applied to a text
+     box it takes the border off and leaves the width to the UA, which is about
+     twenty characters: measured, six cells came to 1,021 pixels against a 640
+     frame, and every one of them invisible. The example rendered a label, a hint
+     and nothing that looked like a code field.
+   
+     So the diagram says what a consumer has to say: how wide a cell is, that it
+     has an edge, and that one character sits in the middle of it. */
+  'pin-input': `helix-base-pin-input::part(cell) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  inline-size: 2rem;
+  padding: 0.25rem;
+  text-align: center;
+}`,
   progress: `helix-base-progress::part(track) {
   background-color: var(--_gray-fill);
   block-size: 0.5rem;
@@ -483,21 +502,70 @@ helix-base-progress::part(indicator) {
   inline-size: 100%;
 }`,
   rating: `/* The mark ships with no glyph, deliberately, so the example draws one.
-   A square rotated forty-five degrees is a diamond and needs no asset. */
+   A square rotated forty-five degrees is a diamond and needs no asset.
+   
+   display is the load-bearing line and was the missing one. A mark is an inline
+   box, and width and height do not apply to those, so a rule giving it three
+   quarters of a rem left ten marks at zero by zero with their fill set and
+   nothing on screen at all. */
 helix-base-rating::part(mark) {
-  background-color: var(--_gray-fill);
+  background-color: currentColor;
   block-size: 0.75rem;
+  display: block;
   inline-size: 0.75rem;
   rotate: 45deg;
 }
 
+/* Two layers in one place, which is what this component is.
+   
+   Both track and fill hold every mark, and the fill is a clip of the whole row
+   rather than a subset of it, so they have to be stacked and not laid side by
+   side. Left to the name-matching, marks became a row, track became a progress
+   groove painted over the marks it is made of, and fill was a block: the
+   component rendered as half a rem of flat grey, and with the groove removed it
+   rendered as nothing.
+   
+   The width of the clip is the component's own arithmetic, published as
+   --rating-full, --rating-part and --rating-steps on the container so a sheet
+   can say this without knowing the score. */
 helix-base-rating::part(marks) {
+  display: inline-block;
+  position: relative;
+}
+
+/* Coloured through currentColor, because a consumer cannot reach inside.
+   
+   A filled mark is a mark inside the fill layer, and ::part(fill) [part=\"mark\"]
+   selects nothing: ::part() reaches the part and no further, so descendants of a
+   part are unreachable from outside the tree. The styled tier writes exactly
+   that selector and it works there, its sheet being inside the shadow root.
+   Colour inherits across the boundary where a selector does not, so the layers
+   set it and the marks take it. */
+helix-base-rating::part(track),
+helix-base-rating::part(fill) {
+  background-color: transparent;
+  block-size: auto;
   display: flex;
   gap: 0.25rem;
+  inline-size: auto;
+}
+
+helix-base-rating::part(track) {
+  color: var(--_gray-fill);
 }
 
 helix-base-rating::part(fill) {
-  background-color: var(--_gray-strong);
+  inline-size: calc(
+    (var(--rating-full, 0) + var(--rating-part, 0)) / var(--rating-steps, 1) * 100%
+  );
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  overflow: hidden;
+  position: absolute;
+}
+
+helix-base-rating::part(fill) {
+  color: var(--_gray-strong);
 }`,
   select: `helix-base-select::part(indicator) {
   ${GLYPH}
@@ -587,6 +655,42 @@ helix-base-switch[data-checked]::part(thumb) {
   display: inline-flex;
   gap: 0.25rem;
   padding: 0.125rem 0.5rem;
+}`,
+  /* A column, because `items` and `list` match the branch that lays a group of
+     things out along a line and a list of times is not one.
+   
+     Left to it, the headless Time Picker drew all ninety-six quarter hours in a
+     single row: measured at 4,896 pixels wide against a 640 frame, which is one
+     row of clipped type and no picker at all. `outline` above is the same fix
+     for the same reason, and both are the price of keying rules off a part's
+     name.
+   
+     The height and the scroll are part of the diagram rather than decoration. A
+     list of ninety-six is unusable at its natural height whatever direction it
+     runs in, so a consumer taking this tier has to bound it, and a skeletal
+     sheet that leaves that out is not showing them the work. */
+  /* A bounded box, because a virtual list has nothing to compute without one.
+   
+     None of the three part names matched anything, so the sheet said nothing
+     about the one part that decides whether the component works: the viewport
+     is the scrolling box, and a window of rows is derived from its height. With
+     no height and no overflow there is no window, so the example rendered two
+     pixels of ink over two thousand rows of data and looked like a component
+     that had failed to load.
+   
+     This is the diagram doing its job rather than a workaround. A consumer
+     taking this tier has to bound the viewport or get the same nothing. */
+  'virtual-list': `helix-base-virtual-list::part(viewport) {
+  block-size: 12rem;
+  overflow-y: auto;
+}`,
+  'time-picker': `helix-base-time-picker::part(list),
+helix-base-time-picker::part(items) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  max-block-size: 12rem;
+  overflow-y: auto;
 }`,
   timeline: `/* Rail then content, side by side. Without a row the marker lands
    wherever the text ends, which is the right-hand edge. */

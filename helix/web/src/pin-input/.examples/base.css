@@ -60,3 +60,11 @@ helix-base-icon::part(svg) {
   flex: none;
   inline-size: 1em;
 }
+
+helix-base-pin-input::part(cell) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  inline-size: 2rem;
+  padding: 0.25rem;
+  text-align: center;
+}
