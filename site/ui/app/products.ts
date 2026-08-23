@@ -87,9 +87,9 @@ export interface Product {
    * **The drawing carries no colour decision.** The tile is a gradient between
    * `--logo-color-from` and `--logo-color-to` and the letter is
    * `--logo-color-knockout`, each falling back to what the wordmark uses, which
-   * is why the panel can render these as a dark tile with a near-white letter
-   * without a second asset: `site.css` sets the three hooks and the drawing
-   * never moves. A monotone variant taking `currentColor` was built first and
+   * is why the panel can render these as a near-black tile on a light ground
+   * and a near-white one on a dark ground without a second asset: `site.css`
+   * sets the three hooks and the drawing never moves. A monotone variant taking `currentColor` was built first and
    * is the wrong shape of solution, because it answers in the drawing a
    * question the hooks already answer in the stylesheet.
    *
