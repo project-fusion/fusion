@@ -12,7 +12,7 @@ these lives on the component itself and is rendered in full at
 
 ## Accordion
 
-### Root — `helix-accordion`
+### Root (`helix-accordion`)
 
 Groups collapsible sections, one open at a time by default.
 
@@ -44,7 +44,7 @@ the default: an accordion is a list, where a card is a surface.
 | `--accordion-border-color` | Color of the seams, and of the frame when outlined. |
 | `--accordion-radii` | Corner radius of the stack, when outlined. |
 
-### Item — `helix-accordion-item`
+### Item (`helix-accordion-item`)
 
 One collapsible section of an accordion.
 
@@ -105,7 +105,7 @@ Usable on its own as a disclosure, with no accordion around it.
 
 ## Announcement
 
-### Root — `helix-announcement`
+### Root (`helix-announcement`)
 
 A page-level message above the masthead, which can be dismissed.
 
@@ -160,7 +160,7 @@ band across the top of the page, not a box that happens to be wide.
 
 ## App Header
 
-### Root — `helix-app-header`
+### Root (`helix-app-header`)
 
 Page-level banner holding brand, navigation, and actions.
 
@@ -217,7 +217,7 @@ no shadow: the rule is the whole of it.
 
 ## Aura
 
-### Root — `helix-aura`
+### Root (`helix-aura`)
 
 A lit, drifting background, drawn from the token layer.
 
@@ -297,7 +297,7 @@ takes no pointer events.
 
 ## Avatar
 
-### Root — `helix-avatar`
+### Root (`helix-avatar`)
 
 Represents a person or entity with an image or their initials.
 
@@ -344,7 +344,7 @@ every size, including one a consumer sets themselves through
 | `--avatar-background-color` | Fill behind the initials. |
 | `--avatar-size` | Edge length of the avatar. |
 
-### Group — `helix-avatar-group`
+### Group (`helix-avatar-group`)
 
 Overlapping avatars, with a count for the ones not shown.
 
@@ -392,7 +392,7 @@ its markup is the worse trade of the two.
 
 ## Badge
 
-### Root — `helix-badge`
+### Root (`helix-badge`)
 
 Attaches a count or a presence mark to another element.
 
@@ -433,7 +433,7 @@ on a dark icon reads as a bite taken out of the icon.
 
 ## Bar Chart
 
-### Root — `helix-bar-chart`
+### Root (`helix-bar-chart`)
 
 Categories as columns, read from a table.
 
@@ -510,7 +510,7 @@ it is measured against.
 
 ## Blockquote
 
-### Root — `helix-blockquote`
+### Root (`helix-blockquote`)
 
 A passage set off from the prose around it.
 
@@ -549,7 +549,7 @@ top of that are the same thing said twice.
 
 ## Breadcrumbs
 
-### Root — `helix-breadcrumbs`
+### Root (`helix-breadcrumbs`)
 
 Shows the path to the current page.
 
@@ -576,7 +576,7 @@ because a truncated path tells the reader less than a two-line one.
 | --- | --- |
 | `--breadcrumbs-gap` | Space between items and separators. |
 
-### Breadcrumb — `helix-breadcrumb`
+### Breadcrumb (`helix-breadcrumb`)
 
 One step in a breadcrumb trail.
 
@@ -627,7 +627,7 @@ and leaves box and background to `::slotted`.
 
 ## Button
 
-### Root — `helix-button`
+### Root (`helix-button`)
 
 Triggers an action, submits a form, or navigates.
 
@@ -693,7 +693,7 @@ ring is declared here rather than inherited, because the base layer's
 
 ## Button Group
 
-### Root — `helix-button-group`
+### Root (`helix-button-group`)
 
 Groups related buttons into one control.
 
@@ -729,7 +729,7 @@ therefore serves a consumer's own anchor styled as a button.
 
 ## Callout
 
-### Root — `helix-callout`
+### Root (`helix-callout`)
 
 Sets a passage apart as information, a warning, or an error.
 
@@ -773,7 +773,7 @@ headless tier; this tier only decides what that meaning looks like.
 
 ## Card
 
-### Root — `helix-card`
+### Root (`helix-card`)
 
 Groups related content and actions into a single surface.
 
@@ -828,7 +828,7 @@ element you slotted, not a wrapper around it.
 
 ## Carousel
 
-### Root — `helix-carousel`
+### Root (`helix-carousel`)
 
 Shows one slide of several, with controls to move between them.
 
@@ -904,7 +904,7 @@ which is what a run of cards wants rather than a run of full-width panels.
 
 ## Checkbox
 
-### Root — `helix-checkbox`
+### Root (`helix-checkbox`)
 
 A box that is ticked, or not, or neither.
 
@@ -986,7 +986,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 ## Checkbox Group
 
-### Root — `helix-checkbox-group`
+### Root (`helix-checkbox-group`)
 
 Groups related checkboxes, and reports them as one set.
 
@@ -1049,7 +1049,7 @@ line per answer rather than hunting along a row.
 
 ## Code
 
-### Root — `helix-code`
+### Root (`helix-code`)
 
 A fragment of code inside a line of prose.
 
@@ -1078,7 +1078,7 @@ around it at the same nominal size. `--code-size` overrides it.
 
 ## Code Block
 
-### Root — `helix-code-block`
+### Root (`helix-code-block`)
 
 A block of code, with somewhere to put its name and a way to take it.
 
@@ -1120,7 +1120,7 @@ of a snippet a reader is most likely to be reading.
 
 ## Color Input
 
-### Root — `helix-color-input`
+### Root (`helix-color-input`)
 
 A color, typed in any syntax or picked from a panel.
 
@@ -1223,7 +1223,7 @@ pads its own lower rows.
 
 ## Color Picker
 
-### Root — `helix-color-picker`
+### Root (`helix-color-picker`)
 
 Picks a color, from a square and two ramps.
 
@@ -1327,7 +1327,7 @@ brought its own card would be a card inside a card there.
 
 ## Combobox
 
-### Root — `helix-combobox`
+### Root (`helix-combobox`)
 
 A field that filters a list as it is typed into.
 
@@ -1424,7 +1424,7 @@ Input, Color Input and Date Input all take.
 
 ## Command
 
-### Root — `helix-command`
+### Root (`helix-command`)
 
 A list of commands, opened from anywhere and filtered by typing.
 
@@ -1491,7 +1491,7 @@ otherwise walk up and down the screen under the words being typed.
 
 ## Copy Button
 
-### Root — `helix-copy-button`
+### Root (`helix-copy-button`)
 
 A button that puts a string on the clipboard and says it did.
 
@@ -1553,7 +1553,7 @@ it for reassurance reads as a second, accidental press.
 
 ## Date Input
 
-### Root — `helix-date-input`
+### Root (`helix-date-input`)
 
 A date, typed or picked from a calendar.
 
@@ -1654,7 +1654,7 @@ whatever holds it.
 
 ## Date Picker
 
-### Root — `helix-date-picker`
+### Root (`helix-date-picker`)
 
 Shows a month, and takes a date from it.
 
@@ -1745,7 +1745,7 @@ grid reads as a continuous run of dates.
 
 ## Dialog
 
-### Root — `helix-dialog`
+### Root (`helix-dialog`)
 
 A modal window, on the platform's own dialog.
 
@@ -1813,7 +1813,7 @@ dialog rather than being a div somebody positioned.
 
 ## Divider
 
-### Root — `helix-divider`
+### Root (`helix-divider`)
 
 Separates content into groups with a rule.
 
@@ -1859,7 +1859,7 @@ tall that is.
 
 ## Donut Chart
 
-### Root — `helix-donut-chart`
+### Root (`helix-donut-chart`)
 
 Parts of a whole as a ring, read from a table.
 
@@ -1929,7 +1929,7 @@ larger than the default.
 
 ## Drawer
 
-### Root — `helix-drawer`
+### Root (`helix-drawer`)
 
 A panel that slides in from an edge.
 
@@ -1996,7 +1996,7 @@ rest is flat and the movement is what says something happened.
 
 ## Drilldown
 
-### Root — `helix-drilldown`
+### Root (`helix-drilldown`)
 
 A stack of pages, one showing at a time, with a way back.
 
@@ -2057,7 +2057,7 @@ from: the page arriving was not in the DOM a frame ago. Under
 | `--drilldown-background` | Fill behind the pages. |
 | `--drilldown-inline-size` | Width of the region. |
 
-### Item — `helix-drilldown-item`
+### Item (`helix-drilldown-item`)
 
 One row of a drill-down, which may hold a page of its own.
 
@@ -2114,7 +2114,7 @@ lines up with the edge the eye is already following down the list.
 
 ## Empty
 
-### Root — `helix-empty`
+### Root (`helix-empty`)
 
 Says that a region has nothing in it, and what to do about it.
 
@@ -2147,7 +2147,7 @@ empty.
 
 ## File Input
 
-### Root — `helix-file-input`
+### Root (`helix-file-input`)
 
 A control for choosing files, by pointer or by dropping them on it.
 
@@ -2238,7 +2238,7 @@ invisible.
 
 ## Flex
 
-### Root — `helix-flex`
+### Root (`helix-flex`)
 
 Lays children out in a row or a column.
 
@@ -2277,7 +2277,7 @@ behavior separate from styling, and this is entirely styling.
 
 ## Grid
 
-### Root — `helix-grid`
+### Root (`helix-grid`)
 
 Lays children out on a grid.
 
@@ -2307,7 +2307,7 @@ Presentation only, so there is no headless tier.
 
 ## Icon
 
-### Root — `helix-icon`
+### Root (`helix-icon`)
 
 Renders a named icon from the Helix set.
 
@@ -2339,7 +2339,7 @@ proportion as the button's own size changes.
 
 ## Icon Button
 
-### Root — `helix-icon-button`
+### Root (`helix-icon-button`)
 
 A square button whose content is an icon.
 
@@ -2404,7 +2404,7 @@ common way a toolbar becomes unusable without sight.
 
 ## Image
 
-### Root — `helix-image`
+### Root (`helix-image`)
 
 A picture that says whether it arrived.
 
@@ -2461,7 +2461,7 @@ base class.
 
 ## Input
 
-### Root — `helix-input`
+### Root (`helix-input`)
 
 A single line of text a reader types into.
 
@@ -2550,7 +2550,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 
 ## Kbd
 
-### Root — `helix-kbd`
+### Root (`helix-kbd`)
 
 A keyboard key or chord, set inline with text.
 
@@ -2584,7 +2584,7 @@ than holding one size and looking wrong in a heading.
 
 ## Legend
 
-### Root — `helix-legend`
+### Root (`helix-legend`)
 
 The names a chart draws, each beside the colour it is drawn in.
 
@@ -2626,7 +2626,7 @@ custom property set inline would be the headless tier naming a colour.
 
 ## Line Chart
 
-### Root — `helix-line-chart`
+### Root (`helix-line-chart`)
 
 A series over time as a line, read from a table.
 
@@ -2695,7 +2695,7 @@ answers for a shape.
 
 ## List
 
-### Root — `helix-list`
+### Root (`helix-list`)
 
 A set of rows, read as a set.
 
@@ -2727,7 +2727,7 @@ decoration doing what emptiness already does.
 | `--list-gap` | Space between rows. |
 | `--list-marker-gutter` | Room the ordered and unordered markers hang into. |
 
-### Item — `helix-list-item`
+### Item (`helix-list-item`)
 
 One row of a list.
 
@@ -2769,7 +2769,7 @@ hold their own width and the middle takes the rest.
 
 ## Listbox
 
-### Root — `helix-listbox`
+### Root (`helix-listbox`)
 
 A list of options, one or several of which are the answer.
 
@@ -2859,7 +2859,7 @@ list moves under the reader rather than the reader moving to find it.
 
 ## Loader
 
-### Root — `helix-loader`
+### Root (`helix-loader`)
 
 Says that something indeterminate is in progress.
 
@@ -2903,7 +2903,7 @@ to say so.
 
 ## Megamenu
 
-### Root — `helix-megamenu`
+### Root (`helix-megamenu`)
 
 A section of a navigation that opens a panel of destinations.
 
@@ -2966,7 +2966,7 @@ Everything about what opens it and what closes it is the base class.
 
 ## Menu
 
-### Root — `helix-menu`
+### Root (`helix-menu`)
 
 A menu of commands, opened from a trigger.
 
@@ -3037,7 +3037,7 @@ one panel and reads the same on a phone as on a desk.
 | `--menu-min-inline-size` | Narrowest the surface gets. |
 | `--menu-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
-### Item — `helix-menu-item`
+### Item (`helix-menu-item`)
 
 One row in a menu: a command, a choice, or a way into a submenu.
 
@@ -3103,7 +3103,7 @@ than as a ragged list.
 
 ## Meter
 
-### Root — `helix-meter`
+### Root (`helix-meter`)
 
 A measurement in a known range, and whether it is where you want it.
 
@@ -3181,7 +3181,7 @@ reading are what say how far past.
 
 ## Navigation
 
-### Root — `helix-navigation`
+### Root (`helix-navigation`)
 
 A set of destinations, with a marker on the current one.
 
@@ -3220,7 +3220,7 @@ says where the current page was as well as where it is.
 
 ## Number Input
 
-### Root — `helix-number-input`
+### Root (`helix-number-input`)
 
 A number a reader types or steps to.
 
@@ -3306,7 +3306,7 @@ three times as long to cross.
 
 ## Option
 
-### Root — `helix-option`
+### Root (`helix-option`)
 
 One choice in a listbox.
 
@@ -3365,7 +3365,7 @@ picked from what they are looking at.
 | `--option-active-color` | Wash behind the option the keyboard is on. |
 | `--option-radii` | Corner radius of the row. A listbox and a select flatten it. |
 
-### Group — `helix-option-group`
+### Group (`helix-option-group`)
 
 A named run of options inside a listbox.
 
@@ -3397,7 +3397,7 @@ tells you which list, not something to read on its own.
 
 ## Outline
 
-### Root — `helix-outline`
+### Root (`helix-outline`)
 
 Links to the headings on this page, marking the one being read.
 
@@ -3448,7 +3448,7 @@ document is not always where the headings are.
 
 ## Pagination
 
-### Root — `helix-pagination`
+### Root (`helix-pagination`)
 
 Moves between pages of a longer result.
 
@@ -3533,7 +3533,7 @@ is a way through rather than a destination, so it does not compete.
 | `--pagination-hover-color` | Fill behind a control under the pointer. |
 | `--pagination-size` | The box every control in the row takes. |
 
-### Size — `helix-pagination-size`
+### Size (`helix-pagination-size`)
 
 Chooses how many items a page holds.
 
@@ -3571,7 +3571,7 @@ reach through both boundaries and a consumer styles it as the select it is.
 | `trigger` | The closed control, forwarded from the select. |
 | `value` | The chosen size inside the trigger, forwarded from the select. |
 
-### Summary — `helix-pagination-summary`
+### Summary (`helix-pagination-summary`)
 
 Reads out which items of how many are on show.
 
@@ -3593,7 +3593,7 @@ a way to move through it.
 
 ## Pin Input
 
-### Root — `helix-pin-input`
+### Root (`helix-pin-input`)
 
 A short code, one character to a box.
 
@@ -3667,7 +3667,7 @@ breathe as a code is typed into it.
 
 ## Popover
 
-### Root — `helix-popover`
+### Root (`helix-popover`)
 
 A panel that opens against a trigger and holds anything.
 
@@ -3737,7 +3737,7 @@ time.
 
 ## Progress
 
-### Root — `helix-progress`
+### Root (`helix-progress`)
 
 Shows how far along a task is, when that is known.
 
@@ -3788,7 +3788,7 @@ thing advancing.
 
 ## Qr Code
 
-### Root — `helix-qr-code`
+### Root (`helix-qr-code`)
 
 Encodes a short piece of text as a scannable square.
 
@@ -3840,7 +3840,7 @@ So the ground is stated and the ink is the foreground it is chosen for.
 
 ## Quote
 
-### Root — `helix-quote`
+### Root (`helix-quote`)
 
 A short quotation, set inline with the text around it.
 
@@ -3875,7 +3875,7 @@ inside a paragraph is that paragraph's text with marks around it.
 
 ## Radio
 
-### Root — `helix-radio`
+### Root (`helix-radio`)
 
 One choice in a radio group.
 
@@ -3942,7 +3942,7 @@ and being chosen is an answer rather than a state.
 | `--radio-card-background-color` | Fill behind a card-shaped choice. |
 | `--radio-card-border-color` | Edge around one. |
 
-### Group — `helix-radio-group`
+### Group (`helix-radio-group`)
 
 A set of choices where exactly one is the answer.
 
@@ -4011,7 +4011,7 @@ group keeps its question above the row rather than beside the first choice.
 
 ## Rating
 
-### Root — `helix-rating`
+### Root (`helix-rating`)
 
 A score out of a few marks, given or shown.
 
@@ -4091,7 +4091,7 @@ Everything about what the score is and how it is chosen is the base class.
 
 ## Sandbox
 
-### Root — `helix-sandbox`
+### Root (`helix-sandbox`)
 
 Pairs an editable source pane with a live preview.
 
@@ -4186,7 +4186,7 @@ what it meant when it was written.
 | `--sandbox-grab` | The invisible width of a divider's drag target. |
 | `--sandbox-separator-color` | Color of the divider. |
 
-### Preview — `helix-sandbox-preview`
+### Preview (`helix-sandbox-preview`)
 
 Renders sandbox source in a frame of its own.
 
@@ -4264,7 +4264,7 @@ nobody is looking at. Top-level navigation, popups and modals are not.
 | --- | --- |
 | `frame` | The iframe. |
 
-### Source — `helix-sandbox-source`
+### Source (`helix-sandbox-source`)
 
 Editable source for a sandbox preview.
 
@@ -4307,7 +4307,7 @@ is the documented escape hatch for exactly this trade.
 | `--sandbox-source-background` | Fill behind the source. |
 | `--sandbox-source-min-block-size` | Minimum height of the pane. |
 
-### Status Bar — `helix-sandbox-status-bar`
+### Status Bar (`helix-sandbox-status-bar`)
 
 Reports where the cursor is and what is being edited.
 
@@ -4354,7 +4354,7 @@ empty, or the bar keeps a gap where a value is not.
 | --- | --- |
 | `--status-bar-color` | Color of the bar's text. |
 
-### Terminal — `helix-sandbox-terminal`
+### Terminal (`helix-sandbox-terminal`)
 
 Shows what the previewed example wrote to the console.
 
@@ -4404,7 +4404,7 @@ the whole panel being re-announced each time.
 | --- | --- |
 | `--terminal-size` | Height of the scrolling region. |
 
-### Toolbar — `helix-sandbox-toolbar`
+### Toolbar (`helix-sandbox-toolbar`)
 
 The bar across the top of a sandbox.
 
@@ -4437,7 +4437,7 @@ Both slots are bare, so an unfilled one generates no box and costs no gap.
 
 ## Scroll Area
 
-### Root — `helix-scroll-area`
+### Root (`helix-scroll-area`)
 
 A scrolling box that says there is more.
 
@@ -4483,7 +4483,7 @@ have content past them is measured by the base class.
 
 ## Select
 
-### Root — `helix-select`
+### Root (`helix-select`)
 
 A closed list that opens to be chosen from.
 
@@ -4577,7 +4577,7 @@ from the field it came out of.
 
 ## Skeleton
 
-### Root — `helix-skeleton`
+### Root (`helix-skeleton`)
 
 Stands in for content that has not arrived.
 
@@ -4607,7 +4607,7 @@ the same one property animating either way.
 
 ## Slider
 
-### Root — `helix-slider`
+### Root (`helix-slider`)
 
 A value chosen from a range by dragging.
 
@@ -4694,7 +4694,7 @@ the thumb being dragged.
 
 ## Sparkline
 
-### Root — `helix-sparkline`
+### Root (`helix-sparkline`)
 
 A line with no axes, for the shape of a series beside the number it belongs to.
 
@@ -4760,7 +4760,7 @@ keeps it out of every other reason it might want to be bigger.
 
 ## Speed Dial
 
-### Root — `helix-speed-dial`
+### Root (`helix-speed-dial`)
 
 A button that fans out the few actions a screen is for.
 
@@ -4815,7 +4815,7 @@ moves through it is the base class.
 | --- | --- |
 | `--speed-dial-gap` | Space between the actions. |
 
-### Item — `helix-speed-dial-item`
+### Item (`helix-speed-dial-item`)
 
 One action in a speed dial: a mark, and a name beside it.
 
@@ -4870,7 +4870,7 @@ over. Everything about choosing it is the base class.
 
 ## Splitter
 
-### Root — `helix-splitter`
+### Root (`helix-splitter`)
 
 Two panes and a divider the reader can move.
 
@@ -4967,7 +4967,7 @@ gesture.
 
 ## Stat
 
-### Root — `helix-stat`
+### Root (`helix-stat`)
 
 One measurement, with the word for what it measures.
 
@@ -4998,7 +4998,7 @@ pair reads as one object rather than as two lines of text.
 | --- | --- |
 | `--stat-value-size` | Size of the figure. |
 
-### Group — `helix-stat-group`
+### Group (`helix-stat-group`)
 
 A row of related measurements.
 
@@ -5030,7 +5030,7 @@ same quantity.
 
 ## Steps
 
-### Root — `helix-steps`
+### Root (`helix-steps`)
 
 A sequence of stages, and where the reader is in it.
 
@@ -5084,7 +5084,7 @@ second name for it here would be a second thing to keep in step.
 | `--steps-complete-color` | The mark on a finished step. |
 | `--steps-current-color` | The mark on the current step. |
 
-### Step — `helix-step`
+### Step (`helix-step`)
 
 One stage in a sequence.
 
@@ -5135,7 +5135,7 @@ Extends `HelixBaseStep`.
 
 ## Switch
 
-### Root — `helix-switch`
+### Root (`helix-switch`)
 
 A control that turns something on or off.
 
@@ -5220,7 +5220,7 @@ consumer has to keep.
 
 ## Table
 
-### Root — `helix-table`
+### Root (`helix-table`)
 
 Tabular data laid out on a grid.
 
@@ -5262,7 +5262,7 @@ decorating none of it.
 | `--table-columns` | Track list for the columns. |
 | `--table-template` | The column track list, built from the columns the consumer declared. |
 
-### Cell — `helix-table-cell`
+### Cell (`helix-table-cell`)
 
 One cell of a table.
 
@@ -5284,7 +5284,7 @@ decorating none of it.
 | --- | --- |
 | *(default)* | The cell's content. |
 
-### Column — `helix-table-column`
+### Column (`helix-table-column`)
 
 One column of a table: its heading, and how wide it is.
 
@@ -5313,7 +5313,7 @@ table.
 | --- | --- |
 | `column` | The heading cell. |
 
-### Row — `helix-table-row`
+### Row (`helix-table-row`)
 
 One row of a table.
 
@@ -5331,7 +5331,7 @@ decorating none of it.
 
 ## Tabs
 
-### Root — `helix-tabs`
+### Root (`helix-tabs`)
 
 A row of tabs and the panel each one shows.
 
@@ -5379,7 +5379,7 @@ a movement instead of two separate fills.
 | `panels` | The panel container. |
 | `indicator` | The mark that travels to the selected tab. |
 
-### Panel — `helix-tabs-panel`
+### Panel (`helix-tabs-panel`)
 
 The content shown for one tab.
 
@@ -5409,7 +5409,7 @@ a movement instead of two separate fills.
 | --- | --- |
 | `panel` | The panel container. |
 
-### Tab — `helix-tabs-tab`
+### Tab (`helix-tabs-tab`)
 
 One tab in a tab list.
 
@@ -5454,7 +5454,7 @@ a movement instead of two separate fills.
 
 ## Tag
 
-### Root — `helix-tag`
+### Root (`helix-tag`)
 
 Labels content with a short piece of metadata.
 
@@ -5511,7 +5511,7 @@ the status colors gets the tints with them.
 
 ## Text
 
-### Root — `helix-text`
+### Root (`helix-text`)
 
 A run of text, with the element and the look chosen separately.
 
@@ -5574,7 +5574,7 @@ cross product, which is the explosion a named ramp exists to prevent.
 
 ## Textarea
 
-### Root — `helix-textarea`
+### Root (`helix-textarea`)
 
 Several lines of text a reader types into.
 
@@ -5640,7 +5640,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 
 ## Time Input
 
-### Root — `helix-time-input`
+### Root (`helix-time-input`)
 
 A time, typed or picked from a list.
 
@@ -5736,7 +5736,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 
 ## Time Picker
 
-### Root — `helix-time-picker`
+### Root (`helix-time-picker`)
 
 Picks a time, from a list of them.
 
@@ -5812,7 +5812,7 @@ card would be a card inside a card there.
 
 ## Timeline
 
-### Root — `helix-timeline`
+### Root (`helix-timeline`)
 
 A record of what happened, in the order it happened.
 
@@ -5839,7 +5839,7 @@ event and the next. Every entry draws its own mark and its own line.
 | --- | --- |
 | `--timeline-gap` | Space between one entry and the next. |
 
-### Item — `helix-timeline-item`
+### Item (`helix-timeline-item`)
 
 One event on a timeline: when it happened, and what it was.
 
@@ -5884,7 +5884,7 @@ arrives at this entry from the one before.
 
 ## Toast
 
-### Root — `helix-toast`
+### Root (`helix-toast`)
 
 The region messages arrive in, and the only thing that announces them.
 
@@ -5935,7 +5935,7 @@ into the top layer.
 | `--toast-gap` | Space between one message and the next. |
 | `--toast-inline-size` | Width of a message. |
 
-### Item — `helix-toast-item`
+### Item (`helix-toast-item`)
 
 One message in the toast region.
 
@@ -6004,7 +6004,7 @@ costs contrast for something the mark already says.
 
 ## Toggle
 
-### Root — `helix-toggle`
+### Root (`helix-toggle`)
 
 One option in a toggle group.
 
@@ -6048,7 +6048,7 @@ one fill appearing as another disappears.
 | --- | --- |
 | `item` | The button or anchor. |
 
-### Group — `helix-toggle-group`
+### Group (`helix-toggle-group`)
 
 A row of options with the selection marked by a moving indicator.
 
@@ -6121,7 +6121,7 @@ corner radius, which is worse than the exception.
 
 ## Toolbar
 
-### Root — `helix-toolbar`
+### Root (`helix-toolbar`)
 
 A group of controls that share one tab stop.
 
@@ -6157,7 +6157,7 @@ them would be a second frame inside whatever already frames the bar.
 
 ## Tooltip
 
-### Root — `helix-tooltip`
+### Root (`helix-tooltip`)
 
 A short description that appears beside what it describes.
 
@@ -6225,7 +6225,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 
 ## Tour
 
-### Root — `helix-tour`
+### Root (`helix-tour`)
 
 A guided run through an interface, one stop at a time.
 
@@ -6283,7 +6283,7 @@ The styled tier of `BaseTour`. It draws the light and nothing else.
 | `--tour-scrim-color` | The darkness outside the lit box. |
 | `--tour-spotlight-radius` | Corner radius of the lit box. |
 
-### Stop — `helix-tour-stop`
+### Stop (`helix-tour-stop`)
 
 One stop on a tour: what it points at, and a panel to say it in.
 
@@ -6345,7 +6345,7 @@ name, on purpose.
 
 ## Tree
 
-### Root — `helix-tree`
+### Root (`helix-tree`)
 
 A tree of items, navigable entirely from the keyboard.
 
@@ -6403,7 +6403,7 @@ to it is one more thing between the reader and the label.
 | `--tree-chevron-order` | Set from `chevron-placement`; read by each item. |
 | `--tree-chevron-gap` | Set from `chevron-placement`; the space before the chevron. |
 
-### Item — `helix-tree-item`
+### Item (`helix-tree-item`)
 
 One node in a tree.
 
@@ -6481,7 +6481,7 @@ the row itself stays flat.
 
 ## Trend
 
-### Root — `helix-trend`
+### Root (`helix-trend`)
 
 Which way a measurement moved, and whether that is good news.
 
@@ -6525,7 +6525,7 @@ reads and the judgment is a gloss on it.
 
 ## Video
 
-### Root — `helix-video`
+### Root (`helix-video`)
 
 Plays a video, with controls this library draws rather than the
 browser's.
@@ -6650,7 +6650,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 ## Video Playlist
 
-### Root — `helix-video-playlist`
+### Root (`helix-video-playlist`)
 
 A set of clips and the one player they take turns in.
 
@@ -6700,7 +6700,7 @@ entries sit in. Everything about which clip is current is the base class.
 | `--video-playlist-layout` | Columns for the player and the list. |
 | `--video-playlist-size` | How tall the list gets before it scrolls. |
 
-### Item — `helix-video-playlist-item`
+### Item (`helix-video-playlist-item`)
 
 One entry in a video playlist.
 
@@ -6751,7 +6751,7 @@ playing. The base class holds what the entry is and what it announces.
 | `--video-playlist-item-background-color` | Fill behind a row. |
 | `--video-playlist-media-size` | Width of the thumbnail column. |
 
-### Menu — `helix-video-playlist-menu`
+### Menu (`helix-video-playlist-menu`)
 
 The playlist's entries, as a menu inside the player's control bar.
 
@@ -6812,7 +6812,7 @@ not.
 
 ## Virtual List
 
-### Root — `helix-virtual-list`
+### Root (`helix-virtual-list`)
 
 Renders the rows of a long set that are on screen, and no others.
 

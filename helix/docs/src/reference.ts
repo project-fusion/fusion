@@ -141,12 +141,7 @@ const element = (declaration: HelixDeclaration, part: string): string[] => {
     tagName,
   } = declaration
 
-  /* The separator is an em dash, which this repository does not otherwise use.
-     It is kept for now so that moving this renderer out of a script and into
-     the package can be proved byte for byte against the reference the script
-     already wrote. Changing it is a one-character commit of its own, where the
-     diff is visibly nothing but the headings. */
-  const lines = [`### ${title(part)} \u2014 \`${tagName}\``, '']
+  const lines = [`### ${title(part)} (\`${tagName}\`)`, '']
   if (summary) {
     lines.push(summary, '')
   }
