@@ -261,11 +261,28 @@ export function ThemeBuilder({
   /* **The ramps are inline, because a stylesheet cannot know the brand.** Both
      are written in OKLCH off the derived primary so the track and the palette
      agree: a saturation ramp drawn in sRGB would promise a colour the engine
-     never produces. */
-  const channelRamps = useMemo((): React.CSSProperties => {
+     never produces.
+
+     **Set on each slider rather than on the section for a stylesheet to route,**
+     which is a bug fix rather than a tidy. The two rules that did the routing
+     were `.themeChannel[label="Saturation"]` and `[label="Accent angle"]`, and a
+     `label` attribute is only there when a *server* wrote it: on a client-side
+     navigation React creates the element and assigns `label` as a property,
+     which Lit does not reflect, so the attribute never exists and the selector
+     matches nothing. Measured on the running site, soft navigation against
+     reload: ten sliders, every label reading empty on the first and every one
+     present on the second, with the ramps following exactly.
+
+     A `style` prop has no such split. React applies it through `node.style` on
+     both paths, and the DOM writes the attribute itself.
+
+     Selecting on a component's *label text* was fragile on top of that: renaming
+     a control in the markup would have silently unstyled it, with nothing to
+     catch that either. */
+  const ramps = useMemo(() => {
     const primary = theme.tokens.find((token) => token.name === 'color-primary')?.value
     if (!primary) {
-      return {}
+      return { accent: undefined, saturation: undefined }
     }
     const { chroma, hue, lightness } = primary
     const wheel = Array.from(
@@ -274,9 +291,9 @@ export function ThemeBuilder({
     ).join(', ')
 
     return {
-      '--theme-accent-ramp': `linear-gradient(to right, ${wheel})`,
-      '--theme-saturation-ramp': `linear-gradient(to right, oklch(${lightness} 0 ${hue}), oklch(${lightness} ${chroma} ${hue}))`,
-    } as React.CSSProperties
+      accent: `linear-gradient(to right, ${wheel})`,
+      saturation: `linear-gradient(to right, oklch(${lightness} 0 ${hue}), oklch(${lightness} ${chroma} ${hue}))`,
+    }
   }, [theme])
   const preview = useRef<HelixSandboxPreview>(null)
 
@@ -436,7 +453,7 @@ export function ThemeBuilder({
           of that was going to be rebuilt here badly. What it does not carry is
           file tabs, because a theme has one artifact and not four. */}
       <helix-splitter className={styles.workbenchBody} default-position={24}>
-        <section className="themeControls" slot="start" style={channelRamps}>
+        <section className="themeControls" slot="start">
           <helix-flex direction="column" gap="lg">
             <helix-flex direction="column" gap="xs">
               <helix-flex align="center" gap="sm" justify="between">
@@ -537,6 +554,7 @@ export function ThemeBuilder({
               className="themeChannel"
               label="Saturation"
               max={100}
+              style={{ '--slider-track-image': ramps.saturation ?? '' }}
               min={0}
               name="chroma"
               onhelix-input={(event) => setChromaScale(Number(event.detail.value))}
@@ -551,6 +569,7 @@ export function ThemeBuilder({
               className="themeChannel"
               label="Accent angle"
               max={360}
+              style={{ '--slider-track-image': ramps.accent ?? '' }}
               min={0}
               name="accent"
               onhelix-input={(event) => setAccentHue(Number(event.detail.value))}
