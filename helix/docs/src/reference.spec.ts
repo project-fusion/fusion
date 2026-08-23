@@ -121,8 +121,8 @@ describe('reference', () => {
   })
 
   test('a table with no rows is not printed at all', () => {
-    expect(rendered).toContain('#### Custom properties')
-    expect(rendered).not.toContain('#### Parts')
+    expect(rendered).toContain('### Custom properties')
+    expect(rendered).not.toContain('### Parts')
   })
 
   test('an unnamed slot reads as the default one', () => {
@@ -144,9 +144,67 @@ describe('reference', () => {
           declarations: [{ name: 'HelixQrCode', tagName: 'helix-qr-code' }],
           path: 'src/qr-code/root/qr-code-root.ts',
         },
+        // A second family, because a lone one gets no heading naming it.
+        {
+          declarations: [{ name: 'HelixCard', tagName: 'helix-card' }],
+          path: 'src/card/root/card-root.ts',
+        },
       ],
     }
     expect(reference(initialism)).toContain('## QR Code')
+  })
+
+  // A page about one component should not say its name twice before its first
+  // sentence, and should not open at a heading level with nothing above it.
+  describe('one family', () => {
+    const one = reference(manifest, { families: ['accordion'], title: 'Accordion' })
+
+    test('gets no heading naming it, and its elements rise a level', () => {
+      expect(one).not.toContain('## Accordion\n')
+      expect(one).toStartWith('# Accordion\n')
+      expect(one).toContain('## Root (`helix-accordion`)')
+      expect(one).toContain('### Properties')
+    })
+
+    test('an unlisted family is not in it', () => {
+      expect(reference(manifest, { families: ['nothing'] })).toBe('# Component reference\n')
+    })
+  })
+
+  // The reference `.md` carries the examples and the HTML page does not. An
+  // agent has no sandbox to be sent to, and to it an example is text.
+  describe('examples', () => {
+    const withExamples = reference(manifest, {
+      examples: {
+        accordion: [
+          {
+            css: 'helix-accordion { display: block }',
+            description: 'One at a time.',
+            html: '<!-- @summary One at a time. -->\n<helix-accordion></helix-accordion>',
+            label: 'Preview',
+          },
+        ],
+      },
+      families: ['accordion'],
+    })
+
+    test('are printed under the family, with their stylesheet', () => {
+      expect(withExamples).toContain('## Examples')
+      expect(withExamples).toContain('### Preview')
+      expect(withExamples).toContain('```html\n<helix-accordion></helix-accordion>\n```')
+      expect(withExamples).toContain('```css\nhelix-accordion { display: block }\n```')
+    })
+
+    // The comment is how an example declares its one-liner to the analyzer, so
+    // it belongs in the file and not a second time in the prose beside it.
+    test('drop the summary comment the description already carries', () => {
+      expect(withExamples).toContain('One at a time.')
+      expect(withExamples).not.toContain('@summary')
+    })
+
+    test('a family with none gets no heading for them', () => {
+      expect(reference(manifest, { families: ['accordion'] })).not.toContain('## Examples')
+    })
   })
 
   test('renders nothing but a heading for an empty manifest', () => {

@@ -68,3 +68,4 @@ site/ui/public/.probe/
 
 # Derived from the manifests and the example files by `bun run catalog`.
 site/ui/lib/catalog.generated.json
+site/ui/public/components/

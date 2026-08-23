@@ -93,13 +93,24 @@ const styled = manifests[0] ?? { modules: [] }
 for (const family of families) {
   writeFileSync(join(PUBLIC, `${family.slug}.json`), `${JSON.stringify(family, null, 2)}\n`)
 
-  const lede = [family.summary, ''].filter((line, index) => index === 0 && line !== '')
+  /* The lede is what the manifest knows and the reference does not print:
+     where the family is in the library, what it answers to, how stable it is,
+     and where its source lives. Deliberately not the summary, which the root
+     element prints two lines further down and would otherwise say twice. */
+  const facts = [
+    ['Category', family.category],
+    ['Status', family.status],
+    ['Since', family.since],
+    ['Aliases', family.aliases.join(', ')],
+    ['Source', family.source],
+  ].filter(([, value]) => value)
+
   writeFileSync(
     join(PUBLIC, `${family.slug}.md`),
     reference(styled, {
       examples: { [family.slug]: family.examples },
       families: [family.slug],
-      lede: lede.length > 0 ? [...lede, ''] : [],
+      lede: facts.length > 0 ? [...facts.map(([key, value]) => `- **${key}:** ${value}`), ''] : [],
       title: family.label,
     }),
   )

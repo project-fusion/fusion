@@ -24,8 +24,35 @@
 import type { Documented, HelixDeclaration, HelixManifest, HelixMember } from '@helix-io/cem'
 import { startCase } from './naming.js'
 
+/**
+ * An example, as much of one as a markdown reference prints.
+ *
+ * Structural rather than the catalog's `Example`, so this module does not
+ * import from one that imports it. Anything the catalog returns satisfies it.
+ */
+export interface ReferenceExample {
+  css: string
+  description: string
+  html: string
+  label: string
+}
+
 /** What to put above the reference, for a caller that generates a file. */
 export interface ReferenceOptions {
+  /**
+   * Examples to print under each family, keyed by family slug.
+   *
+   * **The reference `.md` carries the examples and the HTML page does not**,
+   * and the difference is deliberate rather than an omission on one side. That
+   * page answers what a component can do, and the sandbox beside it answers
+   * what the component looks like; a reference that started collecting pictures
+   * would stop being the one place you can trust to be complete. An agent has
+   * no sandbox to be sent to, and to it an example is text rather than a
+   * picture, so the `.md` is the only surface that has to answer both.
+   */
+  examples?: Record<string, ReferenceExample[]>
+  /** Only these families. Omitted renders everything in the manifest. */
+  families?: string[]
   /** Prose under the heading, already wrapped. Omitted where absent. */
   lede?: string[]
   /** Top-level heading. */
@@ -61,14 +88,14 @@ const code = (text: string | undefined): string =>
   text ? `\`${text.replace(/\|/g, '\\|')}\`` : '-'
 
 /** A markdown table, or nothing at all where there are no rows to put in one. */
-const table = (heading: string, columns: string[], rows: string[][]): string => {
+const table = (depth: number, heading: string, columns: string[], rows: string[][]): string => {
   if (rows.length === 0) {
     return ''
   }
   const head = `| ${columns.join(' | ')} |`
   const rule = `| ${columns.map(() => '---').join(' | ')} |`
   const body = rows.map((row) => `| ${row.join(' | ')} |`).join('\n')
-  return `\n#### ${heading}\n\n${head}\n${rule}\n${body}\n`
+  return `\n${'#'.repeat(depth)} ${heading}\n\n${head}\n${rule}\n${body}\n`
 }
 
 /**
@@ -121,7 +148,7 @@ export const referenceFamilies = (manifest: HelixManifest): ReferenceFamily[] =>
 }
 
 /** The tables for one element, in the order they are printed. */
-const element = (declaration: HelixDeclaration, part: string): string[] => {
+const element = (depth: number, declaration: HelixDeclaration, part: string): string[] => {
   const {
     attributes = [],
     cssParts = [],
@@ -135,7 +162,7 @@ const element = (declaration: HelixDeclaration, part: string): string[] => {
     tagName,
   } = declaration
 
-  const lines = [`### ${startCase(part)} (\`${tagName}\`)`, '']
+  const lines = [`${'#'.repeat(depth)} ${startCase(part)} (\`${tagName}\`)`, '']
   if (summary) {
     lines.push(summary, '')
   }
@@ -156,6 +183,7 @@ const element = (declaration: HelixDeclaration, part: string): string[] => {
 
   lines.push(
     table(
+      depth + 1,
       'Properties',
       ['Property', 'Attribute', 'Type', 'Default', 'From', 'Description'],
       named(members, 'field').map((field) => [
@@ -168,6 +196,7 @@ const element = (declaration: HelixDeclaration, part: string): string[] => {
       ]),
     ).trimEnd(),
     table(
+      depth + 1,
       'Methods',
       ['Method', 'From', 'Description'],
       named(members, 'method').map((method) => [
@@ -177,11 +206,13 @@ const element = (declaration: HelixDeclaration, part: string): string[] => {
       ]),
     ).trimEnd(),
     table(
+      depth + 1,
       'Events',
       ['Event', 'Type', 'Description'],
       events.map((event) => [`\`${event.name}\``, code(event.type?.text), cell(event.description)]),
     ).trimEnd(),
     table(
+      depth + 1,
       'Slots',
       ['Slot', 'Description'],
       slots.map((slot: Documented) => [
@@ -190,11 +221,13 @@ const element = (declaration: HelixDeclaration, part: string): string[] => {
       ]),
     ).trimEnd(),
     table(
+      depth + 1,
       'Parts',
       ['Part', 'Description'],
       cssParts.map((one: Documented) => [`\`${one.name}\``, cell(one.description)]),
     ).trimEnd(),
     table(
+      depth + 1,
       'Custom properties',
       ['Property', 'Description'],
       cssProperties.map((one: Documented) => [`\`${one.name}\``, cell(one.description)]),
@@ -205,19 +238,61 @@ const element = (declaration: HelixDeclaration, part: string): string[] => {
 }
 
 /**
+ * The leading `<!-- @summary -->` comment, which the description above already
+ * carries. It is how an example declares its own one-liner to the analyzer, so
+ * it belongs in the file and not a second time in the prose beside it.
+ */
+const withoutSummary = (html: string): string => html.replace(/^<!--\s*@summary[\s\S]*?-->\n*/, '')
+
+/** One family's examples, as the markdown a reader or an agent can run. */
+const shown = (depth: number, examples: ReferenceExample[]): string[] => {
+  if (examples.length === 0) {
+    return []
+  }
+  const lines = [`${'#'.repeat(depth)} Examples`, '']
+  for (const example of examples) {
+    lines.push(`${'#'.repeat(depth + 1)} ${example.label}`, '')
+    if (example.description) {
+      lines.push(example.description, '')
+    }
+    lines.push('```html', withoutSummary(example.html), '```', '')
+    if (example.css) {
+      lines.push('```css', example.css, '```', '')
+    }
+  }
+  return lines
+}
+
+/**
  * A manifest, as the markdown reference for everything in it.
  *
  * The caller supplies the manifest and whatever preamble belongs above it, so
  * the same renderer serves the whole-library document in `docs/` and a
  * per-family page without either one knowing about the other.
+ *
+ * **A single family gets no heading naming it**, because the title already
+ * does: a document about the accordion should not say Accordion twice before
+ * its first sentence. More than one and the headings are what separate them.
  */
 export const reference = (manifest: HelixManifest, options: ReferenceOptions = {}): string => {
   const lines = [`# ${options.title ?? 'Component reference'}`, '', ...(options.lede ?? [])]
-  for (const { family, parts } of referenceFamilies(manifest)) {
-    lines.push(`## ${startCase(family)}`, '')
-    for (const { declaration, part } of parts) {
-      lines.push(...element(declaration, part))
+  const wanted = options.families
+  const families = referenceFamilies(manifest).filter(
+    (entry) => wanted === undefined || wanted.includes(entry.family),
+  )
+  /* Everything under a family heading sits one level deeper than it would in a
+     document that has no family heading to sit under. Without this a page about
+     one component opens at `###`, which is a heading level with nothing above
+     it and reads as a fragment of a larger file. */
+  const depth = families.length > 1 ? 3 : 2
+  for (const { family, parts } of families) {
+    if (families.length > 1) {
+      lines.push(`## ${startCase(family)}`, '')
     }
+    for (const { declaration, part } of parts) {
+      lines.push(...element(depth, declaration, part))
+    }
+    lines.push(...shown(depth, options.examples?.[family] ?? []))
   }
   return `${lines
     .join('\n')
