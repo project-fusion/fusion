@@ -88,7 +88,12 @@ const auditUnanswered = <T>(host: EventTarget, label: string, next: T, before: T
   if (!Object.is(before, first.before)) {
     return
   }
-  const tag = host instanceof Element ? `<${host.localName}>` : 'A Helix element'
+  /* `typeof` first, because `Element` is not a global everywhere this runs. The
+     server has no DOM unless something shimmed one, and an audit that throws
+     where it meant to warn turns a diagnostic into an outage. Found by testing
+     this on a plain `EventTarget`, which is what it accepts. */
+  const named = typeof Element !== 'undefined' && host instanceof Element
+  const tag = named ? `<${(host as Element).localName}>` : 'A Helix element'
   console.warn(
     `${tag} is controlled: \`${label}\` was declared, so it announces changes and waits to be told. ` +
       `It has asked twice, most recently for ${JSON.stringify(next)}, and nothing assigned ` +
