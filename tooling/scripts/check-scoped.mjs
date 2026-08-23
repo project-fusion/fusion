@@ -28,19 +28,25 @@ for (const file of modules) {
     .replace(/\/\*[\s\S]*?\*\//g, ' ')
     .replace(/:global\([^)]*\)/g, ' ')
   for (const [, name] of text.matchAll(/(?:^|[,\s>+~])\.([A-Za-z][\w-]*)/gm)) {
-    if (!owned.has(name)) owned.set(name, file)
+    if (!owned.has(name)) {
+      owned.set(name, file)
+    }
   }
 }
 
 const found = []
 for (const file of globSync('site/ui/**/*.tsx')) {
-  if (file.includes('node_modules') || file.includes('.next')) continue
+  if (file.includes('node_modules') || file.includes('.next')) {
+    continue
+  }
   const lines = readFileSync(file, 'utf8').split('\n')
   lines.forEach((line, i) => {
     for (const match of line.matchAll(/(?:className|class)=(?:"([^"]*)"|\{`([^`]*)`\})/g)) {
       const value = (match[1] ?? match[2]).replace(/\$\{[^}]*\}/g, ' ')
       for (const word of value.split(/\s+/)) {
-        if (owned.has(word)) found.push({ file, line: i + 1, module: owned.get(word), word })
+        if (owned.has(word)) {
+          found.push({ file, line: i + 1, module: owned.get(word), word })
+        }
       }
     }
   })

@@ -152,7 +152,7 @@ export function AuraLab(): React.ReactElement {
           <helix-text appearance="label" tone="subtle">
             Helix. Aura
           </helix-text>
-          <HeroCopy lede={<>{current?.body}</>} title={<>{current?.name}</>} />
+          <HeroCopy lede={current?.body} title={current?.name} />
         </helix-flex>
       </helix-flex>
 

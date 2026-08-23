@@ -13,7 +13,7 @@
  * the single registration in the root layout.
  */
 import Link from 'next/link'
-import { formatDate, INSIGHTS } from '../../lib/insights'
+import { INSIGHTS } from '../../lib/insights'
 import { PRODUCTS } from '../products'
 import { SERVICES } from '../services'
 import { stageAppearance } from '../verticals'
