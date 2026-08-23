@@ -25,6 +25,32 @@
  *
  * The value is the same wash composited against the page instead of against
  * transparency, so nothing about the controls changes where the field is plain.
+ *
+ * **`in srgb`, and that is what makes the sentence above true.** These mixed in
+ * oklab, which is the right space for choosing a colour between two others and
+ * the wrong one for restating an alpha: compositing is defined against the
+ * destination, in sRGB, so reproducing "six percent of the foreground over the
+ * page" as an opaque colour has to mix where the compositor would. Mixed in
+ * oklab it lands on the perceptual midpoint instead, and near black that is
+ * nowhere near the same place.
+ *
+ * Measured on the page's own ground, as the sRGB level painted:
+ *
+ * ```
+ *              wash    oklab    srgb
+ *  dark   6%     15        1      15
+ *  dark  12%     31        6      31
+ *  light  6%    240      235     240
+ *  light 12%    224      215     224
+ * ```
+ *
+ * So in light the two forms agreed to within five levels and the claim looked
+ * true, while in dark the rest state painted one level above the page and the
+ * hover painted six. Two buttons that were, correctly, reported as having no
+ * visible hover at all: the step was five levels where light mode's is twenty.
+ * It is the same shape as #145, a step that is symmetric in the measure and not
+ * in the eye, and the fix is to stop measuring in the wrong space rather than to
+ * tune a percentage until dark looks right.
  * It is not the page's own colour, which was tried here once and removed: the
  * page colour is a hole cut through the band, and these are recesses in it.
  *
@@ -35,7 +61,7 @@
  * wants the hooks moved onto the two selectors that need them. */
 .designHero {
   --button-background-color: color-mix(
-    in oklab,
+    in srgb,
     var(--helix-color-foreground) 6%,
     var(--helix-color-background)
   );
@@ -49,12 +75,12 @@
    * The step is the same one the library takes for a resting wash of six, twice
    * it, so these deepen by the amount any other button of this kind would. */
   --button-background-color-hover: color-mix(
-    in oklab,
+    in srgb,
     var(--helix-color-foreground) 12%,
     var(--helix-color-background)
   );
   --input-background-color: color-mix(
-    in oklab,
+    in srgb,
     var(--helix-color-foreground) 5%,
     var(--helix-color-background)
   );
