@@ -1120,10 +1120,33 @@ helix-toggle[disabled]::part(item) {
   column-gap: var(--helix-space-sm);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  padding: var(--helix-space-xs) var(--helix-space-sm);
+  padding: var(--helix-space-sm) var(--helix-space-sm);
   row-gap: var(--helix-space-2xs);
   text-decoration: none;
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Rows touch, so the band between two names belongs to one of them.
+ *
+ * The group is a flex column with `gap: xs`, which put eight pixels of nothing
+ * between every pair of rows. Nothing is the operative word: the anchor ended
+ * at its own padding, so the gap was outside every link in the panel. Measured
+ * at 1400 with the panel open, sampling straight down the Helix column, the
+ * cursor went hand, arrow, hand, arrow, hand, and the only part of a row that
+ * could be clicked was the two lines of text. A destination in a panel is a
+ * band, not a phrase.
+ *
+ * The pitch is unchanged rather than merely close: the padding went from `xs`
+ * to `sm` and the pull is the whole `xs` gap, so a row is 8+8+8 of non-content
+ * where it was 8+8 plus an 8 gap. 24 either way, and 67 pixels row to row
+ * before and after.
+ *
+ * Between two items only. The gap still separates the column's heading from the
+ * first row, and the Verticals column stacks plain links in the same kind of
+ * group and is untouched: zeroing the gap on the group would have taken both
+ * of those with it. */
+[data-megamenu-item] + [data-megamenu-item] {
+  margin-block-start: calc(var(--helix-space-xs) * -1);
 }
 
 /* No colour of its own. A mark beside every row in the panel, accented, is a

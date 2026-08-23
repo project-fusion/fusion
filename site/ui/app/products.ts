@@ -120,7 +120,7 @@ export interface Product {
  * count tidy would be softening them by omission, which is the one thing the
  * stage labels exist to prevent.
  *
- * Cortex carries one destination and Helix carries three, and the asymmetry is
+ * Cortex carries one destination and Helix carries four, and the asymmetry is
  * the honest reporting rather than a gap to fill. Engram, Trace and Recall are
  * named in `CLAUDE.md` and none of them is built, so none of them is a row
  * here. The day one is, it is a row.
@@ -129,6 +129,26 @@ export const PRODUCTS: Product[] = [
   {
     body: 'The design system. Web components with a token layer that derives an accessible palette from one brand color, so an interface is consistent because there was nothing else to choose. Components ship as custom elements, which keeps the framework above them a choice rather than a commitment.',
     destinations: [
+      /* First, because the panel is where a reader arrives rather than returns.
+         What a new one needs is how to install it and the vocabulary the
+         component pages already assume; an alphabetical list of every family is
+         what somebody wants on their second visit, and they reach it by name.
+
+         **`/helix/docs`, not `/helix/docs/introduction`.** That route derives
+         the first page of the first section rather than naming one, so a deep
+         link here would hardcode the single thing it exists to compute, and the
+         masthead would be the last place still pointing at the old front page
+         the day the order changes.
+
+         **`Guides` rather than `Docs` or `API`.** Components is documentation
+         too, so either of those names claims a distinction that is not the real
+         one. The real one is prose a reader reads against reference they look
+         up, and only this half is prose. */
+      {
+        href: '/helix/docs',
+        summary: 'Install it, theme it, and the ideas underneath.',
+        title: 'Guides',
+      },
       {
         href: '/helix',
         summary: 'Every family, with its API and an example.',

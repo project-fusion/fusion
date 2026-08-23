@@ -42,6 +42,21 @@ const DESTINATIONS: Findable[] = [
          rather than a component family, so the catalogue cannot offer it and
          nothing else in the palette could reach the thing that drives it. */
       { href: '/helix/theme', label: 'Theme builder, a palette and its audit' },
+      /* Not a tool, and here for the opposite reason to the two above: nothing
+         reaches it at all. It is in `routes.ts`, so it is in the sitemap and in
+         `llms.txt`, and that was the whole of it: no panel row, no palette
+         entry, and no link from any page or any documentation page.
+         `motion.mdx` mentions the aura shader in a sentence about what stops
+         under reduced motion, without linking it.
+
+         The link is here rather than in that sentence because `@helix-io/docs`
+         is a content package and `/helix/aura` is this site's route. The
+         package links its own pages relatively and describes the sandbox and
+         the theme builder without linking either, which is the same boundary
+         the manifest keeps when it records a path and lets the site compose the
+         URL. Versioned MDX naming a live route would point every archived page
+         at today's site. */
+      { href: '/helix/aura', label: 'Aura, the field and its geometry' },
     ],
   },
   {

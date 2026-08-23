@@ -18,7 +18,7 @@ a consumer can reach for a rung we happen not to use. It is worth seeing
 because nothing else can see it, `check:tokens` asking only that every token
 *referenced* exists.
 
-Currently unread anywhere: `--helix-color-accent-active`, `--helix-color-accent-subtle`, `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-leading-loose`, `--helix-shadow-none`, `--helix-material-blur-sm`, `--helix-material-translucent-strong`, `--helix-size-avatar-md`.
+Currently unread anywhere: `--helix-color-accent-active`, `--helix-color-accent-subtle`, `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-translucent-strong`, `--helix-size-avatar-md`.
 
 ## color
 
@@ -110,8 +110,8 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-none` | `var(--_helix-scale-0)` | 114 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 146 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 132 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 129 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 79 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 130 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 80 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 68 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 36 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 43 |
@@ -192,7 +192,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 123 |
+| `--helix-border-thin` | `1px` | 124 |
 | `--helix-border-thick` | `2px` | 35 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 1 |
 | `--helix-border-floating` | `0` | 10 |
@@ -203,10 +203,10 @@ Elevation.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-shadow-none` | `none` | 0 |
+| `--helix-shadow-none` | `none` | 1 |
 | `--helix-shadow-sm` | `0 1px 2px var(--_helix-shadow-ink-sm)` | 8 |
 | `--helix-shadow-md` | `0 4px 12px var(--_helix-shadow-ink-md)` | 11 |
-| `--helix-shadow-lg` | `0 12px 32px var(--_helix-shadow-ink-lg)` | 5 |
+| `--helix-shadow-lg` | `0 12px 32px var(--_helix-shadow-ink-lg)` | 6 |
 | `--helix-shadow-surface` | `var(--helix-shadow-none)` | 1 |
 | `--helix-shadow-floating` | `var(--helix-shadow-lg)` | 12 |
 
