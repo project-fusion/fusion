@@ -11,39 +11,13 @@
  * is worth having at all: none of it has been exercised yet, because nothing
  * has shipped. Saying so is the same discipline the stage labels are.
  */
+import { BAR, TRUST } from '../../trust'
+
 export const metadata = {
   description:
     'The finite checklist every Fusion product clears before it ships, and an honest account of what has been tested so far.',
   title: 'Trust',
 }
-
-/** What has to be true before anything carries the name. */
-const BAR = [
-  {
-    body: 'A written answer to the question every proposal is tested against: what happens to you if Fusion shuts down tomorrow. Published with the product rather than available on request.',
-    name: 'The exit test, answered in writing',
-  },
-  {
-    body: 'What is stored, where it lives, how long it is kept and what causes it to be deleted. Stated before a product collects anything, not in a policy revised afterwards.',
-    name: 'Data handling stated before collection',
-  },
-  {
-    body: 'Yours, generated where you are, never escrowed. A product that can read your data without your key is a product that can be compelled to.',
-    name: 'Keys held by you',
-  },
-  {
-    body: 'You can stop it and keep everything. Not an account closure that starts a countdown, and not an export that produces a file nothing else can read.',
-    name: 'A stop that leaves you whole',
-  },
-  {
-    body: "Anything touching credentials, money or another person's records is reviewed by someone who does not work here before it ships. Named in the release, not asserted.",
-    name: 'Outside review where the stakes are real',
-  },
-  {
-    body: 'Active means it ships with users. Building means real work with nothing shipped. Declared means committed direction with no work started. No product is described as further along than it is.',
-    name: 'The stage label is the true one',
-  },
-]
 
 export default function Page() {
   return (
@@ -54,7 +28,7 @@ export default function Page() {
             Trust
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
-            What has to be true before anything ships
+            {TRUST.title}
           </helix-text>
           <helix-text as="p" data-measure tone="muted">
             Six things. The number matters more than the contents: a bar that is never written down
@@ -93,10 +67,10 @@ export default function Page() {
       <section data-band data-reveal>
         <helix-flex class={`statement`} data-shell direction="column" gap="lg">
           <helix-text tone="subtle" variant="label">
-            Where this stands
+            {TRUST.blocks[1]?.kicker}
           </helix-text>
           <helix-text as="p" data-statement>
-            None of it has been tested, because nothing has shipped.
+            {TRUST.blocks[1]?.title}
           </helix-text>
           <helix-text as="p" data-measure tone="muted">
             Helix is Building and Cortex is Building, which means there is no product yet that has

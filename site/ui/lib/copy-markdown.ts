@@ -1,7 +1,11 @@
+import { CONTACT } from '../app/contact'
 import type { CopyBlock, PageCopy } from '../app/copy'
 import { LANDING } from '../app/landing'
 import { PRODUCTS } from '../app/products'
 import { SERVICES } from '../app/services'
+import { SERVICES_COPY } from '../app/services-copy'
+import { THESIS } from '../app/thesis'
+import { TRUST } from '../app/trust'
 import { VERTICALS } from '../app/verticals'
 import { INSIGHTS } from './insights'
 import type { Route } from './routes'
@@ -39,6 +43,10 @@ const LISTS = {
 /** Which pages have moved their copy into a typed module. */
 const COPY: Record<string, PageCopy> = {
   '/': LANDING,
+  '/contact': CONTACT,
+  '/services': SERVICES_COPY,
+  '/thesis': THESIS,
+  '/trust': TRUST,
 }
 
 /** The copy module for a path, where one exists. */
@@ -54,15 +62,20 @@ export const copyFor = (path: string): PageCopy | undefined => COPY[path]
  * is two product cards under a sentence, deliberately without a title, because
  * a heading there would name what the reader can already see.
  */
-const block = (entry: CopyBlock): string[] => {
+const block = (entry: CopyBlock, pageTitle: string): string[] => {
   const lines: string[] = []
-  if (entry.title) {
+  /* A block whose title is the page's own does not repeat it. On screen the
+     two are far apart, a hero and then a section further down, and the
+     repetition reads as the page announcing where you are. In a document they
+     land four lines from each other. Trust is the case: its bar is the page. */
+  const own = entry.title !== undefined && entry.title !== pageTitle
+  if (own) {
     lines.push(`## ${entry.title}`, '')
   }
   for (const paragraph of entry.body ?? []) {
     lines.push(paragraph, '')
   }
-  const depth = entry.title ? '###' : '##'
+  const depth = own ? '###' : '##'
   const items = entry.items ?? (entry.from ? LISTS[entry.from]() : [])
   for (const item of items) {
     lines.push(`${depth} ${item.name}`, '', item.body, '')
@@ -91,7 +104,7 @@ export const renderCopy = (route: Route, copy: PageCopy): string => {
     '',
     copy.lede,
     '',
-    ...copy.blocks.flatMap(block),
+    ...copy.blocks.flatMap((entry) => block(entry, copy.title)),
   ]
   return `${lines
     .join('\n')

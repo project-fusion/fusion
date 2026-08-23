@@ -1,4 +1,5 @@
 import { SERVICES } from '../../services'
+import { SERVICES_COPY } from '../../services-copy'
 import styles from './services.module.css'
 
 export const metadata = {
@@ -38,7 +39,7 @@ export default function Page() {
             Services
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
-            The part of this you can buy today
+            {SERVICES_COPY.title}
           </helix-text>
           <helix-text as="p" data-measure tone="muted">
             Everything else on this site is being built. This is the work we take on now: interface
@@ -132,7 +133,7 @@ export default function Page() {
             How it runs
           </helix-text>
           <helix-text as="h2" data-measure data-section-title>
-            You are not acquiring a dependency
+            {SERVICES_COPY.blocks[1]?.title}
           </helix-text>
           <helix-text as="p" data-measure tone="muted">
             Your repository, your license, your infrastructure. Handover is a condition of the work
@@ -151,7 +152,7 @@ export default function Page() {
       <section data-band data-closing data-reveal>
         <helix-flex align="center" data-shell direction="column" gap="lg">
           <helix-text as="h2" data-section-title>
-            Start with the audit
+            {SERVICES_COPY.blocks[2]?.title}
           </helix-text>
           <helix-text as="p" data-measure tone="muted">
             Two weeks and a fixed price, and the honest answer at the end of it may be that you do

@@ -12,6 +12,7 @@
  * product that are not in `verticals.ts`, and a page that claims them would be
  * describing a different company.
  */
+import { LADDER, STACK, THESIS } from '../../thesis'
 import { stageAppearance, VERTICALS } from '../../verticals'
 
 export const metadata = {
@@ -19,50 +20,6 @@ export const metadata = {
     'Sovereignty is the goal, abundance is the mechanism, and the same stack runs from one person to one country.',
   title: 'Thesis',
 }
-
-/** The layers, and which of them anyone can use today. */
-const STACK = [
-  { layer: 'Interface', over: 'the tools you build with', vertical: '/helix' },
-  { layer: 'Cognitive', over: 'your intelligence, memory and reasoning', vertical: '/cortex' },
-  { layer: 'Informational', over: 'your records and where they came from', vertical: '/cortex' },
-  { layer: 'Energy', over: 'your own power', vertical: '/energy' },
-  { layer: 'Financial', over: 'your own capital', vertical: '/capital' },
-]
-
-/** The same stack, three subjects. */
-const LADDER = [
-  {
-    body: 'Own your mind, your keys and your power. The model runs where you put it and the memory it accumulates is a file you hold.',
-    means: 'the individual',
-    scale: 'Personal',
-  },
-  {
-    body: 'Operate without platform dependence. A company that cannot be held hostage by a vendor roadmap, because it runs the substrate and holds the data.',
-    means: 'a company or a community',
-    scale: 'Organizational',
-  },
-  {
-    body: 'Energy independence and institutional capability. A state that generates its own power and runs its own intelligence has different options than one that does not.',
-    means: 'the state',
-    scale: 'National',
-  },
-]
-
-/** Why the constraint is binding rather than aspirational. */
-const REASONS = [
-  {
-    body: 'For any proposal: what happens to the user if Fusion shuts down tomorrow? If the answer is that they lose the thing, it is not a Fusion product. That single question is a real filter on breadth.',
-    name: 'It is testable',
-  },
-  {
-    body: 'Model quality is rented and commoditising. An architectural commitment competitors structurally cannot copy, because their business model requires the chokepoint, is not.',
-    name: 'It is the only defensible one',
-  },
-  {
-    body: 'Energy, capital and cognition are obviously the same company under this constraint. Without it they are a conglomerate.',
-    name: 'It makes the verticals cohere',
-  },
-]
 
 export default function Page() {
   return (
@@ -73,13 +30,10 @@ export default function Page() {
             Thesis
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
-            Sovereignty is the goal. Abundance is the mechanism.
+            {THESIS.title}
           </helix-text>
           <helix-text as="p" data-measure tone="muted">
-            Cheap intelligence and cheap energy are collapsing in cost at the same moment. That is
-            not primarily a productivity story. The two things that historically forced a person or
-            a nation to depend on a larger institution were the cost of thinking at scale and the
-            cost of power, and both are falling.
+            {THESIS.lede}
           </helix-text>
         </helix-flex>
       </section>
@@ -88,14 +42,13 @@ export default function Page() {
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text tone="subtle" variant="label">
-              The stack
+              {THESIS.blocks[0]?.kicker}
             </helix-text>
             <helix-text as="h2" data-measure data-section-title>
-              What makes anything sovereign, at any scale
+              {THESIS.blocks[0]?.title}
             </helix-text>
             <helix-text as="p" data-measure tone="muted">
-              Derived rather than invented. Each layer is something a subject either controls or
-              rents, and the stage against each is what is actually built.
+              {THESIS.blocks[0]?.body?.[0]}
             </helix-text>
           </helix-flex>
 
@@ -139,10 +92,10 @@ export default function Page() {
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text tone="subtle" variant="label">
-              The ladder
+              {THESIS.blocks[1]?.kicker}
             </helix-text>
             <helix-text as="h2" data-measure data-section-title>
-              One stack, shipped to progressively larger subjects
+              {THESIS.blocks[1]?.title}
             </helix-text>
           </helix-flex>
 
@@ -173,7 +126,7 @@ export default function Page() {
       <section data-band data-reveal>
         <helix-flex class={`statement`} data-shell direction="column" gap="lg">
           <helix-text tone="subtle" variant="label">
-            The Sovereignty Constraint
+            {THESIS.blocks[2]?.kicker}
           </helix-text>
           <helix-text as="p" data-statement>
             No Fusion product may create a dependency its user cannot exit.
@@ -188,10 +141,10 @@ export default function Page() {
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="xl">
           <helix-text as="h2" data-measure data-section-title>
-            Why it is a law and not a value
+            {THESIS.blocks[2]?.title}
           </helix-text>
           <helix-grid gap="xl" min="18rem">
-            {REASONS.map((reason) => (
+            {(THESIS.blocks[2]?.items ?? []).map((reason) => (
               <helix-flex data-substrate direction="column" gap="sm" key={reason.name}>
                 <helix-text as="h3" data-substrate-name>
                   {reason.name}
