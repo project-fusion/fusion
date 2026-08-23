@@ -105,13 +105,6 @@ export class IndicatorController implements ReactiveController {
     this.place()
   }
 
-  /*
-   * Measures and writes, or gives up without writing anything.
-   *
-   * Public because `slotchange` is not an update: children arriving is exactly
-   * when the first measurement becomes possible, and a component that only
-   * placed on its own updates left the mark unplaced for the life of the page.
-   */
   /** Where the mark was last put, so a placement can tell a move from a resize. */
   private last: { x: string; y: string } | undefined
 
@@ -132,6 +125,13 @@ export class IndicatorController implements ReactiveController {
    */
   private waiting: { on: HTMLElement; settle: (event?: TransitionEvent) => void } | undefined
 
+  /*
+   * Measures and writes, or gives up without writing anything.
+   *
+   * Public because `slotchange` is not an update: children arriving is exactly
+   * when the first measurement becomes possible, and a component that only
+   * placed on its own updates left the mark unplaced for the life of the page.
+   */
   place(): void {
     const indicator = this.options.indicator()
     const surface = this.options.surface()
