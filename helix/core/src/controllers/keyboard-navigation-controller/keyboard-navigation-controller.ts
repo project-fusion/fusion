@@ -177,9 +177,20 @@ export class KeyboardNavigationController implements ReactiveController {
        * reader arrowing backwards into an unanswered group landed one short of
        * the end, and the comment above says plainly that it lands on the end.
        * The wrapping form is right for every real index and wrong for the one
-       * that is not an index. */
+       * that is not an index.
+       *
+       * And the clamp is `Math.max` against the forward branch's `Math.min`,
+       * which it was missing. Unclamped this is `-1` on the first item, and
+       * `items[-1]` is undefined, so nothing was focused and nothing chosen on a
+       * press that `preventDefault` had already swallowed. Holding Left on the
+       * first star of a rating got silence, where holding Right on the last one
+       * holds its ground. */
       next =
-        current < 0 ? last : this.wrap ? (current - 1 + items.length) % items.length : current - 1
+        current < 0
+          ? last
+          : this.wrap
+            ? (current - 1 + items.length) % items.length
+            : Math.max(current - 1, 0)
     } else if (event.key === 'Home') {
       next = 0
     } else {
