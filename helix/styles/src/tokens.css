@@ -1151,6 +1151,22 @@
   --helix-size-icon-sm: calc(1rem * var(--_helix-seed-density));
   --helix-size-focus-ring: var(--helix-border-thick);
   --helix-size-focus-offset: 2px;
+  /* **How far a focus ring reaches past the box it is on**, which is the two
+     above added together, because an outline is drawn outside the border edge
+     and then pushed out again by its offset.
+
+     It exists because a scrolling region clips it. `overflow-y: auto` computes
+     the other axis from `visible` to `auto`, so a component that asked only to
+     scroll vertically became a horizontal clipper as well, and any child filling
+     its width lost the left and right sides of its ring: measured on the
+     drawer's own button, and on menu items, which span their scroller exactly.
+     Two lines of ring above and below the control and nothing down the sides,
+     which reads as a rendering fault rather than as focus.
+
+     A token rather than the sum written out in each of them, because eight
+     components scroll and the ring is one decision. Whoever changes the ring or
+     its offset should not have to find the eight. */
+  --helix-size-focus-reach: calc(var(--helix-size-focus-ring) + var(--helix-size-focus-offset));
 
   /* ======================================================== layer =======
      Positions in a stack, not components. Every rung answers "how far above the

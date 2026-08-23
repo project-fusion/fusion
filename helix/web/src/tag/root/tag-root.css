@@ -40,6 +40,37 @@
   --_tag-label: color-mix(in oklab, var(--_tag-color) 55%, var(--helix-color-foreground));
 }
 
+/* **The label stays inside the pill**, which it did not.
+ *
+ * The host is `white-space: nowrap` and its overflow is visible, so a tag given
+ * less room than its text painted the words straight out through the rounded
+ * end: measured in a table whose Status column had squeezed to 92px around a
+ * 95px label, with "Missed window" running past the pink. A pill whose text
+ * escapes it reads as a rendering fault rather than as a tight column.
+ *
+ * **Whatever squeezes it, that is this component's invariant to keep**, and
+ * being squeezed is normal rather than exceptional: `helix-table-cell` sets
+ * `min-inline-size: 0` on everything slotted into it, on purpose, so a cell can
+ * shrink and take its content with it. That reasoning is about text, which
+ * wraps. A pill cannot.
+ *
+ * On the slot rather than the host, and the difference matters: the host also
+ * holds the dismiss button, whose focus ring is drawn outside its box, so
+ * hiding overflow up there would clip the ring exactly the way the drawer's
+ * scrolling region was clipping its button's. Truncating the one box that holds
+ * the words leaves every other part's overflow alone.
+ *
+ * `display: block` because a `<slot>` is `display: contents` and generates no
+ * box to truncate in, and `min-inline-size: 0` because the block it now
+ * generates is a flex item, which keeps an automatic minimum of its own until
+ * it is told otherwise. */
+slot:not([name]) {
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Filled with the tone, label on top of it. `foreground-inverse` rather than a
    per-tone choice: every tone at full strength is dark enough in light mode and
    light enough in dark for the inverse of the page to read on it. */
