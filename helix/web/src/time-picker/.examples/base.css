@@ -77,6 +77,7 @@ helix-base-time-picker::part(option):focus-visible {
 
 helix-base-time-picker::part(list),
 helix-base-time-picker::part(items) {
+  align-items: stretch;
   display: flex;
   flex-direction: column;
   gap: 0.125rem;

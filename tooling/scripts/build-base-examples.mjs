@@ -142,6 +142,41 @@ const rebase = (html) =>
     return BASE.has(tag) ? `<${close}${tag}` : whole
   })
 
+/* What a token becomes in an example that cannot resolve one.
+ *
+ * The tags get rebased and an example's own `<style>` block did not, so a rule
+ * copied from the styled twin arrived here still naming `--helix-space-sm`.
+ * `headless` does not depend on `helix/styles`, so it resolves to nothing:
+ * measured on Virtual List, where the gap and the inline padding of every row
+ * vanished and the name ran into the note beside it. A missing custom property
+ * is not an error in CSS, so the sheet was valid, the example rendered, and the
+ * only sign was two words touching.
+ *
+ * Literals rather than the gray ramp's names, because these are lengths and the
+ * ramp is colours. Small on purpose: anything not in here throws below rather
+ * than passing through to be discovered by eye a second time. */
+const LENGTHS = {
+  '--helix-space-2xs': '0.125rem',
+  '--helix-space-lg': '1rem',
+  '--helix-space-md': '0.75rem',
+  '--helix-space-sm': '0.5rem',
+  '--helix-space-xs': '0.25rem',
+}
+
+const detoken = (html, slug) =>
+  html.replaceAll(/var\((--helix-[a-z0-9-]+)\)/g, (_whole, name) => {
+    const length = LENGTHS[name]
+    if (length === undefined) {
+      throw new Error(
+        `${slug}: the example's own <style> names ${name}, which the headless tier cannot ` +
+          'resolve, and no literal is recorded for it. Add one to LENGTHS, or take the rule ' +
+          'out of the example: a token here resolves to nothing and the rule silently does ' +
+          'nothing with it.',
+      )
+    }
+    return length
+  })
+
 /**
  * A first stylesheet, from the parts every tag in the example actually renders.
  *
@@ -421,12 +456,34 @@ const EXTRA = {
   gap: 0.5rem;
   overflow: hidden;
 }`,
+  combobox: `helix-base-combobox::part(indicator) {
+  ${GLYPH}
+}`,
   /* Eight parts in the library are an `<svg>` under a name the vocabulary reads
      as a box, and an svg with no size fills its container: the combobox's
      chevron measured 233 by 233. Found by asking which parts are svgs rather
      than by looking, which is the only way to know the list is complete. */
-  combobox: `helix-base-combobox::part(indicator) {
-  ${GLYPH}
+  /* A column of commands inside one box, not a row of them inside two.
+   
+     Two names did the damage. items matched the branch that lays a group out
+     along a line, so three commands sat side by side across the palette, which
+     is a toolbar and not a list. And listbox matched the branch that draws a
+     panel, so the list took a surface and a border of its own inside the
+     dialog's: a bordered box within a bordered box, and inline into the
+     bargain, which is what drew the stray rectangle under the commands.
+   
+     The dialog is the surface here. A listbox inside a command palette is the
+     palette, so it carries nothing of its own and the rows stack. */
+  command: `helix-base-command::part(items) {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+helix-base-command::part(listbox) {
+  background-color: transparent;
+  border: 0;
+  display: block;
+  padding: 0;
 }`,
   'copy-button': `helix-base-copy-button::part(button) {
   border: 1px solid var(--_gray-line);
@@ -535,7 +592,7 @@ helix-base-rating::part(marks) {
 
 /* Coloured through currentColor, because a consumer cannot reach inside.
    
-   A filled mark is a mark inside the fill layer, and ::part(fill) [part=\"mark\"]
+   A filled mark is a mark inside the fill layer, and ::part(fill) [part="mark"]
    selects nothing: ::part() reaches the part and no further, so descendants of a
    part are unreachable from outside the tree. The styled tier writes exactly
    that selector and it works there, its sheet being inside the shadow root.
@@ -656,36 +713,9 @@ helix-base-switch[data-checked]::part(thumb) {
   gap: 0.25rem;
   padding: 0.125rem 0.5rem;
 }`,
-  /* A column, because `items` and `list` match the branch that lays a group of
-     things out along a line and a list of times is not one.
-   
-     Left to it, the headless Time Picker drew all ninety-six quarter hours in a
-     single row: measured at 4,896 pixels wide against a 640 frame, which is one
-     row of clipped type and no picker at all. `outline` above is the same fix
-     for the same reason, and both are the price of keying rules off a part's
-     name.
-   
-     The height and the scroll are part of the diagram rather than decoration. A
-     list of ninety-six is unusable at its natural height whatever direction it
-     runs in, so a consumer taking this tier has to bound it, and a skeletal
-     sheet that leaves that out is not showing them the work. */
-  /* A bounded box, because a virtual list has nothing to compute without one.
-   
-     None of the three part names matched anything, so the sheet said nothing
-     about the one part that decides whether the component works: the viewport
-     is the scrolling box, and a window of rows is derived from its height. With
-     no height and no overflow there is no window, so the example rendered two
-     pixels of ink over two thousand rows of data and looked like a component
-     that had failed to load.
-   
-     This is the diagram doing its job rather than a workaround. A consumer
-     taking this tier has to bound the viewport or get the same nothing. */
-  'virtual-list': `helix-base-virtual-list::part(viewport) {
-  block-size: 12rem;
-  overflow-y: auto;
-}`,
   'time-picker': `helix-base-time-picker::part(list),
 helix-base-time-picker::part(items) {
+  align-items: stretch;
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
@@ -741,6 +771,34 @@ helix-base-tree-item::part(row) {
   display: flex;
   gap: 0.25rem;
   padding-inline-start: calc(var(--tree-level, 0) * 1rem);
+}`,
+  /* A column, because `items` and `list` match the branch that lays a group of
+     things out along a line and a list of times is not one.
+   
+     Left to it, the headless Time Picker drew all ninety-six quarter hours in a
+     single row: measured at 4,896 pixels wide against a 640 frame, which is one
+     row of clipped type and no picker at all. `outline` above is the same fix
+     for the same reason, and both are the price of keying rules off a part's
+     name.
+   
+     The height and the scroll are part of the diagram rather than decoration. A
+     list of ninety-six is unusable at its natural height whatever direction it
+     runs in, so a consumer taking this tier has to bound it, and a skeletal
+     sheet that leaves that out is not showing them the work. */
+  /* A bounded box, because a virtual list has nothing to compute without one.
+   
+     None of the three part names matched anything, so the sheet said nothing
+     about the one part that decides whether the component works: the viewport
+     is the scrolling box, and a window of rows is derived from its height. With
+     no height and no overflow there is no window, so the example rendered two
+     pixels of ink over two thousand rows of data and looked like a component
+     that had failed to load.
+   
+     This is the diagram doing its job rather than a workaround. A consumer
+     taking this tier has to bound the viewport or get the same nothing. */
+  'virtual-list': `helix-base-virtual-list::part(viewport) {
+  block-size: 12rem;
+  overflow-y: auto;
 }`,
 }
 
@@ -865,7 +923,10 @@ for (const slug of wanted) {
     continue
   }
   const source = readFileSync(`helix/web/src/${slug}/.examples/default.html`, 'utf8')
-  const body = rebase(delayout(detext(strip(source.replace(/<!--[\s\S]*?-->\s*/, '')))))
+  const body = detoken(
+    rebase(delayout(detext(strip(source.replace(/<!--[\s\S]*?-->\s*/, ''))))),
+    slug,
+  )
   /* Formatted here rather than left to `format-examples.mjs`, which would
      rewrite it a moment later and leave every file reporting as drifted. One
      rule, one implementation, run by both. */

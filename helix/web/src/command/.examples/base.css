@@ -93,3 +93,15 @@ helix-base-option::part(item):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
+
+helix-base-command::part(items) {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+helix-base-command::part(listbox) {
+  background-color: transparent;
+  border: 0;
+  display: block;
+  padding: 0;
+}

@@ -97,7 +97,17 @@ const page = (family) => {
        grays through `light-dark()`. */
     '<style>:root{color-scheme:light}' +
     'body{margin:0;padding:24px;background:#fff;width:640px;box-sizing:border-box}</style>' +
-    `<script src="/frame.js"></script>${html}`
+    /* `defer`, which is what `frame.html` ships and is not a detail.
+       
+       Loaded eagerly the bundle runs mid-parse, so an element upgrades the
+       moment the parser reaches it and anything it looks up by id further down
+       the document does not exist yet. Virtual List reads its rows from a
+       `<script type="application/json">` that follows it, and came out with
+       zero rows and a viewport full of nothing: a component that works
+       everywhere else, reported broken by the harness looking at it. Deferred,
+       the document is complete before a single tag upgrades, which is the
+       condition the sandbox already renders under. */
+    `<script defer src="/frame.js"></script>${html}`
   )
 }
 
