@@ -1,7 +1,7 @@
-import { navigation } from '@helix-io/docs'
 import type { ReactNode } from 'react'
+import { helixNavigation } from '@/lib/helix-nav'
 import styles from '../components/docs.module.css'
-import { DocsNav } from './docs-nav'
+import { DocsNav } from '../docs-nav'
 
 /**
  * The shell every documentation page sits in.
@@ -15,11 +15,15 @@ import { DocsNav } from './docs-nav'
  * It borrows `docs.module.css` from the component pages rather than growing a
  * second copy of a two-column shell. The day the two shells genuinely differ is
  * the day to split it.
+ *
+ * The rail is shared with the component pages now, and renders the same tree on
+ * both: prose and reference are one navigation, so a reader partway through
+ * Theming can see that Card exists without going back to the masthead.
  */
 export default function DocsLayout({ children }: { children: ReactNode }) {
   return (
     <div className={styles.docsShell}>
-      <DocsNav sections={navigation()} />
+      <DocsNav sections={helixNavigation()} />
       {children}
     </div>
   )

@@ -1,5 +1,5 @@
-import { getFamilies } from '../../../../lib/catalog'
-import { DocsNav } from './[family]/docs-nav'
+import { helixNavigation } from '@/lib/helix-nav'
+import { DocsNav } from '../docs-nav'
 import styles from './docs.module.css'
 
 /**
@@ -39,7 +39,7 @@ import styles from './docs.module.css'
 export default function ComponentsLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.docsShell}>
-      <DocsNav entries={getFamilies()} />
+      <DocsNav sections={helixNavigation()} />
       {children}
     </div>
   )
