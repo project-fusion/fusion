@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { HeroCopy } from '../../hero-copy'
 
 /** The shapes on the bench, in the order the switcher lists them. */
 const SHAPES = [
@@ -151,12 +152,7 @@ export function AuraLab(): React.ReactElement {
           <helix-text appearance="label" tone="subtle">
             Helix. Aura
           </helix-text>
-          <helix-text as="h1" class="heroTitle">
-            {current?.name}
-          </helix-text>
-          <helix-text as="p" class="heroLede measure" tone="muted">
-            {current?.body}
-          </helix-text>
+          <HeroCopy lede={<>{current?.body}</>} title={<>{current?.name}</>} />
         </helix-flex>
       </helix-flex>
 

@@ -17,6 +17,7 @@ import { formatDate, INSIGHTS } from '../../lib/insights'
 import { PRODUCTS } from '../products'
 import { SERVICES } from '../services'
 import { stageAppearance } from '../verticals'
+import { HeroCopy } from './hero-copy'
 import { InsightCard } from './insight-card'
 import styles from './landing.module.css'
 import { Showcase } from './showcase'
@@ -89,40 +90,10 @@ export default function Home() {
           <helix-flex align="center" data-density="sm" gap="sm" wrap>
             <helix-tag>Fusion Development Group</helix-tag>
           </helix-flex>
-          <helix-text as="h1" class="heroTitle">
-            The interface layer, already built
-          </helix-text>
-          {/* **Half the words it had, because a hero is read standing up.** The
-              title carried nine words and the lede three sentences, one of
-              which named both substrates and their jobs before a reader had
-              asked what either was. The names are one click away in the band
-              below and on the bar above; what the hero owes is the shape of the
-              offer, which is: these exist, and there are two ways to use them.
-
-              **The title is the reader's problem and the lede is the answer.**
-              Both lines were about us before: a discipline we practise, then
-              the two audiences we serve. Neither told a reader what they get.
-              The interface layer is the expensive part of any serious product,
-              which is a fact about their work rather than about ours.
-
-              **Helix only, and Cortex is not named here.** The hero is a
-              reader's first sentence about us, and it should name the thing
-              they can have. Helix is nearly shippable and the line below this
-              installs it; Cortex is a long way from a release, and a front door
-              naming both spends half its only sentence on something nobody can
-              use yet. That is the argument the stage labels make everywhere
-              else on the site, applied to the place where getting it wrong
-              costs most. Cortex belongs where it can be described honestly,
-              with a stage on it, rather than in a line that reads as an offer.
-
-              **The sovereignty argument is not here, deliberately.** It is a
-              claim about where this goes rather than about what exists, and a
-              front door that leads with it asks a reader to buy a future before
-              being shown a present. `/thesis` is where it belongs and where it
-              still is. */}
-          <helix-text as="p" class="heroLede measure" tone="muted">
-            Take Helix and go, or hire us to build with it.
-          </helix-text>
+          <HeroCopy
+            lede={<>Take Helix and go, or hire us to build with it.</>}
+            title={<>The interface layer, already built</>}
+          />
           <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
             <Link
               data-button="solid"

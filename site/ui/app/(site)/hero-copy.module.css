@@ -1,0 +1,15 @@
+/* The hero's two lines, beside the component that writes them. */
+
+.heroTitle {
+  /* Past the scale's top step, because the hero is the one place on the site
+     where type is the whole design. */
+  font-size: var(--site-text-hero);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.heroLede {
+  font-size: clamp(var(--helix-text-lg), 2.2vw, var(--helix-text-xl));
+  line-height: var(--helix-leading-normal);
+}
