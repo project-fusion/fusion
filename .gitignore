@@ -70,6 +70,7 @@ site/ui/public/.probe/
 site/ui/lib/catalog.generated.json
 site/ui/public/helix/components/
 site/ui/public/helix/docs/
+site/ui/public/helix/*.md
 site/ui/public/*.md
 site/ui/public/insights/
 helix/theme/wasm/
