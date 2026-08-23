@@ -5,7 +5,7 @@ import { highlight } from '@helix-io/sandbox/highlight'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Fragment } from 'react'
-import { startCase } from '@/lib/naming'
+import { startCase } from '@helix-io/docs'
 import {
   type ApiMember,
   type Element,

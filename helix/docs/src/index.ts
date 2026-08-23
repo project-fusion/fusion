@@ -1,3 +1,14 @@
+export type {
+  ApiMember,
+  Element,
+  EventDoc,
+  Example,
+  ExampleSource,
+  Family,
+  PropertyDoc,
+} from './catalog.js'
+export { catalog, findInCatalog } from './catalog.js'
+export { displayName, startCase, tierOf } from './naming.js'
 export {
   place,
   type ReferenceFamily,

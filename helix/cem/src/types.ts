@@ -83,7 +83,14 @@ export interface HelixMember extends Documented {
   default?: string
   inheritedFrom?: InheritedFrom
   kind?: string
+  /** Declared parameters, for a method. A signature says what to pass. */
+  parameters?: Array<{ name?: string; type?: TypeText }>
   privacy?: string
+  /** Whether it is a getter, so a reader is not invited to set it. */
+  readonly?: boolean
+  return?: { type?: TypeText }
+  /** A static belongs to the class, not to an element a consumer writes. */
+  static?: boolean
 }
 
 /** An event enriched with the React prop name generated for it. */

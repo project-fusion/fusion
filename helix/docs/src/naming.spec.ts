@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { displayName, startCase, tierOf } from './naming'
+import { displayName, startCase, tierOf } from './naming.js'
 
 describe('naming', () => {
   test('a slug becomes words', () => {
