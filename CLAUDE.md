@@ -87,9 +87,16 @@ they document: publishing a Cortex fix would bump the Helix docs to a version in
 which nothing about Helix changed. Per-domain keeps the property that matters,
 that `@helix-io/headless@x` works with `@helix-io/web@x`.
 
-The Rust workspace holds only Cortex crates today, so `[workspace.package]
-version` *is* the Cortex version. **When Helix gains a Rust crate, split it** or
-the two domains are silently back in full lockstep.
+**Rust crates carry their own version and never inherit one.**
+`[workspace.package]` holds the edition, the licence and the toolchain floor,
+which are facts about the workspace; a version is a fact about a domain, and the
+workspace is about to hold two. This said "split it when Helix gains a Rust
+crate" until the split was done ahead of that crate, which is the right order:
+`release.yml` computes `helix` and `cortex` from separate tags, so a shared
+field would take two numbers and keep whichever stamped last. Three identical
+lines today is what lets them differ tomorrow, and `check:publishable` fails
+both on a crate taking `version.workspace = true` and on `[workspace.package]`
+declaring a version at all.
 
 **The version lives in the tag, not in the manifest.** Every manifest holds
 `0.0.0-dev` and the release stamps the real number in CI seconds before packing.

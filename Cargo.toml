@@ -25,12 +25,27 @@ cortex-core = { path = "cortex/core" }
 cortex-engram = { path = "cortex/engram" }
 cortex-trace = { path = "cortex/trace" }
 
+# **No `version` here, and its absence is the point.**
+#
+# Everything else in this table is a fact about the workspace: the edition, the
+# licence, the toolchain floor. A version is a fact about a *domain*, and this
+# workspace is about to hold two. `version = "0.0.0-dev"` inherited by every
+# crate was the Cortex version only because every crate was Cortex, and the day
+# `helix-theme` lands with `version.workspace = true` the two domains are back
+# in full lockstep with nothing saying so: `release.yml` matrices over `helix`
+# and `cortex` and computes each from its own tags, so they would compute two
+# numbers and stamp them into one shared field.
+#
+# So each crate carries its own, which is three identical lines today and is
+# what makes them able to differ tomorrow. The value is the placeholder every
+# manifest in this repository holds; the release stamps the real number seconds
+# before packing and the tag is the record. `check:publishable` fails on a crate
+# that inherits one, so this cannot quietly come back.
 [workspace.package]
 edition = "2021"
 license = "MIT"
 publish = false
 rust-version = "1.90"
-version = "0.0.0-dev"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

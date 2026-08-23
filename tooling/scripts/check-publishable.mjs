@@ -49,7 +49,7 @@
  *
  * Run with `bun run check:publishable` (also part of `bun run verify`).
  */
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { DOMAINS, domainOf, INTERNAL, manifests, publishes, root } from './workspace.mjs'
@@ -204,7 +204,7 @@ for (const domain of Object.keys(DOMAINS)) {
 
 /* The Rust half, which fails in the one direction nothing else watches.
    `cortex` spans two package managers: `@cortex-io/docs` on npm and the crates
-   on Cargo, sharing one version through `[workspace.package]`. The release
+   on Cargo, each carrying its own version (see below). The release
    stamps that version and pushes a `cortex-v*` tag whether or not a crate ever
    leaves, so the day someone turns `publish` on is the day the tag starts
    claiming a crate release that no workflow performs. Silent, and discovered by
@@ -232,6 +232,46 @@ if (declared === 'false' && releases) {
     'Cargo.toml: `[workspace.package] publish` is false while `release.yml` runs `cargo publish`. ' +
       'The release will fail at the last step, after npm has already published.',
   )
+}
+
+/* **A crate may not inherit its version from the workspace**, which is the Rust
+   half of one-version-per-domain.
+ *
+ * `[workspace.package] version` was the Cortex version only because every crate
+ * was Cortex. This workspace is about to hold `helix-theme` and `helix-cli`, and
+ * `release.yml` matrices over `helix` and `cortex` and computes each domain's
+ * number from its own tags: two numbers, one shared field, and whichever
+ * stamped last would win. Nothing else would say so, which is the failure this
+ * whole file exists to prevent one package manager over.
+ *
+ * Read off `members` rather than a glob, so a crate that is added without being
+ * listed fails here rather than being skipped by the check that would have
+ * caught it. */
+const members = [
+  ...(/members\s*=\s*\[([\s\S]*?)\]/.exec(cargo)?.[1] ?? '').matchAll(/"([^"]+)"/g),
+].map((found) => found[1])
+if (members.length === 0) {
+  problems.push('Cargo.toml: no `members` found, so no crate was checked for an inherited version.')
+}
+if (/^version\s*=/m.test(section)) {
+  problems.push(
+    'Cargo.toml: `[workspace.package]` declares a `version`. One value cannot be two domains, ' +
+      'and `release.yml` computes `helix` and `cortex` from separate tags. Each crate carries ' +
+      'its own.',
+  )
+}
+for (const member of members) {
+  const manifest = join(root, member, 'Cargo.toml')
+  if (!existsSync(manifest)) {
+    problems.push(`Cargo.toml: lists \`${member}\` as a member and there is no manifest there.`)
+    continue
+  }
+  if (/^version\.workspace\s*=\s*true$/m.test(readFileSync(manifest, 'utf8'))) {
+    problems.push(
+      `${member}/Cargo.toml: takes \`version.workspace = true\`, which is the Cortex version ` +
+        'only while every crate is Cortex. Declare `version = "0.0.0-dev"` on the crate.',
+    )
+  }
 }
 
 if (problems.length > 0) {
