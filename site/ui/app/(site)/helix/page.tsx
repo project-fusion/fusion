@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { type Family, getFamilies } from '../../../lib/catalog'
 import { findVertical, stageAppearance } from '../../verticals'
 import { ComponentBrowser } from './component-browser'
+import styles from './gallery.module.css'
 
 const vertical = findVertical('/helix')
 
@@ -12,7 +13,7 @@ const vertical = findVertical('/helix')
    a search result shows. */
 export const metadata = { title: 'Helix' }
 
-/**
+/*
  * Fusion Design.
  *
  * The one vertical with something to open, so it lists what Helix ships and
@@ -96,11 +97,11 @@ export default async function Page({
       stageTone={stageAppearance(vertical.stage)}
       title="Helix"
     >
-      <helix-grid className="familyGrid" columns={5} gap="2xl">
+      <helix-grid className={styles.familyGrid} columns={5} gap="2xl">
         {families.map((family) => (
           <Link
             aria-label={family.label}
-            className="familyCard"
+            className={styles.familyCard}
             data-card
             data-slug={family.slug}
             href={`/helix/components/${family.slug}`}
@@ -126,7 +127,7 @@ export default async function Page({
                           and the tooltip is what says which stage it is. A card
                           in a list of fifty-four experimental components is not
                           reporting a problem. */}
-                    <helix-tag className="statusMark">
+                    <helix-tag className={styles.statusMark}>
                       <helix-icon label="Experimental" name="flask"></helix-icon>
                     </helix-tag>
                   </helix-tooltip>

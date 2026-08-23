@@ -1,0 +1,163 @@
+/* The Helix gallery: the lattice its hero is drawn on, and the grid of families.
+ *
+ * The lattice is here rather than in the shared hero because it is a fact about
+ * *this* gallery: sixty-five cards are drawn on that field, so repeating it
+ * behind the heading makes the hero the top of the same sheet. Insights takes
+ * the same hero structure and none of the texture, which is why the structure
+ * is global and this is not.
+ */
+
+.designHero {
+  /* One falloff, named once, because two surfaces wear it: the lattice itself
+     and the layer of shines that light up dots within it. Written twice they
+     would drift, and a shine that outlives the field it belongs to is a stray
+     mark rather than a lit dot. */
+  --site-lattice-mask: radial-gradient(ellipse 90% 78% at 50% 22%, #000 0%, transparent 100%);
+}
+
+.designHero::before {
+  background-image: radial-gradient(var(--site-lattice) 1px, transparent 1px);
+  background-position: center;
+  background-size: var(--site-lattice-pitch) var(--site-lattice-pitch);
+  content: "";
+  inset: 0;
+  mask-image: var(--site-lattice-mask);
+  pointer-events: none;
+  position: absolute;
+  /* `base` under `raised`, rather than a negative z-index.
+   *
+   * An absolutely positioned pseudo-element paints above its own element's
+   * in-flow content, so without this the lattice sits over the heading and the
+   * search. `-1` is the usual answer and is a raw value where a layer token
+   * belongs; there is no rung below `base`, so the two are ordered by lifting
+   * the content instead. `isolation` on the hero keeps that pair local. */
+  z-index: var(--helix-layer-base);
+}
+
+/* Light on the lattice.
+ *
+ * Two dozen of the field's own dots go primary for a couple of seconds each, on
+ * long staggered cycles, so the texture is never quite still without anything
+ * on it ever moving. It is the one place on the page the brand color appears
+ * at rest, which is the whole trick: the hero is the background color now, and
+ * a flat field that large wants a reason to be looked at that is not another
+ * heading.
+ *
+ * Drawn on top of the lattice rather than replacing a dot in it, because a
+ * background is one image and cannot have two dozen of its tiles animated
+ * separately. The gray dot stays underneath and the primary one is the same
+ * size at rest, so what a reader sees is a dot changing color rather than a
+ * second mark arriving next to one. */
+.designHeroField {
+  inset: 0;
+  mask-image: var(--site-lattice-mask);
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+/* `scale` and not `inline-size`, so the growth is composited and not a layout
+ * pass two dozen times a second. `translate` holds the centring, which is why
+ * the two are separate properties here instead of one `transform`: a keyframe
+ * setting `transform` would drop the centring translation and each shine would
+ * light half a pitch down and to the right of the dot it belongs to.
+ *
+ * No `prefers-reduced-motion` block, and that is the one case where its absence
+ * is the answer. These are light-DOM elements, so the base layer's global cap
+ * does reach them, and it resolves the animation to a single 0.01ms pass that
+ * settles on the resting value. The keyframes are interior-only, so that
+ * resting value is `opacity: 0` and the shines simply do not appear. A
+ * component's own sheet has to answer the preference because `*` cannot cross a
+ * shadow boundary; nothing here is behind one. */
+.designHeroShine {
+  animation: siteHeroShine var(--shine-duration) ease-in-out var(--shine-delay) infinite;
+  aspect-ratio: 1;
+  /* A hard core the size of the lattice dot, then a halo. The core is what
+     makes it read as one of the field's dots rather than as a glow placed over
+     it, and the halo is what makes it read as lit. */
+  background: radial-gradient(
+    circle,
+    var(--helix-color-primary) 0 16%,
+    color-mix(in oklab, var(--helix-color-primary) 40%, transparent) 30%,
+    transparent 68%
+  );
+  border-radius: var(--helix-radii-full);
+  inline-size: 0.75rem;
+  /* A percentage of the section, snapped to the nearest lattice dot. The
+     percentage is what carries the field across the whole hero at any width;
+     the snap is what keeps every shine on a dot instead of near one. Rounding
+     is against the offset from the center, not from the edge, because
+     `background-position: center` is what anchors the lattice. */
+  inset-block-start: calc(50% + round(var(--shine-y) * 1% - 50%, var(--site-lattice-pitch)));
+  inset-inline-start: calc(50% + round(var(--shine-x) * 1% - 50%, var(--site-lattice-pitch)));
+  opacity: 0;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* Five across, stepping down as the window narrows.
+ *
+ * A fixed count rather than a floor, because `auto-fit` cannot express "exactly
+ * five": any floor low enough to give five at 1600 gives six or seven at 2560.
+ * The cost is that a fixed count is fixed at every width, so the steps below are
+ * what keep five columns of a hundred pixels off a phone. An outer-tree rule on
+ * the host beats the component's own `:host([columns="5"])`, so none of this
+ * needs `!important` or a wrapper.
+ *
+ * The card is the thing being protected, not the column count: below roughly
+ * 240 pixels a drawing stops being legible at all, which is what sets where
+ * each step falls rather than a list of device widths. */
+.familyGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+@media (width < 90rem) {
+  .familyGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (width < 70rem) {
+  .familyGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width < 48rem) {
+  .familyGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width < 30rem) {
+  .familyGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.familyCard,
+.familyCard helix-card {
+  block-size: 100%;
+}
+
+/* The experimental mark on a component card.
+ *
+ * A tag rather than a bare glyph, because the row already reads as "name, then
+ * a small chip", and an icon floating at the end of it reads as a control the
+ * card does not have. A tag with only a mark in it keeps that shape without
+ * spending a word on something every card in the list would say.
+ *
+ * Square rather than a pill: the inline inset a tag gives its text is there to
+ * keep letters off the edge, and a single centered glyph does not need it on
+ * both sides of nothing. */
+.statusMark {
+  --tag-radii: var(--helix-radii-sm);
+
+  aspect-ratio: 1;
+  justify-content: center;
+  padding-inline: var(--helix-space-none);
+}
+
+.statusMark helix-icon {
+  --icon-size: 0.875rem;
+}

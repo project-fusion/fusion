@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import type { stageAppearance } from '../../verticals'
+import styles from './gallery.module.css'
 
 /**
  * One family, reduced to what searching and filtering need.
@@ -260,7 +261,7 @@ export function ComponentBrowser({
 
   return (
     <>
-      <section className="pageHero designHero">
+      <section className={`pageHero ${styles.designHero}`}>
         {/* One masked field, not twenty-four loose elements.
             
             The mask is the lattice's own, shared through a custom property, so
@@ -272,10 +273,10 @@ export function ComponentBrowser({
             `aria-hidden` once on the container rather than on each child: this
             is decoration, and an element with no content still lands in the
             accessibility tree. */}
-        <div aria-hidden="true" className="designHeroField">
+        <div aria-hidden="true" className={styles.designHeroField}>
           {SHINE.map(([x, y, seconds, delay]) => (
             <span
-              className="designHeroShine"
+              className={styles.designHeroShine}
               key={`${x}:${y}`}
               style={
                 {
