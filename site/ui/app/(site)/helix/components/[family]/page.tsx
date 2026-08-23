@@ -4,6 +4,7 @@
 import { highlight } from '@helix-io/sandbox/highlight'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Fragment } from 'react'
 import { startCase } from '@/lib/naming'
 import {
   type ApiMember,
@@ -71,7 +72,35 @@ const DESCRIPTION = '26rem'
  * default track, is allowed to be arbitrarily narrow. Six rems fits the longest
  * literal the library has, `"transparent"`, at the size this table sets.
  */
-const TYPE = 'minmax(8rem, 1fr)'
+/**
+ * The name column, which may never be narrower than the name in it.
+ *
+ * A column with no width falls back to `minmax(0, 1fr)`, and `0` is a floor
+ * that lets the track shrink under its own content: `spotlightPadding`
+ * measured 115px in a 99px cell and printed its last sixteen pixels over the
+ * type beside it. The element already refuses to break, which is right for an
+ * identifier, so without a floor on the track the name simply overflowed.
+ *
+ * `min-content` is the name itself, since the name cannot break, and `auto`
+ * takes no more than that, so a table of short names stays as narrow as it
+ * always was.
+ */
+const NAME = 'minmax(min-content, auto)'
+
+/**
+ * The type column, floored at the widest thing in it that cannot break.
+ *
+ * It was `minmax(8rem, 1fr)`, and a fixed floor is a guess about content: 8rem
+ * is 128px and Accordion's `"single-collapsible"` needs 159, so the member
+ * overflowed the track by 31px and printed over the column beside it. A union's
+ * members are deliberately unbreakable, so the track has to be at least one
+ * member wide or there is nowhere for it to go.
+ *
+ * `min-content` is that width and is never more than it needs. A signature is
+ * one member and breaks at its spaces, so its `min-content` is a word rather
+ * than the whole of it, and a column of short types stays narrow.
+ */
+const TYPE = 'minmax(min-content, 1fr)'
 
 const first = (text: string): string => text.split('\n\n')[0] ?? ''
 
@@ -204,10 +233,20 @@ function TypeText({ children }: { children: string }) {
     <helix-text class={styles.apiType} variant="code">
       {members.map((member, at) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
-        <span className={held ? styles.apiTypeMember : undefined} key={at}>
-          {at > 0 && <span className={styles.apiTypeBar}>|</span>}
-          {tokens(member)}
-        </span>
+        <Fragment key={at}>
+          {/* The only place a union may break, and it has to be said out loud.
+              The bar is attached by margin rather than by a space, so there is
+              no whitespace between two members and therefore no break
+              opportunity: a four-member union measured 298px and sat in a 128px
+              cell, printing itself over the description. `<wbr>` is a break and
+              no character, so the union still reads as one run and can still
+              only fold where a member starts. */}
+          {at > 0 && <wbr />}
+          <span className={held ? styles.apiTypeMember : undefined}>
+            {at > 0 && <span className={styles.apiTypeBar}>|</span>}
+            {tokens(member)}
+          </span>
+        </Fragment>
       ))}
     </helix-text>
   )
@@ -311,7 +350,7 @@ function MemberTable({
   return (
     <div className={styles.apiTable}>
       <helix-table label={label}>
-        <helix-table-column>
+        <helix-table-column width={NAME}>
           {label}
           {hint && <ColumnHint hint={hint} label={label} />}
         </helix-table-column>
@@ -406,7 +445,7 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
   return (
     <div className={styles.apiTable}>
       <helix-table label="Properties">
-        <helix-table-column>Prop</helix-table-column>
+        <helix-table-column width={NAME}>Prop</helix-table-column>
         <helix-table-column width={TYPE}>Type</helix-table-column>
         <helix-table-column>Default</helix-table-column>
         <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
