@@ -422,7 +422,27 @@ const runThese = async (
 /** What a control may report: a field's value, a set of them, or nothing. */
 type FormValue = File | FormData | string | null
 
-const reported = new WeakMap<HTMLElement, FormValue>()
+/**
+ * What every control has reported, shared by every bundle on the page.
+ *
+ * **On `globalThis` because the guard below is on `HTMLElement.prototype`, and
+ * the two have to have the same reach.** `build-specs.mjs` emits one bundle per
+ * family, each carrying its own copy of this module, and the runner imports all
+ * of them into one page. So the prototype is shared and a module-scoped map is
+ * not: the first family to call `registerDom` set the flag and patched the
+ * prototype to write into *its* map, every family after it returned early at
+ * the flag, and each of those read a map nothing had ever written to.
+ *
+ * Measured: `radio` passes 24 alone and fails three in any pair, whichever
+ * family goes first, `accordion` included. **Every form-value assertion outside
+ * the first family had stopped meaning anything**, and the failure reads as
+ * `expected undefined to be "two"`, which looks exactly like a control that
+ * never reported to its form rather than like a harness that never recorded.
+ * Under happy-dom, where each file gets the node shim, all of them passed.
+ */
+const reported: WeakMap<HTMLElement, FormValue> = ((
+  globalThis as typeof globalThis & { __helixReported?: WeakMap<HTMLElement, FormValue> }
+).__helixReported ??= new WeakMap<HTMLElement, FormValue>())
 
 /**
  * Nothing to register, but `setFormValue` is watched on the way past.
