@@ -13,7 +13,7 @@
  * That has produced a false pass twice, once hiding a stale build for several
  * commits, which is what a prose rule is worth against a spec that looks right.
  *
- * The helpers in `@fusion-io/testing/ssr` are the way through: `withoutStyles`
+ * The helpers in `@helix-io/testing/ssr` are the way through: `withoutStyles`
  * strips the sheet, `hostTag` and `hostAttributes` read the host, `partTag` and
  * `hasPart` read one rendered part. Anything that went through one of them is
  * fine; the raw return of `ssr()` is not.

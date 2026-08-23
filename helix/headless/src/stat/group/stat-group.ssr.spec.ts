@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr } from '@fusion-io/testing/ssr'
+import { hostAttributes, ssr } from '@helix-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 

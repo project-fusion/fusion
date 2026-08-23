@@ -125,11 +125,11 @@ both directions, so the day the flag changes is the day the workflow has to.
   to Helix and still never leave: `@helix-io/cem` is the analyzer configuration
   and `@helix-io/sandbox` the editor and spec runner, both Helix byproducts and
   both build tooling for this repository. Naming them `@fusion-io/*` to say
-  "does not publish" would file Helix-specific tooling beside the company-wide
-  test helpers and claim they are general Fusion tooling, which is the one thing
-  they are not. `bun run check:publishable` enforces the rest: `@fusion-io/*` is
-  always private, a published package may never depend on an unpublished one,
-  and every published package agrees on visibility.
+  "does not publish" would file Helix-specific tooling beside the repository
+  root and the site, and claim they are general Fusion tooling, which is the one
+  thing they are not. `bun run check:publishable` enforces the rest:
+  `@fusion-io/*` is always private, a published package may never depend on an
+  unpublished one, and every published package agrees on visibility.
 - **CLI binaries drop `-cli`**: the crate `cortex-cli` ships `cortex`.
 
 ## Code style

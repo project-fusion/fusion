@@ -3,7 +3,7 @@
  *
  * The sandbox runs a component's own specs against the real platform, so the
  * same files that run in CI are the ones that run there. `bun:test` and
- * `@fusion-io/testing/dom` are resolved to the browser harness instead, which
+ * `@helix-io/testing/dom` are resolved to the browser harness instead, which
  * is the whole of the difference: no rewriting, no second suite to keep in
  * step, and a spec that is deleted stops being reported the same day.
  *
@@ -49,7 +49,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
  * a fact about this repository rather than about the component.
  */
 const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/web/src')]
-const harness = join(root, 'tooling/testing/src/browser.ts')
+const harness = join(root, 'helix/testing/src/browser.ts')
 const entries = join(root, '.local/spec-entries')
 const out = join(root, 'site/ui/public/specs')
 
@@ -84,7 +84,7 @@ const families = async () => {
 const useBrowserHarness = {
   name: 'browser-spec-harness',
   setup(build) {
-    build.onResolve({ filter: /^(bun:test|@fusion-io\/testing\/dom)$/ }, () => ({
+    build.onResolve({ filter: /^(bun:test|@helix-io\/testing\/dom)$/ }, () => ({
       path: harness,
     }))
   },

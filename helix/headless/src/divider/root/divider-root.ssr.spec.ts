@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr } from '@fusion-io/testing/ssr'
+import { partTag, ssr } from '@helix-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 

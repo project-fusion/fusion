@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion-io/testing/dom'
+import { registerDom } from '@helix-io/testing/dom'
 
 const tag = 'probe-element'
 

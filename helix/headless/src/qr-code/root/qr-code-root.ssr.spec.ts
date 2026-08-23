@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, ssr } from '@fusion-io/testing/ssr'
+import { hasPart, ssr } from '@helix-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 

@@ -8,7 +8,7 @@
  * anyone outside this repository. Both of those are true at once, and a rule
  * that read publication off the scope could only express one of them: it would
  * have forced a rename to `@fusion-io/cem`, filing Helix-specific tooling
- * beside the company-wide test helpers and claiming it is general Fusion
+ * beside the repository root and the site, and claiming it is general Fusion
  * tooling, which is exactly what it is not.
  *
  * `private` is still not an allowlist. It lives in the manifest of the package
@@ -27,7 +27,7 @@
  * visible from inside any single package, which is why it is worth a script.
  *
  * `devDependencies` are exempt, because a consumer never installs them.
- * `@fusion-io/testing` is a devDependency of three published packages and that
+ * `@helix-io/testing` is a devDependency of three published packages and that
  * is correct.
  *
  * **`types` before `default`.** Conditions match top to bottom, so a `types`

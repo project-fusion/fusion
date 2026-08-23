@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, slotted } from '@fusion-io/testing/dom'
 import { arrowDown, arrowUp, minus } from '@helix-io/icons'
+import { mount, part, registerDom, slotted } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()

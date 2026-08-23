@@ -5,7 +5,7 @@
  * **This is the third time and the first check.** `bun test` runs the DOM specs
  * under happy-dom with `bun:test`'s `expect`, which has every matcher there is.
  * `bun run specs:browser` runs the same files through the hand-written harness
- * in `tooling/testing/src/browser.ts`, which has the dozen somebody needed. A
+ * in `helix/testing/src/browser.ts`, which has the dozen somebody needed. A
  * spec written against the first type-checks, passes locally, and dies in the
  * second on a name that object never had.
  *
@@ -45,7 +45,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 const SPECS = 'helix'
-const HARNESS = 'tooling/testing/src/browser.ts'
+const HARNESS = 'helix/testing/src/browser.ts'
 
 /** Every `*.dom.spec.ts`, which is the set `specs:browser` bundles and runs. */
 const specs = (root) => {
