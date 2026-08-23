@@ -23,3 +23,17 @@
 :host([orientation="vertical"]) [part="toolbar"] {
   flex-direction: column;
 }
+
+/* Not printed, being chrome.
+ *
+ * It is how a reader moves around a document rather than any of the document: a printed page has no elsewhere to go to, so a bar of destinations is ink spent on navigation that cannot happen.
+ *
+ * Here rather than in a consumer's stylesheet, and that is the whole reason
+ * every component needs its own: `@media print` does not cross a shadow
+ * boundary any more than a reduced-motion rule does, so a page cannot answer
+ * this on a component's behalf. See 165. */
+@media print {
+  :host {
+    display: none;
+  }
+}

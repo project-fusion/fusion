@@ -369,3 +369,17 @@
 :host([align="center"]) ::slotted([slot="icon"]) {
   margin-inline: auto;
 }
+
+/* Not printed, being an overlay.
+ *
+ * It is over the page rather than part of it, and on paper there is no over: a dialog prints as a slab across whatever it covered, and a tooltip prints its tip beside nothing that is hovering.
+ *
+ * Here rather than in a consumer's stylesheet, and that is the whole reason
+ * every component needs its own: `@media print` does not cross a shadow
+ * boundary any more than a reduced-motion rule does, so a page cannot answer
+ * this on a component's behalf. See 165. */
+@media print {
+  :host {
+    display: none;
+  }
+}
