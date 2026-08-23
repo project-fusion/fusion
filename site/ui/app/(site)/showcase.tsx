@@ -582,7 +582,7 @@ export function Showcase(): React.ReactElement {
               a tinted ground, a rule and an icon down the side. A card around
               it is a second surface a few pixels outside the first, and the two
               edges argue about which one is the callout. */}
-          <helix-callout class={styles.showcaseWide} severity="info">
+          <helix-callout class={styles.showcaseWide} tone="info">
             <helix-text appearance="body-strong" slot="title">
               Nothing here needs us to keep running
             </helix-text>

@@ -80,9 +80,26 @@ export class HelixText extends HelixElement {
     | 'label'
     | 'code'
 
-  /** Color role. Separate from `appearance`, because color carries state. */
+  /**
+   * Color role. A separate axis from the type ramp, because color carries
+   * state: folding it in would mean `caption-danger` and the rest of the cross
+   * product.
+   *
+   * **`default` is gone, having been styled nowhere.** It matched no rule and
+   * fell through to the inherited ink, so it read as working while saying
+   * nothing, which is the same shape as the `shadow` an example wrote at Video.
+   * The resting case is the absent attribute.
+   *
+   * **`muted` and `subtle` are weight rather than meaning and belong on
+   * `emphasis`, which is why this is still off the registry.** Splitting them
+   * out is blocked on the palette rather than on the rename: there is a quiet
+   * step for the neutral ink and none for any other tone, so a muted danger has
+   * nothing to be made of. `primary-subtle` is a tinted *ground* and not a
+   * quiet ink. That is #141's to derive, and until it does, folding the two
+   * halves apart would leave three of the four combinations unsayable.
+   */
   @property({ reflect: true })
-  tone?: 'default' | 'muted' | 'subtle' | 'primary' | 'danger'
+  tone?: 'muted' | 'subtle' | 'primary' | 'danger'
 
   protected override render(): unknown {
     /* `Object.hasOwn`, not a truthy index.

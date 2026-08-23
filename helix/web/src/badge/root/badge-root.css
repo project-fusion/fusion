@@ -122,11 +122,11 @@
    usually a count of things waiting, and a count is news rather than a warning:
    red on everything that has unread anything is a page that is always shouting.
    `primary` is gone, having become the default and so a second name for it. */
-:host([appearance="danger"]) [part="indicator"] {
+:host([tone="danger"]) [part="indicator"] {
   background-color: var(--badge-background-color, var(--helix-color-danger-surface));
 }
 
-:host([appearance="neutral"]) [part="indicator"] {
+:host([tone="neutral"]) [part="indicator"] {
   background-color: var(--badge-background-color, var(--helix-color-surface-raised));
   color: var(--helix-color-foreground);
 }

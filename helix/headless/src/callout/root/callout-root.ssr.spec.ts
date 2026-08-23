@@ -4,9 +4,9 @@ import { html } from 'lit'
 import '../index.js'
 
 describe('callout server output', () => {
-  test('the severity icon and its name are in the served markup', () => {
+  test('the tone icon and its name are in the served markup', () => {
     const markup = withoutStyles(
-      ssr(html`<helix-base-callout severity="warning">Careful</helix-base-callout>`),
+      ssr(html`<helix-base-callout tone="warning">Careful</helix-base-callout>`),
     )
     expect(markup).toContain('aria-label="Warning"')
     expect(markup).toContain('role="img"')

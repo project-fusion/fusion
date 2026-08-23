@@ -48,15 +48,15 @@
   position: absolute;
 }
 
-:host([severity="success"]) {
+:host([tone="success"]) {
   --_callout-color: var(--helix-color-success);
 }
 
-:host([severity="warning"]) {
+:host([tone="warning"]) {
   --_callout-color: var(--helix-color-warning);
 }
 
-:host([severity="danger"]) {
+:host([tone="danger"]) {
   --_callout-color: var(--helix-color-danger);
 }
 

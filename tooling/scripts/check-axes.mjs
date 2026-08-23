@@ -74,7 +74,6 @@ const UNSWEPT = {
      Toggle Group's `plain` drops is the background *and* the border, and all
      three of Video's states describe what the control bar sits on. Both are
      separation, and both moved with it. Classify by what a value does. */
-  badge: 'tone, misfiled: danger and neutral are meanings, not treatments',
   'button-group': 'variant: joined and spaced are a layout',
   checkbox: 'variant: `card` gives the option a description and a price, not a border',
   'color-input': 'variant: a swatch is a different control',
@@ -97,7 +96,10 @@ const UNSWEPT = {
  */
 const PENDING = {
   'helix-bar-chart.material': '#156, the wash is a chart-domain axis and not a material',
-  'helix-text.tone': '#158, `muted` and `subtle` are weight where the rest are meaning',
+  /* Blocked on the palette rather than on the rename: there is a quiet step for
+     the neutral ink and none for any other tone, so a muted danger has nothing
+     to be made of and three of the four combinations would be unsayable. */
+  'helix-text.tone': '#141, `muted` and `subtle` want a quiet step per tone first',
 }
 
 const problems = []

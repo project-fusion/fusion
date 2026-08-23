@@ -232,10 +232,24 @@ helix-drawer {
  * another section. Nothing said the page had ended, and an ending is most of
  * what a closing call is for.
  *
- * A ground first, the same pair `/insights` uses for its hero, so the site has
- * one answer to "a band that steps off the page" rather than two. The hairline
- * is what makes it an edge rather than a smudge: at these strengths the fill
- * alone fades in and a reader does not see a boundary they cannot locate.
+ * A ground, and this is the only band on the site whose fill is the whole of
+ * the cue. The hairline this paragraph used to credit is gone, taken out as an
+ * edge the call did not need, and `[data-band]` never drew one: measured on the
+ * landing page the section has no border on either side and no shadow, so
+ * nothing but the colour says the page has ended.
+ *
+ * **Which is why the two tokens are paired here and nowhere else.** 145 says a
+ * consumer writing `light-dark()` across two surface tokens is compensating for
+ * the neutral ramp by hand, and of a surface that is true: a card is told apart
+ * by its edge in both modes, measured at 1.31 light and 1.71 dark against fills
+ * of 1.04 and 1.18, so its fill is the quieter half of a cue and is allowed to
+ * stay quiet. A band with no edge has only the loud half. `surface` alone is
+ * five values off white across the 352 pixels this one stands, and five values
+ * with no boundary anywhere is not a band. `/insights` reached the same rule
+ * from the other side and landed on the other token: its hero took `surface`
+ * because the filter bar's hairline sits under it, and `surface-sunken` at
+ * thirteen values read as a panel dropped on the page. Two grounds, one rule,
+ * that a fill carries as much as it is left alone to carry.
  *
  * **The ground alone, with no light rising into it.** A radial wash of the
  * brand came up from below the bottom edge here, echoing the hero's aura as a

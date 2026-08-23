@@ -49,10 +49,10 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-accent-hover` | `var(--_helix-accent-600)` | 3 |
 | `--helix-color-accent-active` | `var(--_helix-accent-700)` | 0 |
 | `--helix-color-accent-subtle` | `light-dark(var(--_helix-accent-50), var(--_helix-accent-900))` | 0 |
-| `--helix-color-accent-surface` | `var(--_helix-accent-600)` | 2 |
-| `--helix-color-accent-surface-hover` | `var(--_helix-accent-700)` | 2 |
-| `--helix-color-primary-surface` | `var(--_helix-brand-600)` | 11 |
-| `--helix-color-primary-surface-hover` | `var(--_helix-brand-700)` | 2 |
+| `--helix-color-accent-surface` | `var(--_helix-accent-600)` | 3 |
+| `--helix-color-accent-surface-hover` | `var(--_helix-accent-700)` | 3 |
+| `--helix-color-primary-surface` | `var(--_helix-brand-600)` | 12 |
+| `--helix-color-primary-surface-hover` | `var(--_helix-brand-700)` | 3 |
 | `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 61 |
 | `--helix-color-brand-mark` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 1 |
 | `--helix-color-syntax-callable` | `light-dark( var(--_helix-syntax-callable-light), var(--_helix-syntax-callable-dark) )` | 3 |
@@ -91,8 +91,8 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-success` | `light-dark(var(--_helix-success-600), var(--_helix-success-400))` | 15 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-600), var(--_helix-warning-400))` | 12 |
 | `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 66 |
-| `--helix-color-danger-surface` | `var(--_helix-danger-600)` | 3 |
-| `--helix-color-danger-surface-hover` | `var(--_helix-danger-700)` | 2 |
+| `--helix-color-danger-surface` | `var(--_helix-danger-600)` | 4 |
+| `--helix-color-danger-surface-hover` | `var(--_helix-danger-700)` | 3 |
 | `--helix-color-info-surface` | `var(--_helix-info-600)` | 0 |
 | `--helix-color-info-surface-hover` | `var(--_helix-info-700)` | 0 |
 | `--helix-color-success-surface` | `var(--_helix-success-600)` | 0 |

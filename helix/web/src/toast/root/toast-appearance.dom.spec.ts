@@ -110,32 +110,32 @@ if (hasLayout()) {
       expect(getComputedStyle(bar).animationPlayState).toBe('running')
     })
 
-    test('the severity is a named icon, not only a color', async () => {
+    test('the tone is a named icon, not only a color', async () => {
       /* It was a colored bar, which says *something* is different about this
          message and never says what. A reader who cannot tell green from red
          was told nothing at all. The glyph carries the name. */
-      const found = await item('severity="danger"')
+      const found = await item('tone="danger"')
       const glyph = (part(found, 'icon') as HTMLElement).querySelector('svg')
       expect(glyph?.getAttribute('role')).toBe('img')
       expect(glyph?.getAttribute('aria-label')).toBe('Error')
       expect(getComputedStyle(part(found, 'item') as HTMLElement).borderLeftWidth).toBe('0px')
     })
 
-    test('each severity names itself, in the same words `Callout` uses', async () => {
+    test('each tone names itself, in the same words `Callout` uses', async () => {
       // One vocabulary, met in a passage and in a message. Two would be two.
-      for (const [severity, name] of [
+      for (const [tone, name] of [
         ['info', 'Information'],
         ['success', 'Success'],
         ['warning', 'Warning'],
         ['danger', 'Error'],
       ]) {
-        const found = await item(`severity="${severity}"`)
+        const found = await item(`tone="${tone}"`)
         const glyph = (part(found, 'icon') as HTMLElement).querySelector('svg')
-        expect(glyph?.getAttribute('aria-label'), severity).toBe(name)
+        expect(glyph?.getAttribute('aria-label'), tone).toBe(name)
       }
     })
 
-    test('no severity means no mark at all', async () => {
+    test('no tone means no mark at all', async () => {
       /* The common message. "Project saved" is not an error, a warning or an
          announcement, and an icon there would be decoration standing where
          meaning is supposed to be. `Callout` falls back to `info` because it is
@@ -146,7 +146,7 @@ if (hasLayout()) {
     test('the dismiss glyph has its own slot name, because two cannot share one', async () => {
       /* Assignment goes to whichever slot comes first in the tree, so the
          severity mark would have swallowed anything meant for the control. */
-      const found = await item('dismissible severity="info"')
+      const found = await item('dismissible tone="info"')
       expect(part(found, 'dismiss')?.querySelector('slot')?.getAttribute('name')).toBe(
         'dismiss-icon',
       )
@@ -167,12 +167,12 @@ if (hasLayout()) {
         `<div>
            <div data-color-mode="light">
              <helix-toast id="over-light" label="N">
-               <helix-toast-item severity="info">m</helix-toast-item>
+               <helix-toast-item tone="info">m</helix-toast-item>
              </helix-toast>
            </div>
            <div data-color-mode="dark">
              <helix-toast id="over-dark" label="N">
-               <helix-toast-item severity="info">m</helix-toast-item>
+               <helix-toast-item tone="info">m</helix-toast-item>
              </helix-toast>
            </div>
          </div>`,
@@ -192,7 +192,7 @@ if (hasLayout()) {
          which is that rule for free. */
       const host = (await mount(
         `<div data-color-mode="dark"><div data-color-mode="light">
-           <helix-toast label="N"><helix-toast-item severity="info">m</helix-toast-item></helix-toast>
+           <helix-toast label="N"><helix-toast-item tone="info">m</helix-toast-item></helix-toast>
          </div></div>`,
       )) as HTMLElement
       const toast = host.querySelector('helix-toast') as HTMLElement
@@ -203,7 +203,7 @@ if (hasLayout()) {
       const host = (await mount(
         `<div data-color-mode="dark">
            <helix-toast data-color-mode="dark" label="N">
-             <helix-toast-item severity="info">m</helix-toast-item>
+             <helix-toast-item tone="info">m</helix-toast-item>
            </helix-toast>
          </div>`,
       )) as HTMLElement
@@ -253,10 +253,10 @@ if (hasLayout()) {
          and it sat 5.5px low until this was measured. */
       const host = (await mount(
         `<helix-toast label="N">
-           <helix-toast-item id="short" dismissible severity="danger">Short.
+           <helix-toast-item id="short" dismissible tone="danger">Short.
              <helix-button appearance="ghost" slot="actions">Retry</helix-button>
            </helix-toast-item>
-           <helix-toast-item id="long" dismissible severity="danger">A far longer
+           <helix-toast-item id="long" dismissible tone="danger">A far longer
              message that wraps onto several separate lines inside the width a
              toast is given, which is where the alignment question bites.
              <helix-button appearance="ghost" slot="actions">Retry</helix-button>
@@ -294,7 +294,7 @@ if (hasLayout()) {
       /* `backwards` on the entry animation. Without it a stack given staggered
          delays paints in full and each message jumps back to invisible when its
          turn comes, which is the opposite of arriving. */
-      const found = await item('severity="info"')
+      const found = await item('tone="info"')
       expect(getComputedStyle(part(found, 'item') as HTMLElement).animationFillMode).toBe(
         'backwards',
       )

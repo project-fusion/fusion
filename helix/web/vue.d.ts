@@ -305,7 +305,7 @@ would catch. */
 
 **This was `severity` and it was claiming more than it did.** Severity is a
 judgement about the message, and elsewhere in this library it carries one:
-`Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
+`Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
 nothing about the announcement's semantics moved. A property that only
@@ -560,8 +560,14 @@ export type HelixAvatarVueEvents = {
 };
 
 export type HelixBadgeVueProps = {
-  /** How much attention the mark asks for. */
-  appearance?: HelixBadge["appearance"];
+  /** What the mark means.
+
+**The docstring said "how much attention the mark asks for", which is the
+emphasis question, and the values answer a different one.** `danger` and
+`neutral` are meanings: the stylesheet picks a fill by what the count *is*,
+not by how loudly it is drawn. Filed under `appearance` it read as a
+treatment, which is the confusion `check:axes` exists to stop. */
+  tone?: HelixBadge["tone"];
   /** The count or short text to show. Absent shows a dot, zero shows nothing. */
   value?: HelixBadge["value"];
   /** Cap for a numeric value. Past it the indicator reads `{max}+`. */
@@ -850,8 +856,14 @@ anything a consumer sets. */
 export type HelixButtonVueEvents = {};
 
 export type HelixCalloutVueProps = {
-  /** What kind of attention the passage needs. */
-  severity?: HelixCallout["severity"];
+  /** What kind of attention the passage needs.
+
+**`severity` was a sixth spelling of `tone`**, which is the axis for what a
+thing means, and a subset of it: a callout reports a status and never a
+brand role, so it takes four of the seven. One word per axis is the whole
+of the registry, and two words for one axis is how `tone` had drifted into
+five incompatible value sets before anything held it. */
+  tone?: HelixCallout["tone"];
 };
 
 export type HelixCalloutVueEvents = {};
@@ -5919,7 +5931,22 @@ export type HelixTextVueProps = {
   as?: HelixText["as"];
   /** Type treatment. Defaults to the one that matches `as`. */
   appearance?: HelixText["appearance"];
-  /** Color role. Separate from `appearance`, because color carries state. */
+  /** Color role. A separate axis from the type ramp, because color carries
+state: folding it in would mean `caption-danger` and the rest of the cross
+product.
+
+**`default` is gone, having been styled nowhere.** It matched no rule and
+fell through to the inherited ink, so it read as working while saying
+nothing, which is the same shape as the `shadow` an example wrote at Video.
+The resting case is the absent attribute.
+
+**`muted` and `subtle` are weight rather than meaning and belong on
+`emphasis`, which is why this is still off the registry.** Splitting them
+out is blocked on the palette rather than on the rename: there is a quiet
+step for the neutral ink and none for any other tone, so a muted danger has
+nothing to be made of. `primary-subtle` is a tinted *ground* and not a
+quiet ink. That is #141's to derive, and until it does, folding the two
+halves apart would leave three of the four combinations unsayable. */
   tone?: HelixText["tone"];
 };
 
@@ -6393,8 +6420,11 @@ would catch. */
 Read once when the item is first rendered. Changing it afterwards does not
 restart a message the reader is already partway through. */
   duration?: HelixToastItem["duration"];
-  /** What kind of message it is, which picks the mark and its name. */
-  severity?: HelixToastItem["severity"];
+  /** What kind of message it is, which picks the mark and its name.
+
+`severity` was a sixth spelling of `tone`, and a subset of it: a toast
+reports a status and never a brand role. */
+  tone?: HelixToastItem["tone"];
   /** Whether the message is still showing.
 
 The same decide-once contract every other stateful thing here carries, and

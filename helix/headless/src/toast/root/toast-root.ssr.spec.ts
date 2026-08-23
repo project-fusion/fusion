@@ -18,7 +18,7 @@ describe('toast server output', () => {
     const markup = withoutStyles(
       ssr(
         html`<helix-base-toast
-          ><helix-base-toast-item severity="success">Saved</helix-base-toast-item></helix-base-toast
+          ><helix-base-toast-item tone="success">Saved</helix-base-toast-item></helix-base-toast
         >`,
       ),
     )

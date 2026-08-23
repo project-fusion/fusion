@@ -24,9 +24,17 @@ import { styles } from './badge-root.css.js'
  */
 @customElement('helix-badge')
 export class HelixBadge extends HelixBaseBadge {
-  /** How much attention the mark asks for. */
+  /**
+   * What the mark means.
+   *
+   * **The docstring said "how much attention the mark asks for", which is the
+   * emphasis question, and the values answer a different one.** `danger` and
+   * `neutral` are meanings: the stylesheet picks a fill by what the count *is*,
+   * not by how loudly it is drawn. Filed under `appearance` it read as a
+   * treatment, which is the confusion `check:axes` exists to stop.
+   */
   @property({ reflect: true })
-  appearance?: 'danger' | 'neutral'
+  tone?: 'danger' | 'neutral'
 
   static override styles: CSSResultGroup = styles
 }

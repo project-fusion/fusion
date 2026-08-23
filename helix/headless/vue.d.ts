@@ -267,7 +267,7 @@ export type HelixBaseAnnouncementVueProps = {
 
 **This was `severity` and it was claiming more than it did.** Severity is a
 judgement about the message, and elsewhere in this library it carries one:
-`Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
+`Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
 nothing about the announcement's semantics moved. A property that only
@@ -595,8 +595,14 @@ anything a consumer sets. */
 export type HelixBaseButtonVueEvents = {};
 
 export type HelixBaseCalloutVueProps = {
-  /** What kind of attention the passage needs. */
-  severity?: HelixBaseCallout["severity"];
+  /** What kind of attention the passage needs.
+
+**`severity` was a sixth spelling of `tone`**, which is the axis for what a
+thing means, and a subset of it: a callout reports a status and never a
+brand role, so it takes four of the seven. One word per axis is the whole
+of the registry, and two words for one axis is how `tone` had drifted into
+five incompatible value sets before anything held it. */
+  tone?: HelixBaseCallout["tone"];
 };
 
 export type HelixBaseCalloutVueEvents = {};
@@ -5485,8 +5491,11 @@ export type HelixBaseToastItemVueProps = {
 Read once when the item is first rendered. Changing it afterwards does not
 restart a message the reader is already partway through. */
   duration?: HelixBaseToastItem["duration"];
-  /** What kind of message it is, which picks the mark and its name. */
-  severity?: HelixBaseToastItem["severity"];
+  /** What kind of message it is, which picks the mark and its name.
+
+`severity` was a sixth spelling of `tone`, and a subset of it: a toast
+reports a status and never a brand role. */
+  tone?: HelixBaseToastItem["tone"];
   /** Whether the message is still showing.
 
 The same decide-once contract every other stateful thing here carries, and

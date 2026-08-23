@@ -92,9 +92,14 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
   @property({ type: Number })
   duration?: number
 
-  /** What kind of message it is, which picks the mark and its name. */
+  /**
+   * What kind of message it is, which picks the mark and its name.
+   *
+   * `severity` was a sixth spelling of `tone`, and a subset of it: a toast
+   * reports a status and never a brand role.
+   */
   @property({ reflect: true })
-  severity?: 'danger' | 'info' | 'success' | 'warning'
+  tone?: 'danger' | 'info' | 'success' | 'warning'
 
   /** When the current run of the timer began, or nothing while it is paused. */
   private startedAt: number | undefined
@@ -341,7 +346,7 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
        falls back to `info` because a callout exists to set a passage apart and
        is always *about* something; a toast is just the next thing that
        happened. */
-    const severity = severityMark(this.severity)
+    const severity = severityMark(this.tone)
 
     return html`<div
       part="item"

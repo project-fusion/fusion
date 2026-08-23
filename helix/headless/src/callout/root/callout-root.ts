@@ -45,9 +45,17 @@ export class HelixBaseCallout extends HelixElement {
     hostAria(this.internals, { role: 'note' })
   }
 
-  /** What kind of attention the passage needs. */
+  /**
+   * What kind of attention the passage needs.
+   *
+   * **`severity` was a sixth spelling of `tone`**, which is the axis for what a
+   * thing means, and a subset of it: a callout reports a status and never a
+   * brand role, so it takes four of the seven. One word per axis is the whole
+   * of the registry, and two words for one axis is how `tone` had drifted into
+   * five incompatible value sets before anything held it.
+   */
   @property({ reflect: true })
-  severity?: 'info' | 'success' | 'warning' | 'danger'
+  tone?: 'danger' | 'info' | 'success' | 'warning'
 
   /**
    * The mark for the callout's severity, behind a seam.
@@ -75,7 +83,7 @@ export class HelixBaseCallout extends HelixElement {
        is therefore always *about* something. `Toast.Item` takes the same lookup
        and draws nothing instead, since a message is just the next thing that
        happened. Same vocabulary, two honest answers to an absent severity. */
-    const { icon, label } = severityMark(this.severity) ?? SEVERITIES.info
+    const { icon, label } = severityMark(this.tone) ?? SEVERITIES.info
 
     return html`<span part="icon">${this.renderIcon(icon, label)}</span>
       <div part="content">

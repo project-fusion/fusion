@@ -714,7 +714,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "attribute": "tone",
               "reflects": true
             },
@@ -924,7 +924,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "fieldName": "tone"
             },
             {
@@ -4287,12 +4287,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "severity",
+              "name": "tone",
               "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of attention the passage needs.",
-              "attribute": "severity",
+              "description": "What kind of attention the passage needs.\n\n**`severity` was a sixth spelling of `tone`**, which is the axis for what a\nthing means, and a subset of it: a callout reports a status and never a\nbrand role, so it takes four of the seven. One word per axis is the whole\nof the registry, and two words for one axis is how `tone` had drifted into\nfive incompatible value sets before anything held it.",
+              "attribute": "tone",
               "reflects": true
             },
             {
@@ -4429,12 +4429,12 @@
           ],
           "attributes": [
             {
-              "name": "severity",
+              "name": "tone",
               "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of attention the passage needs.",
-              "fieldName": "severity"
+              "description": "What kind of attention the passage needs.\n\n**`severity` was a sixth spelling of `tone`**, which is the axis for what a\nthing means, and a subset of it: a callout reports a status and never a\nbrand role, so it takes four of the seven. One word per axis is the whole\nof the registry, and two words for one axis is how `tone` had drifted into\nfive incompatible value sets before anything held it.",
+              "fieldName": "tone"
             }
           ],
           "superclass": {
@@ -49860,12 +49860,12 @@
             },
             {
               "kind": "field",
-              "name": "severity",
+              "name": "tone",
               "type": {
                 "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of message it is, which picks the mark and its name.",
-              "attribute": "severity",
+              "description": "What kind of message it is, which picks the mark and its name.\n\n`severity` was a sixth spelling of `tone`, and a subset of it: a toast\nreports a status and never a brand role.",
+              "attribute": "tone",
               "reflects": true
             },
             {
@@ -50203,12 +50203,12 @@
               "fieldName": "duration"
             },
             {
-              "name": "severity",
+              "name": "tone",
               "type": {
                 "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of message it is, which picks the mark and its name.",
-              "fieldName": "severity"
+              "description": "What kind of message it is, which picks the mark and its name.\n\n`severity` was a sixth spelling of `tone`, and a subset of it: a toast\nreports a status and never a brand role.",
+              "fieldName": "tone"
             },
             {
               "name": "open",

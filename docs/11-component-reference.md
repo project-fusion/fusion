@@ -406,9 +406,9 @@ on a dark icon reads as a bite taken out of the icon.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'danger' \| 'neutral' \| undefined` | - | - | How much attention the mark asks for. |
 | `label` | `label` | `string` | `''` | `HelixBaseBadge` | Accessible name. Required for a dot, which has no text to read. |
 | `max` | `max` | `number \| undefined` | - | `HelixBaseBadge` | Cap for a numeric value. Past it the indicator reads `{max}+`. |
+| `tone` | `tone` | `'danger' \| 'neutral' \| undefined` | - | - | What the mark means. |
 | `value` | `value` | `string` | `''` | `HelixBaseBadge` | The count or short text to show. Absent shows a dot, zero shows nothing. |
 
 #### Slots
@@ -740,7 +740,7 @@ the headless tier; this tier only decides what that meaning looks like.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `severity` | `severity` | `'info' \| 'success' \| 'warning' \| 'danger' \| undefined` | - | `HelixBaseCallout` | What kind of attention the passage needs. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseCallout` | What kind of attention the passage needs. |
 
 #### Slots
 
@@ -5568,7 +5568,7 @@ the cross product, which is the explosion `appearance` exists to prevent.
     \| 'label'
     \| 'code' \| undefined` | - | - | Type treatment. Defaults to the one that matches `as`. |
 | `as` | `as` | `'span' \| 'p' \| 'h1' \| 'h2' \| 'h3' \| 'h4' \| 'h5' \| 'h6' \| 'strong' \| 'em' \| 'code' \| 'label' \| undefined` | - | - | Which element to render. Decides the outline and the semantics. |
-| `tone` | `tone` | `'default' \| 'muted' \| 'subtle' \| 'primary' \| 'danger' \| undefined` | - | - | Color role. Separate from `appearance`, because color carries state. |
+| `tone` | `tone` | `'muted' \| 'subtle' \| 'primary' \| 'danger' \| undefined` | - | - | Color role. A separate axis from the type ramp, because color carries state: folding it in would mean `caption-danger` and the rest of the cross product. |
 
 #### Slots
 
@@ -5967,7 +5967,7 @@ costs contrast for something the mark already says.
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
 | `duration` | `duration` | `number \| undefined` | - | `HelixBaseToastItem` | How long it stays, in milliseconds. Absent means until it is dismissed. |
 | `open` | `open` | `boolean` | - | `HelixBaseToastItem` | Whether the message is still showing. |
-| `severity` | `severity` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseToastItem` | What kind of message it is, which picks the mark and its name. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseToastItem` | What kind of message it is, which picks the mark and its name. |
 
 #### Methods
 

@@ -778,7 +778,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                   ) : (
                     <helix-flex direction="column" gap="sm">
                       {theme.collisions.map((collision) => (
-                        <helix-callout key={collision} severity="warning">
+                        <helix-callout key={collision} tone="warning">
                           <helix-text>{collision}</helix-text>
                         </helix-callout>
                       ))}

@@ -51,7 +51,7 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
    * judgement about the message, and elsewhere in this library it carries one:
-   * `Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
+   * `Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and
    * nothing about the announcement's semantics moved. A property that only

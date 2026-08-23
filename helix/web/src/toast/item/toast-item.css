@@ -188,19 +188,19 @@ slot[name="icon"]::slotted(*) {
 /* Color on the mark rather than a fill behind the words. A message is text to
    be read, and a colored panel costs contrast to say what the icon already
    says in words. */
-:host([severity="info"]) {
+:host([tone="info"]) {
   --_toast-severity: var(--helix-color-primary);
 }
 
-:host([severity="success"]) {
+:host([tone="success"]) {
   --_toast-severity: var(--helix-color-success);
 }
 
-:host([severity="warning"]) {
+:host([tone="warning"]) {
   --_toast-severity: var(--helix-color-warning);
 }
 
-:host([severity="danger"]) {
+:host([tone="danger"]) {
   --_toast-severity: var(--helix-color-danger);
 }
 

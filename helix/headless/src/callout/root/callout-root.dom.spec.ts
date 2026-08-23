@@ -9,31 +9,29 @@ beforeAll(async () => {
 const iconSvg = (host: HTMLElement): Element | null =>
   host.shadowRoot?.querySelector('[part="icon"] svg') ?? null
 
-describe('callout severity', () => {
-  test('carries the severity as an accessible name, not only as a color', async () => {
+describe('callout tone', () => {
+  test('carries the tone as an accessible name, not only as a color', async () => {
     // Someone who cannot see that the box is red still has to learn it is an
     // error, so the icon is labelled rather than decorative.
-    const callout = await mount('<helix-base-callout severity="danger">Failed</helix-base-callout>')
+    const callout = await mount('<helix-base-callout tone="danger">Failed</helix-base-callout>')
     expect(iconSvg(callout)?.getAttribute('role')).toBe('img')
     expect(iconSvg(callout)?.getAttribute('aria-label')).toBe('Error')
   })
 
-  test('each severity names itself', async () => {
-    for (const [severity, label] of [
+  test('each tone names itself', async () => {
+    for (const [tone, label] of [
       ['info', 'Information'],
       ['success', 'Success'],
       ['warning', 'Warning'],
       ['danger', 'Error'],
     ] as const) {
-      const callout = await mount(
-        `<helix-base-callout severity="${severity}">x</helix-base-callout>`,
-      )
-      expect(iconSvg(callout)?.getAttribute('aria-label'), severity).toBe(label)
+      const callout = await mount(`<helix-base-callout tone="${tone}">x</helix-base-callout>`)
+      expect(iconSvg(callout)?.getAttribute('aria-label'), tone).toBe(label)
     }
   })
 
-  test('an unknown severity falls back rather than rendering nothing', async () => {
-    const callout = await mount('<helix-base-callout severity="nonsense">x</helix-base-callout>')
+  test('an unknown tone falls back rather than rendering nothing', async () => {
+    const callout = await mount('<helix-base-callout tone="nonsense">x</helix-base-callout>')
     expect(iconSvg(callout)?.getAttribute('aria-label')).toBe('Information')
   })
 

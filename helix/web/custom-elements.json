@@ -947,7 +947,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "attribute": "tone",
               "reflects": true,
               "inheritedFrom": {
@@ -1164,7 +1164,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "fieldName": "tone",
               "inheritedFrom": {
                 "name": "HelixBaseAnnouncement",
@@ -3424,12 +3424,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "tone",
               "type": {
                 "text": "'danger' | 'neutral' | undefined"
               },
-              "description": "How much attention the mark asks for.",
-              "attribute": "appearance",
+              "description": "What the mark means.\n\n**The docstring said \"how much attention the mark asks for\", which is the\nemphasis question, and the values answer a different one.** `danger` and\n`neutral` are meanings: the stylesheet picks a fill by what the count *is*,\nnot by how loudly it is drawn. Filed under `appearance` it read as a\ntreatment, which is the confusion `check:axes` exists to stop.",
+              "attribute": "tone",
               "reflects": true
             },
             {
@@ -3610,12 +3610,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "tone",
               "type": {
                 "text": "'danger' | 'neutral' | undefined"
               },
-              "description": "How much attention the mark asks for.",
-              "fieldName": "appearance"
+              "description": "What the mark means.\n\n**The docstring said \"how much attention the mark asks for\", which is the\nemphasis question, and the values answer a different one.** `danger` and\n`neutral` are meanings: the stylesheet picks a fill by what the count *is*,\nnot by how loudly it is drawn. Filed under `appearance` it read as a\ntreatment, which is the confusion `check:axes` exists to stop.",
+              "fieldName": "tone"
             },
             {
               "name": "value",
@@ -6814,12 +6814,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "severity",
+              "name": "tone",
               "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of attention the passage needs.",
-              "attribute": "severity",
+              "description": "What kind of attention the passage needs.\n\n**`severity` was a sixth spelling of `tone`**, which is the axis for what a\nthing means, and a subset of it: a callout reports a status and never a\nbrand role, so it takes four of the seven. One word per axis is the whole\nof the registry, and two words for one axis is how `tone` had drifted into\nfive incompatible value sets before anything held it.",
+              "attribute": "tone",
               "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseCallout",
@@ -7001,12 +7001,12 @@
           "customElement": true,
           "attributes": [
             {
-              "name": "severity",
+              "name": "tone",
               "type": {
-                "text": "'info' | 'success' | 'warning' | 'danger' | undefined"
+                "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of attention the passage needs.",
-              "fieldName": "severity",
+              "description": "What kind of attention the passage needs.\n\n**`severity` was a sixth spelling of `tone`**, which is the axis for what a\nthing means, and a subset of it: a callout reports a status and never a\nbrand role, so it takes four of the seven. One word per axis is the whole\nof the registry, and two words for one axis is how `tone` had drifted into\nfive incompatible value sets before anything held it.",
+              "fieldName": "tone",
               "inheritedFrom": {
                 "name": "HelixBaseCallout",
                 "module": "src/callout/root/callout-root.ts"
@@ -62190,9 +62190,9 @@
               "kind": "field",
               "name": "tone",
               "type": {
-                "text": "'default' | 'muted' | 'subtle' | 'primary' | 'danger' | undefined"
+                "text": "'muted' | 'subtle' | 'primary' | 'danger' | undefined"
               },
-              "description": "Color role. Separate from `appearance`, because color carries state.",
+              "description": "Color role. A separate axis from the type ramp, because color carries\nstate: folding it in would mean `caption-danger` and the rest of the cross\nproduct.\n\n**`default` is gone, having been styled nowhere.** It matched no rule and\nfell through to the inherited ink, so it read as working while saying\nnothing, which is the same shape as the `shadow` an example wrote at Video.\nThe resting case is the absent attribute.\n\n**`muted` and `subtle` are weight rather than meaning and belong on\n`emphasis`, which is why this is still off the registry.** Splitting them\nout is blocked on the palette rather than on the rename: there is a quiet\nstep for the neutral ink and none for any other tone, so a muted danger has\nnothing to be made of. `primary-subtle` is a tinted *ground* and not a\nquiet ink. That is #141's to derive, and until it does, folding the two\nhalves apart would leave three of the four combinations unsayable.",
               "attribute": "tone",
               "reflects": true
             },
@@ -62323,9 +62323,9 @@
             {
               "name": "tone",
               "type": {
-                "text": "'default' | 'muted' | 'subtle' | 'primary' | 'danger' | undefined"
+                "text": "'muted' | 'subtle' | 'primary' | 'danger' | undefined"
               },
-              "description": "Color role. Separate from `appearance`, because color carries state.",
+              "description": "Color role. A separate axis from the type ramp, because color carries\nstate: folding it in would mean `caption-danger` and the rest of the cross\nproduct.\n\n**`default` is gone, having been styled nowhere.** It matched no rule and\nfell through to the inherited ink, so it read as working while saying\nnothing, which is the same shape as the `shadow` an example wrote at Video.\nThe resting case is the absent attribute.\n\n**`muted` and `subtle` are weight rather than meaning and belong on\n`emphasis`, which is why this is still off the registry.** Splitting them\nout is blocked on the palette rather than on the rename: there is a quiet\nstep for the neutral ink and none for any other tone, so a muted danger has\nnothing to be made of. `primary-subtle` is a tinted *ground* and not a\nquiet ink. That is #141's to derive, and until it does, folding the two\nhalves apart would leave three of the four combinations unsayable.",
               "fieldName": "tone"
             }
           ],
@@ -67313,12 +67313,12 @@
             },
             {
               "kind": "field",
-              "name": "severity",
+              "name": "tone",
               "type": {
                 "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of message it is, which picks the mark and its name.",
-              "attribute": "severity",
+              "description": "What kind of message it is, which picks the mark and its name.\n\n`severity` was a sixth spelling of `tone`, and a subset of it: a toast\nreports a status and never a brand role.",
+              "attribute": "tone",
               "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
@@ -67690,12 +67690,12 @@
               }
             },
             {
-              "name": "severity",
+              "name": "tone",
               "type": {
                 "text": "'danger' | 'info' | 'success' | 'warning' | undefined"
               },
-              "description": "What kind of message it is, which picks the mark and its name.",
-              "fieldName": "severity",
+              "description": "What kind of message it is, which picks the mark and its name.\n\n`severity` was a sixth spelling of `tone`, and a subset of it: a toast\nreports a status and never a brand role.",
+              "fieldName": "tone",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
                 "module": "src/toast/item/toast-item.ts"
