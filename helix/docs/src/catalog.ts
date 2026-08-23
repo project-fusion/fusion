@@ -259,18 +259,16 @@ const examplesOf = (
   return (
     sources
       .filter((source) => source.family === slug)
-      /* Compared with the extension still on, which is not incidental to
-       preserve: `compact-counts.html` sorts before `compact.html` because `-`
-       precedes `.`, and by slug alone `compact` would come first. This is what
-       the site rendered before this reader moved into the package, so it is
-       kept here to make the move provable. The ordering itself is worth a
-       second look, and a change to it is its own one-line commit. */
+      /* `default` first, then alphabetical by slug.
+
+         By slug, not by filename. This used to compare `compact-counts.html`
+         against `compact.html`, where `-` precedes `.` and so the longer name
+         sorted first, which is a list ordered by a file extension no reader
+         ever sees. The extension is not part of an example's identity:
+         `compact` and `compact-counts` are what the tabs say, and `compact`
+         comes first. */
       .sort((a, b) =>
-        a.slug === 'default'
-          ? -1
-          : b.slug === 'default'
-            ? 1
-            : `${a.slug}.html`.localeCompare(`${b.slug}.html`),
+        a.slug === 'default' ? -1 : b.slug === 'default' ? 1 : a.slug.localeCompare(b.slug),
       )
       .map((source) => {
         /* Which styled example this one is the headless twin of. `base` is the
