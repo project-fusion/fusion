@@ -58,13 +58,23 @@
  * `inset()` takes its radii in border-radius order, top-left first and
  * clockwise. A column ends at the top, so it is the first two; a bar ends at the
  * right, so it is the second and third. */
+/* **Which end is the far one, said once.** Both are properties rather than two
+   copies of a shape, because `outlined` and `subtle` below need the same answer
+   and got it wrong the first time: they wrote the column's geometry inline, came
+   later in the file at the same specificity, and so turned every horizontal bar
+   back into a column, rounding its top instead of its trailing end and cutting
+   the foot off the wrong side. */
 [part="bar"] {
-  clip-path: inset(0 round var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0);
+  clip-path: inset(var(--_bar-chart-foot, 0) round var(--_bar-chart-corners));
   fill: var(--_bar-chart-series);
+
+  --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0;
+  --_bar-chart-base: 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) * -1) 0;
 }
 
 :host([direction="horizontal"]) [part="bar"] {
-  clip-path: inset(0 round 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0);
+  --_bar-chart-corners: 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0;
+  --_bar-chart-base: 0 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) * -1);
 }
 
 [part="labels"] {
@@ -628,16 +638,15 @@
   stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thick));
   vector-effect: non-scaling-stroke;
 
-  /* **No line along the foot.** A column grows from the baseline and is measured
-     against the rule under it, which this file already says when it rounds the
-     far end only: "a rounded foot would lift it off the rule it is measured
-     against". A bottom edge does the same thing twice over, drawing a second
-     rule a stroke above the real one and detaching the column from it. The clip
-     runs past the foot so the stroke there falls outside it. */
-  clip-path: inset(
-    0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) * -1) 0 round
-      var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0
-  );
+  /* **No line across the base.** A bar grows from the baseline and is measured
+     against the rule there, which this file already says where it rounds the far
+     end only: "a rounded foot would lift it off the rule it is measured
+     against". An edge across the base does that twice over, drawing a second
+     rule a stroke inside the real one. The clip runs past it so the stroke falls
+     outside, and which side that is comes from `--_bar-chart-base` rather than
+     from this rule, so a horizontal bar loses its leading edge and not its
+     bottom one. */
+  --_bar-chart-foot: var(--_bar-chart-base);
 }
 
 /* A wash under the same edge, which is the quiet end of the axis: the column
@@ -650,11 +659,8 @@
 
   --_bar-chart-wash: 0.2;
 
-  /* The foot, for the reason `outlined` gives above it. */
-  clip-path: inset(
-    0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) * -1) 0 round
-      var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0
-  );
+  /* The base, for the reason `outlined` gives above it. */
+  --_bar-chart-foot: var(--_bar-chart-base);
 }
 
 [part="bar"] {
