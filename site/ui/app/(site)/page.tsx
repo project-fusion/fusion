@@ -18,6 +18,7 @@ import { formatDate, INSIGHTS } from '../../lib/insights'
 import { PRODUCTS } from '../products'
 import { SERVICES } from '../services'
 import { stageAppearance } from '../verticals'
+import styles from './landing.module.css'
 import { Showcase } from './showcase'
 
 /** Why choose this over an agency starting from a blank file. */
@@ -42,7 +43,7 @@ const REASONS = [
 
 export default function Home() {
   return (
-    <div className="reel">
+    <div className={styles.reel}>
       {/* Starting at the top of the page and running past the hero.
 
           **`terminus`, tuned so the angle reads about 23 degrees on a large
@@ -70,17 +71,17 @@ export default function Home() {
           stops itself in a background tab, and where WebGL is refused it draws
           nothing and the page is the type it always was. */}
       <helix-aura
-        class="reelAura"
+        class={styles.reelAura}
         gain={0.85}
         scale={1.7}
         shape="flow"
         speed={1}
         terminus={0.5625}
       ></helix-aura>
-      <div className="reelScrim" />
+      <div className={styles.reelScrim} />
 
-      <section className="hero">
-        <helix-flex align="center" class="shell heroShell" direction="column" gap="lg">
+      <section className={styles.hero}>
+        <helix-flex align="center" class={`shell ${styles.heroShell}`} direction="column" gap="lg">
           {/* A tag rather than a line of label text. The name is a thing, not a
               sentence about one, and a tag is what this library uses for a
               thing with a name. The line beside it says what we are made of,
@@ -147,7 +148,7 @@ export default function Home() {
               `CopyButton` rather than a code block with a button beside it,
               because the whole line is the payload and the copy is the only
               interaction it has. */}
-          <helix-flex align="center" class="heroInstall" gap="2xs">
+          <helix-flex align="center" class={styles.heroInstall} gap="2xs">
             <code>bun add @helix-io/web</code>
             <helix-copy-button
               copied-label="Copied"
@@ -158,7 +159,7 @@ export default function Home() {
         </helix-flex>
       </section>
 
-      <section className="band reveal">
+      <section className={`band reveal`}>
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             {/* **No kicker and no title.** Two named cards and a services block
@@ -251,7 +252,7 @@ export default function Home() {
           to care should meet all three together: two they can take and one they
           can hire. `Why us` is a reason to prefer the third and belongs after
           it, not between them. */}
-      <section className="band reveal">
+      <section className={`band reveal`}>
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
@@ -326,7 +327,7 @@ export default function Home() {
           the whole panel reads as a thing being looked into. What overflows is
           masked rather than cut: a hard edge says the layout ran out, a fade
           says there is more, which there is. */}
-      <section className="band reveal showcaseBand">
+      <section className={`band reveal ${styles.showcaseBand}`}>
         {/* **No rule between them, and more room instead.** A line is one way
             to say two things are separate and whitespace is the other, and
             whitespace does not have to be looked past. The splitter that was
@@ -337,8 +338,8 @@ export default function Home() {
             The gap does the work at `3xl`, the widest the scale goes, which is wider than anything else on
             the page joins with, because the two sides are not a pair of columns
             in a layout: they are an argument and the thing it is about. */}
-        <div className="shell showcaseSplit">
-          <helix-flex class="showcaseProse" direction="column" gap="sm">
+        <div className={`shell ${styles.showcaseSplit}`}>
+          <helix-flex class={styles.showcaseProse} direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
               Helix
             </helix-text>
@@ -361,7 +362,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="band reveal">
+      <section className={`band reveal`}>
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
@@ -393,7 +394,7 @@ export default function Home() {
         </helix-flex>
       </section>
 
-      <section className="band reveal">
+      <section className={`band reveal`}>
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-flex align="center" gap="md" justify="between" wrap>
             <helix-flex direction="column" gap="sm">
@@ -472,7 +473,7 @@ export default function Home() {
 
       {/* The story, last and short. It is why the work compounds rather than
           why anyone should buy it, and a reader who wants it can follow it. */}
-      <section className="band closing reveal">
+      <section className={`band closing reveal`}>
         <helix-flex align="center" class="shell" direction="column" gap="lg">
           <helix-text as="h2" class="sectionTitle">
             Take on the work

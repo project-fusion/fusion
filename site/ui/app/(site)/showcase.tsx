@@ -2,6 +2,7 @@
 
 import { deriveTheme, hexToOklch, type ThemeIntent } from '@helix-io/theme'
 import { useEffect, useRef, useState } from 'react'
+import styles from './landing.module.css'
 
 /**
  * The library, running, with a switch that changes what it is showing.
@@ -219,11 +220,11 @@ export function Showcase(): React.ReactElement {
   }, [held])
 
   return (
-    <div className="showcaseStage" ref={stage}>
-      <helix-card class="showcaseAnchor">
+    <div className={styles.showcaseStage} ref={stage}>
+      <helix-card class={styles.showcaseAnchor}>
         <helix-flex direction="column" gap="md">
           <helix-text appearance="label">Helix</helix-text>
-          <helix-text as="h3" class="anchorTitle">
+          <helix-text as="h3" class={styles.anchorTitle}>
             One brand colour in. A whole palette out.
           </helix-text>
           <helix-text>
@@ -238,7 +239,7 @@ export function Showcase(): React.ReactElement {
 
       <helix-toggle-group
         appearance="filled"
-        class="showcaseSwitch"
+        class={styles.showcaseSwitch}
         label="Showing"
         label-placement="start"
         onhelix-change={(event: CustomEvent<{ value: string }>) => {
@@ -265,7 +266,7 @@ export function Showcase(): React.ReactElement {
           `--helix-size-control` every other control is. */}
       <helix-color-input
         aria-label="Brand"
-        class="showcaseBrand"
+        class={styles.showcaseBrand}
         default-value={BRAND}
         name="brand"
         onhelix-change={(event: CustomEvent<{ value: string }>) => {
@@ -274,7 +275,7 @@ export function Showcase(): React.ReactElement {
         value={brand}
       ></helix-color-input>
 
-      <helix-tooltip class="showcaseReset" content="Back to the Fusion blue">
+      <helix-tooltip class={styles.showcaseReset} content="Back to the Fusion blue">
         <helix-icon-button
           disabled={brand === BRAND || undefined}
           label="Reset the brand colour"
@@ -284,13 +285,13 @@ export function Showcase(): React.ReactElement {
         </helix-icon-button>
       </helix-tooltip>
 
-      <div className="showcase">
-        <div className="showcaseView" hidden={view !== 'controls'}>
+      <div className={styles.showcase}>
+        <div className={styles.showcaseView} hidden={view !== 'controls'}>
           {/* A form, laid out as one. The previous version was a switch, a
                 checkbox, a slider and an unlabelled bar stacked at even
                 spacing, which is a pile of controls rather than a thing anybody
                 would fill in. Fields first, then the two that are settings. */}
-          <helix-card appearance="outlined" class="showcaseCard showcaseTall">
+          <helix-card appearance="outlined" class={`showcaseCard ${styles.showcaseTall}`}>
             <helix-flex direction="column" gap="md">
               <helix-select default-value="dark" label="Colour mode" name="mode">
                 <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -367,9 +368,9 @@ export function Showcase(): React.ReactElement {
           {/* Both columns: five faces at about 87 apiece need 435, and half
                 the panel is 297, so in one column the scale wrapped onto two
                 rows. A scale that has to be read in two goes is not a scale. */}
-          <helix-card appearance="outlined" class="showcaseCard showcaseWide">
+          <helix-card appearance="outlined" class={`showcaseCard ${styles.showcaseWide}`}>
             <helix-radio-group
-              class="showcaseFaces"
+              class={styles.showcaseFaces}
               default-value="good"
               label="How did that go"
               name="mood"
@@ -390,7 +391,7 @@ export function Showcase(): React.ReactElement {
           </helix-card>
         </div>
 
-        <div className="showcaseView" hidden={view !== 'data'}>
+        <div className={styles.showcaseView} hidden={view !== 'data'}>
           {/* **The sparkline spans the card, not one stat.** It used to sit
                 under a two stat group aligned to the first of them, 98 wide
                 under a 113 wide figure inside a 174 wide group, so it lined up
@@ -401,10 +402,10 @@ export function Showcase(): React.ReactElement {
                 are one thing. */}
           <helix-card
             appearance="outlined"
-            class="showcaseCard showcaseFigures"
+            class={`showcaseCard ${styles.showcaseFigures}`}
             media-placement="end"
           >
-            <helix-stat-group class="showcaseStats" divided>
+            <helix-stat-group class={styles.showcaseStats} divided>
               <helix-stat>
                 1,284
                 <span slot="label">Installs</span>
@@ -502,7 +503,10 @@ export function Showcase(): React.ReactElement {
                   </tr>
                 </tbody>
               </table>
-              <helix-bar-chart class="showcaseBars" for="showcase-releases"></helix-bar-chart>
+              <helix-bar-chart
+                class={styles.showcaseBars}
+                for="showcase-releases"
+              ></helix-bar-chart>
               {/* Two series need saying which is which, and the default
                   `entries` is the one that names columns, which is what these
                   are. */}
@@ -554,7 +558,10 @@ export function Showcase(): React.ReactElement {
                   the default it produced a single entry reading "Downloads",
                   the value column's own header. */}
               <helix-flex align="center" gap="lg">
-                <helix-donut-chart class="showcaseRing" for="showcase-sources"></helix-donut-chart>
+                <helix-donut-chart
+                  class={styles.showcaseRing}
+                  for="showcase-sources"
+                ></helix-donut-chart>
                 <helix-legend entries="categories" for="showcase-sources"></helix-legend>
               </helix-flex>
             </helix-flex>
@@ -570,12 +577,12 @@ export function Showcase(): React.ReactElement {
               together. */}
         </div>
 
-        <div className="showcaseView" hidden={view !== 'surfaces'}>
+        <div className={styles.showcaseView} hidden={view !== 'surfaces'}>
           {/* Flat, like the code block. `Callout` already draws its own band:
               a tinted ground, a rule and an icon down the side. A card around
               it is a second surface a few pixels outside the first, and the two
               edges argue about which one is the callout. */}
-          <helix-callout class="showcaseWide" severity="info">
+          <helix-callout class={styles.showcaseWide} severity="info">
             <helix-text appearance="body-strong" slot="title">
               Nothing here needs us to keep running
             </helix-text>
