@@ -19,10 +19,14 @@ out/
 .env.*
 !.env.template
 
-# OS / editor
+# OS / editor. `.vscode/settings.json` was tracked from 2812a45f, where it
+# arrived beside a component port rather than by decision. Its only content
+# was a `files.exclude` map restating this file as an editor view
+# preference, and the editor rewrites it, so it was churn nobody read.
 .DS_Store
 *.swp
 .idea/
+.vscode/
 
 # Logs
 *.log
