@@ -31,7 +31,7 @@ const target = () => {
   return { host, log }
 }
 
-const change = (next: string): Event => new CustomEvent('probe-change', { cancelable: true })
+const change = (_next: string): Event => new CustomEvent('probe-change', { cancelable: true })
 
 describe('announcing before applying', () => {
   test('the event goes out first, so a listener sees the state it is being asked to allow', () => {
