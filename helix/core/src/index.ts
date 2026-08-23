@@ -174,10 +174,10 @@ export {
   type ScrollItemOptions,
   scrollItemIntoView,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
-export {
-  type HelixSeverity,
-  SEVERITIES,
-  type SeverityMark,
-  severityMark,
-} from './utils/severities/severities.js'
 export { slotFilled } from './utils/slot-filled/slot-filled.js'
+export {
+  type HelixStatusTone,
+  TONE_MARKS,
+  type ToneMark,
+  toneMark,
+} from './utils/tone-marks/tone-marks.js'

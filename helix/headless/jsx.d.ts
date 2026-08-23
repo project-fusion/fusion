@@ -495,7 +495,7 @@ export type HelixBaseAnnouncementProps = {
 
 **This was `severity` and it was claiming more than it did.** Severity is a
 judgement about the message, and elsewhere in this library it carries one:
-`Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
+`Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
 nothing about the announcement's semantics moved. A property that only
@@ -541,7 +541,7 @@ export type HelixBaseAnnouncementSolidJsProps = {
 
 **This was `severity` and it was claiming more than it did.** Severity is a
 judgement about the message, and elsewhere in this library it carries one:
-`Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
+`Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
 nothing about the announcement's semantics moved. A property that only
@@ -12379,7 +12379,7 @@ export type CustomElements = {
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
    * judgement about the message, and elsewhere in this library it carries one:
-   * `Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
+   * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and
    * nothing about the announcement's semantics moved. A property that only
@@ -13205,7 +13205,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The callout's content.
-   * - `icon`: Replaces the icon chosen by `severity`.
+   * - `icon`: Replaces the icon chosen by `tone`.
    * - `title`: A heading above the content.
    *
    * ## CSS Parts
@@ -13214,7 +13214,7 @@ export type CustomElements = {
    *
    * - `content`: The content region.
    * - `icon`: The icon region.
-   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `icon-mark`: The tone glyph, where none is slotted.
    */
   "helix-base-callout": Partial<
     HelixBaseCalloutProps & BaseProps<HelixBaseCallout> & BaseEvents
@@ -21825,7 +21825,7 @@ export type CustomElements = {
   >;
 
   /**
-   * An element rather than a slot, because it carries a timeout, a severity, a
+   * An element rather than a slot, because it carries a timeout, a tone, a
    * dismiss control and a lifetime that pauses: behavior, state and API, which
    * is the test for whether a region becomes an element in this library.
    *
@@ -21916,7 +21916,7 @@ export type CustomElements = {
    *
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a button or a link.
-   * - `icon`: Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.
+   * - `icon`: Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.
    * - `dismiss-icon`: Replaces the glyph inside the dismiss control.
    *
    * ## Methods
@@ -21946,8 +21946,8 @@ export type CustomElements = {
    * - `content`: The message.
    * - `dismiss`: The control that asks to close.
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
-   * - `icon`: The severity mark, where the message has one.
-   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `icon`: The tone mark, where the message has one.
+   * - `icon-mark`: The tone glyph, where none is slotted.
    * - `item`: The message's own surface.
    * - `timer`: The bar showing how long is left, where a duration was given.
    */
@@ -23598,7 +23598,7 @@ export type CustomElementsSolidJs = {
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
    * judgement about the message, and elsewhere in this library it carries one:
-   * `Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
+   * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and
    * nothing about the announcement's semantics moved. A property that only
@@ -24457,7 +24457,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The callout's content.
-   * - `icon`: Replaces the icon chosen by `severity`.
+   * - `icon`: Replaces the icon chosen by `tone`.
    * - `title`: A heading above the content.
    *
    * ## CSS Parts
@@ -24466,7 +24466,7 @@ export type CustomElementsSolidJs = {
    *
    * - `content`: The content region.
    * - `icon`: The icon region.
-   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `icon-mark`: The tone glyph, where none is slotted.
    */
   "helix-base-callout": Partial<
     HelixBaseCalloutProps &
@@ -33310,7 +33310,7 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * An element rather than a slot, because it carries a timeout, a severity, a
+   * An element rather than a slot, because it carries a timeout, a tone, a
    * dismiss control and a lifetime that pauses: behavior, state and API, which
    * is the test for whether a region becomes an element in this library.
    *
@@ -33401,7 +33401,7 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a button or a link.
-   * - `icon`: Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.
+   * - `icon`: Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.
    * - `dismiss-icon`: Replaces the glyph inside the dismiss control.
    *
    * ## Methods
@@ -33431,8 +33431,8 @@ export type CustomElementsSolidJs = {
    * - `content`: The message.
    * - `dismiss`: The control that asks to close.
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
-   * - `icon`: The severity mark, where the message has one.
-   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `icon`: The tone mark, where the message has one.
+   * - `icon-mark`: The tone glyph, where none is slotted.
    * - `item`: The message's own surface.
    * - `timer`: The bar showing how long is left, where a duration was given.
    */

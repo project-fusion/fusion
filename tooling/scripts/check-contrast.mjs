@@ -79,6 +79,40 @@ const server = createServer((request, response) => {
 await new Promise((done) => server.listen(0, '127.0.0.1', done))
 const origin = `http://127.0.0.1:${server.address().port}`
 
+/**
+ * The pairs `helix/theme/src/model.ts` declares, so the run can say which of them
+ * no example ever put on screen.
+ *
+ * **This check reads what the examples render, and that was an invisible gap
+ * rather than a stated one.** A pair nothing paints is not measured and not
+ * reported, which is how `--helix-color-primary` sat at 4.431:1 against
+ * `surface-raised` in dark until the engine was asked instead. Naming the
+ * unpainted pairs turns the hole into a list.
+ *
+ * Read as text rather than imported, for the reason `check:pairings` gives: this
+ * is a `.mjs` script and the model is TypeScript.
+ */
+const uncommented = (source) => source.replace(/\/\*[\s\S]*?\*\//g, '')
+const model = uncommented(readFileSync(join(root, 'helix/theme/src/model.ts'), 'utf8'))
+const declared = new Set()
+for (const ink of model.matchAll(
+  /\{[^{}]*?grounds:\s*\[([^\]]*)\][^{}]*?name:\s*'([a-z0-9-]+)'/gs,
+)) {
+  const grounds = [...ink[1].matchAll(/'(color-[a-z0-9-]+)'/g)].map((found) => found[1])
+  for (const group of [...ink[1].matchAll(/\.\.\.(?:\[\.\.\.)?([A-Z_]+)/g)].map((f) => f[1])) {
+    const block = model.match(new RegExp(`const ${group} = \\[([^\\]]*)\\]`, 's'))
+    if (block) {
+      grounds.push(...[...block[1].matchAll(/'(color-[a-z0-9-]+)'/g)].map((found) => found[1]))
+    }
+  }
+  for (const ground of grounds) {
+    declared.add(`${ink[2]} on ${ground}`)
+  }
+}
+
+/** Every token the model names, which the page resolves to a colour per mode. */
+const named = [...new Set([...declared].flatMap((pair) => pair.split(' on ')))]
+
 const examples = []
 for (const family of readdirSync(source)) {
   let entries = []
@@ -110,6 +144,7 @@ const page = await browser.newPage({ viewport: { height: 2400, width: 1280 } })
 await page.goto(`${origin}/frame.html`, { waitUntil: 'load' })
 
 const findings = []
+const painted = new Set()
 let measured = 0
 let offscreen = 0
 let unresolved = 0
@@ -126,6 +161,31 @@ for (const mode of ['light', 'dark']) {
     document.documentElement.dataset.colorMode = scheme
     document.documentElement.style.colorScheme = scheme
   }, mode)
+
+  /* One paint per token, read back through the same canvas the walk uses, so a
+     measured hex and a token's hex are the same arithmetic. */
+  const palette = await page.evaluate((names) => {
+    const swatch = document.createElement('canvas')
+    swatch.width = 1
+    swatch.height = 1
+    const brush = swatch.getContext('2d', { willReadFrequently: true })
+    const probe = document.createElement('span')
+    probe.style.position = 'absolute'
+    document.body.append(probe)
+    const found = {}
+    for (const name of names) {
+      probe.style.color = `var(--helix-${name})`
+      brush.fillStyle = '#010203'
+      brush.fillStyle = getComputedStyle(probe).color
+      brush.clearRect(0, 0, 1, 1)
+      brush.fillRect(0, 0, 1, 1)
+      const [r, g, b] = brush.getImageData(0, 0, 1, 1).data
+      const hex = `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
+      found[hex] = [...(found[hex] ?? []), name]
+    }
+    probe.remove()
+    return found
+  }, named)
 
   for (const example of examples) {
     const result = await page.evaluate(
@@ -263,9 +323,24 @@ for (const mode of ['light', 'dark']) {
              read 1:1. */
             const masked = style.maskImage !== 'none' && style.maskImage !== ''
             const paint = masked ? null : parse(style.backgroundColor)
-            if (paint && paint.a > 0) {
-              stack.push(paint)
-              if (paint.a === 1) {
+            /* **A modal's scrim is a `::backdrop`, and it has no node.** So the
+             walk used to step straight past it and measure a glass drawer over
+             the page rather than over the scrimmed page, which is wrong in the
+             optimistic direction: the scrim pulls the ground toward the middle,
+             and a translucent panel carries that through to its own inks.
+             `getComputedStyle` reads a pseudo-element by name, and an element
+             not in the top layer answers with the initial transparent, so this
+             costs one read and needs no test for modality.
+
+             Behind the element's own paint and in front of everything above it,
+             which is where the top layer puts it. */
+            const layers = [paint, parse(getComputedStyle(node, '::backdrop').backgroundColor)]
+            for (const layer of layers) {
+              if (!layer || layer.a === 0) {
+                continue
+              }
+              stack.push(layer)
+              if (layer.a === 1) {
                 let composited = stack.pop()
                 while (stack.length > 0) {
                   composited = over(stack.pop(), composited)
@@ -426,11 +501,12 @@ for (const mode of ['light', 'dark']) {
             const wanted =
               !text || size >= large || (bold && size >= largeBold) ? component : target
             const flat = ink.a === 1 ? ink : over(ink, ground.color)
+            const hex = ({ b, g, r }) =>
+              `#${[r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`
+            out.pairs.push(`${hex(flat)}|${hex(ground.color)}`)
             const measuredRatio = ratio(flat, ground.color)
             out.measured += 1
             if (measuredRatio < wanted) {
-              const hex = ({ b, g, r }) =>
-                `#${[r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`
               out.failures.push({
                 ground: hex(ground.color),
                 ink: hex(flat),
@@ -443,7 +519,7 @@ for (const mode of ['light', 'dark']) {
           }
         }
 
-        const out = { failures: [], measured: 0, offscreen: 0, unresolved: 0 }
+        const out = { failures: [], measured: 0, offscreen: 0, pairs: [], unresolved: 0 }
         walk(host, out)
         return out
       },
@@ -460,6 +536,16 @@ for (const mode of ['light', 'dark']) {
     measured += result.measured
     offscreen += result.offscreen
     unresolved += result.unresolved
+    /* A colour can belong to more than one token, so every combination counts as
+       having been seen: this is a coverage report and not a guarantee. */
+    for (const pair of result.pairs) {
+      const [ink, ground] = pair.split('|')
+      for (const one of palette[ink] ?? []) {
+        for (const other of palette[ground] ?? []) {
+          painted.add(`${one} on ${other}`)
+        }
+      }
+    }
     for (const failure of result.failures) {
       findings.push(
         `${example.name} (${mode}): \`${failure.part}\` is ${failure.ink} on ` +
@@ -492,3 +578,21 @@ console.log(
     (unresolved > 0 ? `. ${unresolved} sit on an unbounded ground and cannot be` : '') +
     (offscreen > 0 ? `, ${offscreen} below the fold` : ''),
 )
+
+/* Reported rather than failed. A pair the model declares and no example paints
+   is a gap in the examples, not a defect in the palette, and the engine measures
+   every one of them regardless. What this adds is knowing which. */
+const unpainted = [...declared].filter((pair) => !painted.has(pair)).sort()
+if (unpainted.length > 0) {
+  console.log(
+    `contrast: ${declared.size - unpainted.length} of ${declared.size} modelled pairs ` +
+      `appear in an example. No example paints ${unpainted.length}, so nothing here ` +
+      'measures them:',
+  )
+  for (const pair of unpainted.slice(0, 12)) {
+    console.log(`  ${pair}`)
+  }
+  if (unpainted.length > 12) {
+    console.log(`  and ${unpainted.length - 12} more.`)
+  }
+}

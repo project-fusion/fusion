@@ -3,8 +3,8 @@ import {
   HelixElement,
   MixinDismissible,
   requestControlledChange,
-  type SeverityMark,
-  severityMark,
+  type ToneMark,
+  toneMark,
 } from '@helix-io/core'
 import { x } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -15,7 +15,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One message in the toast region.
  *
  * @description
- * An element rather than a slot, because it carries a timeout, a severity, a
+ * An element rather than a slot, because it carries a timeout, a tone, a
  * dismiss control and a lifetime that pauses: behavior, state and API, which
  * is the test for whether a region becomes an element in this library.
  *
@@ -62,18 +62,18 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The message.
  * @slot actions - What to do about it, usually a button or a link.
- * @slot icon - Replaces the severity mark. Matches `Callout`, which is why the
+ * @slot icon - Replaces the tone mark. Matches `Callout`, which is why the
  *   dismiss control's own glyph is `dismiss-icon` rather than this: two slots
  *   cannot share a name, assignment goes to whichever comes first in the tree,
- *   and the severity mark is the one a consumer reaches for.
+ *   and the tone mark is the one a consumer reaches for.
  * @slot dismiss-icon - Replaces the glyph inside the dismiss control.
  *
  * @csspart actions - The region holding what to do about it.
  * @csspart content - The message.
  * @csspart dismiss - The control that asks to close.
  * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
- * @csspart icon - The severity mark, where the message has one.
- * @csspart icon-mark - The severity glyph, where none is slotted.
+ * @csspart icon - The tone mark, where the message has one.
+ * @csspart icon-mark - The tone glyph, where none is slotted.
  * @csspart item - The message's own surface.
  * @csspart timer - The bar showing how long is left, where a duration was given.
  *
@@ -297,7 +297,7 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
   }
 
   /**
-   * The mark for the message's severity, behind a seam.
+   * The mark for the message's tone, behind a seam.
    *
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
    * tier above replaces it by overriding. Those answer different people: the
@@ -306,18 +306,18 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
    * cannot change.
    *
    * The mark is passed in rather than looked up again, since `render` has
-   * already resolved the severity and a second lookup is a second place for the
+   * already resolved the tone and a second lookup is a second place for the
    * fallback to disagree with the tone around it.
    */
-  protected renderIcon(severity: SeverityMark): TemplateResult {
+  protected renderIcon(mark: ToneMark): TemplateResult {
     return html`<slot name="icon">
       <svg part="icon-mark"
         fill="currentColor"
-        viewBox=${severity.icon.viewBox}
+        viewBox=${mark.icon.viewBox}
         role="img"
-        aria-label=${severity.label}
+        aria-label=${mark.label}
       >
-        ${unsafeSVG(severity.icon.content)}
+        ${unsafeSVG(mark.icon.content)}
       </svg>
     </slot>`
   }
@@ -340,13 +340,13 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    /* Nothing when no severity was given, which is the common message: "Project
+    /* Nothing when no tone was given, which is the common message: "Project
        saved" is not an error, a warning or an announcement, and an icon there
        would be decoration standing where meaning is supposed to be. `Callout`
        falls back to `info` because a callout exists to set a passage apart and
        is always *about* something; a toast is just the next thing that
        happened. */
-    const severity = severityMark(this.tone)
+    const mark = toneMark(this.tone)
 
     return html`<div
       part="item"
@@ -356,9 +356,9 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
       @focusout=${this.handleResume}
     >
       ${
-        severity
+        mark
           ? html`<span part="icon">
-              ${this.renderIcon(severity)}
+              ${this.renderIcon(mark)}
             </span>`
           : nothing
       }

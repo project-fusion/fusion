@@ -550,7 +550,7 @@ would catch. */
 
 **This was `severity` and it was claiming more than it did.** Severity is a
 judgement about the message, and elsewhere in this library it carries one:
-`Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
+`Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
 nothing about the announcement's semantics moved. A property that only
@@ -594,7 +594,7 @@ would catch. */
 
 **This was `severity` and it was claiming more than it did.** Severity is a
 judgement about the message, and elsewhere in this library it carries one:
-`Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
+`Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
 nothing about the announcement's semantics moved. A property that only
@@ -1156,6 +1156,17 @@ eighty-eight components that means nothing on eighty-seven. `wash` because
 that is what the tier below already calls it, in `--chart-bar-wash` and in
 the `bar-wash-start` and `bar-wash-end` stops. */
   wash?: HelixBarChart["wash"];
+  /** Which series are glass rather than solid, by name.
+
+Matched the way `outlined` is, against the column headings the table gives.
+
+**Per series for the reason `emphasis` is, arrived at one axis later.** A
+chart-wide material puts every column in the same substance, which is right
+when the whole chart is joining the page's language and wrong the moment one
+series is a different kind of fact from the others. The two axes take the
+same shape because they answer the same question about the same thing: what
+is *this series* made of, and how much ink does *this series* claim. */
+  glass?: HelixBarChart["glass"];
   /** How much ink the columns claim.
 
 The chart's treatment, which every series takes unless `outlined` or
@@ -1317,6 +1328,17 @@ eighty-eight components that means nothing on eighty-seven. `wash` because
 that is what the tier below already calls it, in `--chart-bar-wash` and in
 the `bar-wash-start` and `bar-wash-end` stops. */
   "prop:wash"?: HelixBarChart["wash"];
+  /** Which series are glass rather than solid, by name.
+
+Matched the way `outlined` is, against the column headings the table gives.
+
+**Per series for the reason `emphasis` is, arrived at one axis later.** A
+chart-wide material puts every column in the same substance, which is right
+when the whole chart is joining the page's language and wrong the moment one
+series is a different kind of fact from the others. The two axes take the
+same shape because they answer the same question about the same thing: what
+is *this series* made of, and how much ink does *this series* claim. */
+  "prop:glass"?: HelixBarChart["glass"];
   /** How much ink the columns claim.
 
 The chart's treatment, which every series takes unless `outlined` or
@@ -14502,7 +14524,7 @@ export type CustomElements = {
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
    * judgement about the message, and elsewhere in this library it carries one:
-   * `Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
+   * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and
    * nothing about the announcement's semantics moved. A property that only
@@ -15003,6 +15025,16 @@ export type CustomElements = {
    * eighty-eight components that means nothing on eighty-seven. `wash` because
    * that is what the tier below already calls it, in `--chart-bar-wash` and in
    * the `bar-wash-start` and `bar-wash-end` stops.
+   * - `glass`: Which series are glass rather than solid, by name.
+   *
+   * Matched the way `outlined` is, against the column headings the table gives.
+   *
+   * **Per series for the reason `emphasis` is, arrived at one axis later.** A
+   * chart-wide material puts every column in the same substance, which is right
+   * when the whole chart is joining the page's language and wrong the moment one
+   * series is a different kind of fact from the others. The two axes take the
+   * same shape because they answer the same question about the same thing: what
+   * is *this series* made of, and how much ink does *this series* claim.
    * - `emphasis`: How much ink the columns claim.
    *
    * The chart's treatment, which every series takes unless `outlined` or
@@ -15593,7 +15625,7 @@ export type CustomElements = {
    *
    * - `icon`: The icon region.
    * - `content`: The content region.
-   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `icon-mark`: The tone glyph, where none is slotted.
    */
   "helix-callout": Partial<
     HelixCalloutProps & BaseProps<HelixCallout> & BaseEvents
@@ -24413,7 +24445,7 @@ export type CustomElements = {
    *
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a button or a link.
-   * - `icon`: Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.
+   * - `icon`: Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.
    * - `dismiss-icon`: Replaces the glyph inside the dismiss control.
    *
    * ## Methods
@@ -24442,8 +24474,8 @@ export type CustomElements = {
    * - `content`: The message.
    * - `dismiss`: The control that asks to close.
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
-   * - `icon`: The severity mark, where the message has one.
-   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `icon`: The tone mark, where the message has one.
+   * - `icon-mark`: The tone glyph, where none is slotted.
    * - `item`: The message's own surface.
    * - `timer`: The bar showing how long is left, where a duration was given.
    */
@@ -25905,7 +25937,7 @@ export type CustomElementsSolidJs = {
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
    * judgement about the message, and elsewhere in this library it carries one:
-   * `Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
+   * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and
    * nothing about the announcement's semantics moved. A property that only
@@ -26425,6 +26457,16 @@ export type CustomElementsSolidJs = {
    * eighty-eight components that means nothing on eighty-seven. `wash` because
    * that is what the tier below already calls it, in `--chart-bar-wash` and in
    * the `bar-wash-start` and `bar-wash-end` stops.
+   * - `glass`: Which series are glass rather than solid, by name.
+   *
+   * Matched the way `outlined` is, against the column headings the table gives.
+   *
+   * **Per series for the reason `emphasis` is, arrived at one axis later.** A
+   * chart-wide material puts every column in the same substance, which is right
+   * when the whole chart is joining the page's language and wrong the moment one
+   * series is a different kind of fact from the others. The two axes take the
+   * same shape because they answer the same question about the same thing: what
+   * is *this series* made of, and how much ink does *this series* claim.
    * - `emphasis`: How much ink the columns claim.
    *
    * The chart's treatment, which every series takes unless `outlined` or
@@ -27033,7 +27075,7 @@ export type CustomElementsSolidJs = {
    *
    * - `icon`: The icon region.
    * - `content`: The content region.
-   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `icon-mark`: The tone glyph, where none is slotted.
    */
   "helix-callout": Partial<
     HelixCalloutProps &
@@ -36120,7 +36162,7 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a button or a link.
-   * - `icon`: Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.
+   * - `icon`: Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.
    * - `dismiss-icon`: Replaces the glyph inside the dismiss control.
    *
    * ## Methods
@@ -36149,8 +36191,8 @@ export type CustomElementsSolidJs = {
    * - `content`: The message.
    * - `dismiss`: The control that asks to close.
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
-   * - `icon`: The severity mark, where the message has one.
-   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `icon`: The tone mark, where the message has one.
+   * - `icon-mark`: The tone glyph, where none is slotted.
    * - `item`: The message's own surface.
    * - `timer`: The bar showing how long is left, where a duration was given.
    */

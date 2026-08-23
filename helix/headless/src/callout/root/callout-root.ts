@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria, SEVERITIES, severityMark } from '@helix-io/core'
+import { customElement, HelixElement, hostAria, TONE_MARKS, toneMark } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -30,12 +30,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://helix.fusion.dev/components/callout
  *
  * @slot - The callout's content.
- * @slot icon - Replaces the icon chosen by `severity`.
+ * @slot icon - Replaces the icon chosen by `tone`.
  * @slot title - A heading above the content.
  *
  * @csspart content - The content region.
  * @csspart icon - The icon region.
- * @csspart icon-mark - The severity glyph, where none is slotted.
+ * @csspart icon-mark - The tone glyph, where none is slotted.
  */
 @customElement('helix-base-callout')
 export class HelixBaseCallout extends HelixElement {
@@ -58,7 +58,7 @@ export class HelixBaseCallout extends HelixElement {
   tone?: 'danger' | 'info' | 'success' | 'warning'
 
   /**
-   * The mark for the callout's severity, behind a seam.
+   * The mark for the callout's tone, behind a seam.
    *
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
    * tier above replaces it by overriding. Those answer different people: the
@@ -67,7 +67,7 @@ export class HelixBaseCallout extends HelixElement {
    * cannot change.
    *
    * The mark and its label are passed in rather than looked up again, since
-   * `render` has already resolved the severity and a second lookup is a second
+   * `render` has already resolved the tone and a second lookup is a second
    * place for the fallback to disagree with the tone around it.
    */
   protected renderIcon(icon: { content: string; viewBox: string }, label: string): TemplateResult {
@@ -82,8 +82,8 @@ export class HelixBaseCallout extends HelixElement {
     /* Falls back to `info`, because a callout exists to set a passage apart and
        is therefore always *about* something. `Toast.Item` takes the same lookup
        and draws nothing instead, since a message is just the next thing that
-       happened. Same vocabulary, two honest answers to an absent severity. */
-    const { icon, label } = severityMark(this.tone) ?? SEVERITIES.info
+       happened. Same vocabulary, two honest answers to an absent tone. */
+    const { icon, label } = toneMark(this.tone) ?? TONE_MARKS.info
 
     return html`<span part="icon">${this.renderIcon(icon, label)}</span>
       <div part="content">

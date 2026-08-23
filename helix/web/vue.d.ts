@@ -305,7 +305,7 @@ would catch. */
 
 **This was `severity` and it was claiming more than it did.** Severity is a
 judgement about the message, and elsewhere in this library it carries one:
-`Callout` reads `SEVERITIES` for an icon and a label, so `tone="danger"`
+`Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
 nothing about the announcement's semantics moved. A property that only
@@ -616,6 +616,17 @@ eighty-eight components that means nothing on eighty-seven. `wash` because
 that is what the tier below already calls it, in `--chart-bar-wash` and in
 the `bar-wash-start` and `bar-wash-end` stops. */
   wash?: HelixBarChart["wash"];
+  /** Which series are glass rather than solid, by name.
+
+Matched the way `outlined` is, against the column headings the table gives.
+
+**Per series for the reason `emphasis` is, arrived at one axis later.** A
+chart-wide material puts every column in the same substance, which is right
+when the whole chart is joining the page's language and wrong the moment one
+series is a different kind of fact from the others. The two axes take the
+same shape because they answer the same question about the same thing: what
+is *this series* made of, and how much ink does *this series* claim. */
+  glass?: HelixBarChart["glass"];
   /** How much ink the columns claim.
 
 The chart's treatment, which every series takes unless `outlined` or

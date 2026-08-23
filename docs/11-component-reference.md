@@ -451,6 +451,7 @@ it is measured against.
 | `direction` | `direction` | `'horizontal' \| undefined` | - | `HelixBaseBarChart` | Whether the categories run down the side rather than along the bottom. |
 | `emphasis` | `emphasis` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much ink the columns claim. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
+| `glass` | `glass` | `string \| undefined` | - | - | Which series are glass rather than solid, by name. |
 | `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixBaseBarChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `lines` | `lines` | `string \| undefined` | - | `HelixBaseBarChart` | Which series are drawn as a line instead of as columns, by name. |
@@ -762,7 +763,7 @@ headless tier; this tier only decides what that meaning looks like.
 | --- | --- |
 | `icon` | The icon region. |
 | `content` | The content region. |
-| `icon-mark` | The severity glyph, where none is slotted. |
+| `icon-mark` | The tone glyph, where none is slotted. |
 
 #### Custom properties
 
@@ -5995,7 +5996,7 @@ costs contrast for something the mark already says.
 | --- | --- |
 | *(default)* | The message. |
 | `actions` | What to do about it, usually a button or a link. |
-| `icon` | Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for. |
+| `icon` | Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for. |
 | `dismiss-icon` | Replaces the glyph inside the dismiss control. |
 
 #### Parts
@@ -6006,8 +6007,8 @@ costs contrast for something the mark already says.
 | `content` | The message. |
 | `dismiss` | The control that asks to close. |
 | `dismiss-mark` | The glyph on the dismiss control, where none is slotted. |
-| `icon` | The severity mark, where the message has one. |
-| `icon-mark` | The severity glyph, where none is slotted. |
+| `icon` | The tone mark, where the message has one. |
+| `icon-mark` | The tone glyph, where none is slotted. |
 | `item` | The message's own surface. |
 | `timer` | The bar showing how long is left, where a duration was given. |
 

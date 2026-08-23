@@ -79,6 +79,21 @@ export class HelixBarChart extends HelixBaseBarChart {
   wash?: 'gradient'
 
   /**
+   * Which series are glass rather than solid, by name.
+   *
+   * Matched the way `outlined` is, against the column headings the table gives.
+   *
+   * **Per series for the reason `emphasis` is, arrived at one axis later.** A
+   * chart-wide material puts every column in the same substance, which is right
+   * when the whole chart is joining the page's language and wrong the moment one
+   * series is a different kind of fact from the others. The two axes take the
+   * same shape because they answer the same question about the same thing: what
+   * is *this series* made of, and how much ink does *this series* claim.
+   */
+  @property()
+  glass?: string
+
+  /**
    * How much ink the columns claim.
    *
    * The chart's treatment, which every series takes unless `outlined` or
@@ -122,7 +137,7 @@ export class HelixBarChart extends HelixBaseBarChart {
   subtle?: string
 
   /**
-   * Marks each column with the treatment its series asked for.
+   * Marks each column with the treatments its series asked for.
    *
    * **Stamped after render rather than rendered, because the tier that draws
    * the columns is the one that must not know about treatments.** The headless
@@ -150,16 +165,21 @@ export class HelixBarChart extends HelixBaseBarChart {
           }),
       )
 
+    const mark = (bar: SVGRectElement, name: string, value: string | undefined): void => {
+      if (value) {
+        bar.setAttribute(`data-${name}`, value)
+      } else {
+        bar.removeAttribute(`data-${name}`)
+      }
+    }
+
     const outlined = slots(this.outlined)
     const subtle = slots(this.subtle)
+    const glass = slots(this.glass)
     for (const bar of this.renderRoot.querySelectorAll<SVGRectElement>('[part="bar"]')) {
       const at = Number(bar.dataset.series)
-      const asked = outlined.has(at) ? 'outlined' : subtle.has(at) ? 'subtle' : undefined
-      if (asked) {
-        bar.dataset.emphasis = asked
-      } else {
-        bar.removeAttribute('data-emphasis')
-      }
+      mark(bar, 'emphasis', outlined.has(at) ? 'outlined' : subtle.has(at) ? 'subtle' : undefined)
+      mark(bar, 'material', glass.has(at) ? 'glass' : undefined)
     }
   }
 

@@ -60,6 +60,15 @@ const AXES = {
      It was in the first sketch of this registry and nothing needs it, which is
      the same test `UNSWEPT` applies to itself. */
   material: ['frosted', 'glass', 'transparent'],
+  /* **These are the states of `ThemeIntent.separation`'s mechanisms, one to
+     one, and the two word forms are the point rather than a collision.** The
+     theme names what does the separating and a component names what the surface
+     then is: `border` and `outlined`, `fill` and `filled`, `shadow` and
+     `elevated`, `space` and `plain`. Written down here because `fill` had a
+     third use, `Button.fill` for how wide a control is, which is now `width`,
+     and the two that are left agree with each other. The one that remains is
+     CSS's own `fill` property, which every chart writes for paint and which is
+     not ours to rename. */
   separation: ['elevated', 'filled', 'outlined', 'plain'],
   /* `muted` and `subtle` are the neutral role's own quiet inks rather than an
      emphasis axis fused into this one, which was the reading until it was

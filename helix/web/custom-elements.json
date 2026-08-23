@@ -947,7 +947,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: the word it left was a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `TONE_MARKS` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: the word it left was a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "attribute": "tone",
               "reflects": true,
               "inheritedFrom": {
@@ -1164,7 +1164,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: the word it left was a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `TONE_MARKS` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: the word it left was a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "fieldName": "tone",
               "inheritedFrom": {
                 "name": "HelixBaseAnnouncement",
@@ -3943,6 +3943,15 @@
             },
             {
               "kind": "field",
+              "name": "glass",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are glass rather than solid, by name.\n\nMatched the way `outlined` is, against the column headings the table gives.\n\n**Per series for the reason `emphasis` is, arrived at one axis later.** A\nchart-wide material puts every column in the same substance, which is right\nwhen the whole chart is joining the page's language and wrong the moment one\nseries is a different kind of fact from the others. The two axes take the\nsame shape because they answer the same question about the same thing: what\nis *this series* made of, and how much ink does *this series* claim.",
+              "attribute": "glass"
+            },
+            {
+              "kind": "field",
               "name": "emphasis",
               "type": {
                 "text": "'outlined' | 'solid' | 'subtle' | undefined"
@@ -4573,6 +4582,14 @@
               },
               "description": "How a column's fill is distributed across it.\n\n`gradient` fades each column toward its base, into the wash the headless\ntier draws whether or not anything points at it.\n\n**A chart-domain axis and deliberately not a library one.** It lives on this\nfamily alone, and here it is a way of encoding data rather than a way of\nexpressing a theme: promoted to the registry it would put an attribute on\neighty-eight components that means nothing on eighty-seven. `wash` because\nthat is what the tier below already calls it, in `--chart-bar-wash` and in\nthe `bar-wash-start` and `bar-wash-end` stops.",
               "fieldName": "wash"
+            },
+            {
+              "name": "glass",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are glass rather than solid, by name.\n\nMatched the way `outlined` is, against the column headings the table gives.\n\n**Per series for the reason `emphasis` is, arrived at one axis later.** A\nchart-wide material puts every column in the same substance, which is right\nwhen the whole chart is joining the page's language and wrong the moment one\nseries is a different kind of fact from the others. The two axes take the\nsame shape because they answer the same question about the same thing: what\nis *this series* made of, and how much ink does *this series* claim.",
+              "fieldName": "glass"
             },
             {
               "name": "emphasis",
@@ -6940,7 +6957,7 @@
               }
             },
             {
-              "description": "The severity glyph, where none is slotted.",
+              "description": "The tone glyph, where none is slotted.",
               "name": "icon-mark",
               "inheritedFrom": {
                 "name": "HelixBaseCallout",
@@ -7012,7 +7029,7 @@
                   }
                 }
               ],
-              "description": "The mark for the callout's severity, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark and its label are passed in rather than looked up again, since\n`render` has already resolved the severity and a second lookup is a second\nplace for the fallback to disagree with the tone around it.",
+              "description": "The mark for the callout's tone, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark and its label are passed in rather than looked up again, since\n`render` has already resolved the tone and a second lookup is a second\nplace for the fallback to disagree with the tone around it.",
               "inheritedFrom": {
                 "name": "HelixBaseCallout",
                 "module": "src/callout/root/callout-root.ts"
@@ -67664,13 +67681,13 @@
               },
               "parameters": [
                 {
-                  "name": "severity",
+                  "name": "mark",
                   "type": {
-                    "text": "SeverityMark"
+                    "text": "ToneMark"
                   }
                 }
               ],
-              "description": "The mark for the message's severity, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark is passed in rather than looked up again, since `render` has\nalready resolved the severity and a second lookup is a second place for the\nfallback to disagree with the tone around it.",
+              "description": "The mark for the message's tone, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark is passed in rather than looked up again, since `render` has\nalready resolved the tone and a second lookup is a second place for the\nfallback to disagree with the tone around it.",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
                 "module": "src/toast/item/toast-item.ts"
@@ -67895,7 +67912,7 @@
               }
             },
             {
-              "description": "Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.",
+              "description": "Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.",
               "name": "icon",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
@@ -67945,7 +67962,7 @@
               }
             },
             {
-              "description": "The severity mark, where the message has one.",
+              "description": "The tone mark, where the message has one.",
               "name": "icon",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
@@ -67953,7 +67970,7 @@
               }
             },
             {
-              "description": "The severity glyph, where none is slotted.",
+              "description": "The tone glyph, where none is slotted.",
               "name": "icon-mark",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",

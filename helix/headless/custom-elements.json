@@ -714,7 +714,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: the word it left was a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `TONE_MARKS` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: the word it left was a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "attribute": "tone",
               "reflects": true
             },
@@ -924,7 +924,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: the word it left was a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `TONE_MARKS` for an icon and a label, so `tone=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: the word it left was a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "fieldName": "tone"
             },
             {
@@ -4266,7 +4266,7 @@
               "name": "icon"
             },
             {
-              "description": "The severity glyph, where none is slotted.",
+              "description": "The tone glyph, where none is slotted.",
               "name": "icon-mark"
             }
           ],
@@ -4276,7 +4276,7 @@
               "name": ""
             },
             {
-              "description": "Replaces the icon chosen by `severity`.",
+              "description": "Replaces the icon chosen by `tone`.",
               "name": "icon"
             },
             {
@@ -4318,7 +4318,7 @@
                   }
                 }
               ],
-              "description": "The mark for the callout's severity, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark and its label are passed in rather than looked up again, since\n`render` has already resolved the severity and a second lookup is a second\nplace for the fallback to disagree with the tone around it."
+              "description": "The mark for the callout's tone, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark and its label are passed in rather than looked up again, since\n`render` has already resolved the tone and a second lookup is a second\nplace for the fallback to disagree with the tone around it."
             },
             {
               "kind": "field",
@@ -49788,7 +49788,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "An element rather than a slot, because it carries a timeout, a severity, a\ndismiss control and a lifetime that pauses: behavior, state and API, which\nis the test for whether a region becomes an element in this library.\n\n**The timer is the item's own.** Held by the region, one message arriving\nwould restart another's, so a stack of three would go from three seconds each\nto nine for the last one. Each message is on its own clock from the moment it\nis rendered.\n\n**A message is the opposite of the page it is over.** Inverted by default,\nbecause a thing arriving in a corner has to be told apart from the page in\nthe moment before it is read, and inverting does that without spending a\ncolor that means something. It is a flip of `color-scheme` rather than a\nnamed inverse surface: every token in the subtree re-resolves, so a `Retry`\na consumer slots in comes out right without knowing where it is. `Tooltip`\ncan name the inverse surface directly because it holds no controls; this\ncannot. Set `data-color-mode` on the region to take the page's mode instead.\n\n**No duration means it stays.** That is the safe default rather than the\ncommon one: anything carrying an action has to still be there when the reader\ndecides to take it, and a component cannot tell from the outside whether the\nmessage it was given is disposable.\n\n**The clock stops while it is being read.** Hover pauses it, and so does\nfocus landing anywhere inside, which is the case that matters more: a\nkeyboard reader tabbing towards the action in a toast is exactly the person a\ntimer must not race. Both resume where they left off rather than starting\nagain, so a message half-read does not get a full second life every time a\npointer crosses it.\n\n**Going away is a request, never an act.** It dispatches a cancelable\n`helix-dismiss` and does nothing else: the consumer owns the list, so the\nitem removing itself would leave the two disagreeing. Auto-dismiss and the\ndismiss control raise the same event, so a consumer handles one path and not\ntwo.\n\nThe properties below are written by this component and read by whoever draws\nit. A consumer sets none of them: they carry a number this element computed\nand CSS cannot, which is what lets a stylesheet on this tier draw the thing\nwithout measuring anything itself.",
+          "description": "An element rather than a slot, because it carries a timeout, a tone, a\ndismiss control and a lifetime that pauses: behavior, state and API, which\nis the test for whether a region becomes an element in this library.\n\n**The timer is the item's own.** Held by the region, one message arriving\nwould restart another's, so a stack of three would go from three seconds each\nto nine for the last one. Each message is on its own clock from the moment it\nis rendered.\n\n**A message is the opposite of the page it is over.** Inverted by default,\nbecause a thing arriving in a corner has to be told apart from the page in\nthe moment before it is read, and inverting does that without spending a\ncolor that means something. It is a flip of `color-scheme` rather than a\nnamed inverse surface: every token in the subtree re-resolves, so a `Retry`\na consumer slots in comes out right without knowing where it is. `Tooltip`\ncan name the inverse surface directly because it holds no controls; this\ncannot. Set `data-color-mode` on the region to take the page's mode instead.\n\n**No duration means it stays.** That is the safe default rather than the\ncommon one: anything carrying an action has to still be there when the reader\ndecides to take it, and a component cannot tell from the outside whether the\nmessage it was given is disposable.\n\n**The clock stops while it is being read.** Hover pauses it, and so does\nfocus landing anywhere inside, which is the case that matters more: a\nkeyboard reader tabbing towards the action in a toast is exactly the person a\ntimer must not race. Both resume where they left off rather than starting\nagain, so a message half-read does not get a full second life every time a\npointer crosses it.\n\n**Going away is a request, never an act.** It dispatches a cancelable\n`helix-dismiss` and does nothing else: the consumer owns the list, so the\nitem removing itself would leave the two disagreeing. Auto-dismiss and the\ndismiss control raise the same event, so a consumer handles one path and not\ntwo.\n\nThe properties below are written by this component and read by whoever draws\nit. A consumer sets none of them: they carry a number this element computed\nand CSS cannot, which is what lets a stylesheet on this tier draw the thing\nwithout measuring anything itself.",
           "name": "HelixBaseToastItem",
           "cssProperties": [
             {
@@ -49814,11 +49814,11 @@
               "name": "dismiss-mark"
             },
             {
-              "description": "The severity mark, where the message has one.",
+              "description": "The tone mark, where the message has one.",
               "name": "icon"
             },
             {
-              "description": "The severity glyph, where none is slotted.",
+              "description": "The tone glyph, where none is slotted.",
               "name": "icon-mark"
             },
             {
@@ -49840,7 +49840,7 @@
               "name": "actions"
             },
             {
-              "description": "Replaces the severity mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the severity mark is the one a consumer reaches for.",
+              "description": "Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.",
               "name": "icon"
             },
             {
@@ -50013,13 +50013,13 @@
               },
               "parameters": [
                 {
-                  "name": "severity",
+                  "name": "mark",
                   "type": {
-                    "text": "SeverityMark"
+                    "text": "ToneMark"
                   }
                 }
               ],
-              "description": "The mark for the message's severity, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark is passed in rather than looked up again, since `render` has\nalready resolved the severity and a second lookup is a second place for the\nfallback to disagree with the tone around it."
+              "description": "The mark for the message's tone, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark is passed in rather than looked up again, since `render` has\nalready resolved the tone and a second lookup is a second place for the\nfallback to disagree with the tone around it."
             },
             {
               "kind": "method",

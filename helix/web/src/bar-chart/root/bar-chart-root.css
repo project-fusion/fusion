@@ -685,7 +685,8 @@
 
    Scaled by the policy, so a language that is more see-through everywhere is
    more see-through here too. */
-:host([material="glass"]) [part="bar"] {
+[part="bar"][data-material="glass"],
+:host([material="glass"]) [part="bar"]:not([data-material]) {
   --_bar-chart-through: calc(0.62 * var(--helix-material-opacity));
 }
 
