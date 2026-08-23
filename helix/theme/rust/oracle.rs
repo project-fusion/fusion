@@ -88,6 +88,19 @@ impl Divergence {
         }
         self.count += 1;
         let apart = (mine - theirs).abs();
+        /* **A difference that is not a number is not a small difference.** This
+        compared `apart >= self.worst` and nothing else, and `NaN >= 0.0` is
+        false, so a `NaN` on either side left `worst` at zero and the assert
+        below passed: the harness would have certified agreement with a value
+        that is not a value. Measured before fixing, which is the only way this
+        kind of hole is ever visible, since it makes the suite greener rather
+        than redder. */
+        if !apart.is_finite() {
+            self.worst = f64::INFINITY;
+            self.where_at =
+                format!("{at}: rust {mine:?} against typescript {theirs:?}, which is not a number");
+            return;
+        }
         if apart >= self.worst {
             self.worst = apart;
             self.where_at = format!("{at}: rust {mine:?} against typescript {theirs:?}");
@@ -253,6 +266,41 @@ fn the_contrast_search_lands_where_the_typescript_lands() {
     );
 }
 
+/// The other bisection, which the searches only exercised through their own.
+/// A twenty step halving is exactly the shape that agrees on every input anyone
+/// thought to try and diverges on the one nobody did, so it is asserted on the
+/// same grid rather than inferred from the search that calls it.
+#[test]
+fn fitting_to_gamut_lands_where_the_typescript_lands() {
+    let data = oracle();
+    let colors = data["colors"].as_array().expect("colors is an array");
+    let mut chroma = Divergence::new();
+    let mut wrong_hex = Vec::new();
+    for entry in colors {
+        let subject = color(entry);
+        let fitted = fit_to_gamut(subject, GAMUT_STEPS);
+        let at = format!("{subject:?}");
+        chroma.check(fitted.chroma, number(&entry["fitted"], "chroma"), &at);
+        let mine = oklch_to_hex(fitted);
+        let theirs = entry["fitted"]["hex"].as_str().expect("hex is a string");
+        if mine != theirs {
+            wrong_hex.push(format!("{at}: rust {mine} against typescript {theirs}"));
+        }
+        assert!(
+            !is_out_of_gamut(fitted),
+            "{at} is still outside the gamut after fitting"
+        );
+    }
+    chroma.assert("fitted chroma", colors.len());
+    assert!(
+        wrong_hex.is_empty(),
+        "{} of {} fitted colours render to a different hex:\n  {}",
+        wrong_hex.len(),
+        colors.len(),
+        wrong_hex.join("\n  ")
+    );
+}
+
 #[test]
 fn fitting_to_gamut_is_idempotent_on_a_colour_already_inside_it() {
     let inside = Oklch {
@@ -265,7 +313,12 @@ fn fitting_to_gamut_is_idempotent_on_a_colour_already_inside_it() {
 
 #[test]
 fn a_hex_that_is_not_one_is_refused_rather_than_carried() {
-    for text in ["", "#", "#ab", "#abcd", "nonsense", "#gggggg"] {
+    /* `##abcdef` is here because the port accepted it while the TypeScript
+    returned `NaN`: `trim_start_matches` strips every leading hash and the
+    engine being ported strips one. */
+    for text in [
+        "", "#", "#ab", "#abcd", "nonsense", "#gggggg", "##abcdef", "##abc",
+    ] {
         assert!(hex_to_oklch(text).is_none(), "{text} should not parse");
     }
 }

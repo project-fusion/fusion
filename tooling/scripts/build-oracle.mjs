@@ -33,6 +33,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 
 import {
   contrastRatio,
+  fitToGamut,
   hexToOklch,
   isOutOfGamut,
   lightnessForContrast,
@@ -97,17 +98,31 @@ const oracle = {
   /* Regenerating is cheap and reviewing a thousand changed floats is not, so the
      header says what to run rather than leaving a reader to guess. */
   '//': 'Generated from helix/theme/src/oklch.ts by `bun run oracle`. Do not edit.',
-  colors: colors.map((color) => ({
-    ...color,
-    hex: oklchToHex(color),
-    luminance: relativeLuminance(color),
-    outOfGamut: isOutOfGamut(color),
-    shippedLuminance: shippedLuminance(color),
-  })),
+  colors: colors.map((color) => {
+    const fitted = fitToGamut(color)
+    return {
+      ...color,
+      /* The other bisection, dumped directly rather than left to be exercised
+         through the search that calls it. */
+      fitted: { ...fitted, hex: oklchToHex(fitted) },
+      hex: oklchToHex(color),
+      luminance: relativeLuminance(color),
+      outOfGamut: isOutOfGamut(color),
+      shippedLuminance: shippedLuminance(color),
+    }
+  }),
   hexes: HEXES.map((hex) => {
     const color = hexToOklch(hex)
     return { ...color, hex, roundTrip: oklchToHex(color) }
   }),
+  pairs: BACKGROUNDS.flatMap((background) =>
+    colors.slice(0, 60).map((color) => ({
+      background,
+      color,
+      ratio: contrastRatio(color, background),
+      shipped: shippedContrastRatio(color, background),
+    })),
+  ),
   searches: BACKGROUNDS.flatMap((background) =>
     TARGETS.flatMap((target) =>
       [0, 0.1, 0.2].flatMap((chroma) =>
@@ -129,14 +144,6 @@ const oracle = {
       ),
     ),
   ),
-  pairs: BACKGROUNDS.flatMap((background) =>
-    colors.slice(0, 60).map((color) => ({
-      background,
-      color,
-      ratio: contrastRatio(color, background),
-      shipped: shippedContrastRatio(color, background),
-    })),
-  ),
 }
 
 const written = `${JSON.stringify(oracle, null, 2)}\n`
@@ -145,7 +152,7 @@ if (process.argv.includes('--check')) {
   if (!existsSync(OUT) || readFileSync(OUT, 'utf8') !== written) {
     console.error(
       `${OUT} is behind helix/theme/src/oklch.ts. Run \`bun run oracle\` and commit the result.\n\n` +
-        'It is the Rust port\'s only statement of what the TypeScript answers, so a stale one ' +
+        "It is the Rust port's only statement of what the TypeScript answers, so a stale one " +
         'lets `cargo test` certify agreement with an engine that has moved.',
     )
     process.exit(1)

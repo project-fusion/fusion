@@ -119,7 +119,12 @@ this file is a port of, harder for every future reader. */
 #[allow(clippy::many_single_char_names)]
 #[must_use]
 pub fn hex_to_oklch(hex: &str) -> Option<Oklch> {
-    let raw = hex.trim().trim_start_matches('#');
+    /* One `#`, not any number of them. `trim_start_matches` strips every leading
+    one, so `##abc` parsed here and produced a colour where the TypeScript's
+    single `.replace('#', '')` leaves `#abc` and refuses. Accepting a typo the
+    engine being ported rejects is the wrong direction for a port to differ in. */
+    let trimmed = hex.trim();
+    let raw = trimmed.strip_prefix('#').unwrap_or(trimmed);
     let full = match raw.len() {
         3 => raw.chars().flat_map(|c| [c, c]).collect::<String>(),
         6 => raw.to_owned(),
