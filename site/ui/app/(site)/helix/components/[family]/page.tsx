@@ -325,7 +325,6 @@ function MemberTable({
  */
 const opens = (label: string): string => `Open the ${label} specification`
 
-/** The one table with a fourth column, because a property has a resting value. */
 /**
  * A description, and the marks for whatever it is built on.
  *
@@ -369,6 +368,7 @@ function Described({
   )
 }
 
+/** The one table with a fourth column, because a property has a resting value. */
 function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
   if (rows.length === 0) {
     return null
