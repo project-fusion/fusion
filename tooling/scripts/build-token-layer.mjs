@@ -120,11 +120,15 @@ const entries = TOKENS.map(([name, value, description]) => ({
   value,
 }))
 const categories = [...new Set(entries.map((entry) => entry.category))]
-const json = `${JSON.stringify(
-  { categories, count: entries.length, groups: TOKEN_GROUPS, tokens: entries },
-  undefined,
-  2,
-)}\n`
+/* Through the formatter like everything else generated here. `JSON.stringify`
+   with an indent is close to what biome writes and not the same, and a
+   generated file the formatter would rewrite is a check failing over bytes
+   nobody typed. Third time this has come up; there is no fourth way to learn
+   it. */
+const json = formatted(
+  `${JSON.stringify({ categories, count: entries.length, groups: TOKEN_GROUPS, tokens: entries }, undefined, 2)}\n`,
+  'tokens.json',
+)
 
 if (process.argv.includes('--check')) {
   const stale = [
