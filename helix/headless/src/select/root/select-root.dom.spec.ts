@@ -209,7 +209,7 @@ if (hasLayout()) {
     }
 
     const press = async (host: HTMLElement, value: string): Promise<void> => {
-      const option = host.querySelector(`helix-option[value="${value}"]`) as HTMLElement
+      const option = host.querySelector(`helix-base-option[value="${value}"]`) as HTMLElement
       await (option as unknown as { updateComplete: Promise<boolean> }).updateComplete
       const row = option.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null
       if (!row) {

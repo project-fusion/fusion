@@ -356,7 +356,9 @@ if (hasLayout()) {
       )) as Updatable & { value: string }
       await host.updateComplete
 
-      const option = (host as HTMLElement).querySelector('helix-option[value="two"]') as HTMLElement
+      const option = (host as HTMLElement).querySelector(
+        'helix-base-option[value="two"]',
+      ) as HTMLElement
       await (option as unknown as { updateComplete: Promise<boolean> }).updateComplete
       const row = option.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null
       if (!row) {
