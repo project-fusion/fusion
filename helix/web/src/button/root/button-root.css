@@ -263,7 +263,7 @@
 
 /* How much of the room available to it the button takes. On the host, since the
    host is the box in the layout. */
-:host([fill="standard"]) {
+:host([width="standard"]) {
   inline-size: var(--button-inline-size, var(--helix-size-button));
   /* Never wider than the room it has. A standard width is a floor for tidiness,
      not a promise to overflow a narrow column to keep it. */
@@ -272,7 +272,7 @@
 
 /* Block-level, not the resting `inline-flex`. A control that fills its container
    should not be able to share a line with anything beside it. */
-:host([fill="full"]) {
+:host([width="full"]) {
   display: flex;
   inline-size: 100%;
 }

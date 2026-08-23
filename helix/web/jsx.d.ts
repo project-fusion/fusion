@@ -1463,16 +1463,32 @@ export type HelixButtonProps = {
 - `full` fills the container, for a single action at the foot of a form or
   a card, and on a phone where a control is a target before it is a label.
 
-Width and not weight. `emphasis` says how much a button matters and this
-says how much room it takes, and the three are independent: a `ghost
+**This was `fill`, and the name had to disclaim itself.** The paragraph here
+opened "Width and not weight", which is a sentence a name should not need:
+`emphasis` on this same element is documented as "How filled it is drawn",
+so a button carried a property called `fill` beside a property about being
+filled, meaning different things. `separation="filled"` and
+`ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
+colour, and every chart in the library writes `fill` for paint, which left
+this the only use of the word meaning geometry.
+
+`Dialog` had already made the same move for the same reason, its
+`appearance` becoming `size` for saying how wide a panel is, "which its own
+description admitted in as many words". `size` is not available here,
+because that rule's test is whether two of them sitting together could
+legitimately differ, and two buttons do: this is a width *policy* rather
+than a scale, and `standard` exists precisely to stop a row being ragged.
+
+Width and not weight, still. `emphasis` says how much a button matters and
+this says how much room it takes, and the three are independent: a `ghost
 standard` Cancel beside a `solid primary standard` Save is exactly the
 pairing a dialog wants.
 
-**A consumer's own anchor takes it as `data-button-fill`**, the way it
-takes the appearance as `data-button`:
+**A consumer's own anchor takes it as `data-button-width`**, the way it
+takes the emphasis as `data-button`:
 
 ```html
-<a data-button="solid" data-button-fill="standard" data-button-tone="primary" href="/save">Save</a>
+<a data-button="solid" data-button-width="standard" data-button-tone="primary" href="/save">Save</a>
 ```
 
 Both are one declaration in the base layer. They were not, and that was a
@@ -1480,7 +1496,7 @@ real gap rather than a missing convenience: this class promises a link
 styled as a button and a real button are indistinguishable, and a dialog's
 button row is built on `standard`, so the one place the promise mattered
 most was the one place it did not hold. */
-  fill?: HelixButton["fill"];
+  width?: HelixButton["width"];
   /** How filled it is drawn.
 
 **This was `appearance`, and the docstring above it always said what it
@@ -1585,16 +1601,32 @@ export type HelixButtonSolidJsProps = {
 - `full` fills the container, for a single action at the foot of a form or
   a card, and on a phone where a control is a target before it is a label.
 
-Width and not weight. `emphasis` says how much a button matters and this
-says how much room it takes, and the three are independent: a `ghost
+**This was `fill`, and the name had to disclaim itself.** The paragraph here
+opened "Width and not weight", which is a sentence a name should not need:
+`emphasis` on this same element is documented as "How filled it is drawn",
+so a button carried a property called `fill` beside a property about being
+filled, meaning different things. `separation="filled"` and
+`ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
+colour, and every chart in the library writes `fill` for paint, which left
+this the only use of the word meaning geometry.
+
+`Dialog` had already made the same move for the same reason, its
+`appearance` becoming `size` for saying how wide a panel is, "which its own
+description admitted in as many words". `size` is not available here,
+because that rule's test is whether two of them sitting together could
+legitimately differ, and two buttons do: this is a width *policy* rather
+than a scale, and `standard` exists precisely to stop a row being ragged.
+
+Width and not weight, still. `emphasis` says how much a button matters and
+this says how much room it takes, and the three are independent: a `ghost
 standard` Cancel beside a `solid primary standard` Save is exactly the
 pairing a dialog wants.
 
-**A consumer's own anchor takes it as `data-button-fill`**, the way it
-takes the appearance as `data-button`:
+**A consumer's own anchor takes it as `data-button-width`**, the way it
+takes the emphasis as `data-button`:
 
 ```html
-<a data-button="solid" data-button-fill="standard" data-button-tone="primary" href="/save">Save</a>
+<a data-button="solid" data-button-width="standard" data-button-tone="primary" href="/save">Save</a>
 ```
 
 Both are one declaration in the base layer. They were not, and that was a
@@ -1602,7 +1634,7 @@ real gap rather than a missing convenience: this class promises a link
 styled as a button and a real button are indistinguishable, and a dialog's
 button row is built on `standard`, so the one place the promise mattered
 most was the one place it did not hold. */
-  "prop:fill"?: HelixButton["fill"];
+  "prop:width"?: HelixButton["width"];
   /** How filled it is drawn.
 
 **This was `appearance`, and the docstring above it always said what it
@@ -15176,7 +15208,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `fill`: How much of the space available to it the button takes.
+   * - `width`: How much of the space available to it the button takes.
    *
    * - `auto` is the default and is never written: the button is as wide as its
    *   label, which is what a control in a toolbar or beside a field should be.
@@ -15185,16 +15217,32 @@ export type CustomElements = {
    * - `full` fills the container, for a single action at the foot of a form or
    *   a card, and on a phone where a control is a target before it is a label.
    *
-   * Width and not weight. `emphasis` says how much a button matters and this
-   * says how much room it takes, and the three are independent: a `ghost
+   * **This was `fill`, and the name had to disclaim itself.** The paragraph here
+   * opened "Width and not weight", which is a sentence a name should not need:
+   * `emphasis` on this same element is documented as "How filled it is drawn",
+   * so a button carried a property called `fill` beside a property about being
+   * filled, meaning different things. `separation="filled"` and
+   * `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
+   * colour, and every chart in the library writes `fill` for paint, which left
+   * this the only use of the word meaning geometry.
+   *
+   * `Dialog` had already made the same move for the same reason, its
+   * `appearance` becoming `size` for saying how wide a panel is, "which its own
+   * description admitted in as many words". `size` is not available here,
+   * because that rule's test is whether two of them sitting together could
+   * legitimately differ, and two buttons do: this is a width *policy* rather
+   * than a scale, and `standard` exists precisely to stop a row being ragged.
+   *
+   * Width and not weight, still. `emphasis` says how much a button matters and
+   * this says how much room it takes, and the three are independent: a `ghost
    * standard` Cancel beside a `solid primary standard` Save is exactly the
    * pairing a dialog wants.
    *
-   * **A consumer's own anchor takes it as `data-button-fill`**, the way it
-   * takes the appearance as `data-button`:
+   * **A consumer's own anchor takes it as `data-button-width`**, the way it
+   * takes the emphasis as `data-button`:
    *
    * ```html
-   * <a data-button="solid" data-button-fill="standard" data-button-tone="primary" href="/save">Save</a>
+   * <a data-button="solid" data-button-width="standard" data-button-tone="primary" href="/save">Save</a>
    * ```
    *
    * Both are one declaration in the base layer. They were not, and that was a
@@ -15342,7 +15390,7 @@ export type CustomElements = {
    *
    * - `--button-background-color`: Fill behind the button. (default: `undefined`)
    * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
-   * - `--button-inline-size`: Width taken by `fill="standard"`. (default: `undefined`)
+   * - `--button-inline-size`: Width taken by `width="standard"`. (default: `undefined`)
    * - `--button-radii`: Corner radius of the control. (default: `undefined`)
    * - `--button-radii-start`: Leading corners, which a group flattens. (default: `undefined`)
    * - `--button-radii-end`: Trailing corners, which a group flattens. (default: `undefined`)
@@ -26550,7 +26598,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `fill`: How much of the space available to it the button takes.
+   * - `width`: How much of the space available to it the button takes.
    *
    * - `auto` is the default and is never written: the button is as wide as its
    *   label, which is what a control in a toolbar or beside a field should be.
@@ -26559,16 +26607,32 @@ export type CustomElementsSolidJs = {
    * - `full` fills the container, for a single action at the foot of a form or
    *   a card, and on a phone where a control is a target before it is a label.
    *
-   * Width and not weight. `emphasis` says how much a button matters and this
-   * says how much room it takes, and the three are independent: a `ghost
+   * **This was `fill`, and the name had to disclaim itself.** The paragraph here
+   * opened "Width and not weight", which is a sentence a name should not need:
+   * `emphasis` on this same element is documented as "How filled it is drawn",
+   * so a button carried a property called `fill` beside a property about being
+   * filled, meaning different things. `separation="filled"` and
+   * `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
+   * colour, and every chart in the library writes `fill` for paint, which left
+   * this the only use of the word meaning geometry.
+   *
+   * `Dialog` had already made the same move for the same reason, its
+   * `appearance` becoming `size` for saying how wide a panel is, "which its own
+   * description admitted in as many words". `size` is not available here,
+   * because that rule's test is whether two of them sitting together could
+   * legitimately differ, and two buttons do: this is a width *policy* rather
+   * than a scale, and `standard` exists precisely to stop a row being ragged.
+   *
+   * Width and not weight, still. `emphasis` says how much a button matters and
+   * this says how much room it takes, and the three are independent: a `ghost
    * standard` Cancel beside a `solid primary standard` Save is exactly the
    * pairing a dialog wants.
    *
-   * **A consumer's own anchor takes it as `data-button-fill`**, the way it
-   * takes the appearance as `data-button`:
+   * **A consumer's own anchor takes it as `data-button-width`**, the way it
+   * takes the emphasis as `data-button`:
    *
    * ```html
-   * <a data-button="solid" data-button-fill="standard" data-button-tone="primary" href="/save">Save</a>
+   * <a data-button="solid" data-button-width="standard" data-button-tone="primary" href="/save">Save</a>
    * ```
    *
    * Both are one declaration in the base layer. They were not, and that was a
@@ -26716,7 +26780,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--button-background-color`: Fill behind the button. (default: `undefined`)
    * - `--button-foreground-color`: Label and icon color. (default: `undefined`)
-   * - `--button-inline-size`: Width taken by `fill="standard"`. (default: `undefined`)
+   * - `--button-inline-size`: Width taken by `width="standard"`. (default: `undefined`)
    * - `--button-radii`: Corner radius of the control. (default: `undefined`)
    * - `--button-radii-start`: Leading corners, which a group flattens. (default: `undefined`)
    * - `--button-radii-end`: Trailing corners, which a group flattens. (default: `undefined`)
@@ -37301,7 +37365,7 @@ export type CustomCssProperties = {
   "--button-background-color"?: string;
   /** Label and icon color. */
   "--button-foreground-color"?: string;
-  /** Width taken by `fill="standard"`. */
+  /** Width taken by `width="standard"`. */
   "--button-inline-size"?: string;
   /** Corner radius of the control. */
   "--button-radii"?: string;

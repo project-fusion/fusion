@@ -1317,7 +1317,6 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             <helix-flex gap="sm" slot="footer">
               <helix-button
                 emphasis="solid"
-                fill="standard"
                 onClick={() => {
                   const next = pendingSyntax
                   setPendingSyntax(null)
@@ -1326,10 +1325,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                   }
                 }}
                 tone="primary"
+                width="standard"
               >
                 Change anyway
               </helix-button>
-              <helix-button fill="standard" onClick={() => setPendingSyntax(null)}>
+              <helix-button onClick={() => setPendingSyntax(null)} width="standard">
                 Keep editing
               </helix-button>
             </helix-flex>

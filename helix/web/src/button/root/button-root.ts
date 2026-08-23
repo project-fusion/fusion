@@ -30,7 +30,7 @@ import { styles } from './button-root.css.js'
  *
  * @cssproperty --button-background-color - Fill behind the button.
  * @cssproperty --button-foreground-color - Label and icon color.
- * @cssproperty --button-inline-size - Width taken by `fill="standard"`.
+ * @cssproperty --button-inline-size - Width taken by `width="standard"`.
  * @cssproperty --button-radii - Corner radius of the control.
  * @cssproperty --button-radii-start - Leading corners, which a group flattens.
  * @cssproperty --button-radii-end - Trailing corners, which a group flattens.
@@ -47,16 +47,32 @@ export class HelixButton extends MixinControlSurface(HelixBaseButton) {
    * - `full` fills the container, for a single action at the foot of a form or
    *   a card, and on a phone where a control is a target before it is a label.
    *
-   * Width and not weight. `emphasis` says how much a button matters and this
-   * says how much room it takes, and the three are independent: a `ghost
+   * **This was `fill`, and the name had to disclaim itself.** The paragraph here
+   * opened "Width and not weight", which is a sentence a name should not need:
+   * `emphasis` on this same element is documented as "How filled it is drawn",
+   * so a button carried a property called `fill` beside a property about being
+   * filled, meaning different things. `separation="filled"` and
+   * `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
+   * colour, and every chart in the library writes `fill` for paint, which left
+   * this the only use of the word meaning geometry.
+   *
+   * `Dialog` had already made the same move for the same reason, its
+   * `appearance` becoming `size` for saying how wide a panel is, "which its own
+   * description admitted in as many words". `size` is not available here,
+   * because that rule's test is whether two of them sitting together could
+   * legitimately differ, and two buttons do: this is a width *policy* rather
+   * than a scale, and `standard` exists precisely to stop a row being ragged.
+   *
+   * Width and not weight, still. `emphasis` says how much a button matters and
+   * this says how much room it takes, and the three are independent: a `ghost
    * standard` Cancel beside a `solid primary standard` Save is exactly the
    * pairing a dialog wants.
    *
-   * **A consumer's own anchor takes it as `data-button-fill`**, the way it
-   * takes the appearance as `data-button`:
+   * **A consumer's own anchor takes it as `data-button-width`**, the way it
+   * takes the emphasis as `data-button`:
    *
    * ```html
-   * <a data-button="solid" data-button-fill="standard" data-button-tone="primary" href="/save">Save</a>
+   * <a data-button="solid" data-button-width="standard" data-button-tone="primary" href="/save">Save</a>
    * ```
    *
    * Both are one declaration in the base layer. They were not, and that was a
@@ -66,7 +82,7 @@ export class HelixButton extends MixinControlSurface(HelixBaseButton) {
    * most was the one place it did not hold.
    */
   @property({ reflect: true })
-  fill?: 'auto' | 'full' | 'standard'
+  width?: 'auto' | 'full' | 'standard'
 
   static override styles: CSSResultGroup = styles
 }

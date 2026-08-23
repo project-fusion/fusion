@@ -97,13 +97,13 @@ export default function Home() {
           <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
             <Link
               data-button="solid"
-              data-button-fill="standard"
               data-button-tone="primary"
+              data-button-width="standard"
               href="/services"
             >
               See what we do
             </Link>
-            <Link data-button data-button-fill="standard" href="/helix">
+            <Link data-button data-button-width="standard" href="/helix">
               Open Helix
             </Link>
           </helix-flex>
@@ -428,8 +428,8 @@ export default function Home() {
               a reader is actually uncertain about. */}
           <a
             data-button="solid"
-            data-button-fill="standard"
             data-button-tone="primary"
+            data-button-width="standard"
             data-density="lg"
             href="/contact"
           >

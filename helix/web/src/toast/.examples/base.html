@@ -9,10 +9,16 @@
   label="Notifications"
   placement="bottom-end"
 >
-  <helix-base-toast-item dismissible>
+  <helix-base-toast-item
+    dismissible
+    tone="success"
+  >
     Project saved.
   </helix-base-toast-item>
-  <helix-base-toast-item dismissible>
+  <helix-base-toast-item
+    dismissible
+    tone="danger"
+  >
     Could not reach the server.
     <helix-base-button slot="actions">Retry</helix-base-button>
   </helix-base-toast-item>

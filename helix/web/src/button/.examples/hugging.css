@@ -1,0 +1,19 @@
+/* The column is the thing with a width. Nothing is said about the buttons. */
+.column {
+  max-inline-size: 20rem;
+}
+
+/* And this is the whole of "make a button hug its label": one line about how
+   the child sits in its parent, written where every other layout decision is
+   written.
+
+   **`width` on the button is a different question and does not answer this
+   one.** It says which of three behaviours the button has, `auto` against
+   `standard` against `full`, and none of them is "shrink inside whatever is
+   stretching me": that depends on the parent, so a property would have to be
+   re-answered for every layout the button is ever put in. This file is here to
+   say where the answer lives, and it is the reason the axis has three policy
+   values rather than a fourth for hugging. */
+.hug {
+  align-self: start;
+}

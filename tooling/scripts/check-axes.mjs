@@ -29,9 +29,9 @@
  * - A property named after an axis draws only from that axis. A component may
  *   take a subset, because most surfaces have meaning for two of the four, and
  *   may never invent a value.
- * - A visual axis never appears on the headless tier, which has nothing to
- *   paint. `tone` is the exception and a principled one: it says what a thing
- *   means, and meaning survives having no stylesheet.
+ * - A styled axis never appears on the headless tier, which has nothing to
+ *   paint and no box to size. `tone` is the exception and a principled one: it
+ *   says what a thing means, and meaning survives having no stylesheet.
  * - `variant` is the escape hatch and takes no registry, being component-
  *   specific by definition: `segmented` against `underlined`, `list` against
  *   `wheels`, `dots` against `marks`. It lives on either tier, because a choice
@@ -62,6 +62,16 @@ const AXES = {
   material: ['frosted', 'glass', 'transparent'],
   separation: ['elevated', 'filled', 'outlined', 'plain'],
   tone: ['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'surface', 'warning'],
+  /* Geometry rather than paint, and registered because it is cross-cutting:
+     anything that lets a consumer say how much of its container it takes says
+     it with this word and these three values. It was `fill` on `Button`, whose
+     docstring had to open "Width and not weight" because `emphasis` on the same
+     element is documented as "How filled it is drawn". `size` is not the word
+     either, for the reason `Dialog` gives when it takes one: that rule's test is
+     whether two of them sitting together could legitimately differ, and two
+     buttons do. This is a width policy and not a scale, `standard` existing
+     precisely to stop a row being ragged. */
+  width: ['auto', 'full', 'standard'],
 }
 
 /**
@@ -91,9 +101,27 @@ const PENDING = {
   'helix-text.tone': '#141, `muted` and `subtle` want a quiet step per tone first',
 }
 
+/**
+ * Components whose `width` is a length rather than a policy.
+ *
+ * **One axis, two value kinds, and the exception is named rather than assumed.**
+ * `width` asks how much room a thing takes, and most answer with a policy:
+ * `auto`, `standard`, `full`. A table column answers with a CSS grid track,
+ * `16rem` or `minmax(0, 2fr)`, because the question there is not which of three
+ * behaviours but exactly how wide. Same axis, and the value space a continuum,
+ * so the registry cannot hold it and this says which components are on that
+ * side of it. They are exempt from the value list and from the styled-tier rule,
+ * a track being what the headless tier feeds `grid-template-columns`.
+ *
+ * What it does not excuse is a *policy* under another name. `fill`, `span` and
+ * `block` are the ones to watch for, and `fill` is where this started.
+ */
+const LENGTHS = new Set(['table'])
+
 const problems = []
 const seenUnswept = new Set()
 const seenPending = new Set()
+const seenLengths = new Set()
 
 for (const tier of ['headless', 'web']) {
   const manifest = JSON.parse(
@@ -123,6 +151,10 @@ for (const tier of ['headless', 'web']) {
         }
         const axis = AXES[name]
         if (!axis) {
+          continue
+        }
+        if (name === 'width' && LENGTHS.has(family)) {
+          seenLengths.add(family)
           continue
         }
         /* `tone` is the one axis both tiers may carry, and the exception is
@@ -155,6 +187,14 @@ for (const tier of ['headless', 'web']) {
         }
       }
     }
+  }
+}
+
+for (const family of LENGTHS) {
+  if (!seenLengths.has(family)) {
+    problems.push(
+      `\`LENGTHS\` holds \`${family}\`, which no longer takes a \`width\`. Drop the entry.`,
+    )
   }
 }
 

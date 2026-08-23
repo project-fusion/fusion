@@ -1696,6 +1696,82 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/aura/root/aura-axis.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "exitOf",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "tilt",
+              "type": {
+                "text": "number"
+              },
+              "description": "The angle handed to the shader, in degrees."
+            },
+            {
+              "name": "aspect",
+              "type": {
+                "text": "number"
+              },
+              "description": "The box's width over its height."
+            }
+          ],
+          "description": "Where the shader's axis crosses the top edge, as a fraction of the width.\n\nFollows `main()` in `aura-shader.ts`:\n\n1. `p.x *= aspect` stretches the frame before anything rotates, so the tilt\n   the rotation takes is a slope in the stretched frame rather than on\n   screen.\n2. `float a = atan(sin(want), cos(want) * aspect)` is the angle it actually\n   turns by, which is the asked-for screen angle converted into that frame.\n3. `mat2 turn = mat2(cos(a), sin(a), -sin(a), cos(a))` rotates, and the axis\n   is the line the rotated x is zero on: `cos(a) * x - sin(a) * y = 0`.\n\nAt the top edge `y` is 1, so the crossing is at `x = tan(a)` in the stretched\nframe, and dividing the stretch back out puts it on screen. The aspect is\ntherefore paid twice, once going into the rotation and once coming out, which\nis why it appears squared when the three steps are collapsed."
+        },
+        {
+          "kind": "function",
+          "name": "tiltFor",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "terminus",
+              "type": {
+                "text": "number"
+              },
+              "description": "The crossing wanted, as a fraction of the width."
+            },
+            {
+              "name": "aspect",
+              "type": {
+                "text": "number"
+              },
+              "description": "The box's width over its height."
+            }
+          ],
+          "description": "The tilt, in degrees, whose axis crosses the top edge at `terminus`.\n\nThe inverse of `exitOf`, solved rather than fitted: collapsing its three\nsteps gives `terminus = 0.5 + tan(tilt) / (2 * aspect^2)`, and rearranging\nfor the tilt gives what is below.\n\nThis is the contract `terminus` has always claimed and twice failed to keep:\n`0` is the left edge, `0.5` the middle and `1` the right edge, in every box."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "exitOf",
+          "declaration": {
+            "name": "exitOf",
+            "module": "src/aura/root/aura-axis.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "tiltFor",
+          "declaration": {
+            "name": "tiltFor",
+            "module": "src/aura/root/aura-axis.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/aura/root/aura-root.css.ts",
       "declarations": [
         {
@@ -2147,7 +2223,7 @@
                 "text": "number"
               },
               "privacy": "private",
-              "description": "The angle actually drawn, which is `terminus` resolved against the box.\n\n`atan` of the run over the rise, the run being the fraction of the width\nthe exit is asked for and the rise the box's own height. A getter rather\nthan a stored value because the box changes and this has no business\nknowing when: it is read once per frame from numbers that are already\nthere.",
+              "description": "The angle actually drawn, which is `terminus` resolved against the box.\n\nA getter rather than a stored value because the box changes and this has no\nbusiness knowing when: it is read once per frame from numbers already\nthere.\n\nThe solve is `tiltFor` in `aura-axis.ts` rather than an expression here,\nand that is the fix for how this went wrong twice. Both times the\narithmetic sat inside this getter next to a sentence describing different\narithmetic, and nothing in the repository could tell they disagreed. It is\ncallable now, and `aura-root.dom.spec.ts` runs it against a model of the\nshader in both directions. See 155.",
               "readonly": true
             },
             {
@@ -6025,7 +6101,7 @@
               "name": "--button-foreground-color"
             },
             {
-              "description": "Width taken by `fill=\"standard\"`.",
+              "description": "Width taken by `width=\"standard\"`.",
               "name": "--button-inline-size"
             },
             {
@@ -6080,12 +6156,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "fill",
+              "name": "width",
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
               },
-              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `emphasis` says how much a button matters and this\nsays how much room it takes, and the three are independent: a `ghost\nstandard` Cancel beside a `solid primary standard` Save is exactly the\npairing a dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
-              "attribute": "fill",
+              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\n**This was `fill`, and the name had to disclaim itself.** The paragraph here\nopened \"Width and not weight\", which is a sentence a name should not need:\n`emphasis` on this same element is documented as \"How filled it is drawn\",\nso a button carried a property called `fill` beside a property about being\nfilled, meaning different things. `separation=\"filled\"` and\n`ThemeIntent.separation`'s `fill` mechanism both mean a surface's own\ncolour, and every chart in the library writes `fill` for paint, which left\nthis the only use of the word meaning geometry.\n\n`Dialog` had already made the same move for the same reason, its\n`appearance` becoming `size` for saying how wide a panel is, \"which its own\ndescription admitted in as many words\". `size` is not available here,\nbecause that rule's test is whether two of them sitting together could\nlegitimately differ, and two buttons do: this is a width *policy* rather\nthan a scale, and `standard` exists precisely to stop a row being ragged.\n\nWidth and not weight, still. `emphasis` says how much a button matters and\nthis says how much room it takes, and the three are independent: a `ghost\nstandard` Cancel beside a `solid primary standard` Save is exactly the\npairing a dialog wants.\n\n**A consumer's own anchor takes it as `data-button-width`**, the way it\ntakes the emphasis as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-width=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
+              "attribute": "width",
               "reflects": true
             },
             {
@@ -6513,12 +6589,12 @@
           ],
           "attributes": [
             {
-              "name": "fill",
+              "name": "width",
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
               },
-              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `emphasis` says how much a button matters and this\nsays how much room it takes, and the three are independent: a `ghost\nstandard` Cancel beside a `solid primary standard` Save is exactly the\npairing a dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
-              "fieldName": "fill"
+              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\n**This was `fill`, and the name had to disclaim itself.** The paragraph here\nopened \"Width and not weight\", which is a sentence a name should not need:\n`emphasis` on this same element is documented as \"How filled it is drawn\",\nso a button carried a property called `fill` beside a property about being\nfilled, meaning different things. `separation=\"filled\"` and\n`ThemeIntent.separation`'s `fill` mechanism both mean a surface's own\ncolour, and every chart in the library writes `fill` for paint, which left\nthis the only use of the word meaning geometry.\n\n`Dialog` had already made the same move for the same reason, its\n`appearance` becoming `size` for saying how wide a panel is, \"which its own\ndescription admitted in as many words\". `size` is not available here,\nbecause that rule's test is whether two of them sitting together could\nlegitimately differ, and two buttons do: this is a width *policy* rather\nthan a scale, and `standard` exists precisely to stop a row being ragged.\n\nWidth and not weight, still. `emphasis` says how much a button matters and\nthis says how much room it takes, and the three are independent: a `ghost\nstandard` Cancel beside a `solid primary standard` Save is exactly the\npairing a dialog wants.\n\n**A consumer's own anchor takes it as `data-button-width`**, the way it\ntakes the emphasis as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-width=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
+              "fieldName": "width"
             },
             {
               "name": "emphasis",
@@ -6668,15 +6744,15 @@
                 "slug": "disabled"
               },
               {
-                "description": "A button that takes the width it is given rather than the width of its label.",
-                "slug": "fill"
+                "description": "Buttons in a narrow column, where the label decides whether it wraps.",
+                "slug": "hugging"
               },
               {
                 "description": "The four tones, each saying what the action means rather than how loud it is.",
                 "slug": "tones"
               },
               {
-                "description": "Buttons in a narrow column, where the label decides whether it wraps.",
+                "description": "A button that takes the width it is given rather than the width of its label.",
                 "slug": "width"
               },
               {

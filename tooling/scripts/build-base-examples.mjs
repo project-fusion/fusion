@@ -73,7 +73,6 @@ const PRESENTATIONAL = new Set([
   'dense',
   'divided',
   'emphasis',
-  'fill',
   'material',
   'raised',
   'rounded',
@@ -82,6 +81,7 @@ const PRESENTATIONAL = new Set([
   'size',
   'tone',
   'variant',
+  'width',
 ])
 
 const displayName = (slug) =>
@@ -108,16 +108,33 @@ const delayout = (html) =>
     })
     .replaceAll(/<\/helix-(?:flex|grid)>/g, '</div>')
 
-const strip = (html) => {
-  let out = html
-  for (const name of PRESENTATIONAL) {
-    // With a value, and bare: a boolean attribute is written `divided`, not
-    // `divided=""`, and the first pattern alone walked past every one of them.
-    out = out.replaceAll(new RegExp(`\\s+${name}="[^"]*"`, 'g'), '')
-    out = out.replaceAll(new RegExp(`\\s+${name}(?=[\\s>])`, 'g'), '')
-  }
-  return out
-}
+/* Per opening tag rather than across the whole file, and the reason is that one
+   name is on both lists. `width` is a policy on a button, `auto` against `full`
+   against `standard`, and a grid track on a table column, `16rem` or
+   `minmax(0, 2fr)`: presentation in the first case and structure the headless
+   tier owns in the second, which is why `helix-base-table-column` declares it.
+   Stripping by name alone took it out of every base table.
+
+   So the list says what is *presentation* and the manifest says what the tier
+   *has*, and an attribute survives when the base element declares it. That is
+   the sentence at the top of `PRESENTATIONAL` read literally rather than
+   approximated by a name match. */
+const strip = (html) =>
+  html.replaceAll(/<helix-[a-z0-9-]+[^>]*>/g, (tag) => {
+    const styled = /<(helix-[a-z0-9-]+)/.exec(tag)?.[1] ?? ''
+    const declared = BASE.get(styled.replace('helix-', 'helix-base-'))?.attrs ?? new Set()
+    let out = tag
+    for (const name of PRESENTATIONAL) {
+      if (declared.has(name)) {
+        continue
+      }
+      // With a value, and bare: a boolean attribute is written `divided`, not
+      // `divided=""`, and the first pattern alone walked past every one of them.
+      out = out.replaceAll(new RegExp(`\\s+${name}="[^"]*"`, 'g'), '')
+      out = out.replaceAll(new RegExp(`\\s+${name}(?=[\\s>])`, 'g'), '')
+    }
+    return out
+  })
 
 const rebase = (html) =>
   html.replaceAll(/<(\/?)helix-([a-z0-9-]+)/g, (whole, close, rest) => {

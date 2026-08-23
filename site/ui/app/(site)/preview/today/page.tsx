@@ -209,13 +209,13 @@ export default function Page() {
           <helix-flex data-density="lg" gap="sm" wrap>
             <a
               data-button="solid"
-              data-button-fill="standard"
               data-button-tone="primary"
+              data-button-width="standard"
               href="/services"
             >
               See what it costs
             </a>
-            <a data-button data-button-fill="standard" href="mailto:hello@fusion.dev">
+            <a data-button data-button-width="standard" href="mailto:hello@fusion.dev">
               hello@fusion.dev
             </a>
           </helix-flex>
