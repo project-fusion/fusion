@@ -36,7 +36,7 @@ export default function Page() {
   return (
     <>
       <section className="dvHero">
-        <helix-flex class="shell" direction="column" gap="xl">
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-flex align="center" data-density="sm" gap="sm">
             <helix-tag tone="primary">Fusion Development Group</helix-tag>
             <helix-text appearance="label" class="dvMono" tone="subtle">
@@ -50,7 +50,7 @@ export default function Page() {
             <em>Everything</em> follows.
           </helix-text>
 
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Cheap intelligence and cheap energy arrived together, and that is what turns sovereignty
             from a principle you agree with into a stack you can run. We build it from the bottom,
             because a sovereign thing on a rented substrate is a nicely worded dependency.
@@ -67,13 +67,13 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="xl">
+      <section data-band>
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text appearance="label" class="dvMono" tone="subtle">
               The derivation
             </helix-text>
-            <helix-text as="h2" class="sectionTitle measure">
+            <helix-text as="h2" data-measure data-section-title>
               Nothing here was chosen twice
             </helix-text>
           </helix-flex>
@@ -104,8 +104,8 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="lg">
+      <section data-band>
+        <helix-flex data-shell direction="column" gap="lg">
           <helix-card appearance="outlined">
             <helix-flex direction="column" gap="lg">
               <helix-text appearance="label" class="dvMono" slot="header" tone="subtle">
@@ -114,7 +114,7 @@ export default function Page() {
               <helix-text as="p" class="dvSeedText">
                 No Fusion product may create a dependency its user cannot exit.
               </helix-text>
-              <helix-text as="p" class="measure" tone="muted">
+              <helix-text as="p" data-measure tone="muted">
                 You hold your own keys, data, and hardware. We may operate a control plane, never a
                 chokepoint. Every row above is what that sentence produces, and anything it cannot
                 produce is not something we build.

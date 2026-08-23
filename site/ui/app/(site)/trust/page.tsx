@@ -48,15 +48,15 @@ const BAR = [
 export default function Page() {
   return (
     <>
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="lg">
+      <section data-band>
+        <helix-flex data-shell direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
             Trust
           </helix-text>
-          <helix-text as="h1" class="sectionTitle measure">
+          <helix-text as="h1" data-measure data-section-title>
             What has to be true before anything ships
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Six things. The number matters more than the contents: a bar that is never written down
             can be raised forever, and a company that keeps raising one never launches. Counted and
             published, it becomes something that can actually be met, and something you can hold us
@@ -65,21 +65,21 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column">
             {BAR.map((item, index) => (
-              <helix-flex align="start" class="verticalRow" gap="lg" key={item.name} wrap>
+              <helix-flex align="start" data-row gap="lg" key={item.name} wrap>
                 {/* Numbered, because the count is the commitment. A list that
                     can grow quietly is the thing this page exists to prevent. */}
                 <helix-text appearance="label" tone="subtle">
                   {String(index + 1).padStart(2, '0')}
                 </helix-text>
                 <helix-flex direction="column" gap="2xs">
-                  <helix-text as="h2" class="verticalName">
+                  <helix-text as="h2" data-row-name>
                     {item.name}
                   </helix-text>
-                  <helix-text class="measure" tone="muted">
+                  <helix-text data-measure tone="muted">
                     {item.body}
                   </helix-text>
                 </helix-flex>
@@ -90,15 +90,15 @@ export default function Page() {
       </section>
 
       {/* The half that makes the rest credible. */}
-      <section className="band reveal">
-        <helix-flex class="shell statement" direction="column" gap="lg">
+      <section data-band data-reveal>
+        <helix-flex class={`statement`} data-shell direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
             Where this stands
           </helix-text>
-          <helix-text as="p" class="statementText">
+          <helix-text as="p" data-statement>
             None of it has been tested, because nothing has shipped.
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Helix is Building and Cortex is Building, which means there is no product yet that has
             had to clear this list. Publishing the bar before there is anything to hold against it
             is the point: written first, it is a commitment. Written afterwards, it is a description
@@ -107,12 +107,12 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band closing reveal">
-        <helix-flex align="center" class="shell" direction="column" gap="lg">
-          <helix-text as="h2" class="sectionTitle">
+      <section data-band data-closing data-reveal>
+        <helix-flex align="center" data-shell direction="column" gap="lg">
+          <helix-text as="h2" data-section-title>
             Hold us to it
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             If something we ship does not clear one of these, that is worth telling us about, and
             the list is short enough that the check is a real one.
           </helix-text>

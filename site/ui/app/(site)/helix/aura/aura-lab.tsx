@@ -147,7 +147,7 @@ export function AuraLab(): React.ReactElement {
       </div>
       <div className="auraScrim" />
 
-      <helix-flex class="shell auraShell" direction="column" gap="xl">
+      <helix-flex class={`auraShell`} data-shell direction="column" gap="xl">
         <helix-flex direction="column" gap="sm">
           <helix-text appearance="label" tone="subtle">
             Helix. Aura

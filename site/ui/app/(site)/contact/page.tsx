@@ -59,15 +59,15 @@ const NEXT = [
 export default function Page() {
   return (
     <>
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="lg">
+      <section data-band>
+        <helix-flex data-shell direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
             Contact
           </helix-text>
-          <helix-text as="h1" class="sectionTitle measure">
+          <helix-text as="h1" data-measure data-section-title>
             Tell us what you need built
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             One address, read by the people who would do the work. What follows is what to put in
             the first message and what happens after you send it, so neither is a thing you have to
             guess at.
@@ -100,15 +100,15 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-text as="h2" class="sectionTitle measure">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
+          <helix-text as="h2" data-measure data-section-title>
             What to include
           </helix-text>
           <helix-grid gap="xl" min="18rem">
             {INCLUDE.map((item) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={item.name}>
-                <helix-text as="h3" class="substrateName">
+              <helix-flex data-substrate direction="column" gap="sm" key={item.name}>
+                <helix-text as="h3" data-substrate-name>
                   {item.name}
                 </helix-text>
                 <helix-text as="p" tone="muted">
@@ -120,22 +120,22 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-text as="h2" class="sectionTitle measure">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
+          <helix-text as="h2" data-measure data-section-title>
             What happens next
           </helix-text>
           <helix-flex direction="column">
             {NEXT.map((item, index) => (
-              <helix-flex align="start" class="verticalRow" gap="lg" key={item.name} wrap>
+              <helix-flex align="start" data-row gap="lg" key={item.name} wrap>
                 <helix-text appearance="label" tone="subtle">
                   {String(index + 1).padStart(2, '0')}
                 </helix-text>
                 <helix-flex direction="column" gap="sm">
-                  <helix-text as="h3" class="substrateName">
+                  <helix-text as="h3" data-substrate-name>
                     {item.name}
                   </helix-text>
-                  <helix-text as="p" class="measure" tone="muted">
+                  <helix-text as="p" data-measure tone="muted">
                     {item.body}
                   </helix-text>
                 </helix-flex>

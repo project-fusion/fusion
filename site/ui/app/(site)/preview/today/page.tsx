@@ -68,7 +68,7 @@ export default function Page() {
   return (
     <>
       <section className="specHero">
-        <helix-flex class="shell" direction="column" gap="xl">
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-text appearance="label" class="specHeroLabel">
             Fusion Development Group
           </helix-text>
@@ -108,7 +108,7 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="shell">
+      <section data-shell>
         <div className="spec">
           <helix-text class="specLabel">Why us</helix-text>
           <helix-flex direction="column" gap="xl">
@@ -131,7 +131,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="shell">
+      <section data-shell>
         <div className="spec">
           <helix-text class="specLabel">The state of it</helix-text>
           <helix-flex direction="column" gap="xl">
@@ -167,14 +167,14 @@ export default function Page() {
 
       {/* The story, last and short. It is the reason the work compounds rather
           than the reason to buy it, and a reader who wants it can follow it. */}
-      <section className="shell">
+      <section data-shell>
         <div className="spec">
           <helix-text class="specLabel">Where this goes</helix-text>
           <helix-flex direction="column" gap="xl">
             <helix-text as="h2" class="specTitle">
               Software now. The rest of the stack after.
             </helix-text>
-            <helix-flex class="measure" direction="column" gap="md">
+            <helix-flex data-measure direction="column" gap="md">
               <helix-text as="p" tone="muted">
                 Helix is the interface layer and Cortex is memory and provenance. Each engagement
                 that feeds one of them makes the next one faster, which is why we take the work we
@@ -198,12 +198,12 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="band closing">
-        <helix-flex align="center" class="shell" direction="column" gap="lg">
+      <section data-band data-closing>
+        <helix-flex align="center" data-shell direction="column" gap="lg">
           <helix-text as="h2" class="tdAsk">
             Start with the audit.
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Two weeks, fixed price, and the honest answer may be that you do not need the rest.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>

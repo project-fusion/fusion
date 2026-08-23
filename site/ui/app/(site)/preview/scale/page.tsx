@@ -41,7 +41,7 @@ export default function Page() {
             <OceanWorld shot="sea" />
             <div className="scHeroScrim" />
           </div>
-          <helix-flex class="scHeroCopy shell" direction="column" gap="lg">
+          <helix-flex class={`scHeroCopy`} data-shell direction="column" gap="lg">
             <helix-text appearance="label" class="scKicker">
               Fusion Development Group
             </helix-text>
@@ -67,7 +67,7 @@ export default function Page() {
             <OceanWorld shot="sun" />
             <div className="scSceneScrim" />
           </div>
-          <helix-flex class="scSceneCopy shell" direction="column" gap="lg">
+          <helix-flex class={`scSceneCopy`} data-shell direction="column" gap="lg">
             <helix-text appearance="label" class="scKicker">
               The floor
             </helix-text>
@@ -89,7 +89,7 @@ export default function Page() {
             <OceanWorld shot="under" />
             <div className="scSceneScrim" />
           </div>
-          <helix-flex class="scSceneCopy shell" direction="column" gap="lg">
+          <helix-flex class={`scSceneCopy`} data-shell direction="column" gap="lg">
             <helix-text appearance="label" class="scKicker">
               The name
             </helix-text>
@@ -105,11 +105,11 @@ export default function Page() {
         </section>
 
         <section className="scBand">
-          <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex data-shell direction="column" gap="xl">
             <helix-text appearance="label" class="scKicker">
               The constraint
             </helix-text>
-            <helix-text as="h2" class="scSceneTitle measure">
+            <helix-text as="h2" class={`scSceneTitle`} data-measure>
               No product may create a dependency its user cannot exit.
             </helix-text>
             <p className="scSceneLede">
@@ -120,7 +120,7 @@ export default function Page() {
         </section>
 
         <section className="scBand">
-          <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex data-shell direction="column" gap="xl">
             <helix-text appearance="label" class="scKicker">
               Counted honestly
             </helix-text>
@@ -138,8 +138,8 @@ export default function Page() {
         </section>
 
         <section className="scBand">
-          <helix-flex class="shell" direction="column" gap="xl">
-            <helix-text as="h2" class="scSceneTitle measure">
+          <helix-flex data-shell direction="column" gap="xl">
+            <helix-text as="h2" class={`scSceneTitle`} data-measure>
               The map, including the empty parts
             </helix-text>
             <helix-flex direction="column" gap="none">

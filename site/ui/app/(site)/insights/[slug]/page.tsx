@@ -181,7 +181,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
                     </helix-text>
                   </helix-flex>
                   <helix-text appearance="title">{other.title}</helix-text>
-                  <helix-text appearance="caption" class="measure" tone="muted">
+                  <helix-text appearance="caption" data-measure tone="muted">
                     {other.summary}
                   </helix-text>
                 </helix-flex>

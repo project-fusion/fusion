@@ -65,18 +65,18 @@
 
 /* Full width, held off the edges by the inset. Nothing is centered in a measure
    any more; text that needs a measure asks for one. */
-.shell {
+[data-shell] {
   inline-size: 100%;
   padding-inline: var(--site-inset);
 }
 
 /* A reading measure, for prose only. Layout is full width; a line of text is
    not, because past about 70 characters the eye loses the line. */
-.measure {
+[data-measure] {
   max-inline-size: 62ch;
 }
 
-.band {
+[data-band] {
   padding-block: var(--site-band);
 }
 
@@ -167,22 +167,7 @@ helix-drawer {
   --drawer-inset-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
-/* ============================================================ sections === */
-
-/* One statement, set large and centered, with nothing else in the band. This is
-   the constraint, and it is the only thing on the site set as a quotation.
-
-   Capped in `rem`, not `ch`. A `ch` on this container resolves against the
-   container's own font size, which is body text, so `32ch` came out near 250px
-   and broke a one-line claim across four. The measure has to be expressed in
-   the same terms as the type it is holding. */
-.statement {
-  margin-inline: auto;
-  max-inline-size: 52rem;
-  text-align: center;
-}
-
-.statementText {
+[data-statement] {
   font-size: clamp(var(--helix-text-xl), 4vw, var(--helix-text-3xl));
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
@@ -190,7 +175,7 @@ helix-drawer {
 }
 
 /* A section's own heading block: eyebrow, title, one line of context. */
-.sectionTitle {
+[data-section-title] {
   font-size: var(--site-text-section);
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
@@ -200,12 +185,12 @@ helix-drawer {
 /* The two substrates, side by side and given room. Not cards: they are the
    whole point of the section, so they are set as panels with air rather than
    as two of something. */
-.substrate {
+[data-substrate] {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   padding-block-start: var(--helix-space-lg);
 }
 
-.substrateName {
+[data-substrate-name] {
   font-size: clamp(var(--helix-text-xl), 3vw, var(--helix-text-2xl));
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
@@ -218,7 +203,7 @@ helix-drawer {
    row's hover fill and its rule reach past the text while the text itself still
    starts on the same line as everything else down the page. Padding alone would
    indent the labels; margin alone would leave the fill flush against them. */
-.verticalRow {
+[data-row] {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   margin-inline: calc(var(--helix-space-md) * -1);
@@ -227,15 +212,15 @@ helix-drawer {
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-.verticalRow:first-of-type {
+[data-row]:first-of-type {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
 }
 
-.verticalRow:hover {
+[data-row]:hover {
   background-color: var(--helix-color-surface-raised);
 }
 
-.verticalName {
+[data-row-name] {
   font-size: clamp(var(--helix-text-lg), 2.5vw, var(--helix-text-xl));
   letter-spacing: var(--helix-tracking-tight);
 }
@@ -259,7 +244,7 @@ helix-drawer {
  * and a smudge under a call to action looks like a drop shadow that failed
  * rather than like a horizon. The band is the ground and the button is the
  * bright object, which is one idea instead of two. */
-.closing {
+[data-closing] {
   background-color: light-dark(var(--helix-color-surface-sunken), var(--helix-color-surface));
   text-align: center;
 }
@@ -398,7 +383,7 @@ helix-drawer helix-tree {
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .reveal {
+    [data-reveal] {
       animation: site-reveal linear both;
       /* Both ends in `entry`, so the reveal completes as the section finishes
          entering the viewport. Ending on `cover` made the range a fraction of
@@ -407,8 +392,7 @@ helix-drawer helix-tree {
       animation-range: entry 10% entry 90%;
       animation-timeline: view();
     }
-  
-}
+  }
 }
 
 /* Cross-route transitions. The header and its indicator persist while the

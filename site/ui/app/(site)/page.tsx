@@ -82,7 +82,7 @@ export default function Home() {
       <div className={styles.reelScrim} />
 
       <section className={styles.hero}>
-        <helix-flex align="center" class={`shell ${styles.heroShell}`} direction="column" gap="lg">
+        <helix-flex align="center" class={styles.heroShell} data-shell direction="column" gap="lg">
           {/* A tag rather than a line of label text. The name is a thing, not a
               sentence about one, and a tag is what this library uses for a
               thing with a name. The line beside it says what we are made of,
@@ -130,8 +130,8 @@ export default function Home() {
         </helix-flex>
       </section>
 
-      <section className={`band reveal`}>
-        <helix-flex class="shell" direction="column" gap="xl">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             {/* **No kicker and no title.** Two named cards and a services block
                 below them are already legible as a choice; a heading above
@@ -150,7 +150,7 @@ export default function Home() {
                 The licence stays out of it for the reason it was taken out
                 before: whether a package is MIT matters to about one reader in
                 fifty and to none of them first. */}
-            <helix-text as="p" class="measure" tone="muted">
+            <helix-text as="p" data-measure tone="muted">
               Two substrates, both in production. They install from npm and ship as custom elements,
               so the framework above them stays your choice.
             </helix-text>
@@ -158,14 +158,14 @@ export default function Home() {
 
           <helix-grid gap="xl" min="22rem">
             {PRODUCTS.map((product) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={product.name}>
+              <helix-flex data-substrate direction="column" gap="sm" key={product.name}>
                 <helix-flex align="center" data-density="sm" gap="sm">
                   <helix-text appearance="label" tone="subtle">
                     {product.role}
                   </helix-text>
                   <helix-tag tone={stageAppearance(product.stage)}>{product.stage}</helix-tag>
                 </helix-flex>
-                <helix-text as="h3" class="substrateName">
+                <helix-text as="h3" data-substrate-name>
                   {product.name}
                 </helix-text>
                 <helix-text as="p" tone="muted">
@@ -223,16 +223,16 @@ export default function Home() {
           to care should meet all three together: two they can take and one they
           can hire. `Why us` is a reason to prefer the third and belongs after
           it, not between them. */}
-      <section className={`band reveal`}>
-        <helix-flex class="shell" direction="column" gap="xl">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
               Services
             </helix-text>
-            <helix-text as="h2" class="sectionTitle measure">
+            <helix-text as="h2" data-measure data-section-title>
               The part you can buy today
             </helix-text>
-            <helix-text as="p" class="measure" tone="muted">
+            <helix-text as="p" data-measure tone="muted">
               It starts with a two week audit, and every price is published: an offer you cannot
               compare is not an offer.
             </helix-text>
@@ -240,9 +240,9 @@ export default function Home() {
 
           <helix-grid gap="xl" min="18rem">
             {SERVICES.map((service) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={service.name}>
+              <helix-flex data-substrate direction="column" gap="sm" key={service.name}>
                 <helix-icon name={service.icon}></helix-icon>
-                <helix-text as="h3" class="substrateName">
+                <helix-text as="h3" data-substrate-name>
                   {service.name}
                 </helix-text>
                 {/* No number here, and the prices page is one line below.
@@ -298,7 +298,7 @@ export default function Home() {
           the whole panel reads as a thing being looked into. What overflows is
           masked rather than cut: a hard edge says the layout ran out, a fade
           says there is more, which there is. */}
-      <section className={`band reveal ${styles.showcaseBand}`}>
+      <section className={styles.showcaseBand} data-band data-reveal>
         {/* **No rule between them, and more room instead.** A line is one way
             to say two things are separate and whitespace is the other, and
             whitespace does not have to be looked past. The splitter that was
@@ -309,12 +309,12 @@ export default function Home() {
             The gap does the work at `3xl`, the widest the scale goes, which is wider than anything else on
             the page joins with, because the two sides are not a pair of columns
             in a layout: they are an argument and the thing it is about. */}
-        <div className={`shell ${styles.showcaseSplit}`}>
+        <div className={styles.showcaseSplit} data-shell>
           <helix-flex class={styles.showcaseProse} direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
               Helix
             </helix-text>
-            <helix-text as="h2" class="sectionTitle">
+            <helix-text as="h2" data-section-title>
               Drawn by the thing it documents
             </helix-text>
             <helix-text as="p" tone="muted">
@@ -333,8 +333,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={`band reveal`}>
-        <helix-flex class="shell" direction="column" gap="xl">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
               Why us
@@ -345,15 +345,15 @@ export default function Home() {
                 engagement is actually like, which is what its four cards
                 answer: the system exists, that makes it faster, you keep it,
                 and we say what is not done. */}
-            <helix-text as="h2" class="sectionTitle measure">
+            <helix-text as="h2" data-measure data-section-title>
               How the work goes
             </helix-text>
           </helix-flex>
 
           <helix-grid gap="xl" min="18rem">
             {REASONS.map((reason) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={reason.name}>
-                <helix-text as="h3" class="substrateName">
+              <helix-flex data-substrate direction="column" gap="sm" key={reason.name}>
+                <helix-text as="h3" data-substrate-name>
                   {reason.name}
                 </helix-text>
                 <helix-text as="p" tone="muted">
@@ -365,14 +365,14 @@ export default function Home() {
         </helix-flex>
       </section>
 
-      <section className={`band reveal`}>
-        <helix-flex class="shell" direction="column" gap="xl">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-flex align="center" gap="md" justify="between" wrap>
             <helix-flex direction="column" gap="sm">
               <helix-text appearance="label" tone="subtle">
                 Insights
               </helix-text>
-              <helix-text as="h2" class="sectionTitle measure">
+              <helix-text as="h2" data-measure data-section-title>
                 The arguments, written down
               </helix-text>
             </helix-flex>
@@ -414,12 +414,12 @@ export default function Home() {
 
       {/* The story, last and short. It is why the work compounds rather than
           why anyone should buy it, and a reader who wants it can follow it. */}
-      <section className={`band closing reveal`}>
-        <helix-flex align="center" class="shell" direction="column" gap="lg">
-          <helix-text as="h2" class="sectionTitle">
+      <section data-band data-closing data-reveal>
+        <helix-flex align="center" data-shell direction="column" gap="lg">
+          <helix-text as="h2" data-section-title>
             Take on the work
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Tell us what you need built. We will say plainly whether we are the right people for it.
           </helix-text>
           {/* `/contact` rather than the mail client. The address is still the

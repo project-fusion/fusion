@@ -19,7 +19,7 @@ export function HeroCopy({ lede, title }: { lede: ReactNode; title: ReactNode })
       <helix-text as="h1" class={styles.heroTitle}>
         {title}
       </helix-text>
-      <helix-text as="p" class={`${styles.heroLede} measure`} tone="muted">
+      <helix-text as="p" class={styles.heroLede} data-measure tone="muted">
         {lede}
       </helix-text>
     </>

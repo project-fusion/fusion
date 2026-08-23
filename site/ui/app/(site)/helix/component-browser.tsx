@@ -375,8 +375,9 @@ export function ComponentBrowser({
             takes its height from the region rather than asking for one. */}
         <helix-flex
           align="center"
-          className={`${browser.filterBarInner} shell`}
+          className={browser.filterBarInner}
           data-density="sm"
+          data-shell
           gap="md"
           justify="between"
           wrap
@@ -472,7 +473,7 @@ export function ComponentBrowser({
         </style>
       )}
 
-      <div className={`${browser.gridBand} shell`}>
+      <div className={browser.gridBand} data-shell>
         {shown === 0 ? (
           <helix-empty>
             <helix-text as="h2" slot="heading">

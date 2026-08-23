@@ -28,7 +28,7 @@ export function VerticalPage({
   vertical: Vertical
 }) {
   return (
-    <helix-flex class={`shell ${styles.verticalShell}`} direction="column" gap="xl">
+    <helix-flex class={styles.verticalShell} data-shell direction="column" gap="xl">
       <helix-flex direction="column" gap="sm">
         {product && (
           <helix-flex align="center" data-density="sm" gap="xs">

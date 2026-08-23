@@ -67,15 +67,15 @@ const REASONS = [
 export default function Page() {
   return (
     <>
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="lg">
+      <section data-band>
+        <helix-flex data-shell direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
             Thesis
           </helix-text>
-          <helix-text as="h1" class="sectionTitle measure">
+          <helix-text as="h1" data-measure data-section-title>
             Sovereignty is the goal. Abundance is the mechanism.
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Cheap intelligence and cheap energy are collapsing in cost at the same moment. That is
             not primarily a productivity story. The two things that historically forced a person or
             a nation to depend on a larger institution were the cost of thinking at scale and the
@@ -84,16 +84,16 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
               The stack
             </helix-text>
-            <helix-text as="h2" class="sectionTitle measure">
+            <helix-text as="h2" data-measure data-section-title>
               What makes anything sovereign, at any scale
             </helix-text>
-            <helix-text as="p" class="measure" tone="muted">
+            <helix-text as="p" data-measure tone="muted">
               Derived rather than invented. Each layer is something a subject either controls or
               rents, and the stage against each is what is actually built.
             </helix-text>
@@ -103,17 +103,10 @@ export default function Page() {
             {STACK.map((row) => {
               const vertical = VERTICALS.find((entry) => entry.href === row.vertical)
               return (
-                <helix-flex
-                  align="center"
-                  class="verticalRow"
-                  gap="md"
-                  justify="between"
-                  key={row.layer}
-                  wrap
-                >
+                <helix-flex align="center" data-row gap="md" justify="between" key={row.layer} wrap>
                   <helix-flex direction="column" gap="2xs">
                     <helix-flex align="center" data-density="sm" gap="sm" wrap>
-                      <helix-text as="h3" class="verticalName">
+                      <helix-text as="h3" data-row-name>
                         {row.layer}
                       </helix-text>
                       {vertical ? (
@@ -134,7 +127,7 @@ export default function Page() {
             })}
           </helix-flex>
 
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Energy is the missing floor, and every layer above it presumes power. It is also why the
             company is called Fusion: fuel from seawater, no import, no cartel, no grid dependency.
             The name states the destination rather than the position.
@@ -142,24 +135,24 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
               The ladder
             </helix-text>
-            <helix-text as="h2" class="sectionTitle measure">
+            <helix-text as="h2" data-measure data-section-title>
               One stack, shipped to progressively larger subjects
             </helix-text>
           </helix-flex>
 
           <helix-grid gap="xl" min="18rem">
             {LADDER.map((rung) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={rung.scale}>
+              <helix-flex data-substrate direction="column" gap="sm" key={rung.scale}>
                 <helix-text appearance="label" tone="subtle">
                   {rung.means}
                 </helix-text>
-                <helix-text as="h3" class="substrateName">
+                <helix-text as="h3" data-substrate-name>
                   {rung.scale}
                 </helix-text>
                 <helix-text as="p" tone="muted">
@@ -169,7 +162,7 @@ export default function Page() {
             ))}
           </helix-grid>
 
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             This is the growth path and the go-to-market sequence at once. It is not seven unrelated
             markets: it is one stack and one architectural commitment, sold to a larger subject each
             time.
@@ -177,30 +170,30 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band reveal">
-        <helix-flex class="shell statement" direction="column" gap="lg">
+      <section data-band data-reveal>
+        <helix-flex class={`statement`} data-shell direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
             The Sovereignty Constraint
           </helix-text>
-          <helix-text as="p" class="statementText">
+          <helix-text as="p" data-statement>
             No Fusion product may create a dependency its user cannot exit.
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             The user holds their own keys, data and hardware. Fusion may operate a control plane,
             never a chokepoint. Every product must be able to keep working if Fusion disappears.
           </helix-text>
         </helix-flex>
       </section>
 
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-text as="h2" class="sectionTitle measure">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
+          <helix-text as="h2" data-measure data-section-title>
             Why it is a law and not a value
           </helix-text>
           <helix-grid gap="xl" min="18rem">
             {REASONS.map((reason) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={reason.name}>
-                <helix-text as="h3" class="substrateName">
+              <helix-flex data-substrate direction="column" gap="sm" key={reason.name}>
+                <helix-text as="h3" data-substrate-name>
                   {reason.name}
                 </helix-text>
                 <helix-text as="p" tone="muted">
@@ -209,7 +202,7 @@ export default function Page() {
               </helix-flex>
             ))}
           </helix-grid>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             The cost is real and worth stating plainly: it forecloses the highest margin patterns in
             software, which are lock-in, the data moat and usage rent. What is left is services now,
             a hosted control plane sold as convenience later, and hardware margin eventually, which

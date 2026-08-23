@@ -32,15 +32,15 @@ export const metadata = {
 export default function Page() {
   return (
     <>
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="lg">
+      <section data-band>
+        <helix-flex data-shell direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
             Services
           </helix-text>
-          <helix-text as="h1" class="sectionTitle measure">
+          <helix-text as="h1" data-measure data-section-title>
             The part of this you can buy today
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Everything else on this site is being built. This is the work we take on now: interface
             and intelligence work the substrates make faster to do well. Three offers, in the order
             they usually happen. Most start with the audit, which is two weeks at a fixed price, and
@@ -49,8 +49,8 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="xl">
           {SERVICES.map((service) => (
             <helix-card appearance="outlined" class="serviceCard" key={service.name}>
               <helix-flex align="center" gap="md" justify="between" slot="header" wrap>
@@ -63,7 +63,7 @@ export default function Page() {
               </helix-flex>
 
               <helix-flex direction="column" gap="lg">
-                <helix-text as="p" class="measure" tone="muted">
+                <helix-text as="p" data-measure tone="muted">
                   {service.summary}
                 </helix-text>
 
@@ -126,15 +126,15 @@ export default function Page() {
           working out what they are committing to. The same commitment said as
           terms is the thing they actually wanted to know. The rule itself is on
           `/trust`, one link away. */}
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="lg">
+      <section data-band data-reveal>
+        <helix-flex data-shell direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
             How it runs
           </helix-text>
-          <helix-text as="h2" class="sectionTitle measure">
+          <helix-text as="h2" data-measure data-section-title>
             You are not acquiring a dependency
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Your repository, your license, your infrastructure. Handover is a condition of the work
             rather than a phase at the end of it, and the architecture decisions are written down
             with their trade-offs rather than just made. If an engagement would leave you unable to
@@ -148,12 +148,12 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band closing reveal">
-        <helix-flex align="center" class="shell" direction="column" gap="lg">
-          <helix-text as="h2" class="sectionTitle">
+      <section data-band data-closing data-reveal>
+        <helix-flex align="center" data-shell direction="column" gap="lg">
+          <helix-text as="h2" data-section-title>
             Start with the audit
           </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
+          <helix-text as="p" data-measure tone="muted">
             Two weeks and a fixed price, and the honest answer at the end of it may be that you do
             not need the larger engagement. Say plainly what you are trying to do and we will tell
             you whether we are the right people.

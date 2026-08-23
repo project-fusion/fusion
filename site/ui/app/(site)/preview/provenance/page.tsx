@@ -50,7 +50,7 @@ export default function Page() {
   return (
     <>
       <section className="pvHero">
-        <helix-flex class="shell" direction="column" gap="xl">
+        <helix-flex data-shell direction="column" gap="xl">
           <helix-text appearance="label" class="pvRail" tone="subtle">
             FUSION DEVELOPMENT GROUP
           </helix-text>
@@ -74,8 +74,8 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="none">
+      <section data-band>
+        <helix-flex data-shell direction="column" gap="none">
           {CLAIMS.map((claim) => (
             <helix-flex align="start" class="pvRule" gap="xl" key={claim.statement} wrap>
               <helix-flex class="pvClaimText" direction="column" gap="md">
@@ -99,8 +99,8 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="lg">
+      <section data-band>
+        <helix-flex data-shell direction="column" gap="lg">
           <helix-card appearance="outlined">
             <helix-flex align="center" gap="md" justify="between" wrap>
               <helix-flex direction="column" gap="2xs">
