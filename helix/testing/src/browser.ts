@@ -14,9 +14,16 @@
  * that passed while asserting the opposite of what ships. Here they are the
  * platform's own.
  *
- * Only what the specs actually use is implemented: five globals, five matchers
- * and a negation. A matcher that is missing throws by name rather than passing
- * quietly, so a spec reaching for one is a visible failure and not a green tick.
+ * Only what the specs actually use is implemented: a few globals, the matchers
+ * those specs reach for, and a negation. A matcher that is missing throws by
+ * name rather than passing quietly, so a spec reaching for one is a visible
+ * failure and not a green tick.
+ *
+ * The count that used to be here said five and the list had grown to fifteen,
+ * which is the shape of thing `check:matchers` exists to notice: it reads the
+ * specs and this file against each other, so the list moves whenever a spec
+ * reaches for something new, and a number written beside it is stale by the
+ * next one.
  */
 
 /**
@@ -199,6 +206,7 @@ interface Matchers {
   toBeUndefined: () => void
   toBeGreaterThan: (expected: number) => void
   toBeGreaterThanOrEqual: (expected: number) => void
+  toBeInstanceOf: (expected: abstract new (...args: never[]) => unknown) => void
   toBeLessThan: (expected: number) => void
   toBeLessThanOrEqual: (expected: number) => void
   toBeNull: () => void
@@ -245,6 +253,12 @@ const build = (actual: unknown, negated: boolean): Matchers => {
     toBeDefined: () => check(actual !== undefined, 'to be defined'),
     toBeGreaterThan: (expected) => check(number > expected, `to be greater than ${expected}`),
     toBeGreaterThanOrEqual: (expected) => check(number >= expected, `to be at least ${expected}`),
+    /* The class is named in the message, because the failure this replaces said
+       nothing: `toBeInstanceOf` was missing, so under happy-dom the spec passed
+       and in a real engine it was a `TypeError` on an undefined method, reported
+       as a failed assertion about a comparison that never happened. */
+    toBeInstanceOf: (expected) =>
+      check(actual instanceof expected, `to be an instance of ${expected.name}`),
     toBeLessThan: (expected) => check(number < expected, `to be less than ${expected}`),
     toBeLessThanOrEqual: (expected) => check(number <= expected, `to be at most ${expected}`),
     toBeNull: () => check(actual === null, 'to be null'),

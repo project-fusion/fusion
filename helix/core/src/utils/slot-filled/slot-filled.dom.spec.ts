@@ -65,7 +65,7 @@ describe('what counts as filled', () => {
    this asks "will anything render", where the tooltip's emptiness test asks "did
    the consumer provide anything", so a slot showing its fallback is filled.
    happy-dom returns nothing from a flattened `assignedNodes` where a browser
-   returns the fallback, which `tooling/testing/src/browser.ts` records in its own
+   returns the fallback, which `helix/testing/src/browser.ts` records in its own
    header as one of the gaps that makes the browser the stronger environment. An
    assertion here would be measuring happy-dom, and one written to pass under it
    would assert the opposite of what ships.
