@@ -20,10 +20,31 @@
  * - **Read and never declared** is a working feature nobody is told about, and
  *   one nothing stops a later edit from removing, since no document names it.
  *
- * Private properties (`--_name`) are excluded: they are a component talking to
- * itself and are nobody's API. Design tokens (`--helix-name`) are excluded too,
- * because `check:tokens` already owns them and a component reading one is not
- * publishing a hook.
+ * Design tokens (`--helix-name`) are excluded, because `check:tokens` already
+ * owns them and a component reading one is not publishing a hook.
+ *
+ * **Private properties (`--_name`) used to be excluded outright, and that was
+ * the hole.** The reasoning was that they are a component talking to itself and
+ * so nobody's API, which is true of what they promise and says nothing about
+ * whether anyone answers. `--_toggle-height` was written by Toggle Group and
+ * read by nothing at all: the item it was meant to size used a literal
+ * `block-size: 100%` in its own sheet, and the property sat there through every
+ * run of this check because the exemption was on the name rather than on the
+ * question. A private property with no reader is the same broken promise as a
+ * public one, and it is harder to see, because no API page lists it.
+ *
+ * So the third rule below: a private property declared in a component
+ * stylesheet and read by nothing in its own package is dead. Package rather
+ * than file, because that is where the underscore's contract lives: the value
+ * never leaves the package, and Tabs sets `--_tab-radius` on its root for the
+ * tab's own shadow root to read, one file over.
+ *
+ * Two things are deliberately outside it. `helix/styles` is excluded because
+ * its primitives are a scale, and `check:tokens` says in as many words that a
+ * rung with no reader is fine: `--_helix-neutral-500` is not dead, it is a step
+ * nothing has needed yet. And `.examples/` is excluded because a base example's
+ * gray palette is emitted whole for every family by `build-base-examples.mjs`,
+ * so a family that uses four of the seven is not a fault in the example.
  *
  * Run with `bun run check:hooks` (also part of `bun run verify`).
  */
@@ -55,8 +76,24 @@ const isSource = (path) => !path.endsWith('.css.ts') && !path.includes('.spec.')
 
 const ours = (name) => !name.startsWith('--_') && !name.startsWith('--helix-')
 
+/* Where the private rule applies: the component tiers, and not the base
+   examples inside them. See the header for why `helix/styles` is not here. */
+const OWNS_PRIVATE = (path) => !path.startsWith('helix/styles/') && !path.includes('.examples/')
+
+/** The package a file belongs to, which is how far a private property travels. */
+const packageOf = (path) => path.split('/').slice(0, 2).join('/')
+
+/* A comment quoting `var(--_thing)` is prose about a reader, not one. The
+   public halves above scan the file whole and have got away with it; this rule
+   cannot, because a property's own explanation sits directly above it and
+   routinely spells out the rule that was supposed to read it. */
+const withoutComments = (text) => text.replace(/\/\*[\s\S]*?\*\//g, '')
+
 const declared = new Map()
 const read = new Map()
+/* `--_name` -> package -> the file that declared it, and the packages that read it. */
+const privateDeclared = new Map()
+const privateRead = new Map()
 /* Prefixes read through an interpolation, so `--chart-series-7` counts as read
    because something reads `var(--chart-series-${…})`. */
 const families = new Map()
@@ -74,6 +111,23 @@ for (const tier of TIERS) {
         if (ours(name) && !read.has(name)) {
           read.set(name, path)
         }
+      }
+    }
+    if (OWNS_PRIVATE(path)) {
+      const source = withoutComments(text)
+      if (extname(path) === '.css') {
+        for (const [, name] of source.matchAll(/^\s*(--_[a-z0-9-]+)\s*:/gm)) {
+          const where = privateDeclared.get(name) ?? new Map()
+          if (!where.has(packageOf(path))) {
+            where.set(packageOf(path), path)
+          }
+          privateDeclared.set(name, where)
+        }
+      }
+      for (const [, name] of source.matchAll(/var\(\s*(--_[a-z0-9-]+)/g)) {
+        const where = privateRead.get(name) ?? new Set()
+        where.add(packageOf(path))
+        privateRead.set(name, where)
       }
     }
     /* A `style="--a: var(--b)"` in a template is a read too, and missing it
@@ -128,6 +182,17 @@ for (const [name, path] of [...read].sort()) {
         '`@cssproperty`. A hook that works and is not published is one a later ' +
         'edit removes without knowing it was API.',
     )
+  }
+}
+
+for (const [name, where] of [...privateDeclared].sort()) {
+  for (const [pkg, path] of where) {
+    if (!privateRead.get(name)?.has(pkg)) {
+      problems.push(
+        `${path}: declares \`${name}\` and nothing in ${pkg} reads it. A private ` +
+          'property is a component talking to itself, and this one is talking to nobody.',
+      )
+    }
   }
 }
 

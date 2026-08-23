@@ -82,6 +82,22 @@ const FACES: Face[] = [
   { family: 'Source Serif 4', google: 'Source+Serif+4:wght@400;500;600', label: 'Source Serif' },
 ]
 
+/**
+ * The same faces, with a different word for choosing none.
+ *
+ * `--helix-font-display` is emitted as `display ?? body`, so leaving this alone
+ * does not fall back to the system, it follows whatever the body face is: pick
+ * Fraunces for the body and the headings are Fraunces too. Sharing `FACES` here
+ * meant the resting option read `System default`, which is true only while the
+ * body face is also unset and wrong the moment it is not. `Same as body` is
+ * true in both cases, the body face being the system default when nobody has
+ * chosen one.
+ */
+const DISPLAY_FACES: Face[] = [
+  { family: '', label: 'Same as body' },
+  ...FACES.filter((face) => face.family !== ''),
+]
+
 const MONO_FACES: Face[] = [
   { family: '', label: 'System mono' },
   { family: 'JetBrains Mono', google: 'JetBrains+Mono:wght@400;500', label: 'JetBrains Mono' },
@@ -542,10 +558,17 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                 chooses; the size scale, the weights, the leading and the
                 tracking are a system rather than a choice and are still fixed,
                 which is the honest state of it. */}
+            {/* **The placeholder names the resting state, it does not invite a
+                choice.** Select shows the chosen options' words or its
+                placeholder, and an option whose value is the empty string
+                contributes no word, so all three of these read `Choose` while
+                sitting on a real, named answer. The option stays in each list so
+                there is a way back to it, and both states now read alike. */}
             <helix-select
               label="Body face"
               name="body-face"
               onhelix-change={(event) => setBodyFace(event.detail.value)}
+              placeholder="System default"
               value={bodyFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -561,10 +584,11 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               label="Display face"
               name="display-face"
               onhelix-change={(event) => setDisplayFace(event.detail.value)}
+              placeholder="Same as body"
               value={displayFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {FACES.map((face) => (
+              {DISPLAY_FACES.map((face) => (
                 <helix-option key={face.label} value={face.family}>
                   {face.label}
                 </helix-option>
@@ -575,6 +599,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               label="Mono face"
               name="mono-face"
               onhelix-change={(event) => setMonoFace(event.detail.value)}
+              placeholder="System mono"
               value={monoFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
