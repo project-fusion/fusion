@@ -3,6 +3,7 @@
 import type { HelixCommand } from '@helix-io/web'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import styles from './chrome.module.css'
 
 /**
  * Everywhere the palette can take a reader.
@@ -193,7 +194,7 @@ export function SiteFind({
       {trigger && (
         <helix-button
           appearance="outlined"
-          class="siteFind"
+          class={styles.siteFind}
           onClick={() => setOpen(true)}
           slot={slot}
         >
@@ -209,7 +210,7 @@ export function SiteFind({
           a controlled property that is not answered is a control that goes
           quiet: both events are bound. */}
       <helix-command
-        class="siteCommand"
+        class={styles.siteCommand}
         hotkey="mod+k"
         label="Search"
         onhelix-close={() => {
@@ -258,7 +259,7 @@ export function SiteFind({
             The fourth is the second destination, which is why it is here rather
             than in the component: only this knows that a component row's
             alternate is its sandbox. */}
-        <div className="siteCommandHints" slot="footer">
+        <div className={styles.siteCommandHints} slot="footer">
           <span>
             <helix-kbd>↑</helix-kbd>
             <helix-kbd>↓</helix-kbd>
@@ -278,7 +279,7 @@ export function SiteFind({
             Close
           </span>
         </div>
-        <helix-text appearance="caption" class="siteCommandMark" slot="footer">
+        <helix-text appearance="caption" class={styles.siteCommandMark} slot="footer">
           Fusion
         </helix-text>
       </helix-command>

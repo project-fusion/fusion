@@ -1,0 +1,224 @@
+/* The shape both galleries wear: a hero over a filter bar over a grid.
+ *
+ * Two consumers, `component-browser` and `insight-browser`, and nothing else on
+ * the site. That is the whole reason this is one module rather than two: the
+ * point of the shape is that `/helix` and `/insights` are not two different
+ * pages to learn, and a copy in each would be free to drift.
+ *
+ * What is *not* here is either gallery's texture. The lattice belongs to Helix
+ * and the surface fill to Insights, and both are in their own modules.
+ */
+
+/* =================================================== component art ======= */
+
+/* A family's whole card is one link to its API page.
+ *
+ * `data-card` in the base layer does the looking-like-a-link-around-a-card
+ * part: the radius, the hover lift, the focus ring tracing the card's own
+ * corner. What it cannot know is that this particular link is a grid item, and
+ * that the row wants square bottoms.
+ *
+ * Both halves are needed. The anchor stretches because `helix-grid` stretches
+ * its items, and the card then has to be told to fill the anchor, because a
+ * card sizes to its content and would otherwise leave the link standing empty
+ * below it. Neither declaration does anything outside a stretched context:
+ * against an auto-height parent a `100%` block-size resolves to `auto`, which
+ * is why this is safe to state unconditionally rather than only in the grid. */
+/* ====================================================== design hero ===== */
+
+/* The gallery lines up with the masthead, not with the prose column.
+ *
+ * `--site-inset` is a clamp that opens to seven rem on a wide screen, which is
+ * right for a column of text: a measure wants air beside it. The masthead
+ * already opts out of it for the opposite reason, that its contents are a mark
+ * at one edge and controls at the other, and pushing those inward leaves the
+ * bar looking loosely packed. A grid of sixty-five cards is the same kind of
+ * thing: it is furniture running the width of the window, not a paragraph.
+ *
+ * Measured before this, at 1600: the wordmark sat at 48 and the first card at
+ * 96, so the two edges a reader sees stacked down the left of the page
+ * disagreed by 48 pixels. They now both read `space-2xl`, at every width, which
+ * is the same declaration the header makes rather than a number copied from it.
+ *
+ * Set as the variable rather than as `padding-inline`, because `.shell` and
+ * `.pageHeroInner` already read it. Overriding the input leaves one rule
+ * deciding the inset instead of three restating it. */
+.pageHero,
+.filterBar,
+.gridBand {
+  --site-inset: var(--helix-space-2xl);
+}
+
+/* The page's own color, and it runs up behind the masthead.
+ *
+ * The header is `position: sticky`, so it takes a row in flow and the hero
+ * would otherwise begin under it, leaving a white strip above the brand. The
+ * negative start margin pulls the band up by exactly the header's own height
+ * and the padding puts the content back where it was, so the blue reaches the
+ * top of the window and nothing inside the hero moves. It stays under the bar
+ * because the header sets `--helix-layer-sticky` and this sets no layer at all.
+ *
+ * A height rather than only padding. Left to `--site-band` it came out near 760
+ * pixels, which is most of a laptop screen spent on a heading and a text box
+ * before a single component is visible. 28rem is 448.
+ *
+ * It replaces the shared `VerticalPage` header on the two gallery routes. The
+ * three prose verticals keep the left-aligned title, because they are pages of
+ * text and this is the front of a gallery: the search is the reason to center
+ * it, and a centered column with nothing to type into is just a wide heading.
+ *
+ * **Shared, because two galleries now wear it.** `/helix` and `/insights` are
+ * the same page shape, a hero over a filter bar over a grid, and the part that
+ * makes the hero run up behind the sticky masthead is structure rather than
+ * decoration. What stays Design's is the lattice and the shines in the rule
+ * below, which are a fact about a page whose cards are drawn on that same
+ * field. Insights has no drawings, so it takes the structure and none of the
+ * texture. */
+.pageHero {
+  align-items: center;
+  background-color: var(--helix-color-background);
+  display: flex;
+  /* The lattice is a pseudo-element rather than a background on the section,
+     because it has to be masked and a mask on the section would take the
+     heading and the search with it. `isolation` keeps the negative z-index
+     from escaping to whatever is painted behind the page. */
+  isolation: isolate;
+  position: relative;
+  /* The header's own height plus the hairline under it. `--helix-size-header`
+     is the bar, not the box: the border is a further pixel of flow, so pulling
+     up by the token alone left a one pixel band of page above the hero. It is
+     invisible while the two are the same color and would not stay invisible if
+     the hero ever takes one of its own again. */
+  margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
+  min-block-size: 28rem;
+  padding-block: calc(var(--helix-space-3xl) + var(--helix-size-header)) var(--helix-space-3xl);
+}
+
+.pageHeroInner {
+  inline-size: 100%;
+  position: relative;
+  z-index: var(--helix-layer-raised);
+  margin-inline: auto;
+  max-inline-size: 46rem;
+  padding-inline: var(--site-inset);
+  text-align: center;
+}
+
+/* Held off full strength, the way the lede is everywhere else on the site. */
+.pageHeroLede {
+  color: var(--helix-color-foreground-muted);
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  text-wrap: balance;
+}
+
+/* Exactly as wide as the pair of buttons under it.
+ *
+ * Two buttons at `--helix-size-button` welded by a group overlap by one border,
+ * so the group is twice the button less that pixel. Stated as the same
+ * arithmetic rather than as a round number, so the two stay equal if the button
+ * size ever moves.
+ *
+ * `text-align: start` because the hero centers its column and `text-align`
+ * inherits straight through the shadow boundary into the field: the placeholder
+ * and anything typed came out centered, which is not how a search box behaves
+ * anywhere. Centring is a property of the layout here, not of the control. */
+.heroSearch {
+  inline-size: 100%;
+  max-inline-size: calc(var(--helix-size-button) * 2 - var(--helix-border-thin));
+  text-align: start;
+}
+
+/* Chrome, not a form. The label is carried and not shown.
+ *
+ * A search box in a hero and a filter bar over a grid are not fields in a form:
+ * nobody is filling them in and submitting them, and a visible caption over
+ * each one labels furniture. So neither shows a label.
+ *
+ * **Neither loses one, either.** Delete the `label` attribute and the control
+ * has no accessible name at all: a screen reader reaches the search and says
+ * "edit text, blank", and the filter group announces as an unnamed set of
+ * radios. Helix offers no `label-placement`, so the label is hidden the way a
+ * visually-hidden label is always hidden. It stays in the accessibility tree,
+ * takes no space and draws nothing. The search's placeholder repeats it for
+ * anyone reading the screen, and the filter's toggles say what they are.
+ *
+ * A class rather than an element selector, so this is a decision taken per
+ * control. A form on this site should still show its labels. */
+/* The search sits on the hero's own band, so it takes the page's colour rather
+ * than the recessed one.
+ *
+ * `Input` fills with `--helix-color-surface-sunken`, which is the right guess
+ * and is a guess about its ground: sunken is one step *below the page*, and on
+ * a band that is already one step above it the control came out a single value
+ * from what it sits on and stopped reading as a field. Against the page colour
+ * it is a hole in the band in light mode and in dark alike, which is what a
+ * text input should look like.
+ *
+ * Through the component's own hook, which `check:grounds` exists to guarantee
+ * every component publishes. What is *not* systematic is a control noticing its
+ * ground by itself: `Button` solved that by filling with a percentage of the
+ * foreground, which composites over a page, a card or a panel and is right on
+ * all three, and the rest of the controls still name absolute tokens. Filed as 154. */
+.heroSearch {
+  --input-background-color: var(--helix-color-background);
+}
+
+.chromeControl::part(label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* The bar between the hero and the grid, running the full window.
+ *
+ * Full bleed so the rule under it reaches both edges: inset, it read as a stray
+ * line under the toggles rather than as the seam between the hero and the grid.
+ * The contents keep the page's inset through an inner `.shell`, so the toggles
+ * still line up with the first column of cards.
+ *
+ * The count is `aria-live="polite"`, because filtering is a change nothing else
+ * announces: a reader who cannot see the grid shrink otherwise has no
+ * confirmation that typing did anything. */
+.filterBar {
+  border-block: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+.filterBarInner {
+  margin-inline: auto;
+  padding-block: var(--helix-space-sm);
+}
+
+/* Wide enough for the longest option and no wider. Left to size themselves the
+   two selects came out at different widths, which reads as two unrelated
+   controls rather than as a pair. */
+.filterControl {
+  inline-size: 12rem;
+}
+
+/* Present to a screen reader, absent to everything else.
+ *
+ * The same treatment `chromeControl` gives a label it does not show, for text
+ * that has no control to hang off: the filter count, which has to be announced
+ * and does not have to be read. */
+.visuallyHidden {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Air around the grid, on both block sides.
+ *
+ * It sat flush against the filter bar's own hairline above and the footer
+ * below, so the first row read as another row of the bar and the last had
+ * nothing under it. `space-2xl` is the same 48 the grid uses between its own
+ * cards, which is what makes the band read as one field of cards rather than as
+ * a grid that happens to start somewhere. */
+.gridBand {
+  padding-block: var(--helix-space-2xl);
+}

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { getFamilies } from '../../lib/catalog'
 import { INSIGHTS } from '../../lib/insights'
+import styles from '../chrome.module.css'
 import { SiteNav } from '../site-nav'
 
 /**
@@ -46,11 +47,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       />
       <main style={{ viewTransitionName: 'site-content' }}>{children}</main>
 
-      <footer className="siteFooter">
+      <footer className={styles.siteFooter}>
         <helix-flex align="center" class="shell" gap="md" justify="between" wrap>
           <helix-flex align="center" gap="xs">
             <helix-icon
-              className="fusionLogo"
+              className={styles.fusionLogo}
               label="Fusion"
               name="fusion"
               style={{ '--icon-size': '1.25rem' }}

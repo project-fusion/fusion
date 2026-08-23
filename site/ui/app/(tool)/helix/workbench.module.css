@@ -253,3 +253,23 @@
 .dialogWarning {
   color: var(--helix-color-warning);
 }
+
+/* The row reveals it, and only `opacity` is keyed there.
+ *
+ * **A document rule reaching in from `helix-tree-item` is one `check:overruled`
+ * fails on, and it is right to**: it wins whatever the specificity and whatever
+ * the layer, so a property the component sets there is dead. `color` was, which
+ * is why an earlier version of this rule had to go. `opacity` is not set
+ * anywhere in `tree-item.css`, on the host or on slotted content, so keying the
+ * reveal on it collides with nothing and the check stays quiet.
+ *
+ * `:focus-within` beside `:hover` is not decoration. Gated on hover alone the
+ * link is a control a keyboard can focus and never see, which is worse than one
+ * a keyboard cannot reach at all. */
+/* Descendant and not a child combinator: the link sits inside a `helix-tooltip`
+   now, the way the experimental flask beside it does, so the row's direct child
+   is the tooltip rather than the mark. */
+helix-tree-item:hover .docsJump,
+helix-tree-item:focus-within .docsJump {
+  opacity: 1;
+}

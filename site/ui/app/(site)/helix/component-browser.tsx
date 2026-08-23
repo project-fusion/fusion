@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import type { stageAppearance } from '../../verticals'
+import browser from '../browser.module.css'
 import styles from './gallery.module.css'
 
 /**
@@ -289,7 +290,7 @@ export function ComponentBrowser({
             />
           ))}
         </div>
-        <helix-flex align="center" className="pageHeroInner" direction="column" gap="lg">
+        <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
           {/* Eyebrow, title and lede are one block, and the lede was not in it.
            *
            * It sat as a sibling of the block in a column gapped `lg`, so the
@@ -316,12 +317,12 @@ export function ComponentBrowser({
               <helix-tag tone={stageTone}>{stage}</helix-tag>
             </helix-flex>
             <helix-text as="h1">{title}</helix-text>
-            <helix-text as="p" className="pageHeroLede">
+            <helix-text as="p" className={browser.pageHeroLede}>
               {lede}
             </helix-text>
           </helix-flex>
           <helix-input
-            className="heroSearch chromeControl"
+            className={`${browser.heroSearch} ${browser.chromeControl}`}
             default-value={initialQuery}
             label="Search components"
             onhelix-input={(event) => {
@@ -368,13 +369,13 @@ export function ComponentBrowser({
         </helix-flex>
       </section>
 
-      <div className="filterBar">
+      <div className={browser.filterBar}>
         {/* Dense by nature, which is the rule app header and toolbar already
             follow: a bar of filters over a grid is chrome, and a control in it
             takes its height from the region rather than asking for one. */}
         <helix-flex
           align="center"
-          className="filterBarInner shell"
+          className={`${browser.filterBarInner} shell`}
           data-density="sm"
           gap="md"
           justify="between"
@@ -382,7 +383,7 @@ export function ComponentBrowser({
         >
           <helix-flex gap="sm" wrap>
             <helix-select
-              className="chromeControl filterControl"
+              className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={category}
               label="Category"
               onhelix-change={(event) => {
@@ -411,7 +412,7 @@ export function ComponentBrowser({
             </helix-select>
             {statuses.length > 1 && (
               <helix-select
-                className="chromeControl filterControl"
+                className={`${browser.chromeControl} ${browser.filterControl}`}
                 default-value={status}
                 label="Status"
                 onhelix-change={(event) => {
@@ -438,11 +439,11 @@ export function ComponentBrowser({
                 shrink needs to be told; a reader who can see it is being told
                 twice. `chromeControl` is the same visually-hidden treatment the
                 labels take. */}
-            <helix-text aria-live="polite" className="visuallyHidden">
+            <helix-text aria-live="polite" className={browser.visuallyHidden}>
               {shown} of {index.length} components
             </helix-text>
             <helix-select
-              className="chromeControl filterControl"
+              className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={order}
               label="Sort"
               onhelix-change={(event) => sortBy(event.detail.value)}
@@ -471,7 +472,7 @@ export function ComponentBrowser({
         </style>
       )}
 
-      <div className="gridBand shell">
+      <div className={`${browser.gridBand} shell`}>
         {shown === 0 ? (
           <helix-empty>
             <helix-text as="h2" slot="heading">

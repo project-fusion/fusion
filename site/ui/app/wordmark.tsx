@@ -1,3 +1,4 @@
+import styles from './chrome.module.css'
 /**
  * The Fusion lockup: the mark and the name, set together.
  *
@@ -28,8 +29,8 @@
 export function Wordmark({ size = '1.5rem' }: { size?: string }) {
   return (
     <helix-flex align="center" gap="xs" inline>
-      <helix-icon className="fusionLogo" name="fusion" style={{ '--icon-size': size }} />
-      <helix-text class="wordmark">Fusion</helix-text>
+      <helix-icon className={styles.fusionLogo} name="fusion" style={{ '--icon-size': size }} />
+      <helix-text class={styles.wordmark}>Fusion</helix-text>
     </helix-flex>
   )
 }

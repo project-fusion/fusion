@@ -40,7 +40,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 7 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 3 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 4 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 129 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 128 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 80 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 5 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
@@ -111,8 +111,8 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 127 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 128 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 81 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 64 |
-| `--helix-space-xl` | `var(--_helix-scale-8)` | 42 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 63 |
+| `--helix-space-xl` | `var(--_helix-scale-8)` | 41 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 43 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 20 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
@@ -190,7 +190,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 130 |
+| `--helix-border-thin` | `1px` | 129 |
 | `--helix-border-thick` | `2px` | 31 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 1 |
 | `--helix-border-floating` | `0` | 10 |
@@ -279,7 +279,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-md` | `calc(1.5rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-loader-sm` | `calc(1rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 4 |
-| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 22 |
+| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 21 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 45 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 24 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 10 |

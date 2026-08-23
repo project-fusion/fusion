@@ -621,3 +621,31 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.heroInstall code {
+  color: var(--helix-color-foreground-muted);
+}
+
+.heroInstall helix-copy-button {
+  /* Sized to the line, not to a control.
+   *
+   * `IconButton` is `--helix-size-control` by default, which is 40, and a 40
+   * control inside a chip built for 13px type sets the height of the whole
+   * thing: measured at 50 for a line whose text is 20. Through the component's
+   * own `--icon-button-size`, matched to the row's own line box, so the command
+   * is what the box is sized to and the button is something inside it.
+   *
+   * **Floored at 24, because tying a control to a type scale can shrink it out
+   * of being pressable.** `text-sm` times 1.8 is 23.4, which rounds to 23 and
+   * is a pixel under the 24 minimum a target is meant to hold. The `max` keeps
+   * the size following the ramp everywhere the ramp is large enough and stops
+   * it following the ramp down past a floor that is not about type at all.
+   *
+   * The pull-back is separate and only handles the inline axis: the control's
+   * padding is hit area rather than space, so left alone the gap on the right
+   * came out larger than the inset on the left. */
+  --icon-button-radii: var(--helix-radii-xs);
+  --icon-button-size: max(1.5rem, calc(var(--helix-text-sm) * 1.8));
+
+  margin-inline-end: calc(var(--helix-space-2xs) * -1);
+}

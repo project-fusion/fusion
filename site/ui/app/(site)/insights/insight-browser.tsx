@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useState } from 'react'
 import type { Insight } from '../../../lib/insights'
+import browser from '../browser.module.css'
 import styles from './insights.module.css'
 
 /**
@@ -148,11 +149,11 @@ export function InsightBrowser({
   return (
     <>
       <section className={`pageHero ${styles.insightsHero}`}>
-        <helix-flex align="center" className="pageHeroInner" direction="column" gap="lg">
+        <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
           <helix-flex align="center" data-density="sm" direction="column" gap="sm">
             <helix-tag>Fusion Development Group</helix-tag>
             <helix-text as="h1">Insights</helix-text>
-            <helix-text as="p" className="pageHeroLede">
+            <helix-text as="p" className={browser.pageHeroLede}>
               The arguments behind what we build, written where they can be checked.
             </helix-text>
           </helix-flex>
@@ -165,7 +166,7 @@ export function InsightBrowser({
               one line that says what the page is, to save a keystroke nobody
               was about to make. */}
           <helix-input
-            className="heroSearch chromeControl"
+            className={`${browser.heroSearch} ${browser.chromeControl}`}
             default-value={initialQuery}
             label="Search insights"
             onhelix-input={(event) => {
@@ -180,13 +181,13 @@ export function InsightBrowser({
         </helix-flex>
       </section>
 
-      <div className="filterBar">
+      <div className={browser.filterBar}>
         {/* Dense by nature, which is the rule app header and toolbar already
             follow: a bar of filters over a grid is chrome, and a control in it
             takes its height from the region rather than asking for one. */}
         <helix-flex
           align="center"
-          className="filterBarInner shell"
+          className={`${browser.filterBarInner} shell`}
           data-density="sm"
           gap="md"
           justify="between"
@@ -194,7 +195,7 @@ export function InsightBrowser({
         >
           <helix-flex gap="sm" wrap>
             <helix-select
-              className="chromeControl filterControl"
+              className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={topic}
               label="Topic"
               onhelix-change={(event) => {
@@ -218,7 +219,7 @@ export function InsightBrowser({
             </helix-select>
             {kinds.length > 1 && (
               <helix-select
-                className="chromeControl filterControl"
+                className={`${browser.chromeControl} ${browser.filterControl}`}
                 default-value={kind}
                 label="Kind"
                 onhelix-change={(event) => {
@@ -243,11 +244,11 @@ export function InsightBrowser({
             {/* The count is announced and not shown. Filtering is a change
                 nothing else reports, so a reader who cannot see the grid shrink
                 needs to be told; a reader who can see it is being told twice. */}
-            <helix-text aria-live="polite" className="visuallyHidden">
+            <helix-text aria-live="polite" className={browser.visuallyHidden}>
               {shown} of {index.length} posts
             </helix-text>
             <helix-select
-              className="chromeControl filterControl"
+              className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={order}
               label="Sort"
               onhelix-change={(event) => sortBy(event.detail.value)}
@@ -276,7 +277,7 @@ export function InsightBrowser({
         </style>
       )}
 
-      <div className="gridBand shell">
+      <div className={`${browser.gridBand} shell`}>
         {shown === 0 ? (
           <helix-empty>
             <helix-text as="h2" slot="heading">

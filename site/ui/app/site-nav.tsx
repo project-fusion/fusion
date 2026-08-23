@@ -4,6 +4,7 @@ import type { HelixAppHeader, HelixMegamenu } from '@helix-io/web'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import styles from './chrome.module.css'
 import { PreferencesDrawer } from './preferences'
 import { PRODUCTS } from './products'
 import { type Findable, SiteFind } from './site-find'
@@ -152,7 +153,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           unmounted, it would vanish on the frame the panel began collapsing,
           because nothing transitions out of the DOM. */}
       <div
-        className="navGlass"
+        className={styles.navGlass}
         data-lit={scrolled || panelDown ? '' : undefined}
         style={panelDown && panelBottom ? { blockSize: `${panelBottom}px` } : undefined}
       />

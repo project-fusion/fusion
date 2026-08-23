@@ -1,0 +1,303 @@
+/* The site's own furniture: the masthead's glass, the command palette, the
+ * wordmark and the footer.
+ *
+ * Colocated with the components that apply it. Every page renders these, which
+ * is an argument for loading it everywhere and not an argument for leaving the
+ * names global: a class the layout applies is still a class one component owns,
+ * and scoping it means nothing else can reach in and move it.
+ */
+
+/* The one glass. Sized by the app, which is the only place that knows both the
+ * bar's height and the panel's.
+ *
+ * `block-size` rather than a clip, because the sheet is a bare fixed box with
+ * no content to reflow: growing it is what the panel's reveal looks like from
+ * behind, and it lands on the panel's own bottom edge rather than approaching
+ * it. At rest it is exactly the bar.
+ *
+ * Hidden rather than only transparent when neither job is on, so an idle page
+ * is not running a full-screen blur behind nothing. Discrete, so it flips at
+ * the end of the fade rather than the start. */
+.navGlass {
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+  background-color: var(--helix-material-translucent);
+  block-size: var(--helix-size-header);
+  inset-block-start: 0;
+  inset-inline: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transition:
+    block-size var(--helix-duration-slow) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    visibility var(--helix-duration-normal) allow-discrete;
+  visibility: hidden;
+  z-index: var(--helix-layer-raised);
+}
+
+.navGlass[data-lit] {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navGlass {
+    transition: none;
+  }
+}
+
+/* Full bleed, and a rule that is always there.
+ *
+ * The component centers its row in a text column and keeps its hairline
+ * transparent until the page scrolls under it, both right for a marketing page
+ * and neither right here: a tool runs to the window, and nothing under this
+ * header scrolls the document, so the border would never arrive. Set from the
+ * outer tree on the host, which the cascade lets win in both scroll states. */
+/* The mark takes the brand.
+ *
+ * Its gradients were declared against `--logo-color-*` with gray literals as
+ * fallbacks, exactly so a theme could retint it without the SVG being touched.
+ * `primary` is the brand blue and follows the color mode on its own.
+ *
+ * It was briefly the foreground, on a misreading: the mark is not what needed
+ * to change color, the wordmark beside it was. The mark is the one thing here
+ * that carries the brand without words, so it is the one thing that keeps the
+ * brand's color. */
+.fusionLogo {
+  --logo-color-from: var(--helix-color-primary);
+  --logo-color-mid: var(--helix-color-primary-hover);
+  --logo-color-to: var(--helix-color-primary-active);
+}
+
+/* ============================================================ footer ===== */
+
+/* The same inset as the masthead, for the same reason.
+ *
+ * Header and footer are the two pieces of chrome bracketing every page, and a
+ * reader sees their left edges as one line whether or not they are on screen
+ * together. The footer took `--site-inset`, which is a clamp opening to seven
+ * rem, while the header is pinned to `space-2xl`: at 1600 that put the wordmark
+ * at 48 and the copyright at 96, and the layout's own note claimed they started
+ * on the same line.
+ *
+ * The content column keeps the clamp. That is the split: chrome sits at a fixed
+ * inset because it runs the width of the window, and a column of prose gets air
+ * beside it because it is a measure. */
+/* No rule above it, and the space is what separates it.
+ *
+ * The hairline was the second boundary in a row on the landing page, where the
+ * closing band's own ground already ends the page and the footer's line sat a
+ * few pixels under it. Removing the band's rule left this one doing the same
+ * job twice over.
+ *
+ * On every other route it was drawing an edge nobody asked for. A footer is a
+ * wordmark and two quiet lines after `space-xl` of air, at a weight and a size
+ * that already read as chrome rather than as content; a rule across the window
+ * announces it, which is the opposite of what the last thing on a page should
+ * do. What separates it is the space above it and the fact that nothing in it
+ * is the page. */
+.siteFooter {
+  --site-inset: var(--helix-space-2xl);
+
+  padding-block: var(--helix-space-xl);
+}
+
+/* ============================================================ chrome ===== */
+
+/* Mixed case, and large enough to be worth setting.
+ *
+ * It was capitals, on the reasoning that a wordmark is read as a shape rather
+ * than as letters. That reasoning is fine and it was defeating the whole point
+ * here: everything that identifies Funnel Display lives in its lowercase, the
+ * angled cut on the `F` and the wide round `u`, and `text-transform: uppercase`
+ * throws all of it away. Set side by side in caps, Funnel Display and Geist are
+ * the same picture. That is what "the display face is not being applied" turned
+ * out to be, twice: it was applied, the weight axis drives, and there was
+ * nothing left of the face to see.
+ *
+ * Size is the other half. Below about twenty pixels the two faces are within a
+ * hair of each other whatever the case, so this sits just under the mark beside
+ * it: the smallest setting where the face is still identifiable, and a shade
+ * shorter than the mark so the two read as a lockup rather than as two things
+ * of equal weight.
+ *
+ * Not on a `Text` appearance, because there is no ramp step here and there
+ * should not be: this is a brand lockup rather than a size in the type scale,
+ * and a `heading` that happened to match would be coupled to it by accident. */
+.wordmark::part(text) {
+  /* Full strength, black on a white page and white on a black one.
+     The lockup sits inside `<a data-link="quiet">`, which paints navigation in
+     the muted foreground so that a column of rows does not shout, and the
+     wordmark was inheriting it: measured at oklch(0.5), a mid gray, in both
+     modes. Right for a nav row and wrong for the brand's own name, which is
+     the one piece of text on the page that is a thing rather than a label. */
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-display);
+  font-size: var(--site-text-wordmark);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+}
+
+/* ---------------------------------------------------------- palette ----- */
+
+/* **The search in the masthead, and the space between its two halves.**
+ *
+ * A button's `gap` is one number for everything it holds, which is right when
+ * the parts are a mark and a word. Here the last part is a *key*, and a key
+ * pressed to open the thing is not the next word in the label: at the button's
+ * own gap it read as "Search ⌘K" in one breath. The margin is on the key alone,
+ * so the magnifier stays tucked against the word it belongs to.
+ *
+ * `auto` rather than a length would push it to the far edge, which is what a
+ * toolbar does with a trailing control and is wrong for a button: the two would
+ * stop being one object as soon as the button was wider than its content. */
+/* **The same glass as the panel it opens.**
+ *
+ * A trigger and the thing it summons reading as one material is what makes the
+ * palette feel like it came out of the button rather than over it. The tokens
+ * are the panel's, not a second set tuned by eye: `translucent` at the same 72%
+ * and the same blur, so if the material ever moves both move together.
+ *
+ * `--button-background-color` is `Button`'s own hook, so this is a fill the
+ * component was built to take rather than a document rule reaching past it. The
+ * blur has to be set directly, there being no hook for a filter and no reason
+ * for one: it is a property of this surface rather than of buttons. */
+.siteFind {
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+
+  --button-background-color: var(--helix-material-translucent);
+}
+
+.siteFind helix-kbd {
+  margin-inline-start: var(--helix-space-sm);
+}
+
+/* **The palette, dressed as ours.**
+ *
+ * The component already decides everything about how a palette behaves and most
+ * of how it looks: pinned near the top so the field does not walk up the screen
+ * as the list narrows, one text column down the panel, rows at a reading inset.
+ * What is left for the site is the part a design system should not decide for
+ * anybody, which is what the surface says about whose product it is.
+ *
+ * Through `::part()`, which is the published door into a component and the one
+ * mechanism a document rule may use on one. Everything here is a departure the
+ * component invited: the four parts it forwards, and the two hooks it names. */
+/* **A lighter wash than a modal's, which is what makes the glass legible.**
+ *
+ * `Dialog` scrims at 64% black because a modal replaces the page. A palette is
+ * summoned over a page the reader is still in, and at 64% the blur had a
+ * near-uniform dark field to sample rather than the content: the material was
+ * computed and invisible. Mixed down to 45% of the overlay token, the page is
+ * still there to be blurred. The alpha is what matters and `overlay` alone did
+ * not help: it is a lighter black at the same 0.64, so the field it gave the
+ * blur was as solid as before.
+ *
+ * Set on this element and inherited down to the dialog inside it. The value
+ * resolves here, where a token is in scope, which is the whole reason the hook
+ * can take one at all. */
+.siteCommand {
+  --dialog-scrim: color-mix(in oklab, var(--helix-color-overlay) 45%, transparent);
+}
+
+.siteCommand::part(dialog) {
+  /* **Glass, which is what a palette is: the page is still there.**
+   *
+   * A palette does not replace the page the way a dialog does. It is summoned
+   * over whatever was being read and dismissed back to it, so a surface that
+   * lets the page through says what the thing is before any of the copy does.
+   * The tokens are the ones the design system already keeps for this, a
+   * translucent fill over a blur, rather than an opacity invented here.
+   *
+   * **And the scrim is the other half of why this reads flat.** `Dialog` paints
+   * `::backdrop` at 64% black in the dark theme, between this panel and the
+   * page, so what the blur samples is a darkened near-uniform field rather than
+   * the content: blurring it produces almost no visible difference whatever the
+   * panel's own alpha. That value is a literal in the dialog's stylesheet,
+   * which its own comment explains at length: `::backdrop` is in the top layer
+   * and cannot see a custom property declared outside the shadow tree, so the
+   * scrim cannot be themed the way everything else is. Making a palette's scrim
+   * lighter than a modal's is a change to that component, not to this file.
+   *
+   * The border is the material's own, not the brand's. A blue hairline was the
+   * first version and it read as a focus ring on a panel that was not focused:
+   * the eye takes a saturated outline as a state, and a palette that always
+   * looks selected has nothing left to say when a row actually is. */
+  /* `translucent`, not `-strong`. At 88% the panel let 12% of the page through
+     and the blur had almost nothing to work on: the effect was in the computed
+     styles and invisible on the screen. 72% is more than twice as much. */
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+  background-color: var(--helix-material-translucent);
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+  border-radius: var(--helix-radii-lg);
+  /* The largest the scale has. A palette arrives over a page the reader was
+     mid-way through rather than replacing it, so it has to sit clearly above
+     the thing it did not close. */
+  box-shadow: var(--helix-shadow-lg);
+}
+
+/* The mark in the search row takes the brand, which is the one place a small
+   amount of colour reads as identity rather than as decoration: it is the thing
+   the eye lands on first and it is already the panel's subject. */
+.siteCommand::part(search) {
+  color: var(--helix-color-primary);
+}
+
+.siteCommand::part(search-field) {
+  /* The field carries the panel's voice. `display` is the face the masthead and
+     the section titles are set in, so a palette opening over them is the same
+     product rather than a control that happens to be on the page. */
+  font-family: var(--helix-font-display);
+}
+
+/* The row under the keyboard, which the component leaves to whoever knows what
+   the keys do. Ours holds the product's name, quietly, because a palette is the
+   one surface a reader opens from anywhere and may not remember whose it is. */
+.siteCommand::part(footer) {
+  /* **`sm`, not the `xs` the component sets, and the keys are why.** `Kbd`
+     draws its label at 0.75em of the text around it, which is right in prose
+     and compounds in a legend already at the smallest step: 12px of footer gave
+     a 9px glyph inside a 18px key, and an arrow at 9px in the mono face is a
+     smudge. One step up puts the label at 10.5px and the keys read. */
+  font-size: var(--helix-text-sm);
+  justify-content: space-between;
+}
+
+/* **The hints, spaced as groups.**
+ *
+ * A row of them, each holding its keys and the word for what they do. The gap
+ * between groups is the larger of the two so the grouping is visible before any
+ * of it is read: `sm` inside a hint, `lg` between hints. Read as one sentence
+ * with commas, three hints and six words needed punctuation to be told apart,
+ * which is work a layout can do for free.
+ *
+ * The keys keep their own `Kbd` margin against the word beside them, which the
+ * trigger in the masthead already sets, so a key and its label are one object
+ * in both places. */
+.siteCommandHints {
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-lg);
+}
+
+.siteCommandHints span {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}
+
+.siteCommandMark {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-display);
+  letter-spacing: var(--helix-tracking-wide);
+}
+
+/* The row the keyboard is on, in the brand's own subtle ground rather than the
+   neutral wash a select uses. A palette is driven by the arrow keys, so this is
+   the only thing on screen that says where the reader is. */
+.siteCommand {
+  --option-active-color: var(--helix-color-primary-subtle);
+  --option-radii: var(--helix-radii-sm);
+}
