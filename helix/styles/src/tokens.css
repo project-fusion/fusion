@@ -151,6 +151,34 @@
      component reaching for a different rung is a normal thing, whereas a page
      that is not the color it was chosen to be is not. */
   --helix-color-surface-sunken: light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950));
+  /* **What a field is filled with, stated as a step from its ground rather than
+   * as a colour.**
+   *
+   * A control that names an absolute surface is only correct on the one ground
+   * it was designed against, and `surface-sunken` was designed against the page.
+   * Measured as field-to-ground contrast: in light it is 1.119 on the page, 1.073
+   * on a card and **1.027** on a raised surface, where a field has all but
+   * vanished; in dark the same token runs 1.067, 1.108 and **1.390**, too faint
+   * on the page and too heavy on the rung above it. One token, failing in
+   * opposite directions in the two modes.
+   *
+   * A percentage of the foreground mixed toward transparent is a step away from
+   * whatever is behind it, in either mode, which a fixed neutral cannot be.
+   * `Button` had already worked this out for its ghost wash and the argument was
+   * never about buttons. At 5% it reproduces the current field on the light page
+   * exactly, 1.119, and then holds: 1.119, 1.112, 1.114 across page, card and
+   * raised, against the absolute token's 1.027 to 1.119.
+   *
+   * **It composites, which is the point and also the limit.** A translucent fill
+   * takes the colour of what it sits on, so a field over a photograph is tinted
+   * by the picture rather than legible against it. That case wants an opaque
+   * ground and says so through the control's own background hook, which
+   * `check:grounds` exists to guarantee every component publishes.
+   *
+   * Ten controls read this, the resting field box of each. Tracks, grooves,
+   * swatches, hover washes and chart bands still name `surface-sunken`: they are
+   * a different job and each has to say which it is rather than being swept. */
+  --helix-color-well: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   /* Two whole colors, not one color with a `light-dark()` strength.
    *
    * This was `color-mix(in oklab, neutral-950 light-dark(40%, 64%),
@@ -761,6 +789,34 @@
   --helix-leading-tight: 1.2;
   --helix-leading-normal: 1.5;
   --helix-leading-loose: 1.7;
+  /* **A heading derives its leading from its size instead of picking a rung,
+   * because picking is what kept getting it wrong.**
+   *
+   * Every heading took `tight`, and measured against real ink extents rather
+   * than em boxes, four of them set their own wrapped lines closer together
+   * than the paragraph beneath them: `title` cleared 5.7px and `subheading`
+   * 7.7 where body clears 8.8, and prose `h5` and `h6` cleared 4.5 and 4.1. A
+   * ratio does that at small sizes by construction, 1.2 of 18 being less air
+   * than 1.5 of 14, so the scale inverted exactly where a heading stops being
+   * much larger than the text under it.
+   *
+   * So the gap is stated rather than the ratio. `0.99em` is the ink the sans
+   * draws for mixed case, 0.881, plus a tenth of the size as proportional air;
+   * `0.5rem` is the optical constant on top of it. That gives 9.4, 9.5, 10.0,
+   * 10.6, 11.5 and 11.5 across 13, 14, 18, 24, 32 and 44, monotonic and every
+   * one of them clear of body. The large end comes in about a pixel from where
+   * `tight` had it, which is what the small end being right costs.
+   *
+   * **`em` is also what fluid type needs.** A clamped heading spans a range of
+   * sizes and a ratio gives it one gap across the whole range; this gives it
+   * the right gap at every point, `em` resolving against the used font size at
+   * the site of substitution rather than here.
+   *
+   * `tight` keeps its readers and its value: 27 rules take it, and `Radio` and
+   * `Checkbox` compute box geometry from `text-sm * leading-tight`, so it is a
+   * control metric now as much as a type one and cannot be regraded for the
+   * sake of headings. */
+  --helix-leading-heading: calc(0.99em + 0.5rem);
 
   --helix-tracking-tight: -0.01em;
   --helix-tracking-normal: 0;

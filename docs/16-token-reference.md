@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.css`](../helix/styles/src/tokens.css) by
 `bun run tokens`. Do not edit.*
 
-174 semantic tokens in 15 categories, every one in exactly
+176 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -26,21 +26,22 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 63 |
-| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 31 |
+| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 62 |
+| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 32 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 18 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 21 |
-| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 52 |
+| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 42 |
+| `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | 10 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 12 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 162 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 99 |
-| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 67 |
+| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 68 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 25 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 11 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 7 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 3 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 4 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 128 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 129 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 80 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 5 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
@@ -108,10 +109,10 @@ The spacing scale, used for gaps, padding and margins alike.
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 116 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 144 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 127 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 128 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 128 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 81 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 63 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 65 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 41 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 43 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 20 |
@@ -126,7 +127,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-none` | `0` | 32 |
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 112 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 10 |
-| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 4 |
+| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 5 |
 | `--helix-radii-full` | `9999px` | 40 |
 
 ## font
@@ -135,7 +136,7 @@ The three families.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-font-sans` | `var(--_helix-family-sans)` | 73 |
+| `--helix-font-sans` | `var(--_helix-family-sans)` | 74 |
 | `--helix-font-mono` | `var(--_helix-family-mono)` | 22 |
 | `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 23 |
 
@@ -145,7 +146,7 @@ Font size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-text-xs` | `var(--_helix-size-12)` | 55 |
+| `--helix-text-xs` | `var(--_helix-size-12)` | 56 |
 | `--helix-text-sm` | `var(--_helix-size-13)` | 62 |
 | `--helix-text-md` | `var(--_helix-size-14)` | 28 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 13 |
@@ -162,17 +163,18 @@ The three weights.
 |---|---|---|
 | `--helix-weight-regular` | `400` | 12 |
 | `--helix-weight-medium` | `500` | 76 |
-| `--helix-weight-semibold` | `600` | 27 |
+| `--helix-weight-semibold` | `600` | 28 |
 
 ## leading
 
-Line height, unitless so it scales with the size.
+Line height. The three steps are unitless and scale with the size; the heading one states the gap it wants instead, since a ratio picked per appearance is what left four rungs tighter than the paragraph under them.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-leading-tight` | `1.2` | 32 |
+| `--helix-leading-tight` | `1.2` | 23 |
 | `--helix-leading-normal` | `1.5` | 25 |
 | `--helix-leading-loose` | `1.7` | 0 |
+| `--helix-leading-heading` | `calc(0.99em + 0.5rem)` | 9 |
 
 ## tracking
 
@@ -182,7 +184,7 @@ Letter spacing.
 |---|---|---|
 | `--helix-tracking-tight` | `-0.01em` | 24 |
 | `--helix-tracking-normal` | `0` | 13 |
-| `--helix-tracking-wide` | `0.02em` | 7 |
+| `--helix-tracking-wide` | `0.02em` | 8 |
 
 ## border
 
@@ -190,7 +192,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 129 |
+| `--helix-border-thin` | `1px` | 130 |
 | `--helix-border-thick` | `2px` | 31 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 1 |
 | `--helix-border-floating` | `0` | 10 |

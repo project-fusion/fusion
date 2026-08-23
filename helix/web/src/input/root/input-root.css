@@ -32,7 +32,7 @@
    drawn once around the whole thing. */
 [part="field"] {
   align-items: center;
-  background-color: var(--input-background-color, var(--helix-color-surface-sunken));
+  background-color: var(--input-background-color, var(--helix-color-well));
   block-size: var(--_input-size);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);

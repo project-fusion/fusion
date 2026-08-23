@@ -11,7 +11,7 @@
    and measures exactly what it did before. Date Input records the same. */
 [part="field"] {
   align-items: center;
-  background-color: var(--time-input-background-color, var(--helix-color-surface-sunken));
+  background-color: var(--time-input-background-color, var(--helix-color-well));
   flex-wrap: wrap;
   min-block-size: var(--helix-size-control);
   padding-block: var(--helix-space-2xs);

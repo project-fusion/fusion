@@ -291,27 +291,19 @@
   font-family: var(--helix-font-display);
   font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
   letter-spacing: var(--helix-tracking-tight);
-  /* **Not `leading-tight`, because this is the one heading on the site that
-     wraps in the display face.**
+  /* No rule at all now, and the raw 1.3 that stood here is gone.
 
-     Measured rather than eyeballed, using the face's real ink extents rather
-     than its em box. `fusionDisplay` draws 0.90em of ink for mixed case, so at
-     `leading-tight` (1.2) two lines of this title clear each other by 0.30em,
-     while the lede directly under it clears by 0.64em at `leading-normal`. In
-     absolute terms that is the fault: at the size this clamps to, the title's
-     gap and the body's gap come out within a few pixels of each other even
-     though the title is more than twice the size, so the space stops scaling
-     with the type and the second line reads as stuck to the first.
+     It was written because there was no rung between `tight` and `normal` and
+     inventing one here would have named a value nothing else read. 152 checked
+     the rest of the scale and found the fault was general rather than this
+     heading's: four rungs set their wrapped lines closer together than the
+     paragraph under them, and `title` at 18px was worse than this ever was.
+     Headings now derive leading from size through `--helix-leading-heading`,
+     which the base layer already applies to `h1`, so this needs nothing.
 
-     1.3 puts the clearance at 0.40em. Still visibly a heading, tighter than any
-     body text, and the gap now grows with the size.
-
-     A ratio and not a token, because there is no rung between `tight` (1.2) and
-     `normal` (1.5) and inventing one here would name a value nothing else
-     reads. Queued as 152. The other three display-face rules on the site are
-     the wordmark, the command mark and one more, all of which are single lines,
-     which is why this is the only place the tightness ever shows. */
-  line-height: 1.3;
+     It is the better answer here specifically, too. This size is a `clamp`
+     across 32 to 44, and a ratio gives one gap over that whole range where an
+     `em` expression gives the right one at every point in it. */
   text-wrap: balance;
 }
 

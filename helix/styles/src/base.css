@@ -49,7 +49,7 @@ body {
 :where([data-prose] h4, [data-prose] h5, [data-prose] h6) {
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--helix-leading-heading);
 }
 
 /* The type scale lives here rather than in a `Text` component, so a heading is
@@ -306,7 +306,7 @@ helix-card > [slot="media"] {
   font-size: var(--helix-text-3xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--helix-leading-heading);
 }
 
 [data-text="heading"] {
@@ -314,7 +314,7 @@ helix-card > [slot="media"] {
   font-size: var(--helix-text-2xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--helix-leading-heading);
 }
 
 [data-text="subheading"] {
@@ -322,7 +322,7 @@ helix-card > [slot="media"] {
   font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--helix-leading-heading);
 }
 
 [data-text="title"] {
@@ -330,7 +330,7 @@ helix-card > [slot="media"] {
   font-size: var(--helix-text-lg);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--helix-leading-heading);
 }
 
 [data-text="body"] {
@@ -423,7 +423,7 @@ helix-text[tone="danger"] {
  */
 /* Two axes here as well, `data-button` for the fill and `data-button-tone` for
  * the colour, matching the component exactly. `data-button-tone` rather than a
- * bare `data-tone` follows `data-button-fill`: a second axis on a recipe carries
+ * bare `data-tone` follows `data-button-width`: a second axis on a recipe carries
  * the recipe's name, and it cannot ride in the `data-button` value either,
  * because that value is the appearance and the rules below match it exactly. */
 [data-button] {
@@ -576,13 +576,13 @@ helix-text[tone="danger"] {
  * its label, which reads as the button not growing at all. The part is already
  * `inline-size: 100%`, so it follows on its own.
  *
- * `data-button-fill` rather than a bare `data-fill`, following `data-link-size`:
+ * `data-button-width` rather than a bare `data-width`, following `data-link-size`:
  * a second axis on a recipe carries the recipe's name. It cannot ride in the
  * `data-button` value either, because that value is the appearance and the rules
  * above match it exactly. The component's own `fill` lives on its host, in its
  * own stylesheet.
  */
-[data-button][data-button-fill="standard"] {
+[data-button][data-button-width="standard"] {
   inline-size: var(--button-inline-size, var(--helix-size-button));
   /* Never wider than the room it has. A standard width is a floor for tidiness,
      not a promise to overflow a narrow column to keep it. */
@@ -591,7 +591,7 @@ helix-text[tone="danger"] {
 
 /* Block-level, not the recipe's `inline-flex`. A control that fills its
    container should not be able to share a line with anything beside it. */
-[data-button][data-button-fill="full"] {
+[data-button][data-button-width="full"] {
   display: flex;
   inline-size: 100%;
 }

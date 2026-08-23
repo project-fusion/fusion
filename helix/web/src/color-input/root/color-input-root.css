@@ -8,7 +8,7 @@
    Date Input both use, for the same reason. */
 [part="field"] {
   align-items: center;
-  background-color: var(--color-input-background-color, var(--helix-color-surface-sunken));
+  background-color: var(--color-input-background-color, var(--helix-color-well));
   block-size: var(--helix-size-control);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);

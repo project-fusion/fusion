@@ -4,7 +4,7 @@
 [part="field"] {
   align-items: center;
   position: relative;
-  background-color: var(--file-input-background-color, var(--helix-color-surface-sunken));
+  background-color: var(--file-input-background-color, var(--helix-color-well));
   border: var(--helix-border-thin) dashed var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   display: flex;

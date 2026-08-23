@@ -9,7 +9,7 @@
  * mode has one line in it and measures exactly what it did before. */
 [part="field"] {
   align-items: center;
-  background-color: var(--date-input-background-color, var(--helix-color-surface-sunken));
+  background-color: var(--date-input-background-color, var(--helix-color-well));
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   display: flex;

@@ -44,7 +44,7 @@
   font-size: var(--helix-text-3xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--helix-leading-heading);
 }
 
 :host([variant="heading"]),
@@ -53,7 +53,7 @@
   font-size: var(--helix-text-2xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--helix-leading-heading);
 }
 
 :host([variant="subheading"]),
@@ -62,7 +62,7 @@
   font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--helix-leading-heading);
 }
 
 :host([variant="title"]),
@@ -71,7 +71,7 @@
   font-size: var(--helix-text-lg);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-normal);
-  line-height: var(--helix-leading-tight);
+  line-height: var(--helix-leading-heading);
 }
 
 :host([variant="body"]) {

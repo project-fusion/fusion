@@ -10,7 +10,7 @@
    box is the field rather than the control, so the focus ring is drawn once
    around the whole thing. */
 [part="field"] {
-  background-color: var(--textarea-background-color, var(--helix-color-surface-sunken));
+  background-color: var(--textarea-background-color, var(--helix-color-well));
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   display: flex;

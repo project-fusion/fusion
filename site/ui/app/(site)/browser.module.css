@@ -144,24 +144,22 @@
  *
  * A class rather than an element selector, so this is a decision taken per
  * control. A form on this site should still show its labels. */
-/* The search sits on the hero's own band, so it takes the page's colour rather
- * than the recessed one.
+/* No background rule here, and there was one.
  *
- * `Input` fills with `--helix-color-surface-sunken`, which is the right guess
- * and is a guess about its ground: sunken is one step *below the page*, and on
- * a band that is already one step above it the control came out a single value
- * from what it sits on and stopped reading as a field. Against the page colour
- * it is a hole in the band in light mode and in dark alike, which is what a
- * text input should look like.
+ * It set the field to the page's colour because `Input` filled with
+ * `--helix-color-surface-sunken`, one step *below the page*, and this search
+ * sits on a band one step above it: the control came out a single value from
+ * what it sits on and stopped reading as a field. 154 fixed that at the source.
+ * `Input` fills with `--helix-color-well` now, a percentage of the foreground
+ * mixed toward transparent, which is a step away from whatever is behind it, so
+ * the field reads on this band with nothing written here.
  *
- * Through the component's own hook, which `check:grounds` exists to guarantee
- * every component publishes. What is *not* systematic is a control noticing its
- * ground by itself: `Button` solved that by filling with a percentage of the
- * foreground, which composites over a page, a card or a panel and is right on
- * all three, and the rest of the controls still name absolute tokens. Filed as 154. */
-.heroSearch {
-  --input-background-color: var(--helix-color-background);
-}
+ * The rule survived the fix for a sentence, on the argument that the page's own
+ * colour is a hole cut *through* the band where the well is a recess *in* it.
+ * That is true and it was not the reason the rule existed. A consumer override
+ * kept for a look nobody asked for is how a site stops demonstrating the system
+ * it is built from, and the site is the first thing that would have to be right
+ * if the default were still wrong. */
 
 .chromeControl::part(label) {
   block-size: 1px;

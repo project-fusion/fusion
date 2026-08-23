@@ -100,12 +100,19 @@ export const GROUNDS: Ground[] = [
      reason as the surface above, and found by `check:pairings` reporting a pair
      the model had never heard of. */
   { bounded: false, name: 'color-overlay' },
+  /* A field's fill is a percentage of the foreground mixed toward transparent,
+     so what is behind it is whatever the control was dropped onto: a page, a
+     card, a raised panel, a tinted band. That is the whole point of 154, and it
+     is also why the pair cannot be measured here. The ink over it is measured
+     against the grounds it actually composites over, which are already in
+     `PAGE_SURFACES`, and the well only shifts that by the 5% it carries. */
+  { bounded: false, name: 'color-well' },
 ]
 
 export const INKS: Ink[] = [
   {
     contrast: 'text',
-    grounds: [...PAGE_SURFACES, ...TINTS, 'color-overlay'],
+    grounds: [...PAGE_SURFACES, ...TINTS, 'color-overlay', 'color-well'],
     name: 'color-foreground',
   },
   { contrast: 'text', grounds: [...PAGE_SURFACES], name: 'color-foreground-muted' },

@@ -59,7 +59,8 @@ const PURPOSE = {
   easing: 'The shape of the curve it takes it along.',
   font: 'The three families.',
   layer: 'Position in the stack. Positional, never named after a component.',
-  leading: 'Line height, unitless so it scales with the size.',
+  leading:
+    'Line height. The three steps are unitless and scale with the size; the heading one states the gap it wants instead, since a ratio picked per appearance is what left four rungs tighter than the paragraph under them.',
   material: 'Blur and translucency, for a surface that lets the page through.',
   radii: 'Corner radius. `sm` is the house value at 4px and is on nearly every container.',
   shadow: 'Elevation.',
