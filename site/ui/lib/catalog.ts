@@ -17,6 +17,16 @@ const REPO = join(process.cwd(), '..', '..')
 export interface ApiMember {
   description: string
   name: string
+  /**
+   * Where the platform feature this is built on is specified, if it is one.
+   *
+   * Optional here and required on `PropertyDoc`, because a property always has
+   * the field even when it is empty and a slot or a part is built on nothing.
+   * It is on the member rather than only on the property so the Read table can
+   * carry a mark: `form` and `labels` are read-only and are the two members in
+   * the library that most need one.
+   */
+  references?: { label: string; url: string }[]
   type: string
 }
 

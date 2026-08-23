@@ -301,11 +301,7 @@ function MemberTable({
             {typed && (
               <helix-table-cell>{row.type && <TypeText>{row.type}</TypeText>}</helix-table-cell>
             )}
-            <helix-table-cell>
-              <helix-text tone="muted" variant="caption">
-                {first(row.description)}
-              </helix-text>
-            </helix-table-cell>
+            <Described description={row.description} references={row.references} />
           </helix-table-row>
         ))}
       </helix-table>
@@ -330,6 +326,49 @@ function MemberTable({
 const opens = (label: string): string => `Open the ${label} specification`
 
 /** The one table with a fourth column, because a property has a resting value. */
+/**
+ * A description, and the marks for whatever it is built on.
+ *
+ * One component for both tables, because both need it and only one had it.
+ * `form` and `labels` are read-only, so they live in the Read table, and their
+ * rows carried a reference in the manifest that nothing rendered: 96 of the 110
+ * marks in the library were on members this cell was not being used for.
+ */
+function Described({
+  description,
+  references = [],
+}: {
+  description: string
+  references?: { label: string; url: string }[]
+}) {
+  return (
+    <helix-table-cell>
+      <helix-text tone="muted" variant="caption">
+        {first(description)}
+      </helix-text>
+      {references.map((reference) => (
+        /* At the end of the row rather than beside the name, because it                     is secondary to both and the name is what a reader scans.                     An anchor inside the tooltip rather than the tooltip alone:                     the bubble says which feature this is and the mark goes                     there, so a touch screen, where nothing hovers, still has the                     destination. */ <helix-tooltip
+          content={opens(reference.label)}
+          key={reference.url}
+          placement="top"
+        >
+          {' '}
+          <a
+            aria-label={opens(reference.label)}
+            className={styles.apiReference}
+            href={reference.url}
+            rel="noreferrer"
+            target="_blank"
+          >
+            {' '}
+            <helix-icon name="info" />{' '}
+          </a>{' '}
+        </helix-tooltip>
+      ))}{' '}
+    </helix-table-cell>
+  )
+}
+
 function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
   if (rows.length === 0) {
     return null
@@ -352,30 +391,7 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
             <helix-table-cell>
               {row.default && <DefaultText>{row.default}</DefaultText>}
             </helix-table-cell>
-            <helix-table-cell>
-              <helix-text tone="muted" variant="caption">
-                {first(row.description)}
-              </helix-text>
-              {row.references.map((reference) => (
-                /* At the end of the row rather than beside the name, because it
-                   is secondary to both and the name is what a reader scans.
-                   An anchor inside the tooltip rather than the tooltip alone:
-                   the bubble says which feature this is and the mark goes
-                   there, so a touch screen, where nothing hovers, still has the
-                   destination. */
-                <helix-tooltip content={opens(reference.label)} key={reference.url} placement="top">
-                  <a
-                    aria-label={opens(reference.label)}
-                    className={styles.apiReference}
-                    href={reference.url}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    <helix-icon name="info" />
-                  </a>
-                </helix-tooltip>
-              ))}
-            </helix-table-cell>
+            <Described description={row.description} references={row.references} />
           </helix-table-row>
         ))}
       </helix-table>
@@ -420,7 +436,12 @@ function ElementApi({ element }: { element: Element }) {
         label="Read"
         rows={element.properties
           .filter((row) => row.readonly)
-          .map((row) => ({ description: row.description, name: row.name, type: row.type }))}
+          .map((row) => ({
+            description: row.description,
+            name: row.name,
+            references: row.references,
+            type: row.type,
+          }))}
       />
       <MemberTable label="Slot" rows={element.slots} typed={false} />
       <MemberTable
