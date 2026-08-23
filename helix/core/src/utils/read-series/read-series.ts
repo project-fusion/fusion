@@ -170,11 +170,11 @@ export interface RowCell {
 /** One row of a table, headed and with every cell in it. */
 export interface Row {
   /**
-   * The row's own label, from its header cell.
+   * Every cell in the row, in order, numeric or not.
    */
   cells: RowCell[]
   /**
-   * Every cell in the row, in order, numeric or not.
+   * The row's own label, from its header cell.
    */
   label: string
   /**
