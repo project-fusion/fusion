@@ -1,12 +1,14 @@
 'use client'
 
 import { deriveTheme, hexToOklch, type ThemeIntent, toCss } from '@helix-io/theme'
-import { useEffect, useMemo, useState } from 'react'
+import type { HelixSandboxPreview } from '@helix-io/web'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
 import { Wordmark } from '../../../wordmark'
 import '@helix-io/sandbox/editor'
 import { ThemedPage } from './themed-page'
+import { THEMED_PAGE_STYLES } from './themed-page-styles'
 import './theme.css'
 import styles from '../workbench.module.css'
 
@@ -233,7 +235,87 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       '--theme-saturation-ramp': `linear-gradient(to right, oklch(${lightness} 0 ${hue}), oklch(${lightness} ${chroma} ${hue}))`,
     } as React.CSSProperties
   }, [theme])
+  const preview = useRef<HelixSandboxPreview>(null)
+
   const css = useMemo(() => toCss(theme, SCOPE), [theme])
+
+  /* **The artifact keeps its scope and the frame gets `:root`.** What the editor
+     shows is what a consumer pastes, which wants a named scope so it can sit
+     beside their own; what the frame renders is a whole document with one theme
+     in it, where a scope nothing carries would style nothing at all. Same theme,
+     derived once, written twice. */
+  const framed = useMemo(() => toCss(theme, ':root'), [theme])
+
+  /* **Only the faces actually chosen, and only while they are chosen.**
+     Requesting the whole list up front would fetch five faces to show one.
+
+     `display=swap`, so a face that has not landed shows the fallback rather
+     than nothing: a preview whose text disappears while a font downloads is
+     worse than one that reflows.
+
+     A value rather than an effect, because two documents need it now: this one
+     appends a `<link>`, and the frame is sent the same URL as an `@import` at
+     the head of its stylesheet. */
+  const fontsHref = useMemo(() => {
+    const wanted = [bodyFace, displayFace, monoFace]
+      .map((family) => [...FACES, ...MONO_FACES].find((face) => face.family === family)?.google)
+      .filter((request): request is string => Boolean(request))
+
+    if (wanted.length === 0) {
+      return ''
+    }
+
+    return `https://fonts.googleapis.com/css2?${[...new Set(wanted)]
+      .map((request) => `family=${request}`)
+      .join('&')}&display=swap`
+  }, [bodyFace, displayFace, monoFace])
+
+  /* Serialised once, because the page is static and only the palette moves: the
+     frame is sent markup, which is the same path the workbench takes with an
+     example.
+
+     **Rendered in this tree and read back, rather than into a root of its own.**
+     A second `createRoot` into a detached node wants `flushSync` to be readable
+     synchronously, and that produced an empty string with no error to say why.
+     Here React does the rendering it was always going to do, the holder is
+     hidden while it happens, and it unmounts the moment its markup has been
+     taken. */
+  const [markup, setMarkup] = useState('')
+  const holder = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    setMarkup((held) => held || (holder.current?.innerHTML ?? ''))
+  }, [])
+
+  useEffect(() => {
+    if (!preview.current || !markup) {
+      return
+    }
+    preview.current.source = markup
+    /* **The palette, the layout and the faces, because the frame has none of
+       them.** A sandboxed document cannot fetch the site's stylesheet, so the
+       page's own rules travel with its markup the way the theme does. The theme
+       goes second: both are written for `:root` and only one of them changes as
+       the reader drags a slider.
+
+       **The face is a third document the frame cannot reach.** `build-frame.mjs`
+       inlines the three Fusion faces as data URIs precisely because `@font-face`
+       fetches in CORS mode and an opaque origin cannot ask the site for a file;
+       Google serves its own with `Access-Control-Allow-Origin`, so those are
+       reachable and only the request was missing. It went into this document's
+       head and nowhere else, so choosing Inter renamed the family in the
+       artifact while the preview went on drawing the fallback.
+
+       `@import` rather than a `<link>`, because `styles` is a channel that
+       already exists and adding a second one would mean a new field on the
+       render message, a new branch in the frame, and a shipped component
+       changed to carry the theme tool's fonts. It has to lead the stylesheet:
+       an `@import` after any rule is dropped. */
+    preview.current.styles = [
+      fontsHref ? `@import url("${fontsHref}");` : '',
+      THEMED_PAGE_STYLES,
+      framed,
+    ].join('\n')
+  }, [fontsHref, framed, markup])
 
   /* **Lightness only, and in whichever direction reaches the target.** The
      solver moves one component: a brand keeps its hue and its chroma and gives
@@ -259,33 +341,20 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     return () => tag.remove()
   }, [css])
 
-  /* **Only the faces actually chosen, and only while they are chosen.**
-     Requesting the whole list up front would fetch five faces to show one, and
-     leaving the old link behind on every change would accumulate one per
-     selection for the length of the session. The effect owns exactly one tag
-     and takes it away again.
-
-     `display=swap`, so a face that has not landed shows the fallback rather
-     than nothing: a preview whose text disappears while a font downloads is
-     worse than one that reflows. */
+  /* **This document's copy.** The effect owns exactly one tag and takes it away
+     again, so changing a face replaces the link rather than accumulating one per
+     selection for the length of the session. The frame gets the same request
+     through `styles`, because it cannot see this one. */
   useEffect(() => {
-    const wanted = [bodyFace, displayFace, monoFace]
-      .map((family) => [...FACES, ...MONO_FACES].find((face) => face.family === family)?.google)
-      .filter((request): request is string => Boolean(request))
-
-    if (wanted.length === 0) {
+    if (!fontsHref) {
       return
     }
-
-    const unique = [...new Set(wanted)]
     const link = document.createElement('link')
     link.rel = 'stylesheet'
-    link.href = `https://fonts.googleapis.com/css2?${unique
-      .map((request) => `family=${request}`)
-      .join('&')}&display=swap`
+    link.href = fontsHref
     document.head.append(link)
     return () => link.remove()
-  }, [bodyFace, displayFace, monoFace])
+  }, [fontsHref])
 
   const counts = theme.pairings.reduce<Record<string, number>>((all, pair) => {
     all[pair.status] = (all[pair.status] ?? 0) + 1
@@ -722,39 +791,45 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               </helix-flex>
             </helix-sandbox-toolbar>
 
-            {/* `data-helix-theme` and not only the class: the emitted block sets
-                the values, and the attribute is what makes `helix/styles` re-run
-                its own declarations here so the series ramp and the scales
-                re-derive. */}
-            {/* **`color-scheme`, because a theme has one and the preview has to be
-                in it.** The engine emits an explicit value for every token it
-                computes, so those were right; everything it does not emit falls
-                back to the stylesheet's `light-dark()`, which resolves against
-                the *reader's* scheme rather than the theme's. Previewing a light
-                theme on the dark site, `--helix-material-translucent` gave the
-                dark half and a glass card came out near-black on a white page.
+            {/* **A document of its own, and the leak is what forced it.** This
+                was a `div` in the site's page, which meant the site's own
+                stylesheet reached it: nineteen bare `helix-*` rules in
+                `site.css`, and three of them landed here. Measured, the preview's
+                header computed `--app-header-backdrop: none` and
+                `--app-header-background: transparent` because the masthead sets
+                those for itself, so the material control could be dragged from
+                zero to forty and the one surface most likely to be glass never
+                moved. The drawer took the site's header clearance too, for a
+                header that is not above it.
 
-                **`data-color-mode` as well as `color-scheme`, because the two
-                are read by different things.** `color-scheme` is what the
-                platform resolves `light-dark()` against; `data-color-mode` is
-                what this site's build actually keys on, Lightning CSS rewriting
-                `light-dark()` into a custom-property shim before a browser sees
-                it, which `tokens.css` records. Setting only the first left a
-                glass card resolving dark inside a light theme.
+                Scoping the site's rules away from the preview is the same fix
+                nineteen times and once more for every rule anybody adds. The
+                cause is that a preview of a page was not a page, and
+                `helix-sandbox-preview` already exists for exactly this: its own
+                docstring says an example that restyles `helix-card` restyled the
+                sandbox too. The workbench has previewed this way all along.
 
-                Set here rather than emitted, for the reason `tokens.css` gives:
-                a theme scope re-derives colour, and which half that colour is
-                written in is a fact about the surface it is shown on. */}
-            <div
-              className="themePreview"
-              data-color-mode={scheme}
-              data-helix-theme
-              data-theme="preview"
+                The top layer comes free with it. A dialog opened here covered
+                the whole tool, because `showModal` paints outside every ancestor
+                and the tool was an ancestor; in a document of its own it is
+                confined to the pane, which is what a reader is trying to judge.
+
+                `color-mode` rather than a wrapper attribute, because the frame is
+                a document and inherits nothing from this one. */}
+            {markup ? null : (
+              <div hidden ref={holder}>
+                <ThemedPage />
+              </div>
+            )}
+
+            <helix-sandbox-preview
+              color-mode={scheme}
+              label="The themed page"
+              layout="fullscreen"
+              ref={preview}
               slot="preview"
-              style={{ colorScheme: scheme }}
-            >
-              <ThemedPage />
-            </div>
+              src="/sandbox/frame.html"
+            ></helix-sandbox-preview>
 
             {/* **The editor, read-only, rather than a code block.** The
                 artifact pane should read as a source file, which is what the

@@ -13108,10 +13108,6 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -13431,10 +13427,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -13572,10 +13564,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -13877,10 +13865,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -14096,10 +14080,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `color`: Where the picker stands: what was moved, or what the value says, or the start. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -14383,10 +14363,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -14586,6 +14562,7 @@ export type CustomElements = {
    * - `listbox`: The list inside it.
    * - `items`: The scrolling box of commands, forwarded from the listbox.
    * - `empty`: What shows where the filter has hidden everything.
+   * - `filter-mark`: The glyph beside the field, forwarded from the listbox.
    * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
    * - `footer`: The row under the list.
@@ -14689,10 +14666,6 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -14909,10 +14882,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -15123,10 +15092,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -15892,10 +15857,6 @@ export type CustomElements = {
    * Read from the input rather than mirrored into a field. The input is what
    * the picker filled and what a form submits, so a copy here could only ever
    * disagree with it. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -16070,10 +16031,6 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -16399,10 +16356,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -16942,10 +16895,6 @@ export type CustomElements = {
    * list and its options and the keyboard has to move through a grouped list
    * exactly as it moves through a flat one. (property only) (readonly)
    * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -17766,10 +17715,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -18509,10 +18454,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -18960,10 +18901,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -19217,10 +19154,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `score`: The score, as a number, clamped to what the marks can show. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -19468,10 +19401,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -19734,10 +19663,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -20636,10 +20561,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -21194,10 +21115,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -21398,10 +21315,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -21632,10 +21545,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -22098,10 +22007,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -24357,10 +24262,6 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -24692,10 +24593,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -24836,10 +24733,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -25150,10 +25043,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -25372,10 +25261,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `color`: Where the picker stands: what was moved, or what the value says, or the start. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -25662,10 +25547,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -25868,6 +25749,7 @@ export type CustomElementsSolidJs = {
    * - `listbox`: The list inside it.
    * - `items`: The scrolling box of commands, forwarded from the listbox.
    * - `empty`: What shows where the filter has hidden everything.
+   * - `filter-mark`: The glyph beside the field, forwarded from the listbox.
    * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
    * - `footer`: The row under the list.
@@ -25974,10 +25856,6 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -26197,10 +26075,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -26414,10 +26288,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -27207,10 +27077,6 @@ export type CustomElementsSolidJs = {
    * Read from the input rather than mirrored into a field. The input is what
    * the picker filled and what a form submits, so a copy here could only ever
    * disagree with it. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -27388,10 +27254,6 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -27726,10 +27588,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -28287,10 +28145,6 @@ export type CustomElementsSolidJs = {
    * list and its options and the keyboard has to move through a grouped list
    * exactly as it moves through a flat one. (property only) (readonly)
    * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -29132,10 +28986,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -29892,10 +29742,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -30358,10 +30204,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -30621,10 +30463,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `score`: The score, as a number, clamped to what the marks can show. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -30878,10 +30716,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -31150,10 +30984,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -32079,10 +31909,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -32664,10 +32490,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -32871,10 +32693,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -33108,10 +32926,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
@@ -33589,10 +33403,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *

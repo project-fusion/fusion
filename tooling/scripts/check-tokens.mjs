@@ -123,17 +123,52 @@ const walk = function* (dir) {
   }
 }
 
-/** Extracts CSS blocks: whole file for .css, `css\`...\`` templates for .ts. */
+/**
+ * Blanks block comments, keeping every byte and every newline where it was.
+ *
+ * Whitespace rather than deletion, so an offset into the result still points at
+ * the same character of the original and a reported line number is the line the
+ * reader has to open.
+ */
+const blankComments = (source) =>
+  source.replace(/\/\*[\s\S]*?\*\//g, (text) => text.replace(/[^\n]/g, ' '))
+
+/**
+ * Extracts CSS blocks: whole file for .css, `css\`...\`` templates for .ts.
+ *
+ * **Prose was opening blocks, and the cost was silence.** A comment naming a
+ * stylesheet writes the word `css` immediately before a backtick, so every
+ * mention of `site.css` or `theme.css` in a doc comment looked exactly like a
+ * tagged template. On the file this was found with, four such mentions matched
+ * and the fourth ran on past the real `css` template and consumed its opening
+ * backtick, so the stylesheet itself was never extracted and the check passed
+ * over a file it had not read: renaming eight tokens to
+ * `--helix-space-nonexistent` still reported no violations. That is the worst
+ * shape a check can fail in, and it fails this way for any `.ts` file whose
+ * comments mention a `.css` file, which in this repository is most of them.
+ *
+ * Two guards, because the two cases are different. Comments are blanked first,
+ * which removes the whole class. The lookbehind then rejects a `css` that is
+ * part of a longer name, `site.css` in a string or a template, where no comment
+ * is involved at all.
+ *
+ * **And the run is escape-aware.** A lazy `[\s\S]*?` ends at the first `\``, and
+ * a CSS-in-TS file quotes code in its own comments the way everything here does,
+ * so the block would stop early even once it started in the right place.
+ * `(?:[^`\\]|\\[\s\S])*` takes an escaped anything as one unit, so only an
+ * unescaped backtick closes it.
+ */
 const cssBlocks = (file, source) => {
   if (file.endsWith('.css')) {
     return [{ offset: 0, text: source }]
   }
   const blocks = []
-  const pattern = /\bcss`([\s\S]*?)`/g
-  let match = pattern.exec(source)
+  const pattern = /(?<![\w.-])css`((?:[^`\\]|\\[\s\S])*)`/g
+  const scanned = blankComments(source)
+  let match = pattern.exec(scanned)
   while (match !== null) {
     blocks.push({ offset: match.index, text: match[1] })
-    match = pattern.exec(source)
+    match = pattern.exec(scanned)
   }
   return blocks
 }

@@ -2519,15 +2519,6 @@
               "description": "Whether an ancestor `<fieldset disabled>` has switched this control off.\n\nThe platform tells a form-associated element through `formDisabledCallback`\nand nothing here implemented it, so a control inside a disabled fieldset\nstayed fully typeable and announced itself as enabled. Measured: a\n`helix-input` in one accepted text, reported `disabled` as false, and\ncarried no `aria-disabled`.\n\nWhat the platform already did on its own is the submission half. The same\nmeasurement showed the fieldset's controls absent from the form's entry\nlist and the host matching `:disabled`, so the value never went anywhere.\nWhat was missing is everything a reader can see or touch.\n\nState rather than the `disabled` property. Writing that would reflect an\nattribute the consumer's server markup does not have, which React reports\non hydration and does not patch up, and it would also silently overwrite\nwhat the consumer set."
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -2563,7 +2554,15 @@
                 "text": "HTMLFormElement | null"
               },
               "description": "The form this control belongs to, if any.",
-              "readonly": true
+              "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              }
             },
             {
               "kind": "field",
@@ -2572,7 +2571,15 @@
                 "text": "NodeList"
               },
               "description": "Labels associated with this control.",
-              "readonly": true
+              "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              }
             },
             {
               "kind": "field",

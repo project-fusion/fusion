@@ -3944,19 +3944,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -4004,6 +3991,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -4017,6 +4012,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -5701,19 +5704,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -5761,6 +5751,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -5774,6 +5772,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -6592,19 +6598,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -6652,6 +6645,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -6665,6 +6666,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -8262,19 +8271,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -8322,6 +8318,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -8335,6 +8339,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -9475,19 +9487,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -9535,6 +9534,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -9548,6 +9555,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -10851,19 +10866,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -10911,6 +10913,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -10924,6 +10934,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -11397,6 +11415,10 @@
             {
               "description": "What shows where the filter has hidden everything.",
               "name": "empty"
+            },
+            {
+              "description": "The glyph beside the field, forwarded from the listbox.",
+              "name": "filter-mark"
             },
             {
               "description": "The region holding the field that narrows the list.",
@@ -12290,19 +12312,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -12350,6 +12359,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -12363,6 +12380,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -13606,19 +13631,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -13666,6 +13678,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -13679,6 +13699,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -14813,19 +14841,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -14873,6 +14888,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -14886,6 +14909,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -18594,19 +18625,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -18654,6 +18672,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -18667,6 +18693,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -19345,19 +19379,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -19405,6 +19426,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -19418,6 +19447,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -21552,19 +21589,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -21612,6 +21636,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -21625,6 +21657,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -24567,19 +24607,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -24627,6 +24654,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -24640,6 +24675,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -28735,19 +28778,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -28795,6 +28825,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -28808,6 +28846,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -32336,19 +32382,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -32396,6 +32429,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -32409,6 +32450,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -34634,19 +34683,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -34694,6 +34730,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -34707,6 +34751,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -36025,19 +36077,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -36085,6 +36124,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -36098,6 +36145,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -37494,19 +37549,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -37554,6 +37596,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -37567,6 +37617,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -38311,7 +38369,15 @@
                 "text": "number"
               },
               "description": "The chosen value as a number, for anything doing arithmetic on it.",
-              "readonly": true
+              "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "HTMLInputElement.valueAsNumber",
+                    "url": "https://html.spec.whatwg.org/multipage/input.html#dom-input-valueasnumber"
+                  }
+                ]
+              }
             },
             {
               "kind": "field",
@@ -38825,19 +38891,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -38885,6 +38938,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -38898,6 +38959,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -42981,19 +43050,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -43041,6 +43097,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -43054,6 +43118,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -46333,19 +46405,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -46393,6 +46452,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -46406,6 +46473,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -47717,19 +47792,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -47777,6 +47839,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -47790,6 +47860,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -48889,19 +48967,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -48949,6 +49014,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -48962,6 +49035,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -51059,19 +51140,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "formDisabledCallback",
               "return": {
@@ -51119,6 +51187,14 @@
               },
               "description": "The form this control belongs to, if any.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -51132,6 +51208,14 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true,
+              "helix": {
+                "references": [
+                  {
+                    "label": "form-associated custom elements",
+                    "url": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"

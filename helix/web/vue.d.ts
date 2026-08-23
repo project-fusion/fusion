@@ -4853,6 +4853,34 @@ export type HelixSandboxPreviewHelixConsoleElementEvent =
   HelixSandboxPreviewElementEvent<HelixConsoleEvent>;
 
 export type HelixSandboxPreviewVueProps = {
+  /** Which half of the palette the frame renders in.
+
+**The frame is a document and a document has its own colour mode.** Setting
+`data-color-mode` on this element styles this element, and the contents of
+an iframe inherit nothing from it: measured, a frame under a host carrying
+the attribute had it unset on its own root. Left alone the frame follows
+`prefers-color-scheme`, which is right for a preview that should look like
+the reader's own machine, and wrong for one whose tool has a scheme control.
+
+It matters more than a background: `light-dark()` is compiled to a shim
+keyed on this attribute, and of the 56 tokens that differ by scheme the
+theme engine emits 19. The other 37 would stay light in a dark preview,
+including every one of the 24 series colours a chart reads. */
+  "color-mode"?: HelixSandboxPreview["colorMode"];
+  /** Which half of the palette the frame renders in.
+
+**The frame is a document and a document has its own colour mode.** Setting
+`data-color-mode` on this element styles this element, and the contents of
+an iframe inherit nothing from it: measured, a frame under a host carrying
+the attribute had it unset on its own root. Left alone the frame follows
+`prefers-color-scheme`, which is right for a preview that should look like
+the reader's own machine, and wrong for one whose tool has a scheme control.
+
+It matters more than a background: `light-dark()` is compiled to a shim
+keyed on this attribute, and of the 56 tokens that differ by scheme the
+theme engine emits 19. The other 37 would stay light in a dark preview,
+including every one of the 24 series colours a chart reads. */
+  colorMode?: HelixSandboxPreview["colorMode"];
   /** Document the frame loads, which brings the styles and the elements. */
   src?: HelixSandboxPreview["src"];
   /** Markup to render. */

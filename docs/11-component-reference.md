@@ -1477,6 +1477,7 @@ otherwise walk up and down the screen under the words being typed.
 | `listbox` | The list inside it. |
 | `items` | The scrolling box of commands, forwarded from the listbox. |
 | `empty` | What shows where the filter has hidden everything. |
+| `filter-mark` | The glyph beside the field, forwarded from the listbox. |
 | `search` | The region holding the field that narrows the list. |
 | `search-field` | The field itself. |
 | `footer` | The row under the list. |
@@ -4238,6 +4239,7 @@ nobody is looking at. Top-level navigation, popups and modals are not.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `colorMode` | `color-mode` | `'dark' \| 'light' \| undefined` | - | - | Which half of the palette the frame renders in. |
 | `direction` | `direction` | `'rtl' \| undefined` | - | - | Writing direction inside the frame. |
 | `label` | `label` | `string` | `'Preview'` | - | Accessible name for the frame. |
 | `layout` | `layout` | `'padded' \| 'centered' \| 'fullscreen' \| undefined` | - | - | How the example is placed in the frame. |

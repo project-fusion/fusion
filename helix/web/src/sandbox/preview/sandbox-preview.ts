@@ -21,6 +21,7 @@ export interface PreviewReady {
 
 /** What the frame is asked to render. */
 export interface PreviewRender {
+  colorMode?: 'dark' | 'light'
   direction: 'ltr' | 'rtl'
   layout: 'padded' | 'centered' | 'fullscreen'
   source: string
@@ -95,6 +96,24 @@ export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender
  */
 @customElement('helix-sandbox-preview')
 export class HelixSandboxPreview extends HelixElement {
+  /**
+   * Which half of the palette the frame renders in.
+   *
+   * **The frame is a document and a document has its own colour mode.** Setting
+   * `data-color-mode` on this element styles this element, and the contents of
+   * an iframe inherit nothing from it: measured, a frame under a host carrying
+   * the attribute had it unset on its own root. Left alone the frame follows
+   * `prefers-color-scheme`, which is right for a preview that should look like
+   * the reader's own machine, and wrong for one whose tool has a scheme control.
+   *
+   * It matters more than a background: `light-dark()` is compiled to a shim
+   * keyed on this attribute, and of the 56 tokens that differ by scheme the
+   * theme engine emits 19. The other 37 would stay light in a dark preview,
+   * including every one of the 24 series colours a chart reads.
+   */
+  @property({ attribute: 'color-mode' })
+  colorMode?: 'dark' | 'light'
+
   /** Document the frame loads, which brings the styles and the elements. */
   @property()
   src = ''
@@ -194,6 +213,7 @@ export class HelixSandboxPreview extends HelixElement {
       return
     }
     const message: PreviewRender = {
+      ...(this.colorMode ? { colorMode: this.colorMode } : {}),
       direction: this.direction ?? 'ltr',
       layout: this.layout ?? 'padded',
       source: this.source,

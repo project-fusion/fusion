@@ -23,6 +23,7 @@
 import '@helix-io/web'
 
 interface RenderMessage {
+  colorMode?: 'dark' | 'light'
   direction?: 'ltr' | 'rtl'
   layout?: 'padded' | 'centered' | 'fullscreen'
   source?: string
@@ -66,9 +67,22 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
   if (event.data?.type !== 'helix-preview-render' || event.source !== window.parent || !host) {
     return
   }
-  const { direction = 'ltr', layout = 'padded', source = '', styles = '' } = event.data
+  const { colorMode, direction = 'ltr', layout = 'padded', source = '', styles = '' } = event.data
   document.documentElement.dir = direction
   host.dataset.layout = layout
+  /* **Both, because they answer different questions.** `color-scheme` is what
+     the platform paints form controls and scrollbars against; `data-color-mode`
+     is what `light-dark()` resolves through once Lightning CSS has compiled it
+     into a shim. Setting only the first leaves 37 of the 56 two-armed tokens on
+     their light arm, the 24 series colours among them.
+
+     Absent leaves both alone, so a frame nobody has told follows the reader's
+     own `prefers-color-scheme`, which is what a preview of a component should
+     do. A tool with a scheme control of its own says which. */
+  if (colorMode) {
+    document.documentElement.dataset.colorMode = colorMode
+    document.documentElement.style.colorScheme = colorMode
+  }
   /* The stylesheet link is for the reader, and it is dropped before the markup
      is rendered.
 
