@@ -2,7 +2,7 @@ import { pages as docPages, navigation } from '@helix-io/docs'
 import { getFamilies } from './catalog'
 import { INSIGHTS } from './insights'
 
-/**
+/*
  * Every page this site serves, in one module.
  *
  * **Nothing else enumerates routes.** The sitemap, `llms.txt` and the markdown
