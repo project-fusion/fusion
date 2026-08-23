@@ -207,3 +207,38 @@ describe('a relayed native event', () => {
     expect(calls).toBe(0)
   })
 })
+
+/**
+ * The mark that releases `SETTLED`, and the timing is the whole of it.
+ *
+ * A shadow root adopts its stylesheets when the element upgrades, so the first
+ * style resolution that sees a component's own sheet is a change and any
+ * `transition` it declares runs against the property's initial value. What that
+ * looked like in practice was App Header fading a one pixel `currentColor`
+ * hairline out on every load, near-white in dark mode.
+ *
+ * Asserted here rather than by reading a computed style, because the fault is
+ * about *when* the attribute lands and happy-dom has no cascade to ask. If this
+ * ever moves into `firstUpdated` itself the first test fails, which is the
+ * regression worth catching: Lit's upgrade, render and `firstUpdated` share one
+ * microtask checkpoint, so an attribute set there lands in the same resolution
+ * as the sheets and the transition runs anyway.
+ */
+describe('the settled mark', () => {
+  const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
+
+  test('is absent through the first update, so an arriving sheet has nothing to transition', async () => {
+    const element = document.createElement(tag) as HTMLElement & { updateComplete: Promise<unknown> }
+    document.body.append(element)
+    await element.updateComplete
+    expect(element.hasAttribute('data-settled')).toBe(false)
+  })
+
+  test('lands a frame later, by which point the resting value is already resolved', async () => {
+    const element = document.createElement(tag) as HTMLElement & { updateComplete: Promise<unknown> }
+    document.body.append(element)
+    await element.updateComplete
+    await frame()
+    expect(element.hasAttribute('data-settled')).toBe(true)
+  })
+})
