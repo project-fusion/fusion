@@ -19,16 +19,32 @@
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
     // The fourth layer is `helix/web/elements.css` and it was not in `inputs`,
     // so editing any component stylesheet did not invalidate this. `dependsOn`
     // orders the two tasks and ordering is not invalidation: the sandbox
     // stylesheet, which is also what the browser spec runner serves as its
     // whole token layer, could sit a build behind the components it is meant to
     // paint.
+    // Reads the manifests and every `.examples` file, so it depends on the
+    // analyzer having run: `analyze` writes `custom-elements.json`, and a
+    // catalog built before it would describe whatever the last analysis left.
+    "catalog": {
+      "dependsOn": ["^build", "^analyze"],
+      "inputs": [
+        "$TURBO_ROOT$/helix/docs/src/catalog.ts",
+        "$TURBO_ROOT$/helix/docs/src/naming.ts",
+        "$TURBO_ROOT$/helix/headless/custom-elements.json",
+        "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
+        "$TURBO_ROOT$/helix/web/custom-elements.json",
+        "$TURBO_ROOT$/helix/web/src/*/.examples/**",
+        "$TURBO_ROOT$/tooling/scripts/build-catalog.mjs"
+      ],
+      "outputs": ["lib/catalog.generated.json"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
     "frame": {
       "dependsOn": ["^build"],
       "inputs": [

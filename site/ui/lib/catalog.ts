@@ -1,17 +1,21 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
-import { catalog, type ExampleSource, type Family, findInCatalog } from '@helix-io/docs'
+import type { Family } from '@helix-io/docs'
+import { findInCatalog } from '@helix-io/docs'
+import generated from './catalog.generated.json'
 
 /**
- * The component catalog, read from the manifests and from disk.
+ * The component catalog, imported rather than read.
  *
- * **Reading is all that is left here.** The shaping moved to
- * `@helix-io/docs`, because a manifest-to-catalog reader is Helix knowledge
- * that was living in a marketing app, and once both this page and the `.md`
- * route need it, leaving it here means one of them imports across a domain
- * boundary to get at it. What a site owns is where the files are.
+ * **Nothing about a component is written down in this app.** The shaping lives
+ * in `@helix-io/docs`, the sources are the manifests and the `.examples/*.html`
+ * files beside each component, and `bun run catalog` joins the two into the
+ * file imported above. `site/ui` runs it before `next build` and `next dev`,
+ * the same way it already builds the frame and the specs.
  *
- * Server-only, and evaluated during the build, so every page is static.
+ * This used to reach out of the project with `fs` to find those sources, which
+ * Turbopack warned about on every build: a path it cannot statically scope
+ * traces the whole repository into the server bundle, public folder included.
+ * An import inside the project reads nothing at runtime and has nothing to
+ * trace.
  */
 export type {
   ApiMember,
@@ -22,74 +26,7 @@ export type {
   PropertyDoc,
 } from '@helix-io/docs'
 
-const REPO = join(process.cwd(), '..', '..')
-
-const MANIFESTS = [
-  'helix/web/custom-elements.json',
-  'helix/headless/custom-elements.json',
-  'helix/sandbox/custom-elements.json',
-]
-
-/** Where the example files sit, one folder per family. */
-const EXAMPLES = 'helix/web/src'
-
-const readManifest = (path: string) => {
-  const file = join(REPO, path)
-  if (!existsSync(file)) {
-    return { modules: [] }
-  }
-  return JSON.parse(readFileSync(file, 'utf8'))
-}
-
-/** Every example file on disk, as the payload the catalog names and orders. */
-const readExamples = (): ExampleSource[] => {
-  const root = join(REPO, EXAMPLES)
-  if (!existsSync(root)) {
-    return []
-  }
-  const found: ExampleSource[] = []
-  for (const family of readdirSync(root, { withFileTypes: true })) {
-    const dir = join(root, family.name, '.examples')
-    if (!family.isDirectory() || !existsSync(dir)) {
-      continue
-    }
-    for (const file of readdirSync(dir)) {
-      if (!file.endsWith('.html')) {
-        continue
-      }
-      const slug = file.replace(/\.html$/, '')
-      const stylesheet = join(dir, `${slug}.css`)
-      found.push({
-        css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
-        family: family.name,
-        html: readFileSync(join(dir, file), 'utf8').trim(),
-        slug,
-      })
-    }
-  }
-  return found
-}
-
-let cached: Family[] | undefined
-
-/**
- * Every family, read fresh in development.
- *
- * `.examples/*.html` and the manifests are read with `fs`, not imported, so
- * nothing puts them in the module graph and nothing invalidates a value
- * computed once at import time. Adding an example then showed nothing until the
- * dev server was restarted.
- *
- * Production still computes this once. Every page is static there, so the
- * sources cannot change under a running server, and the cache is what keeps the
- * manifests from being parsed for each page of the build.
- */
-export const getFamilies = (): Family[] => {
-  if (cached && process.env.NODE_ENV === 'production') {
-    return cached
-  }
-  cached = catalog(MANIFESTS.map(readManifest), readExamples())
-  return cached
-}
+/** Every family, alphabetical, each with its elements and examples. */
+export const getFamilies = (): Family[] => generated as Family[]
 
 export const findFamily = (slug: string): Family | undefined => findInCatalog(getFamilies(), slug)
