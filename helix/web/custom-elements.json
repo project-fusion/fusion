@@ -586,12 +586,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "separation",
               "type": {
                 "text": "'outlined' | 'plain' | undefined"
               },
-              "description": "Whether the stack is framed.\n\n- `plain` is the default and is what an application usually wants: the\n  seams between items already say the items are one set, so a frame is a\n  second statement of the same thing. Inside a card, a panel, a dialog or a\n  sidebar, it is a line and no meaning.\n- `outlined` frames the stack, for an accordion sitting directly on the\n  page where nothing else says where it starts and stops. A marketing\n  page's FAQ is the case it is for.\n\nBoth are writable, so a generated page can say which it means rather than\nrelying on the absence of an attribute.",
-              "attribute": "appearance",
+              "description": "How the stack separates itself from the page.\n\nTwo of the axis's four values, which is what this surface has meaning for:\na stack of items is already told apart by its seams, so a lift would be a\nthird statement and a fill a second.\n\n- `plain` is the default and is what an application usually wants: the\n  seams between items already say the items are one set, so a frame is a\n  second statement of the same thing. Inside a card, a panel, a dialog or a\n  sidebar, it is a line and no meaning.\n- `outlined` frames the stack, for an accordion sitting directly on the\n  page where nothing else says where it starts and stops. A marketing\n  page's FAQ is the case it is for.\n\nBoth are writable, so a generated page can say which it means rather than\nrelying on the absence of an attribute.",
+              "attribute": "separation",
               "reflects": true
             },
             {
@@ -740,12 +740,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "separation",
               "type": {
                 "text": "'outlined' | 'plain' | undefined"
               },
-              "description": "Whether the stack is framed.\n\n- `plain` is the default and is what an application usually wants: the\n  seams between items already say the items are one set, so a frame is a\n  second statement of the same thing. Inside a card, a panel, a dialog or a\n  sidebar, it is a line and no meaning.\n- `outlined` frames the stack, for an accordion sitting directly on the\n  page where nothing else says where it starts and stops. A marketing\n  page's FAQ is the case it is for.\n\nBoth are writable, so a generated page can say which it means rather than\nrelying on the absence of an attribute.",
-              "fieldName": "appearance"
+              "description": "How the stack separates itself from the page.\n\nTwo of the axis's four values, which is what this surface has meaning for:\na stack of items is already told apart by its seams, so a lift would be a\nthird statement and a fill a second.\n\n- `plain` is the default and is what an application usually wants: the\n  seams between items already say the items are one set, so a frame is a\n  second statement of the same thing. Inside a card, a panel, a dialog or a\n  sidebar, it is a line and no meaning.\n- `outlined` frames the stack, for an accordion sitting directly on the\n  page where nothing else says where it starts and stops. A marketing\n  page's FAQ is the case it is for.\n\nBoth are writable, so a generated page can say which it means rather than\nrelying on the absence of an attribute.",
+              "fieldName": "separation"
             },
             {
               "name": "mode",
@@ -7154,12 +7154,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "separation",
               "type": {
-                "text": "'outlined' | 'elevated' | 'plain' | undefined"
+                "text": "'elevated' | 'filled' | 'outlined' | 'plain' | undefined"
               },
-              "description": "How the card separates itself from the page.\n\n- `outlined` is the default, and a hairline is usually enough. It costs\n  less attention than a shadow: a screen of shadowed cards reads as a stack\n  of things floating, none of them settled.\n- `elevated` is lifted off the page instead of framed, for a card on a\n  colored or busy background, where a line has to compete with whatever is\n  behind it and a shadow does not.\n- `plain` has no frame at all: the card is a layout and whatever it sits in\n  is the surface. For a card inside something already bounded, where a\n  second box adds a line and no meaning.",
-              "attribute": "appearance",
+              "description": "How the card separates itself from the page.\n\n**One value per mechanism, and the theme has the same four.**\n`ThemeIntent.separation` is `border | fill | shadow | space`, so these are\nthe component's words for what a theme states as a policy, one to one. It\nwas `appearance`, which is the library's word for four different questions\nand is being retired from all of them: `outlined` on a Card says where the\nsurface ends and `outlined` on a Button says how much ink, and one word\ncannot keep saying both.\n\n- `outlined` is the default, and a hairline is usually enough. It costs\n  less attention than a shadow: a screen of shadowed cards reads as a stack\n  of things floating, none of them settled.\n- `elevated` is lifted off the page instead of framed, for a card on a\n  colored or busy background, where a line has to compete with whatever is\n  behind it and a shadow does not.\n- `filled` is told apart by its own colour, with neither edge nor lift. For\n  a dense surface where a border on every card is a grid of lines, and for\n  a theme whose `separation` policy is `fill`, which pushes the surface\n  ladder away from the page precisely so this reads.\n- `plain` has no frame at all: the card is a layout and whatever it sits in\n  is the surface. For a card inside something already bounded, where a\n  second box adds a line and no meaning.\n\n**`filled` is new and it closes a hole the engine could already see.**\n`plain` clears the ground *and* the edge, so a surface with its own colour\nand neither edge nor lift was unsayable while being one of the four things\na theme could ask for.",
+              "attribute": "separation",
               "reflects": true
             },
             {
@@ -7168,7 +7168,7 @@
               "type": {
                 "text": "'glass' | undefined"
               },
-              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`appearance` is how a thing is drawn and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`separation` is where the surface ends and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
               "attribute": "material",
               "reflects": true
             },
@@ -7305,19 +7305,19 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "separation",
               "type": {
-                "text": "'outlined' | 'elevated' | 'plain' | undefined"
+                "text": "'elevated' | 'filled' | 'outlined' | 'plain' | undefined"
               },
-              "description": "How the card separates itself from the page.\n\n- `outlined` is the default, and a hairline is usually enough. It costs\n  less attention than a shadow: a screen of shadowed cards reads as a stack\n  of things floating, none of them settled.\n- `elevated` is lifted off the page instead of framed, for a card on a\n  colored or busy background, where a line has to compete with whatever is\n  behind it and a shadow does not.\n- `plain` has no frame at all: the card is a layout and whatever it sits in\n  is the surface. For a card inside something already bounded, where a\n  second box adds a line and no meaning.",
-              "fieldName": "appearance"
+              "description": "How the card separates itself from the page.\n\n**One value per mechanism, and the theme has the same four.**\n`ThemeIntent.separation` is `border | fill | shadow | space`, so these are\nthe component's words for what a theme states as a policy, one to one. It\nwas `appearance`, which is the library's word for four different questions\nand is being retired from all of them: `outlined` on a Card says where the\nsurface ends and `outlined` on a Button says how much ink, and one word\ncannot keep saying both.\n\n- `outlined` is the default, and a hairline is usually enough. It costs\n  less attention than a shadow: a screen of shadowed cards reads as a stack\n  of things floating, none of them settled.\n- `elevated` is lifted off the page instead of framed, for a card on a\n  colored or busy background, where a line has to compete with whatever is\n  behind it and a shadow does not.\n- `filled` is told apart by its own colour, with neither edge nor lift. For\n  a dense surface where a border on every card is a grid of lines, and for\n  a theme whose `separation` policy is `fill`, which pushes the surface\n  ladder away from the page precisely so this reads.\n- `plain` has no frame at all: the card is a layout and whatever it sits in\n  is the surface. For a card inside something already bounded, where a\n  second box adds a line and no meaning.\n\n**`filled` is new and it closes a hole the engine could already see.**\n`plain` clears the ground *and* the edge, so a surface with its own colour\nand neither edge nor lift was unsayable while being one of the four things\na theme could ask for.",
+              "fieldName": "separation"
             },
             {
               "name": "material",
               "type": {
                 "text": "'glass' | undefined"
               },
-              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`appearance` is how a thing is drawn and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`separation` is where the surface ends and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
               "fieldName": "material"
             },
             {
@@ -7372,6 +7372,10 @@
                 "slug": "elevated"
               },
               {
+                "description": "Told apart by its own colour, with neither edge nor lift.",
+                "slug": "filled"
+              },
+              {
                 "description": "Media beside the words rather than above them.",
                 "slug": "horizontal"
               },
@@ -7388,7 +7392,7 @@
                 "slug": "media-beside"
               },
               {
-                "description": "A hairline and no fill.",
+                "description": "A hairline around the surface.",
                 "slug": "outlined"
               },
               {
@@ -43656,12 +43660,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "separation",
               "type": {
                 "text": "'plain' | undefined"
               },
-              "description": "How the panel is framed.\n\nUnset is a surface with an inset, which is what a panel of content wants.\n`plain` removes both, for a panel holding something that brings its own,\nsuch as a list whose rows run to the edges.",
-              "attribute": "appearance",
+              "description": "How the panel separates itself from what it floats over.\n\nOne of the axis's four values, which is all this surface has meaning for: a\nfloating panel keeps its lift by default, `ThemeIntent.separation.floating`\nrefusing `space` for the reason it refuses it everywhere, that a panel over\ncontent nobody can predict has to be readable.\n\nUnset is a surface with an inset, which is what a panel of content wants.\n`plain` removes both, for a panel holding something that brings its own,\nsuch as a list whose rows run to the edges.",
+              "attribute": "separation",
               "reflects": true
             },
             {
@@ -44024,12 +44028,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "separation",
               "type": {
                 "text": "'plain' | undefined"
               },
-              "description": "How the panel is framed.\n\nUnset is a surface with an inset, which is what a panel of content wants.\n`plain` removes both, for a panel holding something that brings its own,\nsuch as a list whose rows run to the edges.",
-              "fieldName": "appearance"
+              "description": "How the panel separates itself from what it floats over.\n\nOne of the axis's four values, which is all this surface has meaning for: a\nfloating panel keeps its lift by default, `ThemeIntent.separation.floating`\nrefusing `space` for the reason it refuses it everywhere, that a panel over\ncontent nobody can predict has to be readable.\n\nUnset is a surface with an inset, which is what a panel of content wants.\n`plain` removes both, for a panel holding something that brings its own,\nsuch as a list whose rows run to the edges.",
+              "fieldName": "separation"
             },
             {
               "name": "open",

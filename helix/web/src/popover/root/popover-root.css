@@ -55,7 +55,7 @@
 /* Nothing but the surface. For a panel holding something that brings its own
    inset, such as a list whose rows run to the edges so their hover reaches
    them. */
-:host([appearance="plain"]) [part="popover"] {
+:host([separation="plain"]) [part="popover"] {
   padding: var(--popover-inset, var(--helix-space-none));
 }
 

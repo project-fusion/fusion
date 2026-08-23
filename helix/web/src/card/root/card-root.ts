@@ -54,24 +54,41 @@ export class HelixCard extends HelixBaseCard {
   /**
    * How the card separates itself from the page.
    *
+   * **One value per mechanism, and the theme has the same four.**
+   * `ThemeIntent.separation` is `border | fill | shadow | space`, so these are
+   * the component's words for what a theme states as a policy, one to one. It
+   * was `appearance`, which is the library's word for four different questions
+   * and is being retired from all of them: `outlined` on a Card says where the
+   * surface ends and `outlined` on a Button says how much ink, and one word
+   * cannot keep saying both.
+   *
    * - `outlined` is the default, and a hairline is usually enough. It costs
    *   less attention than a shadow: a screen of shadowed cards reads as a stack
    *   of things floating, none of them settled.
    * - `elevated` is lifted off the page instead of framed, for a card on a
    *   colored or busy background, where a line has to compete with whatever is
    *   behind it and a shadow does not.
+   * - `filled` is told apart by its own colour, with neither edge nor lift. For
+   *   a dense surface where a border on every card is a grid of lines, and for
+   *   a theme whose `separation` policy is `fill`, which pushes the surface
+   *   ladder away from the page precisely so this reads.
    * - `plain` has no frame at all: the card is a layout and whatever it sits in
    *   is the surface. For a card inside something already bounded, where a
    *   second box adds a line and no meaning.
+   *
+   * **`filled` is new and it closes a hole the engine could already see.**
+   * `plain` clears the ground *and* the edge, so a surface with its own colour
+   * and neither edge nor lift was unsayable while being one of the four things
+   * a theme could ask for.
    */
   @property({ reflect: true })
-  appearance?: 'outlined' | 'elevated' | 'plain'
+  separation?: 'elevated' | 'filled' | 'outlined' | 'plain'
 
   /**
    * What the card is made of.
    *
    * **A third axis, and it passes the test the other two answer to.**
-   * `appearance` is how a thing is drawn and `tone` is what it means; both of
+   * `separation` is where the surface ends and `tone` is what it means; both of
    * those can be true at once with this, an elevated glass card being a
    * perfectly ordinary thing to want, so it is not a value of either.
    *

@@ -106,7 +106,7 @@ export default function Page() {
 
       <section data-band>
         <helix-flex data-shell direction="column" gap="lg">
-          <helix-card appearance="outlined">
+          <helix-card separation="outlined">
             <helix-flex direction="column" gap="lg">
               <helix-text appearance="label" class="dvMono" slot="header" tone="subtle">
                 Seed 00 · The Sovereignty Constraint

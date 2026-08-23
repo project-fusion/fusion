@@ -27,9 +27,9 @@ the default: an accordion is a list, where a card is a surface.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'outlined' \| 'plain' \| undefined` | - | - | Whether the stack is framed. |
 | `items` | - | `HelixBaseAccordionItem[]` | - | `HelixBaseAccordion` | Direct items, in light-DOM order. Client only: the server has no tree. |
 | `mode` | `mode` | `'single' \| 'single-collapsible' \| undefined` | - | `HelixBaseAccordion` | How many sections may be open at once. |
+| `separation` | `separation` | `'outlined' \| 'plain' \| undefined` | - | - | How the stack separates itself from the page. |
 
 #### Slots
 
@@ -792,10 +792,10 @@ element you slotted, not a wrapper around it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'outlined' \| 'elevated' \| 'plain' \| undefined` | - | - | How the card separates itself from the page. |
 | `material` | `material` | `'glass' \| undefined` | - | - | What the card is made of. |
 | `mediaPlacement` | `media-placement` | `'end' \| undefined` | - | `HelixBaseCard` | Puts the media after the content instead of before it. |
 | `orientation` | `orientation` | `'vertical' \| 'horizontal' \| undefined` | - | - | Whether media sits above the content stack or beside it. |
+| `separation` | `separation` | `'elevated' \| 'filled' \| 'outlined' \| 'plain' \| undefined` | - | - | How the card separates itself from the page. |
 
 #### Slots
 
@@ -3693,12 +3693,12 @@ time.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'plain' \| undefined` | - | - | How the panel is framed. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `'Popover'` | `HelixBasePopover` | Accessible name for the panel. |
 | `offset` | `offset` | `number` | `4` | `HelixBasePopover` | Space between the trigger and the panel, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixBasePopover` | Preferred side. It moves if that side does not fit. |
+| `separation` | `separation` | `'plain' \| undefined` | - | - | How the panel separates itself from what it floats over. |
 
 #### Methods
 

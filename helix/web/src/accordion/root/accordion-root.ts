@@ -27,7 +27,11 @@ import { styles } from './accordion-root.css.js'
 @customElement('helix-accordion')
 export class HelixAccordion extends HelixBaseAccordion {
   /**
-   * Whether the stack is framed.
+   * How the stack separates itself from the page.
+   *
+   * Two of the axis's four values, which is what this surface has meaning for:
+   * a stack of items is already told apart by its seams, so a lift would be a
+   * third statement and a fill a second.
    *
    * - `plain` is the default and is what an application usually wants: the
    *   seams between items already say the items are one set, so a frame is a
@@ -41,7 +45,7 @@ export class HelixAccordion extends HelixBaseAccordion {
    * relying on the absence of an attribute.
    */
   @property({ reflect: true })
-  appearance?: 'outlined' | 'plain'
+  separation?: 'outlined' | 'plain'
 
   static override styles: CSSResultGroup = styles
 }

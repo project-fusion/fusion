@@ -101,7 +101,7 @@ export default function Page() {
 
       <section data-band>
         <helix-flex data-shell direction="column" gap="lg">
-          <helix-card appearance="outlined">
+          <helix-card separation="outlined">
             <helix-flex align="center" gap="md" justify="between" wrap>
               <helix-flex direction="column" gap="2xs">
                 <helix-text appearance="title">Check any of it.</helix-text>

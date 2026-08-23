@@ -35,7 +35,7 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
       data-slug={slug ? insight.slug : undefined}
       href={`/insights/${insight.slug}`}
     >
-      <helix-card appearance="elevated">
+      <helix-card separation="elevated">
         <InsightArt image={insight.image} slot="media" />
 
         {/* Both facts as tags, and toned the way the post's own page tones them:

@@ -107,7 +107,7 @@ export default async function Page({
             href={`/helix/components/${family.slug}`}
             key={family.slug}
           >
-            <helix-card appearance="outlined">
+            <helix-card separation="outlined">
               <ComponentArt slug={family.slug} />
               <helix-flex align="center" gap="sm" justify="between" slot="header">
                 <helix-text appearance="title" as="h3">

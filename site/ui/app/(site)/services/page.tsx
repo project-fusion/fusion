@@ -52,7 +52,7 @@ export default function Page() {
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="xl">
           {SERVICES.map((service) => (
-            <helix-card appearance="outlined" class="serviceCard" key={service.name}>
+            <helix-card class="serviceCard" key={service.name} separation="outlined">
               <helix-flex align="center" gap="md" justify="between" slot="header" wrap>
                 <helix-flex align="center" gap="sm">
                   <helix-icon name={service.icon}></helix-icon>

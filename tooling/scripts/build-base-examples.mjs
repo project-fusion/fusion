@@ -60,15 +60,24 @@ for (const mod of manifest.modules) {
 }
 
 /* Presentation the headless tier does not have. `check:examples` would catch
-   each of these, but naming them here keeps the failure list about real gaps. */
+   each of these, but naming them here keeps the failure list about real gaps.
+
+   The visual axes of #158 are here for the same reason `appearance` is, and
+   `appearance` is still here because twenty families have not been swept yet.
+   A list rather than "whatever the base manifest lacks": a styled attribute the
+   headless tier genuinely should have is a gap worth failing on, and stripping
+   by absence would hide exactly that. */
 const PRESENTATIONAL = new Set([
   'appearance',
   'data-density',
   'dense',
   'divided',
+  'emphasis',
   'fill',
+  'material',
   'raised',
   'rounded',
+  'separation',
   'shape',
   'size',
   'tone',

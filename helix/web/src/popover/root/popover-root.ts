@@ -37,14 +37,19 @@ import { styles } from './popover-root.css.js'
 @customElement('helix-popover')
 export class HelixPopover extends HelixBasePopover {
   /**
-   * How the panel is framed.
+   * How the panel separates itself from what it floats over.
+   *
+   * One of the axis's four values, which is all this surface has meaning for: a
+   * floating panel keeps its lift by default, `ThemeIntent.separation.floating`
+   * refusing `space` for the reason it refuses it everywhere, that a panel over
+   * content nobody can predict has to be readable.
    *
    * Unset is a surface with an inset, which is what a panel of content wants.
    * `plain` removes both, for a panel holding something that brings its own,
    * such as a list whose rows run to the edges.
    */
   @property({ reflect: true })
-  appearance?: 'plain'
+  separation?: 'plain'
 
   static override styles: CSSResultGroup = styles
 }

@@ -18,7 +18,7 @@
  *
  * On the host, which is the box. These rules named `[part="container"]`, a
  * wrapper this component does not render: its markup is a bare slot. So the
- * accordion had no border and no corner radius at all, and `appearance="plain"`
+ * accordion had no border and no corner radius at all, and `separation="plain"`
  * did nothing, which is the same fault the card had and neither showed up as
  * anything but a component quietly not looking like itself. Found by
  * `check:selectors` on its first run.
@@ -29,13 +29,13 @@
 
 /* Framed, for an accordion with nothing around it.
  *
- * This rule did not exist. `appearance` declared `outlined` and no selector
+ * This rule did not exist. `separation` declared `outlined` and no selector
  * anywhere matched it, and it looked correct only because the frame was on
  * `:host` and therefore on everything: writing `outlined` and writing nothing
  * gave the same picture for the same reason a broken switch on an already-lit
  * lamp looks like it works. Flipping the default is what made it a real value.
  */
-:host([appearance="outlined"]) {
+:host([separation="outlined"]) {
   border: var(--helix-border-thin) solid var(--accordion-border-color, var(--helix-color-border));
   /* The house radius. Card wrote the argument down: at anything larger the
      corner is softer than the controls inside it and the container stops
@@ -53,7 +53,7 @@
    pixel. `+` reaches slotted siblings because they are siblings in the light
    DOM, which is the tree the selector runs against.
 
-   Unconditional, which is what carries the grouping in both appearances and is
+   Unconditional, which is what carries the grouping in both separations and is
    why the frame is not needed to say the items belong together. */
 ::slotted(* + *) {
   border-block-start: var(--helix-border-thin) solid

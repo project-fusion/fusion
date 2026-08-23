@@ -44,13 +44,27 @@
   --_card-media: var(--card-media-size, 12rem);
 }
 
-:host([appearance="elevated"]) {
+:host([separation="elevated"]) {
   border-color: transparent;
 
   --card-shadow: var(--helix-shadow-md);
 }
 
-:host([appearance="plain"]) {
+/* Told apart by its own colour and nothing else, which is the fourth mechanism
+   `ThemeIntent.separation` has always carried and no component could ask for.
+   The ground stays, both the edge and the lift go: `plain` below clears the
+   ground as well, so between them there was no way to say "a surface, quietly".
+
+   Nothing here states a colour. The base already fills with
+   `--helix-color-surface`, one rung off the page, and a theme whose policy is
+   `fill` pushes that ladder further away exactly so this reads without a line. */
+:host([separation="filled"]) {
+  border-color: transparent;
+
+  --card-shadow: none;
+}
+
+:host([separation="plain"]) {
   background-color: transparent;
   border-color: transparent;
 }
