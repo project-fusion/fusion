@@ -440,9 +440,12 @@ type FormValue = File | FormData | string | null
  * never reported to its form rather than like a harness that never recorded.
  * Under happy-dom, where each file gets the node shim, all of them passed.
  */
-const reported: WeakMap<HTMLElement, FormValue> = ((
-  globalThis as typeof globalThis & { __helixReported?: WeakMap<HTMLElement, FormValue> }
-).__helixReported ??= new WeakMap<HTMLElement, FormValue>())
+const shared = globalThis as typeof globalThis & {
+  __helixReported?: WeakMap<HTMLElement, FormValue>
+}
+const reported: WeakMap<HTMLElement, FormValue> =
+  shared.__helixReported ?? new WeakMap<HTMLElement, FormValue>()
+shared.__helixReported = reported
 
 /**
  * Nothing to register, but `setFormValue` is watched on the way past.
