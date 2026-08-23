@@ -34,6 +34,7 @@ import { formatted } from './lib/formatted.mjs'
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const CONTENT = join(ROOT, 'helix/docs/content')
 const OUT = join(ROOT, 'helix/docs/src/pages.generated.ts')
+const SOURCES = join(ROOT, 'helix/docs/src/sources.generated.ts')
 const SECTIONS = join(ROOT, 'helix/docs/src/sections.ts')
 
 const check = process.argv.includes('--check')
@@ -240,9 +241,35 @@ ${pages.map(literal).join('\n')}
 ]
 `
 
+/* The MDX itself, inlined for the same reason `@fusion-io/site-content` inlines
+   its own: a page that reads the file at request time is the filesystem access
+   that traced this repository into a server bundle, and a content package must
+   not be the thing that puts it back. */
+const sources = `/**
+ * Every page's MDX, inlined by \`bun run docs\`. Do not edit: the files in
+ * \`content/\` are the source, and \`bun run check:docs\` fails when this module
+ * and they disagree.
+ */
+export const docSources: Record<string, string> = {
+${slugs
+  .map((slug) => {
+    const body = readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8')
+      .replace(/\\/g, '\\\\')
+      .replace(/`/g, '\\`')
+      .replace(/\$\{/g, '\\${')
+    const key = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(slug) ? slug : `'${slug}'`
+    return `  ${key}: \`${body}\`,`
+  })
+  .join('\n')}
+}
+`
+
 if (check) {
   const existing = readFileSync(OUT, 'utf8')
-  if (existing !== formatted(generated, 'pages.generated.ts')) {
+  if (
+    existing !== formatted(generated, 'pages.generated.ts') ||
+    readFileSync(SOURCES, 'utf8') !== formatted(sources, 'sources.generated.ts')
+  ) {
     console.error('docs: pages.generated.ts is stale. Run `bun run docs`')
     process.exit(1)
   }
@@ -251,5 +278,6 @@ if (check) {
   )
 } else {
   writeFileSync(OUT, formatted(generated, 'pages.generated.ts'))
+  writeFileSync(SOURCES, formatted(sources, 'sources.generated.ts'))
   console.log(`docs: wrote ${pages.length} pages across ${sections.length} sections`)
 }

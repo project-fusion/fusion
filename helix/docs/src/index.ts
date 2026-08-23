@@ -28,3 +28,4 @@ export {
   sections,
 } from './registry.js'
 export { findSection } from './sections.js'
+export { docSources } from './sources.generated.js'
