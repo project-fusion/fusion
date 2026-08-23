@@ -154,3 +154,125 @@ describe('a stop', () => {
     expect(stop.target).toBeNull()
   })
 })
+
+/**
+ * The three things `21-component-audit.md` named against this family, each of
+ * which was live for two days and none of which had a test.
+ *
+ * `index` carried an `@controlled` tag and honoured none of it: the tour wrote
+ * the property and announced afterwards, so a refusal arrived after the move it
+ * was refusing and a consumer who declared `index` had it overwritten on the
+ * next press. `skip()` and `finish()` did the same with `open`.
+ *
+ * The tag was invisible to `check:controlled`, whose regex wanted the property
+ * name followed immediately by `(`, `:` or `=` and so read `get value():` and
+ * not `index = 0`. Twelve of the thirteen tags in the library are written the
+ * first way, which is why a check reporting a count rather than the names it
+ * found could go on looking thorough.
+ */
+describe('moving between stops', () => {
+  test('announces before it moves, so a refusal is a refusal', async () => {
+    const tour = await run()
+    tour.addEventListener('helix-change', (event) => {
+      event.preventDefault()
+    })
+    tour.next()
+    await tour.updateComplete
+    expect(tour.index).toBe(0)
+  })
+
+  test('and moves where nothing refused', async () => {
+    const tour = await run()
+    const seen: string[] = []
+    tour.addEventListener('helix-change', () => {
+      seen.push(`heard at ${tour.index}`)
+    })
+    tour.next()
+    await tour.updateComplete
+    expect(seen).toEqual(['heard at 0'])
+    expect(tour.index).toBe(1)
+  })
+})
+
+describe('a tour whose stop the consumer owns', () => {
+  /* Declaring `index` is a claim of ownership, so the tour announces and
+     applies nothing until it is told, which is the contract the tag promises
+     and the whole reason it is worth having. */
+  test('announces and applies nothing itself', async () => {
+    /* Three stops and starting on the first, because `next()` on the last stop
+       is a completion rather than a move and announces nothing at all. */
+    const host = (await mount(
+      `<helix-base-tour open index="0">
+        <helix-base-tour-stop for="a">A</helix-base-tour-stop>
+        <helix-base-tour-stop for="b">B</helix-base-tour-stop>
+        <helix-base-tour-stop for="c">C</helix-base-tour-stop>
+      </helix-base-tour>`,
+    )) as Tour
+    await host.updateComplete
+    let heard = 0
+    host.addEventListener('helix-change', () => {
+      heard += 1
+    })
+    host.next()
+    await host.updateComplete
+    expect([heard, host.index]).toEqual([1, 0])
+  })
+
+  /* Decided once, at the first update. A script assigning `index` to a tour
+     nobody owns would otherwise hand it to a consumer who never asked. */
+  test('while a later assignment does not take an unowned tour over', async () => {
+    const tour = await run()
+    tour.index = 1
+    await tour.updateComplete
+    tour.next()
+    await tour.updateComplete
+    expect(tour.index).toBe(2)
+  })
+
+  test('and `default-index` seeds without claiming it', async () => {
+    const host = (await mount(
+      `<helix-base-tour open default-index="1">
+        <helix-base-tour-stop for="a">A</helix-base-tour-stop>
+        <helix-base-tour-stop for="b">B</helix-base-tour-stop>
+      </helix-base-tour>`,
+    )) as Tour
+    await host.updateComplete
+    expect(host.index).toBe(1)
+  })
+})
+
+describe('leaving the run', () => {
+  /* Only one of the two ways out is a request. `HelixCloseEvent` is
+     `cancelable: true` and `HelixCompleteEvent` is not, deliberately: leaving
+     early is something a consumer may refuse, and having finished is something
+     that has already happened. The audit read both as closes and said neither
+     was cancelable; only the first of them ever could be. */
+  test('is cancelable when the reader is leaving early', async () => {
+    const tour = await run()
+    tour.addEventListener('helix-close', (event) => {
+      event.preventDefault()
+    })
+    tour.skip()
+    await tour.updateComplete
+    expect(tour.open).toBe(true)
+  })
+
+  test('and closes where nothing refused', async () => {
+    const tour = await run()
+    tour.skip()
+    await tour.updateComplete
+    expect(tour.open).toBe(false)
+  })
+
+  test('while finishing is a report, and announces before it closes', async () => {
+    const tour = await run()
+    let openWhenHeard: boolean | undefined
+    tour.addEventListener('helix-complete', () => {
+      openWhenHeard = tour.open
+    })
+    tour.index = 2
+    tour.next()
+    await tour.updateComplete
+    expect([openWhenHeard, tour.open]).toEqual([true, false])
+  })
+})

@@ -52928,14 +52928,52 @@
               "type": {
                 "text": "number"
               },
-              "default": "0",
-              "description": "Which stop the reader is on.",
+              "description": "Which stop the reader is on.\n\n**It said `@controlled` for two days and honoured none of it.** The tag is\na claim that a consumer may own the value, and `index` was a plain property\nthe tour wrote to directly: `move` assigned it and *then* announced, so\n`preventDefault` on the change arrived after the move it was refusing, and\na consumer who declared `index` had it overwritten on the next press.\n\nThe shape is `Carousel`'s, which is the nearest thing in the library: a\n`default-index` for markup that only seeds, a held state that is\n`undefined` until somebody sets one, and a mode decided once at the first\nupdate so a later assignment cannot take the tour over.",
               "attribute": "index",
               "helix": {
                 "controlled": [
                   "helix-change"
                 ]
               }
+            },
+            {
+              "kind": "field",
+              "name": "defaultIndex",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Stop to start on, where nothing declared one.",
+              "attribute": "default-index"
+            },
+            {
+              "kind": "field",
+              "name": "indexState",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The stop being shown, whoever set it, and `undefined` until somebody has."
+            },
+            {
+              "kind": "field",
+              "name": "indexMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the stop, decided once and then fixed."
+            },
+            {
+              "kind": "field",
+              "name": "indexIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -53066,7 +53104,7 @@
                   "text": "void"
                 }
               },
-              "description": "Leaves the run early, which is a close rather than a completion.",
+              "description": "Leaves the run early, which is a close rather than a completion.\n\nAnnounced before it is applied, and cancelable because of it. Both closes\nwrote `open` first and dispatched after, so a consumer calling\n`preventDefault` was refusing something that had already happened.",
               "type": {
                 "text": "skip() => void"
               }
@@ -53287,9 +53325,17 @@
               "type": {
                 "text": "number"
               },
-              "default": "0",
-              "description": "Which stop the reader is on.",
+              "description": "Which stop the reader is on.\n\n**It said `@controlled` for two days and honoured none of it.** The tag is\na claim that a consumer may own the value, and `index` was a plain property\nthe tour wrote to directly: `move` assigned it and *then* announced, so\n`preventDefault` on the change arrived after the move it was refusing, and\na consumer who declared `index` had it overwritten on the next press.\n\nThe shape is `Carousel`'s, which is the nearest thing in the library: a\n`default-index` for markup that only seeds, a held state that is\n`undefined` until somebody sets one, and a mode decided once at the first\nupdate so a later assignment cannot take the tour over.",
               "fieldName": "index"
+            },
+            {
+              "name": "default-index",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Stop to start on, where nothing declared one.",
+              "fieldName": "defaultIndex"
             },
             {
               "name": "label",

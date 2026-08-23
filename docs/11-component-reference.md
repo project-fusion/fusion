@@ -6236,8 +6236,9 @@ The styled tier of `BaseTour`. It draws the light and nothing else.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `backLabel` | `back-label` | `string` | `''` | `HelixBaseTour` | Label for the control that goes back, handed to every stop. |
+| `defaultIndex` | `default-index` | `number` | `0` | `HelixBaseTour` | Stop to start on, where nothing declared one. |
 | `doneLabel` | `done-label` | `string` | `''` | `HelixBaseTour` | Label for the control that goes on from the last stop. |
-| `index` | `index` | `number` | `0` | `HelixBaseTour` | Which stop the reader is on. |
+| `index` | `index` | `number` | - | `HelixBaseTour` | Which stop the reader is on. |
 | `label` | `label` | `string` | `''` | `HelixBaseTour` | Accessible name for the run, such as "Getting started". |
 | `length` | - | `number` | - | `HelixBaseTour` | How many stops there are. |
 | `nextLabel` | `next-label` | `string` | `''` | `HelixBaseTour` | Label for the control that goes on. |

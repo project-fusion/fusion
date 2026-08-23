@@ -160,10 +160,22 @@ for (const tier of TIERS) {
     const called = new Set([...source.matchAll(/^\s*label: '([\w-]+)',$/gm)].map((m) => m[1]))
     /* The property the tag sits above, which is the next declaration after the
        comment closes and whatever decorators follow it. */
+    /* `\s*` before the punctuation, which it did not have.
+     *
+       The name has to be followed by `(`, `:` or `=`, and requiring it
+       *immediately* reads `get value(): string` and misses `index = 0`. Twelve
+       of the thirteen tags in the library happen to be written the first way,
+       so the check reported twelve declared properties and looked thorough
+       while skipping one, and the one it skipped was `Tour.index`, which is
+       tagged `@controlled` and announces through nothing at all.
+
+       A check that prints a count without naming what it found cannot be
+       caught doing this, which is the more general lesson and is why the line
+       below now says which. */
     const tagged = new Set(
       [
         ...source.matchAll(
-          /\* @controlled [\w\s-]+\n(?:[\s\S]{0,400}?)\n\s+(?:get )?([A-Za-z]\w*)[(:=]/g,
+          /\* @controlled [\w\s-]+\n(?:[\s\S]{0,400}?)\n\s+(?:get )?([A-Za-z]\w*)\s*[(:=]/g,
         ),
       ].map((match) => match[1]),
     )

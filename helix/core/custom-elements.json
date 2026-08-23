@@ -939,6 +939,15 @@
             },
             {
               "kind": "field",
+              "name": "frame",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "description": "The frame waiting to take focus, so a release can call it off."
+            },
+            {
+              "kind": "field",
               "name": "previous",
               "type": {
                 "text": "HTMLElement | null"

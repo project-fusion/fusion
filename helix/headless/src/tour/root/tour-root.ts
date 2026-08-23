@@ -5,6 +5,7 @@ import {
   HelixCompleteEvent,
   HelixElement,
   hostAria,
+  requestControlledChange,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
@@ -76,10 +77,43 @@ export class HelixBaseTour extends HelixElement {
   /**
    * Which stop the reader is on.
    *
+   * **It said `@controlled` for two days and honoured none of it.** The tag is
+   * a claim that a consumer may own the value, and `index` was a plain property
+   * the tour wrote to directly: `move` assigned it and *then* announced, so
+   * `preventDefault` on the change arrived after the move it was refusing, and
+   * a consumer who declared `index` had it overwritten on the next press.
+   *
+   * The shape is `Carousel`'s, which is the nearest thing in the library: a
+   * `default-index` for markup that only seeds, a held state that is
+   * `undefined` until somebody sets one, and a mode decided once at the first
+   * update so a later assignment cannot take the tour over.
+   *
    * @controlled helix-change
    */
   @property({ type: Number })
-  index = 0
+  get index(): number {
+    return this.indexState ?? this.defaultIndex
+  }
+
+  set index(next: number) {
+    const previous = this.index
+    this.indexState = next
+    this.requestUpdate('index', previous)
+  }
+
+  /** Stop to start on, where nothing declared one. */
+  @property({ attribute: 'default-index', type: Number })
+  defaultIndex = 0
+
+  /** The stop being shown, whoever set it, and `undefined` until somebody has. */
+  private indexState: number | undefined = undefined
+
+  /** Whether the consumer owns the stop, decided once and then fixed. */
+  private indexMode: boolean | undefined = undefined
+
+  private get indexIsControlled(): boolean {
+    return this.indexMode === true
+  }
 
   /** Accessible name for the run, such as "Getting started". */
   @property()
@@ -141,20 +175,51 @@ export class HelixBaseTour extends HelixElement {
     this.move(this.index - 1)
   }
 
-  /** Leaves the run early, which is a close rather than a completion. */
+  /**
+   * Leaves the run early, which is a close rather than a completion.
+   *
+   * Announced before it is applied, and cancelable because of it. Both closes
+   * wrote `open` first and dispatched after, so a consumer calling
+   * `preventDefault` was refusing something that had already happened.
+   */
   skip(): void {
+    const event = new HelixCloseEvent()
+    this.dispatchEvent(event)
+    if (event.defaultPrevented) {
+      return
+    }
     this.open = false
-    this.dispatchEvent(new HelixCloseEvent())
   }
 
+  /* Announced before it closes, and not cancelable, which is the difference
+     from `skip`. `HelixCompleteEvent` is `cancelable: false` by construction:
+     leaving early is a request a consumer may refuse, and having reached the
+     end is something that has already happened. What ordering still buys is a
+     listener that reads `open` and sees the tour as it was when it finished. */
   private finish(): void {
-    this.open = false
     this.dispatchEvent(new HelixCompleteEvent({ value: String(this.index) }))
+    this.open = false
   }
 
+  /* The one audited path, which every stateful change in the library goes
+     through and this did not. It announces, then applies where nothing refused
+     and where the consumer has not taken the value over, and it audits a
+     controlled tour whose consumer never answers. */
   private move(to: number): void {
-    this.index = to
-    this.dispatchEvent(new HelixChangeEvent({ property: 'index', value: String(to) }))
+    requestControlledChange({
+      apply: (value) => {
+        if (this.indexIsControlled) {
+          return
+        }
+        this.index = value
+      },
+      controlled: this.indexIsControlled,
+      event: (value) => new HelixChangeEvent({ property: 'index', value: String(value) }),
+      host: this,
+      label: 'index',
+      next: to,
+      read: () => this.index,
+    })
   }
 
   private readonly handleAsk = (event: Event): void => {
@@ -206,6 +271,13 @@ export class HelixBaseTour extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* Only the first time, before anything reads it. A script assigning `index`
+       to a tour nobody owns would otherwise hand it to a consumer who never
+       asked, and the tour would stop moving itself from then on. See
+       `MixinControllerOpen`, which argues the whole decide-once rule. */
+    if (this.indexMode === undefined) {
+      this.indexMode = this.indexState !== undefined
+    }
     hostAria(this.internals, { label: this.label, role: 'region' })
   }
 
