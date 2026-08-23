@@ -118,3 +118,14 @@
   font-size: var(--helix-text-sm);
   line-height: var(--helix-leading-normal);
 }
+
+/* Print: a fill that is a slab of grey on paper; the border frames it instead.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}

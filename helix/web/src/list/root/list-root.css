@@ -65,3 +65,13 @@
 :host([kind="description"]) ::slotted(*) {
   --list-item-term-weight: var(--helix-weight-semibold);
 }
+
+/* Print: a list.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+  }
+}

@@ -137,3 +137,13 @@
   --_steps-ink-complete: var(--helix-color-foreground-muted);
   --_steps-ink-current: var(--helix-color-foreground);
 }
+
+/* Print: where a process reached, which is a fact and not a control.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+  }
+}

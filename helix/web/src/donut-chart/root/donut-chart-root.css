@@ -485,3 +485,14 @@
 
   font-size: 6.5cqi;
 }
+
+/* Print: the same, and a donut with no fill is a ring of nothing.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+    print-color-adjust: exact;
+  }
+}

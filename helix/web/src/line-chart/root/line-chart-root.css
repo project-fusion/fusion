@@ -375,3 +375,14 @@
 [part="band"] {
   fill: var(--line-chart-band-color, var(--helix-color-surface-sunken));
 }
+
+/* Print: the same.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+    print-color-adjust: exact;
+  }
+}

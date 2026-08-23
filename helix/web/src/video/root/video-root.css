@@ -695,3 +695,13 @@
 [part="back"]:not(:has(*)) {
   display: none;
 }
+
+/* Print: a moving picture, and its controls are the only part that would print.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    display: none;
+  }
+}

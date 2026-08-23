@@ -316,3 +316,14 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: var(--helix-size-focus-offset);
 }
+
+/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+    print-color-adjust: exact;
+  }
+}

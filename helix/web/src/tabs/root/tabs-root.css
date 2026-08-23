@@ -20,7 +20,6 @@
      was describing a value the token had stopped carrying. */
   --_tabs-rule: none;
   --_tab-radius: var(--helix-radii-sm);
-  --_tab-selected-rule: transparent;
   --_tab-selected-shadow: var(--helix-shadow-sm);
   --_tab-selected-surface: var(--helix-color-surface-raised);
 
@@ -73,7 +72,6 @@
 :host([variant="underlined"]) {
   --_tabs-rule: linear-gradient(var(--helix-color-border), var(--helix-color-border));
   --_tab-radius: var(--helix-radii-none);
-  --_tab-selected-rule: var(--helix-color-primary);
   --_tab-selected-shadow: none;
   --_tab-selected-surface: transparent;
 }
@@ -249,4 +247,16 @@
 :host(:not([variant])) {
   --_tab-selected-surface: transparent;
   --_tab-selected-shadow: none;
+}
+
+/* Print: the panel that is open, without the strip that would open another.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+    max-block-size: none;
+    overflow: visible;
+  }
 }

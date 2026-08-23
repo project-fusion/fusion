@@ -46,3 +46,14 @@ slot:not([name])::slotted(*) {
 slot[name="actions"]::slotted(*) {
   margin-block-start: var(--helix-space-sm);
 }
+
+/* Print: a notice, not a panel.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}

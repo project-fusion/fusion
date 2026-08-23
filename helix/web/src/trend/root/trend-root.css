@@ -80,3 +80,13 @@ slot[name="label"] {
   color: var(--helix-color-foreground-muted);
   font-weight: var(--helix-weight-regular);
 }
+
+/* Print: a direction and a number.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+  }
+}

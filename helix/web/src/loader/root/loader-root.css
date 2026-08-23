@@ -254,3 +254,13 @@
     opacity: 1;
   }
 }
+
+/* Print: a spinner is a promise that something is coming, which on paper it is not.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    display: none;
+  }
+}

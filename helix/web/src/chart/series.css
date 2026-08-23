@@ -52,3 +52,14 @@
   --chart-series-23: var(--helix-color-series-23);
   --chart-series-24: var(--helix-color-series-24);
 }
+
+/* Print: the shared chart parts, for the same reason.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+    print-color-adjust: exact;
+  }
+}

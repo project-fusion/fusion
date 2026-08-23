@@ -14,3 +14,13 @@
   margin: var(--helix-space-none);
   padding: var(--helix-space-none);
 }
+
+/* Print: where this page sits, which is worth having on a page with no back button.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+  }
+}
