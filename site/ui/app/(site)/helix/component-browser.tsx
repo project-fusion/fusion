@@ -321,6 +321,16 @@ export function ComponentBrowser({
               {lede}
             </helix-text>
           </helix-flex>
+          {/* "Components" rather than "families", deliberately, and the number is
+              the catalog's rather than the library's.
+            
+              Eighty-nine is what this box searches and what a reader is looking
+              at: one card each. It is not the count of custom elements, which is
+              a hundred and eighteen in the styled tier, because Tabs is one card
+              and two elements. The library says "family" everywhere it has to
+              tell a family from its parts, and that is an authoring concern; a
+              reader browsing meets the word nowhere else on the site, the route
+              being `/helix/components` and the label above saying the same. */}
           <helix-input
             className={`${browser.heroSearch} ${browser.chromeControl}`}
             default-value={initialQuery}
