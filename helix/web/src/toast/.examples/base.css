@@ -98,3 +98,22 @@ helix-base-toast-item::part(item):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
+
+helix-base-toast::part(region) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+helix-base-toast-item::part(item) {
+  align-items: center;
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+helix-base-toast-item::part(content) {
+  flex: 1;
+}

@@ -363,6 +363,21 @@ const HOST = {
   display: inline-flex;
   position: relative;
 }`,
+  /* A row of buttons that touch, which is the group's only reason to exist.
+     Undirected they stacked and read as three separate controls. */
+  'button-group': `helix-base-button-group {
+  display: inline-flex;
+  gap: 0.25rem;
+}`,
+  /* A box, because that is the whole of what a card is.
+     With nothing on the host a card was a heading and a paragraph loose on the
+     page, indistinguishable from the prose around it. */
+  card: `helix-base-card {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  display: block;
+  padding: 0.75rem;
+}`,
   divider: `helix-base-divider {
   background-color: var(--_gray-line);
   block-size: 1px;
@@ -396,6 +411,12 @@ helix-base-divider[orientation="vertical"] {
   color: var(--_gray-mark);
   display: inline-block;
   inline-size: 1.5rem;
+}`,
+  /* A box to be a fraction of. The track is `inline-size: 100%` and the host had
+     no width to take a percentage of, so a meter reading 42% rendered as the
+     characters "42%" and no bar at all. */
+  meter: `helix-base-meter {
+  display: block;
 }`,
   'qr-code': `helix-base-qr-code {
   display: block;
@@ -485,6 +506,21 @@ const GLYPH = `block-size: 1em;
   flex: none;
   inline-size: 1em;`
 
+/* A button with edges, defined once because two examples render one.
+ *
+ * The branch that undresses triggers is right that the platform should not paint
+ * a control, and it leaves a button as bare text: the example rendered the word
+ * "Button" and nothing else, which is not a diagram of a button. `EXTRA` is
+ * keyed by family, so Button had a box and Button Group, whose three children
+ * are buttons, did not. */
+const BUTTON_BOX = `helix-base-button::part(button) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  cursor: pointer;
+  display: inline-flex;
+  padding: 0.25rem 0.75rem;
+}`
+
 const EXTRA = {
   announcement: `helix-base-announcement::part(content) {
   flex: 1;
@@ -515,6 +551,12 @@ helix-base-app-header::part(content) {
   position: absolute;
   text-align: center;
 }`,
+  /* A control with edges. The branch that undresses triggers and buttons is
+     right that the platform should not paint them, and it leaves a button as
+     bare text: the example rendered the word "Button" and nothing else, which
+     is not a diagram of a button. */
+  button: BUTTON_BOX,
+  'button-group': BUTTON_BOX,
   carousel: `helix-base-carousel::part(track) {
   background-color: transparent;
   block-size: auto;
@@ -558,6 +600,14 @@ helix-base-command::part(listbox) {
   'icon-button': `helix-base-icon-button::part(button) {
   border: 1px solid var(--_gray-line);
   padding: 0.375rem;
+}`,
+  /* A row with air in it. Both lines of a row ran together, so a name and the
+     caption under it read as one run of words. */
+  list: `helix-base-list-item::part(row) {
+  align-items: baseline;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
 }`,
   /* A column, the options having matched the branch that lays a group out
      along a line: four options ran across the page as a sentence. */
@@ -715,6 +765,46 @@ helix-base-rating::part(fill) {
   display: block;
   min-block-size: 1em;
 }`,
+  /* The grid the component measured for itself.
+     `table` names its own columns in `--table-template` and nothing read it, so
+     the cells fell into the flow and every heading ran into the next:
+     "ServiceRegionStatus" across the top and the rows under it out of step. */
+  /* The example's own layout, which the styled twin keeps in `default.css` and
+     this generator does not carry across.
+   
+     A skeleton has no size of its own, deliberately: it is a placeholder for
+     something whose shape the consumer knows. So the classes are the diagram,
+     and without them the example rendered nothing at all, which reads as a
+     component that does not work rather than as one waiting to be told how big
+     it is. Widths are unequal on purpose, two bars of a length being a pattern
+     and a pattern reading as decoration. */
+  skeleton: `.row {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.avatar {
+  block-size: 2.5rem;
+  border-radius: 50%;
+  inline-size: 2.5rem;
+}
+
+.stack,
+.lines {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.line-name {
+  inline-size: 40%;
+}
+
+.line-detail {
+  inline-size: 70%;
+}`,
   slider: `/* The control stays the platform's range input, so \`accent-color\` is the
    whole of what a grayscale slider needs. */
 helix-base-slider::part(control) {
@@ -789,6 +879,23 @@ helix-base-switch[data-checked]::part(thumb) {
   background-color: var(--_gray-surface);
   translate: 0.75rem 0;
 }`,
+  table: `helix-base-table::part(table) {
+  display: grid;
+  gap: 0.25rem 1rem;
+  grid-template-columns: var(--table-template, 1fr);
+}
+
+/* The head and every row take no box, so their cells are the grid's items.
+   
+   That is stated in the component's own docs as something the styled tier does,
+   and the styled tier was the only place it was written: without it the cells
+   stayed inside their rows, the grid had three items where it wanted nine, and
+   the three headings ran together as "ServiceRegionStatus" with the rows under
+   them out of step. */
+helix-base-table::part(head),
+helix-base-table-row {
+  display: contents;
+}`,
   tag: `helix-base-tag {
   align-items: center;
   background-color: var(--_gray-fill);
@@ -842,6 +949,27 @@ helix-base-timeline-item::part(dot) {
   block-size: 0.5rem;
   border-radius: 50%;
   inline-size: 0.5rem;
+}`,
+  /* A stack of messages, each one a row inside a box.
+     Left alone the tone mark, the message and the dismiss ran together and the
+     messages had no surface to sit on. */
+  toast: `helix-base-toast::part(region) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+helix-base-toast-item::part(item) {
+  align-items: center;
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+helix-base-toast-item::part(content) {
+  flex: 1;
 }`,
   tree: `/* Down and indented, which is what nesting means.
    
@@ -1030,12 +1158,17 @@ for (const slug of wanted) {
   /* Formatted here rather than left to `format-examples.mjs`, which would
      rewrite it a moment later and leave every file reporting as drifted. One
      rule, one implementation, run by both. */
+  /* The source's own `<link>` comes out first, because this adds one.
+     Skeleton's twin links its sheet in the markup rather than relying on the
+     example runner, so the base copy carried two identical links: harmless to
+     render and a diagram that tells a reader to write the line twice. */
+  const linked = body.replace(/<link\b[^>]*rel=["']stylesheet["'][^>]*>\s*/gi, '')
   const html =
     format(`<!-- @summary The same ${displayName(slug).toLowerCase()} on the headless tier, with every rule written by hand. -->
 
 <link href="styles.css" rel="stylesheet" />
 
-${body.trim()}\n`)
+${linked.trim()}\n`)
   const fromMarkup = [...html.matchAll(/<(helix-base-[a-z0-9-]+)/g)].map((m) => m[1])
   /* Plus every tag the family registers, because a component draws parts no tag
      in the example names: the callout's icon and the breadcrumb's separator are

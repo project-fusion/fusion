@@ -64,3 +64,21 @@ helix-base-icon::part(svg) {
   flex: none;
   inline-size: 1em;
 }
+
+helix-base-table::part(table) {
+  display: grid;
+  gap: 0.25rem 1rem;
+  grid-template-columns: var(--table-template, 1fr);
+}
+
+/* The head and every row take no box, so their cells are the grid's items.
+   
+   That is stated in the component's own docs as something the styled tier does,
+   and the styled tier was the only place it was written: without it the cells
+   stayed inside their rows, the grid had three items where it wanted nine, and
+   the three headings ran together as "ServiceRegionStatus" with the rows under
+   them out of step. */
+helix-base-table::part(head),
+helix-base-table-row {
+  display: contents;
+}

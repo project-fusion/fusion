@@ -43,6 +43,13 @@ helix-base-icon {
   inline-size: 1em;
 }
 
+helix-base-card {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  display: block;
+  padding: 0.75rem;
+}
+
 helix-base-button::part(button) {
   all: unset;
   box-sizing: border-box;

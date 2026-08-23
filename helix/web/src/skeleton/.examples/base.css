@@ -67,8 +67,30 @@ helix-base-icon::part(svg) {
   inline-size: 1em;
 }
 
-helix-base-skeleton::part(skeleton) {
-  background-color: var(--_gray-fill);
-  display: block;
-  min-block-size: 1em;
+.row {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.avatar {
+  block-size: 2.5rem;
+  border-radius: 50%;
+  inline-size: 2.5rem;
+}
+
+.stack,
+.lines {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.line-name {
+  inline-size: 40%;
+}
+
+.line-detail {
+  inline-size: 70%;
 }

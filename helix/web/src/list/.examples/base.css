@@ -54,3 +54,10 @@ helix-base-icon::part(svg) {
   flex: none;
   inline-size: 1em;
 }
+
+helix-base-list-item::part(row) {
+  align-items: baseline;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}

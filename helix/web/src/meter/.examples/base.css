@@ -43,6 +43,10 @@ helix-base-icon {
   inline-size: 1em;
 }
 
+helix-base-meter {
+  display: block;
+}
+
 helix-base-meter::part(track) {
   background-color: var(--_gray-fill);
   block-size: 0.5rem;

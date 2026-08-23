@@ -43,6 +43,11 @@ helix-base-icon {
   inline-size: 1em;
 }
 
+helix-base-button-group {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
 helix-base-button::part(button) {
   all: unset;
   box-sizing: border-box;
@@ -61,4 +66,12 @@ helix-base-icon::part(svg) {
 helix-base-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+helix-base-button::part(button) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  cursor: pointer;
+  display: inline-flex;
+  padding: 0.25rem 0.75rem;
 }
