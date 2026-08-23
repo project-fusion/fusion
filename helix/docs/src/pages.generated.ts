@@ -67,7 +67,7 @@ export const docPages: DocPage[] = [
     order: 4,
     section: 'Getting started',
     slug: 'for-coding-agents',
-    title: 'For coding agents',
+    title: 'Coding agents',
   },
   {
     description:
@@ -155,7 +155,7 @@ export const docPages: DocPage[] = [
     title: 'Routing and navigation',
   },
   {
-    description: 'The editor beside the preview, and the isolation that makes it safe.',
+    description: 'The editor beside the preview, and how to build one of your own.',
     section: 'Tooling',
     slug: 'sandbox',
     title: 'Sandbox',

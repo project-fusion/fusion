@@ -12,10 +12,10 @@ title: Accessibility
 
 # Accessibility
 
-This page is about the division of labour. Some of accessibility is structural
-and a component can own it; some of it is about your content and no component
-can. Knowing which is which is the difference between a page that is accessible
-and a page built out of accessible parts.
+Some of accessibility is structural, and a component can own it. Some of it is
+about your content, and no component can. Knowing which is which is the
+difference between a page that is accessible and a page built out of accessible
+parts.
 
 ## What the library owns
 
@@ -30,16 +30,16 @@ open and returns it to whatever opened it. So do \`Drawer\` and the modal path o
 
 **Contrast, by construction rather than by review.** The theme engine measures
 every foreground against the ground it is really painted on and solves for the
-target rather than checking afterwards. \`bun run check:contrast\` re-measures the
-whole library, including the two thirds of rules that set an ink or a ground
-but not both, so a pairing nobody thought of is still measured.
-See [Surfaces and separation](./surfaces-and-separation).
+target rather than checking afterwards. Every pairing is re-measured, including
+the two thirds of rules that set an ink or a ground but not both, so a pairing
+nobody thought of is still checked. See [Surfaces and
+separation](./surfaces-and-separation).
 
 **Reduced motion, per component.** Fifty-nine stylesheets answer
 \`prefers-reduced-motion\` individually, because they have to: the base layer's
 global rule is \`*, *::before, *::after\` in the document, and \`*\` does not cross
 a shadow boundary, so it reaches your prose and none of the components.
-\`bun run check:motion\` fails a component that animates without answering.
+A component that animates without answering fails the build.
 
 **Disabled without disappearing.** \`disabled\` is mirrored to \`aria-disabled\`
 rather than removing the control from the accessibility tree, so a screen reader
@@ -93,8 +93,8 @@ document and is read where it sits. Neither is a variant of the other.
 **IDREFs do not cross it.** \`aria-labelledby\` and \`aria-describedby\` inside a
 shadow root cannot resolve to an id in your document, and the reference is
 dropped silently rather than erroring. This is why every control renders its own
-label instead of being wrapped by one, and it is worth knowing before you try to
-wire two components together by id. See [Forms and validation](./forms).
+label instead of being wrapped by one, and why wiring two components together by
+id does not work. See [Forms and validation](./forms).
 
 **\`<label for>\` cannot reach in either.** A \`<label>\` in your markup will not
 name a Helix control. Use the control's own \`label\`.
@@ -115,14 +115,12 @@ The base layer's \`[data-hidden-visually]\` clips rather than using
 the accessibility tree entirely, which is the opposite of what visually-hidden
 text is for.
 
-## What we do not claim
+## What is not covered
 
 The library is tested in Chromium, by automated specs and by pixel baselines. It
 is not run through a screen reader on every release, and the components'
 patterns follow the ARIA authoring practices rather than being certified against
-them. Where you find a real failure, it is a bug and worth reporting as one: the
-constraint machinery in this repository exists because we would rather a check
-found it than a user did.
+them. Where you find a real failure, it is a bug: report it.
 `,
   angular: `---
 description: The schema Angular needs before it will compile an unknown tag.
@@ -195,10 +193,9 @@ title: Browser support
 
 # Browser support
 
-Helix is built on the platform rather than on a compatibility layer, which makes
-this page short and specific: there is no polyfill story, no transpiled
-fallback, and no configuration that trades features for reach. What the library
-needs is what the browser has to have.
+Helix is built on the platform rather than on a compatibility layer. There is no
+polyfill story, no transpiled fallback, and no configuration that trades
+features for reach: what the library needs is what your browser has to have.
 
 ## What is tested
 
@@ -229,7 +226,7 @@ deliberate choice and the one place the library takes a dependency instead of
 the platform: anchor positioning is not yet available everywhere the rest of
 this list is.
 
-## The two that decide your floor
+## What decides your floor
 
 **\`light-dark()\` and the Popover API.** Everything else on that list has been
 available longer. If you need to know whether a browser can run Helix, those are
@@ -255,8 +252,8 @@ Nothing else in the library reads it.
 
 ## No IE, no polyfills, no build flag
 
-There is no \`browserslist\` in this repository and no transpilation target, which
-is a decision rather than an oversight. A design system whose components are
+There is no \`browserslist\` and no transpilation target, which is a decision
+rather than an oversight. A design system whose components are
 custom elements cannot be shipped to a browser without custom elements, and
 everything else on the list above arrived in the same generation of browsers
 that shipped those.
@@ -275,8 +272,8 @@ title: Charting
 # Charting
 
 Six chart families: \`Bar Chart\`, \`Line Chart\`, \`Donut Chart\`, \`Sparkline\`,
-\`Trend\` and the shared \`Legend\`. Their API is on their own pages. This page is
-about the one thing those pages cannot tell you, which is how the data gets in.
+\`Trend\` and the shared \`Legend\`. Each has its own API page. Here is how the data
+gets in, which is the same for all of them.
 
 ## The data is a table in the document
 
@@ -296,8 +293,8 @@ about the one thing those pages cannot tell you, which is how the data gets in.
 \`\`\`
 
 \`for\` points at a real \`<table>\` by id, and the chart reads its series from it.
-That is unlike every other component in the library and it is worth
-understanding, because it is not a convenience.
+That is unlike every other component in the library, and it is not a
+convenience.
 
 **A property cannot survive hydration.** A framework's server render emits
 markup, and a property is not markup: an array assigned to \`items\` exists only
@@ -411,7 +408,7 @@ distinguishable in that order rather than to look good as a full set.
 \`keyword\`, \`name\`, \`string\`, \`tag\`. Deliberately fewer than a full editor theme,
 because a code block in documentation is read rather than edited.
 
-## OKLCH, and why it matters here
+## OKLCH
 
 Every colour is authored in OKLCH. Equal numeric steps in sRGB are not equal
 perceptual steps, which makes both ramp generation and contrast arithmetic
@@ -422,17 +419,17 @@ Concretely, this is what lets the theme engine take a brand colour and *solve*
 for a palette rather than have someone pick one. See [Deriving a
 theme](./theming).
 
-## Contrast is a guarantee, not a review step
+## Contrast is a guarantee
 
 The engine measures every ink against the ground it will really be painted on
 and searches for the lightness that meets the target, rather than proposing a
 value and checking it afterwards. Every pairing it produces meets the target by
 construction.
 
-That guarantee is only as good as the list of pairs somebody thought of, which
-is why two checks exist rather than one. \`bun run check:pairings\` holds the
-engine's declared surface model against what components actually paint. \`bun run
-check:contrast\` measures the two thirds that check cannot see: of the rules in
+That guarantee is only as good as the list of pairs somebody thought of, so two
+things are checked rather than one. The engine's declared surface model is held
+against what components actually paint, and every pairing is then measured,
+which covers the two thirds the first cannot see: of the rules in
 the library, eleven set an ink and a ground together, where 165 set only an ink
 and 112 only a ground, and a pairing assembled by the cascade is still a pairing
 a reader has to be able to read.
@@ -553,7 +550,7 @@ Helix has families, parts and groups, and they are not stylistic choices. Each
 answers a different question, and knowing which you are looking at tells you
 what to import and what to write.
 
-## A namespace means composition, never variation
+## Namespaces mean composition
 
 \`Card.Root\` contains \`Card.Header\`. The namespace says *this goes inside that*.
 
@@ -566,7 +563,7 @@ A button that is filled instead of outlined is the same component with a
 different \`appearance\`. A button that holds only an icon has a different
 accessible-name requirement and a different shape, so it is its own component.
 
-## A region becomes an element only when it has behaviour, state or API
+## When a region becomes an element
 
 Otherwise it is a slot.
 
@@ -581,7 +578,7 @@ Measured on Card with identical content: wrappers present but empty rendered
 85px against an ideal of 53px. Bare slots rendered 53px with no hiding logic at
 all.
 
-## A group is a part when it is the control, and a family when it arranges them
+## When a group is a part
 
 The test is whether the group reports a form value.
 
@@ -618,11 +615,11 @@ Text stays an attribute, because that is what most tooltips and most avatars
 hold. Anything richer replaces it by being slotted. Both can never show at once,
 and no component has to detect which you did.
 
-One trap worth knowing: **a whitespace-only text node is assigned to the default
-slot and defeats its fallback.** A newline between the tags is enough. That is
+One trap: **a whitespace-only text node is assigned to the default slot and
+defeats its fallback.** A newline between the tags is enough. That is
 why some examples close on the same line they open.
 
-## Width comes from the layout, not the control
+## Width comes from the layout
 
 There is no \`width\` or \`fill\` property on a button, for the same reason there is
 no \`size\` one: how wide a control is says something about the region it is in.
@@ -651,9 +648,8 @@ To make one hug its label instead, tell the layout:
 <helix-button class="hug">Hugs its label</helix-button>
 \`\`\`
 
-That is the whole of it, and it is worth saying out loud because the default
-surprises people: dropping a button into a column makes it full width, and the
-instinct is to look for a property that turns that off.
+The default surprises people: dropping a button into a column makes it full
+width, and the instinct is to look for a property that turns that off.
 
 **A fixed width is a different question, and it belongs to your site.** A
 marketing page whose hero buttons are all the same width is a real and reusable
@@ -673,7 +669,7 @@ Name it once where your other page constants live:
 The same reasoning puts a hero's type size outside the component scale: a
 marketing hero is not a component, so its measurements are the site's own.
 
-## One property per intent, including labels
+## One property per intent
 
 Every field control names itself the same way, and there are exactly two cases.
 
@@ -703,7 +699,7 @@ There used to be a \`hide-label\` boolean beside \`label\`. It is gone: one
 attribute supplying a label and a second saying not to show it is the absence of
 the first, spelled twice.
 
-## When one behaviour serves several components, it becomes its own family
+## Shared behaviour becomes its own family
 
 \`Option\`, \`Listbox\` and \`Select\` are three families rather than one because the
 keyboard, the filtering, the multi-select rules and the active-item tracking
@@ -833,7 +829,7 @@ package augments \`HTMLElementEventMap\`, which types \`addEventListener\` for
 people writing plain HTML; and the name lives on the class, so a dispatch and a
 listener cannot disagree about the string.
 
-## The prefix earns its place three times
+## Why events are prefixed
 
 **Retargeting.** An event dispatched inside a shadow root is retargeted to look
 like it came from the host, so a bare \`input\` from a \`<helix-input>\` is
@@ -879,11 +875,8 @@ dialog.addEventListener('helix-close', (event) => {
 })
 \`\`\`
 
-\`bun run check:events\` exists partly because this went undocumented: \`Tabs\` and
-\`Toggle.Group\` each dispatched the cancelable \`helix-change\` that is the only
-refusal path, and neither declared it, so the path was undiscoverable. The check
-holds every dispatched event to a declaration and every declaration to a
-dispatch.
+Every dispatched event is held to a declaration and every declaration to a
+dispatch, so an event you can listen for is an event that is documented.
 
 ## The set
 
@@ -918,14 +911,14 @@ the prefix and nothing camel-cases it. See [React](./react), [Vue](./vue) and
 description: Every surface here is readable by a machine, and where each one is.
 order: 4
 section: Getting started
-title: For coding agents
+title: Coding agents
 ---
 
-# For coding agents
+# Coding agents
 
 An agent writing Helix code should not have to read a rendered website. Three
-surfaces exist for that, and all three are generated from the same sources the
-site renders from.
+surfaces give it the library as text, all generated from the sources this site
+renders from.
 
 ## The manifest
 
@@ -969,11 +962,10 @@ The \`.json\` is the same family as structured data.
 docs/11-component-reference.md
 \`\`\`
 
-Every family, every element, every table, in one file. Generated by \`bun run
-reference\` and held to the manifest by \`bun run check:reference\`, so it is
-current or the build fails.
+Every family, every element, every table, in one file. Generated from the
+manifest, so it is current or the build fails.
 
-## The rules that are actually enforced
+## What is enforced
 
 Worth knowing, because they are the difference between code that looks right and
 code that passes:
@@ -1012,7 +1004,7 @@ Markdown**, and links that hand the document's URL to Claude or to Cursor. The
 URL rather than the contents, because the URL stays current and a pasted copy
 starts going stale the moment it is pasted.
 
-## What is deliberately not here
+## What is not here
 
 **\`llms-full.txt\`.** Concatenating every page into one download is out of date
 the moment anything changes, where the links in \`llms.txt\` are individually
@@ -1155,8 +1147,8 @@ Measured: a \`helix-input\` in one accepted text, reported \`disabled\` as false
 and carried no \`aria-disabled\`, while the form's entry list correctly left it
 out. Interactive and unsubmittable is the worst of both.
 
-**The consequence for your own CSS is a rule worth knowing.** Style disabled
-controls with \`:disabled\`, never \`[disabled]\`:
+**For your own CSS this means one rule.** Style disabled controls with
+\`:disabled\`, never \`[disabled]\`:
 
 \`\`\`css
 /* Right: matches the attribute and the ancestor fieldset. */
@@ -1171,8 +1163,8 @@ inside a disabled fieldset, which sets no attribute on anything. A component
 styled with the attribute selector refuses interaction from the fieldset,
 because the platform disables it either way, and paints itself as live. That
 reads as a control that is simply broken, and it is invisible in every example
-that does not happen to use a fieldset. \`bun run check:disabled\` holds the
-library to this; the same reasoning applies to yours.
+that does not happen to use a fieldset. The library holds itself to this, and
+the same reasoning applies to yours.
 
 \`disabled\` is mirrored to \`aria-disabled\` rather than removing the control from
 the accessibility tree, so a screen reader can still announce that the control
@@ -1253,9 +1245,9 @@ import { trash } from '@helix-io/icons'
 \`\`\`
 
 Each glyph is an exported string, so you can put one in your own markup, in a
-canvas, or anywhere an element is not what you want. \`bun run check:icons\` holds
-every \`name\` used anywhere in the repository to the set of glyphs that actually
-exist, in 1,189 files, so a typo is a build failure rather than an empty box.
+canvas, or anywhere an element is not what you want. Every \`name\` the library
+uses is held to the set of glyphs that actually exist, so a typo is a build
+failure rather than an empty box.
 
 ## Adding one
 
@@ -1266,7 +1258,7 @@ hand-transcribing a path into a TypeScript object.
 Keep to the same geometry: 256 box, stroke-width 16, no fill. A glyph drawn at a
 different weight is visible immediately when it sits beside one that was not.
 
-## Icons this set deliberately does not have
+## Icons this set does not have
 
 Product marks. Helix and Cortex have marks and they live in the icon package,
 but a mark is not an icon: it identifies a product and does not mean an action.
@@ -1380,9 +1372,8 @@ whether it needs telling that an unknown tag is deliberate.
 | [Other frameworks](./other-frameworks) | Solid, Qwik, Lit, and the three rules they all reduce to |
 | [Without a bundler](./without-a-bundler) | An import map, or the stylesheets alone |
 
-A framework has a page here when we ship something for it or when it refuses to
-compile without configuration. Everything else shares one page, which says more
-than four pages each saying it works.
+A framework gets its own page when Helix ships typings for it, or when it
+refuses to compile without configuration. Everything else works with no setup.
 `,
   'intent-reference': `---
 description: Every input the theme engine takes, and what each one decides.
@@ -1501,9 +1492,9 @@ title: Introduction
 
 # Helix
 
-Helix is Fusion's design system: the DNA every Fusion product is built from.
-Tokens, element primitives, a headless component tier, a styled tier, and the
-framework typings generated from all of it.
+A design system of web components: tokens, a headless component tier, a styled
+tier, and the framework typings generated from both. It works in any framework,
+or none, because the components are custom elements.
 
 Two things make it different from a component library.
 
@@ -1699,7 +1690,7 @@ overshoot reads as responsive rather than as a bug.
 The theme engine takes a \`motion\` intent input, so a product can be uniformly
 quicker or slower without every component being retuned.
 
-## Reduced motion is per component, and this is why
+## Reduced motion is per component
 
 The base layer has a global rule capping animation and transition duration for a
 reader who asked not to be moved. **It does not reach a single component.**
@@ -1711,8 +1702,8 @@ reader who asked not to be moved. **It does not reach a single component.**
 \`*\` does not cross a shadow boundary. So that rule reaches your prose, your
 layout and the base layer's own recipes, and none of the fifty-odd components
 that draw inside a shadow root. Each one answers \`prefers-reduced-motion\` in its
-own stylesheet, and fifty-nine of them do; \`bun run check:motion\` fails a
-component that animates without one.
+own stylesheet, and fifty-nine of them do, and a component that animates
+without one fails the build.
 
 **The same is true of yours.** If you write a component with a shadow root, the
 global rule will not cover it either. That is not a Helix behaviour, it is how
@@ -1761,9 +1752,7 @@ trailing: true
 # Other frameworks
 
 Solid, Qwik, Lit, Ember, Alpine, htmx, and anything else that puts elements in a
-document. There is one page for all of them rather than a page each, because a
-page per framework is a claim that we test that framework, and what these
-actually need is three rules that do not change between them.
+document. All of them need the same three rules, and nothing beyond them.
 
 ## The three rules
 
@@ -1850,7 +1839,7 @@ The consequence for your CSS: **do not try to raise an overlay with \`z-index\`.
 It has no effect on a top-layer element, and reaching for it means something
 else is wrong.
 
-## Positioning is JavaScript, deliberately
+## Positioning is JavaScript
 
 Placement uses \`@floating-ui/dom\` rather than CSS anchor positioning: flip when
 there is no room below, shift to stay on screen, size to the available space.
@@ -1861,7 +1850,7 @@ support](./browser-support).
 That means an overlay's position is recomputed while it is open, on scroll and
 resize, and stops when it closes.
 
-## Dismissal, and the order it happens in
+## Dismissal
 
 Light dismiss is the platform's: click outside, or press \`Escape\`. What Helix
 adds is making that correct across shadow boundaries.
@@ -1940,7 +1929,7 @@ page.
 
 Three doors are open, and they are in the order you should try them.
 
-## 1. Tokens, when the change is not about one component
+## 1. Tokens
 
 \`\`\`css
 :root {
@@ -1958,7 +1947,7 @@ smaller change and the one that stays consistent.
 
 See [Tokens](./tokens) and [Deriving a theme](./theming).
 
-## 2. Per-component hooks, when the change is about one component
+## 2. Per-component hooks
 
 \`\`\`css
 helix-card {
@@ -1975,17 +1964,17 @@ semantic token, so leaving it alone gets you the themed value, and setting it
 changes that component and nothing else.
 
 **They are API, not tokens**, and the distinction is enforced. A hook is named
-after the component (\`--card-padding\`, \`--drawer-radii\`), a token is named
-\`--helix-*\`, and \`bun run check:hooks\` holds every documented hook to a rule
-that actually reads it, in both directions. Declared and never read is a promise
-with nothing behind it; read and never declared is a working feature nobody is
-told about. Three of \`Button\`'s four hooks had been inert for a refactor's worth
-of time while the reference went on listing them, which is how that check came
+after the component (\`--card-padding\`, \`--drawer-radii\`) and a token is named
+\`--helix-*\`. Every documented hook is held to a rule that actually reads it, in
+both directions: declared and never read is a promise with nothing behind it,
+and read and never declared is a working feature nobody is told about. Three of
+\`Button\`'s four hooks were inert for a refactor's worth of time while the
+reference went on listing them, which is how that check came
 to exist.
 
 Each component's page lists its hooks under Custom properties.
 
-## 3. Parts, when you need at the box itself
+## 3. Parts
 
 \`\`\`css
 helix-select::part(trigger) {
@@ -2002,7 +1991,7 @@ declaration you like on it. It is the most powerful door and the one to try
 last, because it is the one that couples your stylesheet to a component's
 internal structure.
 
-**A published part is a promise**, and \`bun run check:parts\` holds it both ways:
+**A published part is a promise**, held both ways:
 a documented part that nothing renders, and a rendered part nobody was told
 about. The second is the worse of the two, because a \`::part()\` that resolves to
 nothing is valid CSS that matches nothing and reports nothing. \`Breadcrumbs\`
@@ -2076,7 +2065,7 @@ The prop is \`on\` and the event name, verbatim. Not \`onHelixOpen\`, not \`onOp
 React 19 forwards an unknown \`on*\` prop to \`addEventListener\` using the name as
 written, so the casing is the event's own.
 
-## The bridge, and why it exists
+## The bridge
 
 React has a hydration bug with custom events: handlers attached during hydration
 are stashed on the DOM node but never bound, so an event fired before the next
@@ -2085,11 +2074,11 @@ stash off the node and calling what it finds, so a handler works from the first
 paint rather than from the first re-render.
 
 That is runtime code you already have, in \`@helix-io/core\`, and nothing to
-configure. It is worth knowing about for one reason: it reads a React internal,
-the per-page key React stores props under, so \`bun run check:react-bridge\`
-exists in this repository to fail loudly if a React release renames it. The
-failure direction is safe, since finding nothing returns the pre-hydration
-behaviour, but it is silent, which is why it is checked rather than trusted.
+configure. One thing to know about it: it reads a React
+internal, the per-page key React stores props under. If a React release renames
+that key the bridge stops repairing and your handlers go back to needing a
+commit before they fire. Helix pins the React version it was measured against
+and fails its own build when React moves past it, so this cannot go unnoticed.
 
 ## A declared property is a claim of ownership
 
@@ -2119,10 +2108,9 @@ Two ways to write it, depending on which you meant:
 \`\`\`
 
 The constraint is generated from the manifest and covers every controlled
-property in the library, which \`bun run check:controlled\` holds to a fixture in
-both directions: a constraint that stopped constraining and one that grew too
-strict are the same kind of silent, and the second reaches you as "the library
-will not let me write correct code".
+property in the library, checked in both directions: a constraint that stopped
+constraining and one that grew too strict are the same kind of silent, and the
+second reaches you as "the library will not let me write correct code".
 
 See [State and control](./state-and-control) for what the two modes actually do.
 
@@ -2301,7 +2289,7 @@ Before \`href\` existed, the docs sidebar put a \`<Link>\` inside each row. The
 anchor was 57px of a 240px row, so five sixths of every row did nothing, and
 Enter did nothing at all: the tree announced a selection and no anchor heard it.
 
-## \`href\` and a framework's \`<Link>\` are alternatives, not layers
+## \`href\` and a framework's \`<Link>\`
 
 You cannot give a component's internal anchor to \`next/link\`. \`<Link>\` renders
 *its own* \`<a>\` and attaches its own handlers to it, and there is no way to hand
@@ -2332,7 +2320,7 @@ query rather than by looking at its children. What it costs:
   one puts every descendant anchor inside an ancestor anchor. That is invalid,
   and browsers rearrange it.
 
-## Some roles cannot contain a link, and the fix is to move the role
+## Some roles cannot contain a link
 
 \`treeitem\` and \`tab\` are the two in this library. You cannot nest an anchor in
 either, and the answer is not to give up the anchor.
@@ -2363,10 +2351,9 @@ the shape of the markup rather than only adding an attribute. Without an \`href\
 nothing moves: the wrapper stays the \`treeitem\` and holds its group, which is
 what an \`<li>\` holding a \`<ul>\` is.
 
-Tabs have no equivalent published pattern, which is worth knowing before you
-reach for one. Web Awesome hit the same wall and answered it the other way,
-telling consumers to drop the anchor and navigate in JavaScript. That works, and
-it costs every item in the list above.
+Tabs have no equivalent published pattern. Web Awesome hit the same wall and
+answered it the other way, telling consumers to drop the anchor and navigate in
+JavaScript. That works, and it costs every item in the list above.
 
 ## Getting client-side routing back
 
@@ -2435,7 +2422,7 @@ Anything else that should navigate is a gap. Slot a link into it, and press the
 row rather than the words: \`Tree.Item\` follows a slotted anchor from anywhere in
 the row and from the keyboard, which covers the case without an \`href\`.
 
-## \`Option\` cannot take one, and a command palette is where that shows
+## \`Option\` cannot take one
 
 The obvious place to want a link in a list is a command palette, whose entries
 are usually half commands and half destinations. It is the one place this
@@ -2466,28 +2453,29 @@ role onto the anchor, is exactly the one thing that cannot be done here.
 Two constraints pointing opposite ways, and no arrangement satisfies both.
 
 **So a palette routes through its event.** Listen for \`helix-select\` on
-\`helix-command\` and call the router. That is what a palette is for, entries being
-commands and "go to Settings" being a command that navigates, and it is what
-every palette a reader has used already does. What it costs is the gestures only
-a real anchor has: middle-click, a modified click, and the destination in the
-status bar.
+\`helix-command\` and call the router. That is what a palette is for, entries
+being commands and "go to Settings" being a command that navigates, and it is
+what every palette a reader has used already does. What it costs is the gestures
+only a real anchor has: middle-click, a modified click, and the destination in
+the status bar.
 `,
   sandbox: `---
-description: The editor beside the preview, and the isolation that makes it safe.
+description: The editor beside the preview, and how to build one of your own.
 section: Tooling
 title: Sandbox
 ---
 
 # Sandbox
 
+[Open the sandbox](/helix/sandbox).
+
 Every example on a component's page is editable. Change the markup and the
 preview redraws; change the stylesheet beside it and the preview restyles.
 
-That is \`@helix-io/sandbox\`, and it is worth one page for two reasons: the
-isolation is a security decision worth understanding, and the same elements are
-what you would reach for to build a playground of your own.
+The same elements are what you would reach for to build a playground of your
+own, and the isolation below is what makes running someone else's markup safe.
 
-## The frame is sandboxed, and that is not packaging
+## The frame is sandboxed
 
 The preview runs in a sandboxed iframe with an opaque origin, and the script
 that drives it is served as a static classic script rather than rendered by a
@@ -2561,7 +2549,7 @@ Helix, the practical consequence is small: components work in your server
 components and there is nothing to configure. If you are extending one, the
 rules below are the whole contract.
 
-## There is no DOM, and the failure is silent
+## There is no DOM
 
 Lit's element shim carries attributes. It does not carry a tree. \`querySelector\`
 is undefined, \`this.children\` is undefined, and anything that walks the DOM
@@ -2753,9 +2741,9 @@ title: Size and density
 \`\`\`
 
 There is no \`size\` prop on a button, an input, a select or a checkbox. That
-looks like a restriction and is not one, so it is worth saying why.
+looks like a restriction and is not one.
 
-## Size is asked to do three jobs, and only one belongs to the control
+## Size does three jobs
 
 **Emphasis.** \`appearance\` carries it. A filled primary button says "this one
 matters" far louder than eight more pixels ever will.
@@ -2809,7 +2797,7 @@ why it costs no component any API and crosses every shadow boundary on its own.
 The \`-sm\` / \`-md\` / \`-lg\` tokens are the scale and never move. The unsuffixed
 ones are the current step, and \`data-density\` is what moves them.
 
-## Two things that are not this
+## What this is not
 
 **\`data-link-size\` stays.** A text link has no control height: its size is
 typography, and it follows the text around it.
@@ -2931,13 +2919,11 @@ about this library most likely to look like a bug.
 <helix-input label="Name" value="Ada"></helix-input>
 \`\`\`
 
-A \`text\` fence rather than an \`html\` one, deliberately: \`bun run check:examples\`
-refuses a declared \`value\` inside fenced HTML anywhere in this documentation,
-on the grounds that a reader copies what is in front of them and an HTML fence
-is markup with no script by definition. It is right, and this page is the one
-place that has to show the mistake in order to name it.
+It is written as plain text rather than as HTML on purpose: a reader copies what
+is in front of them, and this is the one page that has to show the mistake in
+order to name it. Do not paste it.
 
-## The two modes, and when each is decided
+## The two modes
 
 Every controlled property comes in a pair.
 
@@ -2981,7 +2967,7 @@ four shapes.
 The event is what carries the request. Answer it by moving your own state, and
 the element renders what you hand back.
 
-## Uncontrolled, which is usually what you want
+## Uncontrolled
 
 \`\`\`html
 <helix-input
@@ -2999,7 +2985,7 @@ two controls that have to agree, a value that comes from a route, a dialog whose
 open state is in a store. Not by default, and not because it feels more
 explicit.
 
-## The state is on the host as \`data-\`, not as the attribute
+## State is on the host as \`data-\`
 
 \`\`\`css
 helix-accordion-item[data-open] { … }
@@ -3029,10 +3015,8 @@ item.addEventListener('helix-open', (event) => {
 \`\`\`
 
 \`preventDefault()\` refuses the change and nothing moves. This is the only way to
-refuse one, and it went undocumented long enough that \`bun run check:events\` was
-written partly because of it: \`Tabs\` and \`Toggle.Group\` each dispatched the
-cancelable \`helix-change\` that is the only refusal path, and neither declared
-it, so the path was undiscoverable from the documentation.
+refuse one. Which events are cancelable is on each component's page, and every
+one that is says so.
 
 The imperative form reports the same thing:
 
@@ -3048,8 +3032,8 @@ answered yet.
 **In TypeScript, the constraint is a compile error.** The types intersect every
 controlled tag with a union that requires an answering handler, so \`<helix-input
 value="Ada" />\` does not compile. That constraint is generated several steps
-from anything a person edits, so \`bun run check:controlled\` runs \`tsc\` over a
-fixture and compares the diagnostics in both directions: a constraint that
+from anything a person edits, so it is compiled against a fixture and
+compared in both directions: a constraint that
 stopped constraining and one that grew too strict are the same kind of silent,
 and the second reaches you as "the library will not let me write correct code".
 
@@ -3078,8 +3062,9 @@ title: Surfaces and separation
 
 **A surface is told apart from what is behind it by exactly one of four things:
 a fill, an edge, a lift, or space.** A design language leads with one of them.
-This is the page about which one, and about the ladder that decides what a
-surface sits on.
+Helix leads with the edge on the page and with the lift above it: a card takes a
+hairline and no shadow, a menu takes a shadow and no hairline. The ladder below
+decides what a surface sits on.
 
 ## The four mechanisms
 
@@ -3109,11 +3094,11 @@ Helix expresses the choice in two pairs of policy tokens:
 
 Set the border pair to zero and the shadow pair to something, and the whole
 library goes shadow-first. Reverse them and it goes border-first. Every surface
-in the library is themeable in both directions, which \`bun run check:separation\`
-holds: a surface that hooks its shadow and hardcodes \`border: none\` themes
-perfectly for anyone going shadow-first and cannot be made border-first at all,
-and nothing in the file says so. A half-converted surface is the failure worth
-catching, because it reads as done.
+in the library is themeable in both directions, and held to it: a surface that
+hooks its shadow and hardcodes \`border: none\` themes perfectly for anyone going
+shadow-first and cannot be made border-first at all, and nothing in the file
+says so. A half-converted surface is the failure worth catching, because it
+reads as done.
 
 ## The ladder
 
@@ -3137,7 +3122,7 @@ page on every side, so they are told apart by their fill, and on a white page a
 fill has to be a step *darker* to be seen. \`overlay\` is the opposite: it is told
 apart by its shadow and by covering something, so on white it is white.
 
-## The rule that catches people
+## The common mistake
 
 **\`--helix-color-background\` is the page, and your component is not the page.**
 
@@ -3159,10 +3144,10 @@ a panel or a photograph, and none of those is where a component gets built.
 
 **What to do instead:** put the colour behind a hook that defaults to the page,
 so a consumer whose component is not on the page can correct it. That is what
-\`bun run check:grounds\` requires, and the same reasoning applies to anything you
+the library requires of itself, and the same reasoning applies to anything you
 build on top.
 
-## Contrast follows from this
+## Contrast
 
 The theme engine measures an ink against the ground it is *really* painted on,
 which is why the ladder is a model rather than a naming convention: the engine
@@ -3223,9 +3208,10 @@ title: Theme builder
 
 # Theme builder
 
-A theme is derived rather than picked, which is a strong claim and an abstract
-one until you have moved a slider and watched every surface in the library
-resolve around it. That is what the builder is for.
+[Open the theme builder](/helix/theme).
+
+Move a slider and every surface in the library resolves around it. A theme here
+is derived rather than picked, and this is where you see that happen.
 
 ## What it does
 
@@ -3237,7 +3223,7 @@ token set plus the library rendered in it.
 Light and dark at once, because \`[data-color-mode]\` works on any element and the
 two previews are two subtrees of one document. See [Color modes](./color-modes).
 
-## The contrast column is the part to read
+## The contrast column
 
 Every pairing the engine solved is listed with its measured ratio against the
 ground it is actually painted on. Three states:
@@ -3299,7 +3285,7 @@ never find out. That is a config file, not a theming system.
 inputs, and every foreground and background pair meets its contrast target **by
 construction** rather than by audit.
 
-## Two ways to theme, and only one carries the guarantee
+## Two ways to theme
 
 They are both real and they are not the same thing, so they have different
 names.
@@ -3361,7 +3347,7 @@ possible at all. Colors are authored in it and converted at the edge.
 The brand color keeps its hue and chroma; only lightness moves to meet the
 target. That is what preserves brand identity while guaranteeing contrast.
 
-## Two failure modes it protects against
+## What it protects against
 
 Both of these produce a palette that passes review and fails in production.
 Both are covered by regression tests.
@@ -3413,7 +3399,7 @@ never reverses.
 | \`@helix-io/web\` | Presentation: tokens, parts, \`appearance\` and \`tone\` | \`headless\`, \`styles\` |
 | \`@helix-io/react\` | Generated React wrappers | \`web\` |
 
-## The rule that makes the split worth it
+## Why the split
 
 **\`headless\` must never depend on \`styles\`.**
 
@@ -3522,7 +3508,7 @@ The leading underscore is the whole convention: \`--_helix-\` is private and may
 be renamed or re-spaced without notice. Reaching past the semantic layer is the
 one thing that will break under you.
 
-## The surfaces, which are the ones people get wrong
+## The surfaces
 
 Depth is distance from the page, in whichever direction there is room. The page
 is white in light and black in dark, so in light there is nothing above white to
@@ -3560,11 +3546,11 @@ them to nudge one component; use the semantic tokens to move everything.
 
 ## What is enforced
 
-\`bun run check:tokens\` fails the build on three things:
+Three things fail the build:
 
-1. **A raw value where a token exists.** \`#e5e5e5\` when a neutral is right there.
-2. **A primitive referenced from outside \`@helix-io/styles\`.**
-3. **A reference to a token that does not exist.**
+1. **A raw value where a token exists.** \`#e5e5e5\` when a neutral is right
+   there. 2. **A primitive referenced from outside \`@helix-io/styles\`.** 3. **A
+   reference to a token that does not exist.**
 
 The third earns its keep on its own: a renamed token resolves to nothing, the
 property silently falls back to a browser default, and the code looks correct
@@ -3724,13 +3710,14 @@ There is a real bug underneath this, and the elements work around it for you.
 **React attaches no custom element listener while hydrating**, so on a
 server-rendered page every one of these props is dead until React commits an
 update for some other reason, at which point it silently starts working. Nothing
-is logged. It is [facebook/react#35446](https://github.com/facebook/react/issues/35446),
-open and unfixed.
+is logged. It is
+[facebook/react#35446](https://github.com/facebook/react/issues/35446), open and
+unfixed.
 
 Every Helix element binds the handler itself, immediately before it announces
 anything, using the function React is already holding for it. Measured in Chrome
-against React 19.2.8: on a hydrated page the first event reaches the handler, and
-it is never delivered twice once React binds its own listener.
+against React 19.2.8: on a hydrated page the first event reaches the handler,
+and it is never delivered twice once React binds its own listener.
 
 Nothing is required of you, and nothing changes once React fixes it.
 
@@ -3742,7 +3729,7 @@ that do not bubble (\`load\` and \`error\` on Avatar, \`ended\`, \`play\` and \`
 Video) reach nothing React sets up. The elements bind those for you, so
 \`onError\` on a \`<helix-avatar>\` works like the rest.
 
-## The prop is \`on\` and the event name, verbatim
+## The prop is \`on\` plus the event name
 
 React slices \`on\` off the prop and listens for exactly what is left, without
 inspecting it.
@@ -3834,7 +3821,7 @@ bun add @helix-io/web@1.4.0 @helix-io/styles@1.4.0
 Pin them to the same number or pin none of them. A range that lets one drift
 ahead of another is the one configuration this scheme does not defend against.
 
-## Why lockstep, and why only within Helix
+## Why lockstep
 
 Cortex moves independently. Full-repo lockstep would be wrong here because the
 documentation packages carry the version of what they document: publishing a
@@ -3849,8 +3836,8 @@ packages of the same version are the pair that was tested together.
 Every manifest in the repository holds \`0.0.0-dev\`. The real number is stamped
 in CI, seconds before packing.
 
-That is worth knowing if you ever read the source: a manifest saying \`0.0.0-dev\`
-is not an unreleased package, it is every package. Committing the number back
+If you read the source: a manifest saying \`0.0.0-dev\` is not an unreleased
+package, it is every package. Committing the number back
 would need a bot whose push access outranks branch protection, to record
 something \`git tag\` already holds.
 
@@ -3914,7 +3901,7 @@ vocabularies. You cannot invent a value, and a component may take a subset.
 <helix-megamenu material="glass">…</helix-megamenu>
 \`\`\`
 
-## Why this exists
+## Why two axes
 
 **The library had four axes and one word for all of them.** Counted across both
 tiers, \`appearance\` held 21 declarations describing at least four different
@@ -3929,10 +3916,9 @@ ink. Same word, two questions, and no way to ask one without answering the
 other.
 
 **\`appearance\` is refused outright now.** It is not a word this library uses,
-and a component reintroducing it fails \`bun run check:axes\` rather than being
-asked to explain itself.
+and a component reintroducing it fails the build.
 
-## Two things that can be true at once are two axes
+## Two axes, not one
 
 This is the test, and the library found it before the registry existed.
 \`megamenu-root.css\` reads: a consumer can make the panel glass, which is not an
@@ -4027,8 +4013,8 @@ Rarely necessary. Worth knowing it exists before you go looking for it.
 
 \`value\`, \`open\`, \`checked\` and \`active\` are claims of ownership in Helix, and
 declaring one without answering it gives you a control that ignores input. Vue
-has no type-level constraint for this the way the React types do, so it is worth
-reading [State and control](./state-and-control) once before writing a form.
+has no type-level constraint for this the way the React types do, so read
+[State and control](./state-and-control) before writing a form.
 
 \`\`\`vue
 <!-- Uncontrolled: the element owns it. -->
@@ -4051,7 +4037,7 @@ trailing: true
 Helix ships standard ES modules and plain CSS files, so a page can use it with
 no build step at all. Two ways, and they suit different things.
 
-## Styles alone, and no JavaScript
+## Styles alone
 
 \`\`\`html
 <link
