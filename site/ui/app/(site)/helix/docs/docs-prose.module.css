@@ -1,60 +1,31 @@
 /* A documentation page, set as prose.
  *
- * The document's own `h1` is the page's title, so it takes the size a title
- * takes rather than the size a heading inside prose takes. The alternative was
- * the page rendering a title of its own above it, which put the same words on
- * screen twice and two `h1` elements in the document.
+ * **Almost nothing is left here, and that is the point.** These rules were a
+ * second stylesheet for elements the design system already draws: a type ramp
+ * for `h1` through `h3`, a border and a padding scale for `table`, an overflow
+ * for `pre`. `PROSE_COMPONENTS` maps every one of those to the component that
+ * owns it, so the ramp is `helix-text`, the grid is `helix-table` and the fence
+ * is `helix-code-block`, and each of them is styled once for the whole library
+ * rather than again here.
  *
- * `[data-prose]` in the base layer carries the type scale, the measure, links
- * and inline code, so what is left is the rhythm between blocks and the tables
- * these pages are full of. A rule here that turns out to be true of every prose
- * document belongs in the base layer instead.
- *
- * There was a `pre` rule here giving fenced code its own overflow. It is gone
- * with the element: `PROSE_COMPONENTS` renders every fence as a
- * `helix-code-block`, which owns its scrolling, its copy button and its name
- * bar, and whose own `pre` is in a shadow root a descendant selector cannot
- * reach. */
+ * What a page still owns is the rhythm between blocks, which is a fact about
+ * this column rather than about any component in it. A rule here that turns out
+ * to be true of every prose document belongs in the base layer instead. */
 
 .prose > * + * {
   margin-block-start: var(--helix-space-md);
 }
 
-.prose h1 {
-  font-size: var(--helix-text-3xl);
-  letter-spacing: var(--helix-tracking-tight);
-  line-height: var(--helix-leading-heading);
+/* The document's own `h1` is the page's title, so it sits tight under the
+   section label rather than taking the gap a heading mid-page takes. */
+.prose helix-text[as="h1"] {
   margin-block-start: var(--helix-space-xs);
 }
 
-.prose h2 {
+.prose helix-text[as="h2"] {
   margin-block-start: var(--helix-space-2xl);
 }
 
-.prose h3 {
+.prose helix-text[as="h3"] {
   margin-block-start: var(--helix-space-xl);
-}
-
-/* Tables are how most of these pages carry their facts: token lists, axis
-   vocabularies, the framework matrix. Scrollable rather than squeezed, because
-   a type column with a union in it is wider than any measure. */
-.prose table {
-  border-collapse: collapse;
-  display: block;
-  inline-size: 100%;
-  overflow-x: auto;
-}
-
-.prose th {
-  color: var(--helix-color-foreground-subtle);
-  font-weight: var(--helix-weight-medium);
-  text-align: start;
-  white-space: nowrap;
-}
-
-.prose td,
-.prose th {
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  padding-block: var(--helix-space-sm);
-  padding-inline-end: var(--helix-space-lg);
 }

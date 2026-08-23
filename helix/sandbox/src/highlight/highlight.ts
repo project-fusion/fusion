@@ -2,6 +2,7 @@ import { cssLanguage } from '@codemirror/lang-css'
 import { htmlLanguage } from '@codemirror/lang-html'
 import { javascriptLanguage, tsxLanguage, typescriptLanguage } from '@codemirror/lang-javascript'
 import { classHighlighter, highlightCode } from '@lezer/highlight'
+import { shellLanguage } from './shell.js'
 
 /**
  * The languages a snippet can be written in.
@@ -17,13 +18,17 @@ import { classHighlighter, highlightCode } from '@lezer/highlight'
  * `tsx` covers JSX as well, since the dialect is a superset: there is no `jsx`
  * member because a JSX file that is not TypeScript still parses under it, and
  * a fourth entry would be a distinction with no consequence.
+ *
+ * `sh` is the one grammar here that is not shipped as it comes: see `shell.ts`
+ * for why a mode that knows sh perfectly colours nothing in `bun add`.
  */
-export type HighlightLanguage = 'css' | 'html' | 'js' | 'ts' | 'tsx'
+export type HighlightLanguage = 'css' | 'html' | 'js' | 'sh' | 'ts' | 'tsx'
 
 const PARSERS = {
   css: cssLanguage,
   html: htmlLanguage,
   js: javascriptLanguage,
+  sh: shellLanguage,
   ts: typescriptLanguage,
   tsx: tsxLanguage,
 } as const

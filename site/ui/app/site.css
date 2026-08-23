@@ -515,3 +515,18 @@ helix-app-header {
     opacity: 0;
   }
 }
+
+/* A markdown table, in the box that lets it scroll.
+ *
+ * `helix-table` is a grid and owns its own alignment, so what a page adds is
+ * whether the grid may overflow its column. It may: these tables carry token
+ * values and type unions, and a column holding `'span' | 'p' | 'h1' | 'h2'` is
+ * wider than any measure worth reading prose at. Squeezing it would wrap a type
+ * one character per line.
+ *
+ * The same rule the API reference tables have had, on the attribute rather than
+ * a class because `PROSE_COMPONENTS` renders for four surfaces and belongs to
+ * none of their stylesheets. */
+[data-prose-table] {
+  overflow-x: auto;
+}
