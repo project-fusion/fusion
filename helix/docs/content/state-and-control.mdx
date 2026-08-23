@@ -14,13 +14,16 @@ do.
 That is one rule, it covers thirty-odd families, and it is the single thing
 about this library most likely to look like a bug.
 
-```html
+```text
 <!-- Ignores every keystroke. Nothing is logged. Nothing looks wrong. -->
-<helix-input
-  label="Name"
-  value="Ada"
-></helix-input>
+<helix-input label="Name" value="Ada"></helix-input>
 ```
+
+A `text` fence rather than an `html` one, deliberately: `bun run check:examples`
+refuses a declared `value` inside fenced HTML anywhere in this documentation,
+on the grounds that a reader copies what is in front of them and an HTML fence
+is markup with no script by definition. It is right, and this page is the one
+place that has to show the mistake in order to name it.
 
 ## The two modes, and when each is decided
 
