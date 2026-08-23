@@ -69,7 +69,7 @@ export class HelixText extends HelixElement {
 
   /** Type treatment. Defaults to the one that matches `as`. */
   @property({ reflect: true })
-  appearance?:
+  variant?:
     | 'display'
     | 'heading'
     | 'subheading'

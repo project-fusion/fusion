@@ -46,7 +46,7 @@ export class HelixButtonGroup extends HelixBaseButtonGroup {
    * gave the group and no choice about the spacing.
    */
   @property({ reflect: true })
-  appearance?: 'joined' | 'spaced'
+  variant?: 'joined' | 'spaced'
 }
 
 declare global {

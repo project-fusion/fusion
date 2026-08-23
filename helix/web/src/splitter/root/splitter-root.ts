@@ -74,7 +74,7 @@ export class HelixSplitter extends HelixBaseSplitter {
    * relying on the absence of an attribute.
    */
   @property({ reflect: true })
-  appearance?: 'grip' | 'line'
+  variant?: 'grip' | 'line'
 
   static override styles: CSSResultGroup = styles
 }

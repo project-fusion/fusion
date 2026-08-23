@@ -70,7 +70,7 @@
    inside the tab's own shadow root: `::slotted()` reaches the tab and stops
    there, and an attribute written onto each tab would be an attribute the
    element gave itself. Custom properties cross both boundaries on their own. */
-:host([appearance="underlined"]) {
+:host([variant="underlined"]) {
   --_tabs-rule: linear-gradient(var(--helix-color-border), var(--helix-color-border));
   --_tab-radius: var(--helix-radii-none);
   --_tab-selected-rule: var(--helix-color-primary);
@@ -82,7 +82,7 @@
    makes the row read as one control rather than as buttons that happen to be
    adjacent. It hugs its tabs instead of filling the row: a segmented control
    the width of the window is a menu bar. */
-:host([appearance="segmented"]) [part="tabs"] {
+:host([variant="segmented"]) [part="tabs"] {
   /* A groove, so the pill in it is over the page rather than on it. The one
      place in this component where `overlay` is right. */
   --_tab-selected-surface: var(--helix-color-surface-overlay);
@@ -197,7 +197,7 @@
 }
 
 /* Underline: a bar along the bottom of the strip, on the rule it replaces. */
-:host([appearance="underlined"]) [part="indicator"] {
+:host([variant="underlined"]) [part="indicator"] {
   --_indicator-block: var(--helix-border-thick);
   --_indicator-color: var(--helix-color-primary);
   --_indicator-offset: calc(var(--indicator-height, 0px) - var(--helix-border-thick));
@@ -210,7 +210,7 @@
    The tab's own fill is transparent here for that reason: two things saying
    "this one" would double at the moment of the change, and the one that cannot
    move would win the eye. */
-:host([appearance="segmented"]) [part="indicator"] {
+:host([variant="segmented"]) [part="indicator"] {
   --_indicator-block: var(--indicator-height, 0);
   --_indicator-color: var(--helix-color-surface-overlay);
   --_indicator-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
@@ -218,7 +218,7 @@
   --_indicator-offset: 0px;
 }
 
-:host([appearance="segmented"]) {
+:host([variant="segmented"]) {
   --_tab-selected-surface: transparent;
 }
 
@@ -229,7 +229,7 @@
    `raised` rather than `overlay` here, because this pill lies *on* the page
    with nothing framing it, where the segmented one sits inside a sunken track.
    The same distinction the rest of the library makes. */
-:host(:not([appearance])) [part="indicator"] {
+:host(:not([variant])) [part="indicator"] {
   --_indicator-block: var(--indicator-height, 0);
   /* **`overlay` with an edge, not `raised`.** This pill lies on the page with
      nothing framing it, and `raised` put it a three per cent step off a white
@@ -246,7 +246,7 @@
   --_indicator-offset: 0px;
 }
 
-:host(:not([appearance])) {
+:host(:not([variant])) {
   --_tab-selected-surface: transparent;
   --_tab-selected-shadow: none;
 }

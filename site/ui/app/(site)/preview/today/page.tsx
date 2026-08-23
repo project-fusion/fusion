@@ -69,7 +69,7 @@ export default function Page() {
     <>
       <section className="specHero">
         <helix-flex data-shell direction="column" gap="xl">
-          <helix-text appearance="label" class="specHeroLabel">
+          <helix-text class="specHeroLabel" variant="label">
             Fusion Development Group
           </helix-text>
 
@@ -91,16 +91,16 @@ export default function Page() {
           <div className="specDoors">
             <a className="specDoor" href="/services">
               <helix-text class="specDoorFor">If you need the work done</helix-text>
-              <helix-text appearance="title">Start with an audit</helix-text>
-              <helix-text appearance="caption" tone="muted">
+              <helix-text variant="title">Start with an audit</helix-text>
+              <helix-text tone="muted" variant="caption">
                 Two weeks, $12,000 to $18,000, and the honest answer may be that you do not need the
                 rest. Every price is stated.
               </helix-text>
             </a>
             <a className="specDoor" href="/helix">
               <helix-text class="specDoorFor">If you build interfaces</helix-text>
-              <helix-text appearance="title">Open Helix</helix-text>
-              <helix-text appearance="caption" tone="muted">
+              <helix-text variant="title">Open Helix</helix-text>
+              <helix-text tone="muted" variant="caption">
                 Components, tokens and a sandbox. Your framework stays your choice.
               </helix-text>
             </a>
@@ -118,7 +118,7 @@ export default function Page() {
             <helix-grid gap="2xl" min="18rem">
               {WHY.map((item) => (
                 <helix-flex direction="column" gap="sm" key={item.name}>
-                  <helix-text appearance="title" as="h3">
+                  <helix-text as="h3" variant="title">
                     {item.name}
                   </helix-text>
                   <helix-text as="p" tone="muted">
@@ -142,7 +142,7 @@ export default function Page() {
               {STACK.map((row) => (
                 <helix-flex align="start" class="tdRow" gap="xl" key={row.name} wrap>
                   <helix-flex align="start" class="tdLede" direction="column" gap="2xs">
-                    <helix-text appearance="label" tone="subtle">
+                    <helix-text tone="subtle" variant="label">
                       {row.lede}
                     </helix-text>
                     <helix-tag tone={stageAppearance(row.stage)}>{row.stage}</helix-tag>

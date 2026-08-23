@@ -97,7 +97,7 @@ export function ThemedPage() {
             can find it here even when every button has moved away from it. */}
         <helix-flex align="center" gap="xs" slot="start">
           <Mark />
-          <helix-text appearance="label">{COMPANY}</helix-text>
+          <helix-text variant="label">{COMPANY}</helix-text>
         </helix-flex>
 
         {/* Plain anchors carrying `data-navigation-item`, which is the base
@@ -132,12 +132,12 @@ export function ThemedPage() {
             <helix-tag emphasis="subtle" tone="accent">
               New
             </helix-tag>
-            <helix-text appearance="caption">Live berth windows, in twelve more ports</helix-text>
+            <helix-text variant="caption">Live berth windows, in twelve more ports</helix-text>
           </helix-flex>
-          <helix-text appearance="display" as="h1">
+          <helix-text as="h1" variant="display">
             Know where the freight is before the customer asks.
           </helix-text>
-          <helix-text appearance="body">
+          <helix-text variant="body">
             {COMPANY} reads the schedules, the terminals and the telematics, and tells you which of
             today&rsquo;s shipments is about to be late while there is still something to do about
             it.
@@ -153,7 +153,7 @@ export function ThemedPage() {
           </helix-flex>
           <helix-flex align="center" gap="xs">
             <helix-icon name="check-circle-fill"></helix-icon>
-            <helix-text appearance="caption">
+            <helix-text variant="caption">
               No card. Two weeks of your own history loaded on the first day.
             </helix-text>
           </helix-flex>
@@ -182,10 +182,10 @@ export function ThemedPage() {
             <helix-card key={feature.title}>
               <helix-flex direction="column" gap="sm">
                 <helix-icon className="themedFeatureIcon" name={feature.icon}></helix-icon>
-                <helix-text appearance="subheading" as="h2">
+                <helix-text as="h2" variant="subheading">
                   {feature.title}
                 </helix-text>
-                <helix-text appearance="caption">{feature.body}</helix-text>
+                <helix-text variant="caption">{feature.body}</helix-text>
               </helix-flex>
             </helix-card>
           ))}
@@ -208,7 +208,7 @@ export function ThemedPage() {
             translucent ground *and* a backdrop, and either alone does nothing. */}
         <helix-card material="glass">
           <helix-flex direction="column" gap="md">
-            <helix-text appearance="subheading" as="h2">
+            <helix-text as="h2" variant="subheading">
               On-time arrivals
             </helix-text>
             <table data-hidden-visually id="arrivals">
@@ -258,7 +258,7 @@ export function ThemedPage() {
         <helix-card>
           <helix-flex direction="column" gap="md">
             <helix-flex align="center" gap="sm" justify="between">
-              <helix-text appearance="subheading" as="h2">
+              <helix-text as="h2" variant="subheading">
                 Today
               </helix-text>
               {/* **A menu, which is where motion is most visible.** It is the
@@ -294,14 +294,14 @@ export function ThemedPage() {
             </helix-table>
             <helix-flex align="center" gap="sm">
               <helix-progress value={68}></helix-progress>
-              <helix-text appearance="caption">68% of today&rsquo;s windows closed</helix-text>
+              <helix-text variant="caption">68% of today&rsquo;s windows closed</helix-text>
             </helix-flex>
           </helix-flex>
         </helix-card>
 
         <helix-card>
           <helix-flex direction="column" gap="md">
-            <helix-text appearance="subheading" as="h2">
+            <helix-text as="h2" variant="subheading">
               Start a trial
             </helix-text>
             <helix-input
@@ -337,10 +337,10 @@ export function ThemedPage() {
       <section className="themedClose">
         <helix-flex align="center" gap="md" justify="between">
           <helix-flex direction="column" gap="2xs">
-            <helix-text appearance="subheading" as="h2">
+            <helix-text as="h2" variant="subheading">
               See it against your own lanes
             </helix-text>
-            <helix-text appearance="caption">
+            <helix-text variant="caption">
               Two weeks of your history, loaded before the call.
             </helix-text>
           </helix-flex>
@@ -352,7 +352,7 @@ export function ThemedPage() {
         <helix-flex align="center" gap="md" justify="between">
           <helix-flex align="center" gap="xs">
             <Mark />
-            <helix-text appearance="caption">
+            <helix-text variant="caption">
               &copy; {COMPANY} {new Date().getFullYear()}
             </helix-text>
           </helix-flex>

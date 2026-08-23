@@ -139,11 +139,11 @@
  * The mask goes instead of being swapped for a round one: the mark is already
  * a box painted in `currentcolor`, so a full radius is the whole shape and a
  * circular mask over a square would only be the same circle drawn twice. */
-:host([appearance="dots"]) {
+:host([variant="dots"]) {
   --_rating-mark-size: var(--rating-size, var(--helix-size-icon-sm));
 }
 
-:host([appearance="dots"]) [part="mark"] {
+:host([variant="dots"]) [part="mark"] {
   border-radius: var(--helix-radii-full);
   mask-image: none;
 }

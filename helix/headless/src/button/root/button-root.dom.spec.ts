@@ -11,7 +11,7 @@ const control = (host: HTMLElement): Element | null => part(host, 'button')
 describe('the variant shorthand', () => {
   test('reflects, because the mapping is a stylesheet reading the attribute', async () => {
     /* The whole of `variant` lives in the CSS as extra selectors on the blocks
-       `appearance` and `tone` already have, so the attribute has to be on the
+       `emphasis` and `tone` already have, so the attribute has to be on the
        host for anything to match. Nothing here computes the pair: there is no
        second copy of the mapping to fall out of step with the first.
 
@@ -29,18 +29,18 @@ describe('the variant shorthand', () => {
   })
 
   test('and an axis written out loud is left alone', async () => {
-    /* `variant="primary" appearance="ghost"` is a ghost in the brand colour,
+    /* `variant="primary" emphasis="ghost"` is a ghost in the brand colour,
        which is the only reading of that markup that is not a guess. The
-       selectors say so with `:not([appearance])` rather than relying on their
+       selectors say so with `:not([emphasis])` rather than relying on their
        order, so moving a block cannot change the answer. Measured in a browser:
        transparent fill, transparent border, `oklch(0.7 0.19 258)` ink, which is
        neither plain `ghost` (white ink) nor `solid primary` (blue fill). */
     const button = (await mount(
-      '<helix-base-button appearance="ghost" variant="primary">Go</helix-base-button>',
+      '<helix-base-button emphasis="ghost" variant="primary">Go</helix-base-button>',
     )) as Updatable
     await button.updateComplete
     const host = button as unknown as HTMLElement
-    expect(host.getAttribute('appearance')).toBe('ghost')
+    expect(host.getAttribute('emphasis')).toBe('ghost')
     expect(host.getAttribute('variant')).toBe('primary')
   })
 })

@@ -17,16 +17,16 @@ const checkbox = async (extra = ''): Promise<Choice> =>
 
 describe('the card appearance', () => {
   test('reflects, because that is what the stylesheet selects on', async () => {
-    expect((await radio('appearance="card"')).getAttribute('appearance')).toBe('card')
-    expect((await checkbox('appearance="card"')).getAttribute('appearance')).toBe('card')
+    expect((await radio('variant="card"')).getAttribute('variant')).toBe('card')
+    expect((await checkbox('variant="card"')).getAttribute('variant')).toBe('card')
   })
 
   test('the mark is still rendered, which is the whole point of it staying', async () => {
     /* A card whose only marker was its own border would ask a reader to compare
        surfaces across a row to find the answer, and would leave nothing at all
        for a high-contrast display. */
-    expect(part(await radio('appearance="card"'), 'box')).toBeTruthy()
-    expect(part(await checkbox('appearance="card"'), 'box')).toBeTruthy()
+    expect(part(await radio('variant="card"'), 'box')).toBeTruthy()
+    expect(part(await checkbox('variant="card"'), 'box')).toBeTruthy()
   })
 })
 
@@ -59,11 +59,11 @@ if (hasLayout()) {
     /* Browser-only, and the reason is the fault this is written against: a rule
        whose selector matches nothing is valid CSS that silently does nothing.
        `check:selectors` catches a `[part=]` naming a part nothing renders, and
-       it cannot catch a `:host([appearance="card"])` that never matches because
+       it cannot catch a `:host([variant="card"])` that never matches because
        the property was never reflected. Only a computed style can. */
     test('the row becomes a bounded surface, and the plain one does not', async () => {
       const find = await board(
-        `<helix-radio id="card" appearance="card" value="one">Solo</helix-radio>
+        `<helix-radio id="card" variant="card" value="one">Solo</helix-radio>
          <helix-radio id="plain" value="two">Team</helix-radio>`,
       )
       expect(Number.parseFloat(edge(find('card'), 'item').borderTopWidth)).toBeGreaterThan(0)
@@ -75,7 +75,7 @@ if (hasLayout()) {
       // forwards a press to the real input. Same appearance, so it has to look
       // the same beside a card set of radios.
       const find = await board(
-        `<helix-checkbox id="card" appearance="card" value="one">Backups</helix-checkbox>
+        `<helix-checkbox id="card" variant="card" value="one">Backups</helix-checkbox>
          <helix-checkbox id="plain" value="two">Audit</helix-checkbox>`,
       )
       expect(Number.parseFloat(edge(find('card'), 'field').borderTopWidth)).toBeGreaterThan(0)
@@ -88,8 +88,8 @@ if (hasLayout()) {
          a state. If someone reaches for an accent border here later, this is
          the decision they are changing. */
       const find = await board(
-        `<helix-radio id="chosen" appearance="card" selected value="one">Solo</helix-radio>
-         <helix-radio id="rest" appearance="card" value="two">Team</helix-radio>`,
+        `<helix-radio id="chosen" variant="card" selected value="one">Solo</helix-radio>
+         <helix-radio id="rest" variant="card" value="two">Team</helix-radio>`,
       )
       const chosen = edge(find('chosen'), 'item')
       const rest = edge(find('rest'), 'item')

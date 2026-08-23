@@ -56,11 +56,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               name="fusion"
               style={{ '--icon-size': '1.25rem' }}
             />
-            <helix-text appearance="caption" tone="muted">
+            <helix-text tone="muted" variant="caption">
               Fusion Development Group
             </helix-text>
           </helix-flex>
-          <helix-text appearance="label" tone="subtle">
+          <helix-text tone="subtle" variant="label">
             Developing for humanity.
           </helix-text>
         </helix-flex>

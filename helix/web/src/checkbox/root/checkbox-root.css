@@ -238,7 +238,7 @@
  * than a button, because the label is what forwards a press to the real input,
  * so `field` is what becomes the surface.
  */
-:host([appearance="card"]) {
+:host([variant="card"]) {
   display: block;
 }
 
@@ -250,7 +250,7 @@
  * which was worth measuring: the two rules share exactly two declarations, `gap`
  * and `transition`, and everything that looks copied is four token references
  * doing what tokens are for. What was actually missing was the API. */
-:host([appearance="card"]) [part="field"] {
+:host([variant="card"]) [part="field"] {
   align-items: start;
   background-color: var(--checkbox-card-background-color, var(--helix-color-surface));
   border: var(--helix-border-thin) solid
@@ -265,7 +265,7 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host(:not([disabled])[appearance="card"]) [part="field"]:hover {
+:host(:not([disabled])[variant="card"]) [part="field"]:hover {
   border-color: var(--helix-color-foreground-muted);
 }
 
@@ -281,7 +281,7 @@
  * widened: three pixels is a 1px border with two more laid outside it by
  * `box-shadow`, so nothing about the card's box moves when it is chosen and a
  * column of them does not jump as the answer changes. */
-:host([appearance="card"][data-checked]) [part="field"] {
+:host([variant="card"][data-checked]) [part="field"] {
   background-color: var(--helix-color-surface-raised);
   border-color: var(--helix-color-primary);
   box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
@@ -291,12 +291,12 @@
    `:focus-visible` of the label: the label never takes focus, the input inside
    it does, so this reads that through `:has()` rather than inventing a class
    the component would have to write. */
-:host([appearance="card"]) [part="field"]:has([part="control"]:focus-visible) {
+:host([variant="card"]) [part="field"]:has([part="control"]:focus-visible) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
-:host([appearance="card"]) [part="control"]:focus-visible {
+:host([variant="card"]) [part="control"]:focus-visible {
   outline: none;
 }
 
@@ -304,7 +304,7 @@
    Derived rather than picked, for the reason `Radio` records: a flat `space-2xs`
    put the box's center 6.5px below the center of the text beside it, measured on
    a one-line card, because 4px was chosen for a paragraph. */
-:host([appearance="card"]) [part="box"] {
+:host([variant="card"]) [part="box"] {
   margin-block-start: calc(
     (var(--helix-text-sm) * var(--helix-leading-tight) - var(--_checkbox-size)) /
     2
@@ -315,7 +315,7 @@
    rule it answers loses on specificity and does nothing. `check:motion`
    compares them, which is what turned this from invisible into mechanical. */
 @media (prefers-reduced-motion: reduce) {
-  :host([appearance="card"]) [part="field"] {
+  :host([variant="card"]) [part="field"] {
     transition: none;
   }
 }

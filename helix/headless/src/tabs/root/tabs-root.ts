@@ -89,7 +89,7 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
    * consumer's server markup does not already have.
    */
   @property({ reflect: true })
-  appearance?: 'segmented' | 'underlined'
+  variant?: 'segmented' | 'underlined'
 
   /** Accessible name for the tab list. */
   @property()

@@ -69,7 +69,7 @@ export default function Page() {
     <>
       <section data-band>
         <helix-flex data-shell direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
+          <helix-text tone="subtle" variant="label">
             Thesis
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
@@ -87,7 +87,7 @@ export default function Page() {
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
+            <helix-text tone="subtle" variant="label">
               The stack
             </helix-text>
             <helix-text as="h2" data-measure data-section-title>
@@ -138,7 +138,7 @@ export default function Page() {
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
+            <helix-text tone="subtle" variant="label">
               The ladder
             </helix-text>
             <helix-text as="h2" data-measure data-section-title>
@@ -149,7 +149,7 @@ export default function Page() {
           <helix-grid gap="xl" min="18rem">
             {LADDER.map((rung) => (
               <helix-flex data-substrate direction="column" gap="sm" key={rung.scale}>
-                <helix-text appearance="label" tone="subtle">
+                <helix-text tone="subtle" variant="label">
                   {rung.means}
                 </helix-text>
                 <helix-text as="h3" data-substrate-name>
@@ -172,7 +172,7 @@ export default function Page() {
 
       <section data-band data-reveal>
         <helix-flex class={`statement`} data-shell direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
+          <helix-text tone="subtle" variant="label">
             The Sovereignty Constraint
           </helix-text>
           <helix-text as="p" data-statement>

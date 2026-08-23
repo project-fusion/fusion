@@ -110,7 +110,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           is what a column of fields wants: they share an edge, and a group that
           fills its column has segments wide enough to read. */}
       <helix-flex direction="column" gap="lg">
-        <helix-text appearance="subheading" as="h2">
+        <helix-text as="h2" variant="subheading">
           Preferences
         </helix-text>
 

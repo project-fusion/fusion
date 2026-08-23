@@ -110,7 +110,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
    * the dismissal, is exactly what such a band needs.
    */
   @property({ reflect: true })
-  appearance?: 'full'
+  variant?: 'full'
 
   /**
    * Whether hovering the trigger opens the panel, or only a press does.
@@ -154,7 +154,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
 
   /** A band, whether because it was asked for or because there is no room. */
   private get banded(): boolean {
-    return this.appearance === 'full' || this.narrow
+    return this.variant === 'full' || this.narrow
   }
 
   private readonly handleWidth = (event: MediaQueryListEvent | MediaQueryList): void => {

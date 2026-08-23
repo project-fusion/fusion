@@ -223,7 +223,7 @@ export function Showcase(): React.ReactElement {
     <div className={styles.showcaseStage} ref={stage}>
       <helix-card class={styles.showcaseAnchor}>
         <helix-flex direction="column" gap="md">
-          <helix-text appearance="label">Helix</helix-text>
+          <helix-text variant="label">Helix</helix-text>
           <helix-text as="h3" class={styles.anchorTitle}>
             One brand colour in. A whole palette out.
           </helix-text>
@@ -447,11 +447,11 @@ export function Showcase(): React.ReactElement {
               <helix-timeline-item datetime="2026-08-21T09:12" tone="success">
                 <helix-icon name="check" slot="marker"></helix-icon>
                 <span slot="time">09:12</span>
-                <helix-text appearance="body-strong">Contrast pass</helix-text>
+                <helix-text variant="body-strong">Contrast pass</helix-text>
               </helix-timeline-item>
               <helix-timeline-item datetime="2026-08-21T08:40">
                 <span slot="time">08:40</span>
-                <helix-text appearance="body-strong">Tokens regenerated</helix-text>
+                <helix-text variant="body-strong">Tokens regenerated</helix-text>
               </helix-timeline-item>
             </helix-timeline>
           </helix-card>
@@ -583,7 +583,7 @@ export function Showcase(): React.ReactElement {
               it is a second surface a few pixels outside the first, and the two
               edges argue about which one is the callout. */}
           <helix-callout class={styles.showcaseWide} tone="info">
-            <helix-text appearance="body-strong" slot="title">
+            <helix-text slot="title" variant="body-strong">
               Nothing here needs us to keep running
             </helix-text>
             The packages install from npm and ship as custom elements.

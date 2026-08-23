@@ -84,7 +84,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
    * only the departure has to be named.
    */
   @property({ reflect: true })
-  appearance?: 'list' | 'wheels'
+  variant?: 'list' | 'wheels'
 
   /**
    * How many times can be held at once.
@@ -455,7 +455,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
       part="picker"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
-      appearance=${this.appearance ?? nothing}
+      appearance=${this.variant ?? nothing}
       label=${this.label || 'Time'}
       locale=${this.locale || nothing}
       max=${this.max}

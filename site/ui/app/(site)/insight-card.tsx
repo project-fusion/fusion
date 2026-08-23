@@ -47,10 +47,10 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
         </helix-flex>
 
         <helix-flex direction="column" gap="xs">
-          <helix-text appearance="title" as="h3">
+          <helix-text as="h3" variant="title">
             {insight.title}
           </helix-text>
-          <helix-text appearance="caption" tone="muted">
+          <helix-text tone="muted" variant="caption">
             {insight.summary}
           </helix-text>
         </helix-flex>
@@ -59,10 +59,10 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
             place the date appears in a list, so this is where a crawler finds
             it. */}
         <helix-flex align="center" gap="sm" justify="between" slot="footer">
-          <helix-text appearance="caption" tone="subtle">
+          <helix-text tone="subtle" variant="caption">
             <time dateTime={insight.date}>{formatDate(insight.date)}</time>
           </helix-text>
-          <helix-text appearance="caption" tone="subtle">
+          <helix-text tone="subtle" variant="caption">
             {insight.minutes} min
           </helix-text>
         </helix-flex>

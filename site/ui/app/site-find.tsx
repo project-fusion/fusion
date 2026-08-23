@@ -279,7 +279,7 @@ export function SiteFind({
             Close
           </span>
         </div>
-        <helix-text appearance="caption" class={styles.siteCommandMark} slot="footer">
+        <helix-text class={styles.siteCommandMark} slot="footer" variant="caption">
           Fusion
         </helix-text>
       </helix-command>

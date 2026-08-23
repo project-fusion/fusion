@@ -110,7 +110,7 @@ export default async function Page({
             <helix-card separation="outlined">
               <ComponentArt slug={family.slug} />
               <helix-flex align="center" gap="sm" justify="between" slot="header">
-                <helix-text appearance="title" as="h3">
+                <helix-text as="h3" variant="title">
                   {family.label}
                 </helix-text>
                 {/* A mark rather than a word. Every component in this list is
@@ -133,7 +133,7 @@ export default async function Page({
                   </helix-tooltip>
                 )}
               </helix-flex>
-              <helix-text appearance="caption" tone="muted">
+              <helix-text tone="muted" variant="caption">
                 {family.summary}
               </helix-text>
             </helix-card>

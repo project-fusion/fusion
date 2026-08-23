@@ -51,7 +51,7 @@ export default function Page() {
     <>
       <section className="pvHero">
         <helix-flex data-shell direction="column" gap="xl">
-          <helix-text appearance="label" class="pvRail" tone="subtle">
+          <helix-text class="pvRail" tone="subtle" variant="label">
             FUSION DEVELOPMENT GROUP
           </helix-text>
 
@@ -104,7 +104,7 @@ export default function Page() {
           <helix-card separation="outlined">
             <helix-flex align="center" gap="md" justify="between" wrap>
               <helix-flex direction="column" gap="2xs">
-                <helix-text appearance="title">Check any of it.</helix-text>
+                <helix-text variant="title">Check any of it.</helix-text>
                 <helix-text tone="muted">
                   The repository is the source, and the strategy documents are tracked in it.
                 </helix-text>

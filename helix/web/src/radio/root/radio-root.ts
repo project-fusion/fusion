@@ -51,7 +51,7 @@ export class HelixRadio extends HelixBaseRadio {
    * leave nothing for a high-contrast display.
    */
   @property({ reflect: true })
-  appearance?: 'chip' | 'plain' | 'card'
+  variant?: 'chip' | 'plain' | 'card'
 
   /**
    * Takes the circle away, leaving the card as the whole control.

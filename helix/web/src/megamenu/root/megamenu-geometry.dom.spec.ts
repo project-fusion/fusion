@@ -50,9 +50,9 @@ if (hasLayout()) {
        correctly on every path, and the band stayed painted over the page
        anyway, because a stylesheet gave a hidden panel a display. A box is the
        only thing that answers "did it close" from the reader's side. */
-    const banded = async (appearance: string): Promise<Section> => {
+    const banded = async (variant: string): Promise<Section> => {
       const host = (await mount(
-        `<helix-megamenu appearance="${appearance}" label="Products">
+        `<helix-megamenu variant="${variant}" label="Products">
           <div data-megamenu-group><a href="#one">One</a></div>
         </helix-megamenu>`,
       )) as Section
@@ -63,9 +63,9 @@ if (hasLayout()) {
     const panelBox = (host: Section): DOMRect =>
       (part(host, 'panel') as HTMLElement).getBoundingClientRect()
 
-    for (const appearance of ['card', 'full']) {
-      test(`takes no box when it is ${appearance}`, async () => {
-        const host = await banded(appearance)
+    for (const variant of ['card', 'full']) {
+      test(`takes no box when it is ${variant}`, async () => {
+        const host = await banded(variant)
         press(host, 'none', 0)
         await host.updateComplete
         expect(panelBox(host).height).toBeGreaterThan(0)
@@ -80,7 +80,7 @@ if (hasLayout()) {
         await settled(part(host, 'panel'))
         expect(host.open).toBe(false)
         /* The band was 1280 by 267 here, and `open` was already false.
-           `:host([appearance="full"]) [part="panel"]` is (0,3,0) and the guard
+           `:host([variant="full"]) [part="panel"]` is (0,3,0) and the guard
            was a bare `[part="panel"][hidden]` at (0,2,0), so it lost. */
         expect(panelBox(host).height).toBe(0)
         expect(panelBox(host).width).toBe(0)
@@ -154,7 +154,7 @@ if (hasLayout()) {
     test('and the band spans the page and starts under the bar, not the trigger', async () => {
       const bar = (await mount(
         `<nav style="padding:40px">
-          <helix-megamenu appearance="full" label="Products">
+          <helix-megamenu variant="full" label="Products">
             <div data-megamenu-group>
               <a data-megamenu-item href="/one"><strong>One</strong><span>First.</span></a>
             </div>
@@ -394,7 +394,7 @@ if (hasLayout()) {
          the same question asked in a way a spec can answer. */
       const bar = (await mount(
         `<helix-navigation label="Main" style="padding:0">
-          <helix-megamenu appearance="full" label="Products" style="--megamenu-column-size: 26rem">
+          <helix-megamenu variant="full" label="Products" style="--megamenu-column-size: 26rem">
             ${['One', 'Two', 'Three', 'Four']
               .map(
                 (name) =>
@@ -438,7 +438,7 @@ if (hasLayout()) {
          with it. */
       const bar = (await mount(
         `<nav style="padding:20px">
-          <helix-megamenu appearance="full" label="Products">
+          <helix-megamenu variant="full" label="Products">
             <div data-megamenu-group>
               <a data-megamenu-item href="#one"><strong>One</strong><span>First.</span></a>
             </div>

@@ -86,7 +86,7 @@ export class HelixBaseSteps extends MixinControllerActive(HelixElement) {
    * a reader is told to come back to by number.
    */
   @property({ reflect: true })
-  appearance?: 'numeric'
+  variant?: 'numeric'
 
   /** The steps, in the order the consumer wrote them. */
   private get steps(): HelixBaseStep[] {

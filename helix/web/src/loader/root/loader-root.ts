@@ -41,7 +41,7 @@ export class HelixLoader extends HelixBaseLoader {
    * no longer called Spinner: the old name described one appearance of two.
    */
   @property({ reflect: true })
-  appearance?: 'pulse'
+  variant?: 'pulse'
 
   /** Diameter relative to the surrounding text. */
   @property({ reflect: true })

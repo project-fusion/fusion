@@ -38,8 +38,8 @@
    lives in the base layer too, paired with the `data-button` recipe, and so do
    the link, list-item, card and navigation-item recipes. The base layer is not
    optional for this library; the sentence here used to imply it was. */
-:host([appearance="display"]),
-:host(:not([appearance])[as="h1"]) {
+:host([variant="display"]),
+:host(:not([variant])[as="h1"]) {
   font-family: var(--helix-font-display);
   font-size: var(--helix-text-3xl);
   font-weight: var(--helix-weight-semibold);
@@ -47,8 +47,8 @@
   line-height: var(--helix-leading-tight);
 }
 
-:host([appearance="heading"]),
-:host(:not([appearance])[as="h2"]) {
+:host([variant="heading"]),
+:host(:not([variant])[as="h2"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-2xl);
   font-weight: var(--helix-weight-semibold);
@@ -56,8 +56,8 @@
   line-height: var(--helix-leading-tight);
 }
 
-:host([appearance="subheading"]),
-:host(:not([appearance])[as="h3"]) {
+:host([variant="subheading"]),
+:host(:not([variant])[as="h3"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
@@ -65,8 +65,8 @@
   line-height: var(--helix-leading-tight);
 }
 
-:host([appearance="title"]),
-:host(:not([appearance])[as="h4"]) {
+:host([variant="title"]),
+:host(:not([variant])[as="h4"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-lg);
   font-weight: var(--helix-weight-semibold);
@@ -74,7 +74,7 @@
   line-height: var(--helix-leading-tight);
 }
 
-:host([appearance="body"]) {
+:host([variant="body"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-regular);
@@ -82,10 +82,10 @@
   line-height: var(--helix-leading-normal);
 }
 
-:host([appearance="body-strong"]),
-:host(:not([appearance])[as="h5"]),
-:host(:not([appearance])[as="h6"]),
-:host(:not([appearance])[as="strong"]) {
+:host([variant="body-strong"]),
+:host(:not([variant])[as="h5"]),
+:host(:not([variant])[as="h6"]),
+:host(:not([variant])[as="strong"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
@@ -93,7 +93,7 @@
   line-height: var(--helix-leading-normal);
 }
 
-:host([appearance="caption"]) {
+:host([variant="caption"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-regular);
@@ -101,8 +101,8 @@
   line-height: var(--helix-leading-normal);
 }
 
-:host([appearance="label"]),
-:host(:not([appearance])[as="label"]) {
+:host([variant="label"]),
+:host(:not([variant])[as="label"]) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
@@ -110,8 +110,8 @@
   line-height: var(--helix-leading-normal);
 }
 
-:host([appearance="code"]),
-:host(:not([appearance])[as="code"]) {
+:host([variant="code"]),
+:host(:not([variant])[as="code"]) {
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-regular);

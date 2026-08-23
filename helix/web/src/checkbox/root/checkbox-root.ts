@@ -51,7 +51,7 @@ export class HelixCheckbox extends HelixBaseCheckbox {
    * leave nothing for a high-contrast display.
    */
   @property({ reflect: true })
-  appearance?: 'plain' | 'card'
+  variant?: 'plain' | 'card'
 }
 
 declare global {

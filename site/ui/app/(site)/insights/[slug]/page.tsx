@@ -151,7 +151,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <helix-flex class="insightMore" direction="column" gap="lg">
         <helix-divider></helix-divider>
         <helix-flex align="center" gap="md" justify="between" wrap>
-          <helix-text appearance="title" as="h2">
+          <helix-text as="h2" variant="title">
             Keep reading
           </helix-text>
           {/* Quiet rather than the default link treatment: a bright underlined
@@ -176,12 +176,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
                 <helix-flex direction="column" gap="2xs">
                   <helix-flex align="center" data-density="sm" gap="xs">
                     <helix-tag>{other.topic}</helix-tag>
-                    <helix-text appearance="caption" tone="subtle">
+                    <helix-text tone="subtle" variant="caption">
                       {other.minutes} min
                     </helix-text>
                   </helix-flex>
-                  <helix-text appearance="title">{other.title}</helix-text>
-                  <helix-text appearance="caption" data-measure tone="muted">
+                  <helix-text variant="title">{other.title}</helix-text>
+                  <helix-text data-measure tone="muted" variant="caption">
                     {other.summary}
                   </helix-text>
                 </helix-flex>

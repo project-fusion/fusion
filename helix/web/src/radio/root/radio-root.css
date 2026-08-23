@@ -129,7 +129,7 @@
  * asking the reader to compare surfaces across a row to find the answer, and
  * would leave nothing at all for a monochrome or high-contrast display.
  */
-:host([appearance="card"]) {
+:host([variant="card"]) {
   display: block;
 }
 
@@ -141,7 +141,7 @@
  * which was worth measuring: the two rules share exactly two declarations, `gap`
  * and `transition`, and everything that looks copied is four token references
  * doing what tokens are for. What was actually missing was the API. */
-:host([appearance="card"]) [part="item"] {
+:host([variant="card"]) [part="item"] {
   align-items: start;
   background-color: var(--radio-card-background-color, var(--helix-color-surface));
   border: var(--helix-border-thin) solid var(--radio-card-border-color, var(--helix-color-border));
@@ -155,7 +155,7 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host(:not([disabled])[appearance="card"]) [part="item"]:hover {
+:host(:not([disabled])[variant="card"]) [part="item"]:hover {
   border-color: var(--helix-color-foreground-muted);
 }
 
@@ -173,7 +173,7 @@
  * moves when it is chosen and a column of them does not jump as the answer
  * changes. `--helix-border-thick` is the ring, so a theme that thickens its
  * rules thickens this with them. */
-:host([appearance="card"][selected]) [part="item"] {
+:host([variant="card"][selected]) [part="item"] {
   background-color: var(--helix-color-surface-raised);
   border-color: var(--helix-color-primary);
   box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
@@ -182,12 +182,12 @@
 /* On the whole card, because in this appearance the card is the target. The
    default row rings the circle instead, since there the circle is all there is
    to ring. */
-:host([appearance="card"]) [part="item"]:focus-visible {
+:host([variant="card"]) [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
-:host([appearance="card"]) [part="item"]:focus-visible [part="box"] {
+:host([variant="card"]) [part="item"]:focus-visible [part="box"] {
   outline: none;
 }
 
@@ -200,7 +200,7 @@
  * where a nudge chosen for a paragraph is simply wrong. The line is the font
  * size times its line height, and the circle is taller than that, so the offset
  * comes out negative and lifts it slightly rather than dropping it. */
-:host([appearance="card"]) [part="box"] {
+:host([variant="card"]) [part="box"] {
   margin-block-start: calc(
     (var(--helix-text-sm) * var(--helix-leading-tight) - var(--_radio-size)) /
     2
@@ -224,7 +224,7 @@
  * On the box alone either way, so the control the shadow root renders is still
  * there, still focusable and still reported: this takes away a graphic, never a
  * radio. */
-:host([appearance="card"][hide-control]) [part="box"] {
+:host([variant="card"][hide-control]) [part="box"] {
   display: none;
 }
 
@@ -232,7 +232,7 @@
    rule it answers loses on specificity and does nothing. `check:motion`
    compares them, which is what turned this from invisible into mechanical. */
 @media (prefers-reduced-motion: reduce) {
-  :host([appearance="card"]) [part="item"] {
+  :host([variant="card"]) [part="item"] {
     transition: none;
   }
 }
@@ -252,11 +252,11 @@
  * and there is nowhere to put it that is not on top of the thing it is meant to
  * annotate. What carries the answer instead is weight and height, which the
  * selected rule below draws. */
-:host([appearance="chip"]) [part="box"] {
+:host([variant="chip"]) [part="box"] {
   display: none;
 }
 
-:host([appearance="chip"]) [part="item"] {
+:host([variant="chip"]) [part="item"] {
   align-items: center;
   background-color: var(--helix-color-surface-sunken);
   block-size: var(--radio-chip-size, var(--helix-size-control-md));
@@ -279,18 +279,18 @@
  * and reads at a glance across a row of five. Tinting the background instead
  * says "this one is a slightly different colour", a hue a reader has to
  * interpret rather than a state they can see. */
-:host([appearance="chip"][selected]) [part="item"] {
+:host([variant="chip"][selected]) [part="item"] {
   background-color: var(--helix-color-surface-inverse);
   box-shadow: var(--helix-shadow-md);
   color: var(--helix-color-foreground-inverse);
   translate: 0 -2px;
 }
 
-:host(:not([disabled])[appearance="chip"]) [part="item"]:hover {
+:host(:not([disabled])[variant="chip"]) [part="item"]:hover {
   translate: 0 -1px;
 }
 
-:host([appearance="chip"]) [part="item"]:focus-visible {
+:host([variant="chip"]) [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
@@ -302,7 +302,7 @@
  * the default slot, because this rule would hide the mark with the words, which
  * is why `Radio` grew an `icon` slot. A chip with no mark slotted is an empty
  * circle, and that is the consumer having asked for one. */
-:host([appearance="chip"]) [part="label"] {
+:host([variant="chip"]) [part="label"] {
   clip-path: inset(50%);
   block-size: 1px;
   inline-size: 1px;
@@ -314,12 +314,12 @@
 /* Repeating the selector exactly, because a looser one loses on specificity and
    answers nothing. */
 @media (prefers-reduced-motion: reduce) {
-  :host([appearance="chip"]) [part="item"] {
+  :host([variant="chip"]) [part="item"] {
     transition: none;
   }
 
-  :host([appearance="chip"][selected]) [part="item"],
-  :host(:not([disabled])[appearance="chip"]) [part="item"]:hover {
+  :host([variant="chip"][selected]) [part="item"],
+  :host(:not([disabled])[variant="chip"]) [part="item"]:hover {
     translate: none;
   }
 }

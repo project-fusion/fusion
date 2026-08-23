@@ -42,7 +42,7 @@ export default function Page() {
             <div className="scHeroScrim" />
           </div>
           <helix-flex class={`scHeroCopy`} data-shell direction="column" gap="lg">
-            <helix-text appearance="label" class="scKicker">
+            <helix-text class="scKicker" variant="label">
               Fusion Development Group
             </helix-text>
             <h1 className="scHeroName">Fusion</h1>
@@ -68,7 +68,7 @@ export default function Page() {
             <div className="scSceneScrim" />
           </div>
           <helix-flex class={`scSceneCopy`} data-shell direction="column" gap="lg">
-            <helix-text appearance="label" class="scKicker">
+            <helix-text class="scKicker" variant="label">
               The floor
             </helix-text>
             <helix-text as="h2" class="scSceneTitle">
@@ -90,7 +90,7 @@ export default function Page() {
             <div className="scSceneScrim" />
           </div>
           <helix-flex class={`scSceneCopy`} data-shell direction="column" gap="lg">
-            <helix-text appearance="label" class="scKicker">
+            <helix-text class="scKicker" variant="label">
               The name
             </helix-text>
             <helix-text as="h2" class="scSceneTitle">
@@ -106,7 +106,7 @@ export default function Page() {
 
         <section className="scBand">
           <helix-flex data-shell direction="column" gap="xl">
-            <helix-text appearance="label" class="scKicker">
+            <helix-text class="scKicker" variant="label">
               The constraint
             </helix-text>
             <helix-text as="h2" class={`scSceneTitle`} data-measure>
@@ -121,14 +121,14 @@ export default function Page() {
 
         <section className="scBand">
           <helix-flex data-shell direction="column" gap="xl">
-            <helix-text appearance="label" class="scKicker">
+            <helix-text class="scKicker" variant="label">
               Counted honestly
             </helix-text>
             <helix-grid gap="xl" min="14rem">
               {COUNTED.map((entry) => (
                 <helix-flex direction="column" gap="xs" key={entry.note}>
                   <helix-text class="scFigure">{entry.figure}</helix-text>
-                  <helix-text appearance="caption" tone="muted">
+                  <helix-text tone="muted" variant="caption">
                     {entry.note}
                   </helix-text>
                 </helix-flex>
@@ -153,7 +153,7 @@ export default function Page() {
                   wrap
                 >
                   <helix-flex align="center" data-density="sm" gap="sm" wrap>
-                    <helix-text appearance="title">{vertical.name}</helix-text>
+                    <helix-text variant="title">{vertical.name}</helix-text>
                     <helix-tag tone={stageAppearance(vertical.stage)}>{vertical.stage}</helix-tag>
                   </helix-flex>
                   <helix-text tone="muted">{vertical.summary}</helix-text>

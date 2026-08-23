@@ -706,8 +706,9 @@ therefore serves a consumer's own anchor styled as a button.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'joined' \| 'spaced' \| undefined` | - | - | Whether the buttons are one bar or a spaced row. |
+| `appearance` | - | - | - | - | Whether the buttons are one bar or a spaced row. |
 | `label` | `label` | `string` | `''` | `HelixBaseButtonGroup` | Accessible name for the group. |
+| `variant` | `variant` | `'joined' \| 'spaced' \| undefined` | - | - | Whether the buttons are one bar or a spaced row. |
 
 #### Slots
 
@@ -915,7 +916,6 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 | `checked` | `checked` | `boolean` | - | `MixinControllerChecked` | Whether the control is checked. |
 | `defaultChecked` | `default-checked` | `boolean` | `false` | `MixinControllerChecked` | Initial checked state for uncontrolled use, where nothing declared one. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -931,6 +931,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseCheckbox` | Focus is delegated to the input, so the host is never the focus target. |
 | `value` | `value` | `string` | `'on'` | `HelixBaseCheckbox` | Value submitted when the box is checked. |
+| `variant` | `variant` | `'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 
 #### Methods
 
@@ -1143,7 +1144,6 @@ pads its own lower rows.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColorInput` | Whether the color carries an alpha channel. |
-| `appearance` | `appearance` | `'swatch' \| undefined` | - | `HelixBaseColorInput` | Whether the field is a text box with a swatch on it, or only the swatch. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -1163,6 +1163,7 @@ pads its own lower rows.
 | `swatches` | `swatches` | `string` | `''` | `HelixBaseColorInput` | Colors offered under the picker, as a comma-separated list. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a color'` | `HelixBaseColorInput` | Accessible name for the control that opens the panel. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `variant` | `variant` | `'swatch' \| undefined` | - | `HelixBaseColorInput` | Whether the field is a text box with a swatch on it, or only the swatch. |
 
 #### Methods
 
@@ -2878,9 +2879,9 @@ to say so.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'pulse' \| undefined` | - | - | How the waiting is drawn. |
 | `label` | `label` | `string` | `'Loading'` | `HelixBaseLoader` | Accessible name, announced while the work is outstanding. |
 | `size` | `size` | `'sm' \| 'md' \| 'lg' \| undefined` | - | - | Diameter relative to the surrounding text. |
+| `variant` | `variant` | `'pulse' \| undefined` | - | - | How the waiting is drawn. |
 
 #### Slots
 
@@ -2920,12 +2921,12 @@ Everything about what opens it and what closes it is the base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'full' \| undefined` | - | `HelixBaseMegamenu` | Whether the panel is a card under the trigger or a band across the page. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `fullBelow` | `full-below` | `number` | `640` | `HelixBaseMegamenu` | The width, in pixels, under which a card becomes a band. Zero never does. |
 | `label` | `label` | `string` | `''` | `HelixBaseMegamenu` | The section's name, which names the default trigger and the panel. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `openOn` | `open-on` | `'click' \| 'hover'` | `'hover'` | `HelixBaseMegamenu` | Whether hovering the trigger opens the panel, or only a press does. |
+| `variant` | `variant` | `'full' \| undefined` | - | `HelixBaseMegamenu` | Whether the panel is a card under the trigger or a band across the page. |
 
 #### Methods
 
@@ -3900,11 +3901,11 @@ and being chosen is an answer rather than a state.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'chip' \| 'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseRadio` | Whether this choice can be made. |
 | `hideControl` | `hide-control` | `boolean` | `false` | - | Takes the circle away, leaving the card as the whole control. |
 | `selected` | `selected` | `boolean` | `false` | `HelixBaseRadio` | Whether this is the current choice. Written by the group. |
 | `value` | `value` | `string` | `''` | `HelixBaseRadio` | Identifies this choice to the group, and is what the form submits. |
+| `variant` | `variant` | `'chip' \| 'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 
 #### Methods
 
@@ -4031,7 +4032,6 @@ Everything about what the score is and how it is chosen is the base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'dots' \| 'marks' \| undefined` | - | - | Which mark the row is drawn with. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
@@ -4050,6 +4050,7 @@ Everything about what the score is and how it is chosen is the base class.
 | `step` | `step` | `number` | `1` | `HelixBaseRating` | The smallest part of a mark that can be chosen. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `valueText` | `value-text` | `string` | `''` | `HelixBaseRating` | How the score is read out, where "3.5 out of 5" is not what it should say. |
+| `variant` | `variant` | `'dots' \| 'marks' \| undefined` | - | - | Which mark the row is drawn with. |
 
 #### Methods
 
@@ -4916,7 +4917,6 @@ gesture.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'grip' \| 'line' \| undefined` | - | - | Whether the divider carries a grip. |
 | `collapsed` | `collapsed` | `'end' \| 'start' \| undefined` | - | `HelixBaseSplitter` | Which pane is shut, if either. |
 | `collapsedSize` | `collapsed-size` | `number` | `0` | `HelixBaseSplitter` | How much of a shut pane is still shown, as a percentage. |
 | `cornerLabel` | `corner-label` | `string` | `'Resize both'` | `HelixBaseSplitter` | Accessible name for the handle where two dividers cross. |
@@ -4928,6 +4928,7 @@ gesture.
 | `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseSplitter` | Which way the panes are laid out. |
 | `position` | `position` | `number` | - | `HelixBaseSplitter` | Where the divider sits, as a percentage of the whole. |
 | `step` | `step` | `number` | `2` | `HelixBaseSplitter` | How far one arrow press moves it, as a percentage. |
+| `variant` | `variant` | `'grip' \| 'line' \| undefined` | - | - | Whether the divider carries a grip. |
 | `vertical` | - | `boolean` | - | `HelixBaseSplitter` | Public because a nested splitter compares axes with the one it is in. |
 
 #### Methods
@@ -5059,10 +5060,10 @@ second name for it here would be a second thing to keep in step.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
-| `appearance` | `appearance` | `'numeric' \| undefined` | - | `HelixBaseSteps` | What each step is marked with. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Steps'` | `HelixBaseSteps` | Accessible name for the sequence. |
 | `orientation` | `orientation` | `'vertical' \| undefined` | - | `HelixBaseSteps` | Which way the steps run. |
+| `variant` | `variant` | `'numeric' \| undefined` | - | `HelixBaseSteps` | What each step is marked with. |
 
 #### Methods
 
@@ -5356,10 +5357,10 @@ a movement instead of two separate fills.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
-| `appearance` | `appearance` | `'segmented' \| 'underlined' \| undefined` | - | `HelixBaseTabs` | How the row reads. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Tabs'` | `HelixBaseTabs` | Accessible name for the tab list. |
 | `manual` | `manual` | `boolean` | `false` | `HelixBaseTabs` | Whether arrowing to a tab also selects it. |
+| `variant` | `variant` | `'segmented' \| 'underlined' \| undefined` | - | `HelixBaseTabs` | How the row reads. |
 
 #### Methods
 
@@ -5558,7 +5559,9 @@ the cross product, which is the explosion `appearance` exists to prevent.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `\| 'display'
+| `as` | `as` | `'span' \| 'p' \| 'h1' \| 'h2' \| 'h3' \| 'h4' \| 'h5' \| 'h6' \| 'strong' \| 'em' \| 'code' \| 'label' \| undefined` | - | - | Which element to render. Decides the outline and the semantics. |
+| `tone` | `tone` | `'muted' \| 'subtle' \| 'primary' \| 'danger' \| undefined` | - | - | Color role. A separate axis from the type ramp, because color carries state: folding it in would mean `caption-danger` and the rest of the cross product. |
+| `variant` | `variant` | `\| 'display'
     \| 'heading'
     \| 'subheading'
     \| 'title'
@@ -5567,8 +5570,6 @@ the cross product, which is the explosion `appearance` exists to prevent.
     \| 'caption'
     \| 'label'
     \| 'code' \| undefined` | - | - | Type treatment. Defaults to the one that matches `as`. |
-| `as` | `as` | `'span' \| 'p' \| 'h1' \| 'h2' \| 'h3' \| 'h4' \| 'h5' \| 'h6' \| 'strong' \| 'em' \| 'code' \| 'label' \| undefined` | - | - | Which element to render. Decides the outline and the semantics. |
-| `tone` | `tone` | `'muted' \| 'subtle' \| 'primary' \| 'danger' \| undefined` | - | - | Color role. A separate axis from the type ramp, because color carries state: folding it in would mean `caption-danger` and the rest of the cross product. |
 
 #### Slots
 
@@ -5671,7 +5672,6 @@ belongs to. That is the same reasoning Select gives for its own list.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'list' \| 'wheels' \| undefined` | - | `HelixBaseTimeInput` | Whether the panel is one list of times or a column each. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -5695,6 +5695,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixBaseTimeInput` | Whether the field writes the time out, or holds the value as it is. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a time'` | `HelixBaseTimeInput` | Accessible name for the control that opens the list. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `variant` | `variant` | `'list' \| 'wheels' \| undefined` | - | `HelixBaseTimeInput` | Whether the panel is one list of times or a column each. |
 
 #### Methods
 
@@ -5767,7 +5768,6 @@ card would be a card inside a card there.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'list' \| 'wheels' \| undefined` | - | `HelixBaseTimePicker` | Whether the times are one list or a column each. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `disableTimes` | `disable-times` | `string` | `''` | `HelixBaseTimePicker` | Times that cannot be chosen, comma separated, as `HH:mm`. |
@@ -5784,6 +5784,7 @@ card would be a card inside a card there.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `step` | `step` | `number` | `15` | `HelixBaseTimePicker` | How far apart the offered times are, in minutes. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `variant` | `variant` | `'list' \| 'wheels' \| undefined` | - | `HelixBaseTimePicker` | Whether the times are one list or a column each. |
 
 #### Methods
 

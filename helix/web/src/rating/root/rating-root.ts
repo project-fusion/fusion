@@ -50,7 +50,7 @@ export class HelixRating extends HelixBaseRating {
    * an unset one draws and nothing else had to move.
    */
   @property({ reflect: true })
-  appearance?: 'dots' | 'marks'
+  variant?: 'dots' | 'marks'
 }
 
 declare global {

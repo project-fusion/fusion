@@ -109,7 +109,7 @@ const byExample = (rows: Example[]): Example[] =>
 
 function Code({ children }: { children: string }) {
   return (
-    <helix-text appearance="code" class={styles.apiName}>
+    <helix-text class={styles.apiName} variant="code">
       {children}
     </helix-text>
   )
@@ -172,7 +172,7 @@ function TypeText({ children }: { children: string }) {
      should keep saying what the source says. */
   const members = union(children.replace(/'([^']*)'/g, '"$1"'))
   return (
-    <helix-text appearance="code" class={styles.apiType}>
+    <helix-text class={styles.apiType} variant="code">
       {members.map((member, at) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
         <span className={styles.apiTypeMember} key={at}>
@@ -273,7 +273,7 @@ function MemberTable({
               <helix-table-cell>{row.type && <TypeText>{row.type}</TypeText>}</helix-table-cell>
             )}
             <helix-table-cell>
-              <helix-text appearance="caption" tone="muted">
+              <helix-text tone="muted" variant="caption">
                 {first(row.description)}
               </helix-text>
             </helix-table-cell>
@@ -306,7 +306,7 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
             </helix-table-cell>
             <helix-table-cell>{row.default && <TypeText>{row.default}</TypeText>}</helix-table-cell>
             <helix-table-cell>
-              <helix-text appearance="caption" tone="muted">
+              <helix-text tone="muted" variant="caption">
                 {first(row.description)}
               </helix-text>
               {row.references.map((reference) => (
@@ -356,12 +356,12 @@ function ElementApi({ element }: { element: Element }) {
       <helix-flex align="center" data-density="sm" gap="sm" wrap>
         <helix-text as="h3">{element.part || element.label}</helix-text>
         <helix-tag>
-          <helix-text appearance="code">{element.tagName}</helix-text>
+          <helix-text variant="code">{element.tagName}</helix-text>
         </helix-tag>
       </helix-flex>
 
       {element.summary && (
-        <helix-text appearance="caption" as="p" class={styles.description} tone="muted">
+        <helix-text as="p" class={styles.description} tone="muted" variant="caption">
           {element.summary}
         </helix-text>
       )}
@@ -485,7 +485,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
               </helix-flex>
             </helix-flex>
 
-            <helix-text appearance="caption" as="p" class={styles.description} tone="muted">
+            <helix-text as="p" class={styles.description} tone="muted" variant="caption">
               {first(prose)}
             </helix-text>
 
@@ -545,7 +545,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
               />
             ) : (
               <helix-empty>
-                <helix-text appearance="caption" tone="muted">
+                <helix-text tone="muted" variant="caption">
                   No example yet.
                 </helix-text>
               </helix-empty>
@@ -602,7 +602,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                         reads as data that failed to load; a dash reads as a
                         blank someone still has to fill. */}
                     <helix-table-cell>
-                      <helix-text appearance="caption" tone="muted">
+                      <helix-text tone="muted" variant="caption">
                         {example.description || '-'}
                       </helix-text>
                     </helix-table-cell>
@@ -622,7 +622,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
         {/* A visible heading, not only the accessible one. `label` names the
             navigation for a screen reader and paints nothing, so the rail was
             a column of links with no word saying what they were. */}
-        <helix-text appearance="label" class={styles.docsRailTitle} tone="subtle">
+        <helix-text class={styles.docsRailTitle} tone="subtle" variant="label">
           On this page
         </helix-text>
         <helix-outline label="On this page">

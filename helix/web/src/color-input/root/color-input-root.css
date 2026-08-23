@@ -205,7 +205,7 @@
  * than a width to fill: stretched across a form column it is a banner, and the
  * one thing this appearance exists for is to be small. A consumer who wants it
  * wider sets `--color-input-swatch-size`. */
-:host([appearance="swatch"]) [part="field"] {
+:host([variant="swatch"]) [part="field"] {
   background-color: transparent;
   border: none;
   inline-size: max-content;
@@ -219,18 +219,18 @@
  * a border-radius is that radius less the border width, and at any size where a
  * swatch is worth looking at the two read as a ring around a slightly wrongly
  * rounded square. The preview is the only thing in this shape, so it takes both. */
-:host([appearance="swatch"]) [part="trigger"] {
+:host([variant="swatch"]) [part="trigger"] {
   block-size: var(--color-input-swatch-size, var(--helix-size-control));
   inline-size: var(--color-input-swatch-size, var(--helix-size-control));
 }
 
 /* The ring goes on the trigger rather than around the field, since in this shape
    they are the same box and `:focus-within` on the field would draw it twice. */
-:host([appearance="swatch"]:focus-within) [part="field"] {
+:host([variant="swatch"]:focus-within) [part="field"] {
   outline: none;
 }
 
-:host([appearance="swatch"]) [part="preview"] {
+:host([variant="swatch"]) [part="preview"] {
   block-size: 100%;
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--color-input-swatch-radii, var(--helix-radii-sm));

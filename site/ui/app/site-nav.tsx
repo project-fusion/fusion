@@ -192,7 +192,6 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                 never produced. The server cannot know the width, so this is
                 expected rather than a symptom. */}
             <helix-megamenu
-              appearance="full"
               label="Products"
               onhelix-close={() => setPanelDown(false)}
               /* Both fire before the panel moves and both are cancelable, so
@@ -201,6 +200,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
               onhelix-open={() => setPanelDown(true)}
               ref={panelRef}
               suppressHydrationWarning
+              variant="full"
             >
               {/* The trigger is slotted, and it has to be.
                
@@ -339,7 +339,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
       >
         <helix-flex align="start" direction="column" gap="xl">
           <helix-flex align="start" direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
+            <helix-text tone="subtle" variant="label">
               Products
             </helix-text>
             {PRODUCTS.map((product) => (
@@ -356,7 +356,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           </helix-flex>
 
           <helix-flex align="start" direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
+            <helix-text tone="subtle" variant="label">
               Verticals
             </helix-text>
             {VERTICALS.map((vertical) => (

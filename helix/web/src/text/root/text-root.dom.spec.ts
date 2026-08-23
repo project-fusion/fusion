@@ -7,12 +7,12 @@ beforeAll(async () => {
 })
 
 describe('text', () => {
-  test('appearance is presentation, `as` is semantics, and they are separate', async () => {
+  test('the ramp is presentation, `as` is semantics, and they are separate', async () => {
     // A heading that should not look like one is the whole reason these are
     // two properties rather than one.
-    const text = await mount('<helix-text appearance="body" as="h3">Title</helix-text>')
+    const text = await mount('<helix-text variant="body" as="h3">Title</helix-text>')
     expect(part(text, 'text')?.tagName).toBe('H3')
-    expect(text.getAttribute('appearance')).toBe('body')
+    expect(text.getAttribute('variant')).toBe('body')
   })
 
   test('renders its content through a slot', async () => {

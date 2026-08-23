@@ -39,7 +39,7 @@ export default function Page() {
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex align="center" data-density="sm" gap="sm">
             <helix-tag tone="primary">Fusion Development Group</helix-tag>
-            <helix-text appearance="label" class="dvMono" tone="subtle">
+            <helix-text class="dvMono" tone="subtle" variant="label">
               Seed 00
             </helix-text>
           </helix-flex>
@@ -70,7 +70,7 @@ export default function Page() {
       <section data-band>
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" class="dvMono" tone="subtle">
+            <helix-text class="dvMono" tone="subtle" variant="label">
               The derivation
             </helix-text>
             <helix-text as="h2" data-measure data-section-title>
@@ -93,8 +93,8 @@ export default function Page() {
                   {entry.step}
                 </helix-text>
                 <helix-flex class="dvStepName" direction="column" gap="2xs">
-                  <helix-text appearance="title">{entry.name}</helix-text>
-                  <helix-text appearance="caption" class="dvStepNote" tone="muted">
+                  <helix-text variant="title">{entry.name}</helix-text>
+                  <helix-text class="dvStepNote" tone="muted" variant="caption">
                     {entry.note}
                   </helix-text>
                 </helix-flex>
@@ -108,7 +108,7 @@ export default function Page() {
         <helix-flex data-shell direction="column" gap="lg">
           <helix-card separation="outlined">
             <helix-flex direction="column" gap="lg">
-              <helix-text appearance="label" class="dvMono" slot="header" tone="subtle">
+              <helix-text class="dvMono" slot="header" tone="subtle" variant="label">
                 Seed 00 · The Sovereignty Constraint
               </helix-text>
               <helix-text as="p" class="dvSeedText">

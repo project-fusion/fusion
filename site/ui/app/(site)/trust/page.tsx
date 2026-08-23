@@ -50,7 +50,7 @@ export default function Page() {
     <>
       <section data-band>
         <helix-flex data-shell direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
+          <helix-text tone="subtle" variant="label">
             Trust
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
@@ -72,7 +72,7 @@ export default function Page() {
               <helix-flex align="start" data-row gap="lg" key={item.name} wrap>
                 {/* Numbered, because the count is the commitment. A list that
                     can grow quietly is the thing this page exists to prevent. */}
-                <helix-text appearance="label" tone="subtle">
+                <helix-text tone="subtle" variant="label">
                   {String(index + 1).padStart(2, '0')}
                 </helix-text>
                 <helix-flex direction="column" gap="2xs">
@@ -92,7 +92,7 @@ export default function Page() {
       {/* The half that makes the rest credible. */}
       <section data-band data-reveal>
         <helix-flex class={`statement`} data-shell direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
+          <helix-text tone="subtle" variant="label">
             Where this stands
           </helix-text>
           <helix-text as="p" data-statement>

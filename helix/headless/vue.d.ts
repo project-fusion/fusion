@@ -919,7 +919,7 @@ readable and typeable exactly once, in whichever of the two is present.
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
 where the color is the answer rather than a setting. */
-  appearance?: HelixBaseColorInput["appearance"];
+  variant?: HelixBaseColorInput["variant"];
   /** Whether the color carries an alpha channel. */
   alpha?: HelixBaseColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
@@ -2828,7 +2828,7 @@ tier knows about it at all: a band spans the viewport, so there is nothing
 to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
-  appearance?: HelixBaseMegamenu["appearance"];
+  variant?: HelixBaseMegamenu["variant"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
@@ -4715,7 +4715,7 @@ nothing about whether it is finished.
 `numeric` is the older convention and is still the right one where the
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
-  appearance?: HelixBaseSteps["appearance"];
+  variant?: HelixBaseSteps["variant"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -4947,7 +4947,7 @@ meets first.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
-  appearance?: HelixBaseTabs["appearance"];
+  variant?: HelixBaseTabs["variant"];
   /** Accessible name for the tab list. */
   label?: HelixBaseTabs["label"];
   /** Whether arrowing to a tab also selects it.
@@ -5167,7 +5167,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  appearance?: HelixBaseTimeInput["appearance"];
+  variant?: HelixBaseTimeInput["variant"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -5403,7 +5403,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  appearance?: HelixBaseTimePicker["appearance"];
+  variant?: HelixBaseTimePicker["variant"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseTimePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */

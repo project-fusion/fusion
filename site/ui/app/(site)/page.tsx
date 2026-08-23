@@ -160,7 +160,7 @@ export default function Home() {
             {PRODUCTS.map((product) => (
               <helix-flex data-substrate direction="column" gap="sm" key={product.name}>
                 <helix-flex align="center" data-density="sm" gap="sm">
-                  <helix-text appearance="label" tone="subtle">
+                  <helix-text tone="subtle" variant="label">
                     {product.role}
                   </helix-text>
                   <helix-tag tone={stageAppearance(product.stage)}>{product.stage}</helix-tag>
@@ -195,7 +195,7 @@ export default function Home() {
                   </helix-flex>
                 ) : (
                   <helix-flex direction="column" gap="sm">
-                    <helix-text appearance="caption" tone="subtle">
+                    <helix-text tone="subtle" variant="caption">
                       Nothing to install yet. The shape is written down and the crates are in the
                       open.
                     </helix-text>
@@ -226,7 +226,7 @@ export default function Home() {
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
+            <helix-text tone="subtle" variant="label">
               Services
             </helix-text>
             <helix-text as="h2" data-measure data-section-title>
@@ -311,7 +311,7 @@ export default function Home() {
             in a layout: they are an argument and the thing it is about. */}
         <div className={styles.showcaseSplit} data-shell>
           <helix-flex class={styles.showcaseProse} direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
+            <helix-text tone="subtle" variant="label">
               Helix
             </helix-text>
             <helix-text as="h2" data-section-title>
@@ -336,7 +336,7 @@ export default function Home() {
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
+            <helix-text tone="subtle" variant="label">
               Why us
             </helix-text>
             {/* **"You are hiring the people who built the tools" was the hero's
@@ -369,7 +369,7 @@ export default function Home() {
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex align="center" gap="md" justify="between" wrap>
             <helix-flex direction="column" gap="sm">
-              <helix-text appearance="label" tone="subtle">
+              <helix-text tone="subtle" variant="label">
                 Insights
               </helix-text>
               <helix-text as="h2" data-measure data-section-title>

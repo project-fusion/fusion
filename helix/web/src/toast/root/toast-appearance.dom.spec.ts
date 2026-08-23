@@ -218,7 +218,7 @@ if (hasLayout()) {
          and had never said so. */
       const found = (await mount(
         `<helix-toast label="N"><helix-toast-item dismissible>Message
-           <helix-button appearance="ghost" slot="actions">Retry</helix-button>
+           <helix-button emphasis="ghost" slot="actions">Retry</helix-button>
          </helix-toast-item></helix-toast>`,
       )) as HTMLElement
       const found_item = found.querySelector('helix-toast-item') as Item
@@ -254,12 +254,12 @@ if (hasLayout()) {
       const host = (await mount(
         `<helix-toast label="N">
            <helix-toast-item id="short" dismissible tone="danger">Short.
-             <helix-button appearance="ghost" slot="actions">Retry</helix-button>
+             <helix-button emphasis="ghost" slot="actions">Retry</helix-button>
            </helix-toast-item>
            <helix-toast-item id="long" dismissible tone="danger">A far longer
              message that wraps onto several separate lines inside the width a
              toast is given, which is where the alignment question bites.
-             <helix-button appearance="ghost" slot="actions">Retry</helix-button>
+             <helix-button emphasis="ghost" slot="actions">Retry</helix-button>
            </helix-toast-item>
          </helix-toast>`,
       )) as HTMLElement

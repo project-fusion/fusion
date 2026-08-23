@@ -1759,7 +1759,7 @@ readable and typeable exactly once, in whichever of the two is present.
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
 where the color is the answer rather than a setting. */
-  appearance?: HelixBaseColorInput["appearance"];
+  variant?: HelixBaseColorInput["variant"];
   /** Whether the color carries an alpha channel. */
   alpha?: HelixBaseColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
@@ -1890,7 +1890,7 @@ readable and typeable exactly once, in whichever of the two is present.
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
 where the color is the answer rather than a setting. */
-  "prop:appearance"?: HelixBaseColorInput["appearance"];
+  "prop:variant"?: HelixBaseColorInput["variant"];
   /** Whether the color carries an alpha channel. */
   "prop:alpha"?: HelixBaseColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
@@ -5419,7 +5419,7 @@ tier knows about it at all: a band spans the viewport, so there is nothing
 to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
-  appearance?: HelixBaseMegamenu["appearance"];
+  variant?: HelixBaseMegamenu["variant"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
@@ -5516,7 +5516,7 @@ tier knows about it at all: a band spans the viewport, so there is nothing
 to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
-  "prop:appearance"?: HelixBaseMegamenu["appearance"];
+  "prop:variant"?: HelixBaseMegamenu["variant"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
@@ -9023,7 +9023,7 @@ nothing about whether it is finished.
 `numeric` is the older convention and is still the right one where the
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
-  appearance?: HelixBaseSteps["appearance"];
+  variant?: HelixBaseSteps["variant"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -9075,7 +9075,7 @@ nothing about whether it is finished.
 `numeric` is the older convention and is still the right one where the
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
-  "prop:appearance"?: HelixBaseSteps["appearance"];
+  "prop:variant"?: HelixBaseSteps["variant"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -9472,7 +9472,7 @@ meets first.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
-  appearance?: HelixBaseTabs["appearance"];
+  variant?: HelixBaseTabs["variant"];
   /** Accessible name for the tab list. */
   label?: HelixBaseTabs["label"];
   /** Whether arrowing to a tab also selects it.
@@ -9530,7 +9530,7 @@ meets first.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
-  "prop:appearance"?: HelixBaseTabs["appearance"];
+  "prop:variant"?: HelixBaseTabs["variant"];
   /** Accessible name for the tab list. */
   "prop:label"?: HelixBaseTabs["label"];
   /** Whether arrowing to a tab also selects it.
@@ -9883,7 +9883,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  appearance?: HelixBaseTimeInput["appearance"];
+  variant?: HelixBaseTimeInput["variant"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -10034,7 +10034,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  "prop:appearance"?: HelixBaseTimeInput["appearance"];
+  "prop:variant"?: HelixBaseTimeInput["variant"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -10272,7 +10272,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  appearance?: HelixBaseTimePicker["appearance"];
+  variant?: HelixBaseTimePicker["variant"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseTimePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -10411,7 +10411,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  "prop:appearance"?: HelixBaseTimePicker["appearance"];
+  "prop:variant"?: HelixBaseTimePicker["variant"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixBaseTimePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -13781,7 +13781,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the field is a text box with a swatch on it, or only the swatch.
+   * - `variant`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
    * picker, with no text beside it. It is what a toolbar wants, and a form that
@@ -17167,7 +17167,7 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: The section's name, which names the default trigger and the panel.
-   * - `appearance`: Whether the panel is a card under the trigger or a band across the page.
+   * - `variant`: Whether the panel is a card under the trigger or a band across the page.
    *
    * The resting one is the card, hanging off the trigger and as wide as it
    * needs to be. `full` is the other shape navigations use: a band from edge to
@@ -20424,7 +20424,7 @@ export type CustomElements = {
    * in both. Of those four combinations three are ones nobody should pick, and
    * a property whose job is mostly to be left alone is a property that mostly
    * catches people out.
-   * - `appearance`: What each step is marked with.
+   * - `variant`: What each step is marked with.
    *
    * Absent is the state itself: a check where a stage is done, a target where
    * the reader is, an empty ring ahead of them. Three marks that need no
@@ -20941,7 +20941,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the row reads.
+   * - `variant`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
    * which is what a set sitting inside other chrome wants. `underlined` is a
@@ -21296,7 +21296,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the panel is one list of times or a column each.
+   * - `variant`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
    * hours has. `wheels` splits them into an hour, a minute and a meridiem where
@@ -21569,7 +21569,7 @@ export type CustomElements = {
    * and a wheel has exactly one value by construction. Rather than draw
    * something that cannot say what it holds, `wheels` renders as a list
    * whenever a mode is set.
-   * - `appearance`: Whether the times are one list or a column each.
+   * - `variant`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
    * opening hours or slots actually has. `wheels` splits them into an hour, a
@@ -25054,7 +25054,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the field is a text box with a swatch on it, or only the swatch.
+   * - `variant`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
    * picker, with no text beside it. It is what a toolbar wants, and a form that
@@ -28518,7 +28518,7 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: The section's name, which names the default trigger and the panel.
-   * - `appearance`: Whether the panel is a card under the trigger or a band across the page.
+   * - `variant`: Whether the panel is a card under the trigger or a band across the page.
    *
    * The resting one is the card, hanging off the trigger and as wide as it
    * needs to be. `full` is the other shape navigations use: a band from edge to
@@ -31861,7 +31861,7 @@ export type CustomElementsSolidJs = {
    * in both. Of those four combinations three are ones nobody should pick, and
    * a property whose job is mostly to be left alone is a property that mostly
    * catches people out.
-   * - `appearance`: What each step is marked with.
+   * - `variant`: What each step is marked with.
    *
    * Absent is the state itself: a check where a stage is done, a target where
    * the reader is, an empty ring ahead of them. Three marks that need no
@@ -32402,7 +32402,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the row reads.
+   * - `variant`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
    * which is what a set sitting inside other chrome wants. `underlined` is a
@@ -32769,7 +32769,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the panel is one list of times or a column each.
+   * - `variant`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
    * hours has. `wheels` splits them into an hour, a minute and a meridiem where
@@ -33045,7 +33045,7 @@ export type CustomElementsSolidJs = {
    * and a wheel has exactly one value by construction. Rather than draw
    * something that cannot say what it holds, `wheels` renders as a list
    * whenever a mode is set.
-   * - `appearance`: Whether the times are one list or a column each.
+   * - `variant`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
    * opening hours or slots actually has. `wheels` splits them into an hour, a

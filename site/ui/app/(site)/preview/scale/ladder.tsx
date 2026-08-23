@@ -89,7 +89,7 @@ export function ScaleLadder() {
     <section className="scLadder">
       <div className="scLadderCopy">
         <helix-flex direction="column" gap="xl">
-          <helix-text appearance="label" class="scKicker">
+          <helix-text class="scKicker" variant="label">
             The ladder
           </helix-text>
           <helix-text as="h2" class="scSceneTitle">

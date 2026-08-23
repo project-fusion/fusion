@@ -1405,23 +1405,47 @@ export type HelixBreadcrumbsSolidJsProps = {
 };
 
 export type HelixButtonGroupProps = {
-  /** Whether the buttons are one bar or a spaced row. */
-  appearance?: HelixButtonGroup["appearance"];
+  /** Whether the buttons are one bar or a spaced row.
+
+Joined by default, which is what a button group has always meant here: one
+control made of parts, sharing borders, reading as a segmented bar.
+
+`spaced` is the same set with air between them, for a row of related but
+separate actions. It exists because the semantics and the joining were one
+thing and should not have been: `role="group"` and a shared name are what
+make a set of buttons a set, and a consumer who wanted that *and* ordinary
+spacing had to choose. `helix-flex` gives the spacing and no group; this
+gave the group and no choice about the spacing. */
+  variant?: HelixButtonGroup["variant"];
   /** Accessible name for the group.
 
 On the host through internals, so an author's `aria-label` still overrides
 it and nothing lands on the host that a consumer's markup did not have. */
   label?: HelixButtonGroup["label"];
+  /** Whether the buttons are one bar or a spaced row. */
+  appearance?: HelixButtonGroup["appearance"];
 };
 
 export type HelixButtonGroupSolidJsProps = {
-  /** Whether the buttons are one bar or a spaced row. */
-  "prop:appearance"?: HelixButtonGroup["appearance"];
+  /** Whether the buttons are one bar or a spaced row.
+
+Joined by default, which is what a button group has always meant here: one
+control made of parts, sharing borders, reading as a segmented bar.
+
+`spaced` is the same set with air between them, for a row of related but
+separate actions. It exists because the semantics and the joining were one
+thing and should not have been: `role="group"` and a shared name are what
+make a set of buttons a set, and a consumer who wanted that *and* ordinary
+spacing had to choose. `helix-flex` gives the spacing and no group; this
+gave the group and no choice about the spacing. */
+  "prop:variant"?: HelixButtonGroup["variant"];
   /** Accessible name for the group.
 
 On the host through internals, so an author's `aria-label` still overrides
 it and nothing lands on the host that a consumer's markup did not have. */
   "prop:label"?: HelixButtonGroup["label"];
+  /** Whether the buttons are one bar or a spaced row. */
+  "prop:appearance"?: HelixButtonGroup["appearance"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2432,7 +2456,7 @@ export type HelixCheckboxProps = {
 The box stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
 leave nothing for a high-contrast display. */
-  appearance?: HelixCheckbox["appearance"];
+  variant?: HelixCheckbox["variant"];
   /** Whether the control is checked.
 
 One property rather than two. Reading gives the real state whichever
@@ -2511,7 +2535,7 @@ export type HelixCheckboxSolidJsProps = {
 The box stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
 leave nothing for a high-contrast display. */
-  "prop:appearance"?: HelixCheckbox["appearance"];
+  "prop:variant"?: HelixCheckbox["variant"];
   /** Whether the control is checked.
 
 One property rather than two. Reading gives the real state whichever
@@ -2723,7 +2747,7 @@ readable and typeable exactly once, in whichever of the two is present.
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
 where the color is the answer rather than a setting. */
-  appearance?: HelixColorInput["appearance"];
+  variant?: HelixColorInput["variant"];
   /** Whether the color carries an alpha channel. */
   alpha?: HelixColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
@@ -2854,7 +2878,7 @@ readable and typeable exactly once, in whichever of the two is present.
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
 where the color is the answer rather than a setting. */
-  "prop:appearance"?: HelixColorInput["appearance"];
+  "prop:variant"?: HelixColorInput["variant"];
   /** Whether the color carries an alpha channel. */
   "prop:alpha"?: HelixColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
@@ -6550,7 +6574,7 @@ around a logo reads as chrome bolted to the brand.
 
 That the component can now be drawn without anything spinning is why it is
 no longer called Spinner: the old name described one appearance of two. */
-  appearance?: HelixLoader["appearance"];
+  variant?: HelixLoader["variant"];
   /** Diameter relative to the surrounding text. */
   size?: HelixLoader["size"];
   /** Accessible name, announced while the work is outstanding. */
@@ -6571,7 +6595,7 @@ around a logo reads as chrome bolted to the brand.
 
 That the component can now be drawn without anything spinning is why it is
 no longer called Spinner: the old name described one appearance of two. */
-  "prop:appearance"?: HelixLoader["appearance"];
+  "prop:variant"?: HelixLoader["variant"];
   /** Diameter relative to the surrounding text. */
   "prop:size"?: HelixLoader["size"];
   /** Accessible name, announced while the work is outstanding. */
@@ -6635,7 +6659,7 @@ tier knows about it at all: a band spans the viewport, so there is nothing
 to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
-  appearance?: HelixMegamenu["appearance"];
+  variant?: HelixMegamenu["variant"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
@@ -6732,7 +6756,7 @@ tier knows about it at all: a band spans the viewport, so there is nothing
 to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
-  "prop:appearance"?: HelixMegamenu["appearance"];
+  "prop:variant"?: HelixMegamenu["variant"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
@@ -8834,7 +8858,7 @@ export type HelixRadioProps = {
 The circle stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
 leave nothing for a high-contrast display. */
-  appearance?: HelixRadio["appearance"];
+  variant?: HelixRadio["variant"];
   /** Takes the circle away, leaving the card as the whole control.
 
 Unnecessary under `chip`, which has no room for a circle beside its mark
@@ -8895,7 +8919,7 @@ export type HelixRadioSolidJsProps = {
 The circle stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
 leave nothing for a high-contrast display. */
-  "prop:appearance"?: HelixRadio["appearance"];
+  "prop:variant"?: HelixRadio["variant"];
   /** Takes the circle away, leaving the card as the whole control.
 
 Unnecessary under `chip`, which has no room for a circle beside its mark
@@ -8971,7 +8995,7 @@ either, and both are only a choice of drawing. A scale whose marks are
 held no prop for and reported as a hydration mismatch. The stylesheet was
 already written the right way round, naming only `dots`, so marks is what
 an unset one draws and nothing else had to move. */
-  appearance?: HelixRating["appearance"];
+  variant?: HelixRating["variant"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -9101,7 +9125,7 @@ either, and both are only a choice of drawing. A scale whose marks are
 held no prop for and reported as a hydration mismatch. The stylesheet was
 already written the right way round, naming only `dots`, so marks is what
 an unset one draws and nothing else had to move. */
-  "prop:appearance"?: HelixRating["appearance"];
+  "prop:variant"?: HelixRating["variant"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -10516,7 +10540,7 @@ line can be grabbed. The grip adds no hit area of its own.
 
 Both are writable, so a generated page can say which it means rather than
 relying on the absence of an attribute. */
-  appearance?: HelixSplitter["appearance"];
+  variant?: HelixSplitter["variant"];
   /** Which way the panes are laid out.
 
 `horizontal` is side by side with an upright divider between them, and
@@ -10601,7 +10625,7 @@ line can be grabbed. The grip adds no hit area of its own.
 
 Both are writable, so a generated page can say which it means rather than
 relying on the absence of an attribute. */
-  "prop:appearance"?: HelixSplitter["appearance"];
+  "prop:variant"?: HelixSplitter["variant"];
   /** Which way the panes are laid out.
 
 `horizontal` is side by side with an upright divider between them, and
@@ -10800,7 +10824,7 @@ nothing about whether it is finished.
 `numeric` is the older convention and is still the right one where the
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
-  appearance?: HelixSteps["appearance"];
+  variant?: HelixSteps["variant"];
 
   /** Fired when the active step changes. */
   "onhelix-change"?: (e: HelixStepsHelixChangeElementEvent) => void;
@@ -10852,7 +10876,7 @@ nothing about whether it is finished.
 `numeric` is the older convention and is still the right one where the
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
-  "prop:appearance"?: HelixSteps["appearance"];
+  "prop:variant"?: HelixSteps["variant"];
   /** Fired when the active step changes. */
   "on:helix-change"?: (e: HelixStepsHelixChangeElementEvent) => void;
 
@@ -11246,7 +11270,7 @@ meets first.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
-  appearance?: HelixTabs["appearance"];
+  variant?: HelixTabs["variant"];
   /** Accessible name for the tab list. */
   label?: HelixTabs["label"];
   /** Whether arrowing to a tab also selects it.
@@ -11304,7 +11328,7 @@ meets first.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
-  "prop:appearance"?: HelixTabs["appearance"];
+  "prop:variant"?: HelixTabs["variant"];
   /** Accessible name for the tab list. */
   "prop:label"?: HelixTabs["label"];
   /** Whether arrowing to a tab also selects it.
@@ -11470,7 +11494,7 @@ export type HelixTextProps = {
   /** Which element to render. Decides the outline and the semantics. */
   as?: HelixText["as"];
   /** Type treatment. Defaults to the one that matches `as`. */
-  appearance?: HelixText["appearance"];
+  variant?: HelixText["variant"];
   /** Color role. A separate axis from the type ramp, because color carries
 state: folding it in would mean `caption-danger` and the rest of the cross
 product.
@@ -11494,7 +11518,7 @@ export type HelixTextSolidJsProps = {
   /** Which element to render. Decides the outline and the semantics. */
   "prop:as"?: HelixText["as"];
   /** Type treatment. Defaults to the one that matches `as`. */
-  "prop:appearance"?: HelixText["appearance"];
+  "prop:variant"?: HelixText["variant"];
   /** Color role. A separate axis from the type ramp, because color carries
 state: folding it in would mean `caption-danger` and the rest of the cross
 product.
@@ -11791,7 +11815,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  appearance?: HelixTimeInput["appearance"];
+  variant?: HelixTimeInput["variant"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -11942,7 +11966,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  "prop:appearance"?: HelixTimeInput["appearance"];
+  "prop:variant"?: HelixTimeInput["variant"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -12145,7 +12169,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  appearance?: HelixTimePicker["appearance"];
+  variant?: HelixTimePicker["variant"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -12284,7 +12308,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  "prop:appearance"?: HelixTimePicker["appearance"];
+  "prop:variant"?: HelixTimePicker["variant"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -15106,11 +15130,22 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the buttons are one bar or a spaced row.
+   * - `variant`: Whether the buttons are one bar or a spaced row.
+   *
+   * Joined by default, which is what a button group has always meant here: one
+   * control made of parts, sharing borders, reading as a segmented bar.
+   *
+   * `spaced` is the same set with air between them, for a row of related but
+   * separate actions. It exists because the semantics and the joining were one
+   * thing and should not have been: `role="group"` and a shared name are what
+   * make a set of buttons a set, and a consumer who wanted that *and* ordinary
+   * spacing had to choose. `helix-flex` gives the spacing and no group; this
+   * gave the group and no choice about the spacing.
    * - `label`: Accessible name for the group.
    *
    * On the host through internals, so an author's `aria-label` still overrides
    * it and nothing lands on the host that a consumer's markup did not have.
+   * - `appearance`: Whether the buttons are one bar or a spaced row. (property only)
    *
    * ## Slots
    *
@@ -15781,7 +15816,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the choice presents itself.
+   * - `variant`: How the choice presents itself.
    *
    * - `plain` is the default and is never written: a box beside its words,
    *   which is what a list of choices should be almost always.
@@ -16078,7 +16113,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `appearance`: Whether the field is a text box with a swatch on it, or only the swatch.
+   * - `variant`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
    * picker, with no text beside it. It is what a toolbar wants, and a form that
@@ -19230,7 +19265,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the waiting is drawn.
+   * - `variant`: How the waiting is drawn.
    *
    * Unset is the turning arc, which is what most waits want and what this
    * component was called for years.
@@ -19305,7 +19340,7 @@ export type CustomElements = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: The section's name, which names the default trigger and the panel.
-   * - `appearance`: Whether the panel is a card under the trigger or a band across the page.
+   * - `variant`: Whether the panel is a card under the trigger or a band across the page.
    *
    * The resting one is the card, hanging off the trigger and as wide as it
    * needs to be. `full` is the other shape navigations use: a band from edge to
@@ -21015,7 +21050,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the choice presents itself.
+   * - `variant`: How the choice presents itself.
    *
    * - `plain` is the default and is never written: a circle beside its words,
    *   which is what a list of choices should be almost always.
@@ -21100,7 +21135,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Which mark the row is drawn with.
+   * - `variant`: Which mark the row is drawn with.
    *
    * `marks` is the star, and is what a rating means to most readers. `dots`
    * drops the glyph for a plain circle, which says how much rather than how
@@ -22509,7 +22544,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the divider carries a grip.
+   * - `variant`: Whether the divider carries a grip.
    *
    * - `line` is the divider alone, for a splitter the reader already knows is
    *   one: an editor, a mail client, anything they open every day.
@@ -22744,7 +22779,7 @@ export type CustomElements = {
    * in both. Of those four combinations three are ones nobody should pick, and
    * a property whose job is mostly to be left alone is a property that mostly
    * catches people out.
-   * - `appearance`: What each step is marked with.
+   * - `variant`: What each step is marked with.
    *
    * Absent is the state itself: a check where a stage is done, a target where
    * the reader is, an empty ring ahead of them. Three marks that need no
@@ -23193,7 +23228,7 @@ export type CustomElements = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `appearance`: How the row reads.
+   * - `variant`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
    * which is what a set sitting inside other chrome wants. `underlined` is a
@@ -23413,7 +23448,7 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `as`: Which element to render. Decides the outline and the semantics.
-   * - `appearance`: Type treatment. Defaults to the one that matches `as`.
+   * - `variant`: Type treatment. Defaults to the one that matches `as`.
    * - `tone`: Color role. A separate axis from the type ramp, because color carries
    * state: folding it in would mean `caption-danger` and the rest of the cross
    * product.
@@ -23649,7 +23684,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `appearance`: Whether the panel is one list of times or a column each.
+   * - `variant`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
    * hours has. `wheels` splits them into an hour, a minute and a meridiem where
@@ -23894,7 +23929,7 @@ export type CustomElements = {
    * and a wheel has exactly one value by construction. Rather than draw
    * something that cannot say what it holds, `wheels` renders as a list
    * whenever a mode is set.
-   * - `appearance`: Whether the times are one list or a column each.
+   * - `variant`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
    * opening hours or slots actually has. `wheels` splits them into an hour, a
@@ -26466,11 +26501,22 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the buttons are one bar or a spaced row.
+   * - `variant`: Whether the buttons are one bar or a spaced row.
+   *
+   * Joined by default, which is what a button group has always meant here: one
+   * control made of parts, sharing borders, reading as a segmented bar.
+   *
+   * `spaced` is the same set with air between them, for a row of related but
+   * separate actions. It exists because the semantics and the joining were one
+   * thing and should not have been: `role="group"` and a shared name are what
+   * make a set of buttons a set, and a consumer who wanted that *and* ordinary
+   * spacing had to choose. `helix-flex` gives the spacing and no group; this
+   * gave the group and no choice about the spacing.
    * - `label`: Accessible name for the group.
    *
    * On the host through internals, so an author's `aria-label` still overrides
    * it and nothing lands on the host that a consumer's markup did not have.
+   * - `appearance`: Whether the buttons are one bar or a spaced row. (property only)
    *
    * ## Slots
    *
@@ -27158,7 +27204,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the choice presents itself.
+   * - `variant`: How the choice presents itself.
    *
    * - `plain` is the default and is never written: a box beside its words,
    *   which is what a list of choices should be almost always.
@@ -27463,7 +27509,7 @@ export type CustomElementsSolidJs = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `appearance`: Whether the field is a text box with a swatch on it, or only the swatch.
+   * - `variant`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
    * picker, with no text beside it. It is what a toolbar wants, and a form that
@@ -30697,7 +30743,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the waiting is drawn.
+   * - `variant`: How the waiting is drawn.
    *
    * Unset is the turning arc, which is what most waits want and what this
    * component was called for years.
@@ -30775,7 +30821,7 @@ export type CustomElementsSolidJs = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: The section's name, which names the default trigger and the panel.
-   * - `appearance`: Whether the panel is a card under the trigger or a band across the page.
+   * - `variant`: Whether the panel is a card under the trigger or a band across the page.
    *
    * The resting one is the card, hanging off the trigger and as wide as it
    * needs to be. `full` is the other shape navigations use: a band from edge to
@@ -32542,7 +32588,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How the choice presents itself.
+   * - `variant`: How the choice presents itself.
    *
    * - `plain` is the default and is never written: a circle beside its words,
    *   which is what a list of choices should be almost always.
@@ -32632,7 +32678,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Which mark the row is drawn with.
+   * - `variant`: Which mark the row is drawn with.
    *
    * `marks` is the star, and is what a rating means to most readers. `dots`
    * drops the glyph for a plain circle, which says how much rather than how
@@ -34083,7 +34129,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the divider carries a grip.
+   * - `variant`: Whether the divider carries a grip.
    *
    * - `line` is the divider alone, for a splitter the reader already knows is
    *   one: an editor, a mail client, anything they open every day.
@@ -34326,7 +34372,7 @@ export type CustomElementsSolidJs = {
    * in both. Of those four combinations three are ones nobody should pick, and
    * a property whose job is mostly to be left alone is a property that mostly
    * catches people out.
-   * - `appearance`: What each step is marked with.
+   * - `variant`: What each step is marked with.
    *
    * Absent is the state itself: a check where a stage is done, a target where
    * the reader is, an empty ring ahead of them. Three marks that need no
@@ -34802,7 +34848,7 @@ export type CustomElementsSolidJs = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `appearance`: How the row reads.
+   * - `variant`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
    * which is what a set sitting inside other chrome wants. `underlined` is a
@@ -35029,7 +35075,7 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `as`: Which element to render. Decides the outline and the semantics.
-   * - `appearance`: Type treatment. Defaults to the one that matches `as`.
+   * - `variant`: Type treatment. Defaults to the one that matches `as`.
    * - `tone`: Color role. A separate axis from the type ramp, because color carries
    * state: folding it in would mean `caption-danger` and the rest of the cross
    * product.
@@ -35270,7 +35316,7 @@ export type CustomElementsSolidJs = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `appearance`: Whether the panel is one list of times or a column each.
+   * - `variant`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
    * hours has. `wheels` splits them into an hour, a minute and a meridiem where
@@ -35518,7 +35564,7 @@ export type CustomElementsSolidJs = {
    * and a wheel has exactly one value by construction. Rather than draw
    * something that cannot say what it holds, `wheels` renders as a list
    * whenever a mode is set.
-   * - `appearance`: Whether the times are one list or a column each.
+   * - `variant`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
    * opening hours or slots actually has. `wheels` splits them into an hour, a

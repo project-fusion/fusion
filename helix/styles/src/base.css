@@ -282,11 +282,15 @@ helix-card > [slot="media"] {
  * handful are right; this is the handful, which is why they are named bundles
  * rather than composable size, weight and leading utilities.
  *
- * Each ramp answers to three selectors and they are the same decision written
- * three ways: `data-text` for any element, `helix-text[appearance]` for the
- * component, and `helix-text[as]` for the pairing where an element implies its
- * own treatment. Declared once here so the component and a plain `<h2>` cannot
- * drift apart.
+ * **The ramp is written twice and nothing holds the two copies together.** This
+ * file carries `data-text` for a plain element and the `[data-prose]` headings;
+ * `text-root.css` carries `:host([variant])` and `:host([as])`, which is what
+ * actually styles `helix-text`, a host with a `variant` attribute matching no
+ * rule in this file. The paragraph this replaces said all three selectors were
+ * declared once here and so could not drift apart. They are not and they can:
+ * the same four decisions written eight times across two packages, with no
+ * check standing between them. Anything moving a size, a weight or a leading
+ * has to move in both files.
  *
  * `Text` reaches these through inheritance rather than a copy. Typography
  * inherits across a shadow boundary, so a rule matching the host reaches the
@@ -294,7 +298,7 @@ helix-card > [slot="media"] {
  * the UA's own heading styles do not win against it.
  *
  * `body` is listed for completeness and is what `body` already sets, so an
- * element with no appearance and no pairing needs no rule to look right.
+ * element with no variant and no pairing needs no rule to look right.
  */
 
 [data-text="display"] {
@@ -634,14 +638,14 @@ helix-text[tone="danger"] {
  * stays, because a `<Link data-button>` is in the light DOM and there is nothing
  * to cross.
  */
-helix-button-group:not([appearance="spaced"]) > :not(:first-child) [data-button],
-helix-button-group:not([appearance="spaced"]) > [data-button]:not(:first-child) {
+helix-button-group:not([variant="spaced"]) > :not(:first-child) [data-button],
+helix-button-group:not([variant="spaced"]) > [data-button]:not(:first-child) {
   border-start-start-radius: 0;
   border-end-start-radius: 0;
 }
 
-helix-button-group:not([appearance="spaced"]) > :not(:last-child) [data-button],
-helix-button-group:not([appearance="spaced"]) > [data-button]:not(:last-child) {
+helix-button-group:not([variant="spaced"]) > :not(:last-child) [data-button],
+helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }

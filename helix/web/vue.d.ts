@@ -720,13 +720,25 @@ export type HelixBreadcrumbsVueProps = {};
 export type HelixBreadcrumbsVueEvents = {};
 
 export type HelixButtonGroupVueProps = {
-  /** Whether the buttons are one bar or a spaced row. */
-  appearance?: HelixButtonGroup["appearance"];
+  /** Whether the buttons are one bar or a spaced row.
+
+Joined by default, which is what a button group has always meant here: one
+control made of parts, sharing borders, reading as a segmented bar.
+
+`spaced` is the same set with air between them, for a row of related but
+separate actions. It exists because the semantics and the joining were one
+thing and should not have been: `role="group"` and a shared name are what
+make a set of buttons a set, and a consumer who wanted that *and* ordinary
+spacing had to choose. `helix-flex` gives the spacing and no group; this
+gave the group and no choice about the spacing. */
+  variant?: HelixButtonGroup["variant"];
   /** Accessible name for the group.
 
 On the host through internals, so an author's `aria-label` still overrides
 it and nothing lands on the host that a consumer's markup did not have. */
   label?: HelixButtonGroup["label"];
+  /** Whether the buttons are one bar or a spaced row. */
+  appearance?: HelixButtonGroup["appearance"];
 };
 
 export type HelixButtonGroupVueEvents = {};
@@ -1248,7 +1260,7 @@ export type HelixCheckboxVueProps = {
 The box stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
 leave nothing for a high-contrast display. */
-  appearance?: HelixCheckbox["appearance"];
+  variant?: HelixCheckbox["variant"];
   /** Whether the control is checked.
 
 One property rather than two. Reading gives the real state whichever
@@ -1427,7 +1439,7 @@ readable and typeable exactly once, in whichever of the two is present.
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
 where the color is the answer rather than a setting. */
-  appearance?: HelixColorInput["appearance"];
+  variant?: HelixColorInput["variant"];
   /** Whether the color carries an alpha channel. */
   alpha?: HelixColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
@@ -3379,7 +3391,7 @@ around a logo reads as chrome bolted to the brand.
 
 That the component can now be drawn without anything spinning is why it is
 no longer called Spinner: the old name described one appearance of two. */
-  appearance?: HelixLoader["appearance"];
+  variant?: HelixLoader["variant"];
   /** Diameter relative to the surrounding text. */
   size?: HelixLoader["size"];
   /** Accessible name, announced while the work is outstanding. */
@@ -3440,7 +3452,7 @@ tier knows about it at all: a band spans the viewport, so there is nothing
 to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
-  appearance?: HelixMegamenu["appearance"];
+  variant?: HelixMegamenu["variant"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
@@ -4566,7 +4578,7 @@ export type HelixRadioVueProps = {
 The circle stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
 leave nothing for a high-contrast display. */
-  appearance?: HelixRadio["appearance"];
+  variant?: HelixRadio["variant"];
   /** Takes the circle away, leaving the card as the whole control.
 
 Unnecessary under `chip`, which has no room for a circle beside its mark
@@ -4640,7 +4652,7 @@ either, and both are only a choice of drawing. A scale whose marks are
 held no prop for and reported as a hydration mismatch. The stylesheet was
 already written the right way round, naming only `dots`, so marks is what
 an unset one draws and nothing else had to move. */
-  appearance?: HelixRating["appearance"];
+  variant?: HelixRating["variant"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -5443,7 +5455,7 @@ line can be grabbed. The grip adds no hit area of its own.
 
 Both are writable, so a generated page can say which it means rather than
 relying on the absence of an attribute. */
-  appearance?: HelixSplitter["appearance"];
+  variant?: HelixSplitter["variant"];
   /** Which way the panes are laid out.
 
 `horizontal` is side by side with an upright divider between them, and
@@ -5602,7 +5614,7 @@ nothing about whether it is finished.
 `numeric` is the older convention and is still the right one where the
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
-  appearance?: HelixSteps["appearance"];
+  variant?: HelixSteps["variant"];
 };
 
 export type HelixStepsVueEvents = {
@@ -5831,7 +5843,7 @@ meets first.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
-  appearance?: HelixTabs["appearance"];
+  variant?: HelixTabs["variant"];
   /** Accessible name for the tab list. */
   label?: HelixTabs["label"];
   /** Whether arrowing to a tab also selects it.
@@ -5930,7 +5942,7 @@ export type HelixTextVueProps = {
   /** Which element to render. Decides the outline and the semantics. */
   as?: HelixText["as"];
   /** Type treatment. Defaults to the one that matches `as`. */
-  appearance?: HelixText["appearance"];
+  variant?: HelixText["variant"];
   /** Color role. A separate axis from the type ramp, because color carries
 state: folding it in would mean `caption-danger` and the rest of the cross
 product.
@@ -6131,7 +6143,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  appearance?: HelixTimeInput["appearance"];
+  variant?: HelixTimeInput["variant"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -6332,7 +6344,7 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  appearance?: HelixTimePicker["appearance"];
+  variant?: HelixTimePicker["variant"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to

@@ -29,14 +29,18 @@
  * - A property named after an axis draws only from that axis. A component may
  *   take a subset, because most surfaces have meaning for two of the four, and
  *   may never invent a value.
- * - A visual axis never appears on the headless tier. That tier gets `variant`,
- *   and the split is already true in the code rather than aspirational: every
- *   `appearance` in `headless` is structural, without exception.
- * - A family still carrying `appearance` must be named in `UNSWEPT` with what
- *   it turns out to be. A family carrying it and unlisted fails, so the drawer
- *   cannot refill while #158 is in progress, and an entry for a family that no
- *   longer carries one fails too: an exemption nothing needs is a lie the next
- *   reader has to check.
+ * - A visual axis never appears on the headless tier, which has nothing to
+ *   paint. `tone` is the exception and a principled one: it says what a thing
+ *   means, and meaning survives having no stylesheet.
+ * - `variant` is the escape hatch and takes no registry, being component-
+ *   specific by definition: `segmented` against `underlined`, `list` against
+ *   `wheels`, `dots` against `marks`. It lives on either tier, because a choice
+ *   between two widgets is structural wherever it is made. What it may not be
+ *   is a place to put something that *is* on an axis, which is the failure mode
+ *   `appearance` demonstrated for 21 components.
+ * - `appearance` is refused outright. It is not a word this library uses: it
+ *   held 21 declarations across four axes, and `UNSWEPT` is empty now, so a
+ *   component reintroducing it fails rather than being asked to explain itself.
  *
  * Run with `bun run check:axes`, after `bun run analyze`.
  */
@@ -62,32 +66,17 @@ const AXES = {
 
 /**
  * Families whose `appearance` has not been reclassified yet, each with what it
- * turns out to be. Emptied, the last line of this check becomes unreachable and
- * `appearance` is refused outright.
+ * turns out to be.
+ *
+ * **Empty, and the check below is what keeps it that way.** It held 21
+ * declarations when this was written and now holds none: `appearance` is not a
+ * word this library uses, so any component reintroducing it fails outright
+ * rather than being asked to explain itself. The entries are in the history of
+ * this file if the reasoning is ever wanted; each named the axis its family
+ * turned out to be on, and two of them were wrong because they were read from
+ * value names rather than from what the values did.
  */
-const UNSWEPT = {
-  /* **Two of these were classified from their value names and both were
-     wrong**, which is worth leaving here because it is the same mistake that
-     built the drawer. `toggle-group` was `filled | plain` and `video` was
-     `plain | solid`, and `filled` and `solid` read as fill weight, so the first
-     pass filed both under emphasis. Their stylesheets say otherwise: what
-     Toggle Group's `plain` drops is the background *and* the border, and all
-     three of Video's states describe what the control bar sits on. Both are
-     separation, and both moved with it. Classify by what a value does. */
-  'button-group': 'variant: joined and spaced are a layout',
-  checkbox: 'variant: `card` gives the option a description and a price, not a border',
-  'color-input': 'variant: a swatch is a different control',
-  loader: 'variant: pulse is which animation, not which surface',
-  megamenu: 'variant: `full` is a layout, which is why glass had to be a hook',
-  radio: 'variant: as checkbox, plus `chip` as a third layout',
-  rating: 'variant: dots and marks are which glyph',
-  splitter: 'variant: grip and line are which handle',
-  steps: 'variant: numeric is which marker',
-  tabs: 'variant: segmented and underlined are two different widgets',
-  text: 'a type ramp, which is its own axis and not one of these',
-  'time-input': 'variant: list and wheels are two different controls',
-  'time-picker': 'variant: as time-input',
-}
+const UNSWEPT = {}
 
 /**
  * Values off the registry that another row already owns, so this check names the
@@ -123,9 +112,11 @@ for (const tier of ['headless', 'web']) {
           seenUnswept.add(family)
           if (!(family in UNSWEPT)) {
             problems.push(
-              `${tag} declares \`appearance\`, which is the word four axes shared and ` +
-                'which #158 is retiring. Name the axis it is, or record the family in ' +
-                '`UNSWEPT` with what it turns out to be.',
+              `${tag} declares \`appearance\`, which is not a word this library uses. ` +
+                'It held four axes at once and was retired by #158: `separation` is ' +
+                'where a surface ends, `emphasis` is how much ink a control claims, ' +
+                '`material` is what it is made of, `tone` is what it means, and a ' +
+                'component-specific choice that is none of those is `variant`.',
             )
           }
           continue
@@ -195,5 +186,5 @@ console.log(
   `axes: ${swept} in the registry, every declared value drawn from one of them` +
     (seenUnswept.size > 0
       ? `, ${seenUnswept.size} families still on \`appearance\` and named as such`
-      : ''),
+      : ', and `appearance` is gone'),
 )

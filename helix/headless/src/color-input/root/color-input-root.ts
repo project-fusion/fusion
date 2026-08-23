@@ -93,7 +93,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
    * where the color is the answer rather than a setting.
    */
   @property({ reflect: true })
-  appearance?: 'swatch'
+  variant?: 'swatch'
 
   /** Whether the color carries an alpha channel. */
   @property({ reflect: true, type: Boolean })
@@ -353,7 +353,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
       ?invalid=${this.resolvedFeedback !== ''}
       ?alpha=${this.alpha}
       ?no-format=${this.noFormat}
-      ?no-value=${this.appearance !== 'swatch'}
+      ?no-value=${this.variant !== 'swatch'}
       .format=${this.format ?? 'hex'}
       .value=${this.picked}
       swatches=${this.swatches || nothing}
@@ -376,7 +376,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
              literal and the error lands on a line further down. -->
         <slot name="start"></slot>
         ${
-          this.appearance === 'swatch'
+          this.variant === 'swatch'
             ? nothing
             : html`<input
           part="control"
@@ -396,7 +396,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
         <slot name="end"></slot>
         <button
           part="trigger"
-          id=${this.appearance === 'swatch' ? 'control' : nothing}
+          id=${this.variant === 'swatch' ? 'control' : nothing}
           type="button"
           aria-controls="surface"
           aria-expanded=${this.open ? 'true' : 'false'}

@@ -34,7 +34,7 @@ export default function Page() {
     <>
       <section data-band>
         <helix-flex data-shell direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
+          <helix-text tone="subtle" variant="label">
             Services
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
@@ -56,7 +56,7 @@ export default function Page() {
               <helix-flex align="center" gap="md" justify="between" slot="header" wrap>
                 <helix-flex align="center" gap="sm">
                   <helix-icon name={service.icon}></helix-icon>
-                  <helix-text appearance="title" as="h2">
+                  <helix-text as="h2" variant="title">
                     {service.name}
                   </helix-text>
                 </helix-flex>
@@ -79,15 +79,15 @@ export default function Page() {
                     first and the figure is under it, still in full and still
                     the largest thing in this row. */}
                 <helix-flex align="baseline" gap="sm" wrap>
-                  <helix-text appearance="title">{service.price}</helix-text>
-                  <helix-text appearance="caption" tone="subtle">
+                  <helix-text variant="title">{service.price}</helix-text>
+                  <helix-text tone="subtle" variant="caption">
                     {service.duration}
                   </helix-text>
                 </helix-flex>
 
                 <helix-flex class={styles.serviceBody} gap="2xl" wrap>
                   <helix-flex class={styles.serviceColumn} direction="column" gap="sm">
-                    <helix-text appearance="label" tone="subtle">
+                    <helix-text tone="subtle" variant="label">
                       What is in it
                     </helix-text>
                     {/* `unordered`, because these are a set and the order
@@ -105,7 +105,7 @@ export default function Page() {
                   </helix-flex>
 
                   <helix-flex class={styles.serviceColumn} direction="column" gap="sm">
-                    <helix-text appearance="label" tone="subtle">
+                    <helix-text tone="subtle" variant="label">
                       What you keep
                     </helix-text>
                     <helix-text as="p" tone="muted">
@@ -128,7 +128,7 @@ export default function Page() {
           `/trust`, one link away. */}
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
+          <helix-text tone="subtle" variant="label">
             How it runs
           </helix-text>
           <helix-text as="h2" data-measure data-section-title>

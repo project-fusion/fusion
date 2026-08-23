@@ -173,11 +173,11 @@
  * being dead; with nothing over it, 0.12 to 0.24 is a circle that appears not to
  * move. And it has to carry the whole thing on its own whenever nothing is
  * slotted, which is the case every consumer gets before they add their logo. */
-:host([appearance="pulse"]) [part="indicator"] {
+:host([variant="pulse"]) [part="indicator"] {
   display: none;
 }
 
-:host([appearance="pulse"]) [part="svg"] {
+:host([variant="pulse"]) [part="svg"] {
   animation: none;
 }
 
@@ -196,19 +196,19 @@
  * with no rim around it to give it scale, that reads as a stray dot rather than
  * a brand waiting. Two steps up puts the default at the size the `lg` ring was
  * and keeps `size` meaning what it does elsewhere. */
-:host([appearance="pulse"]) {
+:host([variant="pulse"]) {
   --_loader-size: calc(var(--helix-size-loader-lg) * 2);
 }
 
-:host([appearance="pulse"][size="sm"]) {
+:host([variant="pulse"][size="sm"]) {
   --_loader-size: var(--helix-size-loader-lg);
 }
 
-:host([appearance="pulse"][size="lg"]) {
+:host([variant="pulse"][size="lg"]) {
   --_loader-size: calc(var(--helix-size-loader-lg) * 3);
 }
 
-:host([appearance="pulse"]) [part="track"] {
+:host([variant="pulse"]) [part="track"] {
   display: none;
 }
 
@@ -222,7 +222,7 @@
  *
  * `animation-name` rather than the whole shorthand, so the timing and easing
  * stay the ones the default was tuned with and only the frames change. */
-:host([appearance="pulse"]) [part="mark"] {
+:host([variant="pulse"]) [part="mark"] {
   animation-name: helix-loader-pulse-mark;
 }
 
@@ -249,7 +249,7 @@
   /* The mark, because the mark is the whole of this appearance now. The rule
      that was here answered for the ring, which no longer draws, so a reader who
      asked for less motion still got a fading logo. */
-  :host([appearance="pulse"]) [part="mark"] {
+  :host([variant="pulse"]) [part="mark"] {
     animation: none;
     opacity: 1;
   }

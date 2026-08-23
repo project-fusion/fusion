@@ -156,9 +156,9 @@
 }
 
 /* Interest darkens the line and thickens it. */
-:host(:not([appearance="grip"])) [part="separator"]:hover::before,
-:host(:not([appearance="grip"])) [part="separator"]:focus-visible::before,
-:host(:not([appearance="grip"])) [part="separator"][data-dragging]::before {
+:host(:not([variant="grip"])) [part="separator"]:hover::before,
+:host(:not([variant="grip"])) [part="separator"]:focus-visible::before,
+:host(:not([variant="grip"])) [part="separator"][data-dragging]::before {
   background-color: var(--splitter-hover-color, var(--helix-color-foreground-muted));
   inline-size: var(--helix-border-thick);
 }
@@ -175,13 +175,13 @@
  * fast one leaves the eight pixel target behind, and the nested divider a corner
  * moves is never hovered at all. After the interest rules, so a divider being
  * dragged under the pointer is primary rather than muted. */
-:host(:not([appearance="grip"])) [part="separator"][data-dragging]::before {
+:host(:not([variant="grip"])) [part="separator"][data-dragging]::before {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }
 
-:host([orientation="vertical"]:not([appearance="grip"])) [part="separator"]:hover::before,
-:host([orientation="vertical"]:not([appearance="grip"])) [part="separator"]:focus-visible::before,
-:host([orientation="vertical"]:not([appearance="grip"])) [part="separator"][data-dragging]::before {
+:host([orientation="vertical"]:not([variant="grip"])) [part="separator"]:hover::before,
+:host([orientation="vertical"]:not([variant="grip"])) [part="separator"]:focus-visible::before,
+:host([orientation="vertical"]:not([variant="grip"])) [part="separator"][data-dragging]::before {
   block-size: var(--helix-border-thick);
   inline-size: auto;
 }
@@ -295,7 +295,7 @@
  * thing a plain divider offers and a cursor is easy to miss.
  *
  * **And it answers alone.** The line keeps its color and its width in this
- * shape, which is what the `:not([appearance="grip"])` on the interest rules
+ * shape, which is what the `:not([variant="grip"])` on the interest rules
  * above is doing. Two marks responding to one pointer reads as two things.
  *
  * Drawn on the separator's second pseudo-element, so it costs no markup and no
@@ -303,7 +303,7 @@
  * originating element, so the grip lights the divider by being pointed at
  * without being a target of its own, which is also why it is `grip` and not
  * `handle`: the corner is the thing here that is a box the reader grabs. */
-:host([appearance="grip"]) [part="separator"]::after {
+:host([variant="grip"]) [part="separator"]::after {
   background-color: var(--splitter-grip-color, var(--helix-color-foreground-muted));
   border-radius: var(--helix-radii-full);
   content: "";
@@ -315,14 +315,14 @@
 }
 
 /* Along the run, centered, and offset to the leading side of the line. */
-:host([appearance="grip"]:not([orientation="vertical"])) [part="separator"]::after {
+:host([variant="grip"]:not([orientation="vertical"])) [part="separator"]::after {
   block-size: var(--splitter-grip-length, 2rem);
   inline-size: var(--helix-border-thick);
   inset-block-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
   inset-inline-start: calc(50% - var(--helix-border-thick) - var(--helix-space-2xs));
 }
 
-:host([appearance="grip"][orientation="vertical"]) [part="separator"]::after {
+:host([variant="grip"][orientation="vertical"]) [part="separator"]::after {
   block-size: var(--helix-border-thick);
   inline-size: var(--splitter-grip-length, 2rem);
   inset-block-start: calc(50% - var(--helix-border-thick) - var(--helix-space-2xs));
@@ -334,9 +334,9 @@
    there by whatever contains the splitter, and the grip is hidden at rest
    anyway. Both come back the same way, which is what lets a pane shut to
    nothing be found and opened again. */
-:host([appearance="grip"]) [part="separator"]:hover::after,
-:host([appearance="grip"]) [part="separator"]:focus-visible::after,
-:host([appearance="grip"]) [part="separator"][data-dragging]::after {
+:host([variant="grip"]) [part="separator"]:hover::after,
+:host([variant="grip"]) [part="separator"]:focus-visible::after,
+:host([variant="grip"]) [part="separator"][data-dragging]::after {
   opacity: 1;
 }
 
@@ -344,12 +344,12 @@
    question and a drag is an answer, and a corner moving two dividers at once
    needs the pair to read as one gesture. The only thing that ever changes
    color in this shape. */
-:host([appearance="grip"]) [part="separator"][data-dragging]::after {
+:host([variant="grip"]) [part="separator"][data-dragging]::after {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :host([appearance="grip"]) [part="separator"]::after {
+  :host([variant="grip"]) [part="separator"]::after {
     transition: none;
   }
 }

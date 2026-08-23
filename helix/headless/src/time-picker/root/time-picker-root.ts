@@ -213,7 +213,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    * only the departure has to be named.
    */
   @property({ reflect: true })
-  appearance?: 'list' | 'wheels'
+  variant?: 'list' | 'wheels'
 
   /**
    * Every time on offer, as minutes since midnight.
@@ -409,7 +409,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    * rather than wrong, which is why it can be left in.
    */
   reveal(): void {
-    if (this.appearance !== 'wheels' || this.mode !== undefined) {
+    if (this.variant !== 'wheels' || this.mode !== undefined) {
       return
     }
     for (const column of this.renderRoot?.querySelectorAll<HTMLElement & { reveal?: () => void }>(
@@ -592,7 +592,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
     /* A mode falls back to the list, for the reason the property records: a
        range on wheels is two sets of wheels and a multiple is a set, which a
        wheel cannot hold. */
-    if (this.appearance === 'wheels' && this.mode === undefined) {
+    if (this.variant === 'wheels' && this.mode === undefined) {
       return this.renderSpinner()
     }
     return html`${this.renderList()}`

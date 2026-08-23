@@ -83,7 +83,7 @@ describe('time', () => {
 describe('time as wheels', () => {
   const wheels = async (attrs = ''): Promise<Time> => {
     const host = (await mount(
-      `<helix-base-time-picker appearance="wheels" ${attrs}></helix-base-time-picker>`,
+      `<helix-base-time-picker variant="wheels" ${attrs}></helix-base-time-picker>`,
     )) as Time
     await host.updateComplete
     return host
@@ -223,7 +223,7 @@ describe('time holds more than one', () => {
   test('a mode falls back to the list, because a wheel holds one value', async () => {
     // A range on wheels is two sets of wheels, which is two controls, and a
     // multiple is a set, which a wheel cannot hold by construction.
-    const host = await many('appearance="wheels" mode="range"')
+    const host = await many('variant="wheels" mode="range"')
     expect(part(host, 'list')).not.toBeNull()
     expect(host.shadowRoot?.querySelector('[part="column"]')).toBeNull()
   })
@@ -259,7 +259,7 @@ describe('time is off', () => {
   test('and the wheels refuse on the same terms, which is a separate path in', async () => {
     // `moveColumn` rebuilds the value from three columns and never reaches
     // `handleChange`, so a guard on one says nothing about the other.
-    const host = await picker('appearance="wheels" default-value="09:00" disabled')
+    const host = await picker('variant="wheels" default-value="09:00" disabled')
     const column = host.shadowRoot?.querySelector('[part="column"]') as HTMLElement
     expect(column.hasAttribute('disabled')).toBe(true)
 
@@ -318,7 +318,7 @@ describe('times can be taken out of the list by name', () => {
        moving the hour to 10 lands on 10:00 without any option in the hour
        column having been disabled. */
     const host = await picker(
-      'appearance="wheels" default-value="09:00" disable-times="10:00" max="12:00" min="09:00" step="60"',
+      'variant="wheels" default-value="09:00" disable-times="10:00" max="12:00" min="09:00" step="60"',
     )
     const hour = host.shadowRoot?.querySelector('[data-column="hour"]') as HTMLElement
     hour.dispatchEvent(
@@ -335,7 +335,7 @@ describe('times can be taken out of the list by name', () => {
   test('an hour is only closed when every time in it is', async () => {
     // One free minute is a reason to open the wheel, not to close it.
     const host = await picker(
-      'appearance="wheels" disable-times="10:00,10:15,10:30,10:45,11:00" max="11:59" min="10:00"',
+      'variant="wheels" disable-times="10:00,10:15,10:30,10:45,11:00" max="11:59" min="10:00"',
     )
     const shut = [...(host.shadowRoot?.querySelectorAll('[data-column="hour"] [disabled]') ?? [])]
       .map((one) => one.getAttribute('value'))

@@ -317,7 +317,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
           <helix-flex direction="column" gap="lg">
             <helix-flex direction="column" gap="xs">
               <helix-flex align="center" gap="sm" justify="between">
-                <helix-text appearance="subheading" as="h1">
+                <helix-text as="h1" variant="subheading">
                   Theme builder
                 </helix-text>
                 <helix-tooltip content="Back to the shipped values" placement="bottom">
@@ -326,7 +326,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                   </helix-icon-button>
                 </helix-tooltip>
               </helix-flex>
-              <helix-text appearance="caption">
+              <helix-text variant="caption">
                 Describe a brand. Every pair the palette produces is measured against the ground it
                 lands on.
               </helix-text>
@@ -364,7 +364,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                   <span className="themeShiftArrow" />
                   <span className="themeSwatch" style={{ background: derivedPrimary }} />
                 </div>
-                <helix-text appearance="caption">
+                <helix-text variant="caption">
                   {shift > 0 ? 'Lightened' : 'Darkened'} to clear {contrastTarget}:1. Hue and chroma
                   are kept.
                 </helix-text>
@@ -743,7 +743,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               <helix-tabs-panel slot="panels" value="contrast">
                 <div className="themeFindings">
                   {failures.length === 0 ? (
-                    <helix-text appearance="caption">
+                    <helix-text variant="caption">
                       All {counts.pass ?? 0} measured pairs clear their target. Each is a foreground
                       against a ground the surface model says it lands on, rather than against the
                       page alone.
@@ -770,7 +770,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               <helix-tabs-panel slot="panels" value="collisions">
                 <div className="themeFindings">
                   {theme.collisions.length === 0 ? (
-                    <helix-text appearance="caption">
+                    <helix-text variant="caption">
                       Every role is distinguishable from every other. A collision is two roles a
                       reader cannot tell apart, which no contrast measurement can see: both may
                       clear the page and still say the same thing.
@@ -782,7 +782,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                           <helix-text>{collision}</helix-text>
                         </helix-callout>
                       ))}
-                      <helix-text appearance="caption">
+                      <helix-text variant="caption">
                         The accent yields on its own, and a status may rotate within its meaning up
                         to the allowance. What is left here could not be repaired by either.
                       </helix-text>
@@ -794,7 +794,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               <helix-tabs-panel slot="panels" value="unmeasured">
                 <div className="themeFindings">
                   <helix-flex direction="column" gap="sm">
-                    <helix-text appearance="caption">
+                    <helix-text variant="caption">
                       Not a softer failure: these pairs were never measured, because the ground is
                       not knowable: what sits behind a caption over a photograph is the photograph.
                       Folding them into the passes is how a guarantee becomes a claim about the

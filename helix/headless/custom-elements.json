@@ -7508,12 +7508,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'swatch' | undefined"
               },
               "description": "Whether the field is a text box with a swatch on it, or only the swatch.\n\n`swatch` is the native control's shape: a block of color that opens a\npicker, with no text beside it. It is what a toolbar wants, and a form that\nasks for a color among twenty other questions, where a hex in a box is\neleven characters of noise next to the thing itself.\n\nIt also settles where the value is stated. The default field *is* the input,\nso the panel is told `no-value` and would otherwise show a second one. A\nswatch states nothing, so the panel keeps its own row and the value is\nreadable and typeable exactly once, in whichever of the two is present.\n\nThe trade is real and is the reason this is not the default: a swatch cannot\nbe read or pasted into without opening the panel, which is worse for a form\nwhere the color is the answer rather than a setting.",
-              "attribute": "appearance",
+              "attribute": "variant",
               "reflects": true
             },
             {
@@ -8475,12 +8475,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'swatch' | undefined"
               },
               "description": "Whether the field is a text box with a swatch on it, or only the swatch.\n\n`swatch` is the native control's shape: a block of color that opens a\npicker, with no text beside it. It is what a toolbar wants, and a form that\nasks for a color among twenty other questions, where a hex in a box is\neleven characters of noise next to the thing itself.\n\nIt also settles where the value is stated. The default field *is* the input,\nso the panel is told `no-value` and would otherwise show a second one. A\nswatch states nothing, so the panel keeps its own row and the value is\nreadable and typeable exactly once, in whichever of the two is present.\n\nThe trade is real and is the reason this is not the default: a swatch cannot\nbe read or pasted into without opening the panel, which is worse for a form\nwhere the color is the answer rather than a setting.",
-              "fieldName": "appearance"
+              "fieldName": "variant"
             },
             {
               "name": "alpha",
@@ -25299,12 +25299,12 @@
             },
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'full' | undefined"
               },
               "description": "Whether the panel is a card under the trigger or a band across the page.\n\nThe resting one is the card, hanging off the trigger and as wide as it\nneeds to be. `full` is the other shape navigations use: a band from edge to\nedge under the header, with its contents held to the page's own measure, so\na set of destinations too wide to sit under one word gets the whole width\nto lay out in.\n\nIt changes where the panel goes as well as how it looks, which is why this\ntier knows about it at all: a band spans the viewport, so there is nothing\nto measure it against and nothing to flip or shift to, and the placing pass\nis told not to run. Everything else the popover gives, the top layer and\nthe dismissal, is exactly what such a band needs.",
-              "attribute": "appearance",
+              "attribute": "variant",
               "reflects": true
             },
             {
@@ -25804,12 +25804,12 @@
               "fieldName": "label"
             },
             {
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'full' | undefined"
               },
               "description": "Whether the panel is a card under the trigger or a band across the page.\n\nThe resting one is the card, hanging off the trigger and as wide as it\nneeds to be. `full` is the other shape navigations use: a band from edge to\nedge under the header, with its contents held to the page's own measure, so\na set of destinations too wide to sit under one word gets the whole width\nto lay out in.\n\nIt changes where the panel goes as well as how it looks, which is why this\ntier knows about it at all: a band spans the viewport, so there is nothing\nto measure it against and nothing to flip or shift to, and the placing pass\nis told not to run. Everything else the popover gives, the top layer and\nthe dismissal, is exactly what such a band needs.",
-              "fieldName": "appearance"
+              "fieldName": "variant"
             },
             {
               "name": "open-on",
@@ -41736,12 +41736,12 @@
             },
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'numeric' | undefined"
               },
               "description": "What each step is marked with.\n\nAbsent is the state itself: a check where a stage is done, a target where\nthe reader is, an empty ring ahead of them. Three marks that need no\nlegend, which a number does: \"3\" says where a stage sits in the order and\nnothing about whether it is finished.\n\n`numeric` is the older convention and is still the right one where the\norder is the point, a form that says \"step 3 of 5\" beside it, or a sequence\na reader is told to come back to by number.",
-              "attribute": "appearance",
+              "attribute": "variant",
               "reflects": true
             },
             {
@@ -42034,12 +42034,12 @@
               "fieldName": "orientation"
             },
             {
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'numeric' | undefined"
               },
               "description": "What each step is marked with.\n\nAbsent is the state itself: a check where a stage is done, a target where\nthe reader is, an empty ring ahead of them. Three marks that need no\nlegend, which a number does: \"3\" says where a stage sits in the order and\nnothing about whether it is finished.\n\n`numeric` is the older convention and is still the right one where the\norder is the point, a form that says \"step 3 of 5\" beside it, or a sequence\na reader is told to come back to by number.",
-              "fieldName": "appearance"
+              "fieldName": "variant"
             },
             {
               "name": "active",
@@ -44686,12 +44686,12 @@
             },
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'segmented' | 'underlined' | undefined"
               },
               "description": "How the row reads.\n\nUnset is a raised pill on the selected tab with nothing behind the row,\nwhich is what a set sitting inside other chrome wants. `underlined` is a\nrule under the row and a thicker one under the selected tab, for a set that\nheads a page. `segmented` puts the pill in a framed, sunken track, which\nreads as one control rather than as a row.\n\n`segmented` and not `toggle`, which is what this was called. An appearance\nvalue that is another component's name says \"it looks like that one\", which\na reader can only act on if they already know what that one looks like, and\nevery other appearance in the library describes itself: `outlined`,\n`spaced`, `plain`. This component's own comments called it segmented in\nboth places it explained itself, which is the name that was doing the work.\n\n`underlined` and not `underline` for the shape of the word rather than the\nsense: the two values sit in one list and read as a pair, and `segmented`\nis a participle. `outlined` on Accordion is the same word doing the same\njob. The example file was already `underlined.html`, which is what a reader\nmeets first.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
-              "attribute": "appearance",
+              "attribute": "variant",
               "reflects": true
             },
             {
@@ -45036,12 +45036,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'segmented' | 'underlined' | undefined"
               },
               "description": "How the row reads.\n\nUnset is a raised pill on the selected tab with nothing behind the row,\nwhich is what a set sitting inside other chrome wants. `underlined` is a\nrule under the row and a thicker one under the selected tab, for a set that\nheads a page. `segmented` puts the pill in a framed, sunken track, which\nreads as one control rather than as a row.\n\n`segmented` and not `toggle`, which is what this was called. An appearance\nvalue that is another component's name says \"it looks like that one\", which\na reader can only act on if they already know what that one looks like, and\nevery other appearance in the library describes itself: `outlined`,\n`spaced`, `plain`. This component's own comments called it segmented in\nboth places it explained itself, which is the name that was doing the work.\n\n`underlined` and not `underline` for the shape of the word rather than the\nsense: the two values sit in one list and read as a pair, and `segmented`\nis a participle. `outlined` on Accordion is the same word doing the same\njob. The example file was already `underlined.html`, which is what a reader\nmeets first.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
-              "fieldName": "appearance"
+              "fieldName": "variant"
             },
             {
               "name": "label",
@@ -46821,12 +46821,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'list' | 'wheels' | undefined"
               },
               "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the list, which the stylesheet reads as the base rule, so\nonly the departure has to be named.",
-              "attribute": "appearance",
+              "attribute": "variant",
               "reflects": true
             },
             {
@@ -47930,12 +47930,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'list' | 'wheels' | undefined"
               },
               "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the list, which the stylesheet reads as the base rule, so\nonly the departure has to be named.",
-              "fieldName": "appearance"
+              "fieldName": "variant"
             },
             {
               "name": "mode",
@@ -48416,12 +48416,12 @@
             },
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'list' | 'wheels' | undefined"
               },
               "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the list, which the stylesheet reads as the base rule, so\nonly the departure has to be named.",
-              "attribute": "appearance",
+              "attribute": "variant",
               "reflects": true
             },
             {
@@ -49157,12 +49157,12 @@
               "fieldName": "mode"
             },
             {
-              "name": "appearance",
+              "name": "variant",
               "type": {
                 "text": "'list' | 'wheels' | undefined"
               },
               "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the list, which the stylesheet reads as the base rule, so\nonly the departure has to be named.",
-              "fieldName": "appearance"
+              "fieldName": "variant"
             },
             {
               "name": "default-value",

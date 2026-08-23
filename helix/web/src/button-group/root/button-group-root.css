@@ -4,7 +4,7 @@
 
 /* Each button after the first is pulled onto its neighbour's border, so the two
    share one line rather than drawing two against each other. */
-:host(:not([appearance="spaced"])) ::slotted(*:not(:first-child)) {
+:host(:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
   margin-inline-start: calc(var(--helix-border-thin) * -1);
 }
 
@@ -21,11 +21,11 @@
  * `Button` publishes the two hooks and defaults them to `--button-radii`, so a
  * button outside a group is unaffected and a consumer setting `--button-radii`
  * still gets it on the ends. */
-:host(:not([appearance="spaced"])) ::slotted(*:not(:first-child)) {
+:host(:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
   --button-radii-start: 0;
 }
 
-:host(:not([appearance="spaced"])) ::slotted(*:not(:last-child)) {
+:host(:not([variant="spaced"])) ::slotted(*:not(:last-child)) {
   --button-radii-end: 0;
 }
 
@@ -44,6 +44,6 @@
 /* The same set, spaced. The group keeps its role and its name, which is the
    whole reason this is an appearance and not a `helix-flex`: a row of related
    actions is still a set, and a screen reader should hear it as one. */
-:host([appearance="spaced"]) {
+:host([variant="spaced"]) {
   gap: var(--button-group-gap, var(--helix-space-xs));
 }

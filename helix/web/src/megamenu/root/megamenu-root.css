@@ -231,7 +231,7 @@
  * The corners go, because an edge-to-edge band has no outside corner to round.
  * What is left is the page's own surface and a shadow, which is what a band
  * under a header is: it is not a card, so it is not outlined like one. */
-:host([appearance="full"]) [part="panel"],
+:host([variant="full"]) [part="panel"],
 :host([data-narrow]) [part="panel"] {
   /* The same ground the card takes, and the same one the header above it is
      painted with, so the band reads as the header continuing downward rather
@@ -301,13 +301,13 @@
  * sides and its only shadow is below, so the sides are clipped at zero rather
  * than let out. Sharing one starting value would have let the band's shadow out
  * sideways for the length of the animation and pulled it back at the end. */
-:host([appearance="full"]) [part="panel"]:popover-open,
+:host([variant="full"]) [part="panel"]:popover-open,
 :host([data-narrow]) [part="panel"]:popover-open {
   clip-path: inset(0 0 calc(var(--helix-space-xl) * -1) 0);
 }
 
 @starting-style {
-  :host([appearance="full"]) [part="panel"]:popover-open,
+  :host([variant="full"]) [part="panel"]:popover-open,
   :host([data-narrow]) [part="panel"]:popover-open {
     clip-path: inset(0 0 100% 0);
   }
@@ -339,7 +339,7 @@
  *
  * **The specificity is the whole point, so do not lower it.** `:host` prefixes
  * a selector that would otherwise be (0,2,0) and lose: the band is
- * `:host([appearance="full"]) [part="panel"]`, which is (0,3,0), so a bare
+ * `:host([variant="full"]) [part="panel"]`, which is (0,3,0), so a bare
  * `[part="panel"][hidden]` was outranked and a closed band kept its
  * `display: grid`. Measured on the site: `open` false, `hidden` present,
  * `:popover-open` false, and a 1280 by 267 box still laid out over the page the
