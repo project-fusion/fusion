@@ -892,11 +892,40 @@ export const defaultPairings = (contrastTarget: number): PairingRequest[] =>
  * `springy` takes the `spring` easing the stylesheet already ships rather than
  * a bezier pretending to be one: a real overshoot needs more than two control
  * points, which is what `linear()` with a sampled curve is for.
+ *
+ * **Three curves rather than one, because a character that set `standard` alone
+ * reached seven tenths of the motion in the library.** Counted across every
+ * component stylesheet: 147 uses of `easing-standard` against 33 of
+ * `emphasized` and 29 of `decelerate`, and those 62 kept the stylesheet's own
+ * curve whatever character was picked. Durations already reached all of it, so
+ * `springy` moved every transition at a spring's pace and only some of them on a
+ * spring's curve.
+ *
+ * `accelerate` is deliberately not here, and it is the one curve a character
+ * should not touch: it is the exit, two uses, and a thing leaving that overshoots
+ * on the way out reads as a mistake rather than as a spring.
  */
+const SPRING = 'spring'
+
 const MOTION = {
-  gentle: { curve: 'cubic-bezier(0.4, 0, 0.2, 1)', pace: 1.35 },
-  snappy: { curve: 'cubic-bezier(0.3, 0, 0.1, 1)', pace: 0.7 },
-  springy: { curve: 'var(--helix-easing-spring)', pace: 1.1 },
+  gentle: {
+    decelerate: 'cubic-bezier(0, 0, 0.2, 1)',
+    emphasized: 'cubic-bezier(0.4, 0, 0, 1.2)',
+    pace: 1.35,
+    standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+  snappy: {
+    decelerate: 'cubic-bezier(0, 0, 0.1, 1)',
+    emphasized: 'cubic-bezier(0.2, 0, 0, 1.2)',
+    pace: 0.7,
+    standard: 'cubic-bezier(0.3, 0, 0.1, 1)',
+  },
+  springy: {
+    decelerate: SPRING,
+    emphasized: SPRING,
+    pace: 1.1,
+    standard: SPRING,
+  },
 } as const
 
 /**
@@ -1033,7 +1062,15 @@ export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
     }
   }
   if (character) {
-    lines.push(`  --${namespace}-easing-standard: ${MOTION[character].curve};`)
+    /* The spring is a token rather than a literal, so it has to be written under
+       whatever namespace this theme is emitting. It was `var(--helix-easing-...)`
+       hardcoded, which is correct for exactly one namespace and silently dead for
+       any other, which is the gap `namespace` as an input exists to close. */
+    const curve = (value: string): string =>
+      value === SPRING ? `var(--${namespace}-easing-spring)` : value
+    for (const role of ['standard', 'emphasized', 'decelerate'] as const) {
+      lines.push(`  --${namespace}-easing-${role}: ${curve(MOTION[character][role])};`)
+    }
   }
 
   /* The ramp, emitted only where a base or a ratio was asked for, so a theme
