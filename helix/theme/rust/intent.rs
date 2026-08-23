@@ -26,12 +26,34 @@ pub enum Color {
     Oklch(Oklch),
 }
 
+/// **Rendered as the consumer wrote it**, which matters because these strings
+/// reach a person: `IntentError` quotes the offending value, and the CLI prints
+/// that message verbatim. `{:?}` on the enum emits `Hex("not-a-colour")`, which
+/// names a Rust variant to somebody looking at a JSON file.
+impl std::fmt::Display for Color {
+    fn fmt(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Hex(hex) => write!(out, "{hex}"),
+            Self::Oklch(color) => write!(
+                out,
+                "oklch({} {} {})",
+                color.lightness, color.chroma, color.hue
+            ),
+        }
+    }
+}
+
 /// How a role departs from the role it derives from.
 ///
 /// Written as a relationship rather than a second colour because a literal
 /// drifts out of relation the moment anybody rethemes, which is the failure of
 /// every palette with two hardcoded colours in it.
 #[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct Relation {
     /// How far, in degrees, the angle may move to clear a role it cannot be told
     /// apart from. 45 by default, and 0 holds the angle exactly. The accent is
@@ -50,6 +72,11 @@ pub struct Relation {
 
 /// The roles a [`Relation`] may depart from. One today, deliberately named.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(rename_all = "lowercase")
+)]
 pub enum From {
     Brand,
 }
@@ -75,6 +102,11 @@ pub enum StatusSeed {
 
 /// One pair to measure, by token name, without the namespace prefix.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct PairingRequest {
     pub background: String,
     pub foreground: String,
@@ -87,6 +119,11 @@ pub struct PairingRequest {
 /// How saturated the palette is, independent of which hue it is. Never applied
 /// to a value the consumer pinned, a pinned colour being a fact.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct Chroma {
     pub ceiling: Option<f64>,
     pub scale: Option<f64>,
@@ -96,6 +133,11 @@ pub struct Chroma {
 /// guarantee**: a translucent surface has no known ground, so a pair over it
 /// comes back unverifiable rather than measured.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct Material {
     pub blur: Option<f64>,
     pub opacity: Option<f64>,
@@ -104,6 +146,11 @@ pub struct Material {
 /// How heavy the three weights run. A character rather than three numbers,
 /// because the three move together or the relationships stop meaning anything.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(rename_all = "lowercase")
+)]
 pub enum Weight {
     Light,
     Regular,
@@ -113,6 +160,11 @@ pub enum Weight {
 /// The faces the theme is set in. Families are the half a consumer chooses; the
 /// size scale, the weights and the spacing are the half that is a system.
 #[derive(Clone, Debug, Default, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct Font {
     /// Body size in pixels, 14 being what ships. The whole ramp is built from it.
     pub base: Option<f64>,
@@ -134,6 +186,11 @@ pub struct Font {
 /// the one character that is not physical: the other three accelerate, settle or
 /// overshoot, where linear reads as moved by a mechanism.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(rename_all = "lowercase")
+)]
 pub enum Character {
     Gentle,
     Instant,
@@ -145,6 +202,11 @@ pub enum Character {
 /// The curve every component reaches for by default, and a multiplier on top for
 /// a theme that wants the character and not the pace.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct Motion {
     pub character: Option<Character>,
     pub scale: Option<f64>,
@@ -155,6 +217,11 @@ pub struct Motion {
 /// surface darkens, so a trace that looks right on a light page reads navy
 /// across a dark one.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct Neutral {
     pub chroma: Option<f64>,
     pub hue: Option<f64>,
@@ -162,6 +229,11 @@ pub struct Neutral {
 
 /// What tells a surface from what is behind it.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(rename_all = "lowercase")
+)]
 pub enum Mechanism {
     Border,
     Fill,
@@ -177,6 +249,11 @@ pub enum Mechanism {
 /// detect, the ground being unbounded. Hence two fields and two types rather
 /// than one with a comment asking nicely.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct Separation {
     pub floating: Option<Floating>,
     pub surface: Option<Mechanism>,
@@ -184,6 +261,11 @@ pub struct Separation {
 
 /// The mechanisms a floating surface may use. No `Space`, per [`Separation`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(rename_all = "lowercase")
+)]
 pub enum Floating {
     Border,
     Fill,
@@ -208,6 +290,11 @@ impl std::convert::From<Floating> for Mechanism {
 
 /// Light or dark surface.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(rename_all = "lowercase")
+)]
 pub enum Scheme {
     Dark,
     #[default]
@@ -222,6 +309,11 @@ pub enum Scheme {
 /// the statuses follow the palette's own loudness, hue being meaning and
 /// loudness not.
 #[derive(Clone, Debug, Default, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct Status {
     pub allowance: Option<f64>,
     pub danger: Option<StatusSeed>,
@@ -233,6 +325,11 @@ pub struct Status {
 
 /// Everything a consumer may say about a theme.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
 pub struct ThemeIntent {
     /// The second emphasis. Defaults to the complement of the brand.
     pub accent: Option<Seed>,
@@ -263,6 +360,10 @@ pub struct ThemeIntent {
     /// Values that replace what derivation would have produced. Verified like
     /// anything else: a pinned value that misses its target is a violation, not
     /// an exception.
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, deserialize_with = "crate::wire::tokens")
+    )]
     pub tokens: Option<Vec<(String, Color)>>,
 }
 

@@ -18,5 +18,8 @@ pub mod intent;
 pub mod model;
 pub mod oklch;
 
+#[cfg(feature = "serde")]
+mod wire;
+
 #[cfg(test)]
 mod oracle;

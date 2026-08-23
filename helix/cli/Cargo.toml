@@ -1,0 +1,33 @@
+[package]
+name = "helix-cli"
+description = "The Helix command line: theme derivation, auditing and scaffolding."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`. See the note in the root manifest.
+version = "0.0.0-dev"
+
+# **The binary drops the suffix**, per the naming rule: the crate is `helix-cli`
+# and the command a reader types is `helix`.
+[[bin]]
+name = "helix"
+path = "src/main.rs"
+
+[dependencies]
+# **The derivation is a library and this is a caller.** A binary that scaffolds
+# projects is not the home of colour math, so `helix-theme` stays its own crate
+# and keeps its WASM wrapper buildable without dragging the command surface into
+# `@helix-io/theme`.
+helix-theme = { path = "../theme", features = ["serde"] }
+clap = { version = "4", features = ["derive"] }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["float_roundtrip"] }
+
+[dev-dependencies]
+# The contract tests parse the `--json` output to prove it is parseable, which is
+# the only claim about it worth making.
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

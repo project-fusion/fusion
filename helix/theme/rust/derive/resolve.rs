@@ -206,7 +206,7 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     let resolved = defaults(intent);
     let brand = to_oklch(&resolved.brand).ok_or_else(|| IntentError::Unreadable {
         label: "brand".to_owned(),
-        value: format!("{:?}", resolved.brand),
+        value: resolved.brand.to_string(),
     })?;
 
     finite("brand.chroma", brand.chroma)?;
@@ -259,7 +259,7 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
             if to_oklch(color).is_none() {
                 return Err(IntentError::Unreadable {
                     label: format!("status.{name}"),
-                    value: format!("{color:?}"),
+                    value: color.to_string(),
                 });
             }
         }
@@ -275,7 +275,7 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
         if to_oklch(color).is_none() {
             return Err(IntentError::Unreadable {
                 label: "accent".to_owned(),
-                value: format!("{color:?}"),
+                value: color.to_string(),
             });
         }
     }
