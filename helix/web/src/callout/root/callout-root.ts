@@ -15,7 +15,7 @@ import { styles } from './callout-root.css.js'
  * headless tier; this tier only decides what that meaning looks like.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Admonition, Notice, Note, Alert
  * @documentation https://helix.fusion.dev/components/callout

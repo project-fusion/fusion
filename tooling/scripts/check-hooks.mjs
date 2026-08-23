@@ -90,6 +90,13 @@ const packageOf = (path) => path.split('/').slice(0, 2).join('/')
 const withoutComments = (text) => text.replace(/\/\*[\s\S]*?\*\//g, '')
 
 const declared = new Map()
+/* Every declaration, not just the last, so a name written twice is visible.
+   `declared` above is a Map and the second `set` overwrote the first, which is
+   why this check has never been able to see a duplicate: by the time it counts,
+   each name appears once. Measured on `Divider`, which declared
+   `--divider-color` and `--divider-thickness` twice apiece under two different
+   descriptions, and shipped all eight to the manifest and the API page. */
+const declaredAt = new Map()
 const read = new Map()
 /* `--_name` -> package -> the file that declared it, and the packages that read it. */
 const privateDeclared = new Map()
@@ -104,6 +111,8 @@ for (const tier of TIERS) {
     if (extname(path) === '.ts') {
       for (const [, name] of text.matchAll(/@cssproperty\s+(--[a-z0-9-]+)/g)) {
         declared.set(name, path)
+        const key = `${path}\u0000${name}`
+        declaredAt.set(key, (declaredAt.get(key) ?? 0) + 1)
       }
     }
     if (extname(path) === '.css') {
@@ -166,6 +175,21 @@ const inFamily = (name) => {
   return at > 0 && /^\d+$/.test(name.slice(at + 1)) && families.has(name.slice(0, at))
 }
 
+/* A duplicate pairs with a rule exactly as a single declaration does, so it
+   passes every test below it and is invisible to the two-way check this file is
+   about. It is only ever a mistake: a hook is one thing, and two descriptions of
+   it on one page is the reader being asked which to believe. */
+for (const [key, count] of [...declaredAt].sort()) {
+  if (count > 1) {
+    const [path, name] = key.split('\u0000')
+    problems.push(
+      `${path}: \`${name}\` is declared ${count} times in one doc block. ` +
+        'The manifest keeps every one, so the reference page lists the hook twice, and where the ' +
+        'two descriptions differ it lists it twice saying different things.',
+    )
+  }
+}
+
 for (const [name, path] of [...declared].sort()) {
   if (!read.has(name) && !inFamily(name)) {
     problems.push(
@@ -197,7 +221,9 @@ for (const [name, where] of [...privateDeclared].sort()) {
 }
 
 if (problems.length > 0) {
-  console.error(`CSS hooks that are declared or read but not both (${problems.length}):\n`)
+  console.error(
+    `CSS hooks that do not hold up, declared without a reader, read without a declaration, or declared twice (${problems.length}):\n`,
+  )
   for (const problem of problems) {
     console.error(`  ${problem}\n`)
   }

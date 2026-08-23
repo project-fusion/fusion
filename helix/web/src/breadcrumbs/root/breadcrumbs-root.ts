@@ -11,7 +11,7 @@ import { styles } from './breadcrumbs-root.css.js'
  * because a truncated path tells the reader less than a two-line one.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Breadcrumb, Crumbs
  * @documentation https://helix.fusion.dev/components/breadcrumbs

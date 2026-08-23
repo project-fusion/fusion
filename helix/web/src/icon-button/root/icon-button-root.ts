@@ -19,7 +19,7 @@ import { styles } from './icon-button-root.css.js'
  * common way a toolbar becomes unusable without sight.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases Icon button, Square button
  * @documentation https://helix.fusion.dev/components/icon-button

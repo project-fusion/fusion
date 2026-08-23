@@ -23,7 +23,7 @@ import { styles } from './flex-root.css.js'
  * behavior separate from styling, and this is entirely styling.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Stack, Row, Column, HStack, VStack
  * @documentation https://helix.fusion.dev/components/flex

@@ -17,7 +17,7 @@ import { styles } from './breadcrumb.css.js'
  * and leaves box and background to `::slotted`.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Crumb
  * @documentation https://helix.fusion.dev/components/breadcrumbs
  *

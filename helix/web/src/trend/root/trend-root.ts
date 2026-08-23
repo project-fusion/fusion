@@ -18,7 +18,7 @@ import { styles } from './trend-root.css.js'
  * reads and the judgment is a gloss on it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Delta, Change, Movement
  * @documentation https://helix.fusion.dev/components/trend

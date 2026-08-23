@@ -3303,7 +3303,7 @@
           "summary": "One step in a breadcrumb trail.",
           "helix": {
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/breadcrumbs",
             "aliases": [
               "Crumb"
@@ -3496,7 +3496,7 @@
           "helix": {
             "category": "navigation",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/breadcrumbs",
             "aliases": [
               "Breadcrumb",
@@ -4204,7 +4204,7 @@
           "helix": {
             "category": "actions",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/button",
             "tier": "headless",
             "group": "BaseButton",
@@ -4448,7 +4448,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/callout",
             "aliases": [
               "Admonition",
@@ -15962,7 +15962,7 @@
           "helix": {
             "category": "layout",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/divider",
             "aliases": [
               "Separator",
@@ -19075,7 +19075,7 @@
           "helix": {
             "category": "actions",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/icon-button",
             "aliases": [
               "Icon button",
@@ -45715,7 +45715,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/tag",
             "aliases": [
               "Chip",
@@ -55259,7 +55259,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/trend",
             "aliases": [
               "Delta",

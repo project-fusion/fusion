@@ -57,7 +57,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * honest.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Breadcrumb, Crumbs
  * @documentation https://helix.fusion.dev/components/breadcrumbs

@@ -17810,13 +17810,11 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--divider-color`: Color of the rule. (default: `undefined`)
-   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
-   * - `--divider-color`: Color of the rule. (default: `undefined`)
+   * - `--divider-color`: Colour of the rule. (default: `undefined`)
    * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
-   * - `--divider-length`: How long a vertical rule is. Horizontal takes its width. (default: `undefined`)
    * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
    * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
+   * - `--divider-length`: How long a vertical rule is. Horizontal takes its width. (default: `undefined`)
    * - `--divider-thickness`: How heavy the rule is. (default: `undefined`)
    *
    * ## CSS Parts
@@ -29222,13 +29220,11 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--divider-color`: Color of the rule. (default: `undefined`)
-   * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
-   * - `--divider-color`: Color of the rule. (default: `undefined`)
+   * - `--divider-color`: Colour of the rule. (default: `undefined`)
    * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
-   * - `--divider-length`: How long a vertical rule is. Horizontal takes its width. (default: `undefined`)
    * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
    * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
+   * - `--divider-length`: How long a vertical rule is. Horizontal takes its width. (default: `undefined`)
    * - `--divider-thickness`: How heavy the rule is. (default: `undefined`)
    *
    * ## CSS Parts
@@ -37643,18 +37639,18 @@ export type CustomCssProperties = {
   "--dialog-scrim"?: string;
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--dialog-shadow"?: string;
-  /** Color of the rule. */
+  /** Colour of the rule. */
   "--divider-color"?: string;
-  /** Thickness of the rule. */
-  "--divider-thickness"?: string;
   /** Space taken off both ends of it. */
   "--divider-inset"?: string;
-  /** How long a vertical rule is. Horizontal takes its width. */
-  "--divider-length"?: string;
   /** Off the far end only. */
   "--divider-inset-end"?: string;
   /** Off the near end only. */
   "--divider-inset-start"?: string;
+  /** How long a vertical rule is. Horizontal takes its width. */
+  "--divider-length"?: string;
+  /** How heavy the rule is. */
+  "--divider-thickness"?: string;
   /** Width and height of the ring. */
   "--donut-chart-size"?: string;
   /** Colour of the ring under the slices. */

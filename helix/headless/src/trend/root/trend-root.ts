@@ -49,7 +49,7 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * upgrade, which a React consumer's server markup never had.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Delta, Change, Movement
  * @documentation https://helix.fusion.dev/components/trend

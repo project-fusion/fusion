@@ -17,7 +17,7 @@ import { property } from 'lit/decorators.js'
  * a height of its own.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Separator, Rule
  * @documentation https://helix.fusion.dev/components/divider

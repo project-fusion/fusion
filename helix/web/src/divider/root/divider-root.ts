@@ -13,20 +13,18 @@ import { styles } from './divider-root.css.js'
  * tall that is.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Separator, Rule
  * @documentation https://helix.fusion.dev/components/divider
  *
  * @csspart line - The rule itself.
  *
- * @cssproperty --divider-color - Color of the rule.
- * @cssproperty --divider-thickness - Thickness of the rule.
- * @cssproperty --divider-color - Color of the rule.
+ * @cssproperty --divider-color - Colour of the rule.
  * @cssproperty --divider-inset - Space taken off both ends of it.
- * @cssproperty --divider-length - How long a vertical rule is. Horizontal takes its width.
  * @cssproperty --divider-inset-end - Off the far end only.
  * @cssproperty --divider-inset-start - Off the near end only.
+ * @cssproperty --divider-length - How long a vertical rule is. Horizontal takes its width.
  * @cssproperty --divider-thickness - How heavy the rule is.
  */
 @customElement('helix-divider')

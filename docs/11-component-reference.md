@@ -1848,13 +1848,11 @@ tall that is.
 
 | Property | Description |
 | --- | --- |
-| `--divider-color` | Color of the rule. |
-| `--divider-thickness` | Thickness of the rule. |
-| `--divider-color` | Color of the rule. |
+| `--divider-color` | Colour of the rule. |
 | `--divider-inset` | Space taken off both ends of it. |
-| `--divider-length` | How long a vertical rule is. Horizontal takes its width. |
 | `--divider-inset-end` | Off the far end only. |
 | `--divider-inset-start` | Off the near end only. |
+| `--divider-length` | How long a vertical rule is. Horizontal takes its width. |
 | `--divider-thickness` | How heavy the rule is. |
 
 ## Donut Chart

@@ -18,7 +18,7 @@ import { styles } from './button-root.css.js'
  * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @documentation https://helix.fusion.dev/components/button
  *

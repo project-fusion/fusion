@@ -36,7 +36,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * conveys position.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Crumb
  * @documentation https://helix.fusion.dev/components/breadcrumbs
  *

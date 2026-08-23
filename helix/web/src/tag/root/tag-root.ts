@@ -13,7 +13,7 @@ import { styles } from './tag-root.css.js'
  * the status colors gets the tints with them.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Chip, Pill, Label
  * @documentation https://helix.fusion.dev/components/tag

@@ -7682,18 +7682,18 @@ export type CustomCssProperties = {
   "--dialog-scrim"?: string;
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--dialog-shadow"?: string;
-  /** Color of the rule. */
+  /** Colour of the rule. */
   "--divider-color"?: string;
-  /** Thickness of the rule. */
-  "--divider-thickness"?: string;
   /** Space taken off both ends of it. */
   "--divider-inset"?: string;
-  /** How long a vertical rule is. Horizontal takes its width. */
-  "--divider-length"?: string;
   /** Off the far end only. */
   "--divider-inset-end"?: string;
   /** Off the near end only. */
   "--divider-inset-start"?: string;
+  /** How long a vertical rule is. Horizontal takes its width. */
+  "--divider-length"?: string;
+  /** How heavy the rule is. */
+  "--divider-thickness"?: string;
   /** Width and height of the ring. */
   "--donut-chart-size"?: string;
   /** Colour of the ring under the slices. */

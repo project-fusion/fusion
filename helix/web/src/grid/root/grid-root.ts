@@ -16,7 +16,7 @@ import { styles } from './grid-root.css.js'
  * Presentation only, so there is no headless tier.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Layout, Columns
  * @documentation https://helix.fusion.dev/components/grid

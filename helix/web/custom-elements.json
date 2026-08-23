@@ -5531,7 +5531,7 @@
           "summary": "One step in a breadcrumb trail.",
           "helix": {
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/breadcrumbs",
             "aliases": [
               "Crumb"
@@ -5812,7 +5812,7 @@
           "helix": {
             "category": "navigation",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/breadcrumbs",
             "aliases": [
               "Breadcrumb",
@@ -6815,7 +6815,7 @@
           "helix": {
             "category": "actions",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/button",
             "tier": "styled",
             "group": "Button",
@@ -7153,7 +7153,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/callout",
             "aliases": [
               "Admonition",
@@ -21372,24 +21372,12 @@
           "name": "HelixDivider",
           "cssProperties": [
             {
-              "description": "Color of the rule.",
-              "name": "--divider-color"
-            },
-            {
-              "description": "Thickness of the rule.",
-              "name": "--divider-thickness"
-            },
-            {
-              "description": "Color of the rule.",
+              "description": "Colour of the rule.",
               "name": "--divider-color"
             },
             {
               "description": "Space taken off both ends of it.",
               "name": "--divider-inset"
-            },
-            {
-              "description": "How long a vertical rule is. Horizontal takes its width.",
-              "name": "--divider-length"
             },
             {
               "description": "Off the far end only.",
@@ -21398,6 +21386,10 @@
             {
               "description": "Off the near end only.",
               "name": "--divider-inset-start"
+            },
+            {
+              "description": "How long a vertical rule is. Horizontal takes its width.",
+              "name": "--divider-length"
             },
             {
               "description": "How heavy the rule is.",
@@ -21582,7 +21574,7 @@
           "helix": {
             "category": "layout",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/divider",
             "aliases": [
               "Separator",
@@ -25844,7 +25836,7 @@
           "helix": {
             "category": "layout",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/flex",
             "aliases": [
               "Stack",
@@ -26148,7 +26140,7 @@
           "helix": {
             "category": "layout",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/grid",
             "aliases": [
               "Layout",
@@ -26874,7 +26866,7 @@
           "helix": {
             "category": "actions",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/icon-button",
             "aliases": [
               "Icon button",
@@ -62328,7 +62320,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/tag",
             "aliases": [
               "Chip",
@@ -74330,7 +74322,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/trend",
             "aliases": [
               "Delta",
