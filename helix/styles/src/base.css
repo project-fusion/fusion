@@ -1036,7 +1036,11 @@ helix-toggle[disabled]::part(item) {
   align-items: center;
   color: var(--helix-color-foreground-subtle);
   display: flex;
-  gap: var(--helix-space-2xs);
+  /* `xs` rather than `2xs`: at four the mark and the name read as one crowded
+     lockup, and the name is a product's rather than a caption on the mark. The
+     rule below holds the name still while this moves, so widening this walks the
+     mark further left and never the text. */
+  gap: var(--helix-space-xs);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
@@ -1065,16 +1069,19 @@ helix-toggle[disabled]::part(item) {
      and the first row's title at 104, twelve apart, which reads as a heading
      indented from its own list.
    
-     Pulling the mark by the heading's inline padding puts the name on 104 with
-     the rows and the mark on the group's own edge, which is where a hanging
-     mark belongs. It is the mark that moves rather than the rows, because the
-     rows are the column a reader's eye runs down and the heading is the label
-     on it.
+     So the pull states where the name has to land rather than how far to move.
+     A row's name sits one `space-sm` gutter past the group's edge; this puts the
+     mark's own width and the gap it wants to the left of exactly that, and the
+     mark falls wherever the arithmetic leaves it. It is the mark that moves and
+     never the rows, because the rows are the column a reader's eye runs down and
+     the heading is the label on it.
    
-     Coupled to the `padding-inline` three rules above, deliberately and in
-     sight of it: the pull is that inset and nothing else, so the two move
-     together or the alignment is visibly wrong the moment they do not. */
-  margin-inline-start: calc(var(--helix-space-sm) * -1);
+     Written from `--icon-size` rather than a number, which is what makes it hold:
+     the mark is `icon-sm` here and the site overrides it to `icon-md`, and both
+     land the name on the rows without either knowing about the other. Widen the
+     gap above, resize the mark, change the gutter, and the alignment survives all
+     three. A fixed pull survived none of them. */
+  margin-inline-start: calc(var(--helix-space-sm) - var(--helix-space-xs) - var(--icon-size));
 }
 
 /* A destination with a name and a sentence about it.
