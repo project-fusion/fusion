@@ -49,7 +49,7 @@ shipped one package in five files.
   It has to be layout rather than detection, because **the detection does not
   exist**. `:host(:has([slot='header']))` is invalid CSS: `:has()` is not
   allowed inside the functional `:host()`, so the rule is dropped at parse time
-  and the region stays hidden even when filled. Verified in Chrome 148 —
+  and the region stays hidden even when filled. Verified in Chrome 148:
   `:host`, `:host(*)`, and `:host([a])` report supported, `:host(:has(*))` does
   not, and the compound `:host:has(...)` reports supported and still does not
   work. JavaScript is not an option either: the server cannot inspect children.
@@ -225,7 +225,7 @@ cannot share a process. `*.dom.spec.ts` and `*.ssr.spec.ts` run separately.
 inlines the component's stylesheet into the very markup being asserted, and that
 stylesheet names every part, host attribute, and token the component uses. So
 `toContain('part="media"')` passes on a *selector*, and
-`not.toContain('data-scrolled')` fails on a `:host([data-scrolled])` *rule* —
+`not.toContain('data-scrolled')` fails on a `:host([data-scrolled])` *rule*,
 both saying nothing about what rendered. This has produced a false pass twice,
 once hiding a stale build for several commits.
 
@@ -389,13 +389,50 @@ the route, cannot have moved the state inside one task and was accused of not
 listening. Unmoved across two requests is unanswered whatever the timing, and a
 control asked once and never again is never accused.
 
-**Shared test scaffolding lives in `web/src/testing/`**, excluded from the build
-in `tsconfig.json`. `registerDom()` is idempotent because bun runs every DOM
-spec in one process and `GlobalRegistrator.register()` throws on the second
-call. It also shims `attachInternals`, which happy-dom does not implement —
-Lit's server shim does, so the gap is the test double's alone and the fix
-belongs there. A guard in `HelixFormElement` would make production code
-defensive about a capability every browser has, and swallow a real failure.
+**Shared test scaffolding lives in `@helix-io/testing`**, one module per
+environment: `dom` for happy-dom under bun, `browser` for Chromium, `ssr` for
+Lit's server shim. `registerDom()` is idempotent because bun runs every DOM spec
+in one process and `GlobalRegistrator.register()` throws on the second call. It
+also shims `attachInternals`, which happy-dom does not implement. Lit's server
+shim does, so the gap is the test double's alone and the fix belongs there. A
+guard in `HelixFormElement` would make production code defensive about a
+capability every browser has, and swallow a real failure.
+
+**Import the code under test *after* `registerDom()`, in `beforeAll`.** A static
+import runs first, so anything extending a DOM global captures bun's own rather
+than happy-dom's, and the error never mentions the import. It has cost two
+sessions: a class extending `Event` was refused by `dispatchEvent` as "parameter
+1 is not of type 'Event'", and an element whose base class extended the wrong
+`HTMLElement` crashed happy-dom's *parser* on `innerHTML` with
+`attributes.getNamedItem` undefined. One `import { PALETTE }` was enough to drag
+the module in: it is the module that matters, not what is taken from it.
+
+**Anything a spec puts on a global, it puts back.** One process, so a shadowed
+`document.activeElement` answers a stale value to every file that runs after it,
+and a spec that passes alone fails only in the whole-suite run, which is the one
+shape of failure a per-file run can never show. Restore in `afterEach` or a
+`finally`.
+
+**In the browser, module state is per family and prototypes are not.**
+`build-specs.mjs` emits one bundle per family and the runner imports all of them
+into one page, so a module-scoped map has the reach of one bundle while
+`HTMLElement.prototype` has the reach of the page. Guarding on the second and
+recording in the first is how every form-value assertion outside the first
+family came to read `undefined`: 34 failures that each looked like a component
+not reporting to its form, while happy-dom passed all of them. Shared state goes
+on `globalThis`, next to the guard that decides whether to write it.
+
+**A spec that reads layout has to check the double before trusting it.**
+happy-dom has none, and its gaps are silent rather than loud: it answers
+`0 0 0 0` to every `getBoundingClientRect`, `1` to `getClientRects().length` for
+a `display: contents` element, the empty string for `overflowX` unless the
+longhand was written, `false` to `delegatesFocus` however it was asked for, and
+`undefined` for `TransitionEvent.propertyName` whatever was passed in. It
+implements no ARIA element reflection at all, and
+`insertAdjacentHTML('beforeend', '<tr>')` on a `<tbody>` inserts nothing while
+still counting as a mutation. Supply the input the double cannot produce, and
+say in the spec which half is being asserted. Two of those gaps produce a test
+that passes against code doing nothing.
 
 ## Appearance is the treatment, tone is the meaning
 
