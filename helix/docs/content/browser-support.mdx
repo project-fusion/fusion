@@ -1,0 +1,79 @@
+---
+description: The platform features this is built on, and what is actually tested.
+order: 4
+section: Getting started
+title: Browser support
+---
+
+# Browser support
+
+Helix is built on the platform rather than on a compatibility layer, which makes
+this page short and specific: there is no polyfill story, no transpiled
+fallback, and no configuration that trades features for reach. What the library
+needs is what the browser has to have.
+
+## What is tested
+
+**Chromium, through Playwright.** The DOM specs run in it, and 83 pixel
+baselines are captured in it, on Linux, with the network blocked.
+
+That is the honest extent of it. Everything below is a statement about which
+platform features the library uses, not a claim that we run the suite in Firefox
+and Safari. If you ship Helix to those and find something broken, that is a bug
+report we want, and it is not one we would have caught.
+
+## What the library uses
+
+| Feature | Where |
+|---|---|
+| Custom elements and shadow DOM | Everything |
+| `ElementInternals` | Form participation, and ARIA that has to cross a shadow boundary |
+| Popover API | Every overlay: menu, tooltip, select, combobox, dialog |
+| `light-dark()` | The token layer, in 769 declarations |
+| `oklch()` | Every colour in the system |
+| `:has()` | 74 rules, mostly relational styling of slotted content |
+| `@starting-style` | Entry transitions on overlays |
+| `:state()` | Custom states a consumer's CSS can select |
+| `CSS.highlights` | Filter-match highlighting, in `Command` and `Combobox` |
+
+Positioning is `@floating-ui/dom` rather than CSS anchor positioning, which is a
+deliberate choice and the one place the library takes a dependency instead of
+the platform: anchor positioning is not yet available everywhere the rest of
+this list is.
+
+## The two that decide your floor
+
+**`light-dark()` and the Popover API.** Everything else on that list has been
+available longer. If you need to know whether a browser can run Helix, those are
+the two to check, because they are the newest things the library assumes and
+they are load-bearing: the first is how every token expresses both colour modes
+in one declaration, and the second is how every overlay is drawn in the top
+layer.
+
+Neither degrades usefully. A browser without `light-dark()` gets no colour at
+all rather than one mode; a browser without popover gets overlays that render in
+flow. This is why there is no support table with a fallback column: there is no
+partial mode to be in.
+
+## `CSS.highlights` is the one exception
+
+`Command` and `Combobox` highlight the matched substring in their filtered
+results using the CSS Custom Highlight API. It is the least widely available
+thing here, and it is the only one that degrades gracefully: without it the
+results still filter, sort and select correctly, and the match is simply not
+highlighted.
+
+Nothing else in the library reads it.
+
+## No IE, no polyfills, no build flag
+
+There is no `browserslist` in this repository and no transpilation target, which
+is a decision rather than an oversight. A design system whose components are
+custom elements cannot be shipped to a browser without custom elements, and
+everything else on the list above arrived in the same generation of browsers
+that shipped those.
+
+If you need to support something older, the honest answer is the base layer:
+`@helix-io/styles` is plain CSS with no JavaScript, and a page built from its
+recipes works considerably further back than the components do.
+See [Without a bundler](./without-a-bundler).

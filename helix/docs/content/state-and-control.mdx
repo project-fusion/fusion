@@ -1,0 +1,154 @@
+---
+description: Why writing a property hands the element to you, and what to write instead.
+section: Essentials
+title: State and control
+---
+
+# State and control
+
+**A declared property is a claim of ownership.** Write `value`, `open`,
+`checked` or `active` on a Helix element and the element stops applying its own
+changes: from then on it announces what happened and waits to be told what to
+do.
+
+That is one rule, it covers thirty-odd families, and it is the single thing
+about this library most likely to look like a bug.
+
+```html
+<!-- Ignores every keystroke. Nothing is logged. Nothing looks wrong. -->
+<helix-input
+  label="Name"
+  value="Ada"
+></helix-input>
+```
+
+## The two modes, and when each is decided
+
+Every controlled property comes in a pair.
+
+| Uncontrolled | Controlled |
+|---|---|
+| `default-value`, `default-open`, `default-checked`, `default-active` | `value`, `open`, `checked`, `active` |
+| The element owns the state and moves it | You own the state and move it |
+| The element announces, and applies | The element announces, and waits |
+
+**Which mode an element is in is read once, at its first update**, from whether
+anything had set the controlled property by then. Markup, a hydrating server's
+attributes and a framework's initial properties have all arrived by that point
+and nothing else has happened yet, so the reading is stable. Set, and you own
+it. Unset, and the element does, and the `default-` property says where it
+starts.
+
+Reading is the same in both modes. `dialog.open` answers the question anyone
+asking it meant, whichever mode the dialog is in, which is why there is one
+property rather than an `isOpen` beside it: there is no such second word for a
+value or an active item, so all four of these have the same shape instead of
+four shapes.
+
+## Controlled, written correctly
+
+```tsx
+<helix-input
+  label="Name"
+  onhelix-input={(event) => setName(event.detail.value)}
+  value={name}
+/>
+```
+
+```tsx
+<helix-dialog
+  label="Confirm"
+  onhelix-close={() => setOpen(false)}
+  open={open}
+/>
+```
+
+The event is what carries the request. Answer it by moving your own state, and
+the element renders what you hand back.
+
+## Uncontrolled, which is usually what you want
+
+```html
+<helix-input
+  default-value="Ada"
+  label="Name"
+></helix-input>
+<helix-accordion-item default-open>…</helix-accordion-item>
+```
+
+Nothing to wire. Read the value off the element or off the form when you need
+it, and let it manage itself in between.
+
+**Reach for controlled when something outside the element decides the state**:
+two controls that have to agree, a value that comes from a route, a dialog whose
+open state is in a store. Not by default, and not because it feels more
+explicit.
+
+## The state is on the host as `data-`, not as the attribute
+
+```css
+helix-accordion-item[data-open] { … }
+```
+
+`open` is not reflected, and that is required rather than tidy. Reflection would
+write the resolved state back as an attribute, and writing the attribute is how
+a consumer claims ownership: an uncontrolled element that opened itself would
+put `open` on its own host and, to anything that read it next, be
+indistinguishable from one you control. Cloned, serialised for hydration, or
+diffed by a framework, it would come back controlled and stop responding.
+
+So `data-open` carries the resolved state for stylesheets, in both modes, and
+the plain attribute stays yours to write.
+
+## Refusing a change
+
+Every controlled change announces before it acts, and the announcement is
+cancelable:
+
+```ts
+item.addEventListener('helix-open', (event) => {
+  if (unsaved) {
+    event.preventDefault()
+  }
+})
+```
+
+`preventDefault()` refuses the change and nothing moves. This is the only way to
+refuse one, and it went undocumented long enough that `bun run check:events` was
+written partly because of it: `Tabs` and `Toggle.Group` each dispatched the
+cancelable `helix-change` that is the only refusal path, and neither declared
+it, so the path was undiscoverable from the documentation.
+
+The imperative form reports the same thing:
+
+```ts
+const applied = item.requestOpen(true)
+```
+
+`false` means something refused it, or that you own the state and nothing has
+answered yet.
+
+## What catches the mistake
+
+**In TypeScript, the constraint is a compile error.** The types intersect every
+controlled tag with a union that requires an answering handler, so `<helix-input
+value="Ada" />` does not compile. That constraint is generated several steps
+from anything a person edits, so `bun run check:controlled` runs `tsc` over a
+fixture and compares the diagnostics in both directions: a constraint that
+stopped constraining and one that grew too strict are the same kind of silent,
+and the second reaches you as "the library will not let me write correct code".
+
+**At runtime, the control says so on the console.** A controlled element that
+asks for something and gets no answer warns once, naming itself and the
+property. It is judged on the second unanswered request rather than on a timer,
+which matters: an earlier version waited one task, on the reasoning that React
+commits a `setState` from a handler before the next one. True of React, false of
+anything slower, and a consumer answering by navigating was accused of not
+listening. A warning that is sometimes wrong is one people learn to ignore, and
+this one has to be believed the day it is right.
+
+So there is no deadline. The first unanswered request is remembered and
+judgement waits for the second: if the state has not moved between two requests,
+nothing answered either of them, whatever the timing. A control asked once and
+never again is never accused, which is the right trade, because the symptom this
+exists for is a control that ignores everything.

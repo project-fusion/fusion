@@ -1,0 +1,111 @@
+---
+description: A page that uses Helix with no build step, and what that costs.
+parent: installation
+section: Getting started
+title: Without a bundler
+---
+
+# Without a bundler
+
+Helix ships standard ES modules and plain CSS files, so a page can use it with
+no build step at all. Two ways, and they suit different things.
+
+## Styles alone, and no JavaScript
+
+```html
+<link
+  href="/vendor/helix/tokens.css"
+  rel="stylesheet"
+/>
+<link
+  href="/vendor/helix/base.css"
+  rel="stylesheet"
+/>
+
+<button
+  data-button="solid"
+  data-button-tone="primary"
+>Save</button>
+<div data-card>
+  <h2>A card</h2>
+  <p data-prose>Written in your own markup.</p>
+</div>
+```
+
+`@helix-io/styles` has no dependencies and no JavaScript. It carries the token
+layer, the element reset, the type scale on bare headings, and recipes for
+markup this library does not render, so a page can look like Helix without a
+single custom element on it.
+
+This is a real way to adopt Helix rather than a fallback, and it is the whole of
+what some pages need. See [Recipes](./recipes) for what the base layer provides.
+
+## The elements, through an import map
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "@helix-io/web": "/vendor/helix/web/dist/index.js",
+      "@helix-io/core": "/vendor/helix/core/dist/index.js",
+      "@helix-io/icons": "/vendor/helix/icons/dist/index.js",
+      "lit": "/vendor/lit/index.js"
+    }
+  }
+</script>
+<script type="module">
+  import '@helix-io/web'
+</script>
+```
+
+The components are built on Lit, so `lit` has to resolve too. That is the part
+that makes an import map necessary rather than optional: the package's own
+imports are bare specifiers, and a browser needs to be told where each one is.
+
+**Copy the files, do not point at a CDN.** An import map pointing at someone
+else's server makes your page stop working when theirs does, which is the
+dependency the Sovereignty Constraint exists to refuse. `bun add` and then copy
+`node_modules/@helix-io/*/dist` into whatever you serve.
+
+## What this costs
+
+**Every element ships, whether the page uses one or not.** A bundler is what
+drops the components you never wrote, and without one the browser fetches the
+whole library. Fine for an internal tool or a prototype; not what you want on a
+landing page.
+
+You can narrow it by importing subpaths instead:
+
+```js
+import '@helix-io/web/button'
+import '@helix-io/web/dialog'
+```
+
+Each still pulls its own dependencies, so this is a reduction rather than a
+minimum, but for a page using five components it is a large one.
+
+**No TypeScript, so no controlled-property constraint.** The type error that
+catches `value` without a handler is a compile-time thing, and there is no
+compile. The rule still applies, silently: see [State and
+control](./state-and-control).
+
+## The stylesheets are the same
+
+```html
+<link
+  href="/vendor/helix/tokens.css"
+  rel="stylesheet"
+/>
+<link
+  href="/vendor/helix/base.css"
+  rel="stylesheet"
+/>
+<link
+  href="/vendor/helix/web/elements.css"
+  rel="stylesheet"
+/>
+```
+
+In that order, and `elements.css` matters more here than anywhere: with no
+bundler the module graph arrives over the network, so the interval where the
+markup exists and the definitions do not is longer than it is in a built app.

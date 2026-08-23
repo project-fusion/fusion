@@ -8,8 +8,8 @@ title: Introduction
 # Helix
 
 Helix is Fusion's design system: the DNA every Fusion product is built from.
-Tokens, element primitives, a headless component tier, a styled tier, and
-generated React wrappers.
+Tokens, element primitives, a headless component tier, a styled tier, and the
+framework typings generated from all of it.
 
 Two things make it different from a component library.
 
@@ -30,31 +30,27 @@ analysis time rather than left to review.
 bun add @helix-io/web @helix-io/styles
 ```
 
-Import the tokens once at your app root, then use the components:
+Three imports at your app root, in this order, then the elements are usable
+anywhere:
 
 ```ts
 import '@helix-io/styles/tokens.css'
 import '@helix-io/styles/base.css'
+import '@helix-io/web/elements.css'
 import '@helix-io/web'
 ```
 
 ```html
-<helix-disclosure appearance="outlined">
-  <span slot="summary">What is Helix?</span>
-  <p>A design system that derives its own accessible palette.</p>
-</helix-disclosure>
+<helix-accordion separation="outlined">
+  <helix-accordion-item default-open>
+    <span slot="summary">What is Helix?</span>
+    <p>A design system that derives its own accessible palette.</p>
+  </helix-accordion-item>
+</helix-accordion>
 ```
 
-In React, use the wrappers instead of the custom elements directly:
-
-```tsx
-import { Disclosure } from '@helix-io/react'
-
-<Disclosure appearance="outlined" onOpenChange={({ open }) => track(open)}>
-  <span slot="summary">What is Helix?</span>
-  <p>A design system that derives its own accessible palette.</p>
-</Disclosure>
-```
+[Installation](./installation) has the order those imports are in and why, and a
+page for each framework.
 
 ## Packages
 
@@ -62,9 +58,14 @@ import { Disclosure } from '@helix-io/react'
 | --- | --- |
 | `@helix-io/styles` | Always. Tokens and the base layer |
 | `@helix-io/web` | You want Helix components as-is |
-| `@helix-io/react` | Same, in a React app |
 | `@helix-io/headless` | You want the behavior and none of the styling |
 | `@helix-io/theme` | You are generating or validating a theme |
+| `@helix-io/icons` | You are drawing an icon outside a component |
 | `@helix-io/core` | You are building a new Helix component |
 
-See [Tiers](./tiers) for how they relate and which one to reach for.
+**There is no React package.** The elements are custom elements and React
+renders them directly; what ships for React is a `jsx.d.ts` that types every tag
+and a runtime bridge in `@helix-io/core` that repairs React's hydration of
+custom events. [React](./react) has both.
+
+See [Tiers](./tiers) for how the packages relate and which one to reach for.

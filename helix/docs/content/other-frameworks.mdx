@@ -1,0 +1,70 @@
+---
+description: The three rules every framework reduces to, and what they look like in each.
+parent: installation
+section: Getting started
+title: Other frameworks
+---
+
+# Other frameworks
+
+Solid, Qwik, Lit, Ember, Alpine, htmx, and anything else that puts elements in a
+document. There is one page for all of them rather than a page each, because a
+page per framework is a claim that we test that framework, and what these
+actually need is three rules that do not change between them.
+
+## The three rules
+
+**Strings go through attributes. Everything else goes through properties.** An
+attribute is a string, so an array, an object or a function has to be assigned
+to the element rather than written in the markup. Most frameworks do this for
+you when the element has a matching property.
+
+```js
+element.items = tabs
+```
+
+**Events bind with `addEventListener`, and the name is the event's own.** Helix
+events are `helix-open`, `helix-change`, `helix-input` and so on: lowercase,
+hyphenated, no camel-case variant. Whatever your framework's `on*` syntax is, it
+should end up passing that string through.
+
+```js
+element.addEventListener('helix-change', (event) => console.log(event.detail))
+```
+
+**A declared `value`, `open`, `checked` or `active` is a claim of ownership.**
+The element announces the change and applies none of it, and waits to be told.
+Use `default-value`, `default-open` and their siblings for a control that owns
+its own state. This is the rule most likely to look like a bug, and
+[State and control](./state-and-control) is the page about it.
+
+## What each one needs
+
+| Framework | Notes |
+|---|---|
+| Solid | Sets properties on custom elements by default. Use `prop:` to force one and `attr:` to force the other. `on:helix-change` binds the literal name |
+| Qwik | Works as JSX. Bind with `document:on…` or a ref, since a plain `on*` prop is normalised |
+| Lit | `.prop=`, `?bool=` and `@helix-change=` are already the right three channels |
+| Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |
+| Alpine, htmx | Markup and attributes only, which reaches every uncontrolled component. A controlled one needs script |
+
+Nothing here is tested by us, which is the honest reason it is one page. If your
+framework needs something the three rules above do not cover, that is worth
+telling us: it is either a gap in this page or a gap in the library.
+
+## Typings
+
+`@helix-io/web/jsx` is the base for anything JSX-shaped, and Svelte's own
+typings are built from it. If your framework needs a different shape, the
+manifest ships as `@helix-io/web/custom-elements.json` and describes every tag,
+prop, event and part, which is what all of ours are generated from.
+
+## Registration
+
+```ts
+import '@helix-io/web'
+```
+
+Once, anywhere that runs in the browser. See [Installation](./installation) for
+the stylesheets, which are the same in every framework and are the thing most
+often left out.

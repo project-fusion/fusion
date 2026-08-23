@@ -1,0 +1,104 @@
+---
+description: The typings, the hydration bridge, and the controlled-property constraint.
+parent: installation
+section: Getting started
+title: React
+---
+
+# React
+
+There is no React package. The elements are custom elements and React renders
+them directly. What ships for React is a `jsx.d.ts` that types every tag and a
+runtime bridge in `@helix-io/core` that repairs one React behaviour.
+
+```ts
+import '@helix-io/web/jsx'
+```
+
+A types-only import, once, anywhere TypeScript will see it. After that
+`<helix-button>` is a typed element with its real props, and a value the
+component does not accept is a compile error rather than a runtime shrug.
+
+## Bind events with `onhelix-*`
+
+```tsx
+<helix-accordion-item onhelix-open={(event) => track(event.detail.open)} />
+```
+
+The prop is `on` and the event name, verbatim. Not `onHelixOpen`, not `onOpen`.
+React 19 forwards an unknown `on*` prop to `addEventListener` using the name as
+written, so the casing is the event's own.
+
+## The bridge, and why it exists
+
+React has a hydration bug with custom events: handlers attached during hydration
+are stashed on the DOM node but never bound, so an event fired before the next
+render finds nothing listening. `HelixElement` repairs it by reading React's own
+stash off the node and calling what it finds, so a handler works from the first
+paint rather than from the first re-render.
+
+That is runtime code you already have, in `@helix-io/core`, and nothing to
+configure. It is worth knowing about for one reason: it reads a React internal,
+the per-page key React stores props under, so `bun run check:react-bridge`
+exists in this repository to fail loudly if a React release renames it. The
+failure direction is safe, since finding nothing returns the pre-hydration
+behaviour, but it is silent, which is why it is checked rather than trusted.
+
+## A declared property is a claim of ownership
+
+This is the one thing about Helix that surprises people coming from React, and
+it is a compile error rather than a surprise at runtime:
+
+```tsx
+// Does not compile.
+<helix-input label="Name" value="Ada" />
+```
+
+In React, `value` on a native `<input>` without `onChange` is a warning. In
+Helix it is a type error, and for the same underlying reason stated more
+strictly: **writing a controlled property hands ownership to you.** From then on
+the element announces changes and applies none of them. A consumer who meant to
+seed a value gets a control that ignores every keystroke, with nothing logged
+and nothing visibly wrong.
+
+Two ways to write it, depending on which you meant:
+
+```tsx
+// Controlled: you own it, so you answer it.
+<helix-input label="Name" onhelix-input={(event) => setName(event.detail.value)} value={name} />
+
+// Uncontrolled: the element owns it, and you say where it starts.
+<helix-input default-value="Ada" label="Name" />
+```
+
+The constraint is generated from the manifest and covers every controlled
+property in the library, which `bun run check:controlled` holds to a fixture in
+both directions: a constraint that stopped constraining and one that grew too
+strict are the same kind of silent, and the second reaches you as "the library
+will not let me write correct code".
+
+See [State and control](./state-and-control) for what the two modes actually do.
+
+## Register in a client component
+
+```tsx
+'use client'
+import '@helix-io/web'
+
+export const HelixElements = () => null
+```
+
+Render it once in your layout. **Your pages stay server components.** An
+unregistered tag is an unknown element in the HTML that upgrades when the
+definition lands, so nothing about a server component needs to change.
+
+## There is no declarative shadow DOM
+
+A server component's output is replayed from the flight payload through DOM APIs
+rather than parsed as HTML, and declarative shadow DOM cannot activate for
+script-inserted nodes. This is why `elements.css` exists: it styles the
+un-upgraded markup so the interval before hydration looks like the finished page
+rather than like unstyled boxes.
+
+[Server rendering](./server-rendering) has the whole contract, and
+[Using the elements](./using-the-elements) has the rest of the binding rules.

@@ -1,0 +1,61 @@
+---
+description: The schema Angular needs before it will compile an unknown tag.
+parent: installation
+section: Getting started
+title: Angular
+---
+
+# Angular
+
+Angular refuses to compile a template containing a tag it does not recognise.
+That is a good default and it is the one thing standing between you and working
+Helix components.
+
+```ts
+import { CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core'
+
+@Component({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  standalone: true,
+  template: `<helix-button>Save</helix-button>`,
+})
+export class SaveButton {}
+```
+
+Declare it on the components that use Helix rather than globally if you can.
+`CUSTOM_ELEMENTS_SCHEMA` switches off unknown-element checking for the whole
+template it is on, so scoping it keeps the check for your own typos.
+
+## Binding
+
+```html
+<helix-input
+  (helix-input)="name = $event.detail.value"
+  [value]="name"
+/>
+```
+
+`[prop]` sets a property, which is what a non-string value needs, and `(event)`
+binds with `addEventListener`, so the event name is its own.
+
+**Do not use `attr.` for a controlled property.** `[attr.value]="name"` writes
+the attribute, which Helix reads once as a claim of ownership and then ignores;
+the property is the live channel.
+
+## No typings ship for Angular
+
+There is no `angular.d.ts` in the package. `CUSTOM_ELEMENTS_SCHEMA` turns off
+the checking that typings would feed, so a generated file would describe types
+Angular has already agreed not to enforce. The manifest is published as
+`@helix-io/web/custom-elements.json` if you want to generate something for your
+own codebase from it.
+
+The practical consequence is that a misspelled property fails silently here
+where it is a compile error in React, Vue and Svelte. Worth a note in review.
+
+## The controlled-property rule still applies
+
+A declared `value`, `open`, `checked` or `active` hands ownership to you: the
+element announces the change and applies none of it. Use `default-value` and its
+siblings for a control that owns its own state. See [State and
+control](./state-and-control).

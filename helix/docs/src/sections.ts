@@ -43,6 +43,7 @@ export interface DocSection {
  */
 export const docSections: DocSection[] = [
   { path: true, title: 'Getting started' },
+  { title: 'Foundations' },
   { title: 'Theming' },
   { title: 'Essentials' },
 ]

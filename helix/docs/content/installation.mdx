@@ -1,0 +1,108 @@
+---
+description: What to install, the order the stylesheets go in, and how to check it worked.
+order: 3
+section: Getting started
+title: Installation
+---
+
+# Installation
+
+```sh
+bun add @helix-io/web @helix-io/styles
+```
+
+`@helix-io/styles` is not optional and not a peer dependency by accident. The
+components reference semantic tokens and paint nothing without them: a Helix
+page with the elements installed and the tokens missing renders unstyled boxes
+rather than an unthemed version of itself.
+
+## The stylesheets go in this order
+
+```ts
+import '@helix-io/styles/tokens.css'
+import '@helix-io/styles/base.css'
+import '@helix-io/web/elements.css'
+```
+
+Three files, and each one needs what is above it.
+
+- **`tokens.css`** declares the semantic layer, 176 custom properties in 15
+  categories, plus `color-scheme: light dark` on `:root`. Everything below reads
+  from it.
+- **`base.css`** is the element reset, the type scale on bare `h1` through
+  `h6`, and the recipes for markup this library does not render. It reads
+  tokens.
+- **`elements.css`** is the components' own layer. It is generated from the
+  component stylesheets and is what lets a page render correct-looking Helix
+  before any JavaScript arrives.
+
+**The last one is the one people leave out**, because everything works without
+it right up until the page is server-rendered: an element that has not upgraded
+yet has no shadow root and no styles of its own, so the markup flashes unstyled
+and then snaps into place. `elements.css` is what makes that interval look like
+the finished page.
+
+Put them in a stylesheet you control rather than deep inside a component, so the
+order is visible in one place and stays that way.
+
+## Register the elements
+
+```ts
+import '@helix-io/web'
+```
+
+A side-effect import. It calls `customElements.define` for every element, once,
+and is safe to run more than once: the helper behind it checks the registry
+first, because a second `define` for the same tag throws and takes the rest of
+the module with it.
+
+You can register a subset instead, from a subpath:
+
+```ts
+import '@helix-io/web/button'
+import '@helix-io/web/dialog'
+```
+
+Worth doing when you use a handful of components. Not worth doing in the belief
+that the full import ships everything to the browser: the package is
+side-effectful by design, so a bundler keeps what you import either way, and the
+subpaths are about being explicit rather than about size.
+
+## Check it worked
+
+Render one element and ask the browser whether it upgraded:
+
+```ts
+await customElements.whenDefined('helix-button')
+console.log(document.querySelector('helix-button')?.shadowRoot !== null)
+```
+
+`true` means the definition arrived and the element built its shadow root.
+`false`, or a promise that never settles, means the registration import did not
+run: usually a `'use client'` boundary the import ended up outside of, or a
+subpath import for a component you did not end up using.
+
+**A styling problem looks nothing like that.** If the element upgraded and the
+page still looks wrong, the stylesheets are the thing to check, in the order
+above. The tell is which layer is missing: no colour at all is `tokens.css`,
+unstyled prose and bare headings is `base.css`, and components that look right
+once JavaScript runs but flash unstyled before it is `elements.css`.
+
+## Your framework
+
+The elements are custom elements and every framework can render one. What
+differs is how a framework passes a non-string value, how it binds an event, and
+whether it needs telling that an unknown tag is deliberate.
+
+| | |
+|---|---|
+| [React](./react) | A runtime bridge ships for it, plus `jsx.d.ts` |
+| [Vue](./vue) | Ships `vue.d.ts`, needs `compilerOptions.isCustomElement` |
+| [Svelte](./svelte) | Ships `svelte.d.ts`, and needs nothing else |
+| [Angular](./angular) | Needs `CUSTOM_ELEMENTS_SCHEMA` |
+| [Other frameworks](./other-frameworks) | Solid, Qwik, Lit, and the three rules they all reduce to |
+| [Without a bundler](./without-a-bundler) | An import map, or the stylesheets alone |
+
+A framework has a page here when we ship something for it or when it refuses to
+compile without configuration. Everything else shares one page, which says more
+than four pages each saying it works.

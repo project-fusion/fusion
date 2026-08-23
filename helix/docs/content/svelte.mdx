@@ -1,0 +1,45 @@
+---
+description: Typed tags, and the framework that needs the least said about it.
+parent: installation
+section: Getting started
+title: Svelte
+---
+
+# Svelte
+
+```ts
+import '@helix-io/web/svelte'
+```
+
+A types-only import, once. It augments `SvelteHTMLElements` so every Helix tag
+is typed in a component, and it does so by re-exporting the JSX types rather
+than emitting a second copy: Svelte binds a handler as `onhelix-input={…}`,
+which is the shape those types already describe, and two generated copies of one
+thing are two things that can disagree.
+
+## Nothing else to configure
+
+```svelte
+<helix-input label="Name" onhelix-input={(event) => (name = event.detail.value)} value={name} />
+```
+
+Svelte sets a property when the element has one and an attribute otherwise, and
+binds `on*` with `addEventListener`. There is no unknown-element warning to
+silence and no compiler flag to set. That is the whole page, and it is short
+because Svelte was already right about custom elements.
+
+**Pass objects and arrays as properties**, which Svelte does on its own:
+
+```svelte
+<helix-tabs items={tabs} />
+```
+
+## Two things that are not framework-specific
+
+`bind:` does not work on a Helix control, because there is no two-way binding
+convention a custom element can opt into. Read the value off the event.
+
+And a declared `value`, `open`, `checked` or `active` is a claim of ownership:
+the element announces and waits rather than applying the change itself. Use
+`default-value` and its siblings when you want the element to own its own state.
+See [State and control](./state-and-control).

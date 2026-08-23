@@ -1,0 +1,74 @@
+---
+description: The one compiler setting Vue needs, and why props and events already work.
+parent: installation
+section: Getting started
+title: Vue
+---
+
+# Vue
+
+```ts
+import '@helix-io/web/vue'
+```
+
+A types-only import, once. It augments Vue's `GlobalComponents` so every Helix
+tag is typed in an SFC template, with its real props and its real events. The
+generated file declares the augmentation under both `vue` and
+`@vue/runtime-core`, because tooling disagrees about which one to read.
+
+## Tell the compiler the tags are deliberate
+
+Without this, Vue resolves `<helix-button>` as a component it cannot find and
+warns on every render.
+
+```ts
+// vite.config.ts
+export default defineConfig({
+  plugins: [
+    vue({
+      template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith('helix-') } },
+    }),
+  ],
+})
+```
+
+The prefix test is the whole rule. Every element in the library is `helix-`
+something, in both tiers, and nothing else is.
+
+## Props and events need no ceremony
+
+Vue sets a property when the element has one and falls back to an attribute
+otherwise, which is exactly right for these: a string goes through either path
+and an array or an object goes through the property.
+
+```vue
+<helix-tabs :items="items" @helix-change="onChange" />
+```
+
+`@helix-change` binds with `addEventListener`, so the name is the event's own.
+Vue is the framework this works most quietly in, which is why this page is
+short: there is no bridge and no wrapper, only the compiler setting above.
+
+**Force the property with `.prop` if you ever need to**, for instance where a
+string would be ambiguous:
+
+```vue
+<helix-input :value.prop="'42'" />
+```
+
+Rarely necessary. Worth knowing it exists before you go looking for it.
+
+## The controlled-property rule still applies
+
+`value`, `open`, `checked` and `active` are claims of ownership in Helix, and
+declaring one without answering it gives you a control that ignores input. Vue
+has no type-level constraint for this the way the React types do, so it is worth
+reading [State and control](./state-and-control) once before writing a form.
+
+```vue
+<!-- Uncontrolled: the element owns it. -->
+<helix-input default-value="Ada" label="Name" />
+
+<!-- Controlled: you own it, so you answer it. -->
+<helix-input :value="name" label="Name" @helix-input="name = $event.detail.value" />
+```

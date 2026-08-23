@@ -1,0 +1,119 @@
+---
+description: The three ways in past a shadow root, and which one to reach for.
+section: Theming
+title: Overriding a component
+---
+
+# Overriding a component
+
+Every Helix component draws inside a shadow root, so your stylesheet cannot
+reach in. That is the point: a rule you write can never accidentally break a
+component's internals, and a component can be rewritten without breaking your
+page.
+
+Three doors are open, and they are in the order you should try them.
+
+## 1. Tokens, when the change is not about one component
+
+```css
+:root {
+  --helix-radii-md: 2px;
+}
+```
+
+If every card, dialog and button should be squarer, that is a token change and
+you are done. Tokens cross shadow boundaries on their own, because custom
+properties inherit, so one declaration reaches every component at once.
+
+Reach for this first. Most requests that arrive as "can I restyle the button"
+are really "our brand has less rounding than yours", and the token is both the
+smaller change and the one that stays consistent.
+
+See [Tokens](./tokens) and [Deriving a theme](./theming).
+
+## 2. Per-component hooks, when the change is about one component
+
+```css
+helix-card {
+  --card-padding: var(--helix-space-lg);
+}
+
+helix-accordion {
+  --accordion-border-color: var(--helix-color-border-strong);
+}
+```
+
+A hook is a custom property a component publishes and reads. It defaults to a
+semantic token, so leaving it alone gets you the themed value, and setting it
+changes that component and nothing else.
+
+**They are API, not tokens**, and the distinction is enforced. A hook is named
+after the component (`--card-padding`, `--drawer-radii`), a token is named
+`--helix-*`, and `bun run check:hooks` holds every documented hook to a rule
+that actually reads it, in both directions. Declared and never read is a promise
+with nothing behind it; read and never declared is a working feature nobody is
+told about. Three of `Button`'s four hooks had been inert for a refactor's worth
+of time while the reference went on listing them, which is how that check came
+to exist.
+
+Each component's page lists its hooks under Custom properties.
+
+## 3. Parts, when you need at the box itself
+
+```css
+helix-select::part(trigger) {
+  font-variant-numeric: tabular-nums;
+}
+
+helix-dialog::part(panel) {
+  max-inline-size: 40rem;
+}
+```
+
+`::part()` reaches a named element inside the shadow root and lets you write any
+declaration you like on it. It is the most powerful door and the one to try
+last, because it is the one that couples your stylesheet to a component's
+internal structure.
+
+**A published part is a promise**, and `bun run check:parts` holds it both ways:
+a documented part that nothing renders, and a rendered part nobody was told
+about. The second is the worse of the two, because a `::part()` that resolves to
+nothing is valid CSS that matches nothing and reports nothing. `Breadcrumbs`
+published a `nav` part the family does not render; `Checkbox` renders the
+`field` part the whole styled appearance is built on and never declared it.
+
+Each component's page lists its parts.
+
+### Parts do not nest by default
+
+`::part()` reaches one level. A part inside a part inside a component is not
+addressable from outside unless the component forwards it, which it does with
+`exportparts`. If you find yourself wanting a part that is not published, that
+is worth reporting rather than working around: the missing part is the bug.
+
+## What not to do
+
+**Do not raise specificity to fight a component.** `helix-button.thing.thing` is
+still outside the shadow root, so it wins nothing it was not already winning.
+Selector weight is not what is stopping you.
+
+**Do not restyle through `!important` on the host.** Some properties inherit
+into a shadow root and most do not, so this works for `color` and `font-family`
+and fails silently for everything else, which is a worse outcome than failing
+loudly.
+
+**Do not fork the component to change a colour.** The headless tier exists for
+the case where you want none of our styling, and it is a different decision from
+overriding one value. See [Tiers](./tiers).
+
+## When you want all of it
+
+```ts
+import '@helix-io/headless'
+```
+
+The headless tier is structure, accessibility, state and form participation with
+no CSS at all. You write the entire appearance. That is the honest answer when
+the design is genuinely not ours, and it is a supported tier rather than an
+escape hatch: `helix-base-select` is a registered element, not an abstract
+class.

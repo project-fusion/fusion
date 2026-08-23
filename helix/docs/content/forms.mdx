@@ -1,0 +1,171 @@
+---
+description: Real form participation, labels that resolve across a shadow root, and the disabled trap.
+section: Essentials
+title: Forms and validation
+---
+
+# Forms and validation
+
+Seventeen families take part in forms. They are form-associated custom elements,
+so a `<form>` collects them, resets them, restores them on back-navigation and
+validates them the way it does a native control. Nothing about that is
+simulated.
+
+```html
+<form>
+  <helix-input
+    label="Name"
+    name="name"
+    required
+  ></helix-input>
+  <helix-select
+    label="Plan"
+    name="plan"
+  >
+    <helix-option value="free">Free</helix-option>
+    <helix-option value="pro">Pro</helix-option>
+  </helix-select>
+  <helix-button type="submit">Save</helix-button>
+</form>
+```
+
+`new FormData(form)` has `name` and `plan` in it. So does a server reading the
+POST body.
+
+## Every control carries its own label
+
+```html
+<helix-input
+  hint="We only use this to sign you in."
+  label="Email"
+  name="email"
+  required
+></helix-input>
+```
+
+There is no wrapping `Field` component, and that is not a style preference. **A
+wrapper cannot name what it wraps.** Its label would live in one shadow root and
+the control in another, and measured in Chrome 148: an `aria-labelledby` IDREF
+cannot see across a shadow boundary, and `control.ariaLabelledByElements =
+[labelInTheWrapper]` reads back as zero elements, the reference silently
+dropped. The same assignment with a label in the control's own tree is kept.
+
+That pattern works in React component libraries because they have no shadow
+boundary. Bringing it here brings the ergonomics and none of the conditions that
+made it work.
+
+So every control that wants a label has the same three properties and renders
+its own nodes:
+
+| Property | For |
+|---|---|
+| `label` | The accessible name, and the fallback for the `label` slot |
+| `hint` | Help under the control, while there is nothing wrong |
+| `feedback` | What is wrong, in your words rather than the browser's |
+
+Each is a slot fallback, so anything richer than a string replaces it:
+
+```html
+<helix-input name="email">
+  <span slot="label">Email <helix-badge>required</helix-badge></span>
+</helix-input>
+```
+
+**A whitespace-only text node defeats a default slot's fallback**, which costs a
+label and gives no warning. Measured in Chrome 148: a newline between the tags
+is enough, so `<helix-checkbox label="Accept">` closed on the next line renders
+no label at all. Named slots do not have this problem, because `slot="label"` is
+an attribute and a text node has none. It is the platform's behaviour rather
+than ours, and it is true of every slot fallback in the library.
+
+## Validation
+
+The platform's own validation works, because these are real form participants:
+
+```html
+<helix-input
+  label="Email"
+  name="email"
+  required
+  type="email"
+></helix-input>
+```
+
+Submitting an empty form blocks and points at the control. `checkValidity()`,
+`reportValidity()` and `:invalid` behave.
+
+**`feedback` overrides the message.** Left empty, the browser's own is shown,
+which is localised and familiar; set, it says what you want in the words your
+product uses:
+
+```html
+<helix-input
+  feedback="We need this to send your receipt."
+  label="Email"
+  name="email"
+  required
+></helix-input>
+```
+
+**A group is the participant, not its members.** `Radio.Group` and
+`Toggle.Group` own the `name`, the `value` and the validity: a lone radio is not
+a control at all, it is an answer to one. `Checkbox.Group` is the exception in
+the other direction, since each box in it submits itself already, so the group
+deliberately reports no value of its own.
+
+## The disabled trap
+
+```html
+<fieldset disabled>
+  <helix-input
+    label="Name"
+    name="name"
+  ></helix-input>
+</fieldset>
+```
+
+That works, and it did not always. The platform tells a form-associated element
+through `formDisabledCallback`, which nothing implemented, so a control inside a
+disabled fieldset stayed fully typeable and announced itself as enabled.
+Measured: a `helix-input` in one accepted text, reported `disabled` as false,
+and carried no `aria-disabled`, while the form's entry list correctly left it
+out. Interactive and unsubmittable is the worst of both.
+
+**The consequence for your own CSS is a rule worth knowing.** Style disabled
+controls with `:disabled`, never `[disabled]`:
+
+```css
+/* Right: matches the attribute and the ancestor fieldset. */
+helix-input:disabled { … }
+
+/* Wrong: misses every control inside a disabled fieldset. */
+helix-input[disabled] { … }
+```
+
+The pseudo-class is true for a control carrying the attribute *and* for one
+inside a disabled fieldset, which sets no attribute on anything. A component
+styled with the attribute selector refuses interaction from the fieldset,
+because the platform disables it either way, and paints itself as live. That
+reads as a control that is simply broken, and it is invisible in every example
+that does not happen to use a fieldset. `bun run check:disabled` holds the
+library to this; the same reasoning applies to yours.
+
+`disabled` is mirrored to `aria-disabled` rather than removing the control from
+the accessibility tree, so a screen reader can still announce that the control
+exists and is currently off.
+
+## Controlled and uncontrolled
+
+Every form control follows the ownership rule: a declared `value` or `checked`
+is a claim, and the element will announce and wait rather than apply. In a form
+you usually want the uncontrolled shape and to read the values at submit:
+
+```html
+<helix-input
+  default-value="Ada"
+  label="Name"
+  name="name"
+></helix-input>
+```
+
+See [State and control](./state-and-control).
