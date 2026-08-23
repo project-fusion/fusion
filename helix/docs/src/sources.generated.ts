@@ -188,7 +188,7 @@ control](./state-and-control).
 `,
   'browser-support': `---
 description: The platform features this is built on, and what is actually tested.
-order: 4
+order: 5
 section: Getting started
 title: Browser support
 ---
@@ -916,7 +916,8 @@ the prefix and nothing camel-cases it. See [React](./react), [Vue](./vue) and
 `,
   'for-coding-agents': `---
 description: Every surface here is readable by a machine, and where each one is.
-section: Tooling
+order: 4
+section: Getting started
 title: For coding agents
 ---
 
@@ -991,11 +992,35 @@ code that passes:
 If you are generating Helix code, the first two are the ones that produce
 working-looking output that is wrong.
 
-## What is not here yet
+## The index
 
-\`llms.txt\` and a route registry, which would make these surfaces discoverable
-rather than merely present. That is the next piece of work rather than a
-decision against it.
+\`\`\`
+/llms.txt
+\`\`\`
+
+Every page on the site, grouped, each one linked at its \`.md\` and annotated with
+a sentence. Generated from the same route registry the sitemap comes from, so a
+page cannot exist without appearing here and cannot appear here without
+existing.
+
+Start there rather than crawling. It is one request and it names all 149.
+
+## From a component's page
+
+Every family page carries a menu beside its title with **View Markdown**, **Copy
+Markdown**, and links that hand the document's URL to Claude or to Cursor. The
+URL rather than the contents, because the URL stays current and a pasted copy
+starts going stale the moment it is pasted.
+
+## What is deliberately not here
+
+**\`llms-full.txt\`.** Concatenating every page into one download is out of date
+the moment anything changes, where the links in \`llms.txt\` are individually
+cacheable and individually current.
+
+**A search index.** The site has one for humans; there is nothing an agent can
+query yet, and \`llms.txt\` plus 149 documents is a smaller thing to read than
+most search APIs are to learn.
 `,
   forms: `---
 description: Real form participation, labels that resolve across a shadow root, and the disabled trap.
@@ -3789,7 +3814,7 @@ Turbopack ignores, silently.
 `,
   versioning: `---
 description: What a version number means here, and which packages move together.
-order: 5
+order: 6
 section: Getting started
 title: Versioning
 ---

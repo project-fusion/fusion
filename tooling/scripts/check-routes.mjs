@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { spawnSync } from 'node:child_process'
 /**
  * Every route has a document, and every document has a route.
  *
@@ -44,6 +45,39 @@ const all = routes()
 
 if (all.length === 0) {
   console.error('routes: the registry is empty, which is a check that counts nothing')
+  process.exit(1)
+}
+
+/* **The two halves read the registry from different places, and a stale build
+   makes that look like a content problem.**
+   
+   `routes()` is app code, so it imports `@helix-io/docs` and gets `dist`.
+   `build-catalog.mjs` is tooling, so it reads `src` directly, the way every
+   generator here reads source. Both are right, and between a content edit and
+   the next build they disagree: the catalog writes a document for a page the
+   route registry has never heard of, and the message for that is "a document no
+   route points at", which sends a reader looking through content for a file
+   that is not the problem. It cost a detour once already.
+   
+   Cheaper to say so. The content directory is the truth either way. */
+const authored = new Set(
+  readdirSync(join(ROOT, 'helix/docs/content'))
+    .filter((entry) => entry.endsWith('.mdx'))
+    .map((entry) => entry.replace(/\.mdx$/, '')),
+)
+const built = new Set(
+  all.filter((route) => route.path.startsWith('/helix/docs/')).map((route) => route.path.slice(12)),
+)
+const drifted = [
+  ...[...authored].filter((slug) => !built.has(slug)).map((slug) => `+${slug}`),
+  ...[...built].filter((slug) => !authored.has(slug)).map((slug) => `-${slug}`),
+]
+if (drifted.length > 0) {
+  console.error(
+    `routes: helix/docs/dist is stale against its content (${drifted.join(' ')}).\n` +
+      '  The route registry reads the built package and the catalog reads source.\n' +
+      '  Run `bun run build`, then `bun run catalog`.',
+  )
   process.exit(1)
 }
 
@@ -161,9 +195,30 @@ if (problems.length > 0) {
 }
 
 /* Recorded only when everything passed, so a failing run never writes a path
-   into the record it is about to be judged against. */
+   into the record it is about to be judged against.
+   
+   **And never a page nobody has committed.** A draft sitting untracked in a
+   content folder is a route while it is on disk, and this recorded one, so
+   removing the draft looked exactly like deleting a published page and demanded
+   a redirect for an address that was never served. Publishing is a thing git
+   knows about and the filesystem does not. */
+const untracked = new Set(
+  spawnSync(
+    'git',
+    ['ls-files', '--others', '--exclude-standard', 'helix/docs/content', 'site/content/content'],
+    {
+      cwd: ROOT,
+      encoding: 'utf8',
+    },
+  )
+    .stdout.split('\n')
+    .filter(Boolean)
+    .map((file) => file.replace(/^.*\//, '').replace(/\.mdx$/, '')),
+)
+
 if (problems.length === 0) {
-  const merged = [...new Set([...published.paths, ...live])].sort()
+  const committed = [...live].filter((path) => !untracked.has(path.split('/').at(-1) ?? ''))
+  const merged = [...new Set([...published.paths, ...committed])].sort()
   if (merged.join() !== published.paths.join()) {
     writeFileSync(PUBLISHED, `${JSON.stringify({ paths: merged }, undefined, 2)}\n`)
   }

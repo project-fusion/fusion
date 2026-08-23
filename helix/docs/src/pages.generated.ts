@@ -21,7 +21,7 @@ export const docPages: DocPage[] = [
   },
   {
     description: 'The platform features this is built on, and what is actually tested.',
-    order: 4,
+    order: 5,
     section: 'Getting started',
     slug: 'browser-support',
     title: 'Browser support',
@@ -64,7 +64,8 @@ export const docPages: DocPage[] = [
   },
   {
     description: 'Every surface here is readable by a machine, and where each one is.',
-    section: 'Tooling',
+    order: 4,
+    section: 'Getting started',
     slug: 'for-coding-agents',
     title: 'For coding agents',
   },
@@ -243,7 +244,7 @@ export const docPages: DocPage[] = [
   },
   {
     description: 'What a version number means here, and which packages move together.',
-    order: 5,
+    order: 6,
     section: 'Getting started',
     slug: 'versioning',
     title: 'Versioning',
