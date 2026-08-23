@@ -123,6 +123,9 @@ const kinds = all.reduce((counts, route) => {
 
 /* How many prose pages still serve the stub.
  *
+ * Zero as of the commit that serialized the insight essays. The count stays
+ * because the next page added is the one that will need it.
+ *
  * **Counted rather than failed on**, because a stub is the honest state of a
  * page whose copy has not moved into a typed module yet, and failing on it
  * would only pressure someone into writing the parallel prose this arrangement
