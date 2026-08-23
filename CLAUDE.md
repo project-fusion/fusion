@@ -50,6 +50,16 @@ Rust for backend and substrate cores. TypeScript for frontend.
 - **Biome only** for TS/JS. `cargo fmt` and `clippy` for Rust.
 - **Lit** with legacy decorators (`experimentalDecorators: true`,
   `useDefineForClassFields: false`).
+- **TypeScript 7**, which is the native compiler: `typescript` publishes a
+  `bin/tsc` shim over a platform binary, ships no `tsserver`, and exports no
+  synchronous compiler API. An editor asked to use the workspace version wants
+  `tsc --lsp --stdio` rather than a server script, and anything reaching for
+  `ts.createProgram` has to take the `./unstable/*` surfaces instead.
+  **`node_modules` holds two TypeScripts and that is correct.**
+  `@custom-elements-manifest/analyzer` pins `typescript ~5.4.2` and resolves its
+  own nested 5.4.5, which is what keeps `bun run analyze` working at all: it is
+  a library consumer of the API that 7 no longer has. Upgrading the root does
+  not touch it, and nothing should try to dedupe them.
 - Config files are TypeScript (`*.config.ts`), so they are type-checked rather
   than failing at runtime on a typo. **Not all of them run under bun, and the
   exception has a floor.** `cem analyze` is a Node CLI with its own shebang, so
