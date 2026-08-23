@@ -29,6 +29,28 @@ export interface Window {
 }
 
 /**
+ * How many times an update this asked for may change the answer again.
+ *
+ * **A measurement that its own render moves has no fixed point, and nothing
+ * here could previously stop looking for one.** `clientHeight` is meant to be a
+ * fact about the box, true of any real scroller, and false of a box with no
+ * height: there it is a function of the rows just drawn, so `measure` renders,
+ * the render changes the height, and the next measurement disagrees.
+ *
+ * It does not even diverge, which is what made it hard to see. Measured on the
+ * headless tier with 500 rows and no height on the viewport, it converged
+ * toward a non-integer and then oscillated between 378 and 379 rows forever,
+ * 2505 passes in eight seconds. The loop runs on microtasks, so timers never
+ * fire, and every deadline written to catch this, the harness's 2000ms race and
+ * the spec's own bounded `settle`, is a `setTimeout` that cannot run. The page
+ * simply stops.
+ *
+ * Ten, because a legitimate settling is two or three: nothing, then the real
+ * height, then agreement.
+ */
+const UNSTABLE = 10
+
+/**
  * Works out which slice of a long set is worth rendering.
  *
  * **A controller and not an element, which is the whole reason it is here.**
@@ -88,27 +110,6 @@ export interface Window {
  * between scroll offset and index, which never disagrees with itself. Rows of
  * genuinely different heights are a different component and a harder one.
  */
-/**
- * How many times an update this asked for may change the answer again.
- *
- * **A measurement that its own render moves has no fixed point, and nothing
- * here could previously stop looking for one.** `clientHeight` is meant to be a
- * fact about the box, true of any real scroller, and false of a box with no
- * height: there it is a function of the rows just drawn, so `measure` renders,
- * the render changes the height, and the next measurement disagrees.
- *
- * It does not even diverge, which is what made it hard to see. Measured on the
- * headless tier with 500 rows and no height on the viewport, it converged
- * toward a non-integer and then oscillated between 378 and 379 rows forever,
- * 2505 passes in eight seconds. The loop runs on microtasks, so timers never
- * fire, and every deadline written to catch this, the harness's 2000ms race and
- * the spec's own bounded `settle`, is a `setTimeout` that cannot run. The page
- * simply stops.
- *
- * Ten, because a legitimate settling is two or three: nothing, then the real
- * height, then agreement.
- */
-const UNSTABLE = 10
 
 export class VirtualizeController implements ReactiveController {
   private readonly host: ReactiveControllerHost
