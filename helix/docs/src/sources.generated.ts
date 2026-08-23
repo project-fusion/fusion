@@ -357,6 +357,111 @@ system, and no chart type you build by composing scales. Six drawings that read
 a table, styled by the token system, with an accessible representation by
 construction. When you need a grammar of graphics, use one.
 `,
+  'coding-agents': `---
+description: Every surface here is readable by a machine, and where each one is.
+order: 4
+section: Getting started
+title: Coding agents
+---
+
+# Coding agents
+
+An agent writing Helix code should not have to read a rendered website. Three
+surfaces give it the library as text, all generated from the sources this site
+renders from.
+
+## The manifest
+
+\`\`\`
+@helix-io/web/custom-elements.json
+\`\`\`
+
+Every element, every property with its literal type union, every event with its
+class, every slot, every part, every custom property. It is what the framework
+typings, the reference documentation and the site's component pages are all
+generated from, so it cannot disagree with them.
+
+**A generated manifest is what makes hallucinating a component impossible to
+sustain.** The vocabulary is the file: a tag that is not in it does not exist,
+and a prop value outside a declared union is a value the component will reject.
+
+Literal unions rather than named types are enforced at analysis time for exactly
+this reason: \`'ghost' | 'outlined' | 'solid' | 'subtle'\` tells a reader what to
+write, where \`ButtonEmphasis\` tells them to go and look somewhere else.
+
+## Markdown for every family
+
+\`\`\`
+/components/<family>.md
+/components/<family>.json
+\`\`\`
+
+Static files. The \`.md\` carries the family's metadata, every element's
+description and API tables, and **the examples**, which the HTML page
+deliberately does not: that page answers what a component can do and the sandbox
+beside it answers what it looks like, and a reference that started collecting
+pictures would stop being the one place you can trust to be complete. An agent
+has no sandbox to be sent to, and to it an example is text rather than a
+picture.
+
+The \`.json\` is the same family as structured data.
+
+## What is enforced
+
+Worth knowing, because they are the difference between code that looks right and
+code that passes:
+
+| Rule | Check |
+|---|---|
+| A controlled property must be answered | \`check:controlled\`, a type error |
+| A dispatched event must be declared | \`check:events\` |
+| A documented part must be rendered | \`check:parts\` |
+| A documented CSS hook must be read | \`check:hooks\` |
+| A visual property draws from its axis | \`check:axes\` |
+| A form control styles with \`:disabled\` | \`check:disabled\` |
+| A component that animates answers reduced motion | \`check:motion\` |
+| No component reads a primitive token | \`check:tokens\` |
+
+If you are generating Helix code, the first two are the ones that produce
+working-looking output that is wrong.
+
+## The index
+
+\`\`\`
+/llms.txt
+\`\`\`
+
+Every page on the site, grouped, each one linked at its \`.md\` and annotated with
+a sentence. Generated from the same route registry the sitemap comes from, so a
+page cannot exist without appearing here and cannot appear here without
+existing.
+
+Start there rather than crawling. It is one request and it names all 149.
+
+## From a component's page
+
+Every family page carries a menu beside its title with **View Markdown**, **Copy
+Markdown**, and links that hand the document's URL to Claude or to Cursor. The
+URL rather than the contents, because the URL stays current and a pasted copy
+starts going stale the moment it is pasted.
+
+## What is not here
+
+**\`llms-full.txt\`, or any other whole-library download.** Concatenating every
+page into one file is out of date the moment anything changes, where the links
+in \`llms.txt\` are individually cacheable and individually current.
+
+This page used to offer one anyway, a repository path to a generated document
+holding every family at once, which contradicted the paragraph above it and was
+not a thing a consumer could open: an agent reading the published package has
+this site and no checkout. What it was for is covered better by the two surfaces
+already here. \`llms.txt\` is the index, one request, and each family's \`.md\` is
+the document. Fetch the families you are using.
+
+**A search index.** The site has one for humans; there is nothing an agent can
+query yet, and \`llms.txt\` plus 149 documents is a smaller thing to read than
+most search APIs are to learn.
+`,
   color: `---
 description: The roles, the ramps, and why the palette is solved rather than picked.
 section: Foundations
@@ -906,113 +1011,6 @@ and the detail.
 The prop is \`on\` and the event name, verbatim: \`onhelix-change\`. Nothing strips
 the prefix and nothing camel-cases it. See [React](./react), [Vue](./vue) and
 [Svelte](./svelte).
-`,
-  'for-coding-agents': `---
-description: Every surface here is readable by a machine, and where each one is.
-order: 4
-section: Getting started
-title: Coding agents
----
-
-# Coding agents
-
-An agent writing Helix code should not have to read a rendered website. Three
-surfaces give it the library as text, all generated from the sources this site
-renders from.
-
-## The manifest
-
-\`\`\`
-@helix-io/web/custom-elements.json
-\`\`\`
-
-Every element, every property with its literal type union, every event with its
-class, every slot, every part, every custom property. It is what the framework
-typings, the reference documentation and the site's component pages are all
-generated from, so it cannot disagree with them.
-
-**A generated manifest is what makes hallucinating a component impossible to
-sustain.** The vocabulary is the file: a tag that is not in it does not exist,
-and a prop value outside a declared union is a value the component will reject.
-
-Literal unions rather than named types are enforced at analysis time for exactly
-this reason: \`'ghost' | 'outlined' | 'solid' | 'subtle'\` tells a reader what to
-write, where \`ButtonEmphasis\` tells them to go and look somewhere else.
-
-## Markdown for every family
-
-\`\`\`
-/components/<family>.md
-/components/<family>.json
-\`\`\`
-
-Static files. The \`.md\` carries the family's metadata, every element's
-description and API tables, and **the examples**, which the HTML page
-deliberately does not: that page answers what a component can do and the sandbox
-beside it answers what it looks like, and a reference that started collecting
-pictures would stop being the one place you can trust to be complete. An agent
-has no sandbox to be sent to, and to it an example is text rather than a
-picture.
-
-The \`.json\` is the same family as structured data.
-
-## The whole library in one document
-
-\`\`\`
-docs/11-component-reference.md
-\`\`\`
-
-Every family, every element, every table, in one file. Generated from the
-manifest, so it is current or the build fails.
-
-## What is enforced
-
-Worth knowing, because they are the difference between code that looks right and
-code that passes:
-
-| Rule | Check |
-|---|---|
-| A controlled property must be answered | \`check:controlled\`, a type error |
-| A dispatched event must be declared | \`check:events\` |
-| A documented part must be rendered | \`check:parts\` |
-| A documented CSS hook must be read | \`check:hooks\` |
-| A visual property draws from its axis | \`check:axes\` |
-| A form control styles with \`:disabled\` | \`check:disabled\` |
-| A component that animates answers reduced motion | \`check:motion\` |
-| No component reads a primitive token | \`check:tokens\` |
-
-If you are generating Helix code, the first two are the ones that produce
-working-looking output that is wrong.
-
-## The index
-
-\`\`\`
-/llms.txt
-\`\`\`
-
-Every page on the site, grouped, each one linked at its \`.md\` and annotated with
-a sentence. Generated from the same route registry the sitemap comes from, so a
-page cannot exist without appearing here and cannot appear here without
-existing.
-
-Start there rather than crawling. It is one request and it names all 149.
-
-## From a component's page
-
-Every family page carries a menu beside its title with **View Markdown**, **Copy
-Markdown**, and links that hand the document's URL to Claude or to Cursor. The
-URL rather than the contents, because the URL stays current and a pasted copy
-starts going stale the moment it is pasted.
-
-## What is not here
-
-**\`llms-full.txt\`.** Concatenating every page into one download is out of date
-the moment anything changes, where the links in \`llms.txt\` are individually
-cacheable and individually current.
-
-**A search index.** The site has one for humans; there is nothing an agent can
-query yet, and \`llms.txt\` plus 149 documents is a smaller thing to read than
-most search APIs are to learn.
 `,
   forms: `---
 description: Real form participation, labels that resolve across a shadow root, and the disabled trap.

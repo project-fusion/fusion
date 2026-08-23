@@ -73,6 +73,17 @@ const config: NextConfig = {
       { destination: '/helix', permanent: true, source: '/design' },
       { destination: '/helix/:path*', permanent: true, source: '/design/:path*' },
       { destination: '/cortex', permanent: true, source: '/mind' },
+
+      /* `for-coding-agents` lost its preposition: the page has titled itself
+         Coding agents since it was written, and the filename was the only thing
+         still saying otherwise. It is in `llms.txt` and in `published.json`, so
+         an agent may hold the old address, which is the one kind of reader that
+         will not think to try the other one. */
+      {
+        destination: '/helix/docs/coding-agents',
+        permanent: true,
+        source: '/helix/docs/for-coding-agents',
+      },
     ]
   },
 

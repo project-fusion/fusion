@@ -47,15 +47,6 @@ picture.
 
 The `.json` is the same family as structured data.
 
-## The whole library in one document
-
-```
-docs/11-component-reference.md
-```
-
-Every family, every element, every table, in one file. Generated from the
-manifest, so it is current or the build fails.
-
 ## What is enforced
 
 Worth knowing, because they are the difference between code that looks right and
@@ -97,9 +88,16 @@ starts going stale the moment it is pasted.
 
 ## What is not here
 
-**`llms-full.txt`.** Concatenating every page into one download is out of date
-the moment anything changes, where the links in `llms.txt` are individually
-cacheable and individually current.
+**`llms-full.txt`, or any other whole-library download.** Concatenating every
+page into one file is out of date the moment anything changes, where the links
+in `llms.txt` are individually cacheable and individually current.
+
+This page used to offer one anyway, a repository path to a generated document
+holding every family at once, which contradicted the paragraph above it and was
+not a thing a consumer could open: an agent reading the published package has
+this site and no checkout. What it was for is covered better by the two surfaces
+already here. `llms.txt` is the index, one request, and each family's `.md` is
+the document. Fetch the families you are using.
 
 **A search index.** The site has one for humans; there is nothing an agent can
 query yet, and `llms.txt` plus 149 documents is a smaller thing to read than

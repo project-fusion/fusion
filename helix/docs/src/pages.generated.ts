@@ -33,6 +33,13 @@ export const docPages: DocPage[] = [
     title: 'Charting',
   },
   {
+    description: 'Every surface here is readable by a machine, and where each one is.',
+    order: 4,
+    section: 'Getting started',
+    slug: 'coding-agents',
+    title: 'Coding agents',
+  },
+  {
     description: 'The roles, the ramps, and why the palette is solved rather than picked.',
     section: 'Foundations',
     slug: 'color',
@@ -61,13 +68,6 @@ export const docPages: DocPage[] = [
     section: 'Essentials',
     slug: 'events',
     title: 'Events',
-  },
-  {
-    description: 'Every surface here is readable by a machine, and where each one is.',
-    order: 4,
-    section: 'Getting started',
-    slug: 'for-coding-agents',
-    title: 'Coding agents',
   },
   {
     description:
