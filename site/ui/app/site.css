@@ -278,23 +278,6 @@ helix-drawer {
   text-align: center;
 }
 
-/* ====================================================== vertical ========= */
-
-/* A vertical's page: a title, a lede, and whatever it wants below. It gets the
-   same band of air above and below as a section of the landing page, so moving
-   between the two does not feel like landing in a different site. */
-.verticalShell {
-  padding-block: var(--site-band);
-}
-
-/* The lede runs slightly wider than body prose and slightly larger, so the
-   opening paragraph reads as the page's summary rather than as its first
-   paragraph. */
-.lede {
-  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
-  max-inline-size: 68ch;
-}
-
 /* Interior-only, so 0% and 100% resolve to the resting `opacity: 0` and
    `scale: 1`. A `from` that differed from rest would make every one of these
    jump the instant the page loaded.
@@ -353,13 +336,6 @@ helix-code-block .tok-bool {
 helix-code-block .tok-punctuation,
 helix-code-block .tok-operator {
   color: var(--helix-color-foreground-subtle);
-}
-
-/* A component's prose, which comes from its class comment and can run long.
-   Capped so a reference paragraph stays readable in a wide middle column. */
-.description {
-  max-inline-size: 68ch;
-  white-space: pre-line;
 }
 
 /* The panel is a bar and a console, and the two take opposite sides of a line.
@@ -516,22 +492,6 @@ helix-app-header {
  * failure mode that resolves to nothing and reports no error. */
 .insightCard helix-card {
   align-content: space-between;
-}
-
-/* ======================================================== services ======= */
-
-/* The two columns of an offer, side by side while there is room and stacked
-   when there is not. A floor rather than a count: there are exactly two, so
-   `wrap` plus a minimum says the whole rule. */
-.serviceColumn {
-  flex: 1 1 18rem;
-  min-inline-size: 0;
-}
-
-/* The body sits under a header that already spans the card, so it takes the
-   full width and lets its own columns do the dividing. */
-.serviceBody {
-  inline-size: 100%;
 }
 
 /* A photograph, treated so that any two of them read as one set.

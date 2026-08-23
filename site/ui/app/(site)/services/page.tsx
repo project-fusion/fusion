@@ -1,4 +1,5 @@
 import { SERVICES } from '../../services'
+import styles from './services.module.css'
 
 export const metadata = {
   description:
@@ -84,8 +85,8 @@ export default function Page() {
                   </helix-text>
                 </helix-flex>
 
-                <helix-flex class="serviceBody" gap="2xl" wrap>
-                  <helix-flex class="serviceColumn" direction="column" gap="sm">
+                <helix-flex class={styles.serviceBody} gap="2xl" wrap>
+                  <helix-flex class={styles.serviceColumn} direction="column" gap="sm">
                     <helix-text appearance="label" tone="subtle">
                       What is in it
                     </helix-text>
@@ -103,7 +104,7 @@ export default function Page() {
                     </helix-list>
                   </helix-flex>
 
-                  <helix-flex class="serviceColumn" direction="column" gap="sm">
+                  <helix-flex class={styles.serviceColumn} direction="column" gap="sm">
                     <helix-text appearance="label" tone="subtle">
                       What you keep
                     </helix-text>

@@ -442,3 +442,10 @@
     position: static;
   }
 }
+
+/* A component's prose, which comes from its class comment and can run long.
+   Capped so a reference paragraph stays readable in a wide middle column. */
+.description {
+  max-inline-size: 68ch;
+  white-space: pre-line;
+}

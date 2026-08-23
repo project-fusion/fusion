@@ -361,7 +361,7 @@ function ElementApi({ element }: { element: Element }) {
       </helix-flex>
 
       {element.summary && (
-        <helix-text appearance="caption" as="p" class="description" tone="muted">
+        <helix-text appearance="caption" as="p" class={styles.description} tone="muted">
           {element.summary}
         </helix-text>
       )}
@@ -485,7 +485,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
               </helix-flex>
             </helix-flex>
 
-            <helix-text appearance="caption" as="p" class="description" tone="muted">
+            <helix-text appearance="caption" as="p" class={styles.description} tone="muted">
               {first(prose)}
             </helix-text>
 

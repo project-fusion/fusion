@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { stageAppearance, type Vertical } from '../verticals'
+import styles from './vertical-page.module.css'
 
 /**
  * The shared frame for a vertical's page.
@@ -27,7 +28,7 @@ export function VerticalPage({
   vertical: Vertical
 }) {
   return (
-    <helix-flex class="shell verticalShell" direction="column" gap="xl">
+    <helix-flex class={`shell ${styles.verticalShell}`} direction="column" gap="xl">
       <helix-flex direction="column" gap="sm">
         {product && (
           <helix-flex align="center" data-density="sm" gap="xs">
@@ -43,7 +44,7 @@ export function VerticalPage({
             <helix-tag tone={stageAppearance(vertical.stage)}>{vertical.stage}</helix-tag>
           )}
         </helix-flex>
-        <helix-text as="p" class="lede" tone="muted">
+        <helix-text as="p" class={styles.lede} tone="muted">
           {product ? product.body : vertical.body}
         </helix-text>
       </helix-flex>

@@ -1,0 +1,19 @@
+/* The services page: two columns of prose that the divider between them
+ * measures itself against. One route applies these and no other.
+ */
+
+/* ======================================================== services ======= */
+
+/* The two columns of an offer, side by side while there is room and stacked
+   when there is not. A floor rather than a count: there are exactly two, so
+   `wrap` plus a minimum says the whole rule. */
+.serviceColumn {
+  flex: 1 1 18rem;
+  min-inline-size: 0;
+}
+
+/* The body sits under a header that already spans the card, so it takes the
+   full width and lets its own columns do the dividing. */
+.serviceBody {
+  inline-size: 100%;
+}

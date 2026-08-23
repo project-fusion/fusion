@@ -1,0 +1,20 @@
+/* A vertical's page: the band of air around it, and the lede that opens it.
+ * Colocated with `vertical-page.tsx`, which is the only thing that renders one.
+ */
+
+/* ====================================================== vertical ========= */
+
+/* A vertical's page: a title, a lede, and whatever it wants below. It gets the
+   same band of air above and below as a section of the landing page, so moving
+   between the two does not feel like landing in a different site. */
+.verticalShell {
+  padding-block: var(--site-band);
+}
+
+/* The lede runs slightly wider than body prose and slightly larger, so the
+   opening paragraph reads as the page's summary rather than as its first
+   paragraph. */
+.lede {
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  max-inline-size: 68ch;
+}
