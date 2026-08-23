@@ -285,6 +285,22 @@ function MemberTable({
 }
 
 /** The one table with a fourth column, because a property has a resting value. */
+/**
+ * What a reference mark says, in the tooltip and to a screen reader alike.
+ *
+ * **Composed here rather than carried in the tag**, because the tag's job is to
+ * name which specification a member is built on and this is copy about a link.
+ * Written into each `@reference` it would be the same sentence in five places
+ * and a rewording would be five edits in two packages.
+ *
+ * One string for both surfaces. It used to be `Invoker Commands. Opens the
+ * specification.` in the bubble and `command: Invoker Commands` as the
+ * accessible name, which is two phrasings of one thing and neither of them an
+ * instruction. The row's own name is already the header of the row a reader is
+ * in, so repeating it in the link only makes the announcement longer.
+ */
+const opens = (label: string): string => `Open the ${label} specification`
+
 function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
   if (rows.length === 0) {
     return null
@@ -316,13 +332,9 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
                    the bubble says which feature this is and the mark goes
                    there, so a touch screen, where nothing hovers, still has the
                    destination. */
-                <helix-tooltip
-                  content={`${reference.label}. Opens the specification.`}
-                  key={reference.url}
-                  placement="top"
-                >
+                <helix-tooltip content={opens(reference.label)} key={reference.url} placement="top">
                   <a
-                    aria-label={`${row.name}: ${reference.label}`}
+                    aria-label={opens(reference.label)}
                     className={styles.apiReference}
                     href={reference.url}
                     rel="noreferrer"

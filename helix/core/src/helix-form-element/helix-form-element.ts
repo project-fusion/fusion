@@ -172,7 +172,7 @@ export class HelixFormElement extends HelixElement {
   /**
    * The form this control belongs to, if any.
    *
-   * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements Form-associated custom elements
+   * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements form-associated custom elements
    */
   get form(): HTMLFormElement | null {
     return this.internals.form
@@ -181,7 +181,7 @@ export class HelixFormElement extends HelixElement {
   /**
    * Labels associated with this control.
    *
-   * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements Form-associated custom elements
+   * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements form-associated custom elements
    */
   get labels(): NodeList {
     return this.internals.labels

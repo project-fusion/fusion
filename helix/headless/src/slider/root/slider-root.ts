@@ -186,7 +186,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
   /**
    * The chosen value as a number, for anything doing arithmetic on it.
    *
-   * @reference https://html.spec.whatwg.org/multipage/input.html#dom-input-valueasnumber valueAsNumber
+   * @reference https://html.spec.whatwg.org/multipage/input.html#dom-input-valueasnumber HTMLInputElement.valueAsNumber
    */
   get valueAsNumber(): number {
     const parsed = Number.parseFloat(this.value)
