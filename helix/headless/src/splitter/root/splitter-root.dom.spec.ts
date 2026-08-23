@@ -613,3 +613,41 @@ describe('a press that moves nothing', () => {
     expect(pane.hasAttribute('data-dragging')).toBe(false)
   })
 })
+
+/**
+ * A splitter under a tag this package has never heard of.
+ *
+ * **This is the case a tag match cannot answer, and it was the fault.**
+ * `findOuter` matched `'helix-splitter, helix-base-splitter'`, and only
+ * `@helix-io/web` registers the first: a headless package naming a styled one
+ * by string. Subclassing a base element under a third tag is exactly what this
+ * tier exists to allow and exactly what `helix/web` itself does, and under one
+ * the lookup returned null, so a nested splitter simply had no corner and
+ * nothing said why.
+ *
+ * `closestInstance` asks whether the ancestor *is* a splitter, which is true of
+ * every subclass whatever it is called, and walks through shadow roots on the
+ * way, which `closest` does not.
+ */
+describe('a splitter a consumer has subclassed', () => {
+  test('still finds the one it crosses, whatever either of them is called', async () => {
+    const { HelixBaseSplitter } = await import('./splitter-root.js')
+    for (const tag of ['probe-splitter-outer', 'probe-splitter-inner']) {
+      if (!customElements.get(tag)) {
+        customElements.define(tag, class extends HelixBaseSplitter {})
+      }
+    }
+    const host = (await mount(`<probe-splitter-outer>
+      <div slot="start">one</div>
+      <probe-splitter-inner slot="end" orientation="vertical">
+        <div slot="start">two</div><div slot="end">three</div>
+      </probe-splitter-inner>
+    </probe-splitter-outer>`)) as Splitter
+    const within = host.querySelector('probe-splitter-inner') as Splitter
+    await host.updateComplete
+    await within.updateComplete
+    await host.updateComplete
+    expect(corner(host)).not.toBeNull()
+    expect(corner(within)).toBeNull()
+  })
+})

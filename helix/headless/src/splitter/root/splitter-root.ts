@@ -1,5 +1,6 @@
 import {
   capturePointer,
+  closestInstance,
   customElement,
   HelixChangeEvent,
   HelixElement,
@@ -693,12 +694,23 @@ export class HelixBaseSplitter extends HelixElement {
    * rather than content, absent from the served markup and appearing at
    * hydration, with two working dividers in the meantime.
    *
-   * `parentElement` before `closest`, so a splitter does not find itself.
+   * `parentElement` first, so a splitter does not find itself.
+   *
+   * **By identity rather than by tag, which `closestInstance` exists for and
+   * counts this file in its own documentation.** It matched
+   * `'helix-splitter, helix-base-splitter'`, and only `@helix-io/web` registers
+   * the first of those: a headless package naming a styled one by string. Under
+   * any third tag, which is exactly what subclassing a base element is for and
+   * what `helix/web` itself does, the lookup returned null and a nested
+   * splitter had no corner, with no error anywhere.
+   *
+   * It also crosses shadow boundaries, which `closest` does not: a splitter
+   * slotted into another component's shadow root has a `parentNode` chain
+   * ending at a `ShadowRoot`, and nesting through a slot is the ordinary case
+   * for anything composable.
    */
   private findOuter(): void {
-    const outer = this.parentElement?.closest<HelixBaseSplitter>(
-      'helix-splitter, helix-base-splitter',
-    )
+    const outer = closestInstance(this.parentElement, HelixBaseSplitter)
     if (!outer || outer === this || outer.vertical === this.vertical) {
       // Parallel dividers never meet, so there is no corner to take hold of.
       return

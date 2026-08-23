@@ -35,10 +35,6 @@
   --_toast-enter: var(--helix-space-lg);
 }
 
-:host(:not([placement])) [part="region"] {
-  align-items: flex-end;
-}
-
 [part="region"] {
   display: flex;
   flex-direction: column;
@@ -83,6 +79,14 @@
 
 :host([placement^="top"]) [part="region"] {
   flex-direction: column-reverse;
+}
+
+/* Beside its siblings rather than up with the `:host` rules, because the plain
+   `[part="region"]` block sits between them and is lower specificity: ahead of
+   it this was a descending-specificity selector, which is the shape where a
+   later rule looks like it should win and does not. */
+:host(:not([placement])) [part="region"] {
+  align-items: flex-end;
 }
 
 :host([placement$="start"]) [part="region"] {

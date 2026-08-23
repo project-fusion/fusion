@@ -1,7 +1,7 @@
-import { customElement, HelixCopyEvent } from '@helix-io/core'
+import { CopyController, customElement } from '@helix-io/core'
 import { check, copy } from '@helix-io/icons'
 import { nothing, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import { HelixBaseIconButton } from '../../icon-button/root/icon-button-root.js'
@@ -101,42 +101,34 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
    * would be claiming a copy happened, which is the one thing this element
    * exists to be honest about.
    */
-  @state()
-  private copied = false
-
-  private timer?: ReturnType<typeof setTimeout>
-
   /**
-   * The write, and the only place the confirmation is allowed to come from.
+   * The write, the confirmation, the timer and the event, all of them shared.
    *
-   * Guarded on the API existing, because `navigator.clipboard` is undefined on
-   * an insecure origin rather than throwing, and reaching straight for
-   * `writeText` there is a TypeError on the press instead of a copy that
-   * quietly did not happen.
+   * **This was a second implementation of `CopyController` with the hard half
+   * left out.** It reached straight for `navigator.clipboard.writeText` and had
+   * no `execCommand` fallback, so it was inert in a sandboxed iframe without
+   * `allow-same-origin`, which is the sandbox every example on the docs site
+   * runs in: the guard on the API existing does not help there, because the
+   * object exists and the write rejects. A copy button that does nothing is
+   * indistinguishable from a broken one, and this one was doing nothing in the
+   * one place a reader is most likely to try it.
+   *
+   * The controller also carries the two things this had wrong on its own terms:
+   * it checks the host is still connected after the await, because writing is
+   * asynchronous and `hostDisconnected` clears a timer that does not exist yet,
+   * and it registers itself so the timer is released without an override here.
    */
-  private readonly handleCopy = async (): Promise<void> => {
-    if (this.isDisabled || !navigator.clipboard) {
-      return
-    }
-    try {
-      await navigator.clipboard.writeText(this.value)
-    } catch {
-      // Refused. The button says nothing, because nothing happened.
-      return
-    }
-    this.copied = true
-    this.dispatchEvent(new HelixCopyEvent({ value: this.value }))
-    clearTimeout(this.timer)
-    this.timer = setTimeout(() => {
-      this.copied = false
-    }, CONFIRM)
+  private readonly clipboard = new CopyController(this, { after: CONFIRM })
+
+  private get copied(): boolean {
+    return this.clipboard.copied
   }
 
-  /* A pending timer outlives the element without this, and fires a state change
-     on something no longer in the document. */
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    clearTimeout(this.timer)
+  private readonly handleCopy = async (): Promise<void> => {
+    if (this.isDisabled) {
+      return
+    }
+    await this.clipboard.copy(this.value)
   }
 
   /**

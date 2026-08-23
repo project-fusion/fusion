@@ -12032,28 +12032,26 @@
             },
             {
               "kind": "field",
+              "name": "clipboard",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new CopyController(this, { after: CONFIRM })",
+              "description": "The write, the confirmation, the timer and the event, all of them shared.\n\n**This was a second implementation of `CopyController` with the hard half\nleft out.** It reached straight for `navigator.clipboard.writeText` and had\nno `execCommand` fallback, so it was inert in a sandboxed iframe without\n`allow-same-origin`, which is the sandbox every example on the docs site\nruns in: the guard on the API existing does not help there, because the\nobject exists and the write rejects. A copy button that does nothing is\nindistinguishable from a broken one, and this one was doing nothing in the\none place a reader is most likely to try it.\n\nThe controller also carries the two things this had wrong on its own terms:\nit checks the host is still connected after the await, because writing is\nasynchronous and `hostDisconnected` clears a timer that does not exist yet,\nand it registers itself so the timer is released without an override here."
+            },
+            {
+              "kind": "field",
               "name": "copied",
               "type": {
                 "text": "boolean"
               },
               "privacy": "private",
-              "default": "false",
-              "description": "Whether the confirmation is showing.\n\n`@state`, so it is the component's and not API: a consumer setting this\nwould be claiming a copy happened, which is the one thing this element\nexists to be honest about."
-            },
-            {
-              "kind": "field",
-              "name": "timer",
-              "type": {
-                "text": "ReturnType<typeof setTimeout> | undefined"
-              },
-              "privacy": "private"
+              "readonly": true
             },
             {
               "kind": "field",
               "name": "handleCopy",
               "privacy": "private",
-              "readonly": true,
-              "description": "The write, and the only place the confirmation is allowed to come from.\n\nGuarded on the API existing, because `navigator.clipboard` is undefined on\nan insecure origin rather than throwing, and reaching straight for\n`writeText` there is a TypeError on the press instead of a copy that\nquietly did not happen."
+              "readonly": true
             },
             {
               "kind": "method",
@@ -41035,7 +41033,7 @@
                   "text": "void"
                 }
               },
-              "description": "Announces this splitter to the one it is nested in, if they cross.\n\nClient only. The server has no tree to walk, and a parent that has not\nupgraded has no `orientation` to compare against, so this waits for\n`firstUpdated`. That is what the corner is allowed to be: an affordance\nrather than content, absent from the served markup and appearing at\nhydration, with two working dividers in the meantime.\n\n`parentElement` before `closest`, so a splitter does not find itself."
+              "description": "Announces this splitter to the one it is nested in, if they cross.\n\nClient only. The server has no tree to walk, and a parent that has not\nupgraded has no `orientation` to compare against, so this waits for\n`firstUpdated`. That is what the corner is allowed to be: an affordance\nrather than content, absent from the served markup and appearing at\nhydration, with two working dividers in the meantime.\n\n`parentElement` first, so a splitter does not find itself.\n\n**By identity rather than by tag, which `closestInstance` exists for and\ncounts this file in its own documentation.** It matched\n`'helix-splitter, helix-base-splitter'`, and only `@helix-io/web` registers\nthe first of those: a headless package naming a styled one by string. Under\nany third tag, which is exactly what subclassing a base element is for and\nwhat `helix/web` itself does, the lookup returned null and a nested\nsplitter had no corner, with no error anywhere.\n\nIt also crosses shadow boundaries, which `closest` does not: a splitter\nslotted into another component's shadow root has a `parentNode` chain\nending at a `ShadowRoot`, and nesting through a slot is the ordinary case\nfor anything composable."
             },
             {
               "kind": "field",
