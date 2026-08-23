@@ -3884,6 +3884,10 @@
               "name": "--bar-chart-bar-radius"
             },
             {
+              "description": "Width of the edge an `outlined` or `subtle` column is drawn with.",
+              "name": "--bar-chart-bar-stroke"
+            },
+            {
               "description": "Height of the drawing.",
               "name": "--bar-chart-block-size"
             },
@@ -3926,6 +3930,34 @@
               "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page. `gradient` fades each column toward its base, into\nthe wash the headless tier draws whether or not anything points at it.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.",
               "attribute": "material",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "emphasis",
+              "type": {
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
+              },
+              "description": "How much ink the columns claim.\n\nThe chart's treatment, which every series takes unless `outlined` or\n`subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash\nof the series colour with that edge on it, and absent is the filled column,\nper the rule that a reflected property takes no default.\n\n**It composes with `material` rather than competing with it.** Emphasis\ndecides what is drawn and material decides how much of it comes through, so\n`glass` thins whatever emphasis put there: the fill on a solid column, the\nstroke on an outlined one. That corner was inert when the two were first\nput side by side, `glass` setting a fill opacity on a mark whose fill is\n`none`, and a combination that silently does nothing is the trap\n`--card-backdrop` was for the one commit it shipped alone.",
+              "attribute": "emphasis",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "outlined",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are drawn as an outline rather than a fill, by name.\n\nSpace separated and matched against the column headings the table gives,\nthe way `lines` and `secondary` are, so a chart says `outlined=\"Forecast\"`\nrather than counting columns. Names because they are what the table already\ncarries and what the legend already shows.\n\n**The case this exists for is a series that is not a measurement.** A\nforecast, a target, a budget: something drawn on the same axis as the\nothers and not the same kind of fact, which an outline says without a\nsecond legend or a note under the chart.\n\nPer series and not per bar, because a bar is a mark inside a drawing and\nnobody writes markup for one, which is the same reason `material` sits on\nthe chart.",
+              "attribute": "outlined"
+            },
+            {
+              "kind": "field",
+              "name": "subtle",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are drawn as a wash of their colour, by name. Matched as `outlined` is.",
+              "attribute": "subtle"
             },
             {
               "kind": "field",
@@ -4525,6 +4557,30 @@
               "fieldName": "material"
             },
             {
+              "name": "emphasis",
+              "type": {
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
+              },
+              "description": "How much ink the columns claim.\n\nThe chart's treatment, which every series takes unless `outlined` or\n`subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash\nof the series colour with that edge on it, and absent is the filled column,\nper the rule that a reflected property takes no default.\n\n**It composes with `material` rather than competing with it.** Emphasis\ndecides what is drawn and material decides how much of it comes through, so\n`glass` thins whatever emphasis put there: the fill on a solid column, the\nstroke on an outlined one. That corner was inert when the two were first\nput side by side, `glass` setting a fill opacity on a mark whose fill is\n`none`, and a combination that silently does nothing is the trap\n`--card-backdrop` was for the one commit it shipped alone.",
+              "fieldName": "emphasis"
+            },
+            {
+              "name": "outlined",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are drawn as an outline rather than a fill, by name.\n\nSpace separated and matched against the column headings the table gives,\nthe way `lines` and `secondary` are, so a chart says `outlined=\"Forecast\"`\nrather than counting columns. Names because they are what the table already\ncarries and what the legend already shows.\n\n**The case this exists for is a series that is not a measurement.** A\nforecast, a target, a budget: something drawn on the same axis as the\nothers and not the same kind of fact, which an outline says without a\nsecond legend or a note under the chart.\n\nPer series and not per bar, because a bar is a mark inside a drawing and\nnobody writes markup for one, which is the same reason `material` sits on\nthe chart.",
+              "fieldName": "outlined"
+            },
+            {
+              "name": "subtle",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are drawn as a wash of their colour, by name. Matched as `outlined` is.",
+              "fieldName": "subtle"
+            },
+            {
               "name": "for",
               "type": {
                 "text": "string"
@@ -4624,6 +4680,10 @@
               {
                 "description": "The same bar chart on the headless tier, with every rule written by hand.",
                 "slug": "base"
+              },
+              {
+                "description": "A forecast beside three measurements, told apart by its outline rather than by a note.",
+                "slug": "emphasis"
               },
               {
                 "description": "Three series over the same categories, each taking the next series colour, with a legend reading the same table.",

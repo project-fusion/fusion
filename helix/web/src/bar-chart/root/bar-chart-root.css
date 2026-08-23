@@ -571,6 +571,44 @@
   color: var(--_bar-chart-axis-ink, var(--helix-color-foreground-subtle));
 }
 
+/* **Emphasis, which is how much ink a column claims.** Two knobs rather than a
+   rule per combination: `--_bar-chart-wash` is what emphasis draws and
+   `--_bar-chart-through` is how much of it material lets past, and the paint
+   multiplies them. Written as properties because the alternative is a rule for
+   every pairing of the two axes, which is the cross product a second axis
+   exists to avoid.
+
+   The stroke takes the same factor as the fill, which is what stops the one
+   inert corner. `glass` on an outlined column was setting a fill opacity on a
+   mark whose fill is `none`, so the two rendered identically: measured, the
+   material was a no-op and said nothing about it. Glass thins whatever emphasis
+   put there, so an outlined series goes see-through at its edge. */
+[part="bar"] {
+  fill-opacity: calc(var(--_bar-chart-wash, 1) * var(--_bar-chart-through, 1));
+  stroke-opacity: var(--_bar-chart-through, 1);
+}
+
+/* The mark as its edge alone, for a series that is not a measurement: a
+   forecast, a target, a budget. Hairline width from the border scale rather
+   than a literal, so a theme that thickens its rules thickens this with them. */
+[part="bar"][data-emphasis="outlined"],
+:host([emphasis="outlined"]) [part="bar"]:not([data-emphasis]) {
+  fill: none;
+  stroke: var(--_bar-chart-series);
+  stroke-width: var(--bar-chart-bar-stroke, 1.5);
+}
+
+/* A wash with its own edge on it, which is the reading between filled and
+   outlined and the one that keeps a column's area legible while saying it is
+   not the point. */
+[part="bar"][data-emphasis="subtle"],
+:host([emphasis="subtle"]) [part="bar"]:not([data-emphasis]) {
+  stroke: var(--_bar-chart-series);
+  stroke-width: var(--bar-chart-bar-stroke, 1.5);
+
+  --_bar-chart-wash: 0.16;
+}
+
 /* **Glass, so a chart is in the same language as the page around it.** A glass
    header over opaque columns reads as two designs sharing a window, which is
    what a material policy exists to stop. The gridlines read through, which is
@@ -580,7 +618,7 @@
    Scaled by the policy, so a language that is more see-through everywhere is
    more see-through here too. */
 :host([material="glass"]) [part="bar"] {
-  fill-opacity: calc(0.62 * var(--helix-material-opacity));
+  --_bar-chart-through: calc(0.62 * var(--helix-material-opacity));
 }
 
 /* **Gradient, into the wash the headless tier already draws.** One per series,

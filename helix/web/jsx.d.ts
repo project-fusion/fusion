@@ -1139,6 +1139,39 @@ Styled rather than headless, because what a bar is filled with is a
 treatment and this tier is where treatments live. The gradient it points at
 is drawn below, which is an element and therefore that tier's business. */
   material?: HelixBarChart["material"];
+  /** How much ink the columns claim.
+
+The chart's treatment, which every series takes unless `outlined` or
+`subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+of the series colour with that edge on it, and absent is the filled column,
+per the rule that a reflected property takes no default.
+
+**It composes with `material` rather than competing with it.** Emphasis
+decides what is drawn and material decides how much of it comes through, so
+`glass` thins whatever emphasis put there: the fill on a solid column, the
+stroke on an outlined one. That corner was inert when the two were first
+put side by side, `glass` setting a fill opacity on a mark whose fill is
+`none`, and a combination that silently does nothing is the trap
+`--card-backdrop` was for the one commit it shipped alone. */
+  emphasis?: HelixBarChart["emphasis"];
+  /** Which series are drawn as an outline rather than a fill, by name.
+
+Space separated and matched against the column headings the table gives,
+the way `lines` and `secondary` are, so a chart says `outlined="Forecast"`
+rather than counting columns. Names because they are what the table already
+carries and what the legend already shows.
+
+**The case this exists for is a series that is not a measurement.** A
+forecast, a target, a budget: something drawn on the same axis as the
+others and not the same kind of fact, which an outline says without a
+second legend or a note under the chart.
+
+Per series and not per bar, because a bar is a mark inside a drawing and
+nobody writes markup for one, which is the same reason `material` sits on
+the chart. */
+  outlined?: HelixBarChart["outlined"];
+  /** Which series are drawn as a wash of their colour, by name. Matched as `outlined` is. */
+  subtle?: HelixBarChart["subtle"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -1250,6 +1283,39 @@ Styled rather than headless, because what a bar is filled with is a
 treatment and this tier is where treatments live. The gradient it points at
 is drawn below, which is an element and therefore that tier's business. */
   "prop:material"?: HelixBarChart["material"];
+  /** How much ink the columns claim.
+
+The chart's treatment, which every series takes unless `outlined` or
+`subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+of the series colour with that edge on it, and absent is the filled column,
+per the rule that a reflected property takes no default.
+
+**It composes with `material` rather than competing with it.** Emphasis
+decides what is drawn and material decides how much of it comes through, so
+`glass` thins whatever emphasis put there: the fill on a solid column, the
+stroke on an outlined one. That corner was inert when the two were first
+put side by side, `glass` setting a fill opacity on a mark whose fill is
+`none`, and a combination that silently does nothing is the trap
+`--card-backdrop` was for the one commit it shipped alone. */
+  "prop:emphasis"?: HelixBarChart["emphasis"];
+  /** Which series are drawn as an outline rather than a fill, by name.
+
+Space separated and matched against the column headings the table gives,
+the way `lines` and `secondary` are, so a chart says `outlined="Forecast"`
+rather than counting columns. Names because they are what the table already
+carries and what the legend already shows.
+
+**The case this exists for is a series that is not a measurement.** A
+forecast, a target, a budget: something drawn on the same axis as the
+others and not the same kind of fact, which an outline says without a
+second legend or a note under the chart.
+
+Per series and not per bar, because a bar is a mark inside a drawing and
+nobody writes markup for one, which is the same reason `material` sits on
+the chart. */
+  "prop:outlined"?: HelixBarChart["outlined"];
+  /** Which series are drawn as a wash of their colour, by name. Matched as `outlined` is. */
+  "prop:subtle"?: HelixBarChart["subtle"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -14887,6 +14953,36 @@ export type CustomElements = {
    * Styled rather than headless, because what a bar is filled with is a
    * treatment and this tier is where treatments live. The gradient it points at
    * is drawn below, which is an element and therefore that tier's business.
+   * - `emphasis`: How much ink the columns claim.
+   *
+   * The chart's treatment, which every series takes unless `outlined` or
+   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+   * of the series colour with that edge on it, and absent is the filled column,
+   * per the rule that a reflected property takes no default.
+   *
+   * **It composes with `material` rather than competing with it.** Emphasis
+   * decides what is drawn and material decides how much of it comes through, so
+   * `glass` thins whatever emphasis put there: the fill on a solid column, the
+   * stroke on an outlined one. That corner was inert when the two were first
+   * put side by side, `glass` setting a fill opacity on a mark whose fill is
+   * `none`, and a combination that silently does nothing is the trap
+   * `--card-backdrop` was for the one commit it shipped alone.
+   * - `outlined`: Which series are drawn as an outline rather than a fill, by name.
+   *
+   * Space separated and matched against the column headings the table gives,
+   * the way `lines` and `secondary` are, so a chart says `outlined="Forecast"`
+   * rather than counting columns. Names because they are what the table already
+   * carries and what the legend already shows.
+   *
+   * **The case this exists for is a series that is not a measurement.** A
+   * forecast, a target, a budget: something drawn on the same axis as the
+   * others and not the same kind of fact, which an outline says without a
+   * second legend or a note under the chart.
+   *
+   * Per series and not per bar, because a bar is a mark inside a drawing and
+   * nobody writes markup for one, which is the same reason `material` sits on
+   * the chart.
+   * - `subtle`: Which series are drawn as a wash of their colour, by name. Matched as `outlined` is.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -14999,6 +15095,7 @@ export type CustomElements = {
    * - `--bar-chart-line-width`: Thickness of a `lines` series. (default: `undefined`)
    * - `--bar-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
+   * - `--bar-chart-bar-stroke`: Width of the edge an `outlined` or `subtle` column is drawn with. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
    * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. (default: `undefined`)
@@ -26262,6 +26359,36 @@ export type CustomElementsSolidJs = {
    * Styled rather than headless, because what a bar is filled with is a
    * treatment and this tier is where treatments live. The gradient it points at
    * is drawn below, which is an element and therefore that tier's business.
+   * - `emphasis`: How much ink the columns claim.
+   *
+   * The chart's treatment, which every series takes unless `outlined` or
+   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+   * of the series colour with that edge on it, and absent is the filled column,
+   * per the rule that a reflected property takes no default.
+   *
+   * **It composes with `material` rather than competing with it.** Emphasis
+   * decides what is drawn and material decides how much of it comes through, so
+   * `glass` thins whatever emphasis put there: the fill on a solid column, the
+   * stroke on an outlined one. That corner was inert when the two were first
+   * put side by side, `glass` setting a fill opacity on a mark whose fill is
+   * `none`, and a combination that silently does nothing is the trap
+   * `--card-backdrop` was for the one commit it shipped alone.
+   * - `outlined`: Which series are drawn as an outline rather than a fill, by name.
+   *
+   * Space separated and matched against the column headings the table gives,
+   * the way `lines` and `secondary` are, so a chart says `outlined="Forecast"`
+   * rather than counting columns. Names because they are what the table already
+   * carries and what the legend already shows.
+   *
+   * **The case this exists for is a series that is not a measurement.** A
+   * forecast, a target, a budget: something drawn on the same axis as the
+   * others and not the same kind of fact, which an outline says without a
+   * second legend or a note under the chart.
+   *
+   * Per series and not per bar, because a bar is a mark inside a drawing and
+   * nobody writes markup for one, which is the same reason `material` sits on
+   * the chart.
+   * - `subtle`: Which series are drawn as a wash of their colour, by name. Matched as `outlined` is.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -26374,6 +26501,7 @@ export type CustomElementsSolidJs = {
    * - `--bar-chart-line-width`: Thickness of a `lines` series. (default: `undefined`)
    * - `--bar-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
+   * - `--bar-chart-bar-stroke`: Width of the edge an `outlined` or `subtle` column is drawn with. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
    * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. (default: `undefined`)
@@ -37339,6 +37467,8 @@ export type CustomCssProperties = {
   "--bar-chart-gridline-color"?: string;
   /** Corner radius at the far end of a column. */
   "--bar-chart-bar-radius"?: string;
+  /** Width of the edge an `outlined` or `subtle` column is drawn with. */
+  "--bar-chart-bar-stroke"?: string;
   /** Height of the drawing. */
   "--bar-chart-block-size"?: string;
   /** Space between the drawing and its labels. */
