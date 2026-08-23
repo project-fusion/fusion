@@ -36,6 +36,7 @@ export type TokenColor = [number, number, number]
  */
 export class TokenColorController implements ReactiveController {
   /** Where a resolved color is converted, one pixel at a time. */
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: read in three places below, and this rule's own automatic fix removed it, which failed `typecheck` immediately. The suppression has to sit under the doc comment rather than over it, being directional.
   private context: CanvasRenderingContext2D | null = null
 
   /** Watches the document for `data-color-mode`. */
