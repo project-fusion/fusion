@@ -9,7 +9,7 @@
 use crate::derive::Cast;
 use crate::intent::{
     to_oklch, Chroma, Color, Font, From, Material, Motion, Neutral, PairingRequest, Relation,
-    Scheme, Seed, Separation, Status, ThemeIntent,
+    Scheme, Seed, Separation, Status, StatusSeed, ThemeIntent, STATUS_NAMES,
 };
 use crate::model::{Contrast, INKS};
 use crate::oklch::Oklch;
@@ -249,6 +249,37 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
             return Err(range("chroma.scale", "must not be negative"));
         }
     }
+    /* **A pinned status that cannot be read is refused here rather than ignored
+    later.** The TypeScript carried the `NaN` triple into the palette; the port
+    would have fallen through and derived the status instead, which is quieter
+    and no better: a consumer who pinned a colour and got a computed one back was
+    never told. The brand is validated for the same reason two dozen lines up. */
+    for name in STATUS_NAMES {
+        if let Some(StatusSeed::Color(color)) = resolved.status.seed(name) {
+            if to_oklch(color).is_none() {
+                return Err(IntentError::Unreadable {
+                    label: format!("status.{name}"),
+                    value: format!("{color:?}"),
+                });
+            }
+        }
+    }
+
+    /* And a pinned accent, for the same reason and by the same reading: the
+    TypeScript carries the `NaN` triple, `violations` compares against it and
+    every comparison is false, so the theme reports clean. Three seeds can be
+    handed a colour and all three are checked here, which is what makes the
+    `expect` in each phase downstream a statement about this function rather
+    than an assumption about its caller. */
+    if let Seed::Color(color) = &resolved.accent {
+        if to_oklch(color).is_none() {
+            return Err(IntentError::Unreadable {
+                label: "accent".to_owned(),
+                value: format!("{color:?}"),
+            });
+        }
+    }
+
     if let Some(allowance) = resolved.status.allowance {
         finite("status.allowance", allowance)?;
         if !(0.0..=180.0).contains(&allowance) {

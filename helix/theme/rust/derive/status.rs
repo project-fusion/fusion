@@ -125,15 +125,14 @@ pub fn statuses(
         /* A colour pins the status outright; a hue nudges it within the meaning
         it already carries. */
         if let Some(StatusSeed::Color(color)) = intent.seed(name) {
-            if let Some(pinned) = to_oklch(color) {
-                settled.push(pinned);
-                resolved.push(StatusColor {
-                    color: pinned,
-                    name,
-                    pinned: true,
-                });
-                continue;
-            }
+            let pinned = to_oklch(color).expect("resolve refused an unreadable pinned status");
+            settled.push(pinned);
+            resolved.push(StatusColor {
+                color: pinned,
+                name,
+                pinned: true,
+            });
+            continue;
         }
 
         let (default_hue, own_chroma) = status_seed(name).expect("a declared status has a seed");

@@ -27,12 +27,16 @@
 //! reader tells a decision from a computation by, and the two things the audit
 //! turns on. The phases follow.
 
+pub mod accent;
 pub mod emphasis;
+pub mod fills;
 pub mod inks;
+pub mod marks;
 pub mod resolve;
 pub mod solve;
 pub mod status;
 pub mod surfaces;
+pub mod tokens;
 
 use crate::oklch::{fit_to_gamut, oklch_to_hex, shipped_contrast_ratio, Oklch};
 

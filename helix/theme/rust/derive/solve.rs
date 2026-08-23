@@ -28,6 +28,14 @@ use crate::oklch::{
 /// on every ground the model gives it, so the ground it does worst on is the one
 /// that decides whether it works.
 ///
+/// **Grounds arrive fitted.** Both the candidate search and the worst-case
+/// measurement use them as given, so a caller passing raw ones solves against a
+/// colour that cannot be rendered and then measures against the same
+/// unrenderable colour: self-consistent, and wrong by however far the fit moves.
+/// `solve_for_all` satisfies this by construction, `Surfaces::solved_against`
+/// returning fitted values, which is why it went unstated until `on_accent`
+/// arrived with a ground list of its own.
+///
 /// # Panics
 ///
 /// If handed no grounds. The TypeScript's `reduce` throws on an empty array for

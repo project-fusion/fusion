@@ -122,6 +122,23 @@ const INTENTS = [
      adding this: pull 0.525 against a floor of 0.55, danger chroma 0.0058. */
   { intent: { brand: '#3b82f6', chroma: { scale: 0.05 } }, label: 'quiet' },
   { intent: { brand: '#3b82f6', neutral: { chroma: 0.01, hue: 250 } }, label: 'cast' },
+  /* Pinned tokens, which are the only phase whose *position* in the list is a
+     decision rather than a consequence: `color-primary` replaces an entry the
+     assembly already emitted and keeps its place, `color-house-teal` is one the
+     assembly never emits and lands at the end. Both halves are exercised here
+     because a port that appends unconditionally passes on either alone. */
+  {
+    intent: {
+      brand: '#3b82f6',
+      tokens: { 'color-house-teal': '#0f766e', 'color-primary': '#7c3aed' },
+    },
+    label: 'pinned',
+  },
+  /* A brand no page surface can hold at its own lightness, which is the only
+     input that makes the brand mark walk at all. Every other theme's brand
+     clears 3:1 where it stands, so step 0 answers and the search's direction
+     never shows in an output. */
+  { intent: { brand: '#fef08a' }, label: 'pale' },
 ]
 
 const oracle = {

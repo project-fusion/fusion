@@ -47,16 +47,19 @@
 
 use serde_json::Value;
 
+use crate::derive::accent::{seeded, settle};
 use crate::derive::emphasis::emphasis;
 use crate::derive::inks::neutral_inks;
+use crate::derive::marks::walk_outward;
 use crate::derive::resolve::{brand_and_neutral, default_pairings, resolve, Policy};
 use crate::derive::solve::solve_against;
 use crate::derive::status::{repair_hue, statuses};
 use crate::derive::surfaces::{ladder, surfaces};
+use crate::derive::tokens::derive_tokens;
 use crate::derive::{perceptual_distance, token, Cast, DerivedToken, Deriving, Origin};
 use crate::intent::{
     is_relation, status_seed, to_oklch, Chroma, Color, From, Mechanism, Relation, Scheme, Seed,
-    Separation, Status, ThemeIntent, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
+    Separation, Status, StatusSeed, ThemeIntent, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
 };
 use crate::model::{GROUNDS, INKS};
 use crate::oklch::{
@@ -557,6 +560,31 @@ fn hypot_is_exact_when_it_is_given_the_same_three_numbers() {
 }
 
 /// Looks up one token of one theme by name.
+/// The themes whose token list is a pure derivation.
+///
+/// **A per-phase test looks its token up by name, and a pinned token is the one
+/// case where that name does not hold what the phase computed.** The `pinned`
+/// theme overrides `color-primary` outright, so the primary test read a colour
+/// the primary phase never produced and reported the phase as broken. Filtering
+/// here rather than special-casing in five tests, because the property is about
+/// the theme rather than about any one phase.
+///
+/// [`every_token_of_every_theme_matches`] deliberately does not filter: the
+/// override is exactly what it is there to check.
+fn derived_themes(data: &Value) -> Vec<&Value> {
+    data["themes"]
+        .as_array()
+        .expect("themes is an array")
+        .iter()
+        .filter(|theme| {
+            let label = theme["label"].as_str().expect("label");
+            intent_for(label)
+                .tokens
+                .is_none_or(|pinned| pinned.is_empty())
+        })
+        .collect()
+}
+
 fn token_of<'a>(theme: &'a Value, name: &str) -> &'a Value {
     theme["tokens"]
         .as_array()
@@ -754,6 +782,23 @@ fn an_intent_that_would_pass_every_check_by_accident_is_refused() {
             },
         ),
         (
+            "an unreadable pinned status, which the TypeScript derived instead",
+            ThemeIntent {
+                status: Some(Status {
+                    danger: Some(StatusSeed::Color(Color::Hex("nonsense".to_owned()))),
+                    ..Status::default()
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "an unreadable pinned accent",
+            ThemeIntent {
+                accent: Some(Seed::Color(Color::Hex("nonsense".to_owned()))),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
             "an allowance past half the circle",
             ThemeIntent {
                 status: Some(Status {
@@ -825,6 +870,16 @@ fn intent_for(label: &str) -> ThemeIntent {
                 hue: Some(250.0),
             });
         }
+        "pinned" => {
+            intent.tokens = Some(vec![
+                (
+                    "color-house-teal".to_owned(),
+                    Color::Hex("#0f766e".to_owned()),
+                ),
+                ("color-primary".to_owned(), Color::Hex("#7c3aed".to_owned())),
+            ]);
+        }
+        "pale" => intent.brand = Color::Hex("#fef08a".to_owned()),
         other => panic!("no intent is recorded for `{other}`"),
     }
     intent
@@ -840,7 +895,7 @@ fn intent_for(label: &str) -> ThemeIntent {
 #[test]
 fn the_neutral_inks_land_where_the_typescript_lands() {
     let data = oracle();
-    for theme in data["themes"].as_array().expect("themes is an array") {
+    for theme in derived_themes(&data) {
         let label = theme["label"].as_str().expect("label");
         let intent = intent_for(label);
         let resolved = resolve(&intent).expect("the oracle's intents all resolve");
@@ -993,7 +1048,7 @@ fn deriving_for(label: &str) -> (crate::derive::resolve::Resolved, Deriving, Okl
 #[test]
 fn the_primary_role_lands_where_the_typescript_lands() {
     let data = oracle();
-    for theme in data["themes"].as_array().expect("themes is an array") {
+    for theme in derived_themes(&data) {
         let label = theme["label"].as_str().expect("label");
         let (_resolved, ctx, brand) = deriving_for(label);
         let primary = emphasis(brand, &ctx);
@@ -1034,7 +1089,7 @@ fn the_primary_role_lands_where_the_typescript_lands() {
 #[test]
 fn the_statuses_land_where_the_typescript_lands() {
     let data = oracle();
-    for theme in data["themes"].as_array().expect("themes is an array") {
+    for theme in derived_themes(&data) {
         let label = theme["label"].as_str().expect("label");
         let (resolved, ctx, brand) = deriving_for(label);
         let primary = emphasis(brand, &ctx);
@@ -1101,5 +1156,145 @@ fn the_hue_repair_widens_outward_and_gives_up_rather_than_settling() {
     assert_eq!(
         repair_hue(75.0, 0.0, |_| false).to_bits(),
         75.0_f64.to_bits()
+    );
+}
+
+/// The accent, which settles after the statuses and reports `related` unless the
+/// consumer pinned a colour.
+///
+/// The default intent is the complement, `rotate: 180`, and on the shipped blue
+/// that lands at 80 degrees against an amber `warning` at 75. This is the phase
+/// that was reported as an unrepairable collision on every derivation before the
+/// accent was made the role that yields.
+#[test]
+fn the_accent_lands_where_the_typescript_lands() {
+    let data = oracle();
+    for theme in derived_themes(&data) {
+        let label = theme["label"].as_str().expect("label");
+        let (resolved, ctx, brand) = deriving_for(label);
+        let raw_brand = to_oklch(&resolved.brand).expect("a resolved brand reads");
+        let primary = emphasis(brand, &ctx);
+        let statuses_resolved = statuses(&resolved.status, brand.chroma, primary.raw, &ctx);
+
+        let (accent, pinned) = seeded(&resolved.accent, raw_brand, Policy::new(resolved.chroma));
+        let bound = match &resolved.accent {
+            Seed::Relation(relation) => relation.allowance.unwrap_or(45.0),
+            Seed::Color(_) => 0.0,
+        };
+        let settled = settle(accent, pinned, bound, primary.raw, &statuses_resolved, &ctx);
+        let steps = emphasis(settled, &ctx);
+        let origin = if pinned {
+            Origin::Pinned
+        } else {
+            Origin::Related
+        };
+
+        assert_token(
+            &token(
+                "color-accent",
+                steps.raw,
+                origin,
+                Some(ctx.surfaces.raw_background),
+            ),
+            token_of(theme, "color-accent"),
+            &format!("{label}/color-accent"),
+        );
+        for (name, raw) in [
+            ("color-accent-hover", steps.hover),
+            ("color-accent-active", steps.active),
+            ("color-accent-subtle", steps.subtle),
+            ("color-accent-surface", steps.filled),
+        ] {
+            assert_token(
+                &token(name, raw, origin, None),
+                token_of(theme, name),
+                &format!("{label}/{name}"),
+            );
+        }
+    }
+}
+
+/// **Every token of every theme, in order, by name.**
+///
+/// This is the assertion the per-phase tests above were building toward, and it
+/// subsumes most of them: a phase that derives the right colour and files it
+/// under the wrong name, or emits it in the wrong position, or does not emit it
+/// at all, is invisible to a test that looks its own token up by name. Three of
+/// those four failures produce a theme that still looks derived.
+///
+/// The count is asserted first and separately, because a length mismatch read
+/// through a zipped comparison reports whichever pair happens to diverge first
+/// and says nothing about the token that went missing.
+#[test]
+fn every_token_of_every_theme_matches() {
+    let data = oracle();
+    for theme in data["themes"].as_array().expect("themes is an array") {
+        let label = theme["label"].as_str().expect("label");
+        let resolved = resolve(&intent_for(label)).expect("the oracle's intents all resolve");
+        let ours = derive_tokens(&resolved).tokens;
+        let theirs = theme["tokens"].as_array().expect("tokens is an array");
+
+        assert_eq!(
+            ours.len(),
+            theirs.len(),
+            "{label} emits a different number of tokens: ours {:?}, theirs {:?}",
+            ours.iter().map(|t| t.name.as_str()).collect::<Vec<_>>(),
+            theirs
+                .iter()
+                .map(|t| t["name"].as_str().expect("name"))
+                .collect::<Vec<_>>(),
+        );
+
+        for (index, (ours, theirs)) in ours.iter().zip(theirs).enumerate() {
+            let name = theirs["name"].as_str().expect("name");
+            assert_eq!(
+                ours.name, name,
+                "{label} token {index} is named differently"
+            );
+            assert_token(ours, theirs, &format!("{label}/{name}"));
+        }
+    }
+}
+
+/// **The brand mark walks down before up, which no theme's output can show.**
+///
+/// The direction only decides an answer when both neighbours clear at the same
+/// step, and for every brand in the oracle either the mark does not move at all
+/// or exactly one side clears first. Reversing the two entries left all thirteen
+/// themes byte-identical: measured by making that edit and watching the suite
+/// stay green.
+///
+/// So it is asserted as a rule, the way `repair_hue`'s own order is, and against
+/// a synthetic predicate rather than real contrast. Real contrast cannot produce
+/// the tie: against a mid grey the lighter side clears a full step earlier, so
+/// the walk returns before both sides are ever true at once. The first attempt
+/// at this test tried it anyway and failed, which is the finding rather than the
+/// obstacle.
+#[test]
+fn the_brand_mark_prefers_the_darker_side_of_a_tie() {
+    /* Both neighbours of the fifth step clear and nothing nearer does, so the
+    two entries in the walk are the only thing deciding the answer. */
+    let tie = |lightness: f64| (lightness - 0.5).abs() >= 0.05 - 1e-9;
+    assert!(
+        (walk_outward(0.5, tie) - 0.45).abs() < 1e-12,
+        "the walk took the lighter side of a tie"
+    );
+
+    /* And a lightness with no room below still walks the side that has room. */
+    let only_light = |lightness: f64| lightness >= 0.5;
+    assert!(
+        (walk_outward(0.02, only_light) - 0.5).abs() < 1e-12,
+        "the walk did not reach the one side with room"
+    );
+
+    /* **Out of range is skipped, not clamped**, which is a claim about the
+    answer rather than about the work. 0.015 is off the hundredths grid, so pure
+    black is not a step this walk can reach; clamping would fold the first
+    negative step onto it and return a lightness the caller never asked for. The
+    honest answer is that nothing cleared. */
+    let only_black = |lightness: f64| lightness == 0.0;
+    assert!(
+        (walk_outward(0.015, only_black) - 0.015).abs() < 1e-12,
+        "the walk clamped an out-of-range step onto black"
     );
 }
