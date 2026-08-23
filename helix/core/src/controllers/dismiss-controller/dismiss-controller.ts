@@ -64,6 +64,17 @@ export interface DismissOptions {
  * cannot see. Leaving the browser altogether blurs the window too, so what took
  * focus is the part that distinguishes them.
  */
+/**
+ * Every overlay currently listening, so one press can be settled by asking.
+ *
+ * Module-level because that is the scope the question has: "which open overlay
+ * is innermost" is about the page, and no single controller can answer it from
+ * what it holds. Membership is exactly `activate`/`deactivate`, and
+ * `hostDisconnected` calls the second, so an overlay torn down rather than
+ * closed leaves too.
+ */
+const listening = new Set<DismissController>()
+
 export class DismissController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
   private readonly boundary:
@@ -83,25 +94,42 @@ export class DismissController implements ReactiveController {
     if (event.key !== 'Escape') {
       return
     }
-    /* One overlay per press, and `stopPropagation` cannot arrange that.
+    /* One overlay per press, decided by asking all of them rather than by
+     * comparing against whoever ran before.
      *
-     * Every open overlay registers this same listener on `document`, so one
-     * Escape ran all of them: `stopPropagation` stops an event travelling to
-     * *ancestors*, and these are siblings on one node, where the only ordering
-     * is registration. The comment here claimed the innermost was the one the
-     * reader meant and the code closed the lot.
+     * `stopPropagation` cannot arrange this: every open overlay registers this
+     * same listener on `document`, so they are siblings on one node where the
+     * only ordering is registration, and propagation is about ancestors.
      *
-     * A marker on the event is what siblings can agree on, and it carries the
-     * depth rather than a bare flag: `document` listeners run in registration
-     * order, which is the order the overlays *opened*, and that is not the order
-     * they are nested in. The deepest host wins, whenever it happens to run. */
-    const taken = event as KeyboardEvent & { helixDismissDepth?: number }
-    const depth = deepDepth(this.host)
-    if (taken.helixDismissDepth !== undefined && taken.helixDismissDepth >= depth) {
+     * Carrying the winning depth on the event does not arrange it either, which
+     * is the version this replaced. A handler that runs before any deeper one
+     * has no way to know a deeper one exists, so it dismisses and only then
+     * loses the comparison. Registration order is the order the overlays
+     * *opened*, and opening the outer one first is the ordinary case: a dialog,
+     * then a select inside it. Measured, that closed both.
+     *
+     * So the first handler to see the press takes it for everybody, and picks
+     * the winner from every controller currently listening, which is a question
+     * that has one answer whenever it is asked. */
+    const taken = event as KeyboardEvent & { helixDismissTaken?: true }
+    if (taken.helixDismissTaken) {
       return
     }
-    taken.helixDismissDepth = depth
-    this.onDismiss()
+    taken.helixDismissTaken = true
+
+    /* Ties go to whoever asked, which is the first to run. Two overlays neither
+       of which is inside the other have no better answer available, and exactly
+       one closing is the point. */
+    let deepest: DismissController = this
+    let found = deepDepth(this.host)
+    for (const other of listening) {
+      const depth = deepDepth(other.host)
+      if (depth > found) {
+        found = depth
+        deepest = other
+      }
+    }
+    deepest.onDismiss()
   }
 
   /**
@@ -146,6 +174,7 @@ export class DismissController implements ReactiveController {
       return
     }
     this.active = true
+    listening.add(this)
     document.addEventListener('keydown', this.handleKeydown)
     document.addEventListener('pointerdown', this.handlePointerDown)
     window.addEventListener('blur', this.handleWindowBlur)
@@ -157,6 +186,7 @@ export class DismissController implements ReactiveController {
       return
     }
     this.active = false
+    listening.delete(this)
     document.removeEventListener('keydown', this.handleKeydown)
     document.removeEventListener('pointerdown', this.handlePointerDown)
     window.removeEventListener('blur', this.handleWindowBlur)
