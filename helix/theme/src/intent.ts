@@ -197,10 +197,17 @@ export interface ThemeIntent {
    * multiplies on top for a theme that wants the character and not the pace.
    *
    * `instant` is not scaled. It is 0 and means "do not animate", which is a
-   * statement rather than a duration.
+   * statement rather than a duration, and it emits no curves at all: three
+   * easings for transitions of zero length is a contradiction the type used to
+   * allow through `scale: 0`.
+   *
+   * `precise` is the one character that is not physical. The other three
+   * accelerate, settle or overshoot; linear reads as moved by a mechanism, and
+   * it is the only curve legible on a short travel, because constancy shows in
+   * the timing where an overshoot shows in the distance.
    */
   motion?: {
-    character?: 'gentle' | 'snappy' | 'springy'
+    character?: 'gentle' | 'instant' | 'precise' | 'snappy' | 'springy'
     scale?: number
   }
   /**

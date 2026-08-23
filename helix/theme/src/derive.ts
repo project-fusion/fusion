@@ -914,6 +914,26 @@ const MOTION = {
     pace: 1.35,
     standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
   },
+  /* **Not a pace and not a curve: the absence of both.** Reachable before this
+     as `scale: 0`, which is a trick rather than a decision and which paired
+     incoherently with a character, emitting three curves for transitions of zero
+     length. Named, it is a statement a theme can make, and the emission below
+     refuses to write curves nothing will run. */
+  instant: { pace: 0 },
+  /* **Constant speed, which is the one thing the other characters cannot be.**
+     `gentle`, `snappy` and `springy` are three ways of being physical: they
+     accelerate, settle, or overshoot. Linear reads as instrument-driven instead,
+     a thing moved by a mechanism rather than thrown. It is also the only curve
+     character legible on a short travel, because constancy shows in the timing
+     where an overshoot shows in the distance: measured this session, a spring is
+     one pixel past the finish on a dialog's rise and twelve on a drawer's
+     slide. */
+  precise: {
+    decelerate: 'linear',
+    emphasized: 'linear',
+    pace: 0.85,
+    standard: 'linear',
+  },
   snappy: {
     decelerate: 'cubic-bezier(0, 0, 0.1, 1)',
     emphasized: 'cubic-bezier(0.2, 0, 0, 1.2)',
@@ -1056,20 +1076,24 @@ export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
      leaves the stylesheet's own pace and curves standing. */
   const { character, scale: pace } = theme.intent.motion
   if (character || pace !== undefined) {
-    const multiplier = (character ? MOTION[character].pace : 1) * (pace ?? 1)
+    /* `instant` is 0 whatever the scale says, which is what makes it a statement
+       rather than a very small duration. */
+    const multiplier =
+      character === 'instant' ? 0 : (character ? MOTION[character].pace : 1) * (pace ?? 1)
     for (const [step, ms] of Object.entries(DURATIONS)) {
       lines.push(`  --${namespace}-duration-${step}: ${Math.round(ms * multiplier)}ms;`)
     }
   }
-  if (character) {
+  if (character && character !== 'instant') {
     /* The spring is a token rather than a literal, so it has to be written under
        whatever namespace this theme is emitting. It was `var(--helix-easing-...)`
        hardcoded, which is correct for exactly one namespace and silently dead for
        any other, which is the gap `namespace` as an input exists to close. */
     const curve = (value: string): string =>
       value === SPRING ? `var(--${namespace}-easing-spring)` : value
+    const curves = MOTION[character]
     for (const role of ['standard', 'emphasized', 'decelerate'] as const) {
-      lines.push(`  --${namespace}-easing-${role}: ${curve(MOTION[character][role])};`)
+      lines.push(`  --${namespace}-easing-${role}: ${curve(curves[role])};`)
     }
   }
 

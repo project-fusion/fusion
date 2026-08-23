@@ -91,6 +91,8 @@ const MONO_FACES: Face[] = [
 const stack = (family: string, fallback: string): string =>
   family ? `"${family}", ${fallback}` : ''
 
+type Character = '' | 'gentle' | 'instant' | 'precise' | 'snappy' | 'springy'
+
 type Mechanism = 'border' | 'fill' | 'shadow' | 'space'
 
 export function ThemeBuilder({ findable }: { findable: Findable[] }) {
@@ -108,7 +110,7 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
   const [bodyFace, setBodyFace] = useState('')
   const [displayFace, setDisplayFace] = useState('')
   const [monoFace, setMonoFace] = useState('')
-  const [motion, setMotion] = useState<'' | 'gentle' | 'snappy' | 'springy'>('')
+  const [motion, setMotion] = useState<Character>('')
   const [textBase, setTextBase] = useState(14)
   const [textScale, setTextScale] = useState(132)
   const [surface, setSurface] = useState<Mechanism>('border')
@@ -578,18 +580,24 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
             {/* **Character rather than a duration**, because the pace and the
               curve are one decision: a spring over 120ms is a twitch and a soft
               curve over 120ms is a fade. Leaving it alone emits neither, so the
-              stylesheet's own pace stands. */}
+              stylesheet's own pace stands.
+
+              `precise` is the one that is not physical: the other three
+              accelerate, settle or overshoot, where linear reads as moved by a
+              mechanism. `instant` is neither a pace nor a curve but the absence
+              of both, and it emits no easings at all, three curves for
+              transitions of zero length being a contradiction. */}
             <helix-toggle-group
               label="Motion"
-              onhelix-change={(event) =>
-                setMotion(event.detail.value as '' | 'gentle' | 'snappy' | 'springy')
-              }
+              onhelix-change={(event) => setMotion(event.detail.value as Character)}
               value={motion}
             >
               <helix-toggle value="">Default</helix-toggle>
               <helix-toggle value="snappy">Snappy</helix-toggle>
               <helix-toggle value="gentle">Gentle</helix-toggle>
               <helix-toggle value="springy">Springy</helix-toggle>
+              <helix-toggle value="precise">Precise</helix-toggle>
+              <helix-toggle value="instant">Instant</helix-toggle>
             </helix-toggle-group>
 
             {/* Two policies rather than one, because the two kinds of surface are

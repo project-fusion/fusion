@@ -641,6 +641,29 @@ describe('the separation policy', () => {
     )
   })
 
+  /* Not a very small duration but the absence of one, so a scale cannot bring it
+     back and no curve is written for a transition that will not run. Reachable
+     before as `scale: 0`, which paired with a character emitted three easings
+     for nothing to ease. */
+  test('instant is zero whatever the scale says, and emits no curves', () => {
+    const css = toCss(deriveTheme({ brand: BRAND, motion: { character: 'instant', scale: 3 } }))
+    expect(css).toContain('--helix-duration-fast: 0ms;')
+    expect(css).toContain('--helix-duration-slow: 0ms;')
+    expect(css).not.toContain('--helix-easing-')
+  })
+
+  /* The other three characters accelerate, settle or overshoot. This one is the
+     only way to ask for motion that does none of those, which is also the only
+     curve legible over a short travel: constancy shows in the timing where an
+     overshoot shows in the distance. */
+  test('precise is linear on every curve it sets', () => {
+    const css = toCss(deriveTheme({ brand: BRAND, motion: { character: 'precise' } }))
+    for (const role of ['standard', 'emphasized', 'decelerate']) {
+      expect(css).toContain(`--helix-easing-${role}: linear;`)
+    }
+    expect(css).toContain('--helix-duration-fast: 102ms;')
+  })
+
   test('a scale multiplies on top of the character', () => {
     const css = toCss(deriveTheme({ brand: BRAND, motion: { character: 'snappy', scale: 2 } }))
     expect(css).toContain('--helix-duration-fast: 168ms;')
