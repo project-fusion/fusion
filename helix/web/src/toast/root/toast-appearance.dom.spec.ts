@@ -4,6 +4,13 @@ import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  /* And Button, which one of these slots into `actions` and measures against
+     the dismiss. A spec that mounts another family has to import it for the
+     same reason a component does: the sandbox and the docs site pull the whole
+     barrel, so an unregistered element is invisible everywhere except here.
+     Unimported it is an unknown inline element, and the height that comes back
+     is the line box, 20px against the 32 this asserts. */
+  await import('../../button/index.js')
 })
 
 type Item = HTMLElement & {

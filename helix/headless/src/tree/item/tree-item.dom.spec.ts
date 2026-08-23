@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
+import { mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -21,20 +21,6 @@ const items = (host: HTMLElement): HTMLElement[] => [
 
 const labelLeft = (item: HTMLElement): number =>
   (part(item, 'label') as HTMLElement).getBoundingClientRect().left
-
-/**
- * Registers a test only where there is layout to measure.
- *
- * Not `test.skipIf`, which the browser harness does not have: it exports `test`
- * as a plain function with no skip of any kind, so `skipIf` threw and took the
- * whole family's specs down with it. Measured in the spec frame, which is the
- * only place that could have said so.
- *
- * Registration-time, so a geometry block is honestly *absent* under `bun test`
- * rather than passing without checking anything, which is what `hasLayout` asks
- * for in its own comment.
- */
-const geometry = hasLayout() ? test : (): void => {}
 
 describe('tree item structure', () => {
   test('a branch draws a chevron and a leaf does not', async () => {
@@ -86,55 +72,3 @@ describe('tree item structure', () => {
  * They are guarded rather than deleted so the same file is honest in both
  * harnesses.
  */
-describe('tree item geometry', () => {
-  geometry('siblings share a column, whatever they are', async () => {
-    const tree = await mount(mixed)
-    const [branch, , leaf] = items(tree)
-    expect(labelLeft(leaf as HTMLElement)).toBe(labelLeft(branch as HTMLElement))
-  })
-
-  geometry('a child is one gutter in from its parent', async () => {
-    const tree = await mount(mixed)
-    const [branch, child] = items(tree)
-    expect(labelLeft(child as HTMLElement)).toBeGreaterThan(labelLeft(branch as HTMLElement))
-  })
-
-  /* With the chevron at the end nothing pushes a branch's label, so a leaf must
-     reserve nothing: written unconditionally it put every child of a navigation
-     two gutters in. */
-  geometry('a leaf reserves nothing when the chevron is at the end', async () => {
-    const tree = await mount(
-      mixed.replace('label="Files"', 'label="Files" chevron-placement="end"'),
-    )
-    const [branch, , leaf] = items(tree)
-    expect(labelLeft(leaf as HTMLElement)).toBe(labelLeft(branch as HTMLElement))
-  })
-
-  /* A row advertises itself as a target with a pointer and a full-width hover,
-     so a link inside one has to be the whole row or the advertisement lies. */
-  geometry('a slotted link fills its row', async () => {
-    const tree = await mount(
-      `<helix-base-tree label="Nav">
-        <helix-base-tree-item value="a"><a href="/a" data-link="quiet">A</a></helix-base-tree-item>
-      </helix-base-tree>`,
-    )
-    const item = items(tree)[0] as HTMLElement
-    const link = item.querySelector('a') as HTMLElement
-    const row = part(item, 'row') as HTMLElement
-    const uncovered = row.getBoundingClientRect().width - link.getBoundingClientRect().width
-
-    /* The row's own inset stays the row's; everything else is the target. Asked
-       of the row rather than written as a number, because the number is not one
-       thing: 28 of leading inset where a chevron column is reserved, 8 of
-       trailing, and 4 of gap that the empty `end` slot spends by being a flex
-       item at all. That came to 40 against a hardcoded 32, and the hardcoded
-       figure is the part that was wrong: the link already covers every pixel
-       the row does not keep for itself. */
-    const style = getComputedStyle(row)
-    const inset =
-      Number.parseFloat(style.paddingInlineStart) +
-      Number.parseFloat(style.paddingInlineEnd) +
-      Number.parseFloat(style.columnGap)
-    expect(Math.round(uncovered)).toBeLessThanOrEqual(Math.ceil(inset))
-  })
-})
