@@ -1,0 +1,152 @@
+{
+  "bun": "1.1.43",
+  "measured": "2026-08-23",
+  "systems": [
+    {
+      "name": "Carbon",
+      "note": "Its dialog is called Modal.",
+      "package": "@carbon/web-components",
+      "parts": {
+        "button": {
+          "brotli": 17685,
+          "gzip": 20959,
+          "raw": 133058,
+          "specifier": "@carbon/web-components/es/components/button/index.js"
+        },
+        "checkbox": {
+          "brotli": 13550,
+          "gzip": 15609,
+          "raw": 60255,
+          "specifier": "@carbon/web-components/es/components/checkbox/index.js"
+        },
+        "dialog": {
+          "brotli": 39189,
+          "gzip": 67390,
+          "raw": 510866,
+          "specifier": "@carbon/web-components/es/components/modal/index.js"
+        },
+        "tabs": {
+          "brotli": 43235,
+          "gzip": 73537,
+          "raw": 578766,
+          "specifier": "@carbon/web-components/es/components/tabs/index.js"
+        },
+        "tooltip": {
+          "brotli": 22273,
+          "gzip": 30354,
+          "raw": 189382,
+          "specifier": "@carbon/web-components/es/components/tooltip/index.js"
+        }
+      },
+      "version": "2.61.0"
+    },
+    {
+      "name": "Material Web",
+      "note": "Ships no tooltip. Its button is measured as the filled one, there being no single button element.",
+      "package": "@material/web",
+      "parts": {
+        "button": {
+          "brotli": 12591,
+          "gzip": 14173,
+          "raw": 47060,
+          "specifier": "@material/web/button/filled-button.js"
+        },
+        "checkbox": {
+          "brotli": 12015,
+          "gzip": 13556,
+          "raw": 43785,
+          "specifier": "@material/web/checkbox/checkbox.js"
+        },
+        "dialog": {
+          "brotli": 10229,
+          "gzip": 11510,
+          "raw": 34238,
+          "specifier": "@material/web/dialog/dialog.js"
+        },
+        "tabs": {
+          "brotli": 11368,
+          "gzip": 12820,
+          "raw": 38883,
+          "specifier": "@material/web/tabs/tabs.js"
+        }
+      },
+      "version": "2.5.0"
+    },
+    {
+      "name": "Shoelace",
+      "note": "Its tabs element is Tab Group.",
+      "package": "@shoelace-style/shoelace",
+      "parts": {
+        "button": {
+          "brotli": 15805,
+          "gzip": 18287,
+          "raw": 62628,
+          "specifier": "@shoelace-style/shoelace/dist/components/button/button.js"
+        },
+        "checkbox": {
+          "brotli": 13301,
+          "gzip": 15177,
+          "raw": 47614,
+          "specifier": "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js"
+        },
+        "dialog": {
+          "brotli": 15554,
+          "gzip": 17698,
+          "raw": 52754,
+          "specifier": "@shoelace-style/shoelace/dist/components/dialog/dialog.js"
+        },
+        "tabs": {
+          "brotli": 15068,
+          "gzip": 17140,
+          "raw": 54573,
+          "specifier": "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js"
+        },
+        "tooltip": {
+          "brotli": 17933,
+          "gzip": 20220,
+          "raw": 57412,
+          "specifier": "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js"
+        }
+      },
+      "version": "2.20.1"
+    },
+    {
+      "name": "Spectrum",
+      "note": "One package per component, so there is no barrel to import by accident.",
+      "package": "@spectrum-web-components/button",
+      "parts": {
+        "button": {
+          "brotli": 18674,
+          "gzip": 22045,
+          "raw": 98792,
+          "specifier": "@spectrum-web-components/button/sp-button.js"
+        },
+        "checkbox": {
+          "brotli": 13481,
+          "gzip": 15437,
+          "raw": 62492,
+          "specifier": "@spectrum-web-components/checkbox/sp-checkbox.js"
+        },
+        "dialog": {
+          "brotli": 26262,
+          "gzip": 31899,
+          "raw": 155708,
+          "specifier": "@spectrum-web-components/dialog/sp-dialog.js"
+        },
+        "tabs": {
+          "brotli": 16283,
+          "gzip": 18298,
+          "raw": 64875,
+          "specifier": "@spectrum-web-components/tabs/sp-tabs.js"
+        },
+        "tooltip": {
+          "brotli": 35286,
+          "gzip": 40552,
+          "raw": 136599,
+          "specifier": "@spectrum-web-components/tooltip/sp-tooltip.js"
+        }
+      },
+      "version": "1.12.2"
+    }
+  ]
+}

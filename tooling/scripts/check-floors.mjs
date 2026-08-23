@@ -38,10 +38,23 @@ const checks = Object.keys(scripts)
      and `check:node`, which asserts one fact about the runtime and has no corpus
      at all. That last one is exempt twice over: its success line carries a
      version, and `22.22.0` reads as a count of zero to the rule below, which is
-     the one shape of number that is never a tally. */
+     the one shape of number that is never a tally.
+
+     `check:metrics` is the third of the generated-file comparisons and is
+     exempt with them, even though its line does carry a real tally. What
+     guards a generator is that its output is committed and read, the same
+     defence `check:reference` and `check:tokens-reference` have; running it
+     here would measure every family a second time for fifteen seconds and
+     learn nothing the first run did not. */
   .filter(
     (name) =>
-      !['check:floors', 'check:node', 'check:reference', 'check:tokens-reference'].includes(name),
+      ![
+        'check:floors',
+        'check:metrics',
+        'check:node',
+        'check:reference',
+        'check:tokens-reference',
+      ].includes(name),
   )
 
 const problems = []
