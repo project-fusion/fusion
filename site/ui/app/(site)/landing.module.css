@@ -89,7 +89,19 @@
    *
    * The height goes back to a whole viewport, because the band now spans the
    * strip it was subtracting. */
-  margin-block-start: calc(-1 * var(--helix-size-header));
+  /* The header's height *plus* the hairline under it, which this was missing.
+   *
+   * `--helix-size-header` is the bar's own 56, and `AppHeader` draws a
+   * `border-block-end` under that, so the thing occupying the top of the window
+   * is 57 while the sheet that paints it is 56. Pulled up by 56 the hero
+   * started one pixel late, and that row was painted by neither: the body
+   * showed through as a white line across the top of the window, clearest at
+   * the moment of a navigation because that is when the eye is on the header.
+   *
+   * `.pageHero` in `browser.module.css` has always added the hairline and this
+   * comment already claimed to be "the same construction" as it, which it was
+   * not. It is now. */
+  margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
   min-block-size: 100svh;
   /* `max`, not a sum. Added together the band ran twelve pixels past the
      viewport and broke the one-band-one-screen rhythm the rest of the page
