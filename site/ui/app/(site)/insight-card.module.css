@@ -1,0 +1,68 @@
+/* The card, beside the component that renders it.
+ *
+ * `.insightPhoto` comes with it even though the element is created in
+ * `lib/insight-art.tsx`, because that component only ever appears inside this
+ * one: the picture is part of the card rather than a thing of its own.
+ */
+
+/* The same pair the gallery's cards need, for the same reason.
+ *
+ * The anchor stretches because `helix-grid` stretches its items, and the card
+ * then has to be told to fill the anchor, because a card sizes to its content
+ * and would otherwise leave the link standing empty below it. Neither
+ * declaration does anything outside a stretched context, which is why this is
+ * safe to state unconditionally rather than only in the grid. */
+.insightCard,
+.insightCard helix-card {
+  block-size: 100%;
+}
+
+/* The card's regions pushed apart, so the date sits on the bottom edge whatever
+   the title above it wrapped to. Without it a two-line title and a three-line
+   title put their footers at two different heights, and a row of cards reads as
+   a row of slightly different objects.
+ *
+ * `align-content` on the host, which works because the card is a grid of bare
+ * slots: a `<slot>` is `display: contents`, so the slotted header, body and
+ * footer are grid items of this element rather than of anything inside the
+ * shadow root. There is no custom property for this and inventing one in the
+ * site's stylesheet would name a token the component never reads, which is the
+ * failure mode that resolves to nothing and reports no error. */
+.insightCard helix-card {
+  align-content: space-between;
+}
+
+/* A photograph, treated so that any two of them read as one set.
+ *
+ * **The treatment is the design here, and the vendor is only supply.** Six
+ * pictures chosen well are still six pictures until something ties them
+ * together, and a stock library's abstract-technology shelf is the most reused
+ * imagery on the web, so untreated it reads as the default anyone would have
+ * reached for. Desaturated, they read as ours.
+ *
+ * `grayscale` and not a duotone, for now. A duotone needs a tint strength tuned
+ * against real photographs and there are none in the repository yet, so a
+ * two-element blend stack would be a guess wearing more markup. The filter is
+ * behind a hook: point `--insight-photo-filter` at a `sepia`/`hue-rotate` pair
+ * or at `none` once there is something to look at.
+ *
+ * The ratio is the gallery's rather than the file's, so a grid where some posts
+ * have pictures and some have none keeps one card shape, and two photographs of
+ * different proportions crop to the same box instead of stepping the row.
+ * Stated through the component's own hooks, both of them.
+ *
+ * `--card-media-block-size: auto` hands the height back to the element, which
+ * is what `Card`'s default was written for: it sets a height because a chart
+ * has no intrinsic shape, and a box carrying a ratio has one. On the card
+ * rather than on the picture, because it is the card's hook and it has to be
+ * set whether or not this particular post brought a file. */
+.insightPhoto {
+  --image-aspect: 16 / 10;
+  --image-placeholder-color: var(--helix-color-surface-sunken);
+
+  filter: var(--insight-photo-filter, grayscale(1));
+}
+
+.insightCard helix-card {
+  --card-media-block-size: auto;
+}

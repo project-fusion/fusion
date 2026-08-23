@@ -1,3 +1,4 @@
+import styles from '../app/(site)/insight-card.module.css'
 import type { InsightImage } from './insights'
 
 /**
@@ -40,7 +41,7 @@ export function InsightArt({ image, slot }: { image?: InsightImage; slot?: strin
   return (
     <helix-image
       alt={image.alt}
-      className="insightPhoto"
+      className={styles.insightPhoto}
       loading="lazy"
       slot={slot}
       src={image.src}

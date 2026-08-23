@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { InsightArt } from '../../../lib/insight-art'
 import { formatDate, INSIGHTS, type Insight } from '../../../lib/insights'
+import { InsightCard } from '../insight-card'
 import { InsightBrowser } from './insight-browser'
 import styles from './insights.module.css'
 
@@ -58,47 +58,7 @@ export default async function Page({
     >
       <helix-grid className={styles.insightGrid} columns={4} gap="xl">
         {insights.map((insight) => (
-          <Link
-            aria-label={insight.title}
-            className="insightCard"
-            data-card
-            data-slug={insight.slug}
-            href={`/insights/${insight.slug}`}
-            key={insight.slug}
-          >
-            <helix-card appearance="elevated">
-              <InsightArt image={insight.image} slot="media" />
-              <helix-flex align="center" data-density="sm" gap="sm" slot="header" wrap>
-                {/* Both facts as tags, and toned the way the post's own page
-                    tones them: the subject carries the brand and the kind of
-                    writing stays neutral beside it. The kind was caption text
-                    here, which made the pair read as a label and a footnote
-                    rather than as two filters, and made the card disagree with
-                    the page it opens. */}
-                <helix-tag tone="primary">{insight.topic}</helix-tag>
-                <helix-tag>{insight.kind}</helix-tag>
-              </helix-flex>
-              <helix-flex direction="column" gap="xs">
-                <helix-text appearance="title" as="h3">
-                  {insight.title}
-                </helix-text>
-                <helix-text appearance="caption" tone="muted">
-                  {insight.summary}
-                </helix-text>
-              </helix-flex>
-              <helix-flex align="center" gap="sm" justify="between" slot="footer">
-                {/* A machine-readable date beside the readable one. The card is
-                    the only place the date appears in a list, so this is where
-                    a crawler can find it. */}
-                <helix-text appearance="caption" tone="subtle">
-                  <time dateTime={insight.date}>{formatDate(insight.date)}</time>
-                </helix-text>
-                <helix-text appearance="caption" tone="subtle">
-                  {insight.minutes} min
-                </helix-text>
-              </helix-flex>
-            </helix-card>
-          </Link>
+          <InsightCard insight={insight} key={insight.slug} slug />
         ))}
       </helix-grid>
     </InsightBrowser>

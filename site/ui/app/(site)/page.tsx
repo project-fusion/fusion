@@ -13,11 +13,11 @@
  * the single registration in the root layout.
  */
 import Link from 'next/link'
-import { InsightArt } from '../../lib/insight-art'
 import { formatDate, INSIGHTS } from '../../lib/insights'
 import { PRODUCTS } from '../products'
 import { SERVICES } from '../services'
 import { stageAppearance } from '../verticals'
+import { InsightCard } from './insight-card'
 import styles from './landing.module.css'
 import { Showcase } from './showcase'
 
@@ -435,37 +435,7 @@ export default function Home() {
               paragraph at that width is a column. */}
           <helix-carousel class="insightReel" label="Insights" loop per-view={4}>
             {INSIGHTS.map((insight) => (
-              <Link
-                aria-label={insight.title}
-                className="insightCard"
-                data-card
-                href={`/insights/${insight.slug}`}
-                key={insight.slug}
-              >
-                <helix-card appearance="elevated">
-                  <InsightArt image={insight.image} slot="media" />
-                  {/* The same pair the gallery's cards carry, toned the same
-                      way. This one had the subject alone and no kind at all, so
-                      the two places a card appears described a post differently.
-                      A row rather than a bare tag, because there are two of
-                      them now. */}
-                  <helix-flex align="center" data-density="sm" gap="sm" slot="header" wrap>
-                    <helix-tag tone="primary">{insight.topic}</helix-tag>
-                    <helix-tag>{insight.kind}</helix-tag>
-                  </helix-flex>
-                  <helix-flex direction="column" gap="xs">
-                    <helix-text appearance="title" as="h3">
-                      {insight.title}
-                    </helix-text>
-                    <helix-text appearance="caption" tone="muted">
-                      {insight.summary}
-                    </helix-text>
-                  </helix-flex>
-                  <helix-text appearance="caption" slot="footer" tone="subtle">
-                    <time dateTime={insight.date}>{formatDate(insight.date)}</time>
-                  </helix-text>
-                </helix-card>
-              </Link>
+              <InsightCard insight={insight} key={insight.slug} />
             ))}
           </helix-carousel>
         </helix-flex>
