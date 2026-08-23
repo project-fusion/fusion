@@ -91,90 +91,99 @@ for (const slug of [...drawn].sort()) {
  * nothing, so a word in range is always one of two values and the check is
  * total rather than heuristic.
  */
-const WORDS = [
-  'forty-nine',
-  'fifty',
-  'fifty-one',
-  'fifty-two',
-  'fifty-three',
-  'fifty-four',
-  'fifty-five',
-  'fifty-six',
-  'fifty-seven',
-  'fifty-eight',
-  'fifty-nine',
-  'sixty',
-  'sixty-one',
-  'sixty-two',
-  'sixty-three',
-  'sixty-four',
-  'sixty-five',
-  'sixty-six',
-  'sixty-seven',
-  'sixty-eight',
-  'sixty-nine',
-  'seventy',
-  'seventy-one',
-  'seventy-two',
-  'seventy-three',
-  'seventy-four',
-  'seventy-five',
-  'seventy-six',
-  'seventy-seven',
-  'seventy-eight',
-  'seventy-nine',
-  'eighty',
-  'eighty-one',
-  'eighty-two',
-  'eighty-three',
-  'eighty-four',
-  'eighty-five',
-  'eighty-six',
-  'eighty-seven',
-  'eighty-eight',
-  'eighty-nine',
-  'ninety',
-  'ninety-one',
-  'ninety-two',
-  'ninety-three',
-  'ninety-four',
-  'ninety-five',
-  'ninety-six',
-  'ninety-seven',
-  'ninety-eight',
-  'ninety-nine',
-  'one hundred',
-  'one hundred and one',
-  'one hundred and two',
-  'one hundred and three',
-  'one hundred and four',
-  'one hundred and five',
-  'one hundred and six',
-  'one hundred and seven',
-  'one hundred and eight',
-  'one hundred and nine',
-  'one hundred and ten',
-  'one hundred and eleven',
-  'one hundred and twelve',
-  'one hundred and thirteen',
-  'one hundred and fourteen',
-  'one hundred and fifteen',
-  'one hundred and sixteen',
-  'one hundred and seventeen',
-  'one hundred and eighteen',
-  'one hundred and nineteen',
-  'one hundred and twenty',
+/* **The counter and the matcher are built from the same two arrays, which is
+ * the whole of what this section is for.**
+ *
+ * They used to be two hand-written lists: a `WORDS` table of every count from
+ * forty-nine up, and a separate alternation of decades in the regex below. Two
+ * lists that have to agree and nothing making them, so they drifted exactly as
+ * that arrangement does. The table reached `eighty-five` while the pattern
+ * stopped at `seventy`, and for two families' worth of catalog growth the check
+ * found no words to compare and reported that the prose agreed.
+ *
+ * Extending the pattern to `ninety` fixed the instance and left the shape: the
+ * table then ran to `one hundred and twenty`, a phrase with a space in it that
+ * the decade alternation could not have matched under any suffix, so the same
+ * failure was sitting ten families out. At eighty-nine today that is close
+ * enough to be worth doing properly.
+ *
+ * So `wordFor` spells any number rather than looking one up, the pattern is
+ * assembled from the arrays it spells with, and the assertion underneath walks
+ * the range and proves the second can find everything the first can say. None
+ * of the three can be edited into disagreement without the check failing on its
+ * own way in. */
+const ONES = [
+  'zero',
+  'one',
+  'two',
+  'three',
+  'four',
+  'five',
+  'six',
+  'seven',
+  'eight',
+  'nine',
+  'ten',
+  'eleven',
+  'twelve',
+  'thirteen',
+  'fourteen',
+  'fifteen',
+  'sixteen',
+  'seventeen',
+  'eighteen',
+  'nineteen',
 ]
+const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']
+
+/* Where a word stops being prose and starts being one of the two counts.
+ *
+ * Not zero, and the reason is in the note above: forbidding every number word
+ * flagged a true sentence about how many cards move. Forty is below any count
+ * this catalog has had and above anything the prose says in passing. */
+const FLOOR = 40
+
 const wordFor = (count) => {
-  const word = WORDS[count - 49]
-  if (word === undefined) {
+  if (count < 20) {
+    return ONES[count]
+  }
+  if (count < 100) {
+    const tens = TENS[Math.floor(count / 10)]
+    return count % 10 === 0 ? tens : `${tens}-${ONES[count % 10]}`
+  }
+  if (count < 1000) {
+    const hundreds = `${ONES[Math.floor(count / 100)]} hundred`
+    return count % 100 === 0 ? hundreds : `${hundreds} and ${wordFor(count % 100)}`
+  }
+  throw new Error(
+    `check:art: ${count} is past what wordFor spells. It stops below a thousand because ` +
+      'nothing here counts that high, and a count that does needs the thousands case written ' +
+      'rather than a silent wrong answer.',
+  )
+}
+
+/* Every number word from the floor up, hundreds first so a longer phrase is not
+   matched as its own opening decade. The suffix stays `[a-z-]+` rather than the
+   ones enumerated: what broke was the decade list, and a loose tail means an
+   invented compound like `forty-odd` is still caught and reported. */
+const NUMBER_WORD =
+  `\\b(` +
+  `(?:${ONES.slice(1, 10).join('|')}) hundred(?: and [a-z-]+)?` +
+  `|(?:${TENS.slice(FLOOR / 10).join('|')})(?:-[a-z]+)?` +
+  `)\\b`
+
+/* The proof, rather than the intention. Every word the counter can produce in
+   range has to be one the pattern can find, so narrowing the pattern or teaching
+   the counter a shape it does not cover fails here rather than in six months of
+   a check quietly passing. Two hundred is well past any plausible catalog. */
+for (let n = FLOOR; n <= 200; n += 1) {
+  if (!new RegExp(NUMBER_WORD).test(wordFor(n))) {
     throw new Error(
-      `check:art: ${count} families is past the end of WORDS. Add the words up to it: ` +
-        'the table exists so a number word in this prose is checkable rather than trusted, ' +
-        'and a count off the end silently compared every word against "undefined".',
+      `check:art: wordFor(${n}) is "${wordFor(n)}" and NUMBER_WORD cannot match it. The two are ` +
+        'built from the same arrays so that cannot happen by editing one; something has taught ' +
+        'one of them a shape the other does not know.',
     )
   }
-  return word
 }
 const said = wordFor(families.size)
 
@@ -193,17 +202,10 @@ const foldersSaid = wordFor(folders)
 let compared = 0
 for (const file of ['index.tsx', 'core.tsx']) {
   const text = readFileSync(join(ART, file), 'utf8')
-  /* Every ten-word from forty up, and the range is the whole point.
-   *
-   * This read `forty-x|fifty-x|sixty(-x)?|seventy(-x)?|fifty` and so stopped
-   * matching the day the catalog passed seventy-nine. `WORDS` ran to
-   * `eighty-five` and `wordFor` returned the right answer the whole time; the
-   * regex simply found nothing to compare it against, so the check passed by
-   * having no work to do. It was two families out of date when this was
-   * noticed, which is what a check that silently stops checking costs. */
-  for (const [, word] of text.matchAll(
-    /\b((?:forty|fifty|sixty|seventy|eighty|ninety)(?:-[a-z]+)?)\b/g,
-  )) {
+  /* Built above from the same arrays `wordFor` spells with, so the range this
+     scans and the range the counter can produce cannot come apart. A fresh
+     regex each file because a global one carries `lastIndex` between them. */
+  for (const [, word] of text.matchAll(new RegExp(NUMBER_WORD, 'g'))) {
     compared += 1
     if (word !== said && word !== foldersSaid) {
       problems.push(
