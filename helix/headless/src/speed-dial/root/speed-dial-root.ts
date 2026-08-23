@@ -29,7 +29,7 @@ import type { HelixBaseSpeedDialItem } from '../item/speed-dial-item.js'
  * **The trigger is a control the consumer slots**, and the floating action
  * button is the usual one: `helix-icon-button` with `shape="circle"` and
  * `raised`. There is no `helix-fab` here, and the reason is worth stating,
- * because a component would have re-declared `appearance`, `tone`, `label` and
+ * because a component would have re-declared `emphasis`, `tone`, `label` and
  * a size around a control that already has all four. A round raised button is a
  * shape, and where it sits is `data-dock` in the base layer.
  *

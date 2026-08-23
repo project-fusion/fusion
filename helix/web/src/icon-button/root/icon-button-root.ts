@@ -35,9 +35,9 @@ import { styles } from './icon-button-root.css.js'
 @customElement('helix-icon-button')
 export class HelixIconButton extends MixinControlSurface(HelixBaseIconButton) {
   /**
-   * The outline it is cut to, which is a third axis and not a fourth appearance.
+   * The outline it is cut to, which is an axis of its own and not a value on one.
    *
-   * `appearance` says how filled it is and `tone` says what it means; neither of
+   * `emphasis` says how filled it is and `tone` says what it means; neither of
    * them says what shape it is, and folding a shape into either would put a
    * control's outline in the same word as its colour. A rounded square is the
    * resting one because that is what a control in a row of controls should be.
@@ -45,7 +45,7 @@ export class HelixIconButton extends MixinControlSurface(HelixBaseIconButton) {
    * `circle` is the floating action button, and it is the reason this exists: a
    * round, raised, primary control holding the one action a screen is for. It is
    * a shape rather than a component, because a component would re-declare
-   * `appearance`, `tone`, `label` and the size around a control that already has
+   * `emphasis`, `tone`, `label` and the size around a control that already has
    * them, and because the same shape is wanted by an avatar's overlay, a media
    * control and a map's own buttons. Where it sits is the page's business: see
    * `data-dock` in the base layer.

@@ -274,7 +274,7 @@ nothing about the announcement's semantics moved. A property that only
 changes the paint should say so.
 
 `tone` is the word this library already uses for exactly that, and `Tag`
-made the identical rename for the identical reason: `appearance` is a
+made the identical rename for the identical reason: the word it left was a
 treatment, `tone` is semantic color. The set matches `Tag`'s so the two
 agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
@@ -3779,7 +3779,7 @@ export type HelixBaseProgressVueProps = {
   label?: HelixBaseProgress["label"];
   /** Whether the work has a knowable end.
 
-On the headless tier rather than as an `appearance`, because it is
+On the headless tier rather than as a treatment, because it is
 semantics before it is a picture: a progressbar with no `aria-valuenow` is
 how the platform says "running, and nobody knows how far", and a reader on
 a screen reader is told that rather than being read a number that means
@@ -6541,7 +6541,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseButtonVueProps,
     HelixBaseButtonVueEvents
   >;
-  /** 'severity' lives on the headless tier rather than being an 'appearance' on the styled one, because it is meaning and not decoration. It picks the icon and that icon's accessible name, so a reader who cannot see that the box is red still hears "Error". A callout whose severity existed only as a color would say nothing to them at all.  The icon is the fallback content of a slot, so a consumer replaces it by slotting their own and the default disappears with no emptiness check. That is what slot fallback is for.  Not an 'Announcement', which is the other thing this could be mistaken for. A callout interrupts a document to set a passage apart and is read where it sits; an announcement is page-level chrome above the masthead, announces itself as a live region, and can be dismissed. Neither is a variant of the other. */
+  /** 'tone' lives on the headless tier rather than being a treatment on the styled one, because it is meaning and not decoration. It picks the icon and that icon's accessible name, so a reader who cannot see that the box is red still hears "Error". A callout whose meaning existed only as a color would say nothing to them at all.  The icon is the fallback content of a slot, so a consumer replaces it by slotting their own and the default disappears with no emptiness check. That is what slot fallback is for.  Not an 'Announcement', which is the other thing this could be mistaken for. A callout interrupts a document to set a passage apart and is read where it sits; an announcement is page-level chrome above the masthead, announces itself as a live region, and can be dismissed. Neither is a variant of the other. */
   "helix-base-callout": DefineCustomElement<
     HelixBaseCallout,
     HelixBaseCalloutVueProps,
@@ -6895,7 +6895,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseSpeedDialItemVueProps,
     HelixBaseSpeedDialItemVueEvents
   >;
-  /** **A menu, and deliberately not a new one.** Its rows are commands, which is what 'role="menu"' and 'menuitem' exist for, so this takes them and takes the behaviour with them: the arrow keys are 'KeyboardNavigationController', the panel is 'PopoverController', and open and closed is 'MixinControllerOpen'. 'Menu' is built from the same pieces. What is not shared is what actually differs: a dial has no submenus, no headers, no checkable rows and no long list to type ahead through, and shipping it as an appearance of 'Menu' would have meant defining what a dial with a submenu in it does.  **The trigger is a control the consumer slots**, and the floating action button is the usual one: 'helix-icon-button' with 'shape="circle"' and 'raised'. There is no 'helix-fab' here, and the reason is worth stating, because a component would have re-declared 'appearance', 'tone', 'label' and a size around a control that already has all four. A round raised button is a shape, and where it sits is 'data-dock' in the base layer.  **Nothing is reserved from the keyboard.** A menu that drills has to keep the horizontal pair for going in and coming back; a dial goes nowhere, so all four arrows move through the actions and a reader who guesses either axis is answered. That is the controller's own house position, and this is a component with no reason to argue with it. */
+  /** **A menu, and deliberately not a new one.** Its rows are commands, which is what 'role="menu"' and 'menuitem' exist for, so this takes them and takes the behaviour with them: the arrow keys are 'KeyboardNavigationController', the panel is 'PopoverController', and open and closed is 'MixinControllerOpen'. 'Menu' is built from the same pieces. What is not shared is what actually differs: a dial has no submenus, no headers, no checkable rows and no long list to type ahead through, and shipping it as an appearance of 'Menu' would have meant defining what a dial with a submenu in it does.  **The trigger is a control the consumer slots**, and the floating action button is the usual one: 'helix-icon-button' with 'shape="circle"' and 'raised'. There is no 'helix-fab' here, and the reason is worth stating, because a component would have re-declared 'emphasis', 'tone', 'label' and a size around a control that already has all four. A round raised button is a shape, and where it sits is 'data-dock' in the base layer.  **Nothing is reserved from the keyboard.** A menu that drills has to keep the horizontal pair for going in and coming back; a dial goes nowhere, so all four arrows move through the actions and a reader who guesses either axis is answered. That is the controller's own house position, and this is a component with no reason to argue with it. */
   "helix-base-speed-dial": DefineCustomElement<
     HelixBaseSpeedDial,
     HelixBaseSpeedDialVueProps,

@@ -11,8 +11,8 @@ import { styles } from './callout-root.css.js'
  * bar on the inline start so the severity survives being read in grayscale or
  * by anyone who does not distinguish the hues.
  *
- * There is no `appearance` here. `severity` carries the meaning and lives on
- * the headless tier; this tier only decides what that meaning looks like.
+ * There is no treatment axis here. `tone` carries the meaning and lives on the
+ * headless tier; this tier only decides what that meaning looks like.
  *
  * @since 0.1.0
  * @status experimental

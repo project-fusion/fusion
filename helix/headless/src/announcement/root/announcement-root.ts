@@ -58,7 +58,7 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
    * changes the paint should say so.
    *
    * `tone` is the word this library already uses for exactly that, and `Tag`
-   * made the identical rename for the identical reason: `appearance` is a
+   * made the identical rename for the identical reason: the word it left was a
    * treatment, `tone` is semantic color. The set matches `Tag`'s so the two
    * agree, with `neutral` as the resting value and `primary` for a band that is
    * about the product rather than about a state.

@@ -502,7 +502,7 @@ nothing about the announcement's semantics moved. A property that only
 changes the paint should say so.
 
 `tone` is the word this library already uses for exactly that, and `Tag`
-made the identical rename for the identical reason: `appearance` is a
+made the identical rename for the identical reason: the word it left was a
 treatment, `tone` is semantic color. The set matches `Tag`'s so the two
 agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
@@ -548,7 +548,7 @@ nothing about the announcement's semantics moved. A property that only
 changes the paint should say so.
 
 `tone` is the word this library already uses for exactly that, and `Tag`
-made the identical rename for the identical reason: `appearance` is a
+made the identical rename for the identical reason: the word it left was a
 treatment, `tone` is semantic color. The set matches `Tag`'s so the two
 agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
@@ -7254,7 +7254,7 @@ export type HelixBaseProgressProps = {
   label?: HelixBaseProgress["label"];
   /** Whether the work has a knowable end.
 
-On the headless tier rather than as an `appearance`, because it is
+On the headless tier rather than as a treatment, because it is
 semantics before it is a picture: a progressbar with no `aria-valuenow` is
 how the platform says "running, and nobody knows how far", and a reader on
 a screen reader is told that rather than being read a number that means
@@ -7326,7 +7326,7 @@ export type HelixBaseProgressSolidJsProps = {
   "prop:label"?: HelixBaseProgress["label"];
   /** Whether the work has a knowable end.
 
-On the headless tier rather than as an `appearance`, because it is
+On the headless tier rather than as a treatment, because it is
 semantics before it is a picture: a progressbar with no `aria-valuenow` is
 how the platform says "running, and nobody knows how far", and a reader on
 a screen reader is told that rather than being read a number that means
@@ -12386,7 +12386,7 @@ export type CustomElements = {
    * changes the paint should say so.
    *
    * `tone` is the word this library already uses for exactly that, and `Tag`
-   * made the identical rename for the identical reason: `appearance` is a
+   * made the identical rename for the identical reason: the word it left was a
    * treatment, `tone` is semantic color. The set matches `Tag`'s so the two
    * agree, with `neutral` as the resting value and `primary` for a band that is
    * about the product rather than about a state.
@@ -13172,11 +13172,11 @@ export type CustomElements = {
   >;
 
   /**
-   * `severity` lives on the headless tier rather than being an `appearance` on the
-   * styled one, because it is meaning and not decoration. It picks the icon and
-   * that icon's accessible name, so a reader who cannot see that the box is red
-   * still hears "Error". A callout whose severity existed only as a color would
-   * say nothing to them at all.
+   * `tone` lives on the headless tier rather than being a treatment on the styled
+   * one, because it is meaning and not decoration. It picks the icon and that
+   * icon's accessible name, so a reader who cannot see that the box is red still
+   * hears "Error". A callout whose meaning existed only as a color would say
+   * nothing to them at all.
    *
    * The icon is the fallback content of a slot, so a consumer replaces it by
    * slotting their own and the default disappears with no emptiness check. That
@@ -18721,7 +18721,7 @@ export type CustomElements = {
    * - `label`: Accessible name for what is in progress.
    * - `indeterminate`: Whether the work has a knowable end.
    *
-   * On the headless tier rather than as an `appearance`, because it is
+   * On the headless tier rather than as a treatment, because it is
    * semantics before it is a picture: a progressbar with no `aria-valuenow` is
    * how the platform says "running, and nobody knows how far", and a reader on
    * a screen reader is told that rather than being read a number that means
@@ -20024,7 +20024,7 @@ export type CustomElements = {
    * **The trigger is a control the consumer slots**, and the floating action
    * button is the usual one: `helix-icon-button` with `shape="circle"` and
    * `raised`. There is no `helix-fab` here, and the reason is worth stating,
-   * because a component would have re-declared `appearance`, `tone`, `label` and
+   * because a component would have re-declared `emphasis`, `tone`, `label` and
    * a size around a control that already has all four. A round raised button is a
    * shape, and where it sits is `data-dock` in the base layer.
    *
@@ -23605,7 +23605,7 @@ export type CustomElementsSolidJs = {
    * changes the paint should say so.
    *
    * `tone` is the word this library already uses for exactly that, and `Tag`
-   * made the identical rename for the identical reason: `appearance` is a
+   * made the identical rename for the identical reason: the word it left was a
    * treatment, `tone` is semantic color. The set matches `Tag`'s so the two
    * agree, with `neutral` as the resting value and `primary` for a band that is
    * about the product rather than about a state.
@@ -24424,11 +24424,11 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * `severity` lives on the headless tier rather than being an `appearance` on the
-   * styled one, because it is meaning and not decoration. It picks the icon and
-   * that icon's accessible name, so a reader who cannot see that the box is red
-   * still hears "Error". A callout whose severity existed only as a color would
-   * say nothing to them at all.
+   * `tone` lives on the headless tier rather than being a treatment on the styled
+   * one, because it is meaning and not decoration. It picks the icon and that
+   * icon's accessible name, so a reader who cannot see that the box is red still
+   * hears "Error". A callout whose meaning existed only as a color would say
+   * nothing to them at all.
    *
    * The icon is the fallback content of a slot, so a consumer replaces it by
    * slotting their own and the default disappears with no emptiness check. That
@@ -30110,7 +30110,7 @@ export type CustomElementsSolidJs = {
    * - `label`: Accessible name for what is in progress.
    * - `indeterminate`: Whether the work has a knowable end.
    *
-   * On the headless tier rather than as an `appearance`, because it is
+   * On the headless tier rather than as a treatment, because it is
    * semantics before it is a picture: a progressbar with no `aria-valuenow` is
    * how the platform says "running, and nobody knows how far", and a reader on
    * a screen reader is told that rather than being read a number that means
@@ -31449,7 +31449,7 @@ export type CustomElementsSolidJs = {
    * **The trigger is a control the consumer slots**, and the floating action
    * button is the usual one: `helix-icon-button` with `shape="circle"` and
    * `raised`. There is no `helix-fab` here, and the reason is worth stating,
-   * because a component would have re-declared `appearance`, `tone`, `label` and
+   * because a component would have re-declared `emphasis`, `tone`, `label` and
    * a size around a control that already has all four. A round raised button is a
    * shape, and where it sits is `data-dock` in the base layer.
    *

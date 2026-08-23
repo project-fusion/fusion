@@ -58,8 +58,8 @@ export class HelixAppHeader extends HelixBaseAppHeader {
    *   surface once it has to be legible over moving content.
    *
    * **This was `appearance`, and it was filed under the wrong axis from the
-   * start.** The library's test is the one `Card` states: `appearance` is how a
-   * thing is drawn, `tone` is what it means, `material` is what it is made of,
+   * start.** The library's test is the one `Card` states: `separation` is where
+   * a surface ends, `tone` is what it means, `material` is what it is made of,
    * and a property belongs to `material` when it can be true at the same time
    * as the other two. Every value here varies exactly one quantity, and that
    * quantity is translucency. The proof is inside the component rather than in

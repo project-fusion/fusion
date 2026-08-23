@@ -110,7 +110,7 @@ describe('tabs keyboard', () => {
   test('both axes move the row, not only the one it is laid out on', async () => {
     /* The tab list bound Left and Right alone until it moved onto
        `KeyboardNavigationController`, which binds both axes on purpose: a
-       reader who guesses the wrong axis gets nothing, and `appearance` is
+       reader who guesses the wrong axis gets nothing, and `variant` is
        presentation. Down reads as Right, Up as Left. */
     const host = (await mount(markup)) as Updatable
     press(host, 'ArrowDown')

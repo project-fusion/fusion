@@ -312,7 +312,7 @@ nothing about the announcement's semantics moved. A property that only
 changes the paint should say so.
 
 `tone` is the word this library already uses for exactly that, and `Tag`
-made the identical rename for the identical reason: `appearance` is a
+made the identical rename for the identical reason: the word it left was a
 treatment, `tone` is semantic color. The set matches `Tag`'s so the two
 agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
@@ -348,8 +348,8 @@ property takes no default.
   surface once it has to be legible over moving content.
 
 **This was `appearance`, and it was filed under the wrong axis from the
-start.** The library's test is the one `Card` states: `appearance` is how a
-thing is drawn, `tone` is what it means, `material` is what it is made of,
+start.** The library's test is the one `Card` states: `separation` is where
+a surface ends, `tone` is what it means, `material` is what it is made of,
 and a property belongs to `material` when it can be true at the same time
 as the other two. Every value here varies exactly one quantity, and that
 quantity is translucency. The proof is inside the component rather than in
@@ -753,7 +753,7 @@ export type HelixButtonVueProps = {
 - `full` fills the container, for a single action at the foot of a form or
   a card, and on a phone where a control is a target before it is a label.
 
-Width and not weight. `appearance` says how much a button matters and this
+Width and not weight. `emphasis` says how much a button matters and this
 says how much room it takes, and the three are independent: a `ghost
 standard` Cancel beside a `solid primary standard` Save is exactly the
 pairing a dialog wants.
@@ -2771,9 +2771,9 @@ is two intentions in one element. */
 export type HelixGridVueEvents = {};
 
 export type HelixIconButtonVueProps = {
-  /** The outline it is cut to, which is a third axis and not a fourth appearance.
+  /** The outline it is cut to, which is an axis of its own and not a value on one.
 
-`appearance` says how filled it is and `tone` says what it means; neither of
+`emphasis` says how filled it is and `tone` says what it means; neither of
 them says what shape it is, and folding a shape into either would put a
 control's outline in the same word as its colour. A rounded square is the
 resting one because that is what a control in a row of controls should be.
@@ -2781,7 +2781,7 @@ resting one because that is what a control in a row of controls should be.
 `circle` is the floating action button, and it is the reason this exists: a
 round, raised, primary control holding the one action a screen is for. It is
 a shape rather than a component, because a component would re-declare
-`appearance`, `tone`, `label` and the size around a control that already has
+`emphasis`, `tone`, `label` and the size around a control that already has
 them, and because the same shape is wanted by an avatar's overlay, a media
 control and a map's own buttons. Where it sits is the page's business: see
 `data-dock` in the base layer. */
@@ -4372,7 +4372,7 @@ export type HelixProgressVueProps = {
   label?: HelixProgress["label"];
   /** Whether the work has a knowable end.
 
-On the headless tier rather than as an `appearance`, because it is
+On the headless tier rather than as a treatment, because it is
 semantics before it is a picture: a progressbar with no `aria-valuenow` is
 how the platform says "running, and nobody knows how far", and a reader on
 a screen reader is told that rather than being read a number that means
@@ -8193,7 +8193,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixButtonVueProps,
     HelixButtonVueEvents
   >;
-  /** Tinted from the severity's status color with 'color-mix', and marked with a bar on the inline start so the severity survives being read in grayscale or by anyone who does not distinguish the hues.  There is no 'appearance' here. 'severity' carries the meaning and lives on the headless tier; this tier only decides what that meaning looks like. */
+  /** Tinted from the severity's status color with 'color-mix', and marked with a bar on the inline start so the severity survives being read in grayscale or by anyone who does not distinguish the hues.  There is no treatment axis here. 'tone' carries the meaning and lives on the headless tier; this tier only decides what that meaning looks like. */
   "helix-callout": DefineCustomElement<
     HelixCallout,
     HelixCalloutVueProps,
@@ -8684,7 +8684,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixTagVueProps,
     HelixTagVueEvents
   >;
-  /** Two properties, and they answer different questions. 'as' is the element, which decides the document outline and what a screen reader announces. 'appearance' is the treatment, which decides size, weight, leading, and tracking together.  They are separate because they genuinely come apart: a section's second heading sometimes has to look smaller without lying about the outline, and a '<p>' sometimes has to read as a caption. They default to matching, so the common case is 'as="h2"' and nothing else.  The pairing is resolved in CSS rather than by computing an attribute, so the element writes nothing to its own host: 'as="h2"' picks up the heading ramp through a selector, and setting 'appearance' takes the pairing rule out of play. Deriving it in 'willUpdate' worked, but it put an attribute on the host that the server's markup did not have, which is a hydration mismatch in every React consumer.  **Size, weight, and leading are not properties.** Exposing them separately offers a few hundred combinations of which a handful are right, and every caller then picks one. An appearance is a decision the system already made: the ramp is named, and a page built from it is consistent because there was nothing else to choose.  'tone' stays separate, because color carries state rather than typography. Folding it in would mean 'caption-danger' and 'label-primary' and the rest of the cross product, which is the explosion 'appearance' exists to prevent. */
+  /** Two properties, and they answer different questions. 'as' is the element, which decides the document outline and what a screen reader announces. 'variant' is the ramp, which decides size, weight, leading, and tracking together.  They are separate because they genuinely come apart: a section's second heading sometimes has to look smaller without lying about the outline, and a '<p>' sometimes has to read as a caption. They default to matching, so the common case is 'as="h2"' and nothing else.  The pairing is resolved in CSS rather than by computing an attribute, so the element writes nothing to its own host: 'as="h2"' picks up the heading ramp through a selector, and setting 'variant' takes the pairing rule out of play. Deriving it in 'willUpdate' worked, but it put an attribute on the host that the server's markup did not have, which is a hydration mismatch in every React consumer.  **Size, weight, and leading are not properties.** Exposing them separately offers a few hundred combinations of which a handful are right, and every caller then picks one. A ramp is a decision the system already made: the ramp is named, and a page built from it is consistent because there was nothing else to choose.  'tone' stays separate, because color carries state rather than typography. Folding it in would mean 'caption-danger' and 'label-primary' and the rest of cross product, which is the explosion a named ramp exists to prevent. */
   "helix-text": DefineCustomElement<
     HelixText,
     HelixTextVueProps,

@@ -47,7 +47,7 @@ export class HelixButton extends MixinControlSurface(HelixBaseButton) {
    * - `full` fills the container, for a single action at the foot of a form or
    *   a card, and on a phone where a control is a target before it is a label.
    *
-   * Width and not weight. `appearance` says how much a button matters and this
+   * Width and not weight. `emphasis` says how much a button matters and this
    * says how much room it takes, and the three are independent: a `ghost
    * standard` Cancel beside a `solid primary standard` Save is exactly the
    * pairing a dialog wants.

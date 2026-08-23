@@ -58,7 +58,7 @@ export class HelixBaseProgress extends HelixElement {
   /**
    * Whether the work has a knowable end.
    *
-   * On the headless tier rather than as an `appearance`, because it is
+   * On the headless tier rather than as a treatment, because it is
    * semantics before it is a picture: a progressbar with no `aria-valuenow` is
    * how the platform says "running, and nobody knows how far", and a reader on
    * a screen reader is told that rather than being read a number that means

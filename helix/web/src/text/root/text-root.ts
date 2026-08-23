@@ -26,8 +26,8 @@ const TAGS: Record<string, StaticValue> = {
  * @description
  * Two properties, and they answer different questions. `as` is the element,
  * which decides the document outline and what a screen reader announces.
- * `appearance` is the treatment, which decides size, weight, leading, and
- * tracking together.
+ * `variant` is the ramp, which decides size, weight, leading, and tracking
+ * together.
  *
  * They are separate because they genuinely come apart: a section's second
  * heading sometimes has to look smaller without lying about the outline, and a
@@ -36,20 +36,20 @@ const TAGS: Record<string, StaticValue> = {
  *
  * The pairing is resolved in CSS rather than by computing an attribute, so the
  * element writes nothing to its own host: `as="h2"` picks up the heading ramp
- * through a selector, and setting `appearance` takes the pairing rule out of
+ * through a selector, and setting `variant` takes the pairing rule out of
  * play. Deriving it in `willUpdate` worked, but it put an attribute on the host
  * that the server's markup did not have, which is a hydration mismatch in every
  * React consumer.
  *
  * **Size, weight, and leading are not properties.** Exposing them separately
  * offers a few hundred combinations of which a handful are right, and every
- * caller then picks one. An appearance is a decision the system already made:
+ * caller then picks one. A ramp is a decision the system already made:
  * the ramp is named, and a page built from it is consistent because there was
  * nothing else to choose.
  *
  * `tone` stays separate, because color carries state rather than typography.
  * Folding it in would mean `caption-danger` and `label-primary` and the rest of
- * the cross product, which is the explosion `appearance` exists to prevent.
+ * cross product, which is the explosion a named ramp exists to prevent.
  *
  * @since 0.1.0
  * @status experimental

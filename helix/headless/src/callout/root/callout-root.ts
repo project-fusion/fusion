@@ -7,11 +7,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary Sets a passage apart as information, a warning, or an error.
  *
  * @description
- * `severity` lives on the headless tier rather than being an `appearance` on the
- * styled one, because it is meaning and not decoration. It picks the icon and
- * that icon's accessible name, so a reader who cannot see that the box is red
- * still hears "Error". A callout whose severity existed only as a color would
- * say nothing to them at all.
+ * `tone` lives on the headless tier rather than being a treatment on the styled
+ * one, because it is meaning and not decoration. It picks the icon and that
+ * icon's accessible name, so a reader who cannot see that the box is red still
+ * hears "Error". A callout whose meaning existed only as a color would say
+ * nothing to them at all.
  *
  * The icon is the fallback content of a slot, so a consumer replaces it by
  * slotting their own and the default disappears with no emptiness check. That

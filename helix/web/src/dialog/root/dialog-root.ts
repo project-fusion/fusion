@@ -48,10 +48,11 @@ export class HelixDialog extends HelixBaseDialog {
    * rather than assigned here, for the reason `Drawer.placement` gives: this
    * reflects, and a default would put `size="md"` into markup no consumer wrote.
    *
-   * **This was `appearance`, and it was the wrong word.** Everywhere else in the
-   * library `appearance` says how a thing *reads*: plain against outlined,
-   * flat against material, surface against a page's own color. Here it said how
-   * wide the panel is, which its own description admitted in as many words.
+   * **This was `appearance`, and it was the wrong word.** That word said how a
+   * thing *reads*, and here it said how wide the panel is, which its own
+   * description admitted in as many words. It turned out to be the first of
+   * many: `appearance` held four axes across 21 components and #158 retired it
+   * entirely, so this rename was that sweep arriving early at one component.
    *
    * `size` is right despite the rule that controls have no size, because that
    * rule's own test is whether two of them sitting together could legitimately
