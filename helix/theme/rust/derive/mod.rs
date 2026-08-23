@@ -27,7 +27,9 @@
 //! reader tells a decision from a computation by, and the two things the audit
 //! turns on. The phases follow.
 
+pub mod inks;
 pub mod resolve;
+pub mod solve;
 pub mod surfaces;
 
 use crate::oklch::{fit_to_gamut, oklch_to_hex, shipped_contrast_ratio, Oklch};

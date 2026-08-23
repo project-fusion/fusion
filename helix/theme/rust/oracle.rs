@@ -47,9 +47,11 @@
 
 use serde_json::Value;
 
+use crate::derive::inks::neutral_inks;
 use crate::derive::resolve::{brand_and_neutral, default_pairings, resolve, Policy};
+use crate::derive::solve::solve_against;
 use crate::derive::surfaces::{ladder, surfaces};
-use crate::derive::{perceptual_distance, token, DerivedToken, Origin};
+use crate::derive::{perceptual_distance, token, Cast, DerivedToken, Origin};
 use crate::intent::{
     is_relation, status_seed, to_oklch, Chroma, Color, From, Mechanism, Relation, Scheme, Seed,
     Separation, Status, ThemeIntent, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
@@ -598,6 +600,26 @@ fn assert_token(mine: &DerivedToken, theirs: &Value, at: &str) {
             "{at}: {label} is {mine:?} against {theirs:?}"
         );
     }
+    /* The measured contrast, which the TypeScript omits rather than nulls where a
+    token has no ground to report against. Absent on both sides or equal to the
+    bit on both: a token reporting a ratio nobody asked it to measure is as wrong
+    as one reporting the wrong ratio. */
+    match (
+        mine.contrast,
+        theirs.get("contrast").and_then(Value::as_f64),
+    ) {
+        (None, None) => {}
+        (Some(mine), Some(theirs)) => assert_eq!(
+            mine.to_bits(),
+            theirs.to_bits(),
+            "{at}: contrast is {mine:?} against {theirs:?}"
+        ),
+        (mine, theirs) => {
+            panic!(
+                "{at}: one side reports a contrast and the other does not, {mine:?} / {theirs:?}"
+            )
+        }
+    }
 }
 
 /// The first phase: defaults, the chroma policy, and the ladder the page stands
@@ -790,4 +812,141 @@ fn intent_for(label: &str) -> ThemeIntent {
         other => panic!("no intent is recorded for `{other}`"),
     }
     intent
+}
+
+/// The first tokens that go through the contrast search rather than off a
+/// ladder, and the first that carry a measured ratio.
+///
+/// A bisection agreeing to the bit across ten themes means every branch it took
+/// was the same branch: twenty-four halvings per candidate, four candidates per
+/// ink, both directions tried. That is the assertion 142 asks for and the reason
+/// this is a move rather than a second engine.
+#[test]
+fn the_neutral_inks_land_where_the_typescript_lands() {
+    let data = oracle();
+    for theme in data["themes"].as_array().expect("themes is an array") {
+        let label = theme["label"].as_str().expect("label");
+        let intent = intent_for(label);
+        let resolved = resolve(&intent).expect("the oracle's intents all resolve");
+        let policy = Policy::new(resolved.chroma);
+        let (_raw, _brand, neutral) = brand_and_neutral(&resolved, policy);
+        let built = surfaces(
+            resolved.scheme,
+            neutral,
+            ladder(resolved.separation.surface),
+        );
+        let inks = neutral_inks(built, neutral, resolved.contrast_target);
+
+        for (name, raw) in [
+            ("color-foreground", inks.foreground),
+            ("color-foreground-muted", inks.muted),
+            ("color-border", inks.border),
+        ] {
+            let mine = token(name, raw, Origin::Derived, Some(built.raw_background));
+            assert_token(&mine, token_of(theme, name), &format!("{label}/{name}"));
+        }
+    }
+}
+
+/// `solve_against` keeps the candidate whose weakest pairing is strongest.
+///
+/// **Asserted as the property rather than as an outcome, because an outcome
+/// test did not catch it.** The first version solved a neutral against a white
+/// page and a black one and checked the answer looked reasonable. Inverting the
+/// rule from "best worst case" to "best best case" left every one of the twenty
+/// tests passing: white and black are symmetric, so the two rules agree there,
+/// and the neutral inks are the only tokens ported so far that use the solver.
+///
+/// So this states the rule itself: of the candidates, the one chosen has a
+/// weakest pairing at least as strong as any other's. That is false the moment
+/// the rule is inverted, on grounds where the two disagree, which is what the
+/// asymmetric sets below are for.
+#[test]
+fn the_solver_maximises_the_weakest_pairing() {
+    let ground = |lightness: f64| Oklch {
+        chroma: 0.0,
+        hue: 0.0,
+        lightness,
+    };
+    /* Deliberately lopsided. A page and a near-page agree with almost any rule;
+    a page, a near-page and one dark recess do not. */
+    let sets: [&[Oklch]; 4] = [
+        &[ground(1.0), ground(0.96)],
+        &[ground(1.0), ground(0.96), ground(0.2)],
+        &[ground(0.0), ground(0.21), ground(0.29)],
+        &[ground(1.0), ground(0.5), ground(0.0)],
+    ];
+    let casts = [
+        Cast {
+            chroma: 0.0,
+            hue: 0.0,
+        },
+        Cast {
+            chroma: 0.12,
+            hue: 258.0,
+        },
+    ];
+
+    let mut disagreements = 0;
+    for grounds in sets {
+        for cast in casts {
+            for target in [3.0_f64, 4.5, 7.0] {
+                let worst = |ink: Oklch| {
+                    let fitted = fit_to_gamut(ink, GAMUT_STEPS);
+                    grounds
+                        .iter()
+                        .map(|g| shipped_contrast_ratio(fitted, *g))
+                        .fold(f64::INFINITY, f64::min)
+                };
+                let best_of = |ink: Oklch| {
+                    let fitted = fit_to_gamut(ink, GAMUT_STEPS);
+                    grounds
+                        .iter()
+                        .map(|g| shipped_contrast_ratio(fitted, *g))
+                        .fold(f64::NEG_INFINITY, f64::max)
+                };
+                let chosen = solve_against(grounds, cast, target);
+                let candidates: Vec<Oklch> = grounds
+                    .iter()
+                    .map(|g| {
+                        lightness_for_contrast(
+                            cast.chroma,
+                            cast.hue,
+                            *g,
+                            target,
+                            None,
+                            CONTRAST_STEPS,
+                        )
+                    })
+                    .collect();
+
+                for candidate in &candidates {
+                    assert!(
+                        worst(chosen) >= worst(*candidate),
+                        "a candidate has a stronger weakest pairing than the one chosen: \
+                         {:?} at {worst:?} against {candidate:?}",
+                        chosen,
+                        worst = worst(chosen)
+                    );
+                }
+                /* And record that this input can tell the two rules apart, so a
+                set that could not is a set that proves nothing. */
+                let by_best = candidates.iter().copied().fold(candidates[0], |best, c| {
+                    if best_of(c) > best_of(best) {
+                        c
+                    } else {
+                        best
+                    }
+                });
+                if by_best.lightness.to_bits() != chosen.lightness.to_bits() {
+                    disagreements += 1;
+                }
+            }
+        }
+    }
+    assert!(
+        disagreements > 0,
+        "no input here distinguishes best-worst-case from best-best-case, so this test \
+         would pass with the rule inverted"
+    );
 }
