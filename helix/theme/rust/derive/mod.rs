@@ -32,10 +32,13 @@ pub mod emphasis;
 pub mod fills;
 pub mod inks;
 pub mod marks;
+pub mod report;
 pub mod resolve;
+pub mod seeds;
 pub mod solve;
 pub mod status;
 pub mod surfaces;
+pub mod theme;
 pub mod tokens;
 
 use crate::oklch::{fit_to_gamut, oklch_to_hex, shipped_contrast_ratio, Oklch};

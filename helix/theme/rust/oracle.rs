@@ -47,19 +47,23 @@
 
 use serde_json::Value;
 
+use crate::css::to_css;
 use crate::derive::accent::{seeded, settle};
 use crate::derive::emphasis::emphasis;
 use crate::derive::inks::neutral_inks;
 use crate::derive::marks::walk_outward;
+use crate::derive::report::Outcome;
 use crate::derive::resolve::{brand_and_neutral, default_pairings, resolve, Policy};
 use crate::derive::solve::solve_against;
 use crate::derive::status::{repair_hue, statuses};
 use crate::derive::surfaces::{ladder, surfaces};
+use crate::derive::theme::derive_theme;
 use crate::derive::tokens::derive_tokens;
 use crate::derive::{perceptual_distance, token, Cast, DerivedToken, Deriving, Origin};
 use crate::intent::{
-    is_relation, status_seed, to_oklch, Chroma, Color, From, Mechanism, Relation, Scheme, Seed,
-    Separation, Status, StatusSeed, ThemeIntent, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
+    is_relation, status_seed, to_oklch, Character, Chroma, Color, Floating, Font, From, Material,
+    Mechanism, Motion, Relation, Scheme, Seed, Separation, Status, StatusSeed, ThemeIntent, Weight,
+    STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
 };
 use crate::model::{GROUNDS, INKS};
 use crate::oklch::{
@@ -824,6 +828,10 @@ fn an_intent_that_would_pass_every_check_by_accident_is_refused() {
 /// here: the oracle stores what a theme *came out as*, not what went in, and a
 /// port asserted against outputs it cannot reproduce the inputs of is asserting
 /// nothing. The labels are the join.
+/* One arm per oracle theme, so this grows by a few lines every time a branch
+turns out to need an input that shows it. Splitting it would file half the
+intents somewhere else and leave a reader chasing which half. */
+#[allow(clippy::too_many_lines)]
 fn intent_for(label: &str) -> ThemeIntent {
     let blue = || Color::Hex("#3b82f6".to_owned());
     let mut intent = ThemeIntent::new(blue());
@@ -880,6 +888,67 @@ fn intent_for(label: &str) -> ThemeIntent {
             ]);
         }
         "pale" => intent.brand = Color::Hex("#fef08a".to_owned()),
+        "expressive" => {
+            intent.font = Some(Font {
+                base: Some(16.0),
+                body: Some("Inter".to_owned()),
+                display: None,
+                mono: Some("Berkeley Mono".to_owned()),
+                scale: Some(1.25),
+                weight: Some(Weight::Strong),
+            });
+            intent.material = Some(Material {
+                blur: Some(12.0),
+                opacity: Some(0.72),
+            });
+            intent.motion = Some(Motion {
+                character: Some(Character::Springy),
+                scale: Some(1.2),
+            });
+            intent.namespace = Some("acme".to_owned());
+            intent.separation = Some(Separation {
+                floating: Some(Floating::Shadow),
+                surface: Some(Mechanism::Shadow),
+            });
+        }
+        "instant" => {
+            intent.motion = Some(Motion {
+                character: Some(Character::Instant),
+                scale: Some(3.0),
+            });
+        }
+        "tiny" => {
+            intent.font = Some(Font {
+                base: Some(12.0),
+                body: None,
+                display: None,
+                mono: None,
+                scale: None,
+                weight: None,
+            });
+        }
+        "paced" => {
+            intent.font = Some(Font {
+                base: None,
+                body: None,
+                display: Some("Playfair Display".to_owned()),
+                mono: None,
+                scale: None,
+                weight: Some(Weight::Light),
+            });
+            intent.material = Some(Material {
+                blur: Some(0.0),
+                opacity: Some(1.0),
+            });
+            intent.motion = Some(Motion {
+                character: None,
+                scale: Some(0.5),
+            });
+            intent.separation = Some(Separation {
+                floating: Some(Floating::Border),
+                surface: None,
+            });
+        }
         other => panic!("no intent is recorded for `{other}`"),
     }
     intent
@@ -1297,4 +1366,167 @@ fn the_brand_mark_prefers_the_darker_side_of_a_tie() {
         (walk_outward(0.015, only_black) - 0.015).abs() < 1e-12,
         "the walk clamped an out-of-range step onto black"
     );
+}
+
+/// **The emitted block, byte for byte.**
+///
+/// This is the end of the port and the only assertion that covers the tail of
+/// `to_css`: everything below the tokens is emitted only when asked for, so a
+/// port that dropped the whole of it would pass every other test in this file on
+/// every theme that says nothing about fonts, motion or material. Three intents
+/// exist purely to turn those branches on.
+///
+/// Byte equality rather than a parse, because the artifact is a file a consumer
+/// pastes. Two blocks that mean the same thing and differ in a trailing zero are
+/// a diff in somebody's repository, and `1.000` where the TypeScript writes `1`
+/// is exactly the shape that produces one.
+#[test]
+fn the_emitted_css_is_byte_identical() {
+    let data = oracle();
+    for theme in data["themes"].as_array().expect("themes is an array") {
+        let label = theme["label"].as_str().expect("label");
+        let derived = derive_theme(&intent_for(label)).expect("the oracle's intents all derive");
+        let ours = to_css(&derived, ":root");
+        let theirs = theme["css"].as_str().expect("css is a string");
+        if ours == theirs {
+            continue;
+        }
+        /* Reported as the first differing line rather than as two whole blocks:
+        a theme emits fifty of them, and an assertion that prints both in full
+        makes the reader do the diff. */
+        let mismatch = ours
+            .lines()
+            .zip(theirs.lines())
+            .find(|(ours, theirs)| ours != theirs);
+        match mismatch {
+            Some((ours, theirs)) => {
+                panic!("{label} emits `{ours}` where the TypeScript emits `{theirs}`")
+            }
+            None => panic!(
+                "{label} emits {} lines against the TypeScript's {}",
+                ours.lines().count(),
+                theirs.lines().count()
+            ),
+        }
+    }
+}
+
+/// The findings: every pair the theme was checked against, the ones that failed,
+/// and the roles a reader cannot tell apart.
+///
+/// **The pair count is asserted before the pairs**, for the same reason the token
+/// count is: a pairing silently missing from the results is how a guarantee
+/// becomes a claim about the pairs that happened to be easy, and that is a
+/// failure a zipped comparison reports as a disagreement about some other pair.
+#[test]
+fn the_findings_are_the_ones_the_typescript_reports() {
+    let data = oracle();
+    /* One accumulator across every theme, so the failure names the worst
+    disagreement anywhere rather than the first theme that happens to hold one. */
+    let mut apart = Divergence::new();
+    let mut measured = 0;
+    for theme in data["themes"].as_array().expect("themes is an array") {
+        let label = theme["label"].as_str().expect("label");
+        let derived = derive_theme(&intent_for(label)).expect("the oracle's intents all derive");
+
+        let theirs = theme["pairings"].as_array().expect("pairings is an array");
+        assert_eq!(
+            derived.pairings.len(),
+            theirs.len(),
+            "{label} checks a different number of pairs"
+        );
+        for (ours, theirs) in derived.pairings.iter().zip(theirs) {
+            let where_ = format!(
+                "{label}/{} on {}",
+                theirs["foreground"].as_str().expect("foreground"),
+                theirs["background"].as_str().expect("background"),
+            );
+            assert_eq!(
+                ours.foreground, theirs["foreground"],
+                "{where_}: foreground"
+            );
+            assert_eq!(
+                ours.background, theirs["background"],
+                "{where_}: background"
+            );
+            assert_eq!(
+                match ours.status {
+                    Outcome::Fail => "fail",
+                    Outcome::Pass => "pass",
+                    Outcome::Unverifiable => "unverifiable",
+                },
+                theirs["status"].as_str().expect("status"),
+                "{where_}: status"
+            );
+            /* Compared exactly, which for a float usually deserves a second
+            look and here is the assertion: a target passes from the request to
+            the result untouched, so anything but bit equality means it was
+            recomputed somewhere it should have been carried. */
+            #[allow(clippy::float_cmp)]
+            {
+                assert_eq!(ours.target, number(theirs, "target"), "{where_}: target");
+            }
+            match ours.ratio {
+                None => assert!(
+                    theirs["ratio"].is_null(),
+                    "{where_}: we measured nothing and the TypeScript measured {}",
+                    theirs["ratio"]
+                ),
+                /* Held to the parse tolerance rather than exactly, for the
+                reason `assert_token` gives: a brand parsed an ulp out carries
+                that ulp into the ratio measured against it. The `status` beside
+                it is exact, and it is the half a consumer branches on. */
+                Some(ratio) => {
+                    measured += 1;
+                    apart.check(ratio, number(theirs, "ratio"), &format!("{where_}: ratio"));
+                }
+            }
+        }
+
+        assert_sentences(
+            "violations",
+            &derived.violations,
+            &theme["violations"],
+            label,
+        );
+        assert_sentences(
+            "collisions",
+            &derived.collisions,
+            &theme["collisions"],
+            label,
+        );
+        assert_seeds(&derived.seeds, &theme["seeds"], label);
+    }
+    apart.assert("measured contrast", measured, PARSE_TOLERANCE);
+}
+
+/// Two lists of rendered sentences, compared as lists.
+///
+/// Rendered rather than structured, so the comparison is the whole string:
+/// `violations` reports a ratio to two decimals and `collisions` a distance to
+/// three, and both roundings are part of what a reader is shown.
+fn assert_sentences(what: &str, ours: &[String], theirs: &Value, label: &str) {
+    let theirs: Vec<&str> = theirs
+        .as_array()
+        .expect("an array")
+        .iter()
+        .map(|line| line.as_str().expect("a string"))
+        .collect();
+    assert_eq!(
+        ours.iter().map(String::as_str).collect::<Vec<_>>(),
+        theirs,
+        "{label} reports different {what}"
+    );
+}
+
+fn assert_seeds(ours: &[(String, String)], theirs: &Value, label: &str) {
+    let theirs = theirs.as_object().expect("seeds is an object");
+    assert_eq!(ours.len(), theirs.len(), "{label} seeds a different set");
+    for (name, value) in ours {
+        assert_eq!(
+            value,
+            theirs[name].as_str().expect("a seed is a string"),
+            "{label}/{name}"
+        );
+    }
 }

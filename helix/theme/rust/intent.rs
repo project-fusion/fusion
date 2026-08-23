@@ -190,6 +190,22 @@ pub enum Floating {
     Shadow,
 }
 
+/// **`Space` is the one mechanism a floating panel cannot use**, which is why
+/// [`Floating`] is its own enum rather than an alias: a dropdown separated from
+/// the page by nothing but a gap is a dropdown nobody can see, the gap being
+/// occupied by whatever it opened over. Every other mechanism means the same
+/// thing in both places, so the conversion is total in this direction and
+/// deliberately absent in the other.
+impl std::convert::From<Floating> for Mechanism {
+    fn from(floating: Floating) -> Self {
+        match floating {
+            Floating::Border => Self::Border,
+            Floating::Fill => Self::Fill,
+            Floating::Shadow => Self::Shadow,
+        }
+    }
+}
+
 /// Light or dark surface.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Scheme {
