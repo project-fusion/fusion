@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import styles from '../insights.module.css'
 
 /* How far through the argument a reader is, and how long ago it was written.
 
@@ -89,7 +90,7 @@ export function ReadingProgress() {
        page as text, in the `n min read` tag, and a progress bar announcing
        itself on every scroll frame is the noisiest possible way to say
        something a reader was told once and quietly. */
-    <div aria-hidden="true" className="readingProgress" style={{ scale: `${progress} 1` }} />
+    <div aria-hidden="true" className={styles.readingProgress} style={{ scale: `${progress} 1` }} />
   )
 }
 

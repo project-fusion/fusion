@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { findInsight, formatDate, INSIGHTS } from '../../../../lib/insights'
 import { BODIES } from '../../../../lib/insights/bodies'
+import styles from '../insights.module.css'
 import { PublishedOn, ReadingProgress } from './reading'
 
 export function generateStaticParams(): { slug: string }[] {
@@ -55,7 +56,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const others = INSIGHTS.filter((entry) => entry.slug !== insight.slug).slice(0, 3)
 
   return (
-    <helix-flex class="insightShell" direction="column" gap="2xl">
+    <helix-flex class={styles.insightShell} direction="column" gap="2xl">
       <ReadingProgress />
       {/* **Three groups, not five evenly spaced things.**
           
@@ -66,7 +67,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           then the facts about it, and the spacing is what says so: `xl` between
           the groups and `md` inside them, so the title and its standfirst read
           as one object and the metadata reads as another. */}
-      <helix-flex align="start" class="insightHead" direction="column" gap="xl">
+      <helix-flex align="start" class={styles.insightHead} direction="column" gap="xl">
         {/* The way out, above everything. A reader who opened this from the
             gallery wants it before they want the filing labels.
 
@@ -83,7 +84,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             `Button` itself takes no `href`, which is the whole reason the
             recipe exists: this is the router's own anchor wearing the control's
             clothes. */}
-        <Link className="insightTrail" data-button="ghost" href="/insights">
+        <Link className={styles.insightTrail} data-button="ghost" href="/insights">
           <helix-icon name="caret-left"></helix-icon>
           All insights
         </Link>
@@ -96,11 +97,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             so they belong with the other facts about the piece rather than
             ahead of it. */}
         <helix-flex align="start" direction="column" gap="md">
-          <helix-text as="h1" class="insightTitle">
+          <helix-text as="h1" class={styles.insightTitle}>
             {insight.title}
           </helix-text>
 
-          <helix-text as="p" class="insightLede" tone="muted">
+          <helix-text as="p" class={styles.insightLede} tone="muted">
             {insight.summary}
           </helix-text>
         </helix-flex>
@@ -119,7 +120,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             would turn a row into a mosaic. The subject keeps its wash, so the
             one tag that leads somewhere else is the one that looks like it
             does, and the kind stays neutral beside it. */}
-        <helix-flex align="center" class="insightByline" gap="xs" wrap>
+        <helix-flex align="center" class={styles.insightByline} gap="xs" wrap>
           <helix-tag>
             <helix-avatar name={insight.author} slot="prefix"></helix-avatar>
             {insight.author}
@@ -143,7 +144,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
       {/* `data-prose` because this is the one place on the site rendering prose
           the design system did not lay out. */}
-      <article className="insightBody" data-prose>
+      <article className={styles.insightBody} data-prose>
         <Body />
       </article>
 
@@ -170,8 +171,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             would make three lists of them. */}
         <helix-flex direction="column" gap="2xs">
           {others.map((other) => (
-            <Link className="insightNext" href={`/insights/${other.slug}`} key={other.slug}>
-              <helix-flex align="center" class="insightNextRow" gap="md" justify="between">
+            <Link className={styles.insightNext} href={`/insights/${other.slug}`} key={other.slug}>
+              <helix-flex align="center" class={styles.insightNextRow} gap="md" justify="between">
                 <helix-flex direction="column" gap="2xs">
                   <helix-flex align="center" data-density="sm" gap="xs">
                     <helix-tag>{other.topic}</helix-tag>

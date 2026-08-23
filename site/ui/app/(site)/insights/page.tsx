@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { InsightArt } from '../../../lib/insight-art'
 import { formatDate, INSIGHTS, type Insight } from '../../../lib/insights'
 import { InsightBrowser } from './insight-browser'
+import styles from './insights.module.css'
 
 export const metadata = {
   description: 'The arguments behind what we build, written where they can be checked.',
@@ -55,7 +56,7 @@ export default async function Page({
       order={order}
       sorts={Object.keys(SORTS)}
     >
-      <helix-grid className="insightGrid" columns={4} gap="xl">
+      <helix-grid className={styles.insightGrid} columns={4} gap="xl">
         {insights.map((insight) => (
           <Link
             aria-label={insight.title}

@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useState } from 'react'
 import type { Insight } from '../../../lib/insights'
+import styles from './insights.module.css'
 
 /**
  * One post, reduced to what searching and filtering need.
@@ -146,7 +147,7 @@ export function InsightBrowser({
 
   return (
     <>
-      <section className="pageHero insightsHero">
+      <section className={`pageHero ${styles.insightsHero}`}>
         <helix-flex align="center" className="pageHeroInner" direction="column" gap="lg">
           <helix-flex align="center" data-density="sm" direction="column" gap="sm">
             <helix-tag>Fusion Development Group</helix-tag>

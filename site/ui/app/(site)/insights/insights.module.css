@@ -1,0 +1,337 @@
+/* Insights: the gallery's own hero and grid, and everything a post is made of.
+ *
+ * Scoped to the two routes that read it. What stayed global is the card itself,
+ * `.insightCard` and `.insightPhoto`, because a card is rendered on the landing
+ * page as well and its picture is painted by a component in `lib/`: a name two
+ * routes and a shared component all apply is a shared name, whatever directory
+ * it happens to be styled from.
+ */
+
+/* The same field the drawings sit on, at the same pitch, over the whole band.
+ *
+ * Dots rather than gridlines. Both would work as texture and only one is
+ * already the language: sixty-five cards are drawn on this exact lattice, so
+ * repeating it here makes the hero the top of the same sheet rather than a
+ * second decoration that happens to be nearby. Gridlines would have been a new
+ * idea introduced at the loudest point on the page.
+ *
+ * Faded out at the bottom and at the sides. Uniform, it ran under the search
+ * and straight into the filter bar's own hairline, which put texture behind the
+ * one control on the page a reader has to aim at. The mask leaves it strongest
+ * across the top, where there is nothing but air, and gone by the time the band
+ * ends. */
+/* A step off the page, and the masthead is see-through so it takes the step too.
+ *
+ * `.pageHero` is the page's own colour on both galleries, which is right on
+ * `/helix` because the lattice and its lit dots are what separate the band from
+ * what follows. Insights has neither, so the hero was the same flat colour as
+ * the grid below it and the only thing marking the band was the filter bar's
+ * hairline: a heading, a search box and no edge until 448 pixels down.
+ *
+ * **One token in both modes, after a pass at two.** This paired
+ * `surface-sunken` in light with `surface` in dark, on the reasoning that the
+ * neutral ramp is not symmetric and each mode should take whichever token is
+ * genuinely one step off its own page. The measurements were right and the band
+ * was still too heavy: `surface-sunken` is thirteen values off white across 448
+ * pixels of a hero, which is a grey panel rather than a step. `surface` is five,
+ * and the band is a change in the paper rather than a block on it.
+ *
+ * Which also retires a workaround. Pairing two tokens through `light-dark()` to
+ * compensate for the ramp is the thing 145 says should not spread, and this was
+ * one of the two places doing it. One token, no compensation, and the ramp's
+ * asymmetry stays 145's problem rather than becoming this rule's.
+ *
+ * The bar above it needs no rule at all. `/insights` is already in `onHero`, so
+ * the masthead is `transparent` at rest, and the hero's negative start margin
+ * already pulls up by the header *plus the hairline* for precisely this case,
+ * which the rule above calls out as the thing that stops being invisible the
+ * day the hero takes a colour of its own. This is that day. */
+.insightsHero {
+  background-color: var(--helix-color-surface);
+}
+
+/* ======================================================== insights ======= */
+
+/* Three across, stepping down as the window narrows.
+ *
+ * Three rather than the gallery's five, because these cards carry a title and
+ * two sentences instead of a drawing and a name: a text card at a fifth of a
+ * wide window is a column of broken lines. The steps below fall where a
+ * sentence stops fitting rather than at a list of device widths. */
+.insightGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Three steps down rather than two, because four across needs one more.
+   Straight from four to two would double the card width in a single breakpoint,
+   which is the jump the intermediate step exists to avoid. */
+@media (width < 88rem) {
+  .insightGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width < 70rem) {
+  .insightGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width < 44rem) {
+  .insightGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* A post is a centered column, and the column is the page's measure rather than
+   the shell's full width. */
+/* **90ch, and in characters rather than rems for the reason a measure is.**
+   `44rem` is a length that happens to hold about 70 characters at the current
+   type size and holds a different number at any other: state the column in the
+   unit it is actually about, and it survives a change to the ramp. */
+.insightShell {
+  margin-inline: auto;
+  max-inline-size: 90ch;
+  /* **Not a band at the top, because a post is not a section of the landing
+     page.** `--site-band` is the rhythm that gives each claim on the front page
+     a screen of its own, and it clamps to 12vh, which is 108 on a laptop. Above
+     an article that is 108 pixels of nothing between the masthead and the way
+     out, before a reader reaches a single word of the thing they opened. A page
+     of prose wants to start.
+
+     The end keeps the band. There the space is doing work: it separates the
+     last line of the argument from the footer, and running an article straight
+     into the chrome is the fault the top padding does not have. */
+  padding-block: var(--helix-space-2xl) var(--site-band);
+  padding-inline: var(--site-inset);
+}
+
+/* **Left, with the prose under it.**
+ *
+ * This was centred, on the argument that a centred measure is a column the eye
+ * can find. That holds for a narrow column and stops holding at 90ch: the head
+ * and the body now share an edge wide enough that a centred title starts in a
+ * different place from every line beneath it, and the reader's eye has two left
+ * edges to keep. One edge, and the title, the labels and the byline all return
+ * to it. */
+.insightHead {
+  text-align: start;
+}
+
+/* The chevron sits on the column, and the label sits after it.
+ *
+ * **Both alignments were built and looked at, and this is the one that
+ * survives.** Aligning the *label* is the better-sounding argument: a reader
+ * aligns on words, not on icons, and with the chevron on the column the label
+ * starts 29 inside it, so the masthead has a title and a standfirst at one edge
+ * and the only other words at another. Measured at 24 against 53.
+ *
+ * It loses anyway, because the fix has to put the chevron somewhere and the
+ * only place left is outside. Pulling back far enough to land the label on the
+ * column drags the whole control 44 to the left, and the hover fill goes with
+ * it, since anything that hangs still has to sit inside the thing that lights
+ * up. That gives a wash reaching 44 one way and 16 the other, hanging off the
+ * side of a centred column with nothing under it. A resting misalignment of 29
+ * costs less than a moving one of 44: the first is a slightly indented label,
+ * the second is a shape that looks broken every time a pointer crosses it.
+ *
+ * So one control inset, the fill overhangs evenly, and the chevron holds the
+ * edge that the title and the standfirst hold. The label is inset by the icon
+ * and its gap, which is what a leading icon does to a label anywhere. */
+.insightTrail {
+  margin-inline-start: calc(var(--helix-space-control) * -1);
+}
+
+.insightLede {
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  max-inline-size: 34rem;
+  text-wrap: balance;
+}
+
+/* The avatar sized to sit inside the chip that carries it.
+ *
+ * `Avatar`'s own `sm` is 24, which is exactly the height of a tag at this
+ * density, so slotted as a prefix it filled the chip edge to edge and pushed it
+ * taller than the four beside it. Through the component's own hook, at the
+ * tag's text size, so the two move together if the ramp does.
+ *
+ * The 0.75 the prefix slot puts on everything it holds is left alone. It is
+ * there because a prefix is a category qualifying a label and should not
+ * outshout it, and that reasoning survives the thing being a face rather than a
+ * word: this is a byline, not a profile. */
+.insightByline helix-avatar {
+  --avatar-size: calc(var(--helix-text-xs) * 1.4);
+}
+
+/* A row that is a link. Cards were tried here and are wrong at the foot of an
+   article: three boxes after a column of prose read as a different page
+   starting, where rows read as the same page continuing.
+ *
+ * **The rules are gone, because the hover wash was already doing their job.**
+ * Every row carried a hairline above it *and* a fill on hover, which is two
+ * separators for one boundary: the wash says where a row begins and ends more
+ * exactly than a line between them does, and it says it on the row the reader
+ * is actually pointing at. The one divider that stays is the one above the
+ * whole section, which separates the list from the article rather than the rows
+ * from each other. That one is a real boundary and nothing else marks it.
+ *
+ * **Inset, and pulled back by the same amount.** The wash had no inline padding
+ * at all, so it opened flush against the words and read as a stripe behind the
+ * text rather than as a row containing it. The padding gives it room and the
+ * negative margin puts the text back on the article's own measure, so nothing
+ * moves when the fill appears and the column of prose above still lines up with
+ * the titles below. Same construction the back step uses.
+ *
+ * The radius comes with the inset: a fill with corners is an object, and a fill
+ * that runs to both edges of the page is a band. These are objects. */
+.insightNext {
+  border-radius: var(--helix-radii-sm);
+  color: inherit;
+  display: block;
+  margin-inline: calc(var(--helix-space-md) * -1);
+  padding: var(--helix-space-md);
+  text-decoration: none;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.insightNext:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+}
+
+/* The arrow leans the way the row goes.
+ *
+ * It was a static glyph at the end of a link, which is a picture of a direction
+ * rather than a sign of one: three of them down a page read as decoration
+ * because nothing about them answers the pointer. Four pixels is enough, and
+ * more is a row that feels like it is trying to leave.
+ *
+ * `translate` rather than `transform`, so it composites on its own and cannot
+ * collide with a transform the icon might want later. Declared on the icon
+ * rather than the row, because only the arrow moves.
+ *
+ * The component sets no `translate` of its own, so this adds a property rather
+ * than overruling one. */
+.insightNext helix-icon {
+  transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.insightNext:hover helix-icon {
+  translate: var(--helix-space-2xs) 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightNext helix-icon {
+    transition: none;
+  }
+
+  .insightNext:hover helix-icon {
+    translate: none;
+  }
+}
+
+/* The tags in the byline separate by fill, not by edge.
+ *
+ * Five chips in a row each drawing its own hairline is five more lines than the
+ * row needs: the fill already says where each one begins and ends, and the
+ * edges turned a set of facts into a set of boxes. Through `--tag-border-color`,
+ * which `Tag` now publishes beside the fill and label hooks it already had, so
+ * this is the component's own property rather than a document rule reaching
+ * past it.
+ *
+ * `outlined` goes with the edges, since an outlined chip with no outline is
+ * nothing at all. Every tag is `subtle` now and the subject keeps `primary`,
+ * which is the one distinction the row was making with colour anyway. */
+.insightByline helix-tag {
+  --tag-border-color: transparent;
+}
+
+/* Two of the five are links, and the chip is the whole target.
+ *
+ * `quiet` rather than no treatment at all, because a bare anchor draws an
+ * underline and that line propagates into the label the tag has slotted from
+ * this tree: the chip would come out underlined through its own shadow root.
+ * `quiet` is the variant that takes the decoration off, and its colour never
+ * reaches the label, which `Tag` sets on its own host.
+ *
+ * `inline-flex` so the anchor is exactly the chip. Left inline it takes the
+ * line box's height instead, which puts a taller invisible target around a
+ * short chip and lands the row's `align: center` on the wrong box. */
+.insightByline a {
+  display: inline-flex;
+}
+
+/* The read-through line, on the one strip of the page that never moves.
+ *
+ * Pinned to the masthead's own height at the masthead's own layer, so it rides
+ * the bottom edge of a sticky bar rather than floating somewhere under it. Two
+ * pixels: enough to see at the edge of vision while reading, not enough to be
+ * a second piece of chrome.
+ *
+ * `transform-origin` at the start edge, because the component scales it on X
+ * from 0 and a bar that grows from its middle is not a progress bar. Logical,
+ * so it fills the way the script reads.
+ *
+ * No transition. The value already tracks the scroll frame by frame, and easing
+ * a thing that is already following the pointer makes it lag behind the content
+ * it is reporting on. */
+.readingProgress {
+  background-color: var(--helix-color-primary);
+  block-size: 2px;
+  inset-block-start: var(--helix-size-header);
+  inset-inline: 0;
+  position: fixed;
+  transform-origin: 0 50%;
+  z-index: var(--helix-layer-sticky);
+}
+
+/* Larger than a section title and smaller than the hero's, which is the whole
+   scale a post needs: it is the only heading on the page at this level and
+   everything under it is an `h2` the base layer already sizes. */
+.insightTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
+  letter-spacing: var(--helix-tracking-tight);
+  /* **Not `leading-tight`, because this is the one heading on the site that
+     wraps in the display face.**
+
+     Measured rather than eyeballed, using the face's real ink extents rather
+     than its em box. `fusionDisplay` draws 0.90em of ink for mixed case, so at
+     `leading-tight` (1.2) two lines of this title clear each other by 0.30em,
+     while the lede directly under it clears by 0.64em at `leading-normal`. In
+     absolute terms that is the fault: at the size this clamps to, the title's
+     gap and the body's gap come out within a few pixels of each other even
+     though the title is more than twice the size, so the space stops scaling
+     with the type and the second line reads as stuck to the first.
+
+     1.3 puts the clearance at 0.40em. Still visibly a heading, tighter than any
+     body text, and the gap now grows with the size.
+
+     A ratio and not a token, because there is no rung between `tight` (1.2) and
+     `normal` (1.5) and inventing one here would name a value nothing else
+     reads. Queued as 152. The other three display-face rules on the site are
+     the wordmark, the command mark and one more, all of which are single lines,
+     which is why this is the only place the tightness ever shows. */
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+/* Air between the blocks of a post, said once here rather than on every
+   element: the base layer resets the UA margins and themes prose under
+   `[data-prose]`, and what it cannot know is how far apart this particular
+   page wants its paragraphs. */
+.insightBody > * + * {
+  margin-block-start: var(--helix-space-lg);
+}
+
+/* A heading needs more above it than a paragraph does, or a new section starts
+   at the same distance as the next sentence. */
+.insightBody > * + :where(h2, h3) {
+  margin-block-start: var(--helix-space-2xl);
+}
+
+/* The arrow holds the end of the row rather than wrapping under it. Without a
+   floor of zero the text column refuses to shrink, so `justify: between` has
+   nothing to distribute and the icon drops to a line of its own. */
+.insightNextRow > helix-flex:first-child {
+  min-inline-size: 0;
+}
