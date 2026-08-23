@@ -163,6 +163,27 @@ const kindOf = (token: string): string => {
   return /^[A-Z]/.test(token) ? 'custom' : 'plain'
 }
 
+/**
+ * A default value, which is a literal and not a type.
+ *
+ * **`TypeText` cannot render one, and using it for both is what put a value
+ * through the other column's rules.** A union's members are held unbreakable so
+ * a wrap can only happen between them and the bar starts the line; a default
+ * has no members and may contain a space, and `"Show password"` in an 83px
+ * column then had nowhere to break. Measured on Input: the text ran 108px in an
+ * 83px box and the last nine landed on top of the description beside it.
+ *
+ * Same colours and the same quote swap, because it is still code and a reader
+ * still copies it out. What it does not inherit is the union machinery.
+ */
+function DefaultText({ children }: { children: string }) {
+  return (
+    <helix-text class={styles.apiDefault} variant="code">
+      {tokens(children.replace(/'([^']*)'/g, '"$1"'))}
+    </helix-text>
+  )
+}
+
 function TypeText({ children }: { children: string }) {
   /* Double quotes, because that is what the rest of the library writes. The
      manifest records a literal exactly as the source spelled it, and the source
@@ -171,11 +192,19 @@ function TypeText({ children }: { children: string }) {
      the wrong quote. Swapped on the way out rather than in the manifest, which
      should keep saying what the source says. */
   const members = union(children.replace(/'([^']*)'/g, '"$1"'))
+  /* Unbreakable only where there is a bar to protect.
+   *
+   * The member class holds a member together so a union can only wrap between
+   * its members. With one member there is no between, and holding it together
+   * anyway is how `(options: FocusOptions) => void` came to run 223px in a
+   * 147px column and print itself over the description: a signature is one
+   * member, and it has spaces it would otherwise be glad to break at. */
+  const held = members.length > 1
   return (
     <helix-text class={styles.apiType} variant="code">
       {members.map((member, at) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
-        <span className={styles.apiTypeMember} key={at}>
+        <span className={held ? styles.apiTypeMember : undefined} key={at}>
           {at > 0 && <span className={styles.apiTypeBar}>|</span>}
           {tokens(member)}
         </span>
@@ -320,7 +349,9 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
             <helix-table-cell>
               <TypeText>{row.type}</TypeText>
             </helix-table-cell>
-            <helix-table-cell>{row.default && <TypeText>{row.default}</TypeText>}</helix-table-cell>
+            <helix-table-cell>
+              {row.default && <DefaultText>{row.default}</DefaultText>}
+            </helix-table-cell>
             <helix-table-cell>
               <helix-text tone="muted" variant="caption">
                 {first(row.description)}

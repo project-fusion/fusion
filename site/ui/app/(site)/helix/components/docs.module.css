@@ -310,6 +310,17 @@
 
 .apiName {
   color: var(--helix-color-syntax-name);
+  /* A property name is one identifier and breaking it is worse than a wider
+     column: `defaultValue` came out as `defaultValu` and `e`, which is a name a
+     reader cannot search for and cannot copy from one line.
+     Both halves are needed and the floor alone did nothing. The cell inherits
+     `overflow-wrap: anywhere`, which is right for a description and makes every
+     character a break opportunity, so `min-content` measured one letter and
+     floored at nothing. `normal` puts the word back together and the floor is
+     then the word. The names are short, so the column costs nothing it did not
+     already need. */
+  min-inline-size: min-content;
+  overflow-wrap: normal;
 }
 
 /* And the type beside it, coloured by what each part of it is. The tokens are
@@ -325,9 +336,32 @@
  * `break-word` rather than `anywhere`, so a break is taken only when a single
  * token genuinely cannot fit. `anywhere` would split short unions mid-literal
  * while there was still room to put them on the next line whole. */
+/* A default value, which is code and is not a union.
+ *
+ * It shares the type column's colours and none of its wrapping rules: a literal
+ * has no members to hold together, and holding it together anyway is what made
+ * `"Show password"` overflow an 83px cell and print itself over the description.
+ * `anywhere` rather than `break-word`, because only `anywhere` lowers the
+ * element's min-content size, which is what lets the column be narrow at all
+ * instead of overflowing when it is. */
+.apiDefault {
+  color: var(--helix-color-foreground-subtle);
+  display: block;
+  overflow-wrap: anywhere;
+}
+
 .apiType {
   color: var(--helix-color-foreground-subtle);
   display: block;
+  /* Never narrower than the longest thing in it that cannot break.
+   *
+   * A union's members are held together on purpose, so the column has to be at
+   * least one member wide or the member overflows and prints over the
+   * description. Carousel is the case: `"block-start"` measures 116px and the
+   * column had settled at 112, which is four pixels of a word sitting in the
+   * next column. `min-content` is exactly that floor and asks for nothing more,
+   * so a column with only short types stays narrow. */
+  min-inline-size: min-content;
   overflow-wrap: break-word;
 }
 
