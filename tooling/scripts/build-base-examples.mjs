@@ -1042,10 +1042,23 @@ helix-base-time-picker::part(items) {
      Nothing laid the rail against the content, so the mark, the time and what
      happened landed in whatever order the flow gave them and the times drifted
      off to the right of their own entries. */
+  /* Two columns and two rows, with the rail spanning both.
+   
+     The item renders three children at the top of its shadow root, and the
+     component says why: the time is a sibling of the content rather than the
+     first thing inside it, so the two are separate rows and the rail can place
+     its mark against the second of them rather than a fixed distance from the
+     top. Give the host two columns and nothing else and those three flow as
+     rail, time, content, which puts the content under the rail and the time
+     beside it: the first attempt at this did exactly that and looked stacked.
+     They have to be placed.
+   
+     The rail also matched the branch that paints a progress groove, so before
+     any of that it was a wide grey stripe lying across the entry above it. */
   timeline: `helix-base-timeline-item {
   display: grid;
   gap: 0 0.75rem;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 helix-base-timeline-item::part(rail) {
@@ -1055,6 +1068,8 @@ helix-base-timeline-item::part(rail) {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  grid-column: 1;
+  grid-row: 1 / -1;
   inline-size: auto;
 }
 
@@ -1062,19 +1077,21 @@ helix-base-timeline-item::part(connector) {
   background-color: var(--_gray-line);
   flex: 1;
   inline-size: 1px;
-  min-block-size: 1rem;
+  min-block-size: 0.75rem;
+}
+
+helix-base-timeline-item::part(time) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+  grid-column: 2;
 }
 
 helix-base-timeline-item::part(content) {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
+  grid-column: 2;
   padding-block-end: 1rem;
-}
-
-helix-base-timeline-item::part(time) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
 }`,
   /* A stack of messages, each one a row inside a box.
      Left alone the tone mark, the message and the dismiss ran together and the
