@@ -1,0 +1,70 @@
+---
+description: Five layers, four shadows, and the glass the material tokens make possible.
+section: Foundations
+title: Elevation and material
+---
+
+# Elevation and material
+
+## Layers
+
+```
+--helix-layer-base  raised  sticky  overlay  toast
+```
+
+Five, named after what lives at each rather than numbered. A numbered scale
+invites `z-index: 1001`, and the number nobody can justify is how stacking
+context bugs start.
+
+| Layer | What is at it |
+|---|---|
+| `base` | The document |
+| `raised` | Something lifted but still in the flow: a hovered row, a dragged card |
+| `sticky` | A header or a column that stays while content scrolls under it |
+| `overlay` | Menus, dialogs, popovers, tooltips |
+| `toast` | Above everything, including a modal |
+
+**Most overlays do not need these**, because they use the popover API and render
+in the browser's top layer, which is above every z-index by construction. The
+tokens are for the cases the top layer does not cover: your own sticky header,
+your own dragged element, and anything that has to sit between two of ours.
+
+## Shadows
+
+```
+--helix-shadow-none  sm  md  lg
+--helix-shadow-surface     the policy for a surface in the flow
+--helix-shadow-floating    the policy for a surface over content
+```
+
+The first four are the values. The last two are the *decision*, and they are
+what a theme sets to make the system shadow-first or border-first. See [Surfaces
+and separation](./surfaces-and-separation).
+
+## Material
+
+Eight tokens describing translucency rather than colour:
+
+| | |
+|---|---|
+| `--helix-material-backdrop` | The wash behind a modal |
+| `--helix-material-opacity` | How opaque a translucent surface is |
+| `--helix-material-blur-sm`, `-md`, `-lg` | Backdrop blur radii |
+| `--helix-material-translucent`, `-strong` | The two translucent grounds |
+| `--helix-material-border` | The edge a translucent surface needs to have any at all |
+
+These are what the `material` axis renders: `frosted`, `glass` and `transparent`
+are three points of one optical language, and they are an axis of their own
+rather than values of `emphasis`, because a panel can be glass *and* outlined
+and two things that can be true at once are two axes. See [Visual
+axes](./visual-axes).
+
+**Blur is expensive and is the one thing here worth being deliberate about.** A
+`backdrop-filter` forces the compositor to re-read what is behind the element on
+every frame it moves. A frosted header that is always on screen pays that
+continuously. Reach for `translucent` without the blur when the effect is about
+depth rather than about the texture.
+
+**`material-border` is not decoration.** A translucent surface takes its colour
+from what is behind it, so on a busy background it has no edge at all. The
+border token is what keeps it a shape.

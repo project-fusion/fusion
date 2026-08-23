@@ -1,0 +1,73 @@
+---
+description: Four durations, five curves, and the rule every animating component has to answer.
+section: Foundations
+title: Motion
+---
+
+# Motion
+
+## The tokens
+
+```
+--helix-duration-instant  fast  normal  slow
+--helix-easing-standard  emphasized  decelerate  accelerate  spring
+```
+
+Four durations and five curves. `standard` for most things, `decelerate` for
+something arriving, `accelerate` for something leaving, `emphasized` for a
+movement the reader is meant to follow, and `spring` for the few places
+overshoot reads as responsive rather than as a bug.
+
+The theme engine takes a `motion` intent input, so a product can be uniformly
+quicker or slower without every component being retuned.
+
+## Reduced motion is per component, and this is why
+
+The base layer has a global rule capping animation and transition duration for a
+reader who asked not to be moved. **It does not reach a single component.**
+
+```css
+*, *::before, *::after { … }
+```
+
+`*` does not cross a shadow boundary. So that rule reaches your prose, your
+layout and the base layer's own recipes, and none of the fifty-odd components
+that draw inside a shadow root. Each one answers `prefers-reduced-motion` in its
+own stylesheet, and fifty-nine of them do; `bun run check:motion` fails a
+component that animates without one.
+
+**The same is true of yours.** If you write a component with a shadow root, the
+global rule will not cover it either. That is not a Helix behaviour, it is how
+`*` works, and it is the single easiest accessibility regression to ship without
+noticing.
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+    transition: none;
+  }
+}
+```
+
+## What reduced motion means here
+
+Not "no movement". A transition that communicates a relationship, like a panel
+sliding out of the control that opened it, is doing work; a decorative float is
+not. The library's own policy is to remove the second and shorten the first to
+the point where it is instant but not jarring.
+
+The one place this is absolute is anything that moves continuously without
+input: the aura shader, marquees, and looping loaders all stop rather than speed
+up.
+
+## Two things that are not motion tokens
+
+**`@starting-style`** is how overlays animate in, and it needs no duration token
+of its own: it is a starting value, and the transition that runs from it uses
+the tokens above.
+
+**View transitions** are not used anywhere in the library. A component cannot
+own a view transition, because the transition is between two states of the
+document rather than of the component, so if you want them that is yours to
+drive.

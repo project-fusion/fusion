@@ -1,0 +1,68 @@
+---
+description: Five radii, two widths, and the two tokens that are a policy rather than a value.
+section: Foundations
+title: Shape and borders
+---
+
+# Shape and borders
+
+## Radii
+
+```
+--helix-radii-none  sm  md  lg  full
+```
+
+`full` is `9999px` rather than `50%`, which matters for anything that is not
+square: a percentage radius on a wide element gives an ellipse, and a pill is
+what you wanted.
+
+Rounding is the fastest single change to how a system feels, and it is one
+token:
+
+```css
+:root {
+  --helix-radii-md: 2px;
+}
+```
+
+That makes every card, dialog, input and button squarer at once. The theme
+engine takes a `radius` intent input for exactly this reason. See [Deriving a
+theme](./theming).
+
+**A shape that is round rather than softened does not use these.** An avatar, a
+loader and a radio are circles because of what they are, so they say `50%`
+directly and are unaffected by a theme that squares everything else off.
+
+## Border widths
+
+```
+--helix-border-thin      the default hairline
+--helix-border-thick     an emphasised edge
+--helix-border-surface   the policy for a surface in the flow
+--helix-border-floating  the policy for a surface over content
+```
+
+The first two are values you pick. **The second two are a decision**, and they
+belong to [Surfaces and separation](./surfaces-and-separation): they are what a
+theme sets to zero to go shadow-first, or to a width to go border-first.
+
+This distinction is why a component's border width sits behind a per-component
+hook rather than being written inline. Of 68 border declarations reaching for
+`--helix-color-border` before this was fixed, eight put the *colour* behind a
+hook and none put the width behind one, so a border could be recoloured and
+never removed, and the floating surfaces wrote `border: none` outright so one
+could never be added either.
+
+## Corner radius on a group
+
+Adjacent controls in a group flatten the corners between them, so a button group
+reads as one shape rather than three:
+
+```css
+[data-button]:not(:first-child) { border-start-start-radius: 0; }
+```
+
+The base layer does this for the recipes, and the components do it for
+themselves. Worth knowing if you build your own group: it is the inner corners
+that go flat, not the outer ones, and it is `border-start-start-radius` rather
+than `border-top-left-radius` so it follows the writing direction.

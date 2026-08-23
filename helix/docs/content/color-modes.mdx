@@ -1,0 +1,87 @@
+---
+description: One attribute, two modes, and no token restated to honour it.
+section: Foundations
+title: Color modes
+---
+
+# Color modes
+
+Light and dark are one attribute and no duplicated tokens. There is no second
+stylesheet, no `.dark` class to toggle, and nothing to remember to update twice.
+
+## How it works
+
+```css
+:root {
+  color-scheme: light dark;
+  --helix-color-background: light-dark(#fff, #0b0b0d);
+}
+```
+
+Every token is written once, with both halves in a `light-dark()`. Which half
+resolves is decided by `color-scheme` and nothing else, so the mode is a single
+inherited property and no token is restated to honour it. That is 769
+declarations in the token layer expressing two modes without a second copy of
+anything.
+
+## Setting the mode
+
+```html
+<html data-color-mode="dark">
+```
+
+`[data-color-mode="light"]` and `[data-color-mode="dark"]` set `color-scheme`,
+and `color-scheme` inherits, so the attribute works **on any element** rather
+than only on the root:
+
+```html
+<div data-color-mode="light">
+  <!-- A light preview inside a dark page. One attribute. -->
+</div>
+```
+
+That is the whole mechanism, and it is why the theme builder can show you a
+light and a dark rendering of the same component side by side without rendering
+two documents.
+
+## Following the system
+
+Unset, `:root` declares `color-scheme: light dark`, which means the operating
+system decides. That is the default and it is usually right.
+
+A `prefers-color-scheme` media query still exists in the token layer for one
+narrow case rather than being the mechanism: a value that has to be *derived*
+from the mode, rather than chosen between two, cannot be expressed as
+`light-dark()` and has to ask which mode is current.
+
+## The one component that inverts
+
+`Toast` renders in the opposite mode to the page it is on, which is why it is
+the exception written into the base layer:
+
+```css
+helix-toast:not([data-color-mode]) {
+  color-scheme: var(--_helix-mode-inverted);
+}
+```
+
+A toast is chrome over the page rather than part of it, and inverting is how it
+reads as separate without a border. Opt out by putting `data-color-mode` on it,
+which then wins, because the rule only applies to a toast that has not been
+told.
+
+## What this means for your own CSS
+
+Write `light-dark()` for your own colours and set nothing else:
+
+```css
+.callout {
+  background: light-dark(#eef, #223);
+}
+```
+
+It will follow the page, follow a subtree that was told otherwise, and follow
+the system when nothing has said. Do not write a `prefers-color-scheme` query
+for it, and do not key off the `data-color-mode` attribute: both stop working
+the moment a subtree overrides the mode, which is the case this design exists to
+make cheap.

@@ -1,0 +1,75 @@
+---
+description: One spacing scale, and why a control's height is not on it.
+section: Foundations
+title: Space and size
+---
+
+# Space and size
+
+Two scales that look similar and answer different questions. Space is the gaps
+between things. Size is how big a control is. Mixing them is how a layout ends
+up with a button that is one step of padding taller than the input beside it.
+
+## Space
+
+```
+--helix-space-none  2xs  xs  sm  md  lg  xl  2xl  3xl
+```
+
+Nine steps, t-shirt named rather than numbered. A numbered scale invites
+arithmetic (`space-4` is twice `space-2`) which stops being true the moment the
+scale is tuned, and invites a `space-4.5` the first time something does not fit.
+
+`--helix-space-control` is the tenth and is different in kind: it is the inset a
+control uses, and it follows the region's density rather than sitting on the
+scale. See [Size and density](./size-and-density).
+
+Use them for gap, padding and margin:
+
+```css
+.toolbar {
+  display: flex;
+  gap: var(--helix-space-sm);
+  padding: var(--helix-space-md);
+}
+```
+
+## Size
+
+Thirty-four tokens, and almost all of them name a specific thing:
+`--helix-size-control`, `--helix-size-checkbox`, `--helix-size-switch`,
+`--helix-size-avatar`, `--helix-size-icon`, `--helix-size-tag`,
+`--helix-size-header`, `--helix-size-loader`, `--helix-size-progress`,
+`--helix-size-meter`.
+
+Most come in a `-sm`, `-md` and `-lg` set beside the unsuffixed one. **The
+unsuffixed token is the live one** and the suffixed ones are the values the
+density axis picks between. So a component reads `--helix-size-control` and the
+region's `[data-density]` decides which of `-sm`, `-md` or `-lg` that resolves
+to.
+
+That is why a component has no `size` property: the answer is the region's, and
+saying it once there means a ragged row is not merely discouraged, it is
+unwritable.
+
+## The focus ring is three tokens
+
+```
+--helix-size-focus-ring     the ring's own thickness
+--helix-size-focus-offset   the gap between the control and the ring
+--helix-size-focus-reach    ring plus offset, for reserving room
+```
+
+The third exists because a ring drawn outside a control needs room, and every
+component that draws one otherwise recomputes the sum. Reserve with `reach`,
+draw with the other two.
+
+## What not to do
+
+**Do not use a size token for a gap.** `--helix-size-control` is a height, and a
+layout that uses it as a gap changes meaning the day a density changes under it.
+
+**Do not use a raw value because the scale has no step for it.** If a gap is
+genuinely between `sm` and `md`, that is worth saying out loud rather than
+writing `11px`, because it is usually a sign the two things being separated
+belong at a different level of the layout.

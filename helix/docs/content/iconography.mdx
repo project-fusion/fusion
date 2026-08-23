@@ -1,0 +1,77 @@
+---
+description: 103 glyphs, one geometry, and how to draw one that is not in the set.
+section: Foundations
+title: Iconography
+---
+
+# Iconography
+
+```html
+<helix-icon name="trash"></helix-icon>
+```
+
+103 glyphs, from Phosphor, drawn on a 256 box at stroke-width 16. That is
+Phosphor's own geometry and it is kept rather than rescaled: normalising to a 24
+box would change the optical weight of every glyph and stop the set matching
+anything upstream.
+
+## Size and colour come from the context
+
+An icon has no `size` and no `color` property. It is `1em` square and
+`currentColor`, so it takes the size and colour of the text it sits in:
+
+```html
+<span style="color: var(--helix-color-danger)">
+  <helix-icon name="warning"></helix-icon> Careful
+</span>
+```
+
+Inside a control, `--helix-size-icon` is what decides, and it follows the
+region's density along with everything else. That is why an icon in a small
+button is smaller without anybody saying so.
+
+## Decorative or named
+
+```html
+<!-- Decorative: the text beside it already says what this is. -->
+<helix-button>
+  <helix-icon name="trash"></helix-icon>
+  Delete
+</helix-button>
+
+<!-- Named: there is no text, so the icon has to carry the name. -->
+<helix-icon-button label="Delete" name="trash"></helix-icon-button>
+```
+
+An icon with no `label` is hidden from assistive technology, which is right when
+the words are beside it and wrong when they are not. `Icon.Button` takes a
+`label` because it never has words beside it.
+
+## Importing a glyph directly
+
+```ts
+import { trash } from '@helix-io/icons'
+```
+
+Each glyph is an exported string, so you can put one in your own markup, in a
+canvas, or anywhere an element is not what you want. `bun run check:icons` holds
+every `name` used anywhere in the repository to the set of glyphs that actually
+exist, in 1,189 files, so a typo is a build failure rather than an empty box.
+
+## Adding one
+
+Drop the SVG into `helix/icons/raw` and run `bun run icons`. The set is
+generated from those files, so adding a glyph is adding a file rather than
+hand-transcribing a path into a TypeScript object.
+
+Keep to the same geometry: 256 box, stroke-width 16, no fill. A glyph drawn at a
+different weight is visible immediately when it sits beside one that was not.
+
+## Icons this set deliberately does not have
+
+Product marks. Helix and Cortex have marks and they live in the icon package,
+but a mark is not an icon: it identifies a product and does not mean an action.
+Three earlier attempts at product marks were removed for being pictograms of a
+metaphor standing beside a parent that is a geometric monogram, and the rule
+that replaced them is that **a mark is one rounded body with material removed**.
+If you are reaching for the icon set to draw a logo, that is the wrong drawer.

@@ -1,0 +1,74 @@
+---
+description: Three families, one scale, and a heading that is a real heading.
+section: Foundations
+title: Typography
+---
+
+# Typography
+
+## The families
+
+| Token | For |
+|---|---|
+| `--helix-font-sans` | Everything, unless it is one of the two below |
+| `--helix-font-mono` | Code, and anything that has to line up in a column |
+| `--helix-font-display` | Headings that are meant to be looked at rather than read |
+
+Three, not a scale of weights and widths, because a design system with more type
+families than a product has uses ends up with two that mean the same thing.
+
+## The scale
+
+`--helix-text-xs` through `--helix-text-3xl`, plus `--helix-text-control`, which
+is the size a control's own text takes and follows the region's density rather
+than the type scale.
+
+**The scale is applied to real headings by the base layer, not by a component.**
+
+```css
+:where([data-prose] h1) { font-size: var(--helix-text-3xl); }
+:where([data-prose] h2) { font-size: var(--helix-text-2xl); }
+```
+
+There is no `Text` component and no `Heading` component, and that is deliberate.
+A component would have to take the level as a prop, which tempts `size` to be
+set independently of it, which is how a page ends up with an `<h4>` that looks
+like a title and an outline nothing can navigate. Styling the element means the
+markup and the appearance cannot disagree.
+
+It also reaches prose the design system never renders: anything out of a CMS, a
+markdown file, or a rich-text field lands inside `[data-prose]` and comes out
+right without being rewritten.
+
+## Applying it to your own text
+
+```html
+<article data-prose>
+  <h2>A real heading</h2>
+  <p>Body text, at the right measure and leading.</p>
+</article>
+```
+
+`[data-prose]` is the container. Inside it, headings, paragraphs, lists, links
+and code are all styled from the token layer.
+
+For one-off text outside prose, `[data-text]` carries the ramp:
+
+```html
+<span data-text="sm">Fine print</span>
+```
+
+## The vertical metrics
+
+| | |
+|---|---|
+| `--helix-leading-tight`, `-normal`, `-loose` | Line height for body text |
+| `--helix-leading-heading` | Line height for headings, which want less |
+| `--helix-tracking-tight`, `-normal`, `-wide` | Letter spacing |
+| `--helix-weight-regular`, `-medium`, `-semibold` | Three weights, and no more |
+
+**Headings have their own leading token rather than a smaller number of the body
+one.** A heading set at the paragraph's line height reads as loose at every
+size, and the correction is not proportional: the larger the type, the less
+leading it wants. One token expresses that once instead of a magic multiplier at
+every heading level.

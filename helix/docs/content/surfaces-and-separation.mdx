@@ -1,0 +1,90 @@
+---
+description: The four ways a surface is told apart, and the ground a component is not.
+section: Foundations
+title: Surfaces and separation
+---
+
+# Surfaces and separation
+
+**A surface is told apart from what is behind it by exactly one of four things:
+a fill, an edge, a lift, or space.** A design language leads with one of them.
+This is the page about which one, and about the ladder that decides what a
+surface sits on.
+
+## The four mechanisms
+
+| | |
+|---|---|
+| **Fill** | A different ground colour to what is behind it |
+| **Edge** | A border |
+| **Lift** | A shadow |
+| **Space** | Nothing at all, and the gap does the work |
+
+Most systems use two or three without deciding, which is how you end up with a
+card that has a border, a shadow *and* a tint, each added by someone solving the
+same problem again.
+
+Helix expresses the choice in two pairs of policy tokens:
+
+```
+--helix-border-surface    --helix-shadow-surface     a surface in the flow
+--helix-border-floating   --helix-shadow-floating    a surface over content
+```
+
+Set the border pair to zero and the shadow pair to something, and the whole
+library goes shadow-first. Reverse them and it goes border-first. Every surface
+in the library is themeable in both directions, which `bun run check:separation`
+holds: a surface that hooks its shadow and hardcodes `border: none` themes
+perfectly for anyone going shadow-first and cannot be made border-first at all,
+and nothing in the file says so. A half-converted surface is the failure worth
+catching, because it reads as done.
+
+## The ladder
+
+A surface's ground says where it is, not what shade it is:
+
+| Token | Where it is | Told apart by |
+|---|---|---|
+| `background` | The page | Nothing. It is the ground |
+| `surface` | A plane on the page | Fill, edge or lift, per the policy |
+| `surface-raised` | Lifted while still *lying on* the page | Its fill |
+| `surface-overlay` | *Over* the page rather than on it | Its shadow, and what it covers |
+| `surface-sunken` | A well a value goes into | Its fill, inward |
+
+**`raised` goes down the ramp, not up**, which is the counterintuitive one. A
+selected tab's pill, a hovered row and an option under the pointer all have the
+page on every side, so they are told apart by their fill, and on a white page a
+fill has to be a step *darker* to be seen. `overlay` is the opposite: it is told
+apart by its shadow and by covering something, so on white it is white.
+
+## The rule that catches people
+
+**`--helix-color-background` is the page, and your component is not the page.**
+
+```css
+/* Wrong. Claims the component is sitting on the page. */
+.marker { background: var(--helix-color-background); }
+```
+
+Every use of the page's colour inside a component is a claim about what that
+component is sitting on, and the claim is right exactly as often as the
+component is put on the page and no other ground. `Timeline`'s marker made it,
+painting itself the page colour to knock the rail out behind it, and came out
+darker than any surface that was not the page: on a card it showed as a black
+disc. The sparkline's ring terminus made the same mistake and looked identical.
+
+The trap is that both of those *worked*, for months, because the page is what
+anybody building a component puts it on. It fails on a card, a drawer, a toast,
+a panel or a photograph, and none of those is where a component gets built.
+
+**What to do instead:** put the colour behind a hook that defaults to the page,
+so a consumer whose component is not on the page can correct it. That is what
+`bun run check:grounds` requires, and the same reasoning applies to anything you
+build on top.
+
+## Contrast follows from this
+
+The theme engine measures an ink against the ground it is *really* painted on,
+which is why the ladder is a model rather than a naming convention: the engine
+has to know that `foreground` on `surface-overlay` is a real pair and
+`foreground-on-accent` on `surface` is not. See [Color](./color).

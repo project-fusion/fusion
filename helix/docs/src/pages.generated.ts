@@ -27,10 +27,28 @@ export const docPages: DocPage[] = [
     title: 'Browser support',
   },
   {
+    description: 'The roles, the ramps, and why the palette is solved rather than picked.',
+    section: 'Foundations',
+    slug: 'color',
+    title: 'Color',
+  },
+  {
+    description: 'One attribute, two modes, and no token restated to honour it.',
+    section: 'Foundations',
+    slug: 'color-modes',
+    title: 'Color modes',
+  },
+  {
     description: 'Families, parts and groups, and which to reach for.',
     section: 'Essentials',
     slug: 'composition',
     title: 'Composition',
+  },
+  {
+    description: 'Five layers, four shadows, and the glass the material tokens make possible.',
+    section: 'Foundations',
+    slug: 'elevation-and-material',
+    title: 'Elevation and material',
   },
   {
     description:
@@ -38,6 +56,12 @@ export const docPages: DocPage[] = [
     section: 'Essentials',
     slug: 'forms',
     title: 'Forms and validation',
+  },
+  {
+    description: '103 glyphs, one geometry, and how to draw one that is not in the set.',
+    section: 'Foundations',
+    slug: 'iconography',
+    title: 'Iconography',
   },
   {
     description: 'What to install, the order the stylesheets go in, and how to check it worked.',
@@ -52,6 +76,13 @@ export const docPages: DocPage[] = [
     section: 'Getting started',
     slug: 'introduction',
     title: 'Introduction',
+  },
+  {
+    description:
+      'Four durations, five curves, and the rule every animating component has to answer.',
+    section: 'Foundations',
+    slug: 'motion',
+    title: 'Motion',
   },
   {
     description: 'The three rules every framework reduces to, and what they look like in each.',
@@ -74,6 +105,12 @@ export const docPages: DocPage[] = [
     title: 'React',
   },
   {
+    description: 'Helix styling for markup this library does not render, with no JavaScript.',
+    section: 'Foundations',
+    slug: 'recipes',
+    title: 'Recipes',
+  },
+  {
     description: 'Why a component renders its own anchor, and how to keep a router.',
     section: 'Essentials',
     slug: 'routing',
@@ -86,16 +123,35 @@ export const docPages: DocPage[] = [
     title: 'Server rendering',
   },
   {
+    description:
+      'Five radii, two widths, and the two tokens that are a policy rather than a value.',
+    section: 'Foundations',
+    slug: 'shape-and-borders',
+    title: 'Shape and borders',
+  },
+  {
     description: 'Why no control has a size, and what to write instead.',
     section: 'Theming',
     slug: 'size-and-density',
     title: 'Size and density',
   },
   {
+    description: "One spacing scale, and why a control's height is not on it.",
+    section: 'Foundations',
+    slug: 'space-and-size',
+    title: 'Space and size',
+  },
+  {
     description: 'Why writing a property hands the element to you, and what to write instead.',
     section: 'Essentials',
     slug: 'state-and-control',
     title: 'State and control',
+  },
+  {
+    description: 'The four ways a surface is told apart, and the ground a component is not.',
+    section: 'Foundations',
+    slug: 'surfaces-and-separation',
+    title: 'Surfaces and separation',
   },
   {
     description: 'Typed tags, and the framework that needs the least said about it.',
@@ -123,6 +179,12 @@ export const docPages: DocPage[] = [
     section: 'Theming',
     slug: 'tokens',
     title: 'Tokens',
+  },
+  {
+    description: 'Three families, one scale, and a heading that is a real heading.',
+    section: 'Foundations',
+    slug: 'typography',
+    title: 'Typography',
   },
   {
     description: 'Binding events, registering elements, and the traps in both.',

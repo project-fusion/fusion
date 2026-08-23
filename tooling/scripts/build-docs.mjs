@@ -188,12 +188,20 @@ if (problems.length > 0) {
 }
 
 /**
- * A string as this repository writes one: single quotes, per `biome.json`.
- * `JSON.stringify` would emit double and the formatter would rewrite the
- * generated file on its next run, which is a file that fails `--check` the
- * moment anyone runs `bun run check`.
+ * A string as the formatter would write one.
+ *
+ * Single quotes per `biome.json`, except where the value contains one and no
+ * double quote: the formatter switches quotes rather than escaping, because the
+ * result is shorter and easier to read. Emitting the escaped form instead is a
+ * file that fails `biome ci` the moment a description contains an apostrophe,
+ * which the twelfth page was the first to do.
  */
-const quoted = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+const quoted = (value) => {
+  if (value.includes("'") && !value.includes('"')) {
+    return `"${value.replace(/\\/g, '\\\\')}"`
+  }
+  return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+}
 
 /**
  * A `key: value` line, broken the way the formatter would break it.

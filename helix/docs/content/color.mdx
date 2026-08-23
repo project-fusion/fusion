@@ -1,0 +1,88 @@
+---
+description: The roles, the ramps, and why the palette is solved rather than picked.
+section: Foundations
+title: Color
+---
+
+# Color
+
+Seventy-four of the library's 176 tokens are colour, which is most of what a
+theme is. They are roles rather than values: nothing in Helix is named after
+what it looks like, because a name like `--helix-blue-500` stops being true the
+moment anybody rethemes.
+
+## The roles
+
+**Grounds**, which things sit on. `background` is the page itself, and the
+surfaces above it are a ladder rather than a set:
+
+| Token | What it is |
+|---|---|
+| `--helix-color-background` | The page |
+| `--helix-color-surface` | A plane on the page: a card, a panel you own |
+| `--helix-color-surface-raised` | Lifted while still lying on the page |
+| `--helix-color-surface-overlay` | Over the page rather than on it |
+| `--helix-color-surface-sunken` | A well a value goes into |
+
+Which one to reach for is a question about the geometry rather than about the
+shade, and it is the thing people most often get wrong. See [Surfaces and
+separation](./surfaces-and-separation).
+
+**Inks**, which go on grounds. `foreground`, then `foreground-muted` and
+`foreground-subtle` for text that recedes, and `foreground-on-accent` for text
+that sits on a filled accent rather than on a surface.
+
+**Intent**, which says what something means. `primary` and `accent` for
+emphasis, each with `-hover`, `-active` and `-subtle`; `info`, `success`,
+`warning` and `danger` for status, each with a `-surface` and a `-surface-hover`
+for the tinted box the message sits in.
+
+**Series**, twenty-four of them, for charts. Ordered rather than arbitrary: a
+chart with three lines uses the first three, and they are chosen to stay
+distinguishable in that order rather than to look good as a full set.
+
+**Syntax**, eight roles for code: `callable`, `comment`, `constant`, `invalid`,
+`keyword`, `name`, `string`, `tag`. Deliberately fewer than a full editor theme,
+because a code block in documentation is read rather than edited.
+
+## OKLCH, and why it matters here
+
+Every colour is authored in OKLCH. Equal numeric steps in sRGB are not equal
+perceptual steps, which makes both ramp generation and contrast arithmetic
+unreliable: a ramp that is even by the numbers looks uneven, and a contrast
+solver working in the wrong space cannot converge on a target it can measure.
+
+Concretely, this is what lets the theme engine take a brand colour and *solve*
+for a palette rather than have someone pick one. See [Deriving a
+theme](./theming).
+
+## Contrast is a guarantee, not a review step
+
+The engine measures every ink against the ground it will really be painted on
+and searches for the lightness that meets the target, rather than proposing a
+value and checking it afterwards. Every pairing it produces meets the target by
+construction.
+
+That guarantee is only as good as the list of pairs somebody thought of, which
+is why two checks exist rather than one. `bun run check:pairings` holds the
+engine's declared surface model against what components actually paint. `bun run
+check:contrast` measures the two thirds that check cannot see: of the rules in
+the library, eleven set an ink and a ground together, where 165 set only an ink
+and 112 only a ground, and a pairing assembled by the cascade is still a pairing
+a reader has to be able to read.
+
+## Do not reach past the semantic layer
+
+```css
+/* Yours to read. */
+color: var(--helix-color-foreground-muted);
+
+/* Not yours to read, and `check:tokens` fails the build on it. */
+color: var(--_helix-neutral-500);
+```
+
+The primitive layer underneath, `--_helix-neutral-500` and its kind, is
+`helix/styles`'s own business. The underscore marks it private and the
+indirection is the whole point: it is what lets a theme change what
+`--helix-color-primary` resolves to without every component knowing which step
+of which ramp it happened to be.

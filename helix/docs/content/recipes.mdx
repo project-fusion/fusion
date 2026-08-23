@@ -1,0 +1,95 @@
+---
+description: Helix styling for markup this library does not render, with no JavaScript.
+section: Foundations
+title: Recipes
+---
+
+# Recipes
+
+`@helix-io/styles` carries recipes for markup the components do not render: your
+own anchors, your own buttons, a card you built yourself, prose out of a CMS.
+They are `data-` attributes, they need no JavaScript, and they read the same
+tokens the components do.
+
+This is what lets a page look like Helix without a single custom element on it.
+
+## Buttons
+
+```html
+<button data-button="solid" data-button-tone="primary">Save</button>
+<a data-button="ghost" href="/settings">Settings</a>
+```
+
+Two axes: `data-button` is how much ink it claims (`solid`, `outlined`, `ghost`,
+`subtle`) and `data-button-tone` is what it means (`primary`, `accent`,
+`neutral`, `danger`). `data-button-width` takes `auto`, `standard` or `full`.
+
+**This exists for elements this library does not render**, which is the case an
+`<a>` styled as a button falls into. When you want a button, use `helix-button`:
+the recipe has no loading state, no pressed state and no `type="submit"`
+handling.
+
+## Links
+
+```html
+<a data-link href="/pricing">Pricing</a>
+<a data-link data-link-underline="quiet" href="/docs">Docs</a>
+```
+
+`data-link-size` and `data-link-underline` are the modifiers. `quiet` is for
+navigation, where a line under every row would be noise. A link that opens a new
+context says so on its own, rather than surprising the reader.
+
+## Surfaces and layout
+
+```html
+<div data-card>…</div>
+<li data-list-item>…</li>
+<div data-dock="bottom-end">…</div>
+```
+
+`data-dock` pins something to a corner, which is a fact about the page rather
+than about the control: `data-dock-within` scopes it to the nearest positioned
+ancestor instead of the window.
+
+## Prose
+
+```html
+<article data-prose>
+  <h2>From a CMS</h2>
+  <p>Styled without being rewritten.</p>
+</article>
+```
+
+Headings take the type scale, paragraphs take the measure and leading, lists and
+links and inline code all follow. See [Typography](./typography).
+
+## Region axes
+
+These two are API rather than styling, and they are the reason the base layer is
+worth importing even in an app that uses only components:
+
+```html
+<div data-density="sm">…</div>
+<div data-color-mode="dark">…</div>
+```
+
+`data-density` sets how big the controls in a region are, and it works through
+custom properties so it crosses every shadow boundary on its own.
+`data-color-mode` sets the colour mode for a subtree. See [Size and
+density](./size-and-density) and [Color modes](./color-modes).
+
+## Utilities
+
+```html
+<span data-hidden-visually>Sorting by</span>
+```
+
+Clipped rather than `display: none`, so it stays in the accessibility tree. See
+[Accessibility](./accessibility).
+
+## When a recipe is the wrong tool
+
+A recipe has appearance and no behaviour. It cannot manage state, cannot
+participate in a form, cannot trap focus and has no keyboard handling. If you
+find yourself adding script to a recipe, the component is what you wanted.
