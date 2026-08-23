@@ -313,6 +313,14 @@ for (const slug of slugs) {
   if (fields.pinned !== undefined && fields.pinned !== 'true') {
     fail(slug, '`pinned` is written when true and absent otherwise')
   }
+  if (fields.trailing !== undefined && fields.trailing !== 'true') {
+    fail(slug, '`trailing` is written when true and absent otherwise')
+  }
+  /* It ranks a page against its siblings, and a page with no siblings has no
+     rank to take. Every trailing page today is a child of Installation. */
+  if (fields.trailing === 'true' && fields.parent === undefined) {
+    fail(slug, 'is `trailing` with no `parent`, and a top-level page has nothing to trail')
+  }
   if (fields.order !== undefined && !/^[0-9]+$/.test(fields.order)) {
     fail(slug, `\`order\` is not a number: ${fields.order}`)
   }
@@ -324,6 +332,7 @@ for (const slug of slugs) {
     section: fields.section ?? '',
     slug,
     title: fields.title ?? '',
+    trailing: fields.trailing === 'true',
   })
 }
 
@@ -395,6 +404,7 @@ const literal = (page) =>
     `    section: ${quoted(page.section)},`,
     `    slug: ${quoted(page.slug)},`,
     `    title: ${quoted(page.title)},`,
+    page.trailing ? '    trailing: true,' : undefined,
     '  },',
   ]
     .filter((line) => line !== undefined)

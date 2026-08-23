@@ -48,6 +48,20 @@ export interface DocPage {
   /** Path segment, unique across the package. */
   slug: string
   title: string
+  /**
+   * Whether this page is the general answer rather than a named one.
+   *
+   * The mirror of `pinned`: that sorts a section's entry page first, this sorts
+   * a catch-all after the specific pages it is the alternative to. Installation
+   * is the case. Angular, React, Svelte and Vue are lookups and belong in the
+   * alphabet a reader scans; Other frameworks and Without a bundler answer
+   * "none of the above" and read as nonsense in the middle of it, which is
+   * where the alphabet was putting Other frameworks.
+   *
+   * Trailing pages stay alphabetical among themselves, so this states a rank
+   * and never a position.
+   */
+  trailing?: boolean
 }
 
 /** One section of the sidebar, with the pages under it in render order. */
@@ -93,9 +107,11 @@ const ordered = (pages: DocPage[], section: DocSection): DocPage[] => {
  * each page's children beneath it.
  *
  * A section with no pages cannot appear, because `bun run check:docs` refuses
- * to generate one. Children are always alphabetical: nesting exists for the
- * per-framework installation pages, and a reader picking their framework out of
- * a list is looking one up rather than reading a sequence.
+ * to generate one. Children are alphabetical, because nesting exists for the
+ * per-framework installation pages and a reader picking their framework out of
+ * a list is looking one up rather than reading a sequence, and then the
+ * `trailing` ones, which are the pages that answer "none of the above" and
+ * which the alphabet was interleaving with the answers they follow from.
  */
 export const navigation = (): DocNavSection[] =>
   docSections.map((section) => {
@@ -106,7 +122,11 @@ export const navigation = (): DocNavSection[] =>
       ...section,
       pages: ordered(own, section).map((page) => ({
         ...page,
-        children: docPages.filter((child) => child.parent === page.slug).sort(byTitle),
+        children: docPages
+          .filter((child) => child.parent === page.slug)
+          .sort(
+            (a, b) => Number(a.trailing ?? false) - Number(b.trailing ?? false) || byTitle(a, b),
+          ),
       })),
     }
   })

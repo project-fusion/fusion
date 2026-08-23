@@ -1755,6 +1755,7 @@ description: The three rules every framework reduces to, and what they look like
 parent: installation
 section: Getting started
 title: Other frameworks
+trailing: true
 ---
 
 # Other frameworks
@@ -4042,6 +4043,7 @@ description: A page that uses Helix with no build step, and what that costs.
 parent: installation
 section: Getting started
 title: Without a bundler
+trailing: true
 ---
 
 # Without a bundler

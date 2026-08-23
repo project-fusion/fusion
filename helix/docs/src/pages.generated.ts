@@ -121,6 +121,7 @@ export const docPages: DocPage[] = [
     section: 'Getting started',
     slug: 'other-frameworks',
     title: 'Other frameworks',
+    trailing: true,
   },
   {
     description: 'The top layer, what dismisses what, and where focus goes.',
@@ -269,5 +270,6 @@ export const docPages: DocPage[] = [
     section: 'Getting started',
     slug: 'without-a-bundler',
     title: 'Without a bundler',
+    trailing: true,
   },
 ]

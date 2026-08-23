@@ -51,11 +51,21 @@ describe('navigation orders each section', () => {
     }
   })
 
-  test('children are alphabetical, and every parent resolves', () => {
+  test('children are alphabetical, then the catch-alls, and every parent resolves', () => {
     for (const section of navigation()) {
       for (const page of section.pages) {
-        const names = titles(page.children)
-        expect([...names].sort(), `${page.slug} orders its children`).toEqual(names)
+        /* Two alphabetical runs rather than one, because a page answering "none
+           of the above" reads as nonsense in the middle of the alphabet it is
+           the alternative to. Each run is checked on its own, so this still
+           fails if either is shuffled. */
+        const named = titles(page.children.filter((child) => !child.trailing))
+        const trailing = titles(page.children.filter((child) => child.trailing))
+        expect([...named].sort(), `${page.slug} orders its children`).toEqual(named)
+        expect([...trailing].sort(), `${page.slug} orders its catch-alls`).toEqual(trailing)
+        expect(titles(page.children), `${page.slug} sinks its catch-alls`).toEqual([
+          ...named,
+          ...trailing,
+        ])
         for (const child of page.children) {
           expect(child.parent).toBe(page.slug)
         }
