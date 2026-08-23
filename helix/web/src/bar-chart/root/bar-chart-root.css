@@ -595,10 +595,26 @@
    the way `outlined` already means one thing on a Card's boundary and another
    on a Button's ink.
 
-   A shade of the column rather than a neutral line, mixed toward the page's own
-   foreground so it darkens in light and lightens in dark without a second arm.
-   At full strength the edge reads as a second series; mixed, it reads as the
-   same colour with a defined boundary.
+   **The edge is the series' own colour and the fill is faded toward the page**,
+   which is the third arrangement tried and the first that works in both modes.
+
+   Darkening the *edge* was the first, and it reads against the fill but not
+   against the page: 2.63 on the fill in dark and 1.35 on the page, so the
+   outline merged with the thing it was drawn against and stopped being an
+   outline. Lighter is no help and is inert in dark, 1.06 at every step, a series
+   colour in that palette being at the top of its lightness and clipping.
+   Darkening the *fill* fixed dark and broke light, where a column two steps down
+   reads as a different, heavier chart.
+
+   Fading the fill toward `--helix-color-background` is the one that needs no
+   second arm, because that token already carries the mode: the area moves toward
+   the page in whichever direction the page is, and the boundary stays the colour
+   the series actually is. At 60% the edge reads 1.70 against the fill in light
+   and 2.70 in dark, stands off the page at 3.21 and 4.31, and the fill is still
+   a fill at 1.88 and 1.60 rather than a ghost of one.
+
+   The width carries what the colour cannot: a pixel at 2:1 is a hairline nobody
+   sees, and two is still thin against a column sixty wide.
 
    **`vector-effect`, for the reason two other rules in this file already give**:
    the view box is `0 0 100 H` under `preserveAspectRatio="none"`, so a stroke in
@@ -607,24 +623,46 @@
    the vertical edges and the horizontal ones. */
 [part="bar"][data-emphasis="outlined"],
 :host([emphasis="outlined"]) [part="bar"]:not([data-emphasis]) {
-  stroke: var(--_bar-chart-edge);
-  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thin));
+  fill: var(--_bar-chart-shade);
+  stroke: var(--_bar-chart-series);
+  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thick));
   vector-effect: non-scaling-stroke;
+
+  /* **No line along the foot.** A column grows from the baseline and is measured
+     against the rule under it, which this file already says when it rounds the
+     far end only: "a rounded foot would lift it off the rule it is measured
+     against". A bottom edge does the same thing twice over, drawing a second
+     rule a stroke above the real one and detaching the column from it. The clip
+     runs past the foot so the stroke there falls outside it. */
+  clip-path: inset(
+    0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) * -1) 0 round
+      var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0
+  );
 }
 
 /* A wash under the same edge, which is the quiet end of the axis: the column
    keeps its area and its boundary and stops claiming to be the point. */
 [part="bar"][data-emphasis="subtle"],
 :host([emphasis="subtle"]) [part="bar"]:not([data-emphasis]) {
-  stroke: var(--_bar-chart-edge);
-  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thin));
+  stroke: var(--_bar-chart-series);
+  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thick));
   vector-effect: non-scaling-stroke;
 
   --_bar-chart-wash: 0.2;
+
+  /* The foot, for the reason `outlined` gives above it. */
+  clip-path: inset(
+    0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) * -1) 0 round
+      var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0
+  );
 }
 
 [part="bar"] {
-  --_bar-chart-edge: oklch(from var(--_bar-chart-series) calc(l - 0.2) c h);
+  --_bar-chart-shade: color-mix(
+    in oklab,
+    var(--_bar-chart-series) 60%,
+    var(--helix-color-background)
+  );
 }
 
 /* **Glass, so a chart is in the same language as the page around it.** A glass
