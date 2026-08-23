@@ -85,7 +85,9 @@
     "check:content": "bun tooling/scripts/build-content.mjs --check",
     "insight": "bun tooling/scripts/new-insight.mjs",
     "tokens:build": "bun tooling/scripts/build-token-layer.mjs",
-    "check:tokens-layer": "bun tooling/scripts/build-token-layer.mjs --check"
+    "check:tokens-layer": "bun tooling/scripts/build-token-layer.mjs --check",
+    "wasm": "node tooling/scripts/build-wasm.mjs",
+    "check:wasm": "bun run wasm && node tooling/scripts/check-wasm.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",

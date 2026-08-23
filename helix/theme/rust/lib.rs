@@ -21,5 +21,8 @@ pub mod oklch;
 #[cfg(feature = "serde")]
 mod wire;
 
+#[cfg(feature = "wasm")]
+mod wasm;
+
 #[cfg(test)]
 mod oracle;

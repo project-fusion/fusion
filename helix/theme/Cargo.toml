@@ -20,6 +20,12 @@ version = "0.0.0-dev"
 # splitting the package.
 [lib]
 path = "rust/lib.rs"
+# **`cdylib` for the browser and `rlib` for everything else, and both are
+# required.** `wasm-bindgen` reads a `cdylib`, and declaring only that would stop
+# `helix-cli` linking against this crate at all: `crate-type` replaces the default
+# rather than adding to it, so the day the wrapper was added would be the day the
+# CLI stopped building, for a reason whose error message says nothing about WASM.
+crate-type = ["cdylib", "rlib"]
 
 [features]
 # **Reading an intent out of JSON, which one of the two distributions needs.**
@@ -27,9 +33,15 @@ path = "rust/lib.rs"
 # reads a file and does. Default-off keeps the library dependency-free for the
 # consumer that ships to a browser.
 serde = ["dep:serde"]
+# **The browser distribution.** Pulls `serde` in rather than repeating its
+# argument: the boundary is JSON, so a wrapper without a reader is a wrapper that
+# cannot take an intent.
+wasm = ["serde", "dep:serde_json", "dep:wasm-bindgen"]
 
 [dependencies]
 serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true, features = ["float_roundtrip"] }
+wasm-bindgen = { version = "0.2.126", optional = true }
 
 [dev-dependencies]
 # Only the oracle test reads JSON. The library stays dependency-free, which is
