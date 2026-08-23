@@ -138,9 +138,14 @@ for (const family of families) {
        and that is enough for a test that merely waits too long. It is no use
        against one that pegs the main thread: a timer cannot run when nothing
        yields, so the page never comes back, `page.evaluate` never settles, and
-       the run stops with no output and no name to blame. `virtual-list` does
-       exactly that, and it cost several runs that read as the suite hanging
-       rather than as one family failing.
+       the run stops with no output and no name to blame.
+     *
+       `virtual-list` did exactly that until #174, and it cost several runs that
+       read as the suite hanging rather than as one family failing. It was
+       measuring a box whose height its own render decided, so the window never
+       settled; it is fixed, and this stays, because the failure it catches is a
+       shape rather than a component. `bun run probe:stuck <family>` is what to
+       reach for the next time this line fires.
      *
        Sixty seconds is thirty times the slowest family measured, so this can
        only ever catch something genuinely stuck. */
