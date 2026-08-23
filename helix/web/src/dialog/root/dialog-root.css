@@ -177,7 +177,15 @@
  * - `overlay` likewise, or the dialog leaves the top layer immediately and
  *   animates out behind whatever it was covering.
  * - `@starting-style`, which is where an element entering the top layer comes
- *   *from*: without it the entry has no start value and only the exit plays. */
+ *   *from*: without it the entry has no start value and only the exit plays.
+ *
+ * **The rise is `lg` and was `sm`, which is twelve pixels against twenty-four.**
+ * A dialog's whole entrance is a fade and that rise, so twelve was small enough
+ * that the *pace* of it could not be read: measured, `snappy` settles at 159ms
+ * and `gentle` at 262ms, a difference of a hundred milliseconds that nobody can
+ * see across twelve pixels. Doubling the distance is what makes the duration
+ * legible, which is the point of having a motion character at all. Behind a hook
+ * so a consumer who wants the smaller move can have it back. */
 [part="dialog"] {
   opacity: 0;
   transition:
@@ -185,7 +193,7 @@
     translate var(--helix-duration-normal) var(--helix-easing-decelerate),
     display var(--helix-duration-normal) allow-discrete,
     overlay var(--helix-duration-normal) allow-discrete;
-  translate: 0 var(--helix-space-sm);
+  translate: 0 var(--dialog-rise, var(--helix-space-lg));
 }
 
 [part="dialog"][open] {
@@ -196,7 +204,7 @@
 @starting-style {
   [part="dialog"][open] {
     opacity: 0;
-    translate: 0 var(--helix-space-sm);
+    translate: 0 var(--dialog-rise, var(--helix-space-lg));
   }
 }
 

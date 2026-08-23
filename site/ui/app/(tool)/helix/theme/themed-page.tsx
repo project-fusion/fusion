@@ -292,9 +292,15 @@ export function ThemedPage() {
                 </helix-table-row>
               ))}
             </helix-table>
-            <helix-flex align="center" gap="sm">
-              <helix-progress value={68}></helix-progress>
-              <helix-text variant="caption">68% of today&rsquo;s windows closed</helix-text>
+            <helix-flex align="center" gap="sm" justify="between">
+              <helix-flex align="center" gap="sm">
+                <helix-progress value={68}></helix-progress>
+                <helix-text variant="caption">68% of today&rsquo;s windows closed</helix-text>
+              </helix-flex>
+              <helix-button command="--show" commandfor="lane" emphasis="ghost">
+                Lane detail
+                <helix-icon name="arrow-right" slot="end"></helix-icon>
+              </helix-button>
             </helix-flex>
           </helix-flex>
         </helix-card>
@@ -390,6 +396,42 @@ export function ThemedPage() {
           button takes the palette being built. The alternative is a surface that
           is not modal, and then there is nothing on this page that draws a
           scrim, which is half of what `separation.floating` and `material` do. */}
+      {/* **The one thing here that moves far enough to be timed.** A dialog rises
+          and fades, and even at `lg` that is twenty-four pixels: measured,
+          `snappy` settles at 159ms and `gentle` at 262ms, a hundred milliseconds
+          nobody can read across a short distance. A drawer translates its own
+          full width, so the same hundred milliseconds is the difference between
+          a panel that arrives and one that glides.
+
+          It also carries the scrim and the glass at a size worth looking at,
+          where the dialog shows them in a box. Between them the three axes have
+          somewhere to land: `motion` here, `material` on both, and
+          `separation.floating` on all of it. */}
+      <helix-drawer id="lane" label="Lane detail" material="glass" placement="end">
+        <helix-text as="h2" slot="header">
+          Rotterdam to Felixstowe
+        </helix-text>
+        <helix-flex direction="column" gap="md">
+          <helix-flex direction="column" gap="xs">
+            <helix-text variant="caption">Window</helix-text>
+            <helix-text>06:00 to 09:30, berth 14</helix-text>
+          </helix-flex>
+          <helix-flex direction="column" gap="xs">
+            <helix-text variant="caption">Status</helix-text>
+            <helix-tag emphasis="subtle" tone="success">
+              On time
+            </helix-tag>
+          </helix-flex>
+          <helix-flex direction="column" gap="xs">
+            <helix-text variant="caption">Last reading</helix-text>
+            <helix-text>Nineteen minutes ago, from the terminal feed.</helix-text>
+          </helix-flex>
+          <helix-button command="--close" commandfor="lane" emphasis="solid" tone="primary">
+            Watch this lane
+          </helix-button>
+        </helix-flex>
+      </helix-drawer>
+
       <helix-dialog id="walkthrough" label="Book a walkthrough">
         <helix-text as="h2" slot="header">
           Book a walkthrough

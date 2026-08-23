@@ -22,6 +22,8 @@ import { styles } from './dialog-root.css.js'
  * @property align - Whether the panel's contents run from the start or center on it.
  * @property size - How wide the panel is allowed to be.
  *
+ * @cssproperty --dialog-rise - How far the panel rises as it opens. Follows
+ *   `--helix-space-lg`.
  * @cssproperty --dialog-border-color - Colour of the panel's edge.
  * @cssproperty --dialog-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a

@@ -20666,6 +20666,10 @@
           "name": "HelixDialog",
           "cssProperties": [
             {
+              "description": "How far the panel rises as it opens. Follows `--helix-space-lg`.",
+              "name": "--dialog-rise"
+            },
+            {
               "description": "Colour of the panel's edge.",
               "name": "--dialog-border-color"
             },

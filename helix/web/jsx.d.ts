@@ -17736,6 +17736,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--dialog-rise`: How far the panel rises as it opens. Follows `--helix-space-lg`. (default: `undefined`)
    * - `--dialog-border-color`: Colour of the panel's edge. (default: `undefined`)
    * - `--dialog-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
@@ -29226,6 +29227,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--dialog-rise`: How far the panel rises as it opens. Follows `--helix-space-lg`. (default: `undefined`)
    * - `--dialog-border-color`: Colour of the panel's edge. (default: `undefined`)
    * - `--dialog-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
@@ -37733,6 +37735,8 @@ export type CustomCssProperties = {
   "--date-picker-range-color"?: string;
   /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
   "--date-picker-column-count"?: string;
+  /** How far the panel rises as it opens. Follows `--helix-space-lg`. */
+  "--dialog-rise"?: string;
   /** Colour of the panel's edge. */
   "--dialog-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */

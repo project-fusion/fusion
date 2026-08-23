@@ -1810,6 +1810,7 @@ dialog rather than being a div somebody positioned.
 
 | Property | Description |
 | --- | --- |
+| `--dialog-rise` | How far the panel rises as it opens. Follows `--helix-space-lg`. |
 | `--dialog-border-color` | Colour of the panel's edge. |
 | `--dialog-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--dialog-icon-size` | How big the mark above the title is. |
