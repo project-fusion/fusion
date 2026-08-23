@@ -67,14 +67,33 @@ export class DrilldownController<Row extends Element = Element> implements React
     host.addController(this)
   }
 
+  /**
+   * The row whose page is showing, once the tree has been asked about it.
+   *
+   * **A held reference can outlive the row it names, and the walk alone does
+   * not catch it.** Removing the row a reader is *on* works: its
+   * `parentElement` is null and the walk stops. Removing one of its
+   * *ancestors* does not, because the subtree comes away intact, so the child
+   * still has a parent and the parent still has a parent. Measured on a
+   * three-level menu with the middle page removed: `depth` answered 2, `rows`
+   * listed a page nobody could see, and `back()` walked to a second detached
+   * row before reaching the top.
+   *
+   * That is the disagreement with the tree the walk exists to prevent, so the
+   * question is asked here, once, and every reader below goes through it.
+   */
+  private get here(): Row | null {
+    return this.current?.isConnected ? this.current : null
+  }
+
   /** The row whose page is showing, or `null` at the top. */
   get page(): Row | null {
-    return this.current
+    return this.here
   }
 
   /** Whether the top page is the one showing. */
   get atRoot(): boolean {
-    return this.current === null
+    return this.here === null
   }
 
   /**
@@ -85,7 +104,7 @@ export class DrilldownController<Row extends Element = Element> implements React
    */
   get depth(): number {
     let depth = 0
-    for (let row = this.current; row; row = this.parentOf(row)) {
+    for (let row = this.here; row; row = this.parentOf(row)) {
       depth += 1
     }
     return depth
@@ -99,7 +118,7 @@ export class DrilldownController<Row extends Element = Element> implements React
    * Empty at the top, where the panel's own label is the name of the place.
    */
   get label(): string {
-    return [...(this.current?.childNodes ?? [])]
+    return [...(this.here?.childNodes ?? [])]
       .filter((node) => node.nodeType === Node.TEXT_NODE)
       .map((node) => node.textContent?.trim() ?? '')
       .filter(Boolean)
@@ -110,8 +129,8 @@ export class DrilldownController<Row extends Element = Element> implements React
   get rows(): Row[] {
     const slot = this.options.slot ?? 'page'
     const isRow = this.options.isRow ?? (() => true)
-    const source = this.current
-      ? [...this.current.children].filter((child) => child.slot === slot)
+    const source = this.here
+      ? [...this.here.children].filter((child) => child.slot === slot)
       : this.options.root()
     return source.filter(isRow) as Row[]
   }
@@ -140,10 +159,14 @@ export class DrilldownController<Row extends Element = Element> implements React
 
   /** Returns to the page above, and reports whether there was one. */
   back(): boolean {
-    if (this.current === null) {
+    const from = this.here
+    if (from === null) {
+      /* Which includes a reader whose page has been taken out from under them:
+         they are already at the top, whatever this was still holding. */
+      this.current = null
       return false
     }
-    this.current = this.parentOf(this.current)
+    this.current = this.parentOf(from)
     this.host.requestUpdate()
     return true
   }
