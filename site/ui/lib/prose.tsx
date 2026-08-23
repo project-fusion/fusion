@@ -123,21 +123,36 @@ const TableRow = ({ children }: { children?: ReactNode }) => {
 }
 
 /**
- * The table itself, in the wrapper that lets it scroll.
+ * The table itself, and nothing around it.
  *
- * The same wrapper the API reference tables use, and for the same reason: a
- * column holding a type union is wider than any measure, and a table that
- * squeezes to fit is one nobody can read. The component owns the alignment; the
- * page owns whether it may overflow.
+ * **It had a wrapper carrying `overflow-x: auto`, copied from `.apiTable` on the
+ * component pages, and for a markdown table that wrapper can never do
+ * anything.** `[part="table"]` is `inline-size: 100%` and a column with no
+ * declared width takes `minmax(0, 1fr)`, a track that may shrink below its own
+ * content, so the grid cannot exceed its container at any width. Measured on
+ * the widest table in the documentation at 1280, 900, 600 and 420: `scrollWidth`
+ * equalled `clientWidth` every time.
+ *
+ * **`.apiTable` is not the same case and keeps its wrapper.** Those tables
+ * declare fixed column widths summing to 650px, so they genuinely overflow and
+ * genuinely scroll: measured, 650 against a 324 container at 420. The
+ * difference is the tracks, not the markup, which is exactly why copying the
+ * wrapper across brought none of its behaviour with it.
+ *
+ * Putting the attribute on the element rather than a parent would have been
+ * just as inert, and it is where it would belong if these ever do need to
+ * scroll, since the host is the box that would move.
+ *
+ * The squeeze is real and is a separate thing. A long token value in a narrow
+ * column wraps, and making it scroll instead means changing the tracks too:
+ * under intrinsic sizing `1fr` gives every column the width of the widest, so
+ * the same table came out 4261 wide with all three columns equal, which is
+ * worse to read than the wrap.
  *
  * No `label`. A markdown table has no caption to take one from, and inventing
  * one would put a name on the table that the page never says out loud.
  */
-const Table = ({ children }: { children?: ReactNode }) => (
-  <div data-prose-table>
-    <helix-table>{children}</helix-table>
-  </div>
-)
+const Table = ({ children }: { children?: ReactNode }) => <helix-table>{children}</helix-table>
 
 /** `thead` and `tbody` are grouping this grid does not have. */
 const Unwrap = ({ children }: { children?: ReactNode }) => children
