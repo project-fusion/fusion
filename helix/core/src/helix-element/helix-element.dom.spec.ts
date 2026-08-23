@@ -228,14 +228,18 @@ describe('the settled mark', () => {
   const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
 
   test('is absent through the first update, so an arriving sheet has nothing to transition', async () => {
-    const element = document.createElement(tag) as HTMLElement & { updateComplete: Promise<unknown> }
+    const element = document.createElement(tag) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
     document.body.append(element)
     await element.updateComplete
     expect(element.hasAttribute('data-settled')).toBe(false)
   })
 
   test('lands a frame later, by which point the resting value is already resolved', async () => {
-    const element = document.createElement(tag) as HTMLElement & { updateComplete: Promise<unknown> }
+    const element = document.createElement(tag) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
     document.body.append(element)
     await element.updateComplete
     await frame()

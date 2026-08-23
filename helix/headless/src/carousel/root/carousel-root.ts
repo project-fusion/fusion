@@ -591,6 +591,7 @@ export class HelixBaseCarousel extends HelixElement {
         </button>
       </div>
       <div
+        data-scroller
         part="track"
         @scrollend=${this.handleScroll}
         @pointerdown=${this.handleTake}

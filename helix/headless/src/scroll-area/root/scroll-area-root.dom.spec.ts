@@ -39,3 +39,37 @@ describe('a scroll area', () => {
     expect(part(await area('label="Notes"'), 'viewport')?.getAttribute('aria-label')).toBe('Notes')
   })
 })
+
+/**
+ * The box scrolls on this tier, with no stylesheet from `helix/web` involved.
+ *
+ * **This is the one thing no other spec can see.** Every browser assertion
+ * about scrolling in this library runs against the styled tier, whose sheet
+ * sets `overflow` itself, so removing the mechanism from `core` changes none of
+ * them: measured, `scroll-area`, `virtual-list` and `carousel` all pass in
+ * Chromium either way. What breaks without it is the headless consumer, and
+ * until #175 nothing exercised one.
+ *
+ * Asserted through the adopted stylesheet rather than through a computed style,
+ * because happy-dom has no layout and answers the empty string for a property
+ * that came from an adopted sheet. What is being checked is that the rule is
+ * there and that the component marked its box, which is the whole of the
+ * contract; that a marked box with a bounded height actually scrolls was
+ * measured in Chromium and is written up on `SCROLLER`.
+ */
+describe('the box a headless consumer gets', () => {
+  test('is marked as the one that scrolls, so `scrollTop` exists at all', async () => {
+    const host = await area()
+    expect((part(host, 'viewport') as HTMLElement).hasAttribute('data-scroller')).toBe(true)
+  })
+
+  test('and `core` ships the rule that makes it one, with no token in it', async () => {
+    const host = await area()
+    const rules = (host.shadowRoot?.adoptedStyleSheets ?? []).flatMap((sheet) =>
+      [...(sheet.cssRules ?? [])].map((rule) => rule.cssText),
+    )
+    const scroller = rules.find((text) => text.includes('data-scroller'))
+    expect(scroller).toContain('overflow')
+    expect(scroller).not.toContain('var(')
+  })
+})

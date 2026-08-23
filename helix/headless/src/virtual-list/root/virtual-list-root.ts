@@ -189,6 +189,7 @@ export class HelixBaseVirtualList extends HelixElement {
   protected override render(): TemplateResult {
     const { after, before } = this.virtualize.window
     return html`<div
+      data-scroller
       part="viewport"
       role="list"
       aria-label=${this.label}

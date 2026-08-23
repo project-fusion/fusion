@@ -19,6 +19,43 @@ react      generated wrappers over web and headless
 headless tier independently consumable. If styling leaks downward, we have
 shipped one package in five files.
 
+**It is a rule about the dependency, not about the character `{`.** `core`
+already ships four token-free rules into every shadow root through
+`HelixElement.finalizeStyles`: `box-sizing`, `:host([hidden]) { display: none }`,
+a scroll container's `overflow`, and the transition suppression that stops a
+component animating its own arrival. `HIDDEN` is the clearest case, because the
+notes below argue that `hidden` is base-tier *state* on the grounds that the
+platform acts on it, and the way the base tier makes the platform act is a CSS
+rule shipped from here.
+
+So the test for whether a rule may live in `core` is not "is it CSS" but "does
+it name a token". A mechanism does not: `overflow: auto` is what creates a
+scrollport, and without it `scrollTop` is permanently zero and every scroll API
+on the element is inert. A decision does: a colour, a spacing, a duration, a
+height, an `overscroll-behavior`, a scrollbar treatment. Those stay in
+`helix/web`.
+
+**A component marks a box whose scroll state it reads, with `data-scroller`, and
+no other.** Three do: `ScrollArea`, `VirtualList` and `Carousel`. `Megamenu`'s
+panel also scrolls and is deliberately unmarked, because it scrolls only from a
+`max-block-size` the styled tier chose and the headless tier never asks it where
+it is scrolled to. That line was found by measurement rather than by argument:
+marking it moved a heading four pixels, `overflow` establishing a block
+formatting context and margins that had been collapsing stopping.
+
+**A rule and not an inline `style`**, which was the first idea. An inline style
+on a rendered part outranks every author rule short of `!important`, so a
+consumer wanting `overflow: hidden` there would have to fight it, and that is
+the exact failure the cascade notes below describe: it moves the fight onto
+consumers. A shadow rule loses to a document rule, so `::part(viewport)` from a
+consumer simply wins, which is the right way round and is verified in Chromium.
+
+**The mechanism is not sufficient on its own, and that is correct.** A scroll
+container also needs a bounded box, and how tall a scroll area is, is a design
+decision: the base examples supply it and each component documents it. What
+changed is that a headless consumer now supplies a *size* rather than a size and
+an `overflow` they had no way of knowing was missing.
+
 - **Base extends, styled inherits transitively.** Styled must never extend a
   different root, or a form control's validity ends up in one branch and its
   presentation in another.

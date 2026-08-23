@@ -56,6 +56,62 @@ const HIDDEN = css`
 `
 
 /**
+ * Makes an element a scroll container, where a component says it is one.
+ *
+ * **A box that scrolls is the base tier's, and the base tier had no way to say
+ * so.** `overflow` is what creates a scrollport: without it `scrollTop` is
+ * permanently zero and every scroll API on the element is inert. So a component
+ * that reads `scrollTop` and cannot declare `overflow` is one whose behaviour
+ * lives in somebody else's stylesheet, and six of them do exactly that.
+ *
+ * Measured before deciding: `helix-base-scroll-area`, the component whose
+ * entire purpose is scrolling, computes `overflow-y: visible` on its viewport
+ * with `scrollHeight` equal to `clientHeight`. Standing alone it is a div. The
+ * virtual list was worse, because it *acts* on the reading: #174 is the day it
+ * pegged a renderer measuring a box that could not scroll.
+ *
+ * **It goes here rather than in a stylesheet, because this is where the other
+ * three already are.** `BOX_SIZING`, `HIDDEN` and `SETTLED` are token-free
+ * structural rules `core` ships into every shadow root, and `HIDDEN` is the
+ * exact same category: the rules argue `hidden` is base-tier state because the
+ * platform acts on it, and the way the base tier makes the platform act is a
+ * CSS rule shipped from here. "The headless tier has no CSS" has never meant
+ * `core` has none; it means `helix/headless` must not depend on
+ * `@helix-io/styles`, and a rule with no token in it does not.
+ *
+ * **And a rule rather than an inline style, which was the first idea and is
+ * wrong.** An inline `style` on a rendered part outranks every author rule
+ * short of `!important`, so a consumer wanting `overflow: hidden` on that part
+ * would have to fight it, and this repository's own notes say what that is: it
+ * moves the fight onto consumers, who then need `!important` of their own. A
+ * shadow rule loses to a document rule, so `::part(viewport) { overflow: … }`
+ * from a consumer simply wins, which is the right way round.
+ *
+ * Both axes, and nothing else. Which *kind* of scrolling, how much room,
+ * `overscroll-behavior`, `scroll-snap`, a gutter, a scrollbar treatment: those
+ * are decisions and stay in `helix/web`. This is only the mechanism, and the
+ * styled sheet is prepended-after so it overrides at equal specificity anyway.
+ *
+ * **A component marks a box whose scroll state it reads, and no other**, which
+ * is narrower than "every box that ends up scrolling" and is the line that took
+ * a measurement to find. `Megamenu`'s panel scrolls, and only because the
+ * styled tier gives it a `max-block-size`: that is a decision, the `overflow`
+ * that serves it belongs with it, and the headless tier never asks the panel
+ * where it is scrolled to. Marking it anyway moved a heading four pixels,
+ * because `overflow` establishes a block formatting context and margins that
+ * had been collapsing stopped. A mechanism with a layout consequence is one to
+ * apply exactly where it is needed.
+ *
+ * Three qualify: `ScrollArea`, `VirtualList` and `Carousel`, each of which
+ * reads `scrollTop` or `scrollLeft` and acts on the answer.
+ */
+const SCROLLER = css`
+  [data-scroller] {
+    overflow: auto;
+  }
+`
+
+/**
  * Stops a component animating its own arrival.
  *
  * A shadow root's stylesheets are adopted when the element upgrades, which is
@@ -449,7 +505,7 @@ export class HelixElement extends LitElement {
   protected static override finalizeStyles(
     styles?: CSSResultOrNative | CSSResultOrNative[],
   ): CSSResultOrNative[] {
-    return [BOX_SIZING, HIDDEN, SETTLED, ...LitElement.finalizeStyles(styles)]
+    return [BOX_SIZING, HIDDEN, SCROLLER, SETTLED, ...LitElement.finalizeStyles(styles)]
   }
 
   /**

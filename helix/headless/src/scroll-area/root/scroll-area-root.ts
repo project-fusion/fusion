@@ -184,6 +184,7 @@ export class HelixBaseScrollArea extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`<div
+      data-scroller
       part="viewport"
       role=${this.label ? 'region' : nothing}
       aria-label=${this.label || nothing}
