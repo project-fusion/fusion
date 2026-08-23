@@ -127,6 +127,37 @@ helix-megamenu {
  * heading enough to push every row in the panel down. */
 [data-megamenu-heading] > helix-icon {
   --icon-size: var(--helix-size-icon-md);
+
+  /* The mark as a dark tile with the letter cut out of it in a light brand
+   * step, rather than the brand's own mid blue running to its active one.
+   *
+   * Nothing about the drawing changes to do this. Both marks declare their tile
+   * as a gradient between `--logo-color-from` and `--logo-color-to`, and the
+   * letter as `--logo-color-knockout`, each falling back to what the wordmark
+   * uses; `chrome.module.css` already sets the same three for the wordmark, so
+   * this is the second consumer of a hook that was built for exactly this.
+   *
+   * `primary-surface` and its hover are the two rungs solved to carry near-white
+   * ink, which is what #107 measured them for and why they do not vary by mode:
+   * a fill carrying a light letter has to be dark in both.
+   *
+   * **The letter is mixed rather than taken, because the library has no light
+   * brand step that holds in both modes.** `primary-subtle` is the obvious
+   * reach and is `light-dark(brand-50, brand-900)`, so in dark mode it becomes a
+   * *dark* blue on a tile that did not move: measured at 2.28 against the tile
+   * and 1.85 against its far stop, which is a letter nobody can read. The only
+   * ink solved for these fills is `foreground-on-accent`, and that is white.
+   *
+   * So the light step is made from two things that do not vary, white and the
+   * tile's own fill, which keeps it a tint of the brand rather than plain white
+   * and keeps it the same tint in both modes. */
+  --logo-color-from: var(--helix-color-primary-surface);
+  --logo-color-knockout: color-mix(
+    in oklab,
+    var(--helix-color-foreground-on-accent) 86%,
+    var(--helix-color-primary-surface)
+  );
+  --logo-color-to: var(--helix-color-primary-surface-hover);
 }
 
 helix-app-header {
