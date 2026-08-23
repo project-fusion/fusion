@@ -18,6 +18,7 @@
       "!**/.turbo",
       "!**/node_modules",
       "!**/custom-elements.json",
+      "!helix/theme/rust/oracle.json",
       "!**/*.css.ts",
       "!**/jsx.d.ts",
       "!**/vue.d.ts",

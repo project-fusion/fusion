@@ -4,6 +4,7 @@ members = [
 	"cortex/core",
 	"cortex/trace",
 	"cortex/engram",
+	"helix/theme",
 ]
 
 # Shared dependency versions live here once (lockstep policy). Crates reference

@@ -1,0 +1,30 @@
+[package]
+name = "helix-theme"
+description = "Helix theme derivation: OKLCH colour math and contrast-solved palettes."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`. See the note in the root manifest: a version
+# is a fact about a domain and this workspace holds two. `check:publishable`
+# fails on a crate that inherits one.
+version = "0.0.0-dev"
+
+# **One folder, two source trees, and the lib path is what buys that.**
+#
+# `helix/theme` is one package in two distributions, the crate and the WASM
+# wrapper built from it, which is why 142 puts them in one folder rather than
+# two pretending otherwise. `src/` is already the TypeScript engine, so Cargo's
+# default would drop `.rs` files beside `.ts` ones in a directory with two sets
+# of conventions and two meanings for `mod`. `rust/` keeps them apart without
+# splitting the package.
+[lib]
+path = "rust/lib.rs"
+
+[dev-dependencies]
+# Only the oracle test reads JSON. The library stays dependency-free, which is
+# what keeps the WASM wrapper small and its build boring.
+serde_json.workspace = true
+
+[lints]
+workspace = true
