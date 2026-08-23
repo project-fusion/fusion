@@ -71,6 +71,36 @@ slot:not([name]) {
   text-overflow: ellipsis;
 }
 
+/* A slotted icon sits on the middle, not on the baseline.
+ *
+ * The block above is what makes the words truncate, and it also hands whatever
+ * is slotted a text baseline to stand on. `helix-icon` is `inline-flex`, so its
+ * baseline is its own bottom edge: the glyph rests on the baseline and the
+ * strut's descent is left underneath it, inside a box the host is centring.
+ * Measured on the gallery's experimental mark, a 14px icon in a 28px tag: the
+ * slot came out 17.39px tall and the icon sat 5.30px from the top against
+ * 8.70px from the bottom, lifted 1.7px in a mark small enough that 1.7px is the
+ * whole of what anyone sees.
+ *
+ * `middle` rather than blocking the icon out of the line, and the difference is
+ * a regression rather than a preference. `display: block` centres a lone icon
+ * exactly, and `::slotted(helix-icon:only-child)` looks like it scopes that to a
+ * tag holding nothing else. It does not: `:only-child` counts elements, so an
+ * icon beside a bare text label is still an only child, and blocking it puts it
+ * on a line of its own above the word it belongs to. Measured, and it is the
+ * arrangement the rule would most often meet.
+ *
+ * What is left is 0.41px, not zero, and that is the honest ceiling for CSS
+ * here. `middle` is the baseline plus half an x-height, so the line box stays
+ * 0.81px taller than the icon and the icon rides at the bottom of it. Closing
+ * that needs the component to know it is holding an icon and nothing else,
+ * which is a question `:has()` cannot ask of assigned nodes and the server
+ * cannot ask at all. 0.41px is below a device pixel at every density we draw
+ * at; 1.7px was not. */
+slot:not([name])::slotted(helix-icon) {
+  vertical-align: middle;
+}
+
 /* Filled with the tone, label on top of it. `foreground-inverse` rather than a
    per-tone choice: every tone at full strength is dark enough in light mode and
    light enough in dark for the inverse of the page to read on it. */
