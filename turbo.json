@@ -33,14 +33,21 @@
       "inputs": [
         "$TURBO_ROOT$/helix/docs/src/catalog.ts",
         "$TURBO_ROOT$/helix/docs/src/naming.ts",
+        "$TURBO_ROOT$/helix/docs/content/**",
         "$TURBO_ROOT$/helix/docs/src/reference.ts",
+        "lib/routes.ts",
         "$TURBO_ROOT$/helix/headless/custom-elements.json",
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
         "$TURBO_ROOT$/helix/web/custom-elements.json",
         "$TURBO_ROOT$/helix/web/src/*/.examples/**",
         "$TURBO_ROOT$/tooling/scripts/build-catalog.mjs"
       ],
-      "outputs": ["lib/catalog.generated.json", "public/components/**"]
+      "outputs": [
+        "lib/catalog.generated.json",
+        "public/*.md",
+        "public/helix/components/**",
+        "public/helix/docs/**"
+      ]
     },
     "dev": {
       "cache": false,

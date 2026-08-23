@@ -1,0 +1,221 @@
+import { pages as docPages, navigation } from '@helix-io/docs'
+import { getFamilies } from './catalog'
+import { INSIGHTS } from './insights'
+
+/**
+ * Every page this site serves, in one module.
+ *
+ * **Nothing else enumerates routes.** The sitemap, `llms.txt` and the markdown
+ * generator all read this, which is what makes `check:routes`
+ * possible, and `check:routes` is what stops the markdown surface decaying into
+ * a stale parallel site. That decay is the failure mode of every
+ * documentation-for-models project that keeps two lists.
+ *
+ * **A route says how to get its document rather than holding one.** The three
+ * kinds of page here have three different sources: a component page comes from
+ * the manifest, a docs page from MDX in `@helix-io/docs`, and a prose page from
+ * a module in this app. Holding the text here would be a fourth copy of all
+ * three and the one that goes stale.
+ */
+
+/** Where a route's markdown comes from, and what kind of page it is. */
+export type RouteKind = 'component' | 'doc' | 'insight' | 'page'
+
+export interface Route {
+  /** One-line summary, for `llms.txt` and for a search result. */
+  description: string
+  kind: RouteKind
+  /** Path as served, with a leading slash and no extension. */
+  path: string
+  /**
+   * How often this changes, for the sitemap.
+   *
+   * Generated pages move with the library; prose moves when somebody writes.
+   */
+  priority: number
+  /** Grouping in `llms.txt`. */
+  section: string
+  title: string
+}
+
+/**
+ * Prose pages, whose text lives in this app.
+ *
+ * Written out rather than discovered from the filesystem, because a route is a
+ * promise and a file is not: a `page.tsx` under a route group that nothing
+ * links to should not appear in a sitemap because it happens to exist.
+ */
+const PROSE: Route[] = [
+  {
+    description:
+      'Intelligence and energy are collapsing in cost at the same moment. Fusion builds the stack that makes sovereignty practical.',
+    kind: 'page',
+    path: '/',
+    priority: 1,
+    section: 'Fusion',
+    title: 'Fusion Development Group',
+  },
+  {
+    description: 'Sovereignty at every scale, and the mechanism that makes it practical.',
+    kind: 'page',
+    path: '/thesis',
+    priority: 0.8,
+    section: 'Fusion',
+    title: 'Thesis',
+  },
+  {
+    description: 'What we operate, what you hold, and what happens if we stop.',
+    kind: 'page',
+    path: '/trust',
+    priority: 0.8,
+    section: 'Fusion',
+    title: 'Trust',
+  },
+  {
+    description: 'What we take on, and what it costs.',
+    kind: 'page',
+    path: '/services',
+    priority: 0.7,
+    section: 'Fusion',
+    title: 'Services',
+  },
+  {
+    description: 'How to reach us.',
+    kind: 'page',
+    path: '/contact',
+    priority: 0.5,
+    section: 'Fusion',
+    title: 'Contact',
+  },
+  {
+    description: 'The design system: tokens, two component tiers, and a theme engine.',
+    kind: 'page',
+    path: '/helix',
+    priority: 0.9,
+    section: 'Helix',
+    title: 'Helix',
+  },
+  {
+    description: 'The cognitive substrate: memory, provenance, and context.',
+    kind: 'page',
+    path: '/cortex',
+    priority: 0.9,
+    section: 'Cortex',
+    title: 'Cortex',
+  },
+  {
+    description: 'Energy, and why it is the other half of the thesis.',
+    kind: 'page',
+    path: '/energy',
+    priority: 0.6,
+    section: 'Fusion',
+    title: 'Energy',
+  },
+  {
+    description: 'Capital, and what we are building it for.',
+    kind: 'page',
+    path: '/capital',
+    priority: 0.6,
+    section: 'Fusion',
+    title: 'Capital',
+  },
+  {
+    description: 'A WebGL field, and the geometry behind it.',
+    kind: 'page',
+    path: '/helix/aura',
+    priority: 0.4,
+    section: 'Helix',
+    title: 'Aura',
+  },
+  {
+    description:
+      'An editable source pane beside a live preview. Link a specific example with `?e=<family>.<slug>`.',
+    kind: 'page',
+    path: '/helix/sandbox',
+    priority: 0.5,
+    section: 'Helix',
+    title: 'Sandbox',
+  },
+  {
+    description: 'Intent inputs in, a complete contrast-guaranteed token set out.',
+    kind: 'page',
+    path: '/helix/theme',
+    priority: 0.6,
+    section: 'Helix',
+    title: 'Theme builder',
+  },
+]
+
+/** Every component family, from the manifest. */
+const components = (): Route[] =>
+  getFamilies().map((family) => ({
+    description: family.summary,
+    kind: 'component' as const,
+    path: `/helix/components/${family.slug}`,
+    priority: 0.7,
+    section: 'Helix components',
+    title: family.label,
+  }))
+
+/** Every documentation page, from `@helix-io/docs`. */
+const docs = (): Route[] => {
+  const order = new Map(
+    navigation().flatMap((section, index) =>
+      section.pages.flatMap((page) => [
+        [page.slug, index] as const,
+        ...page.children.map((child) => [child.slug, index] as const),
+      ]),
+    ),
+  )
+  return docPages.map((page) => ({
+    description: page.description,
+    kind: 'doc' as const,
+    path: `/helix/docs/${page.slug}`,
+    priority: order.get(page.slug) === 0 ? 0.8 : 0.6,
+    section: `Helix docs: ${page.section}`,
+    title: page.title,
+  }))
+}
+
+/** Every published insight. */
+const insights = (): Route[] => [
+  {
+    description: 'Short pieces on what we are building and why.',
+    kind: 'page',
+    path: '/insights',
+    priority: 0.6,
+    section: 'Insights',
+    title: 'Insights',
+  },
+  ...INSIGHTS.map((insight) => ({
+    description: insight.summary,
+    kind: 'insight' as const,
+    path: `/insights/${insight.slug}`,
+    priority: 0.5,
+    section: 'Insights',
+    title: insight.title,
+  })),
+]
+
+/**
+ * Every route, in the order `llms.txt` lists them.
+ *
+ * Computed rather than a constant, because two thirds of it comes from
+ * generated sources: a family added to the library and a page added to
+ * `@helix-io/docs` both appear here without anyone editing this file, which is
+ * the only arrangement under which the two can not drift apart.
+ */
+export const routes = (): Route[] => [...PROSE, ...docs(), ...components(), ...insights()]
+
+/** The route at a given path, if this site serves one. */
+export const findRoute = (path: string): Route | undefined =>
+  routes().find((route) => route.path === path)
+
+/** Routes grouped by section, in first-seen order, for `llms.txt`. */
+export const routeSections = (): Array<{ routes: Route[]; section: string }> => {
+  const grouped = new Map<string, Route[]>()
+  for (const route of routes()) {
+    grouped.set(route.section, [...(grouped.get(route.section) ?? []), route])
+  }
+  return [...grouped.entries()].map(([section, entries]) => ({ routes: entries, section }))
+}

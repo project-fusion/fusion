@@ -53,6 +53,15 @@ export interface ReferenceOptions {
   examples?: Record<string, ReferenceExample[]>
   /** Only these families. Omitted renders everything in the manifest. */
   families?: string[]
+  /**
+   * Frontmatter, emitted above the heading.
+   *
+   * Provenance rather than decoration: a generated document should say what it
+   * was generated from, so a reader who finds one detached from this repository
+   * can still tell where to look. Keys are written in the order given, because
+   * a reader scans the first line and `title` is what they want there.
+   */
+  frontmatter?: Array<[string, string]>
   /** Prose under the heading, already wrapped. Omitted where absent. */
   lede?: string[]
   /** Top-level heading. */
@@ -275,7 +284,15 @@ const shown = (depth: number, examples: ReferenceExample[]): string[] => {
  * its first sentence. More than one and the headings are what separate them.
  */
 export const reference = (manifest: HelixManifest, options: ReferenceOptions = {}): string => {
-  const lines = [`# ${options.title ?? 'Component reference'}`, '', ...(options.lede ?? [])]
+  const front = options.frontmatter ?? []
+  const lines = [
+    ...(front.length > 0
+      ? ['---', ...front.map(([key, value]) => `${key}: ${value}`), '---', '']
+      : []),
+    `# ${options.title ?? 'Component reference'}`,
+    '',
+    ...(options.lede ?? []),
+  ]
   const wanted = options.families
   const families = referenceFamilies(manifest).filter(
     (entry) => wanted === undefined || wanted.includes(entry.family),
