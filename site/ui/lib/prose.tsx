@@ -152,7 +152,152 @@ const TableRow = ({ children }: { children?: ReactNode }) => {
  * No `label`. A markdown table has no caption to take one from, and inventing
  * one would put a name on the table that the page never says out loud.
  */
-const Table = ({ children }: { children?: ReactNode }) => <helix-table>{children}</helix-table>
+/** Every string under a node, which is what decides how wide its column is. */
+const textOf = (node: ReactNode): string => {
+  if (node === null || node === undefined || typeof node === 'boolean') {
+    return ''
+  }
+  if (typeof node === 'string' || typeof node === 'number') {
+    return String(node)
+  }
+  if (Array.isArray(node)) {
+    return node.map(textOf).join('')
+  }
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    return textOf(node.props.children)
+  }
+  return ''
+}
+
+/** The rows of a table, as the cells of each. */
+const rowsOf = (children: ReactNode): ReactNode[][] =>
+  Children.toArray(children)
+    .flatMap((group) =>
+      isValidElement<{ children?: ReactNode }>(group) && group.type === Unwrap
+        ? Children.toArray(group.props.children)
+        : [group],
+    )
+    .map((row) =>
+      isValidElement<{ children?: ReactNode }>(row) ? Children.toArray(row.props.children) : [],
+    )
+    .filter((cells) => cells.length > 0)
+
+/**
+ * The longest cell in each column, in characters.
+ *
+ * A proxy for width rather than a measurement of one, and it only has to be
+ * good enough to rank columns against each other. Nothing here can measure
+ * text: this runs once at build, on a server, with no layout.
+ */
+const widthsOf = (rows: ReactNode[][]): number[] => {
+  const widths: number[] = []
+  for (const cells of rows) {
+    for (const [at, cell] of cells.entries()) {
+      widths[at] = Math.max(widths[at] ?? 0, textOf(cell).trim().length)
+    }
+  }
+  return widths
+}
+
+/**
+ * A column short enough that it should simply never wrap.
+ *
+ * Set from what these columns actually hold: `--helix-color-background` is 24
+ * characters and `@helix-io/headless` is 18, and both were being broken across
+ * three lines by a track that had no reason to be as wide as the prose beside
+ * it. Above this a column is carrying a sentence or a token value, and wrapping
+ * is the only thing it can do.
+ */
+const SHORT = 32
+
+/**
+ * The least room a wrapping column may be given before the table scrolls.
+ *
+ * **`minmax(0, …)` is what made the first version of this worse than what it
+ * replaced.** A zero minimum lets a track vanish: measured on the docs column at
+ * a 900px viewport, where the sidebar leaves 240px, a `max-content` name column
+ * asking for 250 starved both prose columns to exactly `0px` and the text
+ * inside them wrapped to forty-eight lines. A floor turns that into an overflow
+ * instead, and an overflow is a thing the host can scroll.
+ *
+ * Fourteen characters, which is narrow enough that it binds only when the
+ * column is genuinely too small to read a table in, and wide enough to be worth
+ * scrolling to.
+ */
+const FLOOR = '14ch'
+
+/**
+ * The track list, derived from what the table holds.
+ *
+ * **The default track is `minmax(0, 1fr)` and it is wrong twice over here.**
+ * Every column comes out the same width whatever it carries, so a column of
+ * 24-character token names is as wide as a column of sentences; and the `0`
+ * minimum lets a track shrink below its own content, which is what licenses the
+ * browser to break inside a word. Both were visible on the same page:
+ * `--helix-color-background` across three lines, and `appearance` split into
+ * `appeara` and `nce` with the inline-code chip broken across the two.
+ *
+ * So a short column takes `max-content`, which is exactly its longest cell and
+ * cannot wrap, and everything else divides what is left in proportion to how
+ * much text it holds. The proportion is what stops a two-word column and a
+ * two-sentence column being handed the same room.
+ *
+ * **The last track is `auto` when nothing is long**, because `max-content`
+ * tracks do not stretch: a table of five short columns would otherwise sit in a
+ * puddle at the left of its own container.
+ */
+const tracksOf = (children: ReactNode): string | undefined => {
+  const widths = widthsOf(rowsOf(children))
+  if (widths.length === 0) {
+    return undefined
+  }
+  const long = widths.filter((width) => width > SHORT)
+  if (long.length === 0) {
+    return widths.map((_, at) => (at === widths.length - 1 ? 'auto' : 'max-content')).join(' ')
+  }
+  /* Against the narrowest long column rather than against the total, so the
+     numbers stay small and readable in the inspector: a column with twice the
+     text of its neighbour asks for twice the room. */
+  const narrowest = Math.min(...long)
+  return widths
+    .map((width) =>
+      width > SHORT ? `minmax(${FLOOR}, ${(width / narrowest).toFixed(2)}fr)` : 'max-content',
+    )
+    .join(' ')
+}
+
+/**
+ * The table itself, and nothing around it.
+ *
+ * It had a wrapper carrying `overflow-x: auto`, copied from `.apiTable` on the
+ * component pages, and for a markdown table that wrapper could never do
+ * anything: `[part="table"]` is `inline-size: 100%` and every column was
+ * `minmax(0, 1fr)`, so the grid could not exceed its container at any width.
+ * Measured at 1280, 900, 600 and 420, `scrollWidth` equalled `clientWidth`
+ * every time.
+ *
+ * `.apiTable` is not the same case and keeps its wrapper: those tables declare
+ * fixed column widths summing to 650px, so they genuinely overflow and
+ * genuinely scroll. The difference is the tracks rather than the markup, which
+ * is why copying the wrapper across brought none of its behaviour with it.
+ *
+ * **Now that a track can be `max-content`, the grid can genuinely outgrow its
+ * container**, on a narrow screen or a table of long names, so the host takes
+ * the overflow. On the element rather than a parent, which is where it belongs:
+ * the host is the box that moves. It costs nothing while everything fits, since
+ * `auto` shows no scrollbar until there is something to scroll.
+ *
+ * No `label`. A markdown table has no caption to take one from, and inventing
+ * one would put a name on the table that the page never says out loud.
+ */
+const Table = ({ children }: { children?: ReactNode }) => {
+  const tracks = tracksOf(children)
+  return (
+    <helix-table data-prose-table style={tracks ? { '--table-columns': tracks } : undefined}>
+      {children}
+    </helix-table>
+  )
+}
 
 /** `thead` and `tbody` are grouping this grid does not have. */
 const Unwrap = ({ children }: { children?: ReactNode }) => children

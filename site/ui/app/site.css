@@ -515,3 +515,18 @@ helix-app-header {
     opacity: 0;
   }
 }
+
+/* A markdown table, which can now outgrow its column.
+ *
+ * `PROSE_COMPONENTS` sizes each track from what the column holds, so a column
+ * of token names takes `max-content` and never wraps. That is the point, and it
+ * is also what lets the grid exceed its container on a narrow screen, where
+ * before it could only squeeze. The host is the box that scrolls: on the
+ * element rather than a wrapper, because a wrapper is a second box that has to
+ * be told the same thing.
+ *
+ * `auto`, so it costs nothing while the table fits. */
+helix-table[data-prose-table] {
+  display: block;
+  overflow-x: auto;
+}
