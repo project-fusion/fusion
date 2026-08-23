@@ -90,8 +90,9 @@ const css = formatted(`${before}${block}${after}`, 'tokens.css')
    a list the moment they are alphabetised. `useSortedKeys` would have done
    exactly that to an object and been right to, since nothing about an object
    promises an order. An array promises one. */
-const entries = TOKENS.map(([name, value]) => ({
+const entries = TOKENS.map(([name, value, description]) => ({
   category: name.split('-')[0],
+  ...(description ? { description } : {}),
   name: `--helix-${name}`,
   value,
 }))

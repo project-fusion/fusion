@@ -26,8 +26,18 @@
  * about the six tokens after it rather than about one.
  */
 
-/** A token: the name after `--helix-`, and the value it resolves to. */
-export type Token = readonly [name: string, value: string]
+/**
+ * A token: the name after `--helix-`, the value it resolves to, and what it is
+ * for where that has been written down.
+ *
+ * **The description is optional and a category is described or it is not.** A
+ * Foundations page renders a third column only when every token in the category
+ * has one, so a half-described category cannot produce a table with holes in
+ * it. Five categories are described today, which is the five whose pages
+ * carried hand-written description tables; the rest gained nothing from a
+ * sentence repeating their name.
+ */
+export type Token = readonly [name: string, value: string, description?: string]
 
 /**
  * Every semantic token, in the order the stylesheet declares them.
@@ -560,11 +570,15 @@ export const TOKENS: Token[] = [
   ['radii-lg', 'calc(var(--_helix-seed-radii) * 1.5)'],
   ['radii-full', '9999px'],
   /* ======================================================== type ======== */
-  ['font-sans', 'var(--_helix-family-sans)'],
-  ['font-mono', 'var(--_helix-family-mono)'],
+  ['font-sans', 'var(--_helix-family-sans)', 'Everything, unless it is one of the two below.'],
+  ['font-mono', 'var(--_helix-family-mono)', 'Code, and anything that has to line up in a column.'],
   /* Falls back to the sans stack, so a product that never sets a display face
      still renders rather than dropping to a serif default. */
-  ['font-display', 'var(--_helix-family-display, var(--_helix-family-sans))'],
+  [
+    'font-display',
+    'var(--_helix-family-display, var(--_helix-family-sans))',
+    'Headings meant to be looked at rather than read. Falls back to the sans face.',
+  ],
   /* The body size is `md`, and it is 14.
 
      **Written down because it was not, which is how it came to be wrong.** It
@@ -591,12 +605,12 @@ export const TOKENS: Token[] = [
   ['text-xl', 'var(--_helix-size-24)'],
   ['text-2xl', 'var(--_helix-size-32)'],
   ['text-3xl', 'var(--_helix-size-44)'],
-  ['weight-regular', '400'],
-  ['weight-medium', '500'],
-  ['weight-semibold', '600'],
-  ['leading-tight', '1.2'],
-  ['leading-normal', '1.5'],
-  ['leading-loose', '1.7'],
+  ['weight-regular', '400', 'Body text, and the weight most of a page is set in.'],
+  ['weight-medium', '500', 'A label, or a heading that should not shout.'],
+  ['weight-semibold', '600', 'A heading, and the heaviest this system goes.'],
+  ['leading-tight', '1.2', 'Body text set close, for a short measure.'],
+  ['leading-normal', '1.5', 'Body text, and the default a paragraph takes.'],
+  ['leading-loose', '1.7', 'Body text set open, for a long measure or a small size.'],
   /* **A heading derives its leading from its size instead of picking a rung,
      because picking is what kept getting it wrong.**
 
@@ -624,10 +638,18 @@ export const TOKENS: Token[] = [
      `Checkbox` compute box geometry from `text-sm * leading-tight`, so it is a
      control metric now as much as a type one and cannot be regraded for the
      sake of headings. */
-  ['leading-heading', 'calc(0.99em + 0.5rem)'],
-  ['tracking-tight', '-0.01em'],
-  ['tracking-normal', '0'],
-  ['tracking-wide', '0.02em'],
+  [
+    'leading-heading',
+    'calc(0.99em + 0.5rem)',
+    'Headings, which want less than a paragraph. Written as a length plus an em so it tightens as the type grows.',
+  ],
+  [
+    'tracking-tight',
+    '-0.01em',
+    'Large type, which needs the letters closer than a paragraph does.',
+  ],
+  ['tracking-normal', '0', 'Body text, and the default.'],
+  ['tracking-wide', '0.02em', 'Small capitals and labels, which need the room.'],
   /* ======================================================== border ====== */
   ['border-thin', '1px'],
   ['border-thick', '2px'],
@@ -709,14 +731,14 @@ export const TOKENS: Token[] = [
      follows this; `megamenu` keeps its own `none`, because a band that sits on
      the page rather than over it is a per-instance choice and turning glass on
      for every one of them would be a visual change nobody asked for. */
-  ['material-backdrop', 'blur(var(--helix-material-blur-md))'],
+  ['material-backdrop', 'blur(var(--helix-material-blur-md))', 'The wash behind a modal.'],
   /* **The scalar the policy moves, where the others are values it sets.** A
      line chart's area wash, a bar chart's faded group and a header's backdrop
      are the same decision at three scales, and each of them held its own number
      until this existed. Multiplied rather than replaced, so a component keeps
      the strength it was drawn at and the theme moves all of them together: 1 is
      what ships, below 1 is more see-through, above 1 more solid. */
-  ['material-opacity', '1'],
+  ['material-opacity', '1', 'How opaque a translucent surface is.'],
   /* **Two facts about glass that no token can express, written where the
      blurs are because they are what a consumer needs before reaching for one.**
      Both were found building a masthead and a menu that share an edge, and
@@ -739,16 +761,20 @@ export const TOKENS: Token[] = [
      is neither, so a cross-fade between two glass surfaces reads as a flash. The
      way out is for one of them never to have had any, so there is nothing to
      hand over. */
-  ['material-blur-sm', '8px'],
-  ['material-blur-md', '16px'],
-  ['material-blur-lg', '32px'],
+  ['material-blur-sm', '8px', 'The lightest backdrop blur.'],
+  ['material-blur-md', '16px', 'The backdrop blur a modal takes.'],
+  ['material-blur-lg', '32px', 'The heaviest backdrop blur.'],
   [
     'material-translucent',
     'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )',
+
+    'The translucent ground, for a surface that admits what is behind it.',
   ],
   [
     'material-translucent-strong',
     'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )',
+
+    'The heavier translucent ground, for one that admits less.',
   ],
   /* Two whole colors, for both reasons the overlay above gives, and it is the
      same bug: `light-dark()` in `color-mix()`'s percentage slot, sitting two
@@ -772,6 +798,8 @@ export const TOKENS: Token[] = [
   [
     'material-border',
     'light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )',
+
+    'The edge a translucent surface needs to have any at all.',
   ],
   /* ======================================================== motion ====== */
   ['duration-instant', '0ms'],

@@ -774,13 +774,20 @@ and separation](./surfaces-and-separation).
 
 Eight tokens describing translucency rather than colour:
 
-| | |
-|---|---|
-| \`--helix-material-backdrop\` | The wash behind a modal |
-| \`--helix-material-opacity\` | How opaque a translucent surface is |
-| \`--helix-material-blur-sm\`, \`-md\`, \`-lg\` | Backdrop blur radii |
-| \`--helix-material-translucent\`, \`-strong\` | The two translucent grounds |
-| \`--helix-material-border\` | The edge a translucent surface needs to have any at all |
+[//]: # (tokens:material)
+
+| Token | Value | For |
+| --- | --- | --- |
+| \`--helix-material-backdrop\` | \`blur(var(--helix-material-blur-md))\` | The wash behind a modal. |
+| \`--helix-material-opacity\` | \`1\` | How opaque a translucent surface is. |
+| \`--helix-material-blur-sm\` | \`8px\` | The lightest backdrop blur. |
+| \`--helix-material-blur-md\` | \`16px\` | The backdrop blur a modal takes. |
+| \`--helix-material-blur-lg\` | \`32px\` | The heaviest backdrop blur. |
+| \`--helix-material-translucent\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.21 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 72%, transparent)\` | The translucent ground, for a surface that admits what is behind it. |
+| \`--helix-material-translucent-strong\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.21 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 88%, transparent)\` | The heavier translucent ground, for one that admits less. |
+| \`--helix-material-border\` | \`light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 14%, transparent), color-mix(in oklab, oklch(1 0 0) 12%, transparent))\` | The edge a translucent surface needs to have any at all. |
+
+[//]: # (/tokens)
 
 These are what the \`material\` axis renders: \`frosted\`, \`glass\` and \`transparent\`
 are three points of one optical language, and they are an axis of their own
@@ -1651,7 +1658,7 @@ title: Motion
 | \`--helix-easing-emphasized\` | \`cubic-bezier(0.3, 0, 0, 1.2)\` |
 | \`--helix-easing-decelerate\` | \`cubic-bezier(0, 0, 0, 1)\` |
 | \`--helix-easing-accelerate\` | \`cubic-bezier(0.3, 0, 1, 1)\` |
-| \`--helix-easing-spring\` | \`linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )\` |
+| \`--helix-easing-spring\` | \`linear(0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1)\` |
 
 [//]: # (/tokens)
 
@@ -3548,11 +3555,15 @@ title: Typography
 
 ## The families
 
-| Token | For |
-|---|---|
-| \`--helix-font-sans\` | Everything, unless it is one of the two below |
-| \`--helix-font-mono\` | Code, and anything that has to line up in a column |
-| \`--helix-font-display\` | Headings that are meant to be looked at rather than read |
+[//]: # (tokens:font)
+
+| Token | Value | For |
+| --- | --- | --- |
+| \`--helix-font-sans\` | \`ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif\` | Everything, unless it is one of the two below. |
+| \`--helix-font-mono\` | \`ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace\` | Code, and anything that has to line up in a column. |
+| \`--helix-font-display\` | \`ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif\` | Headings meant to be looked at rather than read. Falls back to the sans face. |
+
+[//]: # (/tokens)
 
 Three, not a scale of weights and widths, because a design system with more type
 families than a product has uses ends up with two that mean the same thing.
@@ -3600,12 +3611,36 @@ For one-off text outside prose, \`[data-text]\` carries the ramp:
 
 ## The vertical metrics
 
-| | |
-|---|---|
-| \`--helix-leading-tight\`, \`-normal\`, \`-loose\` | Line height for body text |
-| \`--helix-leading-heading\` | Line height for headings, which want less |
-| \`--helix-tracking-tight\`, \`-normal\`, \`-wide\` | Letter spacing |
-| \`--helix-weight-regular\`, \`-medium\`, \`-semibold\` | Three weights, and no more |
+[//]: # (tokens:leading)
+
+| Token | Value | For |
+| --- | --- | --- |
+| \`--helix-leading-tight\` | \`1.2\` | Body text set close, for a short measure. |
+| \`--helix-leading-normal\` | \`1.5\` | Body text, and the default a paragraph takes. |
+| \`--helix-leading-loose\` | \`1.7\` | Body text set open, for a long measure or a small size. |
+| \`--helix-leading-heading\` | \`calc(0.99em + 0.5rem)\` | Headings, which want less than a paragraph. Written as a length plus an em so it tightens as the type grows. |
+
+[//]: # (/tokens)
+
+[//]: # (tokens:tracking)
+
+| Token | Value | For |
+| --- | --- | --- |
+| \`--helix-tracking-tight\` | \`-0.01em\` | Large type, which needs the letters closer than a paragraph does. |
+| \`--helix-tracking-normal\` | \`0\` | Body text, and the default. |
+| \`--helix-tracking-wide\` | \`0.02em\` | Small capitals and labels, which need the room. |
+
+[//]: # (/tokens)
+
+[//]: # (tokens:weight)
+
+| Token | Value | For |
+| --- | --- | --- |
+| \`--helix-weight-regular\` | \`400\` | Body text, and the weight most of a page is set in. |
+| \`--helix-weight-medium\` | \`500\` | A label, or a heading that should not shout. |
+| \`--helix-weight-semibold\` | \`600\` | A heading, and the heaviest this system goes. |
+
+[//]: # (/tokens)
 
 **Headings have their own leading token rather than a smaller number of the body
 one.** A heading set at the paragraph's line height reads as loose at every

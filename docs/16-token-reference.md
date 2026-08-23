@@ -219,7 +219,7 @@ Blur and translucency, for a surface that lets the page through.
 | `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | 4 |
 | `--helix-material-opacity` | `1` | 6 |
 | `--helix-material-blur-sm` | `8px` | 0 |
-| `--helix-material-blur-md` | `16px` | 1 |
+| `--helix-material-blur-md` | `16px` | 2 |
 | `--helix-material-blur-lg` | `32px` | 3 |
 | `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 8 |
 | `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 0 |

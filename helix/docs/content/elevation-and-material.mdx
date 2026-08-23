@@ -60,13 +60,20 @@ and separation](./surfaces-and-separation).
 
 Eight tokens describing translucency rather than colour:
 
-| | |
-|---|---|
-| `--helix-material-backdrop` | The wash behind a modal |
-| `--helix-material-opacity` | How opaque a translucent surface is |
-| `--helix-material-blur-sm`, `-md`, `-lg` | Backdrop blur radii |
-| `--helix-material-translucent`, `-strong` | The two translucent grounds |
-| `--helix-material-border` | The edge a translucent surface needs to have any at all |
+[//]: # (tokens:material)
+
+| Token | Value | For |
+| --- | --- | --- |
+| `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | The wash behind a modal. |
+| `--helix-material-opacity` | `1` | How opaque a translucent surface is. |
+| `--helix-material-blur-sm` | `8px` | The lightest backdrop blur. |
+| `--helix-material-blur-md` | `16px` | The backdrop blur a modal takes. |
+| `--helix-material-blur-lg` | `32px` | The heaviest backdrop blur. |
+| `--helix-material-translucent` | `color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.21 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 72%, transparent)` | The translucent ground, for a surface that admits what is behind it. |
+| `--helix-material-translucent-strong` | `color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.21 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 88%, transparent)` | The heavier translucent ground, for one that admits less. |
+| `--helix-material-border` | `light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 14%, transparent), color-mix(in oklab, oklch(1 0 0) 12%, transparent))` | The edge a translucent surface needs to have any at all. |
+
+[//]: # (/tokens)
 
 These are what the `material` axis renders: `frosted`, `glass` and `transparent`
 are three points of one optical language, and they are an axis of their own

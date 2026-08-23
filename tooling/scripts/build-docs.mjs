@@ -69,11 +69,15 @@ const resolve = (value, primitives, depth = 0) => {
   if (depth > 6) {
     return value
   }
-  const next = value.replace(
+  /* The stylesheet wraps a long value across lines, and the whitespace comes
+     through with it: `color-mix( in oklab, …` is what the source looks like and
+     not what a reader wants in a cell. */
+  const tidy = value.replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\s+/g, ' ')
+  const next = tidy.replace(
     /var\((--_helix-[a-z0-9-]+)(?:,\s*([^()]*))?\)/g,
     (whole, name, fallback) => (primitives.has(name) ? primitives.get(name) : (fallback ?? whole)),
   )
-  return next === value ? value : resolve(next, primitives, depth + 1)
+  return next === tidy ? tidy : resolve(next, primitives, depth + 1)
 }
 const SECTIONS = join(ROOT, 'helix/docs/src/sections.ts')
 
@@ -148,10 +152,19 @@ const table = (category) => {
   if (rows.length === 0) {
     throw new Error(`tokens:${category} names a category the registry does not have`)
   }
+  /* A third column when the category is described, and none when it is not.
+     Half a column is a table with holes in it, and the registry's own rule is
+     that a category is described or it is not. */
+  const described = rows.every((token) => token.description)
   return [
-    '| Token | Value |',
-    '| --- | --- |',
-    ...rows.map((token) => `| \`${token.name}\` | \`${resolve(token.value, primitives)}\` |`),
+    described ? '| Token | Value | For |' : '| Token | Value |',
+    described ? '| --- | --- | --- |' : '| --- | --- |',
+    ...rows.map((token) => {
+      const value = `\`${resolve(token.value, primitives)}\``
+      return described
+        ? `| \`${token.name}\` | ${value} | ${token.description} |`
+        : `| \`${token.name}\` | ${value} |`
+    }),
   ].join('\n')
 }
 
