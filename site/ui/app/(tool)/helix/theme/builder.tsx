@@ -1,66 +1,25 @@
 'use client'
 
-import {
-  type DerivedTheme,
-  initTheme,
-  type ThemeEngine,
-  type ThemeIntent,
-} from '@helix-io/theme'
+import { type DerivedTheme, initTheme, type ThemeEngine } from '@helix-io/theme'
 import type { HelixSandboxPreview } from '@helix-io/web'
-import { THEME_ENGINE } from '../../../../lib/theme-engine'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { THEME_ENGINE } from '../../../../lib/theme-engine'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
 import { Wordmark } from '../../../wordmark'
+import {
+  type Character,
+  INITIAL,
+  intentFrom,
+  type Mechanism,
+  SCOPE,
+  type Settings,
+} from './defaults'
 import '@helix-io/sandbox/editor'
 import { ThemedPage } from './themed-page'
 import { THEMED_PAGE_STYLES } from './themed-page-styles'
 import './theme.css'
 import styles from '../workbench.module.css'
-
-/** Where a reader starts, and what the reset goes back to. */
-const BRAND = '#3b82f6'
-
-/**
- * What there is before the engine has landed.
- *
- * **Nothing derived is exactly what this says**, rather than a stand-in palette
- * or a spinner. The derivation is WebAssembly and instantiates asynchronously,
- * so for one paint there is no theme: the preview renders unthemed, the counts
- * read zero, and the block is empty, which is true. The alternative was seeding
- * this with a theme derived at build time, and that needs the nineteen pieces of
- * state below stated a second time in a generator script, which is a second
- * source of truth for the one thing this page exists to be the source of.
- *
- * Reused rather than rebuilt per render, so `useMemo` below sees a stable
- * reference and nothing downstream re-runs on a paint that changed nothing.
- */
-const NOTHING_YET: DerivedTheme = {
-  collisions: [],
-  css: {},
-  pairings: [],
-  seeds: {},
-  tokens: [],
-  violations: [],
-}
-
-/**
- * The selector the emitted block is written for.
- *
- * **A data attribute rather than a class**, because this is not styling: it
- * names *which theme* a subtree is in, the same way `data-helix-theme` names
- * that a subtree is themed at all and `data-color-mode` names which half of
- * `light-dark()` resolves. A class would say the preview looks a certain way,
- * where the attribute says it is a particular theme, and the emitted block is
- * about the second.
- *
- * **The preview is styled by exactly the CSS the page is showing**, which is
- * the one property a builder has to have: what you copy is what you saw. The
- * alternative, setting properties on the node and rendering a separate string,
- * is two derivations of the same answer, and this session spent most of its
- * time finding bugs of exactly that shape.
- */
-const SCOPE = '[data-theme="preview"]'
 
 /**
  * What share of the stage the preview starts with.
@@ -134,103 +93,73 @@ const MONO_FACES: Face[] = [
   { family: 'Space Mono', google: 'Space+Mono:wght@400;700', label: 'Space Mono' },
 ]
 
-/** The stack a face becomes, so a fetch that has not landed still reads. */
-const stack = (family: string, fallback: string): string =>
-  family ? `"${family}", ${fallback}` : ''
-
-type Character = '' | 'gentle' | 'instant' | 'precise' | 'snappy' | 'springy'
-
-type Mechanism = 'border' | 'fill' | 'shadow' | 'space'
-
-export function ThemeBuilder({ findable }: { findable: Findable[] }) {
+export function ThemeBuilder({
+  findable,
+  initialTheme,
+}: {
+  findable: Findable[]
+  /**
+   * The default theme, derived on the server.
+   *
+   * **This is what the engine being synchronous used to buy for free.** It ran
+   * during server rendering without anybody arranging it, so the first paint
+   * carried a real palette: the slider ramps, which are drawn off the *derived*
+   * primary rather than the brand, and the emitted block, and the counts. The
+   * engine is WebAssembly now and instantiates asynchronously, and measured
+   * without this the ramps appeared 287ms after navigation, of which 26ms was
+   * the module transfer and the rest was hydration.
+   */
+  initialTheme: DerivedTheme
+}) {
   const [prefsOpen, setPrefsOpen] = useState(false)
-  const [brand, setBrand] = useState(BRAND)
-  const [scheme, setScheme] = useState<'dark' | 'light'>('light')
-  const [contrastTarget, setContrastTarget] = useState(4.5)
-  const [chromaScale, setChromaScale] = useState(100)
-  const [accentHue, setAccentHue] = useState(180)
-  const [density, setDensity] = useState(100)
-  const [radius, setRadius] = useState(50)
-  const [allowance, setAllowance] = useState(20)
-  const [harmony, setHarmony] = useState(50)
+  const [brand, setBrand] = useState(INITIAL.brand)
+  const [scheme, setScheme] = useState(INITIAL.scheme)
+  const [contrastTarget, setContrastTarget] = useState(INITIAL.contrastTarget)
+  const [chromaScale, setChromaScale] = useState(INITIAL.chromaScale)
+  const [accentHue, setAccentHue] = useState(INITIAL.accentHue)
+  const [density, setDensity] = useState(INITIAL.density)
+  const [radius, setRadius] = useState(INITIAL.radius)
+  const [allowance, setAllowance] = useState(INITIAL.allowance)
+  const [harmony, setHarmony] = useState(INITIAL.harmony)
   const [split, setSplit] = useState(PREVIEW_SHARE)
-  const [bodyFace, setBodyFace] = useState('')
-  const [displayFace, setDisplayFace] = useState('')
-  const [monoFace, setMonoFace] = useState('')
-  const [motion, setMotion] = useState<Character>('')
-  const [textBase, setTextBase] = useState(14)
-  const [textScale, setTextScale] = useState(132)
-  const [surface, setSurface] = useState<Mechanism>('border')
-  const [floating, setFloating] = useState<Mechanism>('shadow')
+  const [bodyFace, setBodyFace] = useState(INITIAL.bodyFace)
+  const [displayFace, setDisplayFace] = useState(INITIAL.displayFace)
+  const [monoFace, setMonoFace] = useState(INITIAL.monoFace)
+  const [motion, setMotion] = useState(INITIAL.motion)
+  const [textBase, setTextBase] = useState(INITIAL.textBase)
+  const [textScale, setTextScale] = useState(INITIAL.textScale)
+  const [surface, setSurface] = useState(INITIAL.surface)
+  const [floating, setFloating] = useState(INITIAL.floating)
   /* The shipped policy, so the sliders start where the stylesheet already is and
      moving one is a departure a reader can see rather than a jump. */
-  const [blur, setBlur] = useState(16)
-  const [translucency, setTranslucency] = useState(100)
+  const [blur, setBlur] = useState(INITIAL.blur)
+  const [translucency, setTranslucency] = useState(INITIAL.translucency)
 
-  /* Compared against the values the engine and the stylesheet ship with, so
-     "pristine" means the reader has changed nothing rather than that they have
-     returned to some arrangement this file prefers. */
-  const pristine =
-    brand === BRAND &&
-    scheme === 'light' &&
-    contrastTarget === 4.5 &&
-    chromaScale === 100 &&
-    accentHue === 180 &&
-    density === 100 &&
-    radius === 50 &&
-    allowance === 20 &&
-    harmony === 50 &&
-    surface === 'border' &&
-    floating === 'shadow' &&
-    bodyFace === '' &&
-    displayFace === '' &&
-    monoFace === '' &&
-    motion === '' &&
-    textBase === 14 &&
-    textScale === 132
-
-  const reset = (): void => {
-    setBrand(BRAND)
-    setScheme('light')
-    setContrastTarget(4.5)
-    setChromaScale(100)
-    setAccentHue(180)
-    setDensity(100)
-    setRadius(50)
-    setAllowance(20)
-    setHarmony(50)
-    setSurface('border')
-    setFloating('shadow')
-    setBlur(16)
-    setTranslucency(100)
-    setBodyFace('')
-    setDisplayFace('')
-    setMonoFace('')
-    setMotion('')
-    setTextBase(14)
-    setTextScale(132)
-  }
-
-  const intent: ThemeIntent = useMemo(
+  /* **Every reader-movable value in one object**, which is what the three uses
+     below share. It was stated three times, as state initialisers, as the
+     `pristine` comparison and again in `reset`, and a default changed in two of
+     the three is a builder whose reset goes somewhere the reader never was. */
+  const settings: Settings = useMemo(
     () => ({
-      accent: { from: 'brand', rotate: accentHue },
+      accentHue,
+      allowance,
+      blur,
+      bodyFace,
       brand,
-      chroma: { scale: chromaScale / 100 },
+      chromaScale,
       contrastTarget,
-      density: density / 100,
-      ...(motion ? { motion: { character: motion } } : {}),
-      font: {
-        base: textBase,
-        scale: textScale / 100,
-        ...(bodyFace ? { body: stack(bodyFace, 'system-ui, sans-serif') } : {}),
-        ...(displayFace ? { display: stack(displayFace, 'system-ui, sans-serif') } : {}),
-        ...(monoFace ? { mono: stack(monoFace, 'ui-monospace, monospace') } : {}),
-      },
-      material: { blur, opacity: translucency / 100 },
-      radius: radius / 100,
+      density,
+      displayFace,
+      floating,
+      harmony,
+      monoFace,
+      motion,
+      radius,
       scheme,
-      separation: { floating: floating as 'border' | 'fill' | 'shadow', surface },
-      status: { allowance, harmony: harmony / 100 },
+      surface,
+      textBase,
+      textScale,
+      translucency,
     }),
     [
       accentHue,
@@ -246,14 +175,59 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       harmony,
       monoFace,
       motion,
-      textBase,
-      textScale,
       radius,
       scheme,
       surface,
+      textBase,
+      textScale,
       translucency,
     ],
   )
+
+  /* Compared against the values the engine and the stylesheet ship with, so
+     "pristine" means the reader has changed nothing rather than that they have
+     returned to some arrangement this file prefers.
+
+     `split` is deliberately not in it: where a reader dragged the divider is not
+     part of the theme, and resetting the palette should not move their panes. */
+  const pristine = (Object.keys(INITIAL) as Array<keyof Settings>).every(
+    (key) => settings[key] === INITIAL[key],
+  )
+
+  const reset = (): void => {
+    setAccentHue(INITIAL.accentHue)
+    setAllowance(INITIAL.allowance)
+    setBlur(INITIAL.blur)
+    setBodyFace(INITIAL.bodyFace)
+    setBrand(INITIAL.brand)
+    setChromaScale(INITIAL.chromaScale)
+    setContrastTarget(INITIAL.contrastTarget)
+    setDensity(INITIAL.density)
+    setDisplayFace(INITIAL.displayFace)
+    setFloating(INITIAL.floating)
+    setHarmony(INITIAL.harmony)
+    setMonoFace(INITIAL.monoFace)
+    setMotion(INITIAL.motion)
+    setRadius(INITIAL.radius)
+    setScheme(INITIAL.scheme)
+    setSurface(INITIAL.surface)
+    setTextBase(INITIAL.textBase)
+    setTextScale(INITIAL.textScale)
+    setTranslucency(INITIAL.translucency)
+  }
+
+  /* Built from the settings above rather than inline, so the server and the
+     browser cannot describe the same starting theme differently: the page
+     derives `intentFrom(INITIAL)` before it renders, and this derives
+     `intentFrom(settings)` from whatever the reader has moved since. */
+  /* Built from the settings above rather than inline, so the server and the
+     browser cannot describe the same starting theme differently: the page
+     derives `intentFrom(INITIAL)` before it renders, and this derives
+     `intentFrom(settings)` from whatever the reader has moved since.
+
+     `settings` is memoised for this: a fresh object every render would make this
+     memo miss every time, and a derivation is the expensive thing on this page. */
+  const intent = useMemo(() => intentFrom(settings), [settings])
 
   /* **The engine is loaded once and held**, because every keystroke derives
      against it. `initTheme` caches its own promise, so the effect running twice
@@ -280,8 +254,8 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
      keystroke. Measured at 17ms per derivation against the 39ms the TypeScript
      engine took for one, so this page does less work than it used to. */
   const theme = useMemo(
-    () => engine?.derive(intent, [SCOPE, ':root']) ?? NOTHING_YET,
-    [engine, intent],
+    () => engine?.derive(intent, [SCOPE, ':root']) ?? initialTheme,
+    [engine, initialTheme, intent],
   )
 
   /* **The ramps are inline, because a stylesheet cannot know the brand.** Both

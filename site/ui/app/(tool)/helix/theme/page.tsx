@@ -1,6 +1,8 @@
 import { getFamilies } from '../../../../lib/catalog'
 import { INSIGHTS } from '../../../../lib/insights'
+import { serverTheme } from '../../../../lib/theme-engine.server'
 import { ThemeBuilder } from './builder'
+import { INITIAL, intentFrom, SCOPE } from './defaults'
 
 /**
  * The theme builder.
@@ -21,13 +23,22 @@ export const metadata = {
   title: 'Theme builder',
 }
 
-export default function ThemePage() {
+export default async function ThemePage() {
   /* Built here, on a server, and handed down, the way the sandbox page and the
      site layout both already do it: the catalogue reads the manifest off disk
      and the insight registry is the whole of the writing, so a palette that
      imported either would pull it into the browser to display a list of names.
      What crosses is the list. */
   const families = getFamilies()
+
+  /* **The default theme, derived before anything renders.** The engine used to
+     be synchronous JavaScript and did this without being asked, which is what
+     put a real palette in the builder's first paint; it is WebAssembly now, so
+     the server has to do it deliberately. The intent is the one in `defaults`,
+     which is also what the builder's sliders start at, so the palette that
+     arrives in the HTML is the palette the browser would derive a moment later
+     rather than a stand-in for it. */
+  const theme = (await serverTheme()).derive(intentFrom(INITIAL), [SCOPE, ':root'])
 
   return (
     <ThemeBuilder
@@ -49,6 +60,7 @@ export default function ThemePage() {
           })),
         },
       ]}
+      initialTheme={theme}
     />
   )
 }
