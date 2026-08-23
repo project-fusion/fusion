@@ -435,8 +435,15 @@ export function Showcase(): React.ReactElement {
                 to the content width and quietly undo the bleed. The divider
                 went with it, having been the thing separating the numbers from
                 the chart that the bleed now separates by itself. */}
+            {/* Sparkline has neither axis. Its shading is `plot`, absent being a
+                line and `area` a line with the region beneath it washed, and it
+                has no emphasis because there is no fill to claim more or less
+                of. The twelve mentions of "wash" in its stylesheet are the
+                gradient's own parts, `wash-start` and `wash-end`, rather than an
+                attribute anything can set. */}
             <helix-sparkline
               label="Installs rose from 1,240 to 1,284 over seven days"
+              plot="area"
               slot="media"
               values="1240 1318 1102 1291 1244 1180 1284"
             ></helix-sparkline>
@@ -503,9 +510,16 @@ export function Showcase(): React.ReactElement {
                   </tr>
                 </tbody>
               </table>
+              {/* `wash` and `emphasis` are two axes since 156, where one `material`
+                  had been doing both jobs: the wash is how a bar is shaded and
+                  the emphasis is how much ink it claims. Outlined bars with a
+                  gradient in them read as a chart rather than as a block of
+                  colour, which is what a showcase wants. */}
               <helix-bar-chart
                 class={styles.showcaseBars}
+                emphasis="outlined"
                 for="showcase-releases"
+                wash="gradient"
               ></helix-bar-chart>
               {/* Two series need saying which is which, and the default
                   `entries` is the one that names columns, which is what these
