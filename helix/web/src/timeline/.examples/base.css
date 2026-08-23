@@ -64,29 +64,61 @@ helix-base-icon::part(svg) {
   inline-size: 1em;
 }
 
+/* Two rows, named rather than left implicit, because the rail below is a
+   subgrid and a subgrid needs tracks to borrow. The time is the first and the
+   entry is the second. */
 helix-base-timeline-item {
   display: grid;
   gap: 0 0.75rem;
   grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
+/* **The rail takes the entry's own rows**, which is what puts the mark beside
+   the entry rather than beside nothing.
+ *
+ * As a flex column it could not: the connector grew, the mark was pushed to
+ * wherever the growing stopped, and it floated between the time and the first
+ * line of the entry, level with neither. The rail has no idea how tall a time
+ * is, so no gap or margin can answer that question, and a consumer writing two
+ * lines of it moves the mark again.
+ *
+ * A subgrid does answer it, by not asking: the rail borrows the two rows the
+ * entry already has, the line above the mark sits in the first and the mark
+ * itself in the second, so the mark lands on the entry's first line whatever
+ * the time above it does. This is the styled tier's arrangement written out by
+ * hand, which is what a base example is for. */
 helix-base-timeline-item::part(rail) {
-  align-items: center;
   background-color: transparent;
   block-size: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  display: grid;
   grid-column: 1;
   grid-row: 1 / -1;
+  grid-template-rows: subgrid;
   inline-size: auto;
+  justify-items: center;
 }
 
+/* The line above the mark, filling the time's row. */
 helix-base-timeline-item::part(connector) {
   background-color: var(--_gray-line);
-  flex: 1;
+  block-size: 100%;
+  grid-row: 1;
   inline-size: 1px;
-  min-block-size: 0.75rem;
+}
+
+/* And the line below it, which is a pseudo-element because the component draws
+   only one connector and a rail needs a second segment to carry on down. It
+   shares the mark's row and starts where the mark ends, so the two never draw
+   over each other. */
+helix-base-timeline-item::part(rail)::after {
+  align-self: stretch;
+  background-color: var(--_gray-line);
+  content: "";
+  grid-column: 1;
+  grid-row: 2;
+  inline-size: 1px;
+  margin-block-start: 1.25rem;
 }
 
 /* The mark's box, and it needs one because two different things go in it.
@@ -97,10 +129,20 @@ helix-base-timeline-item::part(connector) {
    the four marks line up on one rail. */
 helix-base-timeline-item::part(marker) {
   align-items: center;
-  block-size: 0.75rem;
+  /* The top of the entry's row, which is the line the mark is about. Stretched,
+     it would centre itself against the whole entry and drift down as the entry
+     grows. */
+  align-self: start;
+  /* The box is the entry's first line and the mark inside it is smaller, which
+     is what puts the two centres on top of each other. Sized to the mark
+     instead, a 12px square starts where a 20px line starts and its centre lands
+     three pixels high on every row: measured, and the styled tier is at zero
+     for exactly this reason. */
+  block-size: 1.25rem;
   display: flex;
-  flex: none;
-  inline-size: 0.75rem;
+  grid-column: 1;
+  grid-row: 2;
+  inline-size: 1.25rem;
   justify-content: center;
 }
 
@@ -109,8 +151,8 @@ helix-base-timeline-item::part(marker) {
    for an icon beside words and the wrong one for a mark on a rail. */
 helix-base-timeline-item > [slot="marker"],
 helix-base-timeline-item > [slot="marker"]::part(svg) {
-  block-size: 100%;
-  inline-size: 100%;
+  block-size: 0.75rem;
+  inline-size: 0.75rem;
 }
 
 helix-base-timeline-item::part(time) {
@@ -125,4 +167,12 @@ helix-base-timeline-item::part(content) {
   gap: 0.125rem;
   grid-column: 2;
   padding-block-end: 1rem;
+}
+
+/* The entry's own paragraphs, whose UA margin is the thing the gap above was
+   written to replace. Left alone the two both apply, so the entry is spaced by
+   sixteen pixels it never asked for and its first line starts nineteen below
+   the mark that the subgrid just went to the trouble of aligning with it. */
+helix-base-timeline-item > p {
+  margin: 0;
 }
