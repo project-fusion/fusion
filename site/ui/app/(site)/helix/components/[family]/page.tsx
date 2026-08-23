@@ -14,6 +14,7 @@ import {
   type PropertyDoc,
 } from '../../../../../lib/catalog'
 import { sourceUrl } from '../../../../../lib/source'
+import styles from '../docs.module.css'
 import { ComponentPreview } from './preview'
 
 /**
@@ -108,7 +109,7 @@ const byExample = (rows: Example[]): Example[] =>
 
 function Code({ children }: { children: string }) {
   return (
-    <helix-text appearance="code" class="apiName">
+    <helix-text appearance="code" class={styles.apiName}>
       {children}
     </helix-text>
   )
@@ -171,11 +172,11 @@ function TypeText({ children }: { children: string }) {
      should keep saying what the source says. */
   const members = union(children.replace(/'([^']*)'/g, '"$1"'))
   return (
-    <helix-text appearance="code" class="apiType">
+    <helix-text appearance="code" class={styles.apiType}>
       {members.map((member, at) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
-        <span className="apiTypeMember" key={at}>
-          {at > 0 && <span className="apiTypeBar">|</span>}
+        <span className={styles.apiTypeMember} key={at}>
+          {at > 0 && <span className={styles.apiTypeBar}>|</span>}
           {tokens(member)}
         </span>
       ))}
@@ -252,7 +253,7 @@ function MemberTable({
     return null
   }
   return (
-    <div className="apiTable">
+    <div className={styles.apiTable}>
       <helix-table label={label}>
         <helix-table-column>{label}</helix-table-column>
         {typed && <helix-table-column width={TYPE}>Type</helix-table-column>}
@@ -262,7 +263,11 @@ function MemberTable({
             <helix-table-cell header>
               {/* The unnamed slot has no name, and printing `(default)` in the
                 identifier colour dressed an absence up as one. */}
-              {row.name ? <Code>{row.name}</Code> : <span className="apiUnnamed">(default)</span>}
+              {row.name ? (
+                <Code>{row.name}</Code>
+              ) : (
+                <span className={styles.apiUnnamed}>(default)</span>
+              )}
             </helix-table-cell>
             {typed && (
               <helix-table-cell>{row.type && <TypeText>{row.type}</TypeText>}</helix-table-cell>
@@ -285,7 +290,7 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
     return null
   }
   return (
-    <div className="apiTable">
+    <div className={styles.apiTable}>
       <helix-table label="Properties">
         <helix-table-column>Prop</helix-table-column>
         <helix-table-column width={TYPE}>Type</helix-table-column>
@@ -318,7 +323,7 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
                 >
                   <a
                     aria-label={`${row.name}: ${reference.label}`}
-                    className="apiReference"
+                    className={styles.apiReference}
                     href={reference.url}
                     rel="noreferrer"
                     target="_blank"
@@ -421,7 +426,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
     /* The shell and the rail are the layout's, so the nav survives a navigation
        between families and keeps the state a reader set on it. See #119. */
     <>
-      <article className="docsMain">
+      <article className={styles.docsMain}>
         {/* `3xl`, the top of the scale, because a section break should be the
             largest space on the page: at `2xl` Usage sat as far from Preview as
             Root sat from Group, so the page had one rhythm and no hierarchy.
@@ -432,7 +437,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             {/* Title and its actions on one line. The ellipsis holds everything
                 that is about the *document* rather than about the component, so
                 the one button worth a word of its own keeps it. */}
-            <helix-flex align="center" class="docsTitle" gap="md" justify="between">
+            <helix-flex align="center" class={styles.docsTitle} gap="md" justify="between">
               <helix-text as="h1">{family.label}</helix-text>
               <helix-flex align="center" data-density="sm" gap="xs">
                 {/* An anchor, because it leaves the site. The URL is composed
@@ -609,7 +614,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
         </helix-flex>
       </article>
 
-      <aside className="docsRail">
+      <aside className={styles.docsRail}>
         {/* The real component, which computes what is current from where the
             headings actually are and writes `aria-current` onto these anchors.
             The list it replaced marked nothing at all, so the rail said where
@@ -617,7 +622,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
         {/* A visible heading, not only the accessible one. `label` names the
             navigation for a screen reader and paints nothing, so the rail was
             a column of links with no word saying what they were. */}
-        <helix-text appearance="label" class="docsRailTitle" tone="subtle">
+        <helix-text appearance="label" class={styles.docsRailTitle} tone="subtle">
           On this page
         </helix-text>
         <helix-outline label="On this page">

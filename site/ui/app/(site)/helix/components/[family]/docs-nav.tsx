@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { type MouseEvent as ReactMouseEvent, useCallback, useRef } from 'react'
+import styles from '../docs.module.css'
 
 /** One entry in the sidebar: what it is called and where it goes. */
 export interface DocsNavEntry {
@@ -102,7 +103,7 @@ export function DocsNav({ entries }: { entries: readonly DocsNavEntry[] }) {
     // biome-ignore lint/a11y/useKeyWithClickEvents: delegates to real anchors
     <nav
       aria-label="Documentation"
-      className="docsNav"
+      className={styles.docsNav}
       onClick={navigate}
       onFocus={warm}
       onPointerOver={warm}

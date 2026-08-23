@@ -1,5 +1,6 @@
 import { getFamilies } from '../../../../lib/catalog'
 import { DocsNav } from './[family]/docs-nav'
+import styles from './docs.module.css'
 
 /**
  * The shell every component page sits in, and the rail that outlives them.
@@ -37,7 +38,7 @@ import { DocsNav } from './[family]/docs-nav'
  */
 export default function ComponentsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="docsShell">
+    <div className={styles.docsShell}>
       <DocsNav entries={getFamilies()} />
       {children}
     </div>

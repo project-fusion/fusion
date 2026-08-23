@@ -6,6 +6,7 @@
 import '@helix-io/sandbox/editor'
 import type { HelixChangeEvent, HelixSandbox, HelixSandboxPreview } from '@helix-io/web'
 import { useEffect, useRef, useState } from 'react'
+import docs from '../docs.module.css'
 
 interface Props {
   /** The example's stylesheet, or empty where it needs none. */
@@ -87,7 +88,7 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
 
   return (
     <helix-sandbox
-      class="docsPreview"
+      class={docs.docsPreview}
       lead="preview"
       onhelix-change={sourceEdited}
       orientation="vertical"
@@ -112,17 +113,17 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
         src="/sandbox/frame.html"
       ></helix-sandbox-preview>
 
-      <div className="docsPreviewSource" slot="source">
+      <div className={docs.docsPreviewSource} slot="source">
         {/* Dense, which the bar should have declared from the start. A toolbar
             is dense by nature and the library's own say so themselves; this one
             did not, so its two controls came out at the full 40px control
             height inside a 49px bar. `data-density` costs the controls no API
             and crosses their shadow boundaries on its own. */}
-        <div className="docsPreviewBar" data-density="sm">
+        <div className={docs.docsPreviewBar} data-density="sm">
           {files.map((name) => (
             <button
               aria-pressed={file === name}
-              className="docsPreviewTab"
+              className={docs.docsPreviewTab}
               key={name}
               onClick={() => setFile(name)}
               type="button"
@@ -136,7 +137,7 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
               the file so the confirmation cannot survive a tab change and claim
               the new file was the one copied. */}
           <helix-copy-button
-            className="docsPreviewCopy"
+            className={docs.docsPreviewCopy}
             key={file}
             label={`Copy ${file}`}
             value={file === 'styles.css' ? styles : source}
@@ -149,7 +150,7 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
               two different kinds of control. This is an icon button's box, and
               the tooltip is what the copy button already has. */}
           <helix-tooltip content="Open in the sandbox">
-            <a aria-label="Open in the sandbox" className="docsPreviewOpen" href={sandboxHref}>
+            <a aria-label="Open in the sandbox" className={docs.docsPreviewOpen} href={sandboxHref}>
               <helix-icon name="arrow-square-out"></helix-icon>
             </a>
           </helix-tooltip>
