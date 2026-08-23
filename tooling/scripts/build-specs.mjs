@@ -7,8 +7,23 @@
  * is the whole of the difference: no rewriting, no second suite to keep in
  * step, and a spec that is deleted stops being reported the same day.
  *
- * One `Bun.build` for every family with `splitting`, so Lit and anything two
- * families share is emitted once rather than into each of thirty-six bundles.
+ * One `Bun.build` for every family, each entry self-contained.
+ *
+ * **Splitting was on and had to come off.** It emitted Lit and anything two
+ * families shared once instead of into every bundle, which is the right instinct
+ * and is not worth what it costs here: a family's entry now imports *both*
+ * tiers, because its behaviour is specified in `helix/headless` and its
+ * appearance in `helix/web`, and the styled class extends the base one. An
+ * `extends` clause is evaluated the moment its module runs, so when the two land
+ * in different chunks neither can go first, and every entry dies on
+ * `ReferenceError: Cannot access 'A' before initialization` before a single test
+ * runs. Measured: 218 chunks and a passing suite, then two more spec files took
+ * it to 450 chunks and all 88 families failed at load.
+ *
+ * The cost is disk and not download. 2.1 MB becomes 22 MB across 88 entries,
+ * and the sandbox fetches one family: about 250 KB, which is roughly what an
+ * entry plus the shared chunks it reached came to anyway. A build artifact that
+ * runs is worth ten times the bytes of one that does not.
  *
  * Run with bun, not node: `Bun.build` is the bundler.
  */
@@ -125,7 +140,12 @@ const result = await Bun.build({
   naming: { chunk: '[name]-[hash].[ext]', entry: '[name].[ext]' },
   outdir: out,
   plugins: [useBrowserHarness],
-  splitting: true,
+  /* Off, for the reason the header gives: an entry holding both tiers of a
+     family puts a subclass and its base in different chunks and the cycle is
+     unresolvable. `SHARED` below fixed the same fault for one pair of Lit
+     directives and cannot fix this one, since the pair is different per
+     family. */
+  splitting: false,
   target: 'browser',
 })
 
