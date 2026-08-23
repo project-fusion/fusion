@@ -40,6 +40,33 @@
 export type Token = readonly [name: string, value: string, description?: string]
 
 /**
+ * Sets of tokens this design system has a name for.
+ *
+ * **A category is where a token's name puts it; a group is what the system
+ * calls it.** The surface ladder is five tokens from one category and reads as
+ * a sequence, and the separation policy is four tokens from two categories that
+ * only mean anything as a set. Neither is expressible as a prefix, and both are
+ * referred to by name in the prose that explains them.
+ *
+ * A Foundations page renders one by name, so the page and the system agree
+ * about what the ladder is rather than a page listing five tokens it believes
+ * belong together.
+ */
+export const TOKEN_GROUPS: Record<string, string[]> = {
+  /* Ordered as a ladder rather than alphabetically: it is a sequence from the
+     page outward, and sorting it is the one thing that would stop it reading
+     as one. */
+  'separation-policy': ['border-surface', 'shadow-surface', 'border-floating', 'shadow-floating'],
+  'surface-ladder': [
+    'color-background',
+    'color-surface',
+    'color-surface-raised',
+    'color-surface-overlay',
+    'color-surface-sunken',
+  ],
+}
+
+/**
  * Every semantic token, in the order the stylesheet declares them.
  *
  * Order is content here: the surfaces read as a ladder, the sizes read as a
@@ -74,8 +101,16 @@ export const TOKENS: Token[] = [
      wrong token to move: the page is the one fixed point either mode has, and
      every other step is defined as a distance from it. Nothing below black is
      the constraint, so `sunken` is what gives way. See its note below. */
-  ['color-background', 'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))'],
-  ['color-surface', 'light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))'],
+  [
+    'color-background',
+    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))',
+    'The page. Told apart by nothing, because it is the ground.',
+  ],
+  [
+    'color-surface',
+    'light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))',
+    'A plane on the page: a card, or a panel you own. Told apart by a fill, an edge or a lift, whichever the policy leads with.',
+  ],
   /* Two kinds of "above", and they want opposite fills in light mode.
 
      `raised` is for something lifted while still lying on the page: a tab's
@@ -92,8 +127,16 @@ export const TOKENS: Token[] = [
      took every pill and thumb with it: white on a white page, which is nothing
      at all. In dark they land on the same step, which is why one token got away
      with it for as long as it did. */
-  ['color-surface-raised', 'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))'],
-  ['color-surface-overlay', 'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))'],
+  [
+    'color-surface-raised',
+    'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))',
+    'Lifted while still lying on the page: a selected tab, a hovered row. Told apart by its fill, which goes down the ramp rather than up.',
+  ],
+  [
+    'color-surface-overlay',
+    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))',
+    'Over the page rather than on it: a menu, a popover, a dialog. Told apart by its shadow and by what it covers.',
+  ],
   /* Down in light, up in dark, because "recessed" is a direction and only one
      of the two modes has room in it.
 
@@ -127,7 +170,11 @@ export const TOKENS: Token[] = [
      the component has `--toggle-group-indicator-color` if it needs more: a
      component reaching for a different rung is a normal thing, whereas a page
      that is not the color it was chosen to be is not. */
-  ['color-surface-sunken', 'light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))'],
+  [
+    'color-surface-sunken',
+    'light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))',
+    'A well a value goes into: an input, a track, a groove. Told apart by its fill, inward.',
+  ],
   /* **What a field is filled with, stated as a step from its ground rather than
      as a colour.**
 
@@ -673,8 +720,12 @@ export const TOKENS: Token[] = [
 
      The defaults reproduce exactly what shipped before them: in flow is
      border-first with no lift, floating is shadow-first with no edge. */
-  ['border-surface', 'var(--helix-border-thin)'],
-  ['border-floating', '0'],
+  [
+    'border-surface',
+    'var(--helix-border-thin)',
+    'The edge a surface in the flow takes. Zero to go shadow-first.',
+  ],
+  ['border-floating', '0', 'The edge a surface over content takes.'],
   /* ======================================================== shadow ====== */
   /* Used sparingly. Depth is a hairline border first; shadow is reserved for
      surfaces that genuinely float above the page. */
@@ -703,8 +754,12 @@ export const TOKENS: Token[] = [
      `--helix-border-surface` and `--helix-border-floating`, and a theme moves
      the pair together: border-first sets the edge and clears the lift, and
      shadow-first does the reverse. */
-  ['shadow-surface', 'var(--helix-shadow-none)'],
-  ['shadow-floating', 'var(--helix-shadow-lg)'],
+  [
+    'shadow-surface',
+    'var(--helix-shadow-none)',
+    'The lift a surface in the flow takes. None to go border-first.',
+  ],
+  ['shadow-floating', 'var(--helix-shadow-lg)', 'The lift a surface over content takes.'],
   /* ======================================================== material ==== */
   /* Translucency and blur: how much of what is behind a thing shows through it.
 

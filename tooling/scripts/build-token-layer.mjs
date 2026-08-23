@@ -41,7 +41,7 @@ const JSON_OUT = join(ROOT, 'helix/styles/tokens.json')
 const OPEN = '/* GENERATED from src/tokens.ts by `bun run tokens:build`. Do not edit below. */'
 const CLOSE = '/* GENERATED end. */'
 
-const { TOKENS } = await import('../../helix/styles/src/tokens.ts')
+const { TOKENS, TOKEN_GROUPS } = await import('../../helix/styles/src/tokens.ts')
 
 /* Read back out of the module's own source, because a comment is not a value
    and TypeScript does not hand one to a caller. The file is the source of both
@@ -50,11 +50,20 @@ const source = readFileSync(join(ROOT, 'helix/styles/src/tokens.ts'), 'utf8')
 const body = source.slice(source.indexOf('export const TOKENS: Token[] = ['))
 
 const declarations = []
-/* The trailing comma is not optional to allow for: the formatter writes one
-   whenever a pair does not fit on a line, which 37 of these do not, and a
-   pattern without it silently read 140 of 177 tokens. Caught by diffing the
-   output against the stylesheet it replaces. */
-const pattern = /\/\*([\s\S]*?)\*\/|\[\s*'((?:[^'\\]|\\.)*)',\s*'((?:[^'\\]|\\.)*)'\s*,?\s*\]/g
+/* Two ways this pattern has now been wrong, both silent, both the same shape.
+   
+   First it required the pair on one line, and the formatter breaks one whenever
+   it does not fit, so it read 140 of 177. Then a third element arrived, the
+   description, and `'value' ,? ]` could not skip it, so it read 147 of 177 and
+   dropped every described token out of the stylesheet: `--helix-font-sans`
+   went with them and the whole site fell back to Times.
+   
+   The lesson is not about the regular expression. It is that this script
+   counted `TOKENS.length` and reported 177 while emitting 147, so the check
+   passed over its own output. The assertion below is what actually stops this,
+   and it is why a third failure of the same kind will not be silent. */
+const pattern =
+  /\/\*([\s\S]*?)\*\/|\[\s*'((?:[^'\\]|\\.)*)',\s*'((?:[^'\\]|\\.)*)'\s*(?:,\s*'(?:[^'\\]|\\.)*')?\s*,?\s*\]/g
 for (const match of body.matchAll(pattern)) {
   if (match[1] !== undefined) {
     const lines = match[1]
@@ -74,6 +83,20 @@ for (const match of body.matchAll(pattern)) {
   const name = match[2].replace(/\\'/g, "'")
   const value = match[3].replace(/\\'/g, "'").replace(/\\\\/g, '\\')
   declarations.push(`  --helix-${name}: ${value};`)
+}
+
+/* Every token in the registry has to reach the stylesheet.
+   
+   Counting the source and reporting that number is what let 30 declarations go
+   missing while this said "177 tokens, current". The output is what a browser
+   reads, so the output is what gets counted. */
+const emitted = declarations.filter((line) => line.startsWith('  --helix-')).length
+if (emitted !== TOKENS.length) {
+  console.error(
+    `token layer: ${TOKENS.length} tokens in the registry and ${emitted} reached the stylesheet.\n` +
+      '  The reader in this script did not understand an entry it was handed.',
+  )
+  process.exit(1)
 }
 
 const block = `${OPEN}\n:root,\n[data-helix-theme] {\n${declarations.join('\n')}\n}\n${CLOSE}`
@@ -97,7 +120,11 @@ const entries = TOKENS.map(([name, value, description]) => ({
   value,
 }))
 const categories = [...new Set(entries.map((entry) => entry.category))]
-const json = `${JSON.stringify({ categories, count: entries.length, tokens: entries }, undefined, 2)}\n`
+const json = `${JSON.stringify(
+  { categories, count: entries.length, groups: TOKEN_GROUPS, tokens: entries },
+  undefined,
+  2,
+)}\n`
 
 if (process.argv.includes('--check')) {
   const stale = [

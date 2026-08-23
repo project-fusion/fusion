@@ -192,7 +192,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 124 |
+| `--helix-border-thin` | `1px` | 125 |
 | `--helix-border-thick` | `2px` | 35 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 1 |
 | `--helix-border-floating` | `0` | 10 |
@@ -203,10 +203,10 @@ Elevation.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-shadow-none` | `none` | 1 |
+| `--helix-shadow-none` | `none` | 2 |
 | `--helix-shadow-sm` | `0 1px 2px var(--_helix-shadow-ink-sm)` | 8 |
 | `--helix-shadow-md` | `0 4px 12px var(--_helix-shadow-ink-md)` | 11 |
-| `--helix-shadow-lg` | `0 12px 32px var(--_helix-shadow-ink-lg)` | 6 |
+| `--helix-shadow-lg` | `0 12px 32px var(--_helix-shadow-ink-lg)` | 7 |
 | `--helix-shadow-surface` | `var(--helix-shadow-none)` | 1 |
 | `--helix-shadow-floating` | `var(--helix-shadow-lg)` | 12 |
 
