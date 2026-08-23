@@ -35,9 +35,25 @@
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
 }
 
+/* **The ring draws inside, because the row reaches both edges of its scroller.**
+ *
+ * A row here spans `[part="items"]` exactly, and that region scrolls, so an
+ * outline pushed outwards has nowhere to go: measured at a four pixel reach
+ * against zero slack either side, which clipped both verticals and left two
+ * horizontal lines that read as a drawing fault rather than as focus.
+ *
+ * Inset rather than widening the scroller, which is the trade the drawer makes
+ * and the wrong one here. There the scrolling box is invisible and holds
+ * whatever a consumer slotted; here it is the visible list and the rows are the
+ * component's own, so the component can simply draw its ring where it fits. It
+ * is also what a full bleed row wants regardless of clipping: a ring outside a
+ * row that touches the list's edge is a ring on top of the edge.
+ *
+ * Five families already answer it this way, `menu-item` and `tree-item` among
+ * them. This one was the outlier. */
 [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* The one playing, and it stays marked under the pointer.
