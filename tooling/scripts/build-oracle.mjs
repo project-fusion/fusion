@@ -30,7 +30,7 @@
  * `bun run check:oracle` and part of `bun run verify`.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { perceptualDistance } from '../../helix/theme/src/derive.ts'
+import { deriveTheme, perceptualDistance } from '../../helix/theme/src/derive.ts'
 import { STATUS_CHROMA, STATUS_HUE } from '../../helix/theme/src/intent.ts'
 import { GROUNDS, INKS } from '../../helix/theme/src/model.ts'
 import {
@@ -95,6 +95,29 @@ const BACKGROUNDS = [
 ]
 
 const TARGETS = [3, 4.5, 7]
+
+/* The intents the port is derived against.
+ *
+ * Chosen so each one changes a different phase: the scheme flips the whole
+ * ladder, the separation policy scales it, a ceiling of 0 makes every derived
+ * colour grey, AAA moves every solved lightness, and a brand that *is* a status
+ * colour is the case the hue repair cannot fully answer and reports instead.
+ */
+const INTENTS = [
+  { intent: { brand: '#3b82f6' }, label: 'default' },
+  { intent: { brand: '#3b82f6', scheme: 'dark' }, label: 'dark' },
+  { intent: { brand: '#3b82f6', separation: { surface: 'fill' } }, label: 'fill' },
+  { intent: { brand: '#3b82f6', separation: { surface: 'space' } }, label: 'space' },
+  {
+    intent: { brand: '#3b82f6', scheme: 'dark', separation: { surface: 'fill' } },
+    label: 'dark-fill',
+  },
+  { intent: { brand: '#3b82f6', chroma: { ceiling: 0 } }, label: 'monotone' },
+  { intent: { brand: '#3b82f6', contrastTarget: 7 }, label: 'aaa' },
+  { intent: { brand: '#c1272d' }, label: 'red' },
+  { intent: { brand: '#f59e0b' }, label: 'amber' },
+  { intent: { brand: '#3b82f6', neutral: { chroma: 0.01, hue: 250 } }, label: 'cast' },
+]
 
 const oracle = {
   /* Regenerating is cheap and reviewing a thousand changed floats is not, so the
@@ -168,6 +191,20 @@ const oracle = {
       ),
     ),
   ),
+  /* Whole derived themes, which is what every phase is ultimately asserted
+     against. The artifact is 37 uniquely named tokens, so a disagreement names
+     itself rather than needing a search bisected by hand. */
+  themes: INTENTS.map(({ intent, label }) => {
+    const theme = deriveTheme(intent)
+    return {
+      collisions: theme.collisions,
+      label,
+      pairings: theme.pairings,
+      seeds: theme.seeds,
+      tokens: theme.tokens,
+      violations: theme.violations,
+    }
+  }),
 }
 
 oracle.statuses = { chroma: STATUS_CHROMA, hue: STATUS_HUE }

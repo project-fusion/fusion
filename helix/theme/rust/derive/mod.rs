@@ -27,6 +27,9 @@
 //! reader tells a decision from a computation by, and the two things the audit
 //! turns on. The phases follow.
 
+pub mod resolve;
+pub mod surfaces;
+
 use crate::oklch::{fit_to_gamut, oklch_to_hex, shipped_contrast_ratio, Oklch};
 
 /// Where a value came from. It is what lets a reader of the emitted file tell a
@@ -65,23 +68,63 @@ pub struct DerivedToken {
     pub value: Oklch,
 }
 
+/// A hue and a chroma with no lightness yet: `Omit<Oklch, 'lightness'>` in the
+/// TypeScript, and worth a name here.
+///
+/// It is what a neutral cast is, and what the contrast solver takes: lightness
+/// is the one component both of those are *solving for*, so a type carrying a
+/// meaningless value in that slot would invite it being read as meaningful.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Cast {
+    pub chroma: f64,
+    pub hue: f64,
+}
+
+impl Cast {
+    /// The colour this cast becomes at a given lightness.
+    #[must_use]
+    pub fn at(self, lightness: f64) -> Oklch {
+        Oklch {
+            chroma: self.chroma,
+            hue: self.hue,
+            lightness,
+        }
+    }
+
+    /// The cast a colour carries, dropping the lightness it happens to have.
+    #[must_use]
+    pub fn of(color: Oklch) -> Self {
+        Self {
+            chroma: color.chroma,
+            hue: color.hue,
+        }
+    }
+}
+
 /// Perceptual distance below which two roles are not reliably distinguishable.
 ///
 /// `tokens.css` measured the muted series at 0.064 in `OKLab` and recorded that as
 /// below what anybody tells apart, so the threshold sits just above it.
 pub const COLLISION_DISTANCE: f64 = 0.08;
 
+/// OKLCH as the three `OKLab` axes it is the polar form of.
+///
+/// Its own function rather than a closure, so the oracle's isolation test uses
+/// *this* and not a copy of it. It was a copy for one commit, which left the
+/// test that separates a disagreement in the trigonometry from one in the
+/// algorithm unable to see a disagreement introduced in the trigonometry.
+pub(crate) fn to_lab(color: Oklch) -> [f64; 3] {
+    let rad = color.hue * std::f64::consts::PI / 180.0;
+    [
+        color.lightness,
+        color.chroma * rad.cos(),
+        color.chroma * rad.sin(),
+    ]
+}
+
 /// Euclidean distance in `OKLab`, which is what OKLCH exists to make meaningful.
 #[must_use]
 pub fn perceptual_distance(a: Oklch, b: Oklch) -> f64 {
-    let to_lab = |color: Oklch| {
-        let rad = color.hue * std::f64::consts::PI / 180.0;
-        [
-            color.lightness,
-            color.chroma * rad.cos(),
-            color.chroma * rad.sin(),
-        ]
-    };
     let [l1, a1, b1] = to_lab(a);
     let [l2, a2, b2] = to_lab(b);
     hypot3(l1 - l2, a1 - a2, b1 - b2)
@@ -136,23 +179,11 @@ pub fn token(name: &str, raw: Oklch, origin: Origin, against: Option<Oklch>) -> 
     }
 }
 
-/// Exposed for the oracle test that isolates `hypot3` from the trigonometry
-/// upstream of it. Not part of the surface.
-#[doc(hidden)]
-#[must_use]
-pub fn hypot3_for_test(x: f64, y: f64, z: f64) -> f64 {
+/// Exposed to the oracle's isolation test, which asks whether a disagreement is
+/// in this or in the trigonometry above it. `pub(crate)` because that test is a
+/// module of this crate: scaffolding does not belong in the published surface,
+/// and `cfg(test)` keeps it out of the built library entirely.
+#[cfg(test)]
+pub(crate) fn hypot3_isolated(x: f64, y: f64, z: f64) -> f64 {
     hypot3(x, y, z)
-}
-
-/// Likewise, so the oracle can ask whether our lab triple matches theirs before
-/// asking whether the distance does.
-#[doc(hidden)]
-#[must_use]
-pub fn to_lab_for_test(color: Oklch) -> [f64; 3] {
-    let rad = color.hue * std::f64::consts::PI / 180.0;
-    [
-        color.lightness,
-        color.chroma * rad.cos(),
-        color.chroma * rad.sin(),
-    ]
 }

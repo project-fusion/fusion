@@ -47,10 +47,12 @@
 
 use serde_json::Value;
 
-use crate::derive::perceptual_distance;
+use crate::derive::resolve::{brand_and_neutral, default_pairings, resolve, Policy};
+use crate::derive::surfaces::{ladder, surfaces};
+use crate::derive::{perceptual_distance, token, DerivedToken, Origin};
 use crate::intent::{
-    is_relation, status_seed, to_oklch, Color, From, Relation, Seed, STATUS_CHROMA, STATUS_HUE,
-    STATUS_NAMES,
+    is_relation, status_seed, to_oklch, Chroma, Color, From, Mechanism, Relation, Scheme, Seed,
+    Separation, Status, ThemeIntent, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
 };
 use crate::model::{GROUNDS, INKS};
 use crate::oklch::{
@@ -521,7 +523,7 @@ fn hypot_is_exact_when_it_is_given_the_same_three_numbers() {
     for entry in distances {
         let [l1, a1, b1] = triple(&entry["labA"]);
         let [l2, a2, b2] = triple(&entry["labB"]);
-        let mine = crate::derive::hypot3_for_test(l1 - l2, a1 - a2, b1 - b2);
+        let mine = crate::derive::hypot3_isolated(l1 - l2, a1 - a2, b1 - b2);
         let theirs = number(entry, "distance");
         if mine.to_bits() != theirs.to_bits() {
             wrong += 1;
@@ -537,7 +539,7 @@ fn hypot_is_exact_when_it_is_given_the_same_three_numbers() {
         }
         /* And whether our own lab triples match theirs, which is the other half
         of the question. */
-        let mine = crate::derive::to_lab_for_test(color(&entry["a"]));
+        let mine = crate::derive::to_lab(color(&entry["a"]));
         if mine[1].to_bits() != a1.to_bits() || mine[2].to_bits() != b1.to_bits() {
             lab_wrong += 1;
         }
@@ -548,4 +550,244 @@ fn hypot_is_exact_when_it_is_given_the_same_three_numbers() {
         distances.len()
     );
     assert_eq!(wrong, 0, "hypot3 differs given identical inputs");
+}
+
+/// Looks up one token of one theme by name.
+fn token_of<'a>(theme: &'a Value, name: &str) -> &'a Value {
+    theme["tokens"]
+        .as_array()
+        .expect("tokens is an array")
+        .iter()
+        .find(|token| token["name"].as_str() == Some(name))
+        .unwrap_or_else(|| panic!("{name} is emitted"))
+}
+
+/// Asserts one built token against the one the TypeScript emitted.
+///
+/// This covers `token()` as well as the phase that produced the value: the hex,
+/// the fitted triple and the chroma-reduced flag all come from it, so a phase
+/// asserting its tokens is asserting the builder too.
+fn assert_token(mine: &DerivedToken, theirs: &Value, at: &str) {
+    assert_eq!(mine.hex, theirs["hex"].as_str().expect("hex"), "{at}: hex");
+    assert_eq!(
+        mine.origin.as_str(),
+        theirs["origin"].as_str().expect("origin"),
+        "{at}: origin"
+    );
+    assert_eq!(
+        mine.chroma_reduced,
+        theirs["chromaReduced"].as_bool().expect("chromaReduced"),
+        "{at}: chromaReduced"
+    );
+    for (label, mine, theirs) in [
+        (
+            "chroma",
+            mine.value.chroma,
+            number(&theirs["value"], "chroma"),
+        ),
+        ("hue", mine.value.hue, number(&theirs["value"], "hue")),
+        (
+            "lightness",
+            mine.value.lightness,
+            number(&theirs["value"], "lightness"),
+        ),
+    ] {
+        assert_eq!(
+            mine.to_bits(),
+            theirs.to_bits(),
+            "{at}: {label} is {mine:?} against {theirs:?}"
+        );
+    }
+}
+
+/// The first phase: defaults, the chroma policy, and the ladder the page stands
+/// on. Ten intents, chosen so each moves a different part of it.
+#[test]
+fn the_surface_ladder_is_the_one_the_typescript_derives() {
+    let data = oracle();
+    let themes = data["themes"].as_array().expect("themes is an array");
+    for theme in themes {
+        let label = theme["label"].as_str().expect("label");
+        let intent = intent_for(label);
+        let resolved = resolve(&intent).expect("the oracle's intents all resolve");
+        let policy = Policy::new(resolved.chroma);
+        let (_raw_brand, _brand, neutral) = brand_and_neutral(&resolved, policy);
+        let built = surfaces(
+            resolved.scheme,
+            neutral,
+            ladder(resolved.separation.surface),
+        );
+
+        for (name, raw) in [
+            ("color-background", built.raw_background),
+            ("color-surface", built.raw_surface),
+            ("color-surface-raised", built.raw_raised),
+            ("color-surface-overlay", built.raw_overlay),
+            ("color-surface-sunken", built.raw_sunken),
+        ] {
+            let mine = token(name, raw, Origin::Derived, None);
+            assert_token(&mine, token_of(theme, name), &format!("{label}/{name}"));
+        }
+    }
+}
+
+/// The defaults, which decide what every phase after them is solving for.
+#[test]
+fn resolving_fills_in_what_the_typescript_fills_in() {
+    let resolved = resolve(&ThemeIntent::new(Color::Hex("#3b82f6".to_owned())))
+        .expect("a plain brand resolves");
+    assert_eq!(resolved.contrast_target.to_bits(), 4.5_f64.to_bits());
+    assert_eq!(resolved.density.to_bits(), 1.0_f64.to_bits());
+    assert_eq!(resolved.radius.to_bits(), 0.5_f64.to_bits());
+    assert_eq!(resolved.namespace, "helix");
+    assert_eq!(resolved.scheme, Scheme::Light);
+    /* Derived from the target rather than constant, which is what lets a theme
+    at AAA check its text against AAA. */
+    assert_eq!(resolved.pairings.len(), default_pairings(4.5).len());
+    let aaa = resolve(&ThemeIntent {
+        contrast_target: Some(7.0),
+        ..ThemeIntent::new(Color::Hex("#3b82f6".to_owned()))
+    })
+    .expect("AAA resolves");
+    assert!(
+        aaa.pairings
+            .iter()
+            .any(|pair| pair.target.to_bits() == 7.0_f64.to_bits()),
+        "a theme at AAA checks its text against AAA"
+    );
+    /* And the ring stays at 3 whatever the text target does, per WCAG 1.4.11. */
+    assert!(
+        aaa.pairings
+            .iter()
+            .any(|pair| pair.foreground == "color-focus-ring"
+                && pair.target.to_bits() == 3.0_f64.to_bits()),
+        "raising a theme to AAA raises what its text must reach, not what a ring must"
+    );
+}
+
+/// The guard that exists because `violations` fails open: every `ratio < target`
+/// against `NaN` is false, so a theme derived from a bad brand passes every
+/// check and emits `#000000` everywhere.
+#[test]
+fn an_intent_that_would_pass_every_check_by_accident_is_refused() {
+    let brand = || Color::Hex("#3b82f6".to_owned());
+    let cases: Vec<(&str, ThemeIntent)> = vec![
+        (
+            "an unreadable brand",
+            ThemeIntent::new(Color::Hex("nonsense".to_owned())),
+        ),
+        (
+            "a NaN target",
+            ThemeIntent {
+                contrast_target: Some(f64::NAN),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "a target below 1",
+            ThemeIntent {
+                contrast_target: Some(0.5),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "a target above 21",
+            ThemeIntent {
+                contrast_target: Some(22.0),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "a density of zero",
+            ThemeIntent {
+                density: Some(0.0),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "a negative radius",
+            ThemeIntent {
+                radius: Some(-1.0),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "an infinite ceiling",
+            ThemeIntent {
+                chroma: Some(Chroma {
+                    ceiling: Some(f64::INFINITY),
+                    scale: None,
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "an allowance past half the circle",
+            ThemeIntent {
+                status: Some(Status {
+                    allowance: Some(181.0),
+                    ..Status::default()
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+    ];
+    for (what, intent) in cases {
+        assert!(resolve(&intent).is_err(), "{what} should be refused");
+    }
+    assert!(
+        resolve(&ThemeIntent::new(brand())).is_ok(),
+        "and a plain brand is not"
+    );
+}
+
+/// Rebuilds the intent the oracle derived a theme from, by label.
+///
+/// Duplicated from `build-oracle.mjs` on purpose and it is the one duplication
+/// here: the oracle stores what a theme *came out as*, not what went in, and a
+/// port asserted against outputs it cannot reproduce the inputs of is asserting
+/// nothing. The labels are the join.
+fn intent_for(label: &str) -> ThemeIntent {
+    let blue = || Color::Hex("#3b82f6".to_owned());
+    let mut intent = ThemeIntent::new(blue());
+    match label {
+        "default" => {}
+        "dark" => intent.scheme = Some(Scheme::Dark),
+        "fill" => {
+            intent.separation = Some(Separation {
+                floating: None,
+                surface: Some(Mechanism::Fill),
+            });
+        }
+        "space" => {
+            intent.separation = Some(Separation {
+                floating: None,
+                surface: Some(Mechanism::Space),
+            });
+        }
+        "dark-fill" => {
+            intent.scheme = Some(Scheme::Dark);
+            intent.separation = Some(Separation {
+                floating: None,
+                surface: Some(Mechanism::Fill),
+            });
+        }
+        "monotone" => {
+            intent.chroma = Some(Chroma {
+                ceiling: Some(0.0),
+                scale: None,
+            });
+        }
+        "aaa" => intent.contrast_target = Some(7.0),
+        "red" => intent.brand = Color::Hex("#c1272d".to_owned()),
+        "amber" => intent.brand = Color::Hex("#f59e0b".to_owned()),
+        "cast" => {
+            intent.neutral = Some(crate::intent::Neutral {
+                chroma: Some(0.01),
+                hue: Some(250.0),
+            });
+        }
+        other => panic!("no intent is recorded for `{other}`"),
+    }
+    intent
 }
