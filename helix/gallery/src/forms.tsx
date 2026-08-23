@@ -305,19 +305,22 @@ export const formsArt: Record<string, ReactNode> = {
    */
   'copy-button': (
     <>
-      {/* Centred as a pair. The clipboard sat at 140 to 180 and the tick at 186
-          to 200, so the two together spanned 140 to 200 and centred on 170 in a
-          card whose middle is 160, and the tick rode six units high of the
-          clipboard's own centre. They are 130 to 190 now, centred on both. */}
-      <rect className="artEdge" fill="none" height="40" rx="5" width="40" x="130" y="80" />
-      <rect className="artEdge" fill="none" height="20" rx="3" width="16" x="142" y="90" />
-      <path className="artStroke" d="M144 88h12" strokeLinecap="round" strokeWidth="2" />
-      {/* Only the tick moves, which is the half of this that is the component:
-          a button that says it copied. The clipboard is what it acted on and
-          floating it as well said the whole card had happened. */}
+      {/* The clipboard holds the centre, not the pair's bounding box.
+      
+          Balancing the box put the clipboard at 130 to 170 and the tick beyond
+          it, which centres the ink and reads left-heavy: the clipboard is the
+          object and the tick is a mark beside it, so the eye centres on the
+          clipboard and finds it off to one side. It is back on 140 to 180,
+          which is the card's own middle, with the tick to its right. */}
+      <rect className="artEdge" fill="none" height="40" rx="5" width="40" x="140" y="80" />
+      <rect className="artEdge" fill="none" height="20" rx="3" width="16" x="152" y="90" />
+      <path className="artStroke" d="M154 88h12" strokeLinecap="round" strokeWidth="2" />
+      {/* Only the tick moves, and it moves visibly. `artOn` scales to 0.94 once,
+          which on a two-unit stroke is nothing anybody sees; `artMark` is the
+          gesture for a mark, at 0.72 with a fade under it. */}
       <path
-        className="artStroke artMotion artOn"
-        d="M176 100l5 5 9-9"
+        className="artStroke artMotion artMark"
+        d="M186 100l5 5 9-9"
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"

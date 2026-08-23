@@ -178,7 +178,7 @@ export const contentArt: Record<string, ReactNode> = {
           that hold it, which reads as the card breathing rather than as the one
           mark that makes this a fragment of code. */}
       <path
-        className="artStroke artMotion artOn"
+        className="artStroke artMotion artMark"
         d="M154 86l12 28"
         fill="none"
         strokeLinecap="round"
