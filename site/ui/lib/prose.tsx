@@ -1,5 +1,11 @@
 import { type HighlightLanguage, highlight } from '@helix-io/sandbox/highlight'
-import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
+import {
+  type AnchorHTMLAttributes,
+  Children,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+} from 'react'
 
 /*
  * What MDX renders its elements as, for every prose surface on this site.
@@ -18,13 +24,27 @@ import { Children, isValidElement, type ReactElement, type ReactNode } from 'rea
  * and these pages are neither. A design system that documents itself in markup
  * it does not use is arguing against itself on every page.
  *
- * Two things do not map, and both are the absence of a component rather than a
- * decision:
+ * **`a` maps to an anchor rather than to a component**, because there is no Link
+ * family: links are a base-layer recipe keyed `data-link`. The note here used to
+ * say the anchor carried that attribute already and it did not. Nothing put it
+ * there, no plugin added one, and the only `data-link` in this package was that
+ * sentence. It was invisible because `:where([data-prose] a)` and `[data-link]`
+ * share a declaration block in `base.css`, so a prose link had the base
+ * appearance without the base's attribute, and every check that could have
+ * noticed reads the source rather than the document.
  *
- * - **`a`**, because there is no Link family. Links are a base-layer recipe
- *   keyed `data-link`, so the anchor carries the attribute and takes the same
- *   rule every other link on the site takes.
- * - **`del`**, which is GFM strikethrough and has nothing to be.
+ * `subtle` rather than the base variant. The base is the accent, which is right
+ * for a link a reader is being sent to and wrong for prose, where a paragraph
+ * citing four files would be four blue words pulling the eye off the sentence
+ * they are in. Subtle reads as body text and takes the accent on hover, which
+ * is the state where a reader has already chosen the link.
+ *
+ * The attribute is written before the spread, so a page that means something
+ * else can say so: an anchor authored as raw HTML in MDX reaches this component
+ * too, and `data-link="quiet"` on it wins.
+ *
+ * One thing still does not map, and it is the absence of a component rather
+ * than a decision: **`del`**, which is GFM strikethrough and has nothing to be.
  *
  * `input` is not mapped either, and that one is worth a line: GFM emits a
  * disabled checkbox for a task list, and no page here has one. Mapping an
@@ -310,6 +330,11 @@ const heading = (as: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') =>
 
 /** The map handed to every `renderMdx` call. */
 export const PROSE_COMPONENTS = {
+  a: ({ children, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a data-link="subtle" {...rest}>
+      {children}
+    </a>
+  ),
   blockquote: ({ children }: { children?: ReactNode }) => (
     <helix-blockquote>{children}</helix-blockquote>
   ),
