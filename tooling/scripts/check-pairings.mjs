@@ -3,7 +3,7 @@
  * Holds the theme engine's surface model to what components actually paint.
  *
  * **The guarantee is a claim about the pairs somebody thought of.**
- * `helix/theme/src/model.ts` declares which inks land on which grounds and the
+ * The surface model declares which inks land on which grounds and the
  * engine measures every pair it produces, which is a real guarantee about a
  * list a human wrote. A pair a component paints and the model has never heard
  * of is not failing: it is unmeasured, and nothing anywhere says so.
@@ -33,8 +33,10 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { ORACLE, pairs } from './theme-facts.mjs'
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const MODEL = 'helix/theme/src/model.ts'
+
 const SOURCE = join(ROOT, 'helix/web/src')
 
 /**
@@ -68,26 +70,15 @@ const walk = (dir) => {
 }
 walk(SOURCE)
 
-/* The model, read as text rather than imported: this is a `.mjs` script and the
-   model is TypeScript, and the shape here is simple enough to match. */
-const model = uncommented(readFileSync(join(ROOT, MODEL), 'utf8'))
-const declared = new Set()
-for (const ink of model.matchAll(
-  /\{[^{}]*?grounds:\s*\[([^\]]*)\][^{}]*?name:\s*'([a-z0-9-]+)'/gs,
-)) {
-  const grounds = [...ink[1].matchAll(/'(color-[a-z0-9-]+)'/g)].map((m) => m[1])
-  const groups = [...ink[1].matchAll(/\.\.\.(?:\[\.\.\.)?([A-Z_]+)/g)].map((m) => m[1])
-  for (const group of groups) {
-    const block = model.match(new RegExp(`const ${group} = \\[([^\\]]*)\\]`, 's'))
-    if (block) {
-      grounds.push(...[...block[1].matchAll(/'(color-[a-z0-9-]+)'/g)].map((m) => m[1]))
-    }
-  }
-  for (const ground of grounds) {
-    declared.add(`${ink[2]} on ${ground}`)
-  }
-}
+/* **The pairs the engine measures, read from what it emitted.** This used to
+   match the model's TypeScript with a regular expression, and two things ended
+   that: the model is Rust now, and the expression was quietly missing a third of
+   the pairs. Every status ink's grounds are built by a loop the pattern could not
+   see, so `color-danger on color-surface` and nineteen like it were never
+   checked, which is exactly the case a status fill painted by hand would land in.
 
+   `oracle.json` is the emitted answer and `cargo test` asserts the engine
+   against it, so it cannot go stale without the Rust suite going red. */
 const problems = []
 const painted = new Map()
 
@@ -103,14 +94,14 @@ for (const path of sheets) {
 }
 
 for (const [pair, path] of [...painted].sort()) {
-  if (declared.has(pair) || ACCEPTED.has(pair)) {
+  if (pairs.has(pair) || ACCEPTED.has(pair)) {
     continue
   }
   problems.push(
-    `${path} paints \`${pair}\` and ${MODEL} does not declare it, so the engine ` +
-      'never measures that pair and a theme reports it neither passing nor ' +
-      'failing. Add the ground to that ink, or record it in `ACCEPTED` with the ' +
-      "reason it is not the engine's to check.",
+    `${path} paints \`${pair}\` and the engine does not measure it: no such pair ` +
+      `appears in ${ORACLE}, so a theme reports it neither passing nor failing. ` +
+      'Add the ground to that ink in the surface model, or record it in ' +
+      "`ACCEPTED` with the reason it is not the engine's to check.",
   )
 }
 

@@ -9,7 +9,7 @@
 //!
 //! The port lands one module at a time and the TypeScript stays alive as the
 //! oracle while it does. `oracle.json` is generated from the TypeScript engine
-//! by `bun run oracle` and asserted here byte for byte, so agreement is measured
+//! by the bless and asserted here byte for byte, so a regression is measured
 //! on every `cargo test` rather than assumed from a reading of both files. The
 //! TypeScript goes when the crate answers for all of it.
 pub mod css;
@@ -21,8 +21,14 @@ pub mod oklch;
 #[cfg(feature = "serde")]
 mod wire;
 
+#[cfg(any(feature = "wasm", test))]
+mod shape;
+
 #[cfg(feature = "wasm")]
 mod wasm;
+
+#[cfg(test)]
+mod bless;
 
 #[cfg(test)]
 mod oracle;

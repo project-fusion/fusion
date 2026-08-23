@@ -1,15 +1,19 @@
 /**
  * The intents every theme assertion is derived from.
  *
- * **Their own module, and the reason is a deletion that has not happened yet.**
- * These are data, and `build-oracle.mjs` reaches for the TypeScript engine to
- * turn them into an oracle. `check-wasm.mjs` needs the same list and must not
- * pull that engine in with it: the whole point of the WASM distribution is that
- * `derive.ts` can go, and a check that imports it dies on the day it does, for a
- * reason whose stack trace is about module resolution.
+ * **Stated here as well as in Rust, and the duplication is checked rather than
+ * merely tolerated.** `oracle::intent_for` is what the engine derives from and
+ * this is what `check:wasm` feeds to the browser distribution, and the two are
+ * compared against each other every time that check runs: it drives the WASM
+ * module with the intent from this file and asserts the result against the
+ * oracle theme of the same label, which Rust built from its own. A drift between
+ * them is a failure with the offending token named, rather than two lists
+ * quietly meaning different things.
  *
- * It is also why this file is `.mjs` with no TypeScript import in it. Node runs
- * it directly; `build-oracle.mjs` still needs bun, because it imports `.ts`.
+ * The alternative was serialising the resolved intent into the oracle so this
+ * file could be deleted, which needs a `Serialize` on every shape in the
+ * vocabulary including three unions with hand-written readers. Seventeen small
+ * literals held to each other by a check is the cheaper honest answer.
  *
  * Chosen so each one changes a different phase: the scheme flips the whole
  * ladder, the separation policy scales it, a ceiling of 0 makes every derived

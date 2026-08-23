@@ -50,6 +50,8 @@ import { createServer } from 'node:http'
 import { extname, join, resolve } from 'node:path'
 import { chromium } from 'playwright'
 
+import { pairs } from './theme-facts.mjs'
+
 const root = resolve(import.meta.dirname, '../..')
 const frame = join(root, 'site/ui/public/sandbox')
 const source = join(root, 'helix/web/src')
@@ -79,39 +81,21 @@ const server = createServer((request, response) => {
 await new Promise((done) => server.listen(0, '127.0.0.1', done))
 const origin = `http://127.0.0.1:${server.address().port}`
 
-/**
- * The pairs `helix/theme/src/model.ts` declares, so the run can say which of them
- * no example ever put on screen.
- *
- * **This check reads what the examples render, and that was an invisible gap
- * rather than a stated one.** A pair nothing paints is not measured and not
- * reported, which is how `--helix-color-primary` sat at 4.431:1 against
- * `surface-raised` in dark until the engine was asked instead. Naming the
- * unpainted pairs turns the hole into a list.
- *
- * Read as text rather than imported, for the reason `check:pairings` gives: this
- * is a `.mjs` script and the model is TypeScript.
- */
-const uncommented = (source) => source.replace(/\/\*[\s\S]*?\*\//g, '')
-const model = uncommented(readFileSync(join(root, 'helix/theme/src/model.ts'), 'utf8'))
-const declared = new Set()
-for (const ink of model.matchAll(
-  /\{[^{}]*?grounds:\s*\[([^\]]*)\][^{}]*?name:\s*'([a-z0-9-]+)'/gs,
-)) {
-  const grounds = [...ink[1].matchAll(/'(color-[a-z0-9-]+)'/g)].map((found) => found[1])
-  for (const group of [...ink[1].matchAll(/\.\.\.(?:\[\.\.\.)?([A-Z_]+)/g)].map((f) => f[1])) {
-    const block = model.match(new RegExp(`const ${group} = \\[([^\\]]*)\\]`, 's'))
-    if (block) {
-      grounds.push(...[...block[1].matchAll(/'(color-[a-z0-9-]+)'/g)].map((found) => found[1]))
-    }
-  }
-  for (const ground of grounds) {
-    declared.add(`${ink[2]} on ${ground}`)
-  }
-}
+/* `pairs` is every pair the surface model declares, so the run can say which of
+   them no example ever put on screen.
+
+   **This check reads what the examples render, and that was an invisible gap
+   rather than a stated one.** A pair nothing paints is not measured and not
+   reported, which is how `--helix-color-primary` sat at 4.431:1 against
+   `surface-raised` in dark until the engine was asked instead. Naming the
+   unpainted pairs turns the hole into a list.
+
+   **Read from what the engine emitted, not from its source.** `check:pairings`
+   carries the argument: the model is Rust now, and the regular expression that
+   used to stand in for it missed every status ink's grounds. */
 
 /** Every token the model names, which the page resolves to a colour per mode. */
-const named = [...new Set([...declared].flatMap((pair) => pair.split(' on ')))]
+const named = [...new Set([...pairs].flatMap((pair) => pair.split(' on ')))]
 
 const examples = []
 for (const family of readdirSync(source)) {
@@ -582,10 +566,10 @@ console.log(
 /* Reported rather than failed. A pair the model declares and no example paints
    is a gap in the examples, not a defect in the palette, and the engine measures
    every one of them regardless. What this adds is knowing which. */
-const unpainted = [...declared].filter((pair) => !painted.has(pair)).sort()
+const unpainted = [...pairs].filter((pair) => !painted.has(pair)).sort()
 if (unpainted.length > 0) {
   console.log(
-    `contrast: ${declared.size - unpainted.length} of ${declared.size} modelled pairs ` +
+    `contrast: ${pairs.size - unpainted.length} of ${pairs.size} modelled pairs ` +
       `appear in an example. No example paints ${unpainted.length}, so nothing here ` +
       'measures them:',
   )

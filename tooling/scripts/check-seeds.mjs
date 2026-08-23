@@ -58,10 +58,10 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { emitted as emittedNames, modelNames, seedNames } from './theme-facts.mjs'
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-const ENGINE = 'helix/theme/src/derive.ts'
-const MODEL = 'helix/theme/src/model.ts'
 const SHEETS = ['helix/styles/src/primitives.css', 'helix/styles/src/tokens.css']
 
 /**
@@ -91,15 +91,12 @@ const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const uncommented = (source) =>
   source.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ')
 
-/* **Two forms, because the seeds are data before they are CSS.** They are
-   declared as object keys, `'seed-brand': …`, and rendered into
-   `--${namespace}-seed-brand: …` from that one place, so the literal prefix is
-   never in the source to match on and the key may or may not carry a quote.
-   What both forms share is ending in `seed-<name>` followed by a colon, and
-   nothing else in this file does, comments already being stripped. */
-const emitted = new Set(
-  [...uncommented(read(ENGINE)).matchAll(/seed-([a-z0-9-]+)'?\s*:/g)].map((m) => m[1]),
-)
+/* **The seeds the engine emitted, rather than two regular expressions guessing
+   at how it writes them.** They used to be matched in the TypeScript source in
+   two forms, as an object key and as a rendered property, because the literal
+   prefix was never in the source to match on. The engine is Rust now and the
+   answer is in the oracle: these are the keys it actually wrote. */
+const emitted = seedNames
 
 const consumed = new Set()
 for (const sheet of SHEETS) {
@@ -121,7 +118,7 @@ const problems = []
 for (const name of [...emitted].sort()) {
   if (!consumed.has(name)) {
     problems.push(
-      `${ENGINE} emits the seed \`${name}\` and no stylesheet reads it. A derived theme ` +
+      `the engine emits the seed \`${name}\` and no stylesheet reads it. A derived theme ` +
         'carrying this name moves nothing on the page, which is invisible from ' +
         'either file alone. Either the stylesheet should read it or the engine ' +
         'should stop emitting it.',
@@ -134,7 +131,7 @@ for (const name of [...consumed].sort()) {
     continue
   }
   problems.push(
-    `${SHEETS.join(' or ')} reads the seed \`${name}\` and ${ENGINE} never emits it, so ` +
+    `${SHEETS.join(' or ')} reads the seed \`${name}\` and the engine never emits it, so ` +
       'the documented path to a theme cannot reach it and a consumer has to ' +
       'hand-write CSS to finish the job. Emit it, or record it in `PLANNED` ' +
       'with the reason.',
@@ -151,20 +148,17 @@ for (const [name, why] of PLANNED) {
   }
   if (emitted.has(name)) {
     problems.push(
-      `\`${name}\` is in \`PLANNED\` (${why}) and ${ENGINE} now emits it. The ` +
+      `\`${name}\` is in \`PLANNED\` (${why}) and the engine now emits it. The ` +
         'reason has expired, which is the point of writing one down. Delete the ' +
         'entry.',
     )
   }
 }
 
-/* The token names, read from the model rather than from a derived theme, so the
-   check needs no colour math and cannot be fooled by a theme that happens not
-   to emit something. */
-const modelNames = [
-  ...[...uncommented(read(MODEL)).matchAll(/name:\s*'(color-[a-z0-9-]+)'/g)].map((m) => m[1]),
-  ...[...uncommented(read(MODEL)).matchAll(/'(color-[a-z0-9-]+)',?\s*$/gm)].map((m) => m[1]),
-]
+/* The token names the surface model knows, taken from the pairs the engine
+   measured rather than from a token list: a ground the model names and no theme
+   emits still has to be declared, and it is present there as the background of
+   an unverifiable pair. */
 
 const declared = new Set(
   SHEETS.flatMap((sheet) => [
@@ -175,7 +169,7 @@ const declared = new Set(
 for (const name of [...new Set(modelNames)].sort()) {
   if (!declared.has(name)) {
     problems.push(
-      `${MODEL} names \`${name}\` as an ink or a ground and ${SHEETS[1]} does not ` +
+      `the surface model names \`${name}\` as an ink or a ground and ${SHEETS[1]} does not ` +
         'declare it, so a themed page would set a property nothing reads and the ' +
         'pairing would be measured against a colour no component can paint.',
     )
@@ -189,12 +183,14 @@ for (const name of [...new Set(modelNames)].sort()) {
    the token layer calling it `--helix-font-sans`, so setting a body face moved
    the headings and left every other word on the page alone.
 
-   Read from the template literals rather than by running the engine, so the
-   check needs no colour math and sees a name even where nothing emits it under
-   the default intent. */
-const written = new Set(
-  [...uncommented(read(ENGINE)).matchAll(/`\s*--\$\{namespace\}-([a-z0-9-]+):/g)].map((m) => m[1]),
-)
+   **Read from what the engine emitted across every oracle intent**, where it
+   used to be matched against the template literals. The templates could see a
+   family and never a leaf, `--${namespace}-text-${name}` stopping the pattern at
+   the first `$`, and they could not see the colour tokens at all, those being
+   written by a loop: fifty-three emitted names were outside this check. The
+   trade is that a branch no intent reaches is now invisible, which is why four
+   of the seventeen exist to turn on the tail of the emission. */
+const written = new Set([...emittedNames].filter((name) => !name.startsWith('seed-')))
 
 const declaredAll = new Set(
   SHEETS.flatMap((sheet) => [
@@ -209,18 +205,14 @@ const declaredAll = new Set(
    not have at all: `--helix-typeface-lg` would be reported where
    `--helix-text-lg` is fine. It cannot check the leaf, and saying so is better
    than implying otherwise. */
-const families = new Set(
-  [...uncommented(read(ENGINE)).matchAll(/`\s*--\$\{namespace\}-([a-z0-9-]+)-\$\{/g)].map(
-    (m) => m[1],
-  ),
-)
+const families = new Set([...written].map((name) => name.split('-')[0]))
 
 const declaredFamilies = new Set([...declaredAll].map((name) => name.split('-')[0]))
 
 for (const family of [...families].sort()) {
   if (!declaredFamilies.has(family)) {
     problems.push(
-      `${ENGINE} writes a \`--helix-${family}-*\` family and no stylesheet ` +
+      `the engine writes a \`--helix-${family}-*\` family and no stylesheet ` +
         'declares one, so every token in it sets a property nothing reads.',
     )
   }
@@ -231,7 +223,7 @@ for (const name of [...written].sort()) {
     continue
   }
   problems.push(
-    `${ENGINE} writes \`--helix-${name}\` and no stylesheet declares it, so a ` +
+    `the engine writes \`--helix-${name}\` and no stylesheet declares it, so a ` +
       'derived theme carrying it sets a property nothing reads. Either the token ' +
       'layer should have the name or the engine should stop writing it.',
   )

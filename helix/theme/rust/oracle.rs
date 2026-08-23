@@ -1,12 +1,21 @@
-//! The port held to the engine it replaces.
+//! The engine held to what it answered.
 //!
-//! `oracle.json` is what `src/oklch.ts` answers, frozen by `bun run oracle`.
-//! Every value below is asserted against it, so "the port agrees" is measured on
-//! each `cargo test` rather than concluded from reading both files. 142 asks for
-//! exactly this and says why: both functions here bisect, so agreement on intent
-//! is not agreement on output, and a last-place difference in one channel moves
-//! a byte, which moves the luminance, which moves the side of 4.5 the search
-//! lands on.
+//! **This was a differential check and is a snapshot now, and the difference is
+//! worth stating plainly.** `oracle.json` held what the TypeScript engine
+//! answered, and every value below asserted that the port agreed with an
+//! implementation written independently. That engine is deleted: the port passed
+//! and 142 was filed to stop two implementations of a search existing at once.
+//! So these tests prove that nothing has changed since somebody last looked,
+//! rather than that the answers are right.
+//!
+//! The reason the check was worth having in the first place is unchanged and is
+//! why the snapshot is worth keeping: both functions here bisect, so agreement
+//! on intent is not agreement on output, and a last-place difference in one
+//! channel moves a byte, which moves the luminance, which moves the side of 4.5
+//! the search lands on. A regression of that shape is invisible to a type
+//! checker and to a reviewer, and this catches it.
+//!
+//! `bless.rs` is what rewrites the file, deliberately awkwardly.
 //!
 //! **The port is bit-exact almost everywhere, and finding that out took
 //! correcting the harness twice.**
@@ -824,15 +833,42 @@ fn an_intent_that_would_pass_every_check_by_accident_is_refused() {
 
 /// Rebuilds the intent the oracle derived a theme from, by label.
 ///
-/// Duplicated from `build-oracle.mjs` on purpose and it is the one duplication
+/// Stated here and in `tooling/scripts/theme-intents.mjs`, and it is the one duplication
 /// here: the oracle stores what a theme *came out as*, not what went in, and a
 /// port asserted against outputs it cannot reproduce the inputs of is asserting
 /// nothing. The labels are the join.
+/// Every theme the oracle records, in the order it records them.
+///
+/// **The order is the file's order and is load-bearing for review**, not for any
+/// assertion: a bless that reordered them would rewrite every theme block and
+/// bury whatever actually changed.
+pub fn labels() -> Vec<&'static str> {
+    vec![
+        "default",
+        "dark",
+        "fill",
+        "space",
+        "dark-fill",
+        "monotone",
+        "aaa",
+        "red",
+        "amber",
+        "quiet",
+        "cast",
+        "pinned",
+        "pale",
+        "expressive",
+        "instant",
+        "tiny",
+        "paced",
+    ]
+}
+
 /* One arm per oracle theme, so this grows by a few lines every time a branch
 turns out to need an input that shows it. Splitting it would file half the
 intents somewhere else and leave a reader chasing which half. */
 #[allow(clippy::too_many_lines)]
-fn intent_for(label: &str) -> ThemeIntent {
+pub fn intent_for(label: &str) -> ThemeIntent {
     let blue = || Color::Hex("#3b82f6".to_owned());
     let mut intent = ThemeIntent::new(blue());
     match label {

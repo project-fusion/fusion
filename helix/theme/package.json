@@ -24,7 +24,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "node ../../tooling/scripts/build-wasm.mjs && tsc -p tsconfig.json",
-    "test": "bun test src",
+    "test": "cargo test -p helix-theme --manifest-path ../../Cargo.toml",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "publishConfig": {
