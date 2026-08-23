@@ -28,6 +28,9 @@
     "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "devDependencies": {
+    "@helix-io/cem": "workspace:*"
+  },
   "publishConfig": {
     "access": "restricted"
   }

@@ -147,12 +147,18 @@ export const createHelixCemConfig = ({
 
 export { toReactProp } from './plugins/react-events.js'
 export type {
+  Documented,
+  HelixAttribute,
   HelixContext,
   HelixDeclaration,
   HelixEvent,
   HelixManifest,
+  HelixMember,
   HelixMetadata,
+  HelixModule,
+  InheritedFrom,
   Plugin,
+  TypeText,
   Violation,
 } from './types.js'
 export {

@@ -21,6 +21,44 @@ export type { Plugin }
 export interface Documented {
   description?: string
   name: string
+  /** Declared type, where the entry has one. Slots and parts do not. */
+  type?: TypeText
+}
+
+/**
+ * A type as the manifest records it: rendered source text, not a structure.
+ *
+ * The analyzer writes what was written, so a union arrives as
+ * `'single' | 'single-collapsible' | undefined` and nothing downstream has to
+ * reconstruct it.
+ */
+export interface TypeText {
+  text?: string
+}
+
+/**
+ * Where a member came from, when it was not declared on the element itself.
+ *
+ * The analyzer resolves inheritance across packages, so a styled component
+ * carries every member its headless base contributes with the base named here.
+ * That is what lets a reference document the styled tier alone without losing
+ * anything, and what fills the "From" column.
+ */
+export interface InheritedFrom {
+  module?: string
+  name: string
+}
+
+/**
+ * An observed attribute, and the property it is the attribute of.
+ *
+ * `fieldName` is the join: an attribute and its property are one thing with two
+ * names, and pairing them by string similarity would guess wrong on the first
+ * component whose attribute is not the kebab-case of its field.
+ */
+export interface HelixAttribute extends Documented {
+  fieldName?: string
+  inheritedFrom?: InheritedFrom
 }
 
 export interface HelixMember extends Documented {
@@ -41,12 +79,16 @@ export interface HelixMember extends Documented {
      */
     references?: { label: string; url: string }[]
   }
+  /** Initial value, as source text. Absent where there is no default. */
+  default?: string
+  inheritedFrom?: InheritedFrom
   kind?: string
   privacy?: string
 }
 
 /** An event enriched with the React prop name generated for it. */
 export interface HelixEvent extends Documented {
+  inheritedFrom?: InheritedFrom
   /** Generated React prop, e.g. `open-change` becomes `onOpenChange`. */
   reactProp?: string
 }
@@ -140,6 +182,7 @@ export interface HelixMetadata {
  * that flag.
  */
 export interface HelixDeclaration extends Documented {
+  attributes?: HelixAttribute[]
   cssParts?: Documented[]
   cssProperties?: Documented[]
   customElement?: boolean
