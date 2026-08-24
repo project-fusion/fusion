@@ -34,6 +34,9 @@ import { styles } from './card-root.css.js'
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
  *
+ * @cssproperty --card-align - How the regions pack when the card is stretched
+ *   taller than its content. `start` by default, so the slack is at the bottom;
+ *   `space-between` puts a footer on the floor.
  * @cssproperty --card-backdrop - Filter applied behind a `material="glass"` card. Follows
  *   the theme's material policy; set it to override the strength on one card.
  * @cssproperty --card-background-color - Surface behind the card.

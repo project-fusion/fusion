@@ -31,6 +31,10 @@ import { styles } from './slider-root.css.js'
  * @cssproperty --slider-fill-color - The part behind the thumb.
  * @cssproperty --slider-marker-color - The ticks along the track.
  * @cssproperty --slider-track-image - The whole track, for a slider whose color is the value.
+ * @cssproperty --slider-track-size - How thick the track is. The progress bar's own size by default, the two being the same object.
+ * @cssproperty --slider-thumb-size - The handle across the track. Square with the length by default, which is what makes it round.
+ * @cssproperty --slider-thumb-length - The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval.
+ * @cssproperty --slider-thumb-radii - The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise.
  * @cssproperty --slider-length - How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row.
  */
 @customElement('helix-slider')

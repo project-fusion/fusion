@@ -520,7 +520,22 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       layout,
       panes,
       syntax,
-      tier: forcedTier,
+      /* **What is being shown, not only what the address asked for.**
+         `forcedTier` is null unless the URL carried one, so writing it back
+         meant a reader who switched to base in the drawer got a link that said
+         styled: following it showed the other package, which is exactly the
+         failure the parameter exists to prevent. The address has to describe the
+         sandbox, whichever control put it in that state.
+
+         Still never written back to `localStorage`, which is the half of the
+         argument that holds: a link says what it is about, and opening one must
+         not re-set the reader's own preference.
+
+         Styled is the absence, so a default sandbox is `?e=family.slug` and
+         nothing else. An explicit `t=styled` survives, because a link that
+         deliberately pins the common tier still means it for a reader whose
+         preference is base. */
+      tier: forcedTier ?? (preferredTier === 'base' ? 'base' : null),
     })
     /* The fragment is only ours to write once the editor has been seeded.
        Before that it is still the one the page arrived with, and this effect
@@ -543,6 +558,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     familySlug,
     forcedTier,
     layout,
+    /* The effect reads it now, so it has to rerun when the drawer moves it. */
+    preferredTier,
     previewTheme,
     showEditor,
     showPanel,

@@ -309,11 +309,22 @@ const footprint = (dir) => {
       continue
     }
     for (const file of walk(path)) {
-      bytes += statSync(file).size
-      count += 1
+      /* **Maps are counted and then taken off, because they no longer ship.**
+         `publish.mjs` opens the packed tarball and removes every `.map` and the
+         trailing `sourceMappingURL` comment with it, so `dist` on disk is not
+         what lands in a consumer's `node_modules`. Measuring the directory and
+         reporting the total overstated every row by its own map column: 272,406
+         bytes on `@helix-io/web` alone.
+
+         Still counted rather than skipped, so the row can say how much was
+         removed. A number that used to be part of the total and is now
+         subtracted from it is worth showing rather than quietly dropping. */
       if (file.endsWith('.map')) {
         maps += statSync(file).size
+        continue
       }
+      bytes += statSync(file).size
+      count += 1
     }
   }
   return {
@@ -635,10 +646,11 @@ lines.push(
   '',
   'A different question from what reaches a browser, and the one an install',
   'budget is written against. Unpacked bytes of exactly what each package',
-  'publishes, which is its `files` field. Source maps are counted separately',
-  'because they ship and no page downloads them.',
+  'publishes, which is its `files` field. **Source maps are not in these',
+  'numbers**: they are stripped from the tarball at pack time, so the last',
+  'column is what was removed rather than part of what remains.',
   '',
-  '| Package | Unpacked | Files | Of which source maps | Runtime dependencies |',
+  '| Package | Unpacked | Files | Source maps stripped | Runtime dependencies |',
   '|---|---|---|---|---|',
   ...footprints.map(
     (one) =>

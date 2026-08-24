@@ -7271,6 +7271,10 @@
           "name": "HelixCard",
           "cssProperties": [
             {
+              "description": "How the regions pack when the card is stretched taller than its content. `start` by default, so the slack is at the bottom; `space-between` puts a footer on the floor.",
+              "name": "--card-align"
+            },
+            {
               "description": "Filter applied behind a `material=\"glass\"` card. Follows the theme's material policy; set it to override the strength on one card.",
               "name": "--card-backdrop"
             },
@@ -53109,6 +53113,22 @@
               "name": "--slider-track-image"
             },
             {
+              "description": "How thick the track is. The progress bar's own size by default, the two being the same object.",
+              "name": "--slider-track-size"
+            },
+            {
+              "description": "The handle across the track. Square with the length by default, which is what makes it round.",
+              "name": "--slider-thumb-size"
+            },
+            {
+              "description": "The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval.",
+              "name": "--slider-thumb-length"
+            },
+            {
+              "description": "The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise.",
+              "name": "--slider-thumb-radii"
+            },
+            {
               "description": "How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row.",
               "name": "--slider-length"
             },
@@ -54087,6 +54107,10 @@
               {
                 "description": "Two thumbs on one track, for a span rather than a point.",
                 "slug": "range"
+              },
+              {
+                "description": "A track given thickness and a handle given two dimensions.",
+                "slug": "shape"
               },
               {
                 "description": "A value that moves in named steps rather than continuously.",

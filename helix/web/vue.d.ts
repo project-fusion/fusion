@@ -7699,6 +7699,8 @@ export type CustomCssProperties = {
   "--callout-background-color"?: string;
   /** Corner radius of the callout. */
   "--callout-radii"?: string;
+  /** How the regions pack when the card is stretched taller than its content. `start` by default, so the slack is at the bottom; `space-between` puts a footer on the floor. */
+  "--card-align"?: string;
   /** Filter applied behind a `material="glass"` card. Follows the theme's material policy; set it to override the strength on one card. */
   "--card-backdrop"?: string;
   /** Surface behind the card. */
@@ -8157,6 +8159,14 @@ export type CustomCssProperties = {
   "--slider-marker-color"?: string;
   /** The whole track, for a slider whose color is the value. */
   "--slider-track-image"?: string;
+  /** How thick the track is. The progress bar's own size by default, the two being the same object. */
+  "--slider-track-size"?: string;
+  /** The handle across the track. Square with the length by default, which is what makes it round. */
+  "--slider-thumb-size"?: string;
+  /** The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval. */
+  "--slider-thumb-length"?: string;
+  /** The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. */
+  "--slider-thumb-radii"?: string;
   /** How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. */
   "--slider-length"?: string;
   /** The value as a fraction of the range, 0 to 1. */

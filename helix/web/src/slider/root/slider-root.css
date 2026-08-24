@@ -8,8 +8,29 @@
      horizontal bar a proportion is read off. It was a bare `0.25rem`, so it was
      both a raw value and half the height of the bar beside it, and at 4px the
      fill and the rules in a table beside it were the same weight. */
-  --_slider-track: var(--helix-size-progress);
-  --_slider-thumb: var(--helix-size-checkbox);
+  --_slider-track: var(--slider-track-size, var(--helix-size-progress));
+  /* **The thumb has two dimensions and they are relative to travel, not to the
+     screen.** `Switch` published a height and derived a width from it and this
+     published neither, so the one control in the library whose whole subject is
+     a handle on a track could not be given a taller track or a handle that is
+     not a circle: `inline-size` and `block-size` were both bound to one
+     variable and the radius was `radii-full` written in place.
+   *
+   * `--_slider-thumb` is the thickness, across the track, and
+   * `--_slider-thumb-length` is along it, defaulting to the same so a slider
+   * nobody has touched is still round.
+   *
+   * **Naming them for the axes works because the thumb is inside the rotation.**
+   * The vertical control sets `writing-mode: vertical-lr`, so a pseudo-element
+   * of it resolves `block-size` against the turned frame: block is the track's
+   * thickness and inline is its length in both orientations, which is the same
+   * property the note at the foot of this file credits for making vertical
+   * nearly free. What does *not* rotate is a margin, which resolves against the
+   * containing block rather than the element, and that is why the two insets
+   * below are written once per orientation and each names the length. */
+  --_slider-thumb: var(--slider-thumb-size, var(--helix-size-checkbox));
+  --_slider-thumb-length: var(--slider-thumb-length, var(--_slider-thumb));
+  --_slider-thumb-radii: var(--slider-thumb-radii, var(--helix-radii-full));
   /* The ring while the thumb is held or focused. The accent at low opacity, so
      it reads as the control's own color rather than as a second element. */
   /* A halo of the fill it is a halo of.
@@ -136,7 +157,7 @@
 [part="markers"] {
   align-self: center;
   block-size: var(--_slider-track);
-  margin-inline: calc(var(--_slider-thumb) / 2);
+  margin-inline: calc(var(--_slider-thumb-length) / 2);
   pointer-events: none;
   position: relative;
   z-index: var(--helix-layer-raised);
@@ -194,7 +215,7 @@
  * saves inventing a token for a value nobody sees. */
 /* biome-ignore lint/style/noDescendingSpecificity: the rule above it places `control` and `markers` in the same grid cell in one selector list, which is one decision about one layout. Reordering to satisfy this would split that pair so a single-part rule could sit between them, and the pair is the thing worth keeping together. Specificity decides here either way. */
 [part="markers"] {
-  --_slider-hole: calc(var(--_slider-thumb) / 2 + var(--helix-border-thin));
+  --_slider-hole: calc(var(--_slider-thumb-length) / 2 + var(--helix-border-thin));
 
   mask-image: radial-gradient(
     circle at calc(var(--slider-fraction, 0) * 100%) 50%,
@@ -329,7 +350,7 @@
   background-color: var(--slider-thumb-color, var(--helix-color-surface-inverse));
   block-size: var(--_slider-thumb);
   border: none;
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--_slider-thumb-radii);
   /* A ring of the ground's own color, so the thumb reads against whichever
      half of the track it is over.
 
@@ -351,7 +372,7 @@
   box-shadow:
     0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
     var(--helix-shadow-md);
-  inline-size: var(--_slider-thumb);
+  inline-size: var(--_slider-thumb-length);
   margin-block-start: calc((var(--_slider-track) - var(--_slider-thumb)) / 2);
 }
 
@@ -377,7 +398,7 @@
   /* Stated rather than dropped: Firefox's UA stylesheet gives the thumb a
      border, so leaving the declaration out leaves a border rather than none. */
   border: none;
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--_slider-thumb-radii);
   /* A ring of the ground's own color, so the thumb reads against whichever
      half of the track it is over.
 
@@ -399,7 +420,7 @@
   box-shadow:
     0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
     var(--helix-shadow-md);
-  inline-size: var(--_slider-thumb);
+  inline-size: var(--_slider-thumb-length);
 }
 
 [part="control"]:focus-visible {
@@ -533,7 +554,7 @@
 :host([orientation="vertical"]) [part="control"] {
   direction: rtl;
   inline-size: var(--slider-length, 9rem);
-  margin-block: calc(var(--_slider-thumb) / 2);
+  margin-block: calc(var(--_slider-thumb-length) / 2);
   margin-inline: 0;
   writing-mode: vertical-lr;
 

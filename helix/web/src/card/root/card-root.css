@@ -17,6 +17,29 @@
      lifted by two rules that disagree about how far. */
   box-shadow: var(--card-shadow, var(--helix-shadow-surface));
   color: var(--helix-color-foreground-muted);
+  /* **Packed at the top, with the slack at the bottom.**
+   *
+   * `align-content` computes to `stretch` on a grid, and a stretched grid with
+   * `auto` rows gives every row an equal share of the free space. A card is
+   * stretched whenever it sits in a grid beside a taller one, so a card with
+   * less in it than its neighbour was distributing the difference *between its
+   * own regions*: measured on the docs index, a header box 113px tall against
+   * its neighbour's 26px, which reads as a heading floating above a gap rather
+   * than as a card with room left at the end.
+   *
+   * The regions are bare slots and an unfilled one generates no row, so there is
+   * no row this could hand the slack to instead: a `grid-template-rows` naming
+   * four would misalign every card that omits one, which is the whole reason the
+   * slots are bare. Packing at the start is the arrangement that is right
+   * whichever regions are present.
+   *
+   * **A hook rather than a bare value, because the other answer is real.** A row
+   * of cards whose footers should sit at one height wants `space-between`, which
+   * is what the site's insight cards ask for. Written as a plain declaration here
+   * that would be a document rule overruling a shadow one, which is dead in a way
+   * nothing reports: `check:overruled` catches exactly that and did. A custom
+   * property is the door this library already publishes for a single knob. */
+  align-content: var(--card-align, start);
   display: grid;
   gap: var(--helix-space-sm);
   grid-template-columns: minmax(0, 1fr);

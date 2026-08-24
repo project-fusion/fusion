@@ -1,0 +1,27 @@
+/* Three hooks and no attribute, which is the point of the example.
+ *
+ * A track thick enough to hold a handle inside it, and a handle that is longer
+ * across the track than along it, is a shape a great many products draw and
+ * that no `shape="oval"` could have covered: it is two numbers, and a named
+ * value is one point in the space they describe.
+ *
+ * `--slider-thumb-size` is the handle across the track and
+ * `--slider-thumb-length` is along it, so this one is a bar standing upright in
+ * a groove. Swapping which is larger gives the opposite handle, and leaving
+ * both alone gives the circle every other example draws.
+ *
+ * On the group rather than on a slider, for the reason `vertical.css` gives
+ * about `--slider-length`: these are custom properties, so a shape set once for
+ * a row is a row whose members cannot disagree about it.
+ *
+ * **The names are relative to travel, not to the screen**, which is what makes
+ * the vertical pair below take the same three declarations and come out right.
+ * The handle is inside the control's own writing mode, and the vertical control
+ * turns that mode over, so `size` stays the thickness and `length` stays the
+ * distance along the track in either orientation. */
+.thick {
+  --slider-track-size: var(--helix-space-md);
+  --slider-thumb-size: var(--helix-space-lg);
+  --slider-thumb-length: var(--helix-space-xs);
+  --slider-thumb-radii: var(--helix-radii-sm);
+}

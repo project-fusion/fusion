@@ -1745,7 +1745,7 @@ repository does that. The per-component tables are what a page pays.
 | \`@helix-io/headless\` | 440,452 | 112,913 | 89,222 | Every headless family, which is what the barrel means. |
 | \`@helix-io/icons\` | 45,442 | 14,544 | 12,328 | The whole glyph set. |
 | \`@helix-io/theme\` | 3,274 | 1,567 | 1,349 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| \`@helix-io/web\` | 1,494,067 | 426,078 | 299,814 | Every styled family. |
+| \`@helix-io/web\` | 1,497,100 | 427,111 | 300,649 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -1765,7 +1765,7 @@ is why it is the whole cost of adopting the base layer on its own.
 
 **Most of a first component is the runtime under it.** The median styled family is 18,915 bytes gzipped alone and adds 6,169 to a page that already has Helix on it, so 67 percent of the first one is shared and 33 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is \`quote\` at 8,705 gzipped alone, the dearest \`color-input\` at 63,228, over 88 components. Every family at once is 426,078.
+Across the tier: the cheapest is \`quote\` at 8,705 gzipped alone, the dearest \`color-input\` at 63,689, over 88 components. Every family at once is 427,111.
 
 **No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@helix-io/headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixBaseButton } from '@helix-io/headless'\` costs 112,913 bytes gzipped whatever else the page does, which is 6 times the median family measured above. The styled tier imports the family it extends instead, all 88 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
 
@@ -1930,14 +1930,14 @@ The headless tier plus presentation. This is what \`bun add @helix-io/web\` give
 | \`button\` | 41,802 | 14,193 | 12,409 | 17,702 | 6,087 | 4,772 |
 | \`button-group\` | 26,306 | 9,530 | 8,390 | 3,755 | 1,814 | 1,179 |
 | \`callout\` | 73,396 | 25,185 | 21,134 | 5,722 | 2,452 | 1,775 |
-| \`card\` | 32,446 | 11,806 | 10,314 | 9,900 | 4,071 | 3,127 |
+| \`card\` | 33,938 | 12,393 | 10,823 | 11,392 | 4,654 | 3,683 |
 | \`carousel\` | 99,243 | 33,114 | 27,936 | 30,793 | 9,869 | 8,032 |
 | \`checkbox\` | 53,484 | 17,788 | 15,521 | 24,811 | 8,689 | 7,005 |
 | \`checkbox-group\` | 43,038 | 14,482 | 12,650 | 13,869 | 5,368 | 3,909 |
 | \`code\` | 27,494 | 10,200 | 8,960 | 6,115 | 2,812 | 2,029 |
 | \`code-block\` | 139,064 | 45,928 | 39,014 | 44,092 | 12,914 | 10,635 |
-| \`color-input\` | 205,959 | 63,228 | 53,819 | 106,571 | 29,269 | 24,597 |
-| \`color-picker\` | 165,842 | 51,271 | 42,946 | 90,010 | 25,571 | 21,437 |
+| \`color-input\` | 207,500 | 63,689 | 54,155 | 108,112 | 29,732 | 25,007 |
+| \`color-picker\` | 167,383 | 51,742 | 43,395 | 91,551 | 26,036 | 21,914 |
 | \`combobox\` | 160,835 | 51,901 | 44,140 | 60,378 | 17,803 | 14,852 |
 | \`command\` | 131,429 | 42,435 | 35,728 | 53,842 | 16,582 | 13,841 |
 | \`copy-button\` | 131,922 | 44,012 | 37,350 | 36,950 | 11,022 | 8,971 |
@@ -1981,7 +1981,7 @@ The headless tier plus presentation. This is what \`bun add @helix-io/web\` give
 | \`scroll-area\` | 30,387 | 10,571 | 9,246 | 8,156 | 3,082 | 2,132 |
 | \`select\` | 151,663 | 49,486 | 41,936 | 52,032 | 15,469 | 12,830 |
 | \`skeleton\` | 26,413 | 9,559 | 8,432 | 4,231 | 1,912 | 1,291 |
-| \`slider\` | 67,635 | 21,245 | 18,436 | 38,796 | 12,040 | 9,758 |
+| \`slider\` | 69,176 | 21,726 | 18,893 | 40,337 | 12,516 | 10,147 |
 | \`sparkline\` | 44,568 | 16,300 | 14,269 | 19,172 | 7,329 | 6,030 |
 | \`speed-dial\` | 112,369 | 38,517 | 32,605 | 19,397 | 6,191 | 4,769 |
 | \`splitter\` | 51,659 | 16,693 | 14,668 | 28,307 | 8,639 | 7,120 |
@@ -2011,17 +2011,18 @@ The headless tier plus presentation. This is what \`bun add @helix-io/web\` give
 
 A different question from what reaches a browser, and the one an install
 budget is written against. Unpacked bytes of exactly what each package
-publishes, which is its \`files\` field. Source maps are counted separately
-because they ship and no page downloads them.
+publishes, which is its \`files\` field. **Source maps are not in these
+numbers**: they are stripped from the tarball at pack time, so the last
+column is what was removed rather than part of what remains.
 
-| Package | Unpacked | Files | Of which source maps | Runtime dependencies |
+| Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
-| \`@helix-io/core\` | 916,630 | 205 | 139,228 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
-| \`@helix-io/headless\` | 7,843,263 | 776 | 613,969 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
-| \`@helix-io/icons\` | 84,047 | 17 | 19,847 | none |
+| \`@helix-io/core\` | 777,402 | 103 | 139,228 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
+| \`@helix-io/headless\` | 7,229,294 | 390 | 613,969 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
+| \`@helix-io/icons\` | 64,200 | 11 | 19,847 | none |
 | \`@helix-io/styles\` | 268,379 | 5 | 0 | none |
-| \`@helix-io/theme\` | 612,715 | 28 | 47,856 | none |
-| \`@helix-io/web\` | 8,247,442 | 1,345 | 272,406 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/theme\` | 564,859 | 16 | 47,856 | none |
+| \`@helix-io/web\` | 7,984,361 | 675 | 272,464 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 
@@ -4068,6 +4069,189 @@ one.** A heading set at the paragraph's line height reads as loose at every
 size, and the correction is not proportional: the larger the type, the less
 leading it wants. One token expresses that once instead of a magic multiplier at
 every heading level.
+`,
+  'using-helix-with-an-agent': `---
+description: The four things that look like a library bug and are not, and where an agent should read from.
+parent: coding-agents
+section: Getting started
+title: Using Helix with an agent
+---
+
+
+# Using Helix with an agent
+
+**A page rather than a skill file, and the format is the point.** This started as
+\`.claude/skills/using-helix/SKILL.md\`, which is one vendor's format sitting in a
+repository, and every other vendor has its own: Cursor reads \`.cursor/rules\`,
+Copilot reads \`.github/copilot-instructions.md\`, and a consumer of the published
+packages has none of them because they have this site and no checkout.
+
+So the content lives once, here, at a URL that [llms.txt](https://fusion.dev/llms.txt) indexes and
+that every one of those formats can point at. Paste the link into whichever file
+your tool reads. What is vendor-neutral and executable is [the MCP
+server](./coding-agents), which Claude, Cursor, Windsurf and Zed all speak.
+
+## Read the manifest before writing a tag
+
+\`\`\`
+https://fusion.dev/helix/custom-elements.json
+@helix-io/web/custom-elements.json
+\`\`\`
+
+Every tag, every property with its literal union, every event with its class,
+every slot, part and custom property. **The vocabulary is the file**: a tag that
+is not in it does not exist, and a property value outside a declared union is one
+the component rejects. Unions are literal rather than named for exactly this
+reason, so \`'ghost' | 'outlined' | 'solid' | 'subtle'\` answers the question where
+\`ButtonEmphasis\` sends you somewhere else.
+
+One family as data, when the whole manifest is more than the question needs:
+
+\`\`\`
+https://fusion.dev/helix/components/<family>.json
+https://fusion.dev/helix/components/<family>.md
+\`\`\`
+
+The \`.md\` carries the API tables **and the examples**, which the HTML page
+deliberately does not. Start from \`https://fusion.dev/llms.txt\`, which is one
+request and names every document plus these two surfaces.
+
+## The four things that go wrong
+
+These are in order of how often they look like a library bug and are not.
+
+### 1. A declared \`value\` hands you the control
+
+\`\`\`text
+<!-- Ignores every keystroke. Nothing is logged. Nothing looks wrong. -->
+<helix-input label="Name" value="Ada"></helix-input>
+\`\`\`
+
+Do not paste it. Plain text rather than a live example, the same way
+[State and control](./state-and-control) shows this one: a reader copies what is
+in front of them, and these are the two pages that have to show the mistake in
+order to name it.
+
+**Writing \`value\`, \`open\`, \`checked\` or \`active\` is a claim of ownership.** From
+then on the element announces changes and applies none of them, waiting to be
+told. Which mode it is in is read once, at its first update.
+
+Seed with the \`default-\` twin, or answer the event:
+
+\`\`\`html
+<helix-input
+  default-value="Ada"
+  label="Name"
+></helix-input>
+\`\`\`
+
+\`\`\`tsx
+<helix-input label="Name" onhelix-input={(e) => setName(e.detail.value)} value={name} />
+\`\`\`
+
+In TypeScript this is a compile error rather than a surprise. Everywhere else the
+element warns on its second unanswered request.
+
+### 2. The event name is the event's own
+
+\`onhelix-open\`, not \`onHelixOpen\` and not \`onOpen\`. React slices \`on\` off the
+prop and listens for exactly what is left, so the casing is not negotiable. From
+anything that is not React, \`addEventListener('helix-open', …)\`.
+
+**Lifecycle does not bubble and coordination does.** \`helix-open\` and
+\`helix-close\` reach the element and stop, so a menu closing inside a dialog is
+not the dialog closing; \`helix-select\`, \`helix-change\` and \`helix-dismiss\` cross
+shadow boundaries and can be caught on a container. If a listener on a wrapper
+hears nothing, it is a lifecycle event and belongs on the element.
+
+### 3. \`:disabled\`, never \`[disabled]\`
+
+\`\`\`css
+helix-input:disabled { … }   /* right: matches a disabled fieldset too */
+helix-input[disabled] { … }  /* wrong: a fieldset sets no attribute */
+\`\`\`
+
+A control inside \`<fieldset disabled>\` is disabled by the platform and carries no
+attribute, so the attribute selector paints it as live while it refuses input.
+
+### 4. Three stylesheets, in this order
+
+\`\`\`ts
+import '@helix-io/styles/tokens.css'
+import '@helix-io/styles/base.css'
+import '@helix-io/web/elements.css'
+import '@helix-io/web'
+\`\`\`
+
+The third is the one people leave out, and everything works without it until the
+page is server-rendered: an element that has not upgraded has no styles of its
+own, so the markup flashes unstyled and then snaps into place. The tell for a
+missing layer is which: no color at all is \`tokens.css\`, bare headings is
+\`base.css\`, a flash before hydration is \`elements.css\`.
+
+## Choosing a family
+
+Ask the manifest, not your memory. Each family's \`helix.aliases\` lists the other
+names it goes by, which is usually how a request arrives: \`Segment\` and \`NavItem\`
+are \`Toggle\`, \`Key\` is \`Legend\`, \`Hint\` is \`Tooltip\`.
+
+Two distinctions worth knowing before searching:
+
+- **A group is a part when it reports a form value** and its own family when it
+  does not. \`Radio.Group\` and \`Toggle.Group\` are parts; \`Checkbox Group\` and
+  \`Button Group\` are families whose members submit themselves.
+- **A control has no \`size\`.** Height comes from \`data-density\` on the region,
+  \`sm\` / \`md\` / \`lg\`, which crosses shadow boundaries through custom properties.
+  If two controls in a row must differ in height, the layout is wrong rather than
+  the API.
+
+## Styling from the outside
+
+Three doors, in the order to try them.
+
+1. **A token.** \`--helix-radii-md: 2px\` at \`:root\` reaches every component,
+   because custom properties inherit. Most "can I restyle the button" is really
+   "our brand has less rounding".
+2. **A per-component hook.** \`--card-padding\` on \`helix-card\`. Named after the
+   component, documented on its page, defaults to a semantic token.
+3. **A part.** \`helix-select::part(trigger)\`. The most powerful and the one that
+   couples you to internal structure.
+
+**Never read a primitive.** \`--_helix-neutral-500\` and its kind belong to
+\`@helix-io/styles\`; the underscore says so and the indirection is the point.
+
+## No custom elements at all
+
+\`@helix-io/styles\` is plain CSS with no JavaScript, and it carries recipes for
+markup Helix does not render:
+
+\`\`\`html
+<button
+  data-button="solid"
+  data-button-tone="primary"
+>Save</button>
+<article data-prose><h2>From a CMS</h2></article>
+<div data-density="sm">…</div>
+\`\`\`
+
+A recipe has appearance and no behavior: no state, no form participation, no
+focus trapping, no keyboard handling. If you are adding script to one, the
+component is what you wanted.
+
+## What this skill will not tell you
+
+**Anything the manifest answers.** Property names, unions, part names, event
+names and hooks change with the library and are in a file you can fetch; a list
+of them here would be a second copy going stale. Fetch the family.
+
+**What a brand color derives to.** That is computation rather than a document,
+and \`helix mcp\` is where it lives: an MCP server over stdio with
+\`helix_audit_theme\` and \`helix_derive_theme\`, both taking the JSON a
+\`helix.theme.json\` holds. It runs on your machine and nobody hosts it.
+
+**Whether a component is good for your case.** The examples are the honest
+answer to that and they are text: every family's \`.md\` carries them, and
+\`https://fusion.dev/helix/sandbox?e=<family>.<slug>\` opens one editable.
 `,
   'using-the-elements': `---
 description: Binding events, registering elements, and the traps in both.

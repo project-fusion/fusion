@@ -1,14 +1,23 @@
 ---
-name: using-helix
-description: Writes application code that uses the published Helix packages: choosing a component family, binding its events, theming through tokens, and the ownership rule that makes a control ignore input. Use when consuming @helix-io/web, @helix-io/styles, @helix-io/headless or @helix-io/theme from an application, when a Helix control is not responding, or when a page needs Helix styling without custom elements.
+description: The four things that look like a library bug and are not, and where an agent should read from.
+parent: coding-agents
+section: Getting started
+title: Using Helix with an agent
 ---
 
-# Using Helix
 
-**This is the outward-facing half.** `adding-helix-components` is for a
-contributor to this repository and assumes a checkout; this assumes the published
-packages and a website. If you are editing `helix/web/src`, you want the other
-one.
+# Using Helix with an agent
+
+**A page rather than a skill file, and the format is the point.** This started as
+`.claude/skills/using-helix/SKILL.md`, which is one vendor's format sitting in a
+repository, and every other vendor has its own: Cursor reads `.cursor/rules`,
+Copilot reads `.github/copilot-instructions.md`, and a consumer of the published
+packages has none of them because they have this site and no checkout.
+
+So the content lives once, here, at a URL that [llms.txt](https://fusion.dev/llms.txt) indexes and
+that every one of those formats can point at. Paste the link into whichever file
+your tool reads. What is vendor-neutral and executable is [the MCP
+server](./coding-agents), which Claude, Cursor, Windsurf and Zed all speak.
 
 ## Read the manifest before writing a tag
 
@@ -41,10 +50,15 @@ These are in order of how often they look like a library bug and are not.
 
 ### 1. A declared `value` hands you the control
 
-```html
+```text
 <!-- Ignores every keystroke. Nothing is logged. Nothing looks wrong. -->
 <helix-input label="Name" value="Ada"></helix-input>
 ```
+
+Do not paste it. Plain text rather than a live example, the same way
+[State and control](./state-and-control) shows this one: a reader copies what is
+in front of them, and these are the two pages that have to show the mistake in
+order to name it.
 
 **Writing `value`, `open`, `checked` or `active` is a claim of ownership.** From
 then on the element announces changes and applies none of them, waiting to be
@@ -53,7 +67,10 @@ told. Which mode it is in is read once, at its first update.
 Seed with the `default-` twin, or answer the event:
 
 ```html
-<helix-input default-value="Ada" label="Name"></helix-input>
+<helix-input
+  default-value="Ada"
+  label="Name"
+></helix-input>
 ```
 
 ```tsx
@@ -137,7 +154,10 @@ Three doors, in the order to try them.
 markup Helix does not render:
 
 ```html
-<button data-button="solid" data-button-tone="primary">Save</button>
+<button
+  data-button="solid"
+  data-button-tone="primary"
+>Save</button>
 <article data-prose><h2>From a CMS</h2></article>
 <div data-density="sm">…</div>
 ```

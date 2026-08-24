@@ -817,6 +817,7 @@ element you slotted, not a wrapper around it.
 
 | Property | Description |
 | --- | --- |
+| `--card-align` | How the regions pack when the card is stretched taller than its content. `start` by default, so the slack is at the bottom; `space-between` puts a footer on the floor. |
 | `--card-backdrop` | Filter applied behind a `material="glass"` card. Follows the theme's material policy; set it to override the strength on one card. |
 | `--card-background-color` | Surface behind the card. |
 | `--card-border-color` | Border color of the surface. |
@@ -4699,6 +4700,10 @@ the thumb being dragged.
 | `--slider-fill-color` | The part behind the thumb. |
 | `--slider-marker-color` | The ticks along the track. |
 | `--slider-track-image` | The whole track, for a slider whose color is the value. |
+| `--slider-track-size` | How thick the track is. The progress bar's own size by default, the two being the same object. |
+| `--slider-thumb-size` | The handle across the track. Square with the length by default, which is what makes it round. |
+| `--slider-thumb-length` | The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval. |
+| `--slider-thumb-radii` | The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. |
 | `--slider-length` | How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. |
 | `--slider-fraction` | The value as a fraction of the range, 0 to 1. |
 | `--slider-from` | Where the filled span starts, as a percentage of the track. |

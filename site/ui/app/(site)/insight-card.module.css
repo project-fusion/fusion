@@ -22,14 +22,16 @@
    title put their footers at two different heights, and a row of cards reads as
    a row of slightly different objects.
  *
- * `align-content` on the host, which works because the card is a grid of bare
- * slots: a `<slot>` is `display: contents`, so the slotted header, body and
- * footer are grid items of this element rather than of anything inside the
- * shadow root. There is no custom property for this and inventing one in the
- * site's stylesheet would name a token the component never reads, which is the
- * failure mode that resolves to nothing and reports no error. */
+ * **Through `--card-align`, which the component publishes now.** This set
+ * `align-content` on the host directly, and that is a document rule overruling a
+ * shadow one: it worked only because the card set nothing there, and the day the
+ * card packed its own regions at the start the two collided and the component's
+ * value was the dead one. `check:overruled` reported it the same hour. The note
+ * this replaces said there was no custom property for it and that inventing one
+ * here would name something the component never reads, which was true and is the
+ * argument for the component publishing one rather than for reaching past it. */
 .insightCard helix-card {
-  align-content: space-between;
+  --card-align: space-between;
 }
 
 /* A photograph, treated so that any two of them read as one set.

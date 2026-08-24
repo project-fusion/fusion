@@ -244,6 +244,14 @@ export const docPages: DocPage[] = [
     title: 'Typography',
   },
   {
+    description:
+      'The four things that look like a library bug and are not, and where an agent should read from.',
+    parent: 'coding-agents',
+    section: 'Getting started',
+    slug: 'using-helix-with-an-agent',
+    title: 'Using Helix with an agent',
+  },
+  {
     description: 'Binding events, registering elements, and the traps in both.',
     pinned: true,
     section: 'Essentials',
