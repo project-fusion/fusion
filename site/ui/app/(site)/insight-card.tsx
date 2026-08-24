@@ -35,7 +35,14 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
       data-slug={slug ? insight.slug : undefined}
       href={`/insights/${insight.slug}`}
     >
-      <helix-card separation="elevated">
+      {/* **The component's own attribute, not `data-material`.** `Card` carries
+          `material` as a reflected property, so the recipe would be the second
+          way to say one thing and the component is the one that owns its
+          surface: `--card-backdrop` and `--card-background-color` are the hooks
+          that tune it, and a document rule reaching past them is what
+          `check:overruled` exists to catch. The recipe is for elements that are
+          not components. */}
+      <helix-card material="glass" separation="elevated">
         <InsightArt image={insight.image} slot="media" />
 
         {/* Both facts as tags, and toned the way the post's own page tones them:

@@ -422,7 +422,7 @@ export default function Home() {
 
       {/* The story, last and short. It is why the work compounds rather than
           why anyone should buy it, and a reader who wants it can follow it. */}
-      <section data-band data-closing data-reveal>
+      <section data-band data-closing data-material="glass" data-reveal>
         <helix-flex align="center" data-shell direction="column" gap="lg">
           <helix-text as="h2" data-section-title>
             {LANDING.blocks[5]?.title}

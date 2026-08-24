@@ -310,8 +310,51 @@ helix-drawer {
  * rather than like a horizon. The band is the ground and the button is the
  * bright object, which is one idea instead of two. */
 [data-closing] {
-  background-color: light-dark(var(--helix-color-surface-sunken), var(--helix-color-surface));
+  /* **Frosted admits what is behind it, and in light mode there is nothing to
+     admit.** The band takes `data-material="glass"`, whose ground is white at
+     72%: over a near-white page that is *lighter* than the page, so the closing
+     band stopped reading as a band and started reading as an empty bordered box.
+     Dark is where the treatment pays, the aura being visible behind it and the
+     ground being a dark surface rather than the page's own color.
+
+     So the ground is chosen by mode and the rest of the material is not. The
+     blur and the edge still come from the recipe, and the dark value tracks
+     whichever material the band is wearing: `glass` is 72%, so this is
+     `translucent` rather than `translucent-strong`. */
+  background-color: light-dark(
+    var(--helix-color-surface-sunken),
+    var(--helix-material-translucent)
+  );
+  /* **A full-bleed band has no left or right edge to draw.** The material's
+     border is not decoration, it is what keeps a translucent surface a shape
+     when it takes its color from whatever is behind it. That argument holds for
+     a card and not for a band that runs to both window edges: those two sides
+     are the window, so drawing them put a box around the call to action. Top and
+     bottom are real and stay. */
+  border-inline-width: 0;
   text-align: center;
+}
+
+/* **And the blur comes off where it can do nothing**, since an opaque ground is
+   in front of it. A `backdrop-filter` makes the compositor re-read what is
+   behind the element on every frame it moves, and this band is on screen for the
+   whole tail of a scroll: paying that for an effect nobody can see is the exact
+   thing `elevation-and-material.mdx` says to be deliberate about.
+
+   Two rules because the attribute is absent for a reader who has not chosen,
+   which is most of them: `[data-color-mode="light"]` catches an explicit choice
+   and the query catches the system following light with nothing declared.
+   `:not([data-color-mode])` rather than `:not([data-color-mode="dark"])`,
+   because the second also matches a system-dark reader and would take the blur
+   away from the one mode it is for. */
+[data-color-mode="light"] [data-closing] {
+  backdrop-filter: none;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-color-mode]) [data-closing] {
+    backdrop-filter: none;
+  }
 }
 
 /* Interior-only, so 0% and 100% resolve to the resting `opacity: 0` and
