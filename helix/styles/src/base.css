@@ -1047,7 +1047,16 @@ helix-toggle[disabled]::part(item) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
-  margin: var(--helix-space-none) var(--helix-space-none) var(--helix-space-xs);
+  /* `2xs` below, not `xs`, and the number is derived rather than picked.
+     A reader sees the distance between *text*, so the heading's own margin has
+     to make up whatever the first row's padding does not. Rows used to carry
+     `xs` of padding and the gap sat between them, so 8 of margin plus the 8 gap
+     plus 8 of padding was 24 and matched the 24 between two rows. Making rows
+     touch moved their padding to `sm`: row to row stayed 24, being 12 and 12
+     with the gap pulled out, and this path silently became 8 plus 8 plus 12,
+     which is 28. Measured in Chromium, heading bottom at 35 and the first row's
+     name at 63. 4 puts it back on the rhythm at 24. */
+  margin: var(--helix-space-none) var(--helix-space-none) var(--helix-space-2xs);
   padding-inline: var(--helix-space-sm);
 }
 
