@@ -42,7 +42,7 @@ const LIMIT = 200
  * @csspart count - How many times a repeated line arrived.
  * @csspart empty - Shown while nothing has been written.
  *
- * @cssproperty --terminal-size - Height of the scrolling region.
+ * @cssproperty --sandbox-terminal-size - Height of the scrolling region.
  */
 @customElement('helix-sandbox-terminal')
 export class HelixSandboxTerminal extends HelixElement {

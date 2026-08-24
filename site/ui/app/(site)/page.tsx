@@ -186,9 +186,14 @@ export default function Home() {
                         beside it and answers a question almost nobody asked
                         yet. `license` stays on the product type, where the
                         pages that do want it can read it. */}
-                    <helix-flex align="center" data-density="sm" gap="sm" wrap>
-                      <a data-button="subtle" href={product.href}>
-                        Open the components
+                    {/* **Standard width and the large control height**, the
+                        same pair the hero uses. `sm` here made the one action on
+                        a panel the smallest control on the page, which is the
+                        opposite of what it is: the panel exists to send a reader
+                        somewhere and this is the door. */}
+                    <helix-flex align="center" data-density="lg" gap="sm" wrap>
+                      <a data-button="subtle" data-button-width="standard" href={product.href}>
+                        Explore components
                       </a>
                     </helix-flex>
                   </helix-flex>
@@ -198,9 +203,15 @@ export default function Home() {
                       Nothing to install yet. The shape is written down and the crates are in the
                       open.
                     </helix-text>
-                    <helix-flex data-density="sm">
-                      <a data-button="subtle" href={product.href}>
-                        Read the shape
+                    <helix-flex data-density="lg">
+                      {/* Paired with `Explore components` as verb and noun, and
+                          naming what is actually behind the link. The sentence
+                          above says the shape is written down, so the offer is
+                          to read it: `Read the shape` said the same thing in
+                          words that only make sense having just read that
+                          sentence. */}
+                      <a data-button="subtle" data-button-width="standard" href={product.href}>
+                        Read the design
                       </a>
                     </helix-flex>
                   </helix-flex>

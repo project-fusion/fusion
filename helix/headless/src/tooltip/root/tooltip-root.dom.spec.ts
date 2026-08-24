@@ -279,4 +279,31 @@ describe('tooltip for', () => {
     await host.updateComplete
     expect(host.open).toBe(false)
   })
+
+  test('unless it persists, where the hint is what changed', async () => {
+    /* `CopyButton` swaps its content from Copy to Copied on the same click that
+       used to hide the bubble, so the confirmation was written and taken off
+       screen in one frame and a reader saw a flash. `persist` says the hint was
+       not spent, it was replaced. */
+    const host = (await mount(
+      '<helix-headless-tooltip persist content="Copy"><button type="button">copy</button></helix-headless-tooltip>',
+    )) as HTMLElement & { content: string; open: boolean; updateComplete: Promise<boolean> }
+    await host.updateComplete
+
+    host.dispatchEvent(new Event('focusin', { bubbles: true }))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+
+    const trigger = host.querySelector('button') as HTMLButtonElement
+    trigger.click()
+    host.content = 'Copied'
+    await host.updateComplete
+    expect(host.open).toBe(true)
+
+    /* A reader saying they are done still closes it. Activation is the control
+       reporting success; a blur is the reader leaving. */
+    host.dispatchEvent(new Event('focusout', { bubbles: true }))
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
 })

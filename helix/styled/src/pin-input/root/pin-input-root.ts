@@ -30,7 +30,7 @@ import { styles } from './pin-input-root.css.js'
  * @csspart field - The row of boxes.
  * @csspart cell - One box.
  *
- * @cssproperty --pin-gap - Space between one box and the next.
+ * @cssproperty --pin-input-gap - Space between one box and the next.
  */
 @customElement('helix-pin-input')
 export class HelixPinInput extends HelixHeadlessPinInput {

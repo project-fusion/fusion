@@ -11,7 +11,7 @@
    * Here and not on the control, because `::slotted()` reaches one level and
    * the trigger is inside whatever was slotted. A custom property inherits the
    * rest of the way, and one nothing reads costs nothing. */
-  --icon-button-size: var(--breadcrumb-control-size, calc(1lh + var(--helix-space-2xs) * 2));
+  --icon-button-size: var(--breadcrumbs-control-size, calc(1lh + var(--helix-space-2xs) * 2));
 
   align-items: center;
   display: inline-flex;
@@ -74,7 +74,7 @@
    * either mode, which is the argument the base layer already makes for
    * `data-button`, and it is the same wash the tree and list rows hover with. */
   background-color: var(
-    --breadcrumb-hover-color,
+    --breadcrumbs-hover-color,
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
   );
 }
@@ -171,7 +171,7 @@
  * overrides both. */
 a[part="link"]:hover {
   background-color: var(
-    --breadcrumb-hover-color,
+    --breadcrumbs-hover-color,
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
   );
   color: var(--helix-color-foreground);

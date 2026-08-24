@@ -60,7 +60,9 @@ an `overflow` they had no way of knowing was missing.
   different root, or a form control's validity ends up in one branch and its
   presentation in another.
 - **Base is headless, styled is presentational.** Base owns markup, ARIA, slots,
-  events, form participation. No CSS, no tokens, no `appearance`/`tone`.
+  events, form participation. No CSS, no tokens, and none of the styled visual
+  axes. `tone` is the one that crosses, because it says what a thing means and
+  meaning survives having no stylesheet.
 - **The headless tier is `BaseCard`, not `CardBase`**, and namespaces as
   `BaseCard.Root` beside `Card.Root`. Both tiers register elements
   (`helix-headless-card`, `helix-card`): an unregistered element can only be
@@ -339,8 +341,9 @@ draws come out identical.
 **Reflect only what CSS selects on.** Reflection exists so a selector can reach a
 value. `href`, `target`, and `rel` reflected on Button until they were told not
 to, which wrote a destination onto a host that is not a link and put a bare
-`target rel` pair into every button ever rendered. `appearance`, `size`,
-`disabled`, and `orientation` reflect; the rest do not.
+`target rel` pair into every button ever rendered. The visual axes reflect, and so do
+`variant`, `orientation`, `disabled`, and the `size` that survives on avatar and
+loader; the rest do not.
 
 **And a reflected property takes no default.** The two together are what write
 onto every host: `Tree.chevronPlacement` reflected and defaulted to `'start'`,
@@ -471,30 +474,62 @@ still counting as a mutation. Supply the input the double cannot produce, and
 say in the spec which half is being asserted. Two of those gaps produce a test
 that passes against code doing nothing.
 
-## Appearance is the treatment, tone is the meaning
+## Visual axes are a registry, and `appearance` is refused
 
-**Two properties, never one.** `appearance` is how a thing is drawn (`solid`,
-`outlined`, `subtle`, `ghost`; `elevated`, `plain`, `card` where those fit) and
-`tone` is what it means (`neutral`, `primary`, `danger`, and the status set on
-anything that reports a status).
+**Five axes, fixed vocabularies, and a component takes a subset of one.** They
+are declared in `tooling/scripts/check-axes.mjs`, which is the registry:
 
-`Tag` found this first and `Button` followed it 19 Aug 2026. Button held
-`primary`, `secondary`, `tertiary` and `danger` on one property: the first three
-are a rank and the fourth is a meaning, so an outlined Delete and a Delete in a
-menu row could not be written at all, and neither could a filled neutral. The
-same test applies to anything new: *can two of these values be true at once?* If
-yes they are two axes, whatever the count of combinations looks like.
+| Axis | Values | Families |
+|---|---|---|
+| `emphasis` | `ghost` `outlined` `solid` `subtle` | 9 |
+| `material` | `frosted` `glass` `transparent` | 8 |
+| `separation` | `elevated` `filled` `outlined` `plain` | 5 |
+| `tone` | `accent` `danger` `info` `muted` `neutral` `primary` `subtle` `success` `surface` `warning` | 9 |
+| `width` | `auto` `full` `standard` | 4 |
 
-**The resting state is the absence of both**, per the reflected-property rule
-above: `outlined` on Button, `ghost` on IconButton, and `neutral` everywhere.
+`variant` is the escape hatch and takes no registry, being component-specific by
+definition: `segmented` against `underlined`, `list` against `wheels`, `dots`
+against `marks`. It lives on either tier, because a choice between two widgets is
+structural wherever it is made. What it may not be is a place to put something
+that *is* on an axis.
+
+**A styled axis never appears on the headless tier**, which has nothing to paint
+and no box to size. `tone` is the exception and a principled one: it says what a
+thing means, and meaning survives having no stylesheet.
+
+*Rewritten 24 Aug 2026, and the section this replaces described an API the build
+refuses.* It read "Appearance is the treatment, tone is the meaning" and
+prescribed `appearance` with `solid`/`outlined`/`subtle`/`ghost` plus
+`elevated`/`plain`/`card`, naming `outlined` on Button and `ghost` on IconButton
+as the resting values. Button has no such property, `check:axes` fails outright
+on the word, and `UNSWEPT` is empty. The consumer documentation was already
+correct in `visual-axes.mdx`, so this file was the only place still teaching it,
+which is the worse half: it is the file that shapes the next change.
+
+**That is the third time a rule here has outlived its decision**, after the
+event-naming one that survived four days of work against it and the
+`helix/react` section that described a package which never existed. The pattern
+is the same each time: a rule and its enforcement live in different files and
+nothing holds them together. Where a check owns a vocabulary, quote the check
+and name it, so the next reader can go and see.
+
+**What the old section was right about, and what survives it.** The test is
+still *can two of these values be true at once?* If yes they are two axes,
+whatever the count of combinations looks like. That is what split Button's old
+`primary`/`secondary`/`tertiary`/`danger` into a rank and a meaning, and it is
+what `megamenu-root.css` derived from the inside before there was a registry to
+put the answer in: a panel can be glass *and* outlined.
+
+**The resting state is the absence of every axis**, per the reflected-property
+rule above: `outlined` on Button, `ghost` on IconButton, `neutral` everywhere.
 Written out, those values select nothing and land on the base rule.
 
-**Every appearance names its own hover.** A generic
+**Every emphasis names its own hover.** A generic
 `:host(:not(:disabled)) [part="button"]:hover` is four class-equivalents and an
-appearance rule is three, so an appearance without a hover of its own loses its
-fill the moment a pointer touches it. Measured on the old `danger`, which had no
-hover rule and turned neutral grey under the pointer in every build since it was
-written.
+emphasis rule is three, so an emphasis without a hover of its own loses its fill
+the moment a pointer touches it. Measured on the old `danger`, which had no hover
+rule and turned neutral grey under the pointer in every build since it was
+written. `button-root.css` carries the count beside the rules it explains.
 
 ## Size and density
 
@@ -502,7 +537,7 @@ written.
 
 ```html
 <helix-flex data-density="lg">
-  <helix-button appearance="solid" tone="primary">See what is shipping</helix-button>
+  <helix-button emphasis="solid" tone="primary">See what is shipping</helix-button>
 </helix-flex>
 ```
 
@@ -510,8 +545,8 @@ The reasoning, because the conclusion looks like a restriction and is not. Size
 gets asked to do three jobs at once, and only one of them belongs to the
 control:
 
-- **Emphasis.** `appearance` carries it. A filled button says "this one matters"
-  far louder than eight more pixels.
+- **Emphasis.** `emphasis` carries it, which is what the axis is named for. A
+  filled button says "this one matters" far louder than eight more pixels.
 - **Fit.** A fact about the region: a toolbar is tight, a hero is spacious, a
   table row is tighter still.
 - **Optical role.** Real, and only for things that are not controls. An avatar

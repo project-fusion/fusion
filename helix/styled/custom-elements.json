@@ -70860,6 +70860,21 @@
             },
             {
               "kind": "field",
+              "name": "persist",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the bubble survives the trigger being used.\n\n**Activation takes a tooltip down, because a hint about what a control will\ndo is spent once the control has done it.** That is right for a gear that\nopens a drawer and wrong for a control whose tooltip *becomes* the answer:\n`CopyButton` swaps its content from Copy to Copied on the same click, so the\nbubble was being hidden at the exact moment it had something to say. What a\nreader saw was a flash, and the confirmation the component had carefully\nwritten was never on screen long enough to read.\n\nSo this is not \"keep it open\", it is \"the hint is not spent\": set it where\nthe words change to describe what just happened, and leave it alone\neverywhere else. Escape, blur and pointer-leave still close it, because\nthose are a reader saying they are done rather than a control saying it\nworked.",
+              "attribute": "persist",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "delay",
               "type": {
                 "text": "number"
@@ -71128,7 +71143,7 @@
               "name": "handleActivate",
               "privacy": "private",
               "readonly": true,
-              "description": "Activating the trigger closes the bubble, which nothing was doing.\n\nA tooltip is a hint about what a control will do, and once the control has\nbeen used the hint is spent. Nothing else was going to take it down either:\n`pointerleave` cannot fire while the pointer is still on the button it just\npressed, and `focusout` does not fire when activation leaves focus where it\nwas. So a gear that opened a drawer left its own label floating over the\ndrawer until the reader moved the mouse away.\n\n`click` rather than `pointerdown`, because it is the one event both a mouse\nand a keyboard produce: Enter and Space on a focused button raise it, and a\nhint that outlived activation for keyboard readers alone would be the same\nbug with a smaller audience.\n\nHolds are cleared as well as hiding, the same as Escape. Leaving them set\nmeans the pointer is still recorded as being over the trigger, so the next\n`focusout` anywhere releases nothing and the bubble comes back on a\n`release` it should have been dropped from.",
+              "description": "Activating the trigger closes the bubble, which nothing was doing.\n\nA tooltip is a hint about what a control will do, and once the control has\nbeen used the hint is spent. Nothing else was going to take it down either:\n`pointerleave` cannot fire while the pointer is still on the button it just\npressed, and `focusout` does not fire when activation leaves focus where it\nwas. So a gear that opened a drawer left its own label floating over the\ndrawer until the reader moved the mouse away.\n\n`click` rather than `pointerdown`, because it is the one event both a mouse\nand a keyboard produce: Enter and Space on a focused button raise it, and a\nhint that outlived activation for keyboard readers alone would be the same\nbug with a smaller audience.\n\nHolds are cleared as well as hiding, the same as Escape. Leaving them set\nmeans the pointer is still recorded as being over the trigger, so the next\n`focusout` anywhere releases nothing and the bubble comes back on a\n`release` it should have been dropped from.\n\n`persist` opts out entirely, holds included: a tooltip whose content becomes\nthe confirmation has not spent its hint, it has changed it, and the pointer\nreally is still over the trigger. See the property.",
               "inheritedFrom": {
                 "name": "HelixHeadlessTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -71430,6 +71445,19 @@
               "default": "false",
               "description": "Whether the tooltip never shows.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
+            },
+            {
+              "name": "persist",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the bubble survives the trigger being used.\n\n**Activation takes a tooltip down, because a hint about what a control will\ndo is spent once the control has done it.** That is right for a gear that\nopens a drawer and wrong for a control whose tooltip *becomes* the answer:\n`CopyButton` swaps its content from Copy to Copied on the same click, so the\nbubble was being hidden at the exact moment it had something to say. What a\nreader saw was a flash, and the confirmation the component had carefully\nwritten was never on screen long enough to read.\n\nSo this is not \"keep it open\", it is \"the hint is not spent\": set it where\nthe words change to describe what just happened, and leave it alone\neverywhere else. Escape, blur and pointer-leave still close it, because\nthose are a reader saying they are done rather than a control saying it\nworked.",
+              "fieldName": "persist",
               "inheritedFrom": {
                 "name": "HelixHeadlessTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"

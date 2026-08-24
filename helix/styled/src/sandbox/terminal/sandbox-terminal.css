@@ -5,7 +5,7 @@
 
      `100%` of an auto-height parent is auto, so a terminal used somewhere with
      no height still sizes to what it holds. */
-  block-size: var(--terminal-size, 100%);
+  block-size: var(--sandbox-terminal-size, 100%);
   display: grid;
   grid-template-rows: minmax(0, 1fr);
   min-block-size: 0;

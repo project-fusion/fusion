@@ -161,6 +161,26 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   disabled = false
 
   /**
+   * Whether the bubble survives the trigger being used.
+   *
+   * **Activation takes a tooltip down, because a hint about what a control will
+   * do is spent once the control has done it.** That is right for a gear that
+   * opens a drawer and wrong for a control whose tooltip *becomes* the answer:
+   * `CopyButton` swaps its content from Copy to Copied on the same click, so the
+   * bubble was being hidden at the exact moment it had something to say. What a
+   * reader saw was a flash, and the confirmation the component had carefully
+   * written was never on screen long enough to read.
+   *
+   * So this is not "keep it open", it is "the hint is not spent": set it where
+   * the words change to describe what just happened, and leave it alone
+   * everywhere else. Escape, blur and pointer-leave still close it, because
+   * those are a reader saying they are done rather than a control saying it
+   * worked.
+   */
+  @property({ reflect: true, type: Boolean })
+  persist = false
+
+  /**
    * How long the pointer must rest before the bubble appears, in milliseconds.
    *
    * Without one, sweeping across a row of controls flashes a tooltip for each
@@ -457,8 +477,15 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * means the pointer is still recorded as being over the trigger, so the next
    * `focusout` anywhere releases nothing and the bubble comes back on a
    * `release` it should have been dropped from.
+   *
+   * `persist` opts out entirely, holds included: a tooltip whose content becomes
+   * the confirmation has not spent its hint, it has changed it, and the pointer
+   * really is still over the trigger. See the property.
    */
   private readonly handleActivate = (): void => {
+    if (this.persist) {
+      return
+    }
     this.holds.clear()
     this.hide()
   }

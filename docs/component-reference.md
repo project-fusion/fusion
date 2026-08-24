@@ -6201,6 +6201,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 | `material` | `material` | `'glass' \| undefined` | - | - | What the bubble is made of. |
 | `offset` | `offset` | `number` | `8` | `HelixHeadlessTooltip` | Space between the trigger and the point of the bubble, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `persist` | `persist` | `boolean` | `false` | `HelixHeadlessTooltip` | Whether the bubble survives the trigger being used. |
 | `placement` | `placement` | `Placement` | `'top'` | `HelixHeadlessTooltip` | Preferred side. It moves if that side does not fit. |
 | `within` | `within` | `string` | `''` | `HelixHeadlessTooltip` | The id of a box to keep the bubble inside, instead of the viewport. |
 

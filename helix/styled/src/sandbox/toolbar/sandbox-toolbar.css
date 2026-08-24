@@ -44,7 +44,7 @@
 slot {
   align-items: center;
   display: flex;
-  gap: var(--toolbar-gap, var(--helix-space-sm));
+  gap: var(--sandbox-toolbar-gap, var(--helix-space-sm));
   min-inline-size: 0;
 }
 

@@ -46,7 +46,7 @@ const LABELS: Record<string, string> = {
  * @csspart caret - The line and column readout.
  * @csspart language - The language readout.
  *
- * @cssproperty --status-bar-color - Color of the bar's text.
+ * @cssproperty --sandbox-status-bar-color - Color of the bar's text.
  */
 @customElement('helix-sandbox-status-bar')
 export class HelixSandboxStatusBar extends HelixElement {

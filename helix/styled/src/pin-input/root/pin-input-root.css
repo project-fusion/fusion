@@ -9,7 +9,7 @@
    field with lines drawn in it. */
 [part="field"] {
   display: flex;
-  gap: var(--pin-gap, var(--helix-space-xs));
+  gap: var(--pin-input-gap, var(--helix-space-xs));
 }
 
 /* Square at the control height, so the row reads as boxes rather than as short

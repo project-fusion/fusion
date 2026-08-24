@@ -199,7 +199,11 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * Rendering the button here as well would make all three a rewrite.
    */
   protected renderTooltip(control: TemplateResult): TemplateResult {
-    return html`<${this.tag('tooltip')} content=${this.says} exportparts="tooltip">
+    /* `persist`, because this bubble is the confirmation rather than a hint
+       about it. Without it the tooltip hid on the same click that swapped its
+       content to Copied, so the words this component takes such care over were
+       written and then taken off screen in the same frame. */
+    return html`<${this.tag('tooltip')} content=${this.says} persist exportparts="tooltip">
       ${control}
     </${this.tag('tooltip')}>`
   }

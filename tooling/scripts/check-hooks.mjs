@@ -46,6 +46,31 @@
  * gray palette is emitted whole for every family by `build-headless-examples.mjs`,
  * so a family that uses four of the seven is not a fault in the example.
  *
+ * **A hook is named after the family that owns it, and that is the third
+ * silent failure this file covers.** A consumer predicts `--card-padding` from
+ * `<helix-card>` and predicts nothing at all from a name that does not follow,
+ * and a custom property naming no declaration is inert with no error: the same
+ * class as a `::part()` that resolves to nothing. Six were unguessable.
+ * `<helix-pin-input>` published `--pin-gap`. `<helix-breadcrumb>` published
+ * `--breadcrumb-hover-color` and `--breadcrumb-control-size` beside its own
+ * `--breadcrumbs-separator-color`, so one component shipped both spellings and
+ * neither reading was wrong from inside it.
+ *
+ * **The family, not the element**, which took a measurement to settle. The
+ * obvious rule is the tag, and it is wrong in both tiers at once: the headless
+ * elements are `helix-headless-slider` and publish `--slider-*` because the
+ * hook is shared with the styled tier, and `<helix-tree-item>` publishes
+ * `--tree-*` because the hook belongs to Tree rather than to the row. Fifty-odd
+ * correct names fail a tag rule and none of them should change.
+ *
+ * **A public name may not be shared, which is the rule `--_color` was split
+ * for.** Two elements in one family documenting one hook is inheritance and is
+ * fine, `--table-columns` at both tiers being exactly that. Two *families* is a
+ * collision: `--toolbar-gap` was declared by `<helix-toolbar>` defaulting to
+ * `space-2xs` and by `<helix-sandbox-toolbar>` defaulting to `space-sm`, so one
+ * declaration on a container holding both set two different things and neither
+ * component could be blamed.
+ *
  * Run with `bun run check:hooks` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
@@ -83,6 +108,39 @@ const OWNS_PRIVATE = (path) => !path.startsWith('helix/styles/') && !path.includ
 /** The package a file belongs to, which is how far a private property travels. */
 const packageOf = (path) => path.split('/').slice(0, 2).join('/')
 
+/**
+ * Prefixes owned by a shared vocabulary rather than by one family.
+ *
+ * **Registered rather than inferred, so the exemption is a decision somebody
+ * made.** `--chart-*` is real: `helix/styled/src/chart/series.css` is imported
+ * by Legend and three chart families, `chart/terminus.css` by Sparkline, and
+ * `MixinChartSource` in core writes `--chart-series-N` for all of them. A hook
+ * five components read is not Sparkline's however it was declared, and naming
+ * it `--sparkline-terminus-size` would be the lie.
+ *
+ * The bar for adding one is a file more than one family imports. Anything else
+ * is a family hook that has drifted.
+ */
+const SHARED = new Set(['chart'])
+
+/**
+ * The family a hook belongs to, which is the directory the component sits in.
+ *
+ * `helix/styled/src/tree/item/…` is Tree whichever element declares it, and a
+ * controller in core is its own owner: `floating-controller` owns `--floating-*`.
+ * A mixin has no family and reaches every one that applies it, so it declares
+ * only shared names and `SHARED` is what clears it.
+ */
+const ownerOf = (path) => {
+  const parts = path.split('/')
+  if (parts[0] === 'helix' && parts[1] === 'core') {
+    /* One level deeper than a tier, because core groups by kind first:
+       `core/src/controllers/floating-controller` owns `--floating-*`. */
+    return parts[4]?.replace(/-controller$/, '') ?? ''
+  }
+  return parts[3] ?? ''
+}
+
 /* A comment quoting `var(--_thing)` is prose about a reader, not one. The
    public halves above scan the file whole and have got away with it; this rule
    cannot, because a property's own explanation sits directly above it and
@@ -90,6 +148,10 @@ const packageOf = (path) => path.split('/').slice(0, 2).join('/')
 const withoutComments = (text) => text.replace(/\/\*[\s\S]*?\*\//g, '')
 
 const declared = new Map()
+/* `--name` -> family -> the first file in it that declared the hook. Two
+   families under one name is the collision the header describes; two files in
+   one family is a hook documented at both tiers, which is inheritance. */
+const declaredBy = new Map()
 /* Every declaration, not just the last, so a name written twice is visible.
    `declared` above is a Map and the second `set` overwrote the first, which is
    why this check has never been able to see a duplicate: by the time it counts,
@@ -113,6 +175,14 @@ for (const tier of TIERS) {
         declared.set(name, path)
         const key = `${path}\u0000${name}`
         declaredAt.set(key, (declaredAt.get(key) ?? 0) + 1)
+        const owner = ownerOf(path)
+        if (owner) {
+          const owners = declaredBy.get(name) ?? new Map()
+          if (!owners.has(owner)) {
+            owners.set(owner, path)
+          }
+          declaredBy.set(name, owners)
+        }
       }
     }
     if (extname(path) === '.css') {
@@ -209,6 +279,37 @@ for (const [name, path] of [...read].sort()) {
   }
 }
 
+/* Named after the family that owns it, or after a registered shared
+   vocabulary. A name a consumer cannot predict is one they never try, and one
+   they mistype resolves to nothing with no error to go on. */
+for (const [name, owners] of [...declaredBy].sort()) {
+  for (const [owner, path] of owners) {
+    const bare = name.slice(2)
+    if (bare.startsWith(`${owner}-`) || [...SHARED].some((one) => bare.startsWith(`${one}-`))) {
+      continue
+    }
+    problems.push(
+      `${path}: documents \`${name}\`, which \`${owner}\` does not own. A hook is named after ` +
+        `its family, so this one reads as \`--${owner}-…\`, and the name a consumer guesses from ` +
+        'the element resolves to nothing with no error. Rename it, or register a shared prefix in ' +
+        '`SHARED` if more than one family reads the rule.',
+    )
+  }
+}
+
+/* One public name, one owner. Two tiers of one family is inheritance; two
+   families is two components answering to one declaration. */
+for (const [name, owners] of [...declaredBy].sort()) {
+  if (owners.size > 1) {
+    const where = [...owners].map(([owner, path]) => `${owner} (${path})`).join(' and ')
+    problems.push(
+      `\`${name}\` is documented by more than one family: ${where}. A consumer setting it on a ` +
+        'container holding both sets two different things, and neither component is wrong. ' +
+        'A public name cannot be shared.',
+    )
+  }
+}
+
 for (const [name, where] of [...privateDeclared].sort()) {
   for (const [pkg, path] of where) {
     if (!privateRead.get(name)?.has(pkg)) {
@@ -230,4 +331,7 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-console.log(`hooks: ${declared.size} documented CSS properties, every one read by a rule`)
+console.log(
+  `hooks: ${declared.size} documented CSS properties, every one read by a rule, named after its ` +
+    'family, and owned by one',
+)
