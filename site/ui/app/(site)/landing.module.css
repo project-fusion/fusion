@@ -467,7 +467,18 @@
 }
 
 /* Stacked where a split would be two narrow strips, and the rule turns with it.
-   A vertical divider between stacked blocks is a line pointing the wrong way. */
+   A vertical divider between stacked blocks is a line pointing the wrong way.
+
+   **The `grid-template-columns` line is the one that does the stacking, and it
+   was missing.** This block described stacking and only released the heights, so
+   the split stayed two columns all the way down: at 390 the prose column took
+   its 20rem floor, the gap took its own, and the stage was squeezed to 64px and
+   pushed past the edge. Measured, `.showcaseStage` at x=384 running to 448
+   against a 390 viewport, which is a page that scrolls sideways on a phone.
+
+   It is the failure mode a comment is worst at catching, because the block reads
+   as though it has already been done: three declarations that are all about
+   stacking, none of which stacks anything. */
 @media (width < 64rem) {
   .showcaseBand {
     align-content: center;
@@ -476,6 +487,7 @@
 
   .showcaseSplit {
     block-size: auto;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .showcaseStage {
@@ -628,9 +640,31 @@
   inline-size: var(--helix-size-checkbox);
 }
 
+/* The stage's own controls stack too, and only its `views` grid was doing it.
+ *
+ * `"switch brand reset"` is one row of three at every width, and at 390 there is
+ * not room for it: the toggle group broke its four options onto four lines and
+ * the color field beside it was squeezed until `#3b82f6` rendered as `32f6`, the
+ * two of them overlapping. Measured at 390, the group occupying x=65 to 240 and
+ * the field starting at 245 with its value clipped.
+ *
+ * The switch takes a row of its own and the color keeps its reset beside it,
+ * which is the pairing the wide layout already has: the two halves that must
+ * stay together are the color and the control that undoes it, and the switch is
+ * the one that can be anywhere. */
 @media (width < 56rem) {
   .showcaseView {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .showcaseStage {
+    grid-template-areas:
+      "anchor anchor"
+      "switch switch"
+      "brand  reset"
+      "views  views";
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
   }
 }
 
