@@ -1,4 +1,5 @@
 import { CONTACT, INCLUDE, NEXT } from '../../contact'
+import styles from './contact.module.css'
 
 export const metadata = {
   description:
@@ -88,14 +89,23 @@ export default function Page() {
                 <helix-text tone="subtle" variant="label">
                   {String(index + 1).padStart(2, '0')}
                 </helix-text>
-                <helix-flex direction="column" gap="sm">
+                {/* The name and the body side by side, not stacked.
+                    A step's rule runs the width of the shell and the row lights
+                    up on hover across the same width, and stacked at `62ch` the
+                    content stopped around half of it: measured, a 1264px rule
+                    over 611px of text, so the right half of every step was
+                    empty and the rule read as a column that had gone missing.
+                    Two tracks with a floor, so they sit beside each other while
+                    there is room and stack when there is not, which is the same
+                    rule the grid above this section uses. */}
+                <helix-grid class={styles.stepBody} gap="lg" min="20rem">
                   <helix-text as="h3" data-substrate-name>
                     {item.name}
                   </helix-text>
-                  <helix-text as="p" data-measure tone="muted">
+                  <helix-text as="p" tone="muted">
                     {item.body}
                   </helix-text>
-                </helix-flex>
+                </helix-grid>
               </helix-flex>
             ))}
           </helix-flex>

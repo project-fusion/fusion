@@ -1,19 +1,21 @@
-/* The services page: two columns of prose that the divider between them
- * measures itself against. One route applies these and no other.
+/* The services page. One route applies these and no other.
  */
 
 /* ======================================================== services ======= */
 
-/* The two columns of an offer, side by side while there is room and stacked
-   when there is not. A floor rather than a count: there are exactly two, so
-   `wrap` plus a minimum says the whole rule. */
-.serviceColumn {
-  flex: 1 1 18rem;
-  min-inline-size: 0;
-}
-
-/* The body sits under a header that already spans the card, so it takes the
-   full width and lets its own columns do the dividing. */
-.serviceBody {
+/* What a reader is left holding, as the card's bottom line.
+ *
+ * A footer slot rather than a second column, because the two halves are not the
+ * same size and never will be: `What is in it` is a summary, a price and four
+ * bullets, and this is one sentence. Measured side by side on the audit card,
+ * 500px of content against 60, so whichever end the sentence was pinned to left
+ * a void beside the other.
+ *
+ * Aligned to the start, since the sentence is a statement rather than a control:
+ * the footer's own rule is for actions, which conclude a card by being pressed,
+ * and this concludes it by being read.
+ */
+.serviceKeep {
+  align-items: start;
   inline-size: 100%;
 }

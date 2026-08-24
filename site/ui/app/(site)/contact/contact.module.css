@@ -1,0 +1,25 @@
+/* The contact page. One route applies these and no other.
+ */
+
+/* ======================================================== contact ======== */
+
+/* The body of a numbered step, filling what is left of the row beside its
+   number.
+ *
+ * The row draws a rule across the shell and lights up on hover across the same
+ * width, and what sat inside it was a stacked heading and a `62ch` paragraph, so
+ * a rule ran the full 1440 over content that stopped around 700 and the right
+ * half of every step was empty. Measured before the change: rule 1264px, content
+ * 611px.
+ *
+ * Widening the content rather than narrowing the rule, because the paragraph is
+ * one or two sentences and a measure is right for reading it: what was wrong was
+ * that the name and the body were stacked when there was room for them to sit
+ * beside each other, which is how a numbered process reads anyway. `min-inline-size`
+ * because a flex item's automatic minimum is its content, and a long word in the
+ * body would otherwise push the row wider than the shell.
+ */
+.stepBody {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}

@@ -53,7 +53,22 @@ export default async function Page() {
       </section>
 
       <section data-band data-reveal>
-        <helix-flex data-shell direction="column" gap="xl">
+        {/* **The three offers side by side, not stacked.**
+            Stacked, each card ran the width of the shell over content that did
+            not: measured at 1440, an 1136px card holding a 611px summary and
+            four short bullets, so half of every card was empty whichever way its
+            interior was arranged. Two columns inside the card put a one-sentence
+            takeaway against four bullets and a price, 60px of content against
+            500. One column left the whole right half blank.
+
+            The card was never the wrong shape; it was the wrong width. Three
+            tracks give each one about 390px, which is what this content wants,
+            and it is what the page is for: this docstring says an offer whose
+            cost appears only after a conversation cannot be compared, and
+            comparison wants them adjacent rather than a scroll apart. The floor
+            drops them to two and then one where there is no room, and the grid
+            equalises their heights so the prices line up. */}
+        <helix-grid data-shell gap="xl" min="22rem">
           {SERVICES.map((service) => (
             <helix-card class="serviceCard" key={service.name} separation="outlined">
               <helix-flex align="center" gap="md" justify="between" slot="header" wrap>
@@ -65,6 +80,21 @@ export default async function Page() {
                 </helix-flex>
               </helix-flex>
 
+              {/* **One column, and what you keep is the card's bottom line.**
+                  This was two columns beside each other, and it did not work in
+                  either arrangement it was tried in. `What you keep` is one
+                  sentence and `What is in it` is four bullets under a summary
+                  and a price, so a column apiece is 500px of content against 60,
+                  and the right side of every card is a void whichever end the
+                  sentence is pinned to. Measured on the audit card: 1136px wide,
+                  a 611px summary, and 210px of nothing beside it.
+
+                  A footer is the honest shape. It spans the card, so nothing is
+                  empty, and it puts the takeaway where a reader arrives at it
+                  last, which is where the thing they are deciding on belongs:
+                  the bullets say what the work is and this says what they are
+                  left holding. It is also the one line here that is true after
+                  the engagement ends. */}
               <helix-flex direction="column" gap="lg">
                 <helix-text as="p" data-measure tone="muted">
                   {service.summary}
@@ -88,38 +118,36 @@ export default async function Page() {
                   </helix-text>
                 </helix-flex>
 
-                <helix-flex class={styles.serviceBody} gap="2xl" wrap>
-                  <helix-flex class={styles.serviceColumn} direction="column" gap="sm">
-                    <helix-text tone="subtle" variant="label">
-                      What is in it
-                    </helix-text>
-                    {/* `unordered`, because these are a set and the order
+                <helix-flex direction="column" gap="sm">
+                  <helix-text tone="subtle" variant="label">
+                    What is in it
+                  </helix-text>
+                  {/* `unordered`, because these are a set and the order
                         does not carry information: a bare `helix-list` is the
                         `default` kind, which is a run of rows with no marker
                         and is what a list of files or settings wants. `label`
                         because the host takes `role="list"` and a list
                         announced with no name in a page of three identical
                         cards tells a reader nothing about which one it is. */}
-                    <helix-list kind="unordered" label={`What ${service.name} includes`}>
-                      {service.includes.map((item) => (
-                        <helix-list-item key={item}>{item}</helix-list-item>
-                      ))}
-                    </helix-list>
-                  </helix-flex>
-
-                  <helix-flex class={styles.serviceColumn} direction="column" gap="sm">
-                    <helix-text tone="subtle" variant="label">
-                      What you keep
-                    </helix-text>
-                    <helix-text as="p" tone="muted">
-                      {service.outcome}
-                    </helix-text>
-                  </helix-flex>
+                  <helix-list kind="unordered" label={`What ${service.name} includes`}>
+                    {service.includes.map((item) => (
+                      <helix-list-item key={item}>{item}</helix-list-item>
+                    ))}
+                  </helix-list>
                 </helix-flex>
+              </helix-flex>
+
+              <helix-flex class={styles.serviceKeep} direction="column" gap="sm" slot="footer">
+                <helix-text tone="subtle" variant="label">
+                  What you keep
+                </helix-text>
+                <helix-text as="p" data-measure tone="muted">
+                  {service.outcome}
+                </helix-text>
               </helix-flex>
             </helix-card>
           ))}
-        </helix-flex>
+        </helix-grid>
       </section>
 
       {/* The prose, from `@fusion-io/site-content`.
