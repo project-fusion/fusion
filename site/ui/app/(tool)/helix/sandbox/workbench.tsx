@@ -1,8 +1,5 @@
 'use client'
 
-// The editor is on its own path: it carries CodeMirror, and the site's
-// element registration runs on every page.
-import '@helix-io/sandbox/editor'
 import { scrollItemIntoView } from '@helix-io/core'
 import { htmlToJsx, jsxToHtml } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
@@ -25,6 +22,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { Family } from '../../../../content/catalog/catalog'
 import { useApiTier } from '../../../../hooks/use-api-tier/use-api-tier'
 import { useElementRef } from '../../../../hooks/use-element-ref/use-element-ref'
+import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
 import { Wordmark } from '../../../wordmark'
@@ -122,6 +120,8 @@ const resolve = (families: Family[], familySlug: string | null, exampleSlug: str
 }
 
 export function SandboxWorkbench({ families, findable = [] }: Props) {
+  useSandboxEditor()
+
   const preview = useRef<HelixSandboxPreview>(null)
   const _files = useRef<HelixToggleGroup>(null)
   /* Held as state, not as a ref: an effect observes the splitter's width and a

@@ -140,16 +140,24 @@ record. \`helix-v1.4.0\` means a release that promoted, and \`helix-attempt-v1.4
 means a number that was spent and did not, so version computation reads both. A
 failed release burns a number rather than poisoning the next one.
 
-## The split that has not happened yet
+## The split that has now happened
 
-The Rust workspace holds only Cortex crates today, which means
-\`[workspace.package] version\` is the Cortex version by accident of there being
-nothing else in it. The day Helix gains a Rust crate, that has to split, or the
-two domains are silently back in full lockstep with nothing reporting it.
+This section used to say the split had not. The Rust workspace held only Cortex
+crates, so \`[workspace.package] version\` was the Cortex version by accident of
+there being nothing else in it, and the day Helix gained a Rust crate the two
+domains would have been silently back in full lockstep.
 
-Writing this down is most of the mitigation. A constraint that holds because of
-a current absence is not a constraint, it is a coincidence, and coincidences do
-not survive the commit that ends them.
+Helix has two Rust crates now, and the field is gone. \`[workspace.package]\`
+keeps the edition, the license and the toolchain floor, which are facts about
+the workspace; each crate declares its own \`0.0.0-dev\`, which is a fact about a
+domain. Three identical lines whose whole purpose is to be able to differ, and a
+check that fails both on a crate inheriting a version and on the workspace
+declaring one at all.
+
+The split was made ahead of the crate rather than with it, which is the order
+worth keeping: a constraint that holds because of a current absence is not a
+constraint, it is a coincidence, and coincidences do not survive the commit that
+ends them.
 `,
   services: `---
 appends: services
@@ -282,7 +290,9 @@ title: The Sovereignty Constraint
 topic: Sovereignty
 ---
 
-> No Fusion product may create a dependency its user cannot exit. The user holds their own keys, data, and hardware. Fusion may operate a control plane, never a chokepoint.
+> No Fusion product may create a dependency its user cannot exit. The user
+> holds their own keys, data, and hardware. Fusion may operate a control plane,
+> never a chokepoint.
 
 That is the whole rule. It is short because it has to be usable during an
 argument about a feature, and it is a law rather than a value because values
@@ -358,19 +368,18 @@ no grid dependency. The name states the destination rather than the position.
 ### Personal
 
 Own your mind, your keys and your power. The model runs where you put it and
-the memory it accumulates is a file you hold. The subject is the individual.
+the memory it accumulates is a file you hold.
 
 ### Organizational
 
 Operate without platform dependence. A company that cannot be held hostage by a
-vendor roadmap, because it runs the substrate and holds the data. The subject is
-a company or a community.
+vendor roadmap, because it runs the substrate and holds the data.
 
 ### National
 
 Energy independence and institutional capability. A state that generates its own
 power and runs its own intelligence has different options than one that does
-not. The subject is the state.
+not.
 
 This is the growth path and the go-to-market sequence at once. It is not seven
 unrelated markets: it is one stack and one architectural commitment, sold to a
@@ -378,7 +387,7 @@ larger subject each time.
 
 ## Why it is a law and not a value
 
-**No Fusion product may create a dependency its user cannot exit.**
+> No Fusion product may create a dependency its user cannot exit.
 
 The user holds their own keys, data and hardware. Fusion may operate a control
 plane, never a chokepoint. Every product must be able to keep working if Fusion

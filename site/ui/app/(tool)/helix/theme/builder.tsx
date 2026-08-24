@@ -3,6 +3,7 @@
 import { type DerivedTheme, initTheme, type ThemeEngine } from '@helix-io/theme'
 import type { HelixSandboxPreview } from '@helix-io/web'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
 import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
@@ -15,7 +16,6 @@ import {
   SCOPE,
   type Settings,
 } from './defaults'
-import '@helix-io/sandbox/editor'
 import { ThemedPage } from './themed-page'
 import { THEMED_PAGE_STYLES } from './themed-page-styles'
 import './theme.css'
@@ -111,6 +111,8 @@ export function ThemeBuilder({
    */
   initialTheme: DerivedTheme
 }) {
+  useSandboxEditor()
+
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [brand, setBrand] = useState(INITIAL.brand)
   const [scheme, setScheme] = useState(INITIAL.scheme)

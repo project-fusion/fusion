@@ -35,13 +35,21 @@ record. `helix-v1.4.0` means a release that promoted, and `helix-attempt-v1.4.0`
 means a number that was spent and did not, so version computation reads both. A
 failed release burns a number rather than poisoning the next one.
 
-## The split that has not happened yet
+## The split that has now happened
 
-The Rust workspace holds only Cortex crates today, which means
-`[workspace.package] version` is the Cortex version by accident of there being
-nothing else in it. The day Helix gains a Rust crate, that has to split, or the
-two domains are silently back in full lockstep with nothing reporting it.
+This section used to say the split had not. The Rust workspace held only Cortex
+crates, so `[workspace.package] version` was the Cortex version by accident of
+there being nothing else in it, and the day Helix gained a Rust crate the two
+domains would have been silently back in full lockstep.
 
-Writing this down is most of the mitigation. A constraint that holds because of
-a current absence is not a constraint, it is a coincidence, and coincidences do
-not survive the commit that ends them.
+Helix has two Rust crates now, and the field is gone. `[workspace.package]`
+keeps the edition, the license and the toolchain floor, which are facts about
+the workspace; each crate declares its own `0.0.0-dev`, which is a fact about a
+domain. Three identical lines whose whole purpose is to be able to differ, and a
+check that fails both on a crate inheriting a version and on the workspace
+declaring one at all.
+
+The split was made ahead of the crate rather than with it, which is the order
+worth keeping: a constraint that holds because of a current absence is not a
+constraint, it is a coincidence, and coincidences do not survive the commit that
+ends them.
