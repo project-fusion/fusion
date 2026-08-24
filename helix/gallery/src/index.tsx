@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { chartsArt } from './charts'
 import { contentArt } from './content'
 import { coreArt } from './core'
 import { formsArt } from './forms'
@@ -8,10 +9,13 @@ import { toolingArt } from './tooling'
 /**
  * Abstract art for a family's gallery card, keyed by slug.
  *
- * All eighty-nine families have an entry, and the five files are split by kind
+ * All eighty-nine families have an entry, and the six files are split by kind
  * rather than by anything the build cares about: one file of eighty-nine is hard
  * to navigate and every entry would sit beside a neighbor it has nothing to do
- * with. The system they all obey is documented at the top of `core.tsx`.
+ * with. **The split follows the catalog's own**, which is why `charts.tsx`
+ * exists: `content` held 27 families and meant none of the other seven, and its
+ * art file was 1,136 lines for exactly that reason. A drawer in the catalog is a
+ * drawer in the gallery, so splitting one splits the other. The system they all obey is documented at the top of `core.tsx`.
  *
  * **Eighty-nine, not the eighty-eight folders in `helix/web/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
@@ -51,6 +55,7 @@ import { toolingArt } from './tooling'
  * that simply has no picture, and looks deliberate until someone draws one.
  */
 const art: Record<string, ReactNode> = {
+  ...chartsArt,
   ...contentArt,
   ...coreArt,
   ...formsArt,
