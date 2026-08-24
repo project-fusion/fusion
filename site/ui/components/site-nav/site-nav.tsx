@@ -105,7 +105,14 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const [panelBottom, setPanelBottom] = useState(0)
 
   useEffect(() => {
-    const panel = panelRef.current?.shadowRoot?.querySelector('[part="panel"]')
+    /* `surface`, which is what the part is called. It was `panel`, and when the
+       component renamed it this measurement went on asking for the old name,
+       found nothing, and returned early: the sheet stayed at the bar's own
+       height while the panel opened over the page with no glass behind it at
+       all. Nothing failed, because a query that matches nothing is not an
+       error, and the only symptom was a navigation panel you could read the
+       hero through. */
+    const panel = panelRef.current?.shadowRoot?.querySelector('[part="surface"]')
     if (!panelDown || !panel) {
       return
     }
