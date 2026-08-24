@@ -105,6 +105,35 @@ export class HelixBaseButton extends HelixFormElement {
   }
 
   private readonly handleClick = (): void => {
+    /* **Re-linked here, and this is the line that makes a trigger reliable.**
+     *
+     * `linkCommand` used to run from `updated` alone, so the target was
+     * resolved once, whenever the button last rendered, and never again. A
+     * button whose properties do not change does not update again, so one whose
+     * target had not been inserted yet stayed wired to nothing for good.
+     * Measured: `commandForElement` read null with the target absent, null
+     * again after the target was inserted, and resolved the instant an
+     * unrelated property forced an update. Whether a trigger worked came down
+     * to insertion order, which is why it survived a full reload and not a
+     * client navigation, where the same markup arrives in pieces.
+     *
+     * **The fallback path was the correct one all along**, which is the tell:
+     * `sendCommand` resolves through `commandTarget` at activation, so a
+     * browser *without* invokers ran this correctly and a browser with them did
+     * not.
+     *
+     * A click listener is early enough, and that is measured rather than read
+     * off the specification: activation behaviour runs after the click has
+     * finished dispatching, so a handler that assigns `commandForElement` sets
+     * it before the browser looks. Probed on a bare `<button command>` whose
+     * target was assigned from its own click listener, the dialog opened, and
+     * the control that assigned nothing did not.
+     *
+     * `updated` keeps its call, because the common case is a target that was
+     * there all along and `commandForElement` should be readable before anybody
+     * clicks anything. This is the guarantee, not the mechanism. */
+    this.linkCommand()
+
     // Before the type check, which returns for `button`, the default and the
     // type every invoker in this library uses.
     this.sendCommand()

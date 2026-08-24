@@ -84,3 +84,38 @@ describe('button form participation', () => {
     expect(submitted).toBe(0)
   })
 })
+
+describe('button invokers', () => {
+  /* **A target that arrives after the button rendered still gets the command.**
+   *
+   * `linkCommand` ran from `updated` alone, so the target was resolved once and
+   * never again, and a button whose properties do not change does not update
+   * again: one rendered before its target existed stayed wired to nothing
+   * permanently. Measured before the fix, `commandForElement` read null with the
+   * target absent, null again after it was inserted, and resolved only when an
+   * unrelated property forced an update.
+   *
+   * **The environment decides which half of the component this exercises**, and
+   * both halves are worth having. Under happy-dom there are no invokers, so this
+   * is `sendCommand` and its live lookup, which was always correct. In the
+   * browser suite it is the native path, which was the broken one. The assertion
+   * is the same either way because the fallback event is named `command` to
+   * match the platform's. */
+  test('a command reaches a target inserted after the button rendered', async () => {
+    const button = await mount(
+      '<helix-base-button command="--go" commandfor="late">Go</helix-base-button>',
+    )
+
+    const target = document.createElement('div')
+    target.id = 'late'
+    document.body.append(target)
+
+    let received: string | null = null
+    target.addEventListener('command', (event) => {
+      received = (event as Event & { command?: string }).command ?? null
+    })
+
+    ;(control(button) as HTMLElement).click()
+    expect(received).toBe('--go')
+  })
+})
