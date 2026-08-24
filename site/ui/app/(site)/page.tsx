@@ -171,21 +171,24 @@ export default function Home() {
                   {product.body}
                 </helix-text>
 
-                {/* The command, where there is one, and the honest sentence
-                    where there is not. A `Building` product with an install
-                    line would be the stage label saying one thing and the page
-                    another. */}
+                {/* **The command is not repeated here.** The hero carries it
+                    already, in a pill built for one line, and the same string
+                    twice on one page is a second copy to keep current and a
+                    reader wondering which one is. This panel's job is to say what
+                    the product is and open the door.
+
+                    What is left is the honest sentence where there is nothing to
+                    install: a `Building` product with an install line would be
+                    the stage label saying one thing and the page another.
+                    `install` stays on the product type, since it is what tells
+                    these two panels apart.
+
+                    No license line either. It is a fact for whoever is about to
+                    install, and the install page is one click away; on a landing
+                    panel it takes the same weight as the button beside it and
+                    answers a question almost nobody has asked yet. */}
                 {product.install ? (
                   <helix-flex direction="column" gap="sm">
-                    <helix-code-block label={`Install ${product.name}`}>
-                      {product.install}
-                    </helix-code-block>
-                    {/* No license line. It is a fact for whoever is about to
-                        install, and the install page is one click away; on a
-                        landing card it takes the same weight as the button
-                        beside it and answers a question almost nobody asked
-                        yet. `license` stays on the product type, where the
-                        pages that do want it can read it. */}
                     {/* **Standard width and the large control height**, the
                         same pair the hero uses. `sm` here made the one action on
                         a panel the smallest control on the page, which is the

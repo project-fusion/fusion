@@ -54,6 +54,7 @@ const CONFIRM = 1600
  * @csspart button - The inner button.
  * @csspart mark - The clipboard glyph, and the confirmation that replaces it.
  * @csspart tooltip - The bubble, forwarded from the tooltip inside.
+ * @csspart tooltip-arrow - The point, resting against the trigger.
  */
 @customElement('helix-headless-copy-button')
 export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
@@ -203,7 +204,8 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
        about it. Without it the tooltip hid on the same click that swapped its
        content to Copied, so the words this component takes such care over were
        written and then taken off screen in the same frame. */
-    return html`<${this.tag('tooltip')} content=${this.says} persist exportparts="tooltip">
+    return html`<${this.tag('tooltip')} content=${this.says} persist
+    exportparts="arrow: tooltip-arrow, tooltip">
       ${control}
     </${this.tag('tooltip')}>`
   }

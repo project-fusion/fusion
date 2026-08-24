@@ -22,6 +22,22 @@ const tooltip = async (attrs = 'content="Regenerates the manifests"'): Promise<T
     `<helix-headless-tooltip ${attrs}><button>Analyze</button></helix-headless-tooltip>`,
   )) as Tooltip
 
+/**
+ * Focus as the browser delivers it: from the control, bubbling to the host.
+ *
+ * A bare `focusin` on the host is not the event a browser sends. `focusin`
+ * bubbles *from* the element that took focus, and the tooltip reads the target to
+ * ask whether the focus was one a reader chose, so dispatching it on the host
+ * hands it an element that is not focused at all. That gap is what let a stale
+ * focus hold survive a mouse press for as long as it did.
+ */
+const focusTrigger = async (tip: Tooltip): Promise<void> => {
+  const trigger = tip.querySelector('button') as HTMLButtonElement
+  trigger.focus()
+  trigger.dispatchEvent(new Event('focusin', { bubbles: true }))
+  await tip.updateComplete
+}
+
 /** A tooltip whose bubble is filled from the light DOM instead of `content`. */
 const slotted = async (attrs = '', inner = '<b>Rich</b>'): Promise<Tooltip> =>
   (await mount(
@@ -66,12 +82,14 @@ describe('tooltip', () => {
     // A tooltip that shows only on hover is one a keyboard reader never sees.
     const tip = await tooltip()
     const shown: string[] = []
-    for (const type of ['pointerenter', 'focusin']) {
-      tip.dispatchEvent(new Event(type))
-      await tip.updateComplete
-      shown.push(type)
-      tip.hide()
-    }
+    tip.dispatchEvent(new Event('pointerenter'))
+    await tip.updateComplete
+    shown.push('pointerenter')
+    tip.hide()
+
+    await focusTrigger(tip)
+    shown.push('focusin')
+    tip.hide()
     expect(shown).toEqual(['pointerenter', 'focusin'])
   })
 
@@ -82,8 +100,7 @@ describe('tooltip', () => {
     tip.dispatchEvent(new Event('pointerenter'))
     expect(tip.open).toBe(false)
 
-    tip.dispatchEvent(new Event('focusin'))
-    await tip.updateComplete
+    await focusTrigger(tip)
     expect(tip.open).toBe(true)
   })
 
@@ -265,8 +282,7 @@ describe('tooltip for', () => {
     )) as HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
     await host.updateComplete
 
-    host.dispatchEvent(new Event('focusin', { bubbles: true }))
-    await host.updateComplete
+    await focusTrigger(host as unknown as Tooltip)
     expect(host.open).toBe(true)
 
     const trigger = host.querySelector('button') as HTMLButtonElement
@@ -290,8 +306,7 @@ describe('tooltip for', () => {
     )) as HTMLElement & { content: string; open: boolean; updateComplete: Promise<boolean> }
     await host.updateComplete
 
-    host.dispatchEvent(new Event('focusin', { bubbles: true }))
-    await host.updateComplete
+    await focusTrigger(host as unknown as Tooltip)
     expect(host.open).toBe(true)
 
     const trigger = host.querySelector('button') as HTMLButtonElement
@@ -305,5 +320,32 @@ describe('tooltip for', () => {
     host.dispatchEvent(new Event('focusout', { bubbles: true }))
     await host.updateComplete
     expect(host.open).toBe(false)
+  })
+
+  test('and focus the reader did not choose takes no hold', async () => {
+    /* **A mouse press focuses the button it pressed.** An unconditional focus
+       hold meant that after any click the bubble was held up by a reader who had
+       not asked for it: the pointer leaving released the pointer hold, found a
+       focus hold still set, and left the tooltip on screen until something else
+       blurred the control. Invisible until `persist`, because activation used to
+       clear every hold on the way out.
+
+       `:focus-visible` is the test, and this asserts it through the one case a
+       unit DOM can express: a `focusin` whose target is not focused at all. The
+       real case, a genuine mouse press on a real button, cannot be built here,
+       since a programmatically focused element in this DOM *does* match
+       `:focus-visible`. That half is checked in a browser instead, where hover
+       opens the bubble, the click leaves it open reading Copied, and moving the
+       pointer away closes it. */
+    const tip = await tooltip('content="Copy" delay="0"')
+    const unfocused = tip.querySelector('button') as HTMLButtonElement
+
+    unfocused.dispatchEvent(new Event('focusin', { bubbles: true }))
+    await tip.updateComplete
+    expect(tip.open).toBe(false)
+
+    // And the same event from a control that really has focus still opens it.
+    await focusTrigger(tip)
+    expect(tip.open).toBe(true)
   })
 })

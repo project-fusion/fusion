@@ -441,7 +441,31 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     this.timer = setTimeout(() => this.release(), this.delayOut)
   }
 
-  private readonly showNow = (): void => {
+  /**
+   * Focus opens the bubble, but only the kind of focus a reader chose.
+   *
+   * **A mouse press focuses the button it pressed**, so an unconditional focus
+   * hold meant that after any click the bubble was held up by a reader who was
+   * not asking for it: moving the pointer away released the pointer hold, found
+   * a focus hold still set, and left the tooltip on screen until something else
+   * blurred the control.
+   *
+   * It never showed until `persist` arrived, because activation used to clear
+   * every hold and hide, so the click path threw the stale hold away before
+   * anyone could see it. A tooltip that survives its own activation is the first
+   * one to hold that focus long enough to matter.
+   *
+   * `:focus-visible` is the platform's own answer to "did they mean it", and a
+   * button does not match it on a mouse press. Keyboard focus still opens with no
+   * delay, which is the case this branch exists for: a reader who tabbed to a
+   * control has already committed to it. Where it does not match there is nothing
+   * to do, the pointer having opened the bubble already if a pointer is involved.
+   */
+  private readonly showNow = (event: Event): void => {
+    const focused = event.target
+    if (focused instanceof Element && !focused.matches(':focus-visible')) {
+      return
+    }
     this.holds.add('focus')
     this.show()
   }
