@@ -19,6 +19,7 @@
       "!**/node_modules",
       "!**/custom-elements.json",
       "!helix/theme/rust/oracle.json",
+      "!tooling/eval/questions.json",
       "!**/*.css.ts",
       "!**/jsx.d.ts",
       "!**/vue.d.ts",
