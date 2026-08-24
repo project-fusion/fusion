@@ -4304,6 +4304,7 @@ is the documented escape hatch for exactly this trade.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `helix-caret` | `HelixCaretEvent` | Fired when the cursor moves. |
 | `helix-change` | `HelixChangeEvent` | Fired when the source is edited. |
 
 #### Parts

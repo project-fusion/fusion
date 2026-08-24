@@ -19,9 +19,9 @@ about this library most likely to look like a bug.
 <helix-input label="Name" value="Ada"></helix-input>
 ```
 
-It is written as plain text rather than as HTML on purpose: a reader copies what
-is in front of them, and this is the one page that has to show the mistake in
-order to name it. Do not paste it.
+Do not paste it. It is plain text rather than a live example because a reader
+copies what is in front of them, and this is the one page that has to show the
+mistake in order to name it.
 
 ## The two modes
 
@@ -131,11 +131,9 @@ answered yet.
 
 **In TypeScript, the constraint is a compile error.** The types intersect every
 controlled tag with a union that requires an answering handler, so `<helix-input
-value="Ada" />` does not compile. That constraint is generated several steps
-from anything a person edits, so it is compiled against a fixture and
-compared in both directions: a constraint that
-stopped constraining and one that grew too strict are the same kind of silent,
-and the second reaches you as "the library will not let me write correct code".
+value="Ada" />` does not compile. The constraint is generated, and regression
+tested in both directions, so an error here is real and an absent one means you
+answered.
 
 **At runtime, the control says so on the console.** A controlled element that
 asks for something and gets no answer warns once, naming itself and the
@@ -146,8 +144,7 @@ anything slower, and a consumer answering by navigating was accused of not
 listening. A warning that is sometimes wrong is one people learn to ignore, and
 this one has to be believed the day it is right.
 
-So there is no deadline. The first unanswered request is remembered and
-judgment waits for the second: if the state has not moved between two requests,
-nothing answered either of them, whatever the timing. A control asked once and
-never again is never accused, which is the right trade, because the symptom this
-exists for is a control that ignores everything.
+So there is no deadline: if the state has not moved between two requests, nothing
+answered either of them, whatever the timing. A control asked once and never again
+is never accused, which is the right trade, because the symptom this exists for is
+a control that ignores everything.

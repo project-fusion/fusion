@@ -40,11 +40,9 @@ Helix expresses the choice in two pairs of policy tokens:
 
 Set the border pair to zero and the shadow pair to something, and the whole
 library goes shadow-first. Reverse them and it goes border-first. Every surface
-in the library is themeable in both directions, and held to it: a surface that
-hooks its shadow and hardcodes `border: none` themes perfectly for anyone going
-shadow-first and cannot be made border-first at all, and nothing in the file
-says so. A half-converted surface is the failure worth catching, because it
-reads as done.
+in the library is themeable in both directions, and checked, because a
+half-converted one reads as done: hook the shadow and hardcode `border: none`
+and it themes perfectly in one direction and cannot be moved in the other.
 
 ## The ladder
 

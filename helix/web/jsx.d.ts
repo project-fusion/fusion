@@ -17,6 +17,7 @@ import type {
   HelixButtonGroup,
   HelixCallout,
   HelixCard,
+  HelixCaretEvent,
   HelixCarousel,
   HelixChangeEvent,
   HelixCheckbox,
@@ -9905,6 +9906,9 @@ export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
   HelixSandboxSource,
   E
 >;
+/** `helix-caret` event type */
+export type HelixSandboxSourceHelixCaretElementEvent =
+  HelixSandboxSourceElementEvent<HelixCaretEvent>;
 /** `helix-change` event type */
 export type HelixSandboxSourceHelixChangeElementEvent =
   HelixSandboxSourceElementEvent<HelixChangeEvent>;
@@ -9928,6 +9932,8 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   /** Whether Tab indents rather than moving focus. */
   tabIndents?: HelixSandboxSource["tabIndents"];
 
+  /** Fired when the cursor moves. */
+  "onhelix-caret"?: (e: HelixSandboxSourceHelixCaretElementEvent) => void;
   /** Fired when the source is edited. */
   "onhelix-change"?: (e: HelixSandboxSourceHelixChangeElementEvent) => void;
 };
@@ -9950,6 +9956,8 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   "bool:tab-indents"?: HelixSandboxSource["tabIndents"];
   /** Whether Tab indents rather than moving focus. */
   "prop:tabIndents"?: HelixSandboxSource["tabIndents"];
+  /** Fired when the cursor moves. */
+  "on:helix-caret"?: (e: HelixSandboxSourceHelixCaretElementEvent) => void;
   /** Fired when the source is edited. */
   "on:helix-change"?: (e: HelixSandboxSourceHelixChangeElementEvent) => void;
 
@@ -22178,6 +22186,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-caret`: Fired when the cursor moves.
    * - `helix-change`: Fired when the source is edited.
    *
    * ## CSS Custom Properties
@@ -33885,6 +33894,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-caret`: Fired when the cursor moves.
    * - `helix-change`: Fired when the source is edited.
    *
    * ## CSS Custom Properties

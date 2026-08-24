@@ -20,19 +20,18 @@ It never says *this is a version of that*. An icon-only button is not a part of
 > Variants are props. Alternatives are separate components.
 
 A button that is filled instead of outlined is the same component with a
-different `appearance`. A button that holds only an icon has a different
+different `emphasis`. A button that holds only an icon has a different
 accessible-name requirement and a different shape, so it is its own component.
 
 ## When a region becomes an element
 
-Otherwise it is a slot.
+When it has behavior, state or API. Otherwise it is a slot.
 
 `Card`'s header, body and footer carried none of the three, so five elements
 became one and a title became a real `<h2>` the consumer writes. `Tabs.Tab`,
 `Select.Option` and `Accordion.Item` do carry state, so they stay elements.
 
-This matters more than it sounds, because **an empty region still costs
-layout**. A `<slot>` is `display: contents`, so an unassigned one generates no
+**An empty region still costs layout.** A `<slot>` is `display: contents`, so an unassigned one generates no
 box: no grid row, no flex item, no gap. A wrapper generates one either way.
 Measured on Card with identical content: wrappers present but empty rendered
 85px against an ideal of 53px. Bare slots rendered 53px with no hiding logic at
@@ -144,16 +143,15 @@ screen reader announces as "edit text", which is almost never what you want.
 If the page already makes the purpose plain, that is the `aria-label` case, not
 the empty case.
 
-**`aria-label` works here because the component forwards it**, and that is worth
-knowing because it is not true of custom elements in general. A custom element
+**`aria-label` works here because the component forwards it**, which is not true
+of custom elements in general. A custom element
 cannot delegate a label to the control inside its shadow root: an `aria-label`
 you write on the host sits on a wrapper and never reaches the `<input>` that
 actually takes focus. Measured on this library before it was fixed, the inner
 input came back with no label and no name at all.
 
 So the field renders the label and clips it, and the name arrives through the
-same `<label for>` a visible one does. You write the obvious attribute and it
-does the obvious thing.
+same `<label for>` a visible one does.
 
 There used to be a `hide-label` boolean beside `label`. It is gone: one
 attribute supplying a label and a second saying not to show it is the absence of

@@ -134,6 +134,7 @@ import type {
   HelixFilterEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
+  HelixCaretEvent,
   HelixTourAskEvent,
   HelixNextEvent,
   HelixPreviousEvent,
@@ -5108,6 +5109,9 @@ export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
   HelixSandboxSource,
   E
 >;
+/** `helix-caret` event type */
+export type HelixSandboxSourceHelixCaretElementEvent =
+  HelixSandboxSourceElementEvent<HelixCaretEvent>;
 /** `helix-change` event type */
 export type HelixSandboxSourceHelixChangeElementEvent =
   HelixSandboxSourceElementEvent<HelixChangeEvent>;
@@ -5133,6 +5137,8 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
 };
 
 export type HelixSandboxSourceVueEvents = {
+  /** Fired when the cursor moves. */
+  "helix-caret": HelixSandboxSourceHelixCaretElementEvent;
   /** Fired when the source is edited. */
   "helix-change": HelixSandboxSourceHelixChangeElementEvent;
 };

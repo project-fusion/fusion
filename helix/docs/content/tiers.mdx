@@ -15,7 +15,7 @@ never reverses.
 | `@helix-io/styles` | Tokens and the base layer. Pure CSS | nothing |
 | `@helix-io/core` | Element base class, mixins, decorators | Lit |
 | `@helix-io/headless` | Structure, accessibility, state, form participation | `core` |
-| `@helix-io/web` | Presentation: tokens, parts, `appearance` and `tone` | `headless`, `styles` |
+| `@helix-io/web` | Presentation: tokens, parts, and the visual axes | `headless`, `styles` |
 | `@helix-io/react` | Generated React wrappers | `web` |
 
 ## Why the split
@@ -23,7 +23,7 @@ never reverses.
 **`headless` must never depend on `styles`.**
 
 That single constraint is what makes the headless tier independently
-consumable, and therefore separately valuable. Consume it and bring your own
+consumable. Consume it and bring your own
 styling entirely; nothing about how Helix looks comes with it. If styling leaks
 downward, the five packages are one package in five files.
 
@@ -31,19 +31,19 @@ downward, the five packages are one package in five files.
 
 The base tier owns what a component **is and does**: markup structure, ARIA
 wiring, slots, events, internal state, form participation. It ships no CSS, no
-token references, and no `appearance` or `tone` properties.
+token references, and none of the visual axes.
 
 The styled tier extends it and adds only presentation. Token references live
 here.
 
 ```ts
-// headless/src/disclosure/root/disclosure-root.ts
+// headless/src/accordion/item/accordion-item.ts
 // no CSS, no tokens
-export class HelixBaseDisclosure extends WithOpen(HelixElement) {
+export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
   protected override render() {
     return html`
       <div part="container">
-        <button aria-expanded=${this.isOpen} part="trigger" @click=${this.toggle}>
+        <button aria-expanded=${this.open} part="trigger" @click=${this.handleToggle}>
           <slot name="summary"></slot>
         </button>
       </div>
@@ -51,24 +51,24 @@ export class HelixBaseDisclosure extends WithOpen(HelixElement) {
   }
 }
 
-// web/src/disclosure/root/disclosure-root.ts
+// web/src/accordion/root/accordion-root.ts
 // extends the base, adds presentation only
-import { styles } from './disclosure-root.css.js'
+import { styles } from './accordion-root.css.js'
 
-@customElement('helix-disclosure')
-export class HelixDisclosure extends HelixBaseDisclosure {
+@customElement('helix-accordion')
+export class HelixAccordion extends HelixBaseAccordion {
   @property({ reflect: true })
-  appearance: 'outlined' | 'plain' = 'outlined'
+  separation?: 'outlined' | 'plain'
 
   static override styles: CSSResultGroup = styles
 }
 ```
 
 ```css
-/* web/src/disclosure/root/disclosure-root.css */
+/* web/src/accordion/item/accordion-item.css */
 [part='trigger'] {
   min-block-size: var(--helix-size-control);
-  padding: var(--disclosure-padding, var(--helix-space-sm));
+  padding: var(--helix-space-sm);
 }
 ```
 
@@ -78,7 +78,7 @@ Shadow DOM markup uses CSS Shadow Parts, not class names. Every structural
 element carries a `part`, which doubles as the public override API:
 
 ```css
-helix-disclosure::part(trigger) {
+helix-accordion-item::part(trigger) {
   font-weight: 600;
 }
 ```
@@ -88,16 +88,16 @@ to a system token, so overriding it restyles one component without touching
 `--helix-*` and affecting everything else:
 
 ```css
-helix-disclosure {
-  --disclosure-padding: 1rem 1.5rem;
+helix-accordion {
+  --accordion-radii: 1rem;
 }
 ```
 
 ## Mixins and tooling
 
-`open` and `defaultOpen` come from the `WithOpen` mixin in `@helix-io/core`.
+`open` and `defaultOpen` come from `MixinControllerOpen` in `@helix-io/core`.
 The manifest analyzer cannot follow a mixin into another package, so any
 mixin-provided API a component exposes has to be documented on the component
-itself with `@fires`, `@property`, or similar. Undocumented mixin API is
+itself with `@event`, `@property`, or similar. Undocumented mixin API is
 invisible to IDE tooltips, the React wrapper generator, and any agent reading
 the manifest.

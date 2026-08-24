@@ -1,4 +1,10 @@
-import { customElement, HelixChangeEvent, HelixElement, onUnlessFalse } from '@helix-io/core'
+import {
+  customElement,
+  HelixCaretEvent,
+  HelixChangeEvent,
+  HelixElement,
+  onUnlessFalse,
+} from '@helix-io/core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -24,6 +30,7 @@ import { styles } from './sandbox-source.css.js'
  *
  * @csspart source - The editable region.
  *
+ * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.
  * @event {HelixChangeEvent} helix-change - Fired when the source is edited.
  *
  * @cssproperty --sandbox-source-background - Fill behind the source.
@@ -57,9 +64,43 @@ export class HelixSandboxSource extends HelixElement {
   /** Set by Escape, so the next Tab leaves the field. */
   private escaped = false
 
+  /**
+   * Reports where the cursor is, for a status bar to read.
+   *
+   * **The shipped shell could not fill its own readout before this.**
+   * `SandboxRoot` binds a `helix-caret` listener and writes `line` and `column`
+   * onto every slotted status bar, and `SandboxStatusBar` renders a `caret` part
+   * as soon as it has both, and both of those ship from `@helix-io/web`. The one
+   * pane that reported a position was `SandboxEditor`, which is in
+   * `@helix-io/sandbox` and is `private` while Helix is pre-release. So a
+   * consumer taking the published shell and this pane got a status bar that
+   * could never show a position, and the only fix available to them was a
+   * package they cannot install.
+   *
+   * That is the gap rather than a dead event: the editor has dispatched this
+   * since it was written, and `check:events` has always seen it. What was
+   * missing was the half of the pair that ships.
+   *
+   * The textarea is the only thing that knows, so this is where it belongs.
+   * One-based on both axes, which is what an editor shows and what the detail's
+   * own documentation says.
+   */
+  private readonly reportCaret = (event: Event): void => {
+    const field = event.target as HTMLTextAreaElement
+    const at = field.selectionStart ?? 0
+    const before = field.value.slice(0, at)
+    this.dispatchEvent(
+      new HelixCaretEvent({
+        column: at - (before.lastIndexOf('\n') + 1) + 1,
+        line: before.split('\n').length,
+      }),
+    )
+  }
+
   private readonly handleInput = (event: Event): void => {
     this.value = (event.target as HTMLTextAreaElement).value
     this.dispatchEvent(new HelixChangeEvent({ property: 'value', value: this.value }))
+    this.reportCaret(event)
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -89,8 +130,11 @@ export class HelixSandboxSource extends HelixElement {
       aria-label=${this.fieldLabel}
       spellcheck="false"
       .value=${this.value}
+      @focus=${this.reportCaret}
       @input=${this.handleInput}
       @keydown=${this.handleKeydown}
+      @keyup=${this.reportCaret}
+      @pointerup=${this.reportCaret}
     ></textarea>`
   }
 

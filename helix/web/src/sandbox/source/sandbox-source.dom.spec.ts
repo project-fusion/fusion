@@ -103,3 +103,60 @@ describe('the source pane', () => {
     expect(host.getAttribute('name')).toBe('css')
   })
 })
+
+/**
+ * The cursor readout, which is the half of this pane a status bar reads.
+ *
+ * Worth its own block because this pane is the half of the readout that *ships*.
+ * The root's listener and the status bar's `caret` part are both in
+ * `@helix-io/web`, and the only pane that reported a position was the editor in
+ * the private `@helix-io/sandbox`, so a consumer with the published shell had a
+ * status bar that could never fill.
+ */
+describe('the source pane reporting its cursor', () => {
+  const caret = async (value: string, at: number): Promise<{ column: number; line: number }> => {
+    const host = await source()
+    const field = part(host, 'source') as HTMLTextAreaElement
+    let detail: { column: number; line: number } | undefined
+    host.addEventListener('helix-caret', (event) => {
+      detail = (event as CustomEvent<{ column: number; line: number }>).detail
+    })
+    field.value = value
+    field.selectionStart = at
+    field.selectionEnd = at
+    field.dispatchEvent(new Event('keyup', { bubbles: true }))
+    return detail as { column: number; line: number }
+  }
+
+  /* One-based on both axes, which is what an editor shows and what the detail's
+     own documentation promises. A zero would be a position nothing is at. */
+  test('counts from one on both axes', async () => {
+    expect(await caret('abc', 0)).toEqual({ column: 1, line: 1 })
+    expect(await caret('abc', 3)).toEqual({ column: 4, line: 1 })
+  })
+
+  /* The column restarts at each newline rather than counting from the top of the
+     document, which is the whole difference between a column and an offset. */
+  test('restarts the column at every line', async () => {
+    expect(await caret('ab\ncdef', 3)).toEqual({ column: 1, line: 2 })
+    expect(await caret('ab\ncdef', 6)).toEqual({ column: 4, line: 2 })
+    expect(await caret('ab\ncd\ne', 6)).toEqual({ column: 1, line: 3 })
+  })
+
+  /* Bubbling and composed, because the root binds one listener on itself and the
+     pane is inside its shadow tree. Neither, and the status bar stays empty for
+     the same reason it was empty before this was wired at all. */
+  test('leaves its own root, which is where the listener is', async () => {
+    const host = await source()
+    const field = part(host, 'source') as HTMLTextAreaElement
+    let seen: Event | undefined
+    host.addEventListener('helix-caret', (event) => {
+      seen = event
+    })
+    field.value = 'a'
+    field.selectionStart = 1
+    field.dispatchEvent(new Event('keyup', { bubbles: true }))
+    expect(seen?.bubbles).toBe(true)
+    expect(seen?.composed).toBe(true)
+  })
+})

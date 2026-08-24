@@ -10,8 +10,6 @@ Some components navigate. A tree used as a sidebar, a button that goes
 somewhere, a tab that is really a page. Those all want to be links, and a link
 inside a shadow root is where web components and framework routers disagree.
 
-This is the whole of that disagreement, and what to do about it.
-
 ## A component that navigates renders its own anchor
 
 `Tree.Item` and `Button` both take an `href`, and when they have one the thing
@@ -26,8 +24,8 @@ you press *is* an `<a>`:
 </helix-tree-item>
 ```
 
-That is not a detail of the implementation. It is the entire point, and what it
-buys is a list of things no amount of JavaScript reproduces:
+That is not a detail of the implementation. What it buys is a list of things no
+amount of JavaScript reproduces:
 
 - the whole row is the target, not just the words
 - Enter works, because a focused anchor is a thing Enter activates
@@ -177,8 +175,7 @@ the row and from the keyboard, which covers the case without an `href`.
 
 The obvious place to want a link in a list is a command palette, whose entries
 are usually half commands and half destinations. It is the one place this
-library cannot offer an `href`, and the reason is worth writing down so nobody
-spends an afternoon rediscovering it.
+library cannot offer an `href`.
 
 **A listbox cannot move focus to its options.** A combobox keeps focus in its
 text field while the arrows walk the list, so the pattern it is obliged to use

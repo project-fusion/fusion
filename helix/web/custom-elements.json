@@ -49955,6 +49955,13 @@
             },
             {
               "kind": "field",
+              "name": "reportCaret",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Reports where the cursor is, for a status bar to read.\n\n**The shipped shell could not fill its own readout before this.**\n`SandboxRoot` binds a `helix-caret` listener and writes `line` and `column`\nonto every slotted status bar, and `SandboxStatusBar` renders a `caret` part\nas soon as it has both, and both of those ship from `@helix-io/web`. The one\npane that reported a position was `SandboxEditor`, which is in\n`@helix-io/sandbox` and is `private` while Helix is pre-release. So a\nconsumer taking the published shell and this pane got a status bar that\ncould never show a position, and the only fix available to them was a\npackage they cannot install.\n\nThat is the gap rather than a dead event: the editor has dispatched this\nsince it was written, and `check:events` has always seen it. What was\nmissing was the half of the pair that ships.\n\nThe textarea is the only thing that knows, so this is where it belongs.\nOne-based on both axes, which is what an editor shows and what the detail's\nown documentation says."
+            },
+            {
+              "kind": "field",
               "name": "handleInput",
               "privacy": "private",
               "readonly": true
@@ -50073,6 +50080,14 @@
             }
           ],
           "events": [
+            {
+              "type": {
+                "text": "HelixCaretEvent"
+              },
+              "description": "Fired when the cursor moves.",
+              "name": "helix-caret",
+              "reactProp": "onhelix-caret"
+            },
             {
               "type": {
                 "text": "HelixChangeEvent"

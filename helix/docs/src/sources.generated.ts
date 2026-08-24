@@ -408,8 +408,7 @@ The \`.json\` is the same family as structured data.
 
 ## What is enforced
 
-Worth knowing, because they are the difference between code that looks right and
-code that passes:
+These are the difference between code that looks right and code that passes:
 
 | Rule | Check |
 |---|---|
@@ -665,19 +664,18 @@ It never says *this is a version of that*. An icon-only button is not a part of
 > Variants are props. Alternatives are separate components.
 
 A button that is filled instead of outlined is the same component with a
-different \`appearance\`. A button that holds only an icon has a different
+different \`emphasis\`. A button that holds only an icon has a different
 accessible-name requirement and a different shape, so it is its own component.
 
 ## When a region becomes an element
 
-Otherwise it is a slot.
+When it has behavior, state or API. Otherwise it is a slot.
 
 \`Card\`'s header, body and footer carried none of the three, so five elements
 became one and a title became a real \`<h2>\` the consumer writes. \`Tabs.Tab\`,
 \`Select.Option\` and \`Accordion.Item\` do carry state, so they stay elements.
 
-This matters more than it sounds, because **an empty region still costs
-layout**. A \`<slot>\` is \`display: contents\`, so an unassigned one generates no
+**An empty region still costs layout.** A \`<slot>\` is \`display: contents\`, so an unassigned one generates no
 box: no grid row, no flex item, no gap. A wrapper generates one either way.
 Measured on Card with identical content: wrappers present but empty rendered
 85px against an ideal of 53px. Bare slots rendered 53px with no hiding logic at
@@ -789,16 +787,15 @@ screen reader announces as "edit text", which is almost never what you want.
 If the page already makes the purpose plain, that is the \`aria-label\` case, not
 the empty case.
 
-**\`aria-label\` works here because the component forwards it**, and that is worth
-knowing because it is not true of custom elements in general. A custom element
+**\`aria-label\` works here because the component forwards it**, which is not true
+of custom elements in general. A custom element
 cannot delegate a label to the control inside its shadow root: an \`aria-label\`
 you write on the host sits on a wrapper and never reaches the \`<input>\` that
 actually takes focus. Measured on this library before it was fixed, the inner
 input came back with no label and no name at all.
 
 So the field renders the label and clips it, and the name arrives through the
-same \`<label for>\` a visible one does. You write the obvious attribute and it
-does the obvious thing.
+same \`<label for>\` a visible one does.
 
 There used to be a \`hide-label\` boolean beside \`label\`. It is gone: one
 attribute supplying a label and a second saying not to show it is the absence of
@@ -1710,7 +1707,7 @@ repository does that. The per-component tables are what a page pays.
 | \`@helix-io/headless\` | 440,452 | 112,913 | 89,222 | Every headless family, which is what the barrel means. |
 | \`@helix-io/icons\` | 45,442 | 14,544 | 12,328 | The whole glyph set. |
 | \`@helix-io/theme\` | 3,274 | 1,567 | 1,349 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| \`@helix-io/web\` | 1,493,773 | 425,987 | 299,632 | Every styled family. |
+| \`@helix-io/web\` | 1,494,067 | 426,078 | 299,814 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -1730,7 +1727,7 @@ is why it is the whole cost of adopting the base layer on its own.
 
 **Most of a first component is the runtime under it.** The median styled family is 18,915 bytes gzipped alone and adds 6,169 to a page that already has Helix on it, so 67 percent of the first one is shared and 33 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is \`quote\` at 8,705 gzipped alone, the dearest \`color-input\` at 63,228, over 88 components. Every family at once is 425,987.
+Across the tier: the cheapest is \`quote\` at 8,705 gzipped alone, the dearest \`color-input\` at 63,228, over 88 components. Every family at once is 426,078.
 
 **No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@helix-io/headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixBaseButton } from '@helix-io/headless'\` costs 112,913 bytes gzipped whatever else the page does, which is 6 times the median family measured above. The styled tier imports the family it extends instead, all 88 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
 
@@ -1942,7 +1939,7 @@ The headless tier plus presentation. This is what \`bun add @helix-io/web\` give
 | \`quote\` | 24,133 | 8,705 | 7,710 | 1,952 | 1,025 | 556 |
 | \`radio\` | 57,332 | 18,660 | 16,278 | 27,201 | 9,038 | 7,369 |
 | \`rating\` | 42,852 | 14,602 | 12,854 | 13,217 | 5,165 | 3,936 |
-| \`sandbox\` | 78,072 | 23,927 | 20,830 | 54,692 | 15,872 | 13,198 |
+| \`sandbox\` | 78,365 | 24,014 | 20,911 | 54,986 | 15,972 | 13,295 |
 | \`scroll-area\` | 30,387 | 10,571 | 9,246 | 8,156 | 3,082 | 2,132 |
 | \`select\` | 151,663 | 49,486 | 41,936 | 52,032 | 15,469 | 12,830 |
 | \`skeleton\` | 26,413 | 9,559 | 8,432 | 4,231 | 1,912 | 1,291 |
@@ -1986,7 +1983,7 @@ because they ship and no page downloads them.
 | \`@helix-io/icons\` | 84,047 | 17 | 19,847 | none |
 | \`@helix-io/styles\` | 268,379 | 5 | 0 | none |
 | \`@helix-io/theme\` | 612,715 | 28 | 47,856 | none |
-| \`@helix-io/web\` | 8,241,452 | 1,345 | 271,765 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/web\` | 8,247,442 | 1,345 | 272,406 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 
@@ -2608,8 +2605,6 @@ Some components navigate. A tree used as a sidebar, a button that goes
 somewhere, a tab that is really a page. Those all want to be links, and a link
 inside a shadow root is where web components and framework routers disagree.
 
-This is the whole of that disagreement, and what to do about it.
-
 ## A component that navigates renders its own anchor
 
 \`Tree.Item\` and \`Button\` both take an \`href\`, and when they have one the thing
@@ -2624,8 +2619,8 @@ you press *is* an \`<a>\`:
 </helix-tree-item>
 \`\`\`
 
-That is not a detail of the implementation. It is the entire point, and what it
-buys is a list of things no amount of JavaScript reproduces:
+That is not a detail of the implementation. What it buys is a list of things no
+amount of JavaScript reproduces:
 
 - the whole row is the target, not just the words
 - Enter works, because a focused anchor is a thing Enter activates
@@ -2775,8 +2770,7 @@ the row and from the keyboard, which covers the case without an \`href\`.
 
 The obvious place to want a link in a list is a command palette, whose entries
 are usually half commands and half destinations. It is the one place this
-library cannot offer an \`href\`, and the reason is worth writing down so nobody
-spends an afternoon rediscovering it.
+library cannot offer an \`href\`.
 
 **A listbox cannot move focus to its options.** A combobox keeps focus in its
 text field while the arrows walk the list, so the pattern it is obliged to use
@@ -3094,7 +3088,7 @@ looks like a restriction and is not one.
 
 ## Size does three jobs
 
-**Emphasis.** \`appearance\` carries it. A filled primary button says "this one
+**Emphasis.** The \`emphasis\` axis carries it. A filled primary button says "this one
 matters" far louder than eight more pixels ever will.
 
 **Fit.** This is a fact about the region rather than about the control. A
@@ -3268,9 +3262,9 @@ about this library most likely to look like a bug.
 <helix-input label="Name" value="Ada"></helix-input>
 \`\`\`
 
-It is written as plain text rather than as HTML on purpose: a reader copies what
-is in front of them, and this is the one page that has to show the mistake in
-order to name it. Do not paste it.
+Do not paste it. It is plain text rather than a live example because a reader
+copies what is in front of them, and this is the one page that has to show the
+mistake in order to name it.
 
 ## The two modes
 
@@ -3380,11 +3374,9 @@ answered yet.
 
 **In TypeScript, the constraint is a compile error.** The types intersect every
 controlled tag with a union that requires an answering handler, so \`<helix-input
-value="Ada" />\` does not compile. That constraint is generated several steps
-from anything a person edits, so it is compiled against a fixture and
-compared in both directions: a constraint that
-stopped constraining and one that grew too strict are the same kind of silent,
-and the second reaches you as "the library will not let me write correct code".
+value="Ada" />\` does not compile. The constraint is generated, and regression
+tested in both directions, so an error here is real and an absent one means you
+answered.
 
 **At runtime, the control says so on the console.** A controlled element that
 asks for something and gets no answer warns once, naming itself and the
@@ -3395,11 +3387,10 @@ anything slower, and a consumer answering by navigating was accused of not
 listening. A warning that is sometimes wrong is one people learn to ignore, and
 this one has to be believed the day it is right.
 
-So there is no deadline. The first unanswered request is remembered and
-judgment waits for the second: if the state has not moved between two requests,
-nothing answered either of them, whatever the timing. A control asked once and
-never again is never accused, which is the right trade, because the symptom this
-exists for is a control that ignores everything.
+So there is no deadline: if the state has not moved between two requests, nothing
+answered either of them, whatever the timing. A control asked once and never again
+is never accused, which is the right trade, because the symptom this exists for is
+a control that ignores everything.
 `,
   'surfaces-and-separation': `---
 description: The four ways a surface is told apart, and the ground a component is not.
@@ -3443,11 +3434,9 @@ Helix expresses the choice in two pairs of policy tokens:
 
 Set the border pair to zero and the shadow pair to something, and the whole
 library goes shadow-first. Reverse them and it goes border-first. Every surface
-in the library is themeable in both directions, and held to it: a surface that
-hooks its shadow and hardcodes \`border: none\` themes perfectly for anyone going
-shadow-first and cannot be made border-first at all, and nothing in the file
-says so. A half-converted surface is the failure worth catching, because it
-reads as done.
+in the library is themeable in both directions, and checked, because a
+half-converted one reads as done: hook the shadow and hardcode \`border: none\`
+and it themes perfectly in one direction and cannot be moved in the other.
 
 ## The ladder
 
@@ -3745,7 +3734,7 @@ never reverses.
 | \`@helix-io/styles\` | Tokens and the base layer. Pure CSS | nothing |
 | \`@helix-io/core\` | Element base class, mixins, decorators | Lit |
 | \`@helix-io/headless\` | Structure, accessibility, state, form participation | \`core\` |
-| \`@helix-io/web\` | Presentation: tokens, parts, \`appearance\` and \`tone\` | \`headless\`, \`styles\` |
+| \`@helix-io/web\` | Presentation: tokens, parts, and the visual axes | \`headless\`, \`styles\` |
 | \`@helix-io/react\` | Generated React wrappers | \`web\` |
 
 ## Why the split
@@ -3753,7 +3742,7 @@ never reverses.
 **\`headless\` must never depend on \`styles\`.**
 
 That single constraint is what makes the headless tier independently
-consumable, and therefore separately valuable. Consume it and bring your own
+consumable. Consume it and bring your own
 styling entirely; nothing about how Helix looks comes with it. If styling leaks
 downward, the five packages are one package in five files.
 
@@ -3761,19 +3750,19 @@ downward, the five packages are one package in five files.
 
 The base tier owns what a component **is and does**: markup structure, ARIA
 wiring, slots, events, internal state, form participation. It ships no CSS, no
-token references, and no \`appearance\` or \`tone\` properties.
+token references, and none of the visual axes.
 
 The styled tier extends it and adds only presentation. Token references live
 here.
 
 \`\`\`ts
-// headless/src/disclosure/root/disclosure-root.ts
+// headless/src/accordion/item/accordion-item.ts
 // no CSS, no tokens
-export class HelixBaseDisclosure extends WithOpen(HelixElement) {
+export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
   protected override render() {
     return html\`
       <div part="container">
-        <button aria-expanded=\${this.isOpen} part="trigger" @click=\${this.toggle}>
+        <button aria-expanded=\${this.open} part="trigger" @click=\${this.handleToggle}>
           <slot name="summary"></slot>
         </button>
       </div>
@@ -3781,24 +3770,24 @@ export class HelixBaseDisclosure extends WithOpen(HelixElement) {
   }
 }
 
-// web/src/disclosure/root/disclosure-root.ts
+// web/src/accordion/root/accordion-root.ts
 // extends the base, adds presentation only
-import { styles } from './disclosure-root.css.js'
+import { styles } from './accordion-root.css.js'
 
-@customElement('helix-disclosure')
-export class HelixDisclosure extends HelixBaseDisclosure {
+@customElement('helix-accordion')
+export class HelixAccordion extends HelixBaseAccordion {
   @property({ reflect: true })
-  appearance: 'outlined' | 'plain' = 'outlined'
+  separation?: 'outlined' | 'plain'
 
   static override styles: CSSResultGroup = styles
 }
 \`\`\`
 
 \`\`\`css
-/* web/src/disclosure/root/disclosure-root.css */
+/* web/src/accordion/item/accordion-item.css */
 [part='trigger'] {
   min-block-size: var(--helix-size-control);
-  padding: var(--disclosure-padding, var(--helix-space-sm));
+  padding: var(--helix-space-sm);
 }
 \`\`\`
 
@@ -3808,7 +3797,7 @@ Shadow DOM markup uses CSS Shadow Parts, not class names. Every structural
 element carries a \`part\`, which doubles as the public override API:
 
 \`\`\`css
-helix-disclosure::part(trigger) {
+helix-accordion-item::part(trigger) {
   font-weight: 600;
 }
 \`\`\`
@@ -3818,17 +3807,17 @@ to a system token, so overriding it restyles one component without touching
 \`--helix-*\` and affecting everything else:
 
 \`\`\`css
-helix-disclosure {
-  --disclosure-padding: 1rem 1.5rem;
+helix-accordion {
+  --accordion-radii: 1rem;
 }
 \`\`\`
 
 ## Mixins and tooling
 
-\`open\` and \`defaultOpen\` come from the \`WithOpen\` mixin in \`@helix-io/core\`.
+\`open\` and \`defaultOpen\` come from \`MixinControllerOpen\` in \`@helix-io/core\`.
 The manifest analyzer cannot follow a mixin into another package, so any
 mixin-provided API a component exposes has to be documented on the component
-itself with \`@fires\`, \`@property\`, or similar. Undocumented mixin API is
+itself with \`@event\`, \`@property\`, or similar. Undocumented mixin API is
 invisible to IDE tooltips, the React wrapper generator, and any agent reading
 the manifest.
 `,
@@ -4084,7 +4073,7 @@ React slices \`on\` off the prop and listens for exactly what is left, without
 inspecting it.
 
 - \`onhelix-open\` reaches \`helix-open\`. ✅
-- \`onhelix-value-change\` reaches \`helix-value-change\`. ✅
+- \`onhelix-sample-start\` reaches \`helix-sample-start\`. ✅
 - \`onHelixOpen\` binds an event called \`HelixOpen\`, which nobody dispatches. ❌
 
 The number of hyphens does not matter, measured in Chrome against React 19.2.8.
