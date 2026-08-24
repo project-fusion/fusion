@@ -12,7 +12,7 @@ import { styles } from './video-playlist-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category media
  * @aliases Playlist, Queue, Up next
  * @documentation https://helix.fusion.dev/components/video-playlist
  *

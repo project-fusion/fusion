@@ -13,7 +13,7 @@ import { styles } from './table-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category data
  * @documentation https://helix.fusion.dev/components/table
  *
  * @slot - The table's rows.

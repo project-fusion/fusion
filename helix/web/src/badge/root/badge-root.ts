@@ -14,7 +14,7 @@ import { styles } from './badge-root.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category markers
  * @aliases Count, Indicator, Pip
  * @documentation https://helix.fusion.dev/components/badge
  *

@@ -51,7 +51,7 @@ import { FRAGMENT, INTERACTIONS, SHAPES, VERTEX } from './aura-shader.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category media
  * @aliases Backdrop, Background, Atmosphere, Gradient
  * @documentation https://helix.fusion.dev/components/aura
  *

@@ -142,7 +142,7 @@ const SKIP_SECONDS = 10
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category media
  * @aliases Player, Media, Movie
  * @documentation https://helix.fusion.dev/components/video
  *

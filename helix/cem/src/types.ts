@@ -115,14 +115,27 @@ export interface HelixEvent extends Documented {
  * did not describe them. A category is a fact about a component, so it belongs
  * on the component, in the manifest, beside `@status`.
  *
- * **`charts` was split out of `content` on 23 Aug 2026, and the count is the
- * argument.** `content` held 27 of 88 families and meant "none of the other
- * seven", which is a drawer rather than a category: six drew a reading, four
- * displayed data, six were media, six typographic and three markers. A reader
- * filtering by it was filtering by nothing. The six that draw are the clearest
- * cluster in it and the one another component can be wrong about, since a
- * legend whose swatches disagree with the chart they key is a visible fault.
- * Whether the rest of `content` splits further is open.
+ * **`content` is gone, and the count was always the argument.** It held 27 of 88
+ * families and meant "none of the other seven", which is a drawer rather than a
+ * category: a reader filtering by it was filtering by nothing. `charts` came out
+ * on 23 Aug 2026, the six that draw being the clearest cluster and the one
+ * another component can be wrong about, since a legend whose swatches disagree
+ * with the chart they key is a visible fault. The remaining 21 came out on 24
+ * Aug as `media` (7), `typography` (6), `data` (4) and `markers` (3), with
+ * `carousel` going to `layout` because arranging children in a viewport is what
+ * it does.
+ *
+ * **Retired rather than left holding the residue**, which is the part worth
+ * saying. A category that survives a split as the name for whatever did not fit
+ * is the same drawer with fewer things in it, and `content` was the worst
+ * possible name for one: everything here is content. Nothing means "none of the
+ * others" now, and the ceiling on any future drawer is that it has to be
+ * nameable.
+ *
+ * **`markers` at 3 and `tooling` at 1 are deliberate.** A category earns its
+ * name by what filtering on it returns, not by how many families it holds, and
+ * three that annotate something else is a truer answer than three folded into a
+ * word that covers the library.
  *
  * **The list and the type are one declaration, because they were two.** The
  * array lived in `metadata.ts` and the union was written out here, so adding a
@@ -133,13 +146,16 @@ export interface HelixEvent extends Documented {
 export const CATEGORIES = [
   'actions',
   'charts',
-  'content',
+  'data',
   'feedback',
   'forms',
   'layout',
+  'markers',
+  'media',
   'navigation',
   'overlays',
   'tooling',
+  'typography',
 ] as const
 
 /** One of the categories a component may declare. */
@@ -149,7 +165,7 @@ export type Category = (typeof CATEGORIES)[number]
  * Which families a family is read beside, and owes a consistent answer to.
  *
  * **A second grouping, because `category` cannot be this and measurement says
- * so.** The nine chart-adjacent families span three categories: `content` holds
+ * so.** The nine chart-adjacent families span three categories: `charts` holds
  * the six that draw, `feedback` holds `meter` and `progress`, and `overlays`
  * holds `tooltip`. So a rule keyed on category would never compare a meter
  * against a bar chart. And `content` carried 27 families before `charts` was

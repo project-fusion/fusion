@@ -121,7 +121,7 @@ const pathFor = (
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category media
  * @aliases QR, Barcode, Scan code
  * @documentation https://helix.fusion.dev/components/qr-code
  *

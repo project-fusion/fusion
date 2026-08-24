@@ -19,7 +19,7 @@ import { html, type TemplateResult } from 'lit'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category typography
  * @aliases Inline code, Kbd
  * @documentation https://helix.fusion.dev/components/code
  *

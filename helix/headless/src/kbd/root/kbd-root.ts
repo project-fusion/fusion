@@ -15,7 +15,7 @@ import { html, type TemplateResult } from 'lit'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category typography
  * @aliases Key, Shortcut, Hotkey
  * @documentation https://helix.fusion.dev/components/kbd
  *

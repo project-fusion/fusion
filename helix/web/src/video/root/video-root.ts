@@ -29,7 +29,7 @@ import { styles } from './video-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category media
  * @documentation https://helix.fusion.dev/components/video
  *
  * @property separation - Whether the bar floats on the picture or sits on its own ground.

@@ -33,7 +33,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category media
  * @aliases Glyph, Symbol
  * @documentation https://helix.fusion.dev/components/icon
  *

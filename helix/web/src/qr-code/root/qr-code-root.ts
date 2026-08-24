@@ -18,7 +18,7 @@ import { styles } from './qr-code-root.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category media
  * @documentation https://helix.fusion.dev/components/qr-code
  *
  * @cssproperty --qr-code-size - How wide the square is. Defaults to `12rem`.

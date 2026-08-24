@@ -25,7 +25,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category markers
  * @aliases Admonition, Notice, Note, Alert
  * @documentation https://helix.fusion.dev/components/callout
  *

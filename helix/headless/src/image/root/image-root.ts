@@ -35,7 +35,7 @@ import { property, state } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category media
  * @aliases Picture, Img, Figure
  * @documentation https://helix.fusion.dev/components/image
  *

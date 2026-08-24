@@ -40,7 +40,7 @@ const PALETTE = 24
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category charts
  * @aliases Key, Series Key
  * @documentation https://helix.fusion.dev/components/legend
  *

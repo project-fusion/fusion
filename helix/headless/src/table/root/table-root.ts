@@ -24,7 +24,7 @@ import type { HelixBaseTableColumn } from '../column/table-column.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category data
  * @aliases DataTable, Grid table
  * @documentation https://helix.fusion.dev/components/table
  *

@@ -2530,7 +2530,7 @@
           },
           "summary": "A lit, drifting background, drawn from the token layer.",
           "helix": {
-            "category": "content",
+            "category": "media",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/aura",
@@ -3350,7 +3350,7 @@
           },
           "summary": "Represents a person or entity with an image or their initials.",
           "helix": {
-            "category": "content",
+            "category": "media",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/avatar",
@@ -3738,7 +3738,7 @@
           },
           "summary": "Attaches a count or a presence mark to another element.",
           "helix": {
-            "category": "content",
+            "category": "markers",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/badge",
@@ -5145,7 +5145,7 @@
           },
           "summary": "A passage set off from the prose around it.",
           "helix": {
-            "category": "content",
+            "category": "typography",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/blockquote",
@@ -7158,7 +7158,7 @@
           },
           "summary": "Sets a passage apart as information, a warning, or an error.",
           "helix": {
-            "category": "content",
+            "category": "markers",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/callout",
@@ -8388,7 +8388,7 @@
           },
           "summary": "Shows one slide of several, with controls to move between them.",
           "helix": {
-            "category": "content",
+            "category": "layout",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/carousel",
@@ -10795,7 +10795,7 @@
           },
           "summary": "A block of code, with somewhere to put its name and a way to take it.",
           "helix": {
-            "category": "content",
+            "category": "typography",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/code-block",
@@ -11098,7 +11098,7 @@
           },
           "summary": "A fragment of code inside a line of prose.",
           "helix": {
-            "category": "content",
+            "category": "typography",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/code",
@@ -27201,7 +27201,7 @@
           },
           "summary": "Renders a named icon from the Helix set.",
           "helix": {
-            "category": "content",
+            "category": "media",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/icon",
@@ -27728,7 +27728,7 @@
           },
           "summary": "A picture that says whether it arrived.",
           "helix": {
-            "category": "content",
+            "category": "media",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/image",
@@ -30126,7 +30126,7 @@
           },
           "summary": "A keyboard key or chord, set inline with text.",
           "helix": {
-            "category": "content",
+            "category": "typography",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/kbd",
@@ -32161,7 +32161,7 @@
           },
           "summary": "A set of rows, read as a set.",
           "helix": {
-            "category": "content",
+            "category": "data",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/list",
@@ -45471,7 +45471,7 @@
           },
           "summary": "Encodes a short piece of text as a scannable square.",
           "helix": {
-            "category": "content",
+            "category": "media",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/qr-code",
@@ -45813,7 +45813,7 @@
           },
           "summary": "A short quotation, set inline with the text around it.",
           "helix": {
-            "category": "content",
+            "category": "typography",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/quote",
@@ -57709,7 +57709,7 @@
           },
           "summary": "One measurement, with the word for what it measures.",
           "helix": {
-            "category": "content",
+            "category": "data",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/stat",
@@ -60725,7 +60725,7 @@
           },
           "summary": "Tabular data laid out on a grid.",
           "helix": {
-            "category": "content",
+            "category": "data",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/table",
@@ -62632,7 +62632,7 @@
           },
           "summary": "Labels content with a short piece of metadata.",
           "helix": {
-            "category": "content",
+            "category": "markers",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/tag",
@@ -62918,7 +62918,7 @@
           },
           "summary": "A run of text, with the element and the look chosen separately.",
           "helix": {
-            "category": "content",
+            "category": "typography",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/text",
@@ -67373,7 +67373,7 @@
           },
           "summary": "One event on a timeline: when it happened, and what it was.",
           "helix": {
-            "category": "content",
+            "category": "data",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/timeline",
@@ -67676,7 +67676,7 @@
           },
           "summary": "A record of what happened, in the order it happened.",
           "helix": {
-            "category": "content",
+            "category": "data",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/timeline",
@@ -75136,7 +75136,7 @@
           },
           "summary": "One entry in a video playlist.",
           "helix": {
-            "category": "content",
+            "category": "media",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/video-playlist",
@@ -75591,6 +75591,7 @@
           },
           "summary": "The playlist's entries, as a menu inside the player's control bar.",
           "helix": {
+            "category": "media",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/video-playlist",
@@ -76113,7 +76114,7 @@
           },
           "summary": "A set of clips and the one player they take turns in.",
           "helix": {
-            "category": "content",
+            "category": "media",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/video-playlist",
@@ -77776,7 +77777,7 @@
           },
           "summary": "Plays a video, with controls this library draws rather than the\nbrowser's.",
           "helix": {
-            "category": "content",
+            "category": "media",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/video",

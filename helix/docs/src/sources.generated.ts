@@ -2018,11 +2018,11 @@ column is what was removed rather than part of what remains.
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
 | \`@helix-io/core\` | 777,402 | 103 | 139,228 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
-| \`@helix-io/headless\` | 7,231,239 | 390 | 614,039 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
+| \`@helix-io/headless\` | 7,231,209 | 390 | 614,039 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 64,200 | 11 | 19,847 | none |
 | \`@helix-io/styles\` | 268,379 | 5 | 0 | none |
 | \`@helix-io/theme\` | 564,859 | 16 | 47,856 | none |
-| \`@helix-io/web\` | 7,989,550 | 675 | 272,699 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/web\` | 7,989,541 | 675 | 272,699 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 

@@ -18,7 +18,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category markers
  * @aliases Chip, Pill, Label
  * @documentation https://helix.fusion.dev/components/tag
  *

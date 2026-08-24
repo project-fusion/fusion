@@ -14,7 +14,7 @@ import '../../copy-button/index.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category typography
  * @documentation https://helix.fusion.dev/components/code-block
  *
  * @cssproperty --code-block-background - The ground behind the code, for a block that is not on the page.

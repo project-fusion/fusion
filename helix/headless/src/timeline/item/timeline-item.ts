@@ -25,7 +25,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category data
  * @aliases Activity item, History entry, Event
  * @documentation https://helix.fusion.dev/components/timeline
  *

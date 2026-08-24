@@ -50,7 +50,7 @@ const HEIGHT = 100
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category charts
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://helix.fusion.dev/components/line-chart
  *

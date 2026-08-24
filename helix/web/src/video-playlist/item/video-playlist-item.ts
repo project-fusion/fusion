@@ -12,7 +12,7 @@ import { styles } from './video-playlist-item.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category media
  * @documentation https://helix.fusion.dev/components/video-playlist
  *
  * @cssproperty --video-playlist-item-background-color - Fill behind a row.

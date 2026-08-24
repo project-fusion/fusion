@@ -17,7 +17,7 @@ import { styles } from './code-root.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category typography
  * @documentation https://helix.fusion.dev/components/code
  */
 @customElement('helix-code')

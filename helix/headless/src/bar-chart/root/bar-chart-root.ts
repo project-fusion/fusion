@@ -48,7 +48,7 @@ const HEIGHT = 100
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category charts
  * @aliases Column Chart, Categorical Chart
  * @documentation https://helix.fusion.dev/components/bar-chart
  *

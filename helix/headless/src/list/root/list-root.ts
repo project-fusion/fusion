@@ -12,7 +12,7 @@ import { property } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category data
  * @aliases Rows, Stack, Menu
  * @documentation https://helix.fusion.dev/components/list
  *

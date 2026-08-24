@@ -14,7 +14,7 @@ import { styles } from './blockquote-root.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category typography
  * @aliases Pullquote, Citation, Excerpt
  * @documentation https://helix.fusion.dev/components/blockquote
  *

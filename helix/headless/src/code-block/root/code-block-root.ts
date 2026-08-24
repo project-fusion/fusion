@@ -28,7 +28,7 @@ import '../../copy-button/index.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category typography
  * @aliases Code block, Snippet, Pre
  * @documentation https://helix.fusion.dev/components/code-block
  *
