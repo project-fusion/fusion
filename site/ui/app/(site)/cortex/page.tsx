@@ -1,5 +1,5 @@
-import { PRODUCTS } from '../../products'
-import { findVertical, stageAppearance } from '../../verticals'
+import { PRODUCTS } from '@/content/products/products'
+import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { VerticalPage } from '../vertical-page'
 import { CORTEX_MODULES } from './modules'
 

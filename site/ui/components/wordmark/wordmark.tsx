@@ -1,4 +1,4 @@
-import styles from './chrome.module.css'
+import styles from '../chrome.module.css'
 /**
  * The Fusion lockup: the mark and the name, set together.
  *

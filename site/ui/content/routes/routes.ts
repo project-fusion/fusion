@@ -1,6 +1,6 @@
 import { findSitePage } from '@fusion-io/insights'
 import { pages as docPages, navigation } from '@helix-io/docs'
-import { LANDING } from '../../app/landing'
+import { LANDING } from '@/content/landing/landing'
 import { getFamilies } from '../catalog/catalog'
 import { INSIGHTS } from '../insights'
 

@@ -75,22 +75,30 @@ const stamp = (contents) => createHash('sha256').update(contents).digest('hex').
 
 const css = await Promise.all(layers.map((layer) => readFile(join(root, layer), 'utf8')))
 
-/* The brand faces, inlined.
+/* The brand faces, fetched rather than inlined.
  *
- * The frame is a sandboxed document with an opaque origin. A stylesheet and a
- * classic script it can fetch, because neither is CORS-checked; a font is,
- * because `@font-face` fetches in CORS mode, and a request from an opaque
- * origin arrives as `Origin: null` with nothing on the other end configured to
- * allow it. `next/font` is no help either: it emits URLs only the site's own
- * build knows.
+ * The frame is a sandboxed document with an opaque origin, so a font request
+ * from it arrives as `Origin: null`: `@font-face` fetches in CORS mode, and
+ * nothing on the other end used to allow that. What is *not* true, and was
+ * assumed here for a while, is that the frame cannot resolve a URL. It loads
+ * from `/sandbox/frame.html`, an ordinary same-origin address, so only the
+ * origin is opaque and a path resolves the way any page's does.
  *
- * So the same files the site loads go in as data URIs, which are not fetched at
- * all and therefore have nothing to be refused. Eighty kilobytes for the three
- * latin faces, against a frame that already carries the component library.
+ * So the fix was one header. `next.config.ts` sends
+ * `Access-Control-Allow-Origin: *` for `/fonts/*`, the faces sit at a stable
+ * public path instead of behind `next/font`'s content hash, and the site and
+ * the frame now ask for the same three URLs.
  *
- * Without this the preview rendered in the fallback stack while the site around
- * it rendered in the brand's, so the one place a reader compares a component
- * against the real thing was the one place the type was wrong.
+ * **This used to inline them**, 111,208 bytes of base64 over 83,340 bytes of
+ * woff2, which was 38% of a 292,825 byte `frame.css`. Worse than its size: the
+ * stylesheet is stamped with a hash of its own contents, so the faces rode
+ * inside a bundle re-stamped by any change to any token in `helix/styles`, and
+ * a one-character color change cost every preview visitor a fresh 111KB of
+ * font.
+ *
+ * Without any of this the preview rendered in the fallback stack while the site
+ * around it rendered in the brand's, so the one place a reader compares a
+ * component against the real thing was the one place the type was wrong.
  */
 const faces = [
   { file: 'geist-latin.woff2', name: 'Fusion Sans', weight: '100 900' },
@@ -98,17 +106,14 @@ const faces = [
   { file: 'funnel-display-latin.woff2', name: 'Fusion Display', weight: '300 800' },
 ]
 
-const fonts = await Promise.all(
-  faces.map(async ({ file, name, weight }) => {
-    const data = await readFile(join(root, 'site/ui/app/fonts', file))
-    return `@font-face {
+const fonts = faces.map(
+  ({ file, name, weight }) => `@font-face {
   font-display: swap;
   font-family: '${name}';
   font-style: normal;
   font-weight: ${weight};
-  src: url(data:font/woff2;base64,${data.toString('base64')}) format('woff2');
-}`
-  }),
+  src: url(/fonts/${file}) format('woff2');
+}`,
 )
 
 /* After the layers, so these win. `primitives.css` sets the sans and mono

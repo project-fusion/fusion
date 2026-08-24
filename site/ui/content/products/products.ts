@@ -1,4 +1,4 @@
-import type { Stage } from './verticals'
+import type { Stage } from '@/content/verticals/verticals'
 
 /**
  * A place inside a product worth putting in the masthead.

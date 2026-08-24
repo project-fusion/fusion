@@ -4,7 +4,7 @@ import type { HelixInput } from '@helix-io/styled'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import type { stageAppearance } from '../../../verticals'
+import type { stageAppearance } from '@/content/verticals/verticals'
 import browser from '../../browser.module.css'
 import styles from './gallery.module.css'
 

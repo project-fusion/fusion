@@ -3,7 +3,7 @@
 import type { HelixCommand } from '@helix-io/styled'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import styles from './chrome.module.css'
+import styles from '../chrome.module.css'
 
 /**
  * Everywhere the palette can take a reader.

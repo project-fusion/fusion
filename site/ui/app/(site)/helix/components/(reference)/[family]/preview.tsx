@@ -1,11 +1,8 @@
 'use client'
 
-/* The editor is a subpath, not the barrel. It carries CodeMirror, and that
-   split exists so a page showing a sandbox without an editable pane does not
-   pay for one. This page has an editable pane, so it pays. */
-import '@helix-io/sandbox/editor'
 import type { HelixChangeEvent, HelixSandbox, HelixSandboxPreview } from '@helix-io/styled'
 import { useEffect, useRef, useState } from 'react'
+import { useSandboxEditor } from '@/hooks/use-sandbox-editor/use-sandbox-editor'
 import docs from '../docs.module.css'
 
 interface Props {
@@ -35,6 +32,22 @@ interface Props {
  * the workbench already uses for its own file tabs.
  */
 export function ComponentPreview({ css, html, sandboxHref }: Props) {
+  /* **The editor is a subpath and it is asked for after hydration**, which is
+     two decisions rather than one. The subpath because it carries CodeMirror
+     and a page showing a sandbox without an editable pane should not pay for
+     one; this page has one, so it pays. The effect because a module-scope
+     `import '@helix-io/sandbox/editor'` registers the definitions during the
+     client bundle's evaluation, so the elements upgrade and write their own
+     bookkeeping before React hydrates, and React then reads a DOM that has
+     gained attributes since the server wrote it.
+
+     That is 241's fault exactly, and 241 fixed two of the three files that had
+     it. This one was never named in the row, and the reference pages went on
+     reporting a `data-settled` the server never sent while `/helix/theme` and
+     `/helix/sandbox` had gone quiet. Found by probing a route the row had not
+     listed. */
+  useSandboxEditor()
+
   const preview = useRef<HelixSandboxPreview>(null)
   const sandbox = useRef<HelixSandbox>(null)
 

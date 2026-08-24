@@ -1,8 +1,8 @@
 import { ComponentArt } from '@helix-io/gallery'
 import Link from 'next/link'
+import { PRODUCTS } from '@/content/products/products'
+import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { type Family, getFamilies } from '../../../../content/catalog/catalog'
-import { PRODUCTS } from '../../../products'
-import { findVertical, stageAppearance } from '../../../verticals'
 import { ComponentBrowser } from './component-browser'
 import styles from './gallery.module.css'
 

@@ -1,7 +1,7 @@
 import Link from 'next/link'
+import { PRODUCTS } from '@/content/products/products'
+import { findVertical } from '@/content/verticals/verticals'
 import { getFamilies } from '../../../content/catalog/catalog'
-import { PRODUCTS } from '../../products'
-import { findVertical } from '../../verticals'
 import { VerticalPage } from '../vertical-page'
 
 const vertical = findVertical('/helix')

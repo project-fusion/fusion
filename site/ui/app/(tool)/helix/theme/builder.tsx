@@ -3,11 +3,11 @@
 import type { HelixSandboxPreview } from '@helix-io/styled'
 import { type DerivedTheme, initTheme, type ThemeEngine } from '@helix-io/theme'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { PreferencesDrawer } from '@/components/preferences/preferences'
+import { type Findable, SiteFind } from '@/components/site-find/site-find'
+import { Wordmark } from '@/components/wordmark/wordmark'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
 import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
-import { PreferencesDrawer } from '../../../preferences'
-import { type Findable, SiteFind } from '../../../site-find'
-import { Wordmark } from '../../../wordmark'
 import {
   type Character,
   INITIAL,
@@ -39,7 +39,7 @@ const PREVIEW_SHARE = 68
  *
  * **A preview is not a deployment, which is what makes this fine here.** The
  * Sovereignty Constraint is about what a Fusion product does to a consumer's
- * page: `site/ui/app/fonts.ts` vendors the site's own three faces precisely so
+ * page: `site/ui/app/fonts.css` vendors the site's own three faces precisely so
  * the wordmark does not sit behind someone else's uptime. Nothing here ships to
  * anybody. A reader is trying faces on, and trying one on means fetching it.
  *

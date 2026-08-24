@@ -1,4 +1,4 @@
-import { findVertical } from '../../verticals'
+import { findVertical } from '@/content/verticals/verticals'
 import { VerticalPage } from '../vertical-page'
 
 const vertical = findVertical('/capital')

@@ -1,4 +1,4 @@
-import type { PageCopy } from './copy'
+import type { PageCopy } from '@/content/copy/copy'
 
 /**
  * Everything the landing page says, as data.

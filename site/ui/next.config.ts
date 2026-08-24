@@ -49,6 +49,33 @@ const config: NextConfig = {
         headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
         source: '/sandbox/frame.html',
       },
+      /**
+       * The brand faces, fetchable by the sandbox frame.
+       *
+       * The preview is an iframe with `allow-scripts` and no
+       * `allow-same-origin`, so it runs on an opaque origin and every
+       * CORS-checked request it makes arrives as `Origin: null`. `@font-face`
+       * fetches in CORS mode, which is why the frame could not load a face this
+       * server sent and inlined all three as data URIs instead: 111,208 bytes
+       * of a 292,825 byte `frame.css`.
+       *
+       * `*` rather than a list, because the value that has to be allowed is
+       * `null` and there is no way to name it: an opaque origin matches no
+       * origin. What is being allowed is reading three woff2 files that are
+       * already public, by a document this site serves, and a font carries no
+       * credentials and no user data.
+       *
+       * Immutable because the faces are replaced by hand and approximately
+       * never, which is the property `next/font`'s content hash used to buy and
+       * the frame could not use, having no way to learn a new hash.
+       */
+      {
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+        source: '/fonts/:file*',
+      },
     ]
   },
 

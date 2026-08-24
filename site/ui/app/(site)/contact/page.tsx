@@ -1,4 +1,4 @@
-import { CONTACT, INCLUDE, NEXT } from '../../contact'
+import { CONTACT, INCLUDE, NEXT } from '@/content/contact/contact'
 import styles from './contact.module.css'
 
 export const metadata = {

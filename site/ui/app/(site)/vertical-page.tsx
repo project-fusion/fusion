@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { stageAppearance, type Vertical } from '../verticals'
+import { stageAppearance, type Vertical } from '@/content/verticals/verticals'
 import styles from './vertical-page.module.css'
 
 /**

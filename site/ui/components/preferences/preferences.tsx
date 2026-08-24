@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import type { ApiTier } from '../hooks/use-api-tier/use-api-tier'
+import type { ApiTier } from '@/hooks/use-api-tier/use-api-tier'
 
 type ColorMode = 'system' | 'light' | 'dark'
 

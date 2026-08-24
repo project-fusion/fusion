@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
+import { SiteNav } from '@/components/site-nav/site-nav'
+import styles from '../../components/chrome.module.css'
 import { getFamilies } from '../../content/catalog/catalog'
 import { INSIGHTS } from '../../content/insights'
-import styles from '../chrome.module.css'
-import { SiteNav } from '../site-nav'
 
 /**
  * Header, content column, and footer: everything except the tools.

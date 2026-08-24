@@ -1,4 +1,4 @@
-import type { PageCopy } from './copy'
+import type { PageCopy } from '@/content/copy/copy'
 
 /*
  * The contact page, as data.

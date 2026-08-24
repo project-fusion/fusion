@@ -13,11 +13,11 @@
  * the single registration in the root layout.
  */
 import Link from 'next/link'
+import { INSTALL, LANDING } from '@/content/landing/landing'
+import { PRODUCTS } from '@/content/products/products'
+import { SERVICES } from '@/content/services/services'
+import { stageAppearance } from '@/content/verticals/verticals'
 import { INSIGHTS } from '../../content/insights'
-import { INSTALL, LANDING } from '../landing'
-import { PRODUCTS } from '../products'
-import { SERVICES } from '../services'
-import { stageAppearance } from '../verticals'
 import { HeroCopy } from './hero-copy'
 import { InsightCard } from './insight-card'
 import styles from './landing.module.css'

@@ -247,9 +247,38 @@ for (const file of walk(root)) {
   for (const block of cssBlocks(file, source)) {
     const text = stripComments(block.text)
 
+    /* **Inside `@font-face` the tokenized properties are facts about a file,
+       not choices about a design.** `font-weight: 100 900` there is the range
+       the variable font supplies and `font-style: normal` is what it contains;
+       a token would be a category error, and `--helix-weight-regular` is not a
+       range and could not be written in that slot anyway. This never fired
+       before the brand faces moved from `next/font` into CSS on 24 Aug 2026,
+       which is why the rule had not met one. Tracked by depth rather than by
+       filename, so a `@font-face` anywhere is covered and nothing else is. */
+    let inFace = false
+    let faceDepth = 0
+
     for (const [index, rawLine] of text.split('\n').entries()) {
       const line = rawLine.trim()
       const at = `${rel}:${lineOf(source, block.offset) + index}`
+
+      if (/^@font-face\b/.test(line)) {
+        inFace = true
+        faceDepth = 0
+      }
+      if (inFace) {
+        faceDepth += (line.match(/{/g) ?? []).length - (line.match(/}/g) ?? []).length
+        const closed = faceDepth <= 0 && line.includes('}')
+        if (line.includes(':')) {
+          if (closed) {
+            inFace = false
+          }
+          continue
+        }
+        if (closed) {
+          inFace = false
+        }
+      }
 
       /* A primitive named and defined nowhere, checked before the skip below,
          because a definition line is the only place this can happen.

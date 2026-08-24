@@ -4,12 +4,12 @@ import type { HelixAppHeader, HelixMegamenu } from '@helix-io/styled'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import styles from './chrome.module.css'
-import { PreferencesDrawer } from './preferences'
-import { PRODUCTS } from './products'
-import { type Findable, SiteFind } from './site-find'
-import { stageAppearance, VERTICALS } from './verticals'
-import { Wordmark } from './wordmark'
+import { PreferencesDrawer } from '@/components/preferences/preferences'
+import { type Findable, SiteFind } from '@/components/site-find/site-find'
+import { Wordmark } from '@/components/wordmark/wordmark'
+import { PRODUCTS } from '@/content/products/products'
+import { stageAppearance, VERTICALS } from '@/content/verticals/verticals'
+import styles from '../chrome.module.css'
 
 /**
  * The other two sections of the site, beside the Products panel.
