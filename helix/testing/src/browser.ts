@@ -507,6 +507,24 @@ export const role = (host: HTMLElement): string | null =>
   (host as unknown as { internals?: ElementInternals }).internals?.role ??
   null
 
+/**
+ * The accessible name a screen reader announces on the host.
+ *
+ * The same shape as `role` above and for the same reason: components name
+ * themselves through `ElementInternals`, which writes no attribute, so
+ * `getAttribute('aria-label')` reports nothing on an element that is correctly
+ * named. An author's own `aria-label` still wins, which is the platform's
+ * precedence and why the attribute is checked first.
+ *
+ * Added while writing the first spec for `Option.Group`, whose whole job is to
+ * name a run of options: without this the assertion that it does so had nothing
+ * to read.
+ */
+export const label = (host: HTMLElement): string | null =>
+  host.getAttribute('aria-label') ??
+  (host as unknown as { internals?: ElementInternals }).internals?.ariaLabel ??
+  null
+
 /** Finds a shadow part by name. */
 export const part = (host: HTMLElement, name: string): Element | null =>
   host.shadowRoot?.querySelector(`[part="${name}"]`) ?? null
