@@ -42,6 +42,16 @@
  *   `vue.d.ts`. Nothing has ever dispatched it: the event is `helix-change`. It
  *   slipped the rule above because it carries none of this library's prefixes,
  *   so the verb is what catches it instead.
+ * - **A subpath, resolved rather than assumed.** `@helix-io/web/custom-elements.json`
+ *   was recommended by two pages and refused by `require.resolve`: the export map
+ *   answered it through a wildcard pattern that rewrites a subpath into a
+ *   directory under `dist` with an index in it, so the path asked for a file that
+ *   is not there. A package name existing says nothing about a path inside it,
+ *   and the only honest test is Node's own resolver.
+ *
+ *   Writing that pattern out literally in this comment is what broke this file
+ *   once, the wildcard and the slash closing the block. Described rather than
+ *   quoted, for the same reason a docs page shows a mistake as plain text.
  * - **A package.** `@helix-io/react` was in the Tiers package table, counted
  *   among "five packages", two pages after the Introduction said there is no
  *   React package. The rules file went further and documented regenerating
@@ -65,6 +75,7 @@
  * `bun run analyze`.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -222,6 +233,10 @@ const exported = () => {
 const { events, hooks, tags } = fromManifests()
 const tokens = fromTokens()
 const packages = fromPackages()
+/* Resolved from the repository root, which is where a consumer's `node_modules`
+   sits in the workspace: asking from this script's own directory would answer for
+   `tooling/` rather than for the packages. */
+const { resolve } = createRequire(join(ROOT, 'package.json'))
 const exports_ = exported()
 const problems = []
 let checked = 0
@@ -303,13 +318,30 @@ for (const page of pages()) {
     }
   }
 
-  /* A scoped package name, which is the whole of this rule: a subpath is the
-     package's business and `@helix-io/web/card` is verified by the export map
-     rather than here. */
-  for (const match of text.matchAll(/@(?:helix|cortex|fusion)-io\/[a-z][a-z0-9-]*/g)) {
+  /* A scoped name, and the subpath with it. The package half is a lookup and the
+     subpath half is Node's resolver, because an export map is a program and
+     reading it is how the `./*` pattern got believed in the first place. */
+  for (const match of text.matchAll(
+    /@(?:helix|cortex|fusion)-io\/[a-z][a-z0-9-]*(\/[A-Za-z0-9][\w./-]*)?/g,
+  )) {
+    const specifier = match[0]
+    const name = specifier.split('/').slice(0, 2).join('/')
     checked += 1
-    if (!packages.has(match[0]) && !HISTORICAL.test(around(match.index))) {
-      problems.push(`${where}: \`${match[0]}\` is not a package in this workspace.`)
+    if (!packages.has(name)) {
+      if (!HISTORICAL.test(around(match.index))) {
+        problems.push(`${where}: \`${name}\` is not a package in this workspace.`)
+      }
+      continue
+    }
+    if (specifier === name || HISTORICAL.test(around(match.index))) {
+      continue
+    }
+    try {
+      resolve(specifier)
+    } catch {
+      problems.push(
+        `${where}: \`${specifier}\` is not a path \`${name}\` exports. Its export map refuses it.`,
+      )
     }
   }
 
