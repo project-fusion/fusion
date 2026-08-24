@@ -1,4 +1,4 @@
-import { findSitePage, sitePageSources } from '@fusion-io/site-content'
+import { findSitePage, sitePageSources } from '@fusion-io/insights'
 import { renderMdx } from '../../../utils/mdx/mdx'
 import { SERVICES } from '../../services'
 import documents from '../document-page.module.css'
@@ -150,7 +150,7 @@ export default async function Page() {
         </helix-grid>
       </section>
 
-      {/* The prose, from `@fusion-io/site-content`.
+      {/* The prose, from `@fusion-io/insights`.
           
           Two sections that used to be JSX with their sentences inside it. The
           buttons stay here: a call to action is chrome around a document rather

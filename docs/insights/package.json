@@ -1,7 +1,7 @@
 {
-  "name": "@fusion-io/site-content",
+  "name": "@fusion-io/insights",
   "description": "The site's own prose, as MDX with a typed registry.",
-  "version": "0.0.1",
+  "version": "0.0.0-dev",
   "private": true,
   "license": "MIT",
   "type": "module",

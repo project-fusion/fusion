@@ -25,7 +25,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const CONTENT = join(ROOT, 'site/content/content')
+const CONTENT = join(ROOT, 'docs/insights/content')
 
 const args = process.argv.slice(2)
 const flags = new Map()
@@ -65,7 +65,7 @@ if (!/^[a-z0-9-]+$/.test(slug)) {
 const file = join(CONTENT, `${slug}.mdx`)
 if (existsSync(file)) {
   console.error(
-    `insight: /insights/${slug} already exists, at site/content/content/${slug}.mdx.\n` +
+    `insight: /insights/${slug} already exists, at docs/insights/content/${slug}.mdx.\n` +
       '  Two posts cannot share an address. Change the title, or pass --slug.',
   )
   process.exit(1)
@@ -113,6 +113,6 @@ writeFileSync(
   ].join('\n'),
 )
 
-console.log(`insight: site/content/content/${slug}.mdx`)
+console.log(`insight: docs/insights/content/${slug}.mdx`)
 console.log(`  /insights/${slug}`)
 console.log('  Fill in `description`, `kind` and `topic`, then `bun run content`.')

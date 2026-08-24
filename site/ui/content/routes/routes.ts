@@ -1,4 +1,4 @@
-import { findSitePage } from '@fusion-io/site-content'
+import { findSitePage } from '@fusion-io/insights'
 import { pages as docPages, navigation } from '@helix-io/docs'
 import { LANDING } from '../../app/landing'
 import { getFamilies } from '../catalog/catalog'

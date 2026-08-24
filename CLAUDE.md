@@ -81,13 +81,15 @@ Rust for backend and substrate cores. TypeScript for frontend.
 helix/     styles core headless web icons theme cem docs gallery sandbox
            testing cli
 cortex/    core trace engram docs
-docs/      plan/ is the numbered strategy; the queue and two generated
-           references sit above it, being infrastructure rather than plan
+site/      ui, the Next application that renders everything above and below
+docs/      plan/ is the numbered strategy, insights/ is the published writing;
+           the queue and two generated references sit above both, being
+           infrastructure rather than either
 tooling/   CI and build scripts
 .local/    per-machine scratch, gitignored
 ```
 
-- **Domain folders at root, packages flat inside.** A new product gets a new
+- **Product domains at root, packages flat inside.** A new product gets a new
   top-level folder.
 - **The folder drops the domain prefix; the package name keeps it.**
   `helix/web` is `@helix-io/web`; `cortex/core` is the crate `cortex-core`.
@@ -95,6 +97,24 @@ tooling/   CI and build scripts
   names recur across domains.
 - **`<domain>/docs` is a content package, not a site**: versioned MDX plus a
   typed registry. The site that renders it is separate and depends on it.
+- **`docs/` is the repository's own writing, grouped by what a file is**, and it
+  is the one folder that is not a product domain. `plan/` is strategy, `insights/`
+  is what gets published, and a package inside it is scoped `@fusion-io/*`
+  because the writing belongs to the company rather than to any product.
+
+  *Amended 24 Aug 2026, when `site/content` became `docs/insights`.* This said
+  "domain folders at root" without qualification, so a package under `docs/` was
+  a contradiction and the move was held on it for a day. The rule was right about
+  what it was protecting, which is products scattering, and too broad about how
+  it said so: `docs/` holds no product and never did.
+
+  **What settled it was this file's own next bullet.** A `<domain>/docs` is a
+  content package and *the site that renders it is separate*, which is exactly
+  what `site/content` was not: filing the published writing under `site/` made it
+  a part of the renderer, so replacing `site/ui` would have taken the company's
+  written arguments with it. The insights are rendered by the site and are not of
+  it, and that is the same relationship `helix/docs` already has to the docs
+  site.
 
 ## Versioning: lockstep per domain
 

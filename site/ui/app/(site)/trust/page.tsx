@@ -1,9 +1,9 @@
-import { findSitePage, sitePageSources } from '@fusion-io/site-content'
+import { findSitePage, sitePageSources } from '@fusion-io/insights'
 import { renderMdx } from '../../../utils/mdx/mdx'
 import { DocumentPage } from '../document-page'
 
 /**
- * The trust bar, rendered from `@fusion-io/site-content`.
+ * The trust bar, rendered from `@fusion-io/insights`.
  *
  * **The point is that it is finite.** `the internal plan` names the risk
  * this page exists to answer: a trust bar that is never defined can never be

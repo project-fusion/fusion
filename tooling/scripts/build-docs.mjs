@@ -422,7 +422,7 @@ ${pages.map(literal).join('\n')}
 ]
 `
 
-/* The MDX itself, inlined for the same reason `@fusion-io/site-content` inlines
+/* The MDX itself, inlined for the same reason `@fusion-io/insights` inlines
    its own: a page that reads the file at request time is the filesystem access
    that traced this repository into a server bundle, and a content package must
    not be the thing that puts it back. */

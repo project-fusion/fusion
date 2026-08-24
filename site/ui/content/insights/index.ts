@@ -1,4 +1,4 @@
-import { essays } from '@fusion-io/site-content'
+import { essays } from '@fusion-io/insights'
 /**
  * What an insight is about. One per post, and the filter bar reads the set off
  * the posts rather than from a list kept beside them.
@@ -124,7 +124,7 @@ export interface Insight {
  * reader asks for something else.
  *
  * **There is no hand-written registry any more, and the slug is the file's
- * name.** A post is one `.mdx` in `@fusion-io/site-content`: creating one is
+ * name.** A post is one `.mdx` in `@fusion-io/insights`: creating one is
  * naming a file, two posts cannot silently take the same URL because two files
  * cannot take the same name, and retitling is editing frontmatter rather than
  * moving an address. A deliberate rename is a `git mv`, which is visible in

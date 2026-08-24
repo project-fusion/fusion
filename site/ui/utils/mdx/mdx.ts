@@ -14,7 +14,7 @@ import { PROSE_COMPONENTS } from '../../components/prose/prose'
  *
  * **The source arrives as a string, never as a path.** Reading it would be the
  * filesystem access that traced this app's whole repository into the server
- * bundle and was removed two days ago, so `@fusion-io/site-content` generates
+ * bundle and was removed two days ago, so `@fusion-io/insights` generates
  * its files into a module and this compiles what it is handed.
  *
  * **Not `@next/mdx`.** Its file convention wants `.mdx` inside `app/`, and all

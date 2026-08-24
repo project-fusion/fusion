@@ -3,7 +3,7 @@
  * Inlines the site's MDX into a module, and derives the registries from its
  * frontmatter.
  *
- * `@fusion-io/site-content` is a folder of `.mdx` files and a typed registry,
+ * `@fusion-io/insights` is a folder of `.mdx` files and a typed registry,
  * shaped like the two documentation packages. The site compiles those files to
  * React and serves the same bytes as `/thesis.md`, and it must do both without
  * touching the filesystem: a path this app cannot statically scope traces the
@@ -20,9 +20,9 @@ import { fileURLToPath } from 'node:url'
 import { formatted } from './lib/formatted.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const CONTENT = join(ROOT, 'site/content/content')
-const OUT = join(ROOT, 'site/content/src/sources.generated.ts')
-const PAGES = join(ROOT, 'site/content/src/pages.generated.ts')
+const CONTENT = join(ROOT, 'docs/insights/content')
+const OUT = join(ROOT, 'docs/insights/src/sources.generated.ts')
+const PAGES = join(ROOT, 'docs/insights/src/pages.generated.ts')
 
 /**
  * The frontmatter of one file, as strings.
