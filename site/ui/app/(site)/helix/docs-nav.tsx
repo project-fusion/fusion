@@ -115,29 +115,54 @@ export function DocsNav({ sections }: { sections: readonly NavSection[] }) {
             {...(index === opened ? { 'default-open': true } : {})}
           >
             {section.title}
-            {section.entries.map((entry) => (
-              <helix-tree-item
-                href={entry.href}
-                key={entry.href}
-                slot="children"
-                value={entry.href}
-                {...((entry.children ?? []).some((child) => child.href === pathname)
-                  ? { 'default-open': true }
-                  : {})}
-              >
-                {entry.label}
-                {(entry.children ?? []).map((child) => (
-                  <helix-tree-item
-                    href={child.href}
-                    key={child.href}
-                    slot="children"
-                    value={child.href}
-                  >
-                    {child.label}
-                  </helix-tree-item>
-                ))}
-              </helix-tree-item>
-            ))}
+            {section.entries.map((entry) => {
+              const children = entry.children ?? []
+              /* **A row is a destination or a group, and never both.**
+               *
+               * A page with children used to be written as one row carrying an
+               * `href` *and* a chevron, which made the row ambiguous and the
+               * component resolve it the only way it could: `TreeItem` toggles
+               * from anywhere in the row when there is no `href`, and where
+               * there is one the row navigates and only the chevron opens. So
+               * pressing "Installation" went to the page and left the branch
+               * shut, and a reader who wanted its children had to find a
+               * fourteen-pixel target.
+               *
+               * The page is still a page. It moves down a level as the group's
+               * first child, so the group toggles from anywhere in its row and
+               * the destination has a row of its own. Nothing is unreachable
+               * that was reachable before, and one press does one thing.
+               *
+               * **"Overview" everywhere rather than a name per group.** "Any
+               * framework" reads better over the installation pages and then
+               * fails over the agent ones, and a reader learns one convention
+               * once where they have to notice three. */
+              const rows =
+                children.length > 0
+                  ? [{ href: entry.href, label: 'Overview' }, ...children]
+                  : children
+              return (
+                <helix-tree-item
+                  key={entry.href}
+                  slot="children"
+                  value={entry.href}
+                  {...(children.length > 0 ? {} : { href: entry.href })}
+                  {...(rows.some((row) => row.href === pathname) ? { 'default-open': true } : {})}
+                >
+                  {entry.label}
+                  {rows.map((row) => (
+                    <helix-tree-item
+                      href={row.href}
+                      key={row.href}
+                      slot="children"
+                      value={row.href}
+                    >
+                      {row.label}
+                    </helix-tree-item>
+                  ))}
+                </helix-tree-item>
+              )
+            })}
           </helix-tree-item>
         ))}
       </helix-tree>
