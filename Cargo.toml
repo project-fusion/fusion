@@ -14,6 +14,10 @@ members = [
 anyhow = "1"
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
+# **One dependency, not two.** `ratatui` re-exports the `crossterm` it was built
+# against, so depending on both would be two versions to keep in step and a
+# terminal backend that disagrees with the widgets drawing into it.
+ratatui = "0.29"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sqlx = { version = "0.8", default-features = false, features = ["chrono", "json", "macros", "runtime-tokio", "uuid"] }

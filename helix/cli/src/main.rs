@@ -41,9 +41,9 @@ fn main() {
     let from = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
     let outcome = match &cli.noun {
         Noun::Theme { verb } => match verb {
-            Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint, false),
+            Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint),
             Theme::Build(args) => theme::build::run(args, &from, cli.json),
-            Theme::Check(args) => theme::audit::run(args, &from, cli.json, paint, true),
+            Theme::Check(args) => theme::audit::check(args, &from, cli.json),
             Theme::Init(args) => theme::init::run(args, &from, cli.json),
         },
     };

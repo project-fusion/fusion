@@ -68,7 +68,10 @@ pub enum Theme {
     /// **The one verb that is a report rather than an artifact.** It exits 1 when
     /// a pair fails, so it is usable as a gate, and prints the whole matrix
     /// either way, so it is usable as an answer.
-    Audit(Common),
+    ///
+    /// On a terminal it opens a screen; anywhere else it prints the table. Both
+    /// read one report, so neither is the authoritative one.
+    Audit(Audit),
     /// Fail if the theme has violations, and print nothing when it does not.
     ///
     /// The CI shape of `audit`: same measurement, no output on success, so a
@@ -89,6 +92,22 @@ pub struct Common {
     /// read as one of them. The positional wins if both are given.
     #[arg(long, value_name = "PATH")]
     pub config: Option<PathBuf>,
+}
+
+#[derive(Args, Debug)]
+pub struct Audit {
+    #[command(flatten)]
+    pub common: Common,
+
+    /// Print the table instead of opening the screen.
+    ///
+    /// **The screen is what a terminal gets and this is how to refuse it**, for
+    /// the reader who wants to scroll their own scrollback, copy a row, or diff
+    /// two runs. It is not the CI flag: without a tty the table is already what
+    /// prints, so a pipeline needs nothing, and a flag that had to be remembered
+    /// there would be one nobody remembered.
+    #[arg(long)]
+    pub plain: bool,
 }
 
 #[derive(Args, Debug)]

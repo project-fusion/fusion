@@ -3,6 +3,8 @@
 pub mod audit;
 pub mod build;
 pub mod init;
+pub mod report;
+pub mod tui;
 
 use std::path::Path;
 

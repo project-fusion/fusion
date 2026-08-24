@@ -372,3 +372,72 @@ fn strip(line: &str) -> String {
     }
     visible
 }
+
+/// **The table is what a pipe gets, and the screen is not.** A TUI written to
+/// something that is not a terminal is escape sequences in a log file, so the
+/// branch is on `stdout().is_terminal()` and every one of these tests exercises
+/// the false side of it by being a pipe. This is the test that says so out loud,
+/// because the day somebody makes the screen the default unconditionally, every
+/// other test in this file starts asserting against a raw-mode alternate screen
+/// and none of them explains why.
+#[test]
+fn audit_prints_the_table_when_there_is_no_terminal() {
+    let sandbox = Sandbox::new("audit-piped", Some(CLEAN));
+    let output = run(&sandbox.0, &["theme", "audit"]);
+    assert_eq!(code(&output), 0);
+
+    let printed = out(&output);
+    assert!(printed.contains("color-foreground"), "{printed}");
+    assert!(printed.contains("passed,"), "{printed}");
+    /* No alternate screen and no cursor moves, which is what a TUI would have
+    written first. Checked as an absence because that is the failure: a table with
+    an escape sequence in front of it looks fine on a terminal and is unusable in
+    a file. */
+    assert!(
+        !printed.contains("\u{1b}[?1049h"),
+        "entered an alternate screen"
+    );
+}
+
+/// `--plain` is the same output on a terminal, and the flag exists so a reader
+/// can have it there.
+///
+/// Asserted as byte equality against the piped run rather than by looking for
+/// words in it: the claim is that the flag selects the *same* presentation, and
+/// two renderings that merely both mention a token name are not that.
+#[test]
+fn plain_asks_for_the_table_and_gets_exactly_the_table() {
+    let sandbox = Sandbox::new("audit-plain", Some(CLEAN));
+    let piped = run(&sandbox.0, &["theme", "audit"]);
+    let plain = run(&sandbox.0, &["theme", "audit", "--plain"]);
+    assert_eq!(code(&plain), code(&piped));
+    assert_eq!(out(&plain), out(&piped));
+}
+
+/// The exit code is the measurement's, whichever presentation ran.
+///
+/// `audit` is a gate as well as a report, so a failing theme has to exit 1 down
+/// the plain path too: a flag about how something is drawn must not change what
+/// it concluded.
+#[test]
+fn plain_does_not_change_the_verdict() {
+    let sandbox = Sandbox::new("audit-plain-fails", Some(FAILING));
+    assert_eq!(code(&run(&sandbox.0, &["theme", "audit"])), 1);
+    assert_eq!(code(&run(&sandbox.0, &["theme", "audit", "--plain"])), 1);
+}
+
+/// `--json` outranks `--plain`, and neither opens a screen.
+///
+/// A caller passing both is asking for a document, and the flag that says which
+/// human rendering to use has nothing to say about that.
+#[test]
+fn json_wins_over_plain() {
+    let sandbox = Sandbox::new("audit-json-plain", Some(CLEAN));
+    let output = run(&sandbox.0, &["theme", "audit", "--plain", "--json"]);
+    assert_eq!(code(&output), 0);
+    let parsed: serde_json::Value =
+        serde_json::from_str(&out(&output)).expect("--json --plain is still JSON");
+    assert!(parsed.get("pairings").is_some_and(|pairings| pairings
+        .as_array()
+        .is_some_and(|pairings| !pairings.is_empty())));
+}

@@ -21,6 +21,9 @@ path = "src/main.rs"
 # `@helix-io/theme`.
 helix-theme = { path = "../theme", features = ["serde"] }
 clap = { version = "4", features = ["derive"] }
+# **Only the CLI takes this.** `helix-theme` computes and does not draw, and a
+# library that pulled a terminal backend in would carry it into the WASM build.
+ratatui = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["float_roundtrip"] }
 
