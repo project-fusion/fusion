@@ -1,8 +1,13 @@
 import type { ReactNode } from 'react'
 import { SiteNav } from '@/components/site-nav/site-nav'
 import styles from '../../components/chrome.module.css'
-import { getFamilies } from '../../content/catalog/catalog'
-import { INSIGHTS } from '../../content/insights'
+import { type RouteKind, routes } from '../../content/routes/routes'
+
+/** The registry's routes of one kind, as palette items. */
+const findable = (kind: RouteKind) =>
+  routes()
+    .filter((route) => route.kind === kind)
+    .map((route) => ({ href: route.path, label: route.title }))
 
 /**
  * Header, content column, and footer: everything except the tools.
@@ -22,27 +27,31 @@ import { INSIGHTS } from '../../content/insights'
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      {/* **Built here, on the server, and handed down.** The catalog reads the
-          manifest off disk and the insight registry is the whole of the
-          writing: both belong to a server component, and a palette that
-          imported them would pull the manifest into the client bundle to
-          display a list of names. What crosses is the list. */}
+      {/* **Built here, on the server, and handed down.** The registry reads the
+          manifest off disk and holds the whole of the writing: it belongs to a
+          server component, and a palette that imported it would pull the
+          manifest into the client bundle to display a list of names. What
+          crosses is the list.
+
+          **From `routes()` rather than from three hand-picked arrays**, which
+          is why the documentation is in here at all. This passed the families
+          and the insights and nothing else, so all 43 documentation pages were
+          unreachable from the palette: a reader who typed "installation" got
+          nothing, on a site whose largest section is documentation. The
+          registry already knew about them, `check:routes` counting 89
+          component, 43 doc, 6 insight and 15 page, and it is the same list the
+          sitemap and `llms.txt` are built from. A fourth copy of it here would
+          have drifted the same way the third one did.
+
+          `Route.description` says in its own comment that it is for `llms.txt`
+          *and for a search result*, which is worth acting on when `Findable`
+          grows somewhere to put it. Today an item is a label and a href, so
+          the title is what a reader matches against. */}
       <SiteNav
         findable={[
-          {
-            group: 'Components',
-            items: getFamilies().map((family) => ({
-              href: `/helix/components/${family.slug}`,
-              label: family.label,
-            })),
-          },
-          {
-            group: 'Writing',
-            items: INSIGHTS.map((insight) => ({
-              href: `/insights/${insight.slug}`,
-              label: insight.title,
-            })),
-          },
+          { group: 'Components', items: findable('component') },
+          { group: 'Documentation', items: findable('doc') },
+          { group: 'Writing', items: findable('insight') },
         ]}
       />
       <main style={{ viewTransitionName: 'site-content' }}>{children}</main>
