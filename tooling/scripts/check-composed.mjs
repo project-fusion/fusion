@@ -75,6 +75,21 @@ import { join } from 'node:path'
 
 const TIERS = ['helix/headless/src', 'helix/web/src']
 
+/* **Where a tag can be written by something that is not a component.**
+ *
+ * `drawTooltip` in `helix/core` wrote `<helix-tooltip>` into a template three
+ * charts render, and every rule above was blind to it: they hold a *component*
+ * to interpolating through `tier`, and this is a free function with no class and
+ * no tier to read. The consequence was the one the tier split exists to
+ * prevent, a headless consumer getting an inert unknown element where the
+ * reading should be, and no test here could see it either, since the sandbox
+ * frame and the docs site both import the whole library so the tag is always
+ * registered by the time anything looks.
+ *
+ * A free function takes the tag as an argument instead, which is what every
+ * component already does one level up. */
+const SHARED = ['helix/core/src']
+
 /** Every `.ts` under a directory that is a component rather than a spec. */
 const sources = (dir) => {
   const found = []
@@ -127,7 +142,14 @@ const renders = (code) =>
 const literals = (code) => new Set([...code.matchAll(/<(helix-[a-z-]+)/g)].map((one) => one[1]))
 
 const problems = []
+let checked = 0
 const read = new Map()
+const shared = new Map()
+for (const dir of SHARED) {
+  for (const path of sources(dir)) {
+    shared.set(path, withoutComments(readFileSync(path, 'utf8')))
+  }
+}
 for (const tier of TIERS) {
   for (const path of sources(tier)) {
     const code = withoutComments(readFileSync(path, 'utf8'))
@@ -161,6 +183,7 @@ for (const [path, code] of read) {
      component has no tier to be agnostic for and may name what it renders. */
   const twin = path.startsWith('helix/headless/src') || inherited !== undefined
   for (const tag of literals(code)) {
+    checked += 1
     if (twin) {
       problems.push(
         `${path}: writes \`<${tag}>\` into a template. The headless tier may not name a ` +
@@ -188,6 +211,7 @@ for (const [path, code] of read) {
 
   const imported = imports(code)
   for (const name of tags) {
+    checked += 1
     const family = familyOf(name)
     if (family === own || imported.has(family)) {
       continue
@@ -201,6 +225,20 @@ for (const [path, code] of read) {
   }
 }
 
+/* A shared module has no tier, so any literal `helix-` tag in it is a decision
+   about a tier taken by a file that cannot know one. */
+for (const [path, code] of shared) {
+  for (const tag of literals(code)) {
+    checked += 1
+    problems.push(
+      `${path}: writes \`<${tag}>\` into a template, and is on no tier. A shared module ` +
+        `renders into whichever tier called it, so naming a tag here picks one for every ` +
+        `caller: the headless tier gets an inert unknown element. Take the tag as an ` +
+        `argument and let the caller pass \`this.tag('${tag.replace(/^helix-(base-)?/, '')}')\`.`,
+    )
+  }
+}
+
 if (problems.length > 0) {
   console.error(`Components rendering a tag they do not import (${problems.length}):\n`)
   for (const problem of problems) {
@@ -209,4 +247,12 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-console.log('composed: every rendered helix tag is imported by the file that renders it')
+/* **The number is why `check:floors` can see this check at all.** It read
+   integers out of a success line and skipped a line that has none, so this one
+   was silently exempt from the thing floors exists to catch: a check that has
+   quietly stopped checking. `checked` is a tally of *assertions*, one per tag
+   resolved or refused, rather than of files scanned, which would be a fact
+   about the corpus and would keep rising while the checking fell to zero. */
+console.log(
+  `composed: ${checked} rendered helix tags, every one imported by the file that renders it`,
+)

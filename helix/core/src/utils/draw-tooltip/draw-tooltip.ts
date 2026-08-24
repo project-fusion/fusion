@@ -1,5 +1,6 @@
-import { html, nothing, type TemplateResult } from 'lit'
+import { nothing, type TemplateResult } from 'lit'
 import { styleMap } from 'lit/directives/style-map.js'
+import { html, type StaticValue } from 'lit/static-html.js'
 import { seriesIndex } from '../../mixins/mixin-chart-source/mixin-chart-source.js'
 import type { Row } from '../read-series/read-series.js'
 
@@ -15,6 +16,21 @@ import type { Row } from '../read-series/read-series.js'
  * `protected render…()`. So the markup is shared here, the way `drawIcon`
  * shares a glyph, and each chart keeps a one-line seam of its own.
  *
+ *
+ * **The tooltip's tag is an argument, because this file is on the wrong tier to
+ * know it.** It wrote `<helix-tooltip>` literally, which `helix/web` registers
+ * and `@helix-io/headless` does not, so a consumer of the headless tier alone
+ * got an inert unknown element where the reading should be: the chart correct,
+ * the markup correct, and resting a pointer on a bar doing nothing. Nothing
+ * here could catch it. `check:composed` holds a *component* to interpolating
+ * its tag through `tier` and this is a free function with no class to read one
+ * from, and both the sandbox frame and the docs site import the whole library,
+ * so every environment a test runs in has the styled tag registered and the
+ * element upgrades.
+ *
+ * So the caller passes `this.tag('tooltip')` and each tier answers with its own
+ * name, which is how every composed tag in the library already resolves. That
+ * makes this `static-html` rather than `lit`, a tag being a `StaticValue`.
  * **It shows the table's text and not the chart's numbers.** `$128k` is what
  * the cell says and `128000` is what the drawing measured, and a tooltip
  * printing the second is the chart overruling the table about how its own
@@ -82,6 +98,7 @@ export interface TooltipAt {
 export const drawTooltip = (
   rows: Row[],
   at: number,
+  tag: StaticValue,
   where?: TooltipAt,
 ): TemplateResult | typeof nothing => {
   const row = rows[at]
@@ -103,7 +120,7 @@ export const drawTooltip = (
       part="mark"
       style=${styleMap({ insetBlockStart: place.y, insetInlineStart: place.x })}
     ></div>
-    <helix-tooltip
+    <${tag}
       exportparts="tooltip"
       for="helix-chart-mark"
       open
@@ -131,5 +148,5 @@ export const drawTooltip = (
             </span>`,
         )}
       </div>
-    </helix-tooltip>`
+    </${tag}>`
 }

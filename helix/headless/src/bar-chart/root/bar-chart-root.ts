@@ -657,7 +657,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     const at = this.pointer.at
     const series = this.series
     if (at < 0 || series.length === 0) {
-      return drawTooltip(this.rows, at)
+      return drawTooltip(this.rows, at, this.tag('tooltip'))
     }
     /* Off the far end of the tallest bar in the group, so the box never covers
        the columns it is describing. Horizontal bars grow rightward, so the far
@@ -672,7 +672,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     const far = sideways ? Math.max(...ends) : Math.min(...ends)
     const slot = 100 / this.readings
     const across = at * slot + slot / 2
-    return drawTooltip(this.rows, at, {
+    return drawTooltip(this.rows, at, this.tag('tooltip'), {
       placement: sideways ? 'right' : 'top',
       x: sideways ? `${far}%` : `${across}%`,
       y: sideways ? `${across}%` : `${far}%`,

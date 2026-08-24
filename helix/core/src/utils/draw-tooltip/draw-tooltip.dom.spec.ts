@@ -12,17 +12,25 @@ import type { Row } from '../read-series/read-series.js'
  * beside the chart. Escaping that means reimplementing `PopoverController`,
  * which is `Tooltip` with extra steps and a second copy of the hard part.
  *
- * `helix-tooltip` is not defined in this package, which costs nothing here: an
- * unknown element still carries every attribute and child that was rendered
- * into it, and those are what is being asserted.
+ * **The tag is the caller's, so this file supplies one.** It used to write
+ * `helix-tooltip` itself, which only `helix/web` registers, so a consumer of the
+ * headless tier alone got an inert unknown element. Passing it in is what lets
+ * each tier answer with its own name, and it is asserted below rather than
+ * assumed, a tag nothing checks being exactly how the first version was wrong.
+ *
+ * The element is still undefined in this package and that still costs nothing:
+ * an unknown element carries every attribute and child rendered into it, and
+ * those are what is asserted.
  */
 let drawTooltip: typeof import('./draw-tooltip.js').drawTooltip
 let render: typeof import('lit').render
+let unsafeStatic: typeof import('lit/static-html.js').unsafeStatic
 let nothing: typeof import('lit').nothing
 
 beforeAll(async () => {
   registerDom()
   ;({ drawTooltip } = await import('./draw-tooltip.js'))
+  ;({ unsafeStatic } = await import('lit/static-html.js'))
   ;({ nothing, render } = await import('lit'))
 })
 
@@ -37,9 +45,11 @@ const ROWS: Row[] = [
   { cells: [{ name: 'Revenue', text: '$96k', value: 96_000 }], label: 'April' },
 ]
 
-const drawn = (at: number, where?: Parameters<typeof drawTooltip>[2]): HTMLElement => {
+const TAG = 'helix-tooltip'
+
+const drawn = (at: number, where?: Parameters<typeof drawTooltip>[3]): HTMLElement => {
   const into = document.createElement('div')
-  render(drawTooltip(ROWS, at, where), into)
+  render(drawTooltip(ROWS, at, unsafeStatic(TAG), where), into)
   return into
 }
 
@@ -114,11 +124,22 @@ describe('where the bubble points', () => {
     expect(named).toBe('helix-chart-mark')
     expect(into.querySelector(`#${named}`)).not.toBeNull()
   })
+
+  /* The whole of the tier fix, asserted from the outside: whatever tag the
+     caller hands over is the tag in the document. A base tier passes
+     `helix-base-tooltip` and a styled one passes `helix-tooltip`, and neither
+     of them is written down in this file. */
+  test('under whichever tag the caller named, and no other', () => {
+    const into = document.createElement('div')
+    render(drawTooltip(ROWS, 0, unsafeStatic('helix-base-tooltip')), into)
+    expect(into.querySelector('helix-base-tooltip')).not.toBeNull()
+    expect(into.querySelector('helix-tooltip')).toBeNull()
+  })
 })
 
 describe('a reading that is not there', () => {
   test('draws nothing rather than an empty bubble', () => {
-    expect(drawTooltip(ROWS, 9)).toBe(nothing)
-    expect(drawTooltip([], 0)).toBe(nothing)
+    expect(drawTooltip(ROWS, 9, unsafeStatic(TAG))).toBe(nothing)
+    expect(drawTooltip([], 0, unsafeStatic(TAG))).toBe(nothing)
   })
 })
