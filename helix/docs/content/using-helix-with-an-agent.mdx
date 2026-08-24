@@ -102,20 +102,28 @@ helix-input[disabled] { … }  /* wrong: a fieldset sets no attribute */
 A control inside `<fieldset disabled>` is disabled by the platform and carries no
 attribute, so the attribute selector paints it as live while it refuses input.
 
-### 4. Three stylesheets, in this order
+### 4. Four stylesheets, in this order
 
 ```ts
+import '@helix-io/styles/primitives.css'
 import '@helix-io/styles/tokens.css'
 import '@helix-io/styles/base.css'
 import '@helix-io/styled/elements.css'
 import '@helix-io/styled'
 ```
 
-The third is the one people leave out, and everything works without it until the
-page is server-rendered: an element that has not upgraded has no styles of its
-own, so the markup flashes unstyled and then snaps into place. The tell for a
-missing layer is which: no color at all is `tokens.css`, bare headings is
-`base.css`, a flash before hydration is `elements.css`.
+`elements.css` is the one people leave out, and everything works without it
+until the page is server-rendered: an element that has not upgraded has no
+styles of its own, so the markup flashes unstyled and then snaps into place.
+
+The tell for a missing layer is which. A flash before hydration is
+`elements.css`; bare headings are `base.css`. **No color anywhere is either of
+the top two, and they are told apart by what is in the stylesheet rather than by
+what you see**: `tokens.css` missing leaves nothing declaring
+`--helix-color-*` at all, while `primitives.css` missing leaves all 177 declared
+and every one of them resolving to `rgba(0, 0, 0, 0)`, because `tokens.css`
+refers to a primitive 235 times and to nothing else. The second is the one that
+looks like a working install.
 
 ## Choosing a family
 
