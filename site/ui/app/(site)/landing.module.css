@@ -29,6 +29,23 @@
  * horizontal inset changes. */
 /* The containing block for the aura, which is absolute against it. */
 .reel {
+  /* **Clipped, because an absolutely positioned child pushes the page taller.**
+     The second field is a child of the band it lights and stands `200svh` from
+     that band's top, which lands 62px past the footer: abspos boxes do not take
+     part in flow but they do contribute scrollable overflow, so the document
+     went from 4774 to 4836 and the footer stopped being the last thing on the
+     page. The first field never showed this, being a child of the reel itself
+     with its 1800 comfortably inside 4690.
+
+     Clipping here rather than shortening the second field, because the height is
+     what makes the two boxes the same shape and the same shape is what lets them
+     share a `terminus`. And the reel is the right edge to clip at: it is the lit
+     region by definition, and it ends exactly where the footer begins.
+
+     `clip` rather than `hidden`: it establishes no scroll container, so nothing
+     inside gains a scrollport it can be scrolled within. Nothing here is sticky,
+     which is the other thing a clip context would change. */
+  overflow: clip;
   position: relative;
 }
 
