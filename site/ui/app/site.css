@@ -585,3 +585,30 @@ helix-table[data-prose-table] {
   display: block;
   overflow-x: auto;
 }
+
+/* The swatch in a documentation token table, written by `build-docs.mjs`.
+ *
+ * Global rather than a module class, because the generator writes the markup
+ * and a module class would reach it as a literal compared against a hashed
+ * name: a rule that exists, markup that is valid, and nothing drawn. The
+ * generator's own note carries the rest of that argument.
+ *
+ * Only the background is inline, being the one thing that differs per row and
+ * the one thing the generator knows. The shape is here, where it changes once.
+ *
+ * A border, because two of the tokens it draws are the page's own colour in one
+ * mode or the other: `--helix-color-background` is white on white in light and
+ * black on black in dark, so without an edge the first row of the ladder shows
+ * nothing at all.
+ *
+ * `inline-block` with an explicit size, since the span has no content and an
+ * empty inline box has no height to give it. */
+[data-token-swatch] {
+  background-clip: padding-box;
+  block-size: var(--helix-size-icon);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: inline-block;
+  inline-size: var(--helix-size-icon-lg);
+  vertical-align: middle;
+}
