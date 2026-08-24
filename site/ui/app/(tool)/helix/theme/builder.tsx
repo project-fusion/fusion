@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { Wordmark } from '@/components/wordmark/wordmark'
+import { type FaceRow, GOOGLE_FACES } from '@/content/faces/faces'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
 import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
 import {
@@ -59,15 +60,49 @@ interface Face {
 
 const SYSTEM: Face = { family: '', label: 'System default' }
 
-const FACES: Face[] = [
-  SYSTEM,
-  { family: 'Inter', google: 'Inter:wght@400;500;600', label: 'Inter' },
-  { family: 'DM Sans', google: 'DM+Sans:wght@400;500;700', label: 'DM Sans' },
-  { family: 'Work Sans', google: 'Work+Sans:wght@400;500;600', label: 'Work Sans' },
-  { family: 'Fraunces', google: 'Fraunces:wght@400;500;600', label: 'Fraunces' },
-  { family: 'Playfair Display', google: 'Playfair+Display:wght@400;500;600', label: 'Playfair' },
-  { family: 'Source Serif 4', google: 'Source+Serif+4:wght@400;500;600', label: 'Source Serif' },
+/**
+ * Every Google family, rather than the six somebody happened to like.
+ *
+ * The nine hardcoded here were a list, not a judgement: they carried the exact
+ * weights the token layer uses because each was written out by hand, which is
+ * precisely what does not scale and precisely what `bun run faces` now does for
+ * 1,939 of them. A family is offered when it can serve at least one of 400, 500
+ * and 600, and asked for the ones it has: the same request against a family
+ * shipping only 400 and 700 returns a stylesheet missing two weights and a page
+ * that synthesizes the difference.
+ *
+ * **The policy did not have to change to allow this**, which is the point the
+ * row this came from makes. The builder already fetched `fonts.googleapis.com`
+ * and already argued why. A longer list is a longer list.
+ */
+const fromCatalog = (row: FaceRow): Face => ({
+  family: row[0],
+  google: `${row[0].replace(/ /g, '+')}:wght@${row[1]}`,
+  label: row[0],
+})
+
+const CATALOG: Face[] = GOOGLE_FACES.filter((row) => row[2] === 0).map(fromCatalog)
+const CATALOG_MONO: Face[] = GOOGLE_FACES.filter((row) => row[2] === 1).map(fromCatalog)
+
+/**
+ * The six that lead the list, because 1,939 alphabetical families is a wall.
+ *
+ * A combobox filters as it is typed into, which answers "I know what I want"
+ * and not "show me something reasonable". These are the ones the builder used
+ * to offer, so the reader who opened it before sees what they saw, and the
+ * reader who has no opinion gets a short list of faces that read well at the
+ * sizes the token layer sets rather than the first six words in the alphabet.
+ */
+const LEADING = ['Inter', 'DM Sans', 'Work Sans', 'Fraunces', 'Playfair Display', 'Source Serif 4']
+
+const lead = (faces: Face[]): Face[] => [
+  ...LEADING.map((name) => faces.find((face) => face.family === name)).filter(
+    (face): face is Face => face !== undefined,
+  ),
+  ...faces.filter((face) => !LEADING.includes(face.family)),
 ]
+
+const FACES: Face[] = [SYSTEM, ...lead(CATALOG)]
 
 /**
  * The same faces, with a different word for choosing none.
@@ -85,11 +120,17 @@ const DISPLAY_FACES: Face[] = [
   ...FACES.filter((face) => face.family !== ''),
 ]
 
+/* Monospace is a category in the catalog rather than a list here, so a face
+   that calls itself mono is offered where mono is asked for and nowhere else.
+   The three that used to be hardcoded lead it for the same reason as above. */
+const MONO_LEADING = ['JetBrains Mono', 'IBM Plex Mono', 'Space Mono']
+
 const MONO_FACES: Face[] = [
   { family: '', label: 'System mono' },
-  { family: 'JetBrains Mono', google: 'JetBrains+Mono:wght@400;500', label: 'JetBrains Mono' },
-  { family: 'IBM Plex Mono', google: 'IBM+Plex+Mono:wght@400;500', label: 'IBM Plex Mono' },
-  { family: 'Space Mono', google: 'Space+Mono:wght@400;700', label: 'Space Mono' },
+  ...MONO_LEADING.map((name) => CATALOG_MONO.find((face) => face.family === name)).filter(
+    (face): face is Face => face !== undefined,
+  ),
+  ...CATALOG_MONO.filter((face) => !MONO_LEADING.includes(face.family)),
 ]
 
 export function ThemeBuilder({
@@ -605,7 +646,7 @@ export function ThemeBuilder({
                 contributes no word, so all three of these read `Choose` while
                 sitting on a real, named answer. The option stays in each list so
                 there is a way back to it, and both states now read alike. */}
-            <helix-select
+            <helix-combobox
               label="Body face"
               name="body-face"
               onhelix-change={(event) => setBodyFace(event.detail.value)}
@@ -618,9 +659,9 @@ export function ThemeBuilder({
                   {face.label}
                 </helix-option>
               ))}
-            </helix-select>
+            </helix-combobox>
 
-            <helix-select
+            <helix-combobox
               hint="Headings. Follows the body face where it is left alone."
               label="Display face"
               name="display-face"
@@ -634,9 +675,9 @@ export function ThemeBuilder({
                   {face.label}
                 </helix-option>
               ))}
-            </helix-select>
+            </helix-combobox>
 
-            <helix-select
+            <helix-combobox
               label="Mono face"
               name="mono-face"
               onhelix-change={(event) => setMonoFace(event.detail.value)}
@@ -649,7 +690,7 @@ export function ThemeBuilder({
                   {face.label}
                 </helix-option>
               ))}
-            </helix-select>
+            </helix-combobox>
 
             {/* **Hue is meaning and loudness is not**, which is the line this
               draws. A status that rotates with the brand is a warning a reader
