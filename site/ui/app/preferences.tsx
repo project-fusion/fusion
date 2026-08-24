@@ -74,10 +74,18 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
       setMode(stored)
       apply(stored)
     }
+    /* Only when the address did not say, which is the same rule the sandbox
+       applies to its language. A link carrying `?tier=` is a statement about
+       what that page is; what this browser last chose is not, and a link must
+       never re-set somebody's own drawer. The page has already written the
+       attribute server-side, so this leaves it alone rather than racing it. */
     const storedTier = window.localStorage.getItem(TIER_KEY) as ApiTier | null
+    const asked = new URLSearchParams(window.location.search).get('tier')
     if (storedTier) {
       setTier(storedTier)
-      applyTier(storedTier)
+      if (asked !== 'base' && asked !== 'styled') {
+        applyTier(storedTier)
+      }
     }
   }, [])
 

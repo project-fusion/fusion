@@ -287,6 +287,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     setDirection(url.direction)
     setSyntax(url.syntax)
     setPreviewTheme(url.colorMode)
+    setForcedTier(url.tier)
     setShowEditor(url.panes.includes('editor'))
     setShowPanel(url.panes.includes('panel'))
     setShowStatus(url.panes.includes('status'))
@@ -369,7 +370,17 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      `base` is what the drawer calls it and `headless` is what the manifest
      calls the tier those examples render, which is the same tier under the two
      names each surface already uses. */
-  const wanted = useApiTier() === 'base' ? 'headless' : 'styled'
+  /* **The address wins over the drawer, and never writes back to it.**
+     `useApiTier` reads the reader's own setting, which is theirs and applies to
+     every page. A link that names a tier is saying what *this* sandbox is
+     about, so it forces the answer here and leaves `localStorage` alone:
+     following somebody's link must not re-set your own preference, which is the
+     half of the color-mode argument in `url-state.ts` that still applies to a
+     tier. Null until the URL is read, which is after mount, so the first paint
+     follows the drawer exactly as it did. See 211. */
+  const [forcedTier, setForcedTier] = useState<'base' | 'styled' | null>(null)
+  const preferredTier = useApiTier()
+  const wanted = (forcedTier ?? preferredTier) === 'base' ? 'headless' : 'styled'
   const inTier = useMemo(() => {
     const kept = families.map((entry) => ({
       ...entry,
@@ -509,6 +520,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       layout,
       panes,
       syntax,
+      tier: forcedTier,
     })
     /* The fragment is only ours to write once the editor has been seeded.
        Before that it is still the one the page arrived with, and this effect
@@ -529,6 +541,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     direction,
     exampleSlug,
     familySlug,
+    forcedTier,
     layout,
     previewTheme,
     showEditor,

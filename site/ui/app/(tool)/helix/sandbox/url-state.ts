@@ -25,6 +25,16 @@
  * opposite of what it says. Listing what is there has one sense whatever the
  * defaults are.
  *
+ * **The API tier is here, and the same test decides it.** It is a preference in
+ * `localStorage`, set from the drawer and read off `:root[data-api-tier]`, and a
+ * preference is exactly what the color mode below is refused for. What makes it
+ * different is that it is *also* a property of what is being shown: the
+ * workbench loads `@helix-io/headless` or `@helix-io/web` from it, so two
+ * sandboxes at the same address showing different packages is the link failing
+ * to say what it is about. So it is carried, and it forces the tier for this
+ * page only. Following somebody's link must never re-set your own drawer, which
+ * is the half of the color-mode argument that still applies. See 211.
+ *
  * The site's own color mode is deliberately not here. It is a preference about
  * how someone reads, held in `localStorage` and applying to every page, and
  * putting it in a shared link would mean handing your eyesight to whoever opens
@@ -40,6 +50,9 @@ export type Direction = 'ltr' | 'rtl'
 
 /** Which file the editor is showing. */
 export type Syntax = 'html' | 'tsx'
+
+/** Which tier's package the preview loads. */
+export type Tier = 'base' | 'styled'
 
 /** A region of the sandbox that can be turned off. */
 export type Section = 'editor' | 'panel' | 'rail' | 'status'
@@ -59,6 +72,8 @@ export type SandboxUrlState = {
   layout: Layout
   /** Which file the editor is showing. */
   syntax: Syntax
+  /** Which tier the preview shows, or null to follow the reader's own setting. */
+  tier: Tier | null
 }
 
 /** What the sandbox looks like before anyone has changed anything. */
@@ -73,11 +88,17 @@ export const DEFAULTS: SandboxUrlState = {
      something to turn on rather than something to dismiss. */
   panes: ['editor', 'panel', 'rail'],
   syntax: 'html',
+  /* Null rather than `styled`, and the distinction is the whole point: absent
+     means follow the reader, where `styled` would mean override them with the
+     value they probably already have. Only a link that says something forces
+     anything. */
+  tier: null,
 }
 
 const LAYOUTS: Layout[] = ['padded', 'centered', 'fullscreen']
 const DIRECTIONS: Direction[] = ['ltr', 'rtl']
 const SYNTAXES: Syntax[] = ['html', 'tsx']
+const TIERS: Tier[] = ['base', 'styled']
 const SECTIONS: Section[] = ['editor', 'panel', 'rail', 'status']
 
 /**
@@ -117,6 +138,7 @@ export const readUrlState = (search: string): SandboxUrlState => {
     layout: oneOf(params.get('l'), LAYOUTS, DEFAULTS.layout),
     panes,
     syntax: oneOf(params.get('x'), SYNTAXES, DEFAULTS.syntax),
+    tier: oneOf(params.get('t'), TIERS, null as never) || null,
   }
 }
 
@@ -145,6 +167,9 @@ export const writeUrlState = (state: SandboxUrlState): string => {
   }
   if (state.colorMode) {
     params.set('c', state.colorMode)
+  }
+  if (state.tier) {
+    params.set('t', state.tier)
   }
   // In the order the regions appear, not the order they were switched on, and
   // only when the set differs from the one a fresh sandbox has.

@@ -534,8 +534,28 @@ function onlyTier(examples: readonly Example[]): 'headless' | 'styled' | undefin
   return tiers.size === 1 ? [...tiers][0] : undefined
 }
 
-export default async function FamilyDocs({ params }: { params: Promise<{ family: string }> }) {
+export default async function FamilyDocs({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ family: string }>
+  searchParams: Promise<{ tier?: string }>
+}) {
   const family = findFamily((await params).family)
+  /* **The address may say which tier this page is about, and the server can
+     act on it, which is what the preference never could.**
+     The tier is a reader's own setting in `localStorage`, so the server has
+     never seen it and the attribute is applied in an effect: a reader who
+     prefers base gets a frame of styled before it switches. A query parameter
+     is in the request, so the attribute can be in the HTML, and this is the
+     first tier state on the site that does not flash.
+
+     It forces the page and never writes storage. Following somebody's link must
+     not re-set your own drawer, which is why `preferences.tsx` skips its stored
+     value when the address said something. Validated against the two literals
+     before it reaches a script tag. See 211. */
+  const asked = (await searchParams).tier
+  const forced = asked === 'base' || asked === 'styled' ? asked : undefined
   if (!family) {
     notFound()
   }
@@ -553,6 +573,17 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
     /* The shell and the rail are the layout's, so the nav survives a navigation
        between families and keeps the state a reader set on it. See #119. */
     <>
+      {forced && (
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: one of two literals this file chose
+          dangerouslySetInnerHTML={{
+            __html:
+              forced === 'base'
+                ? "document.documentElement.dataset.apiTier='base'"
+                : 'delete document.documentElement.dataset.apiTier',
+          }}
+        />
+      )}
       <article className={styles.docsMain}>
         {/* `3xl`, the top of the scale, because a section break should be the
             largest space on the page: at `2xl` Usage sat as far from Preview as
