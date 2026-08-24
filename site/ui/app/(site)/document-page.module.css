@@ -18,7 +18,10 @@
    unit it is actually about, and it survives a change to the ramp. */
 .documentShell {
   margin-inline: auto;
-  max-inline-size: 90ch;
+  /* Wider than the measure now, because the measure moved to `.documentBody`
+     below: this is the width the *page* takes, and the column of prose inside it
+     is its own decision. */
+  max-inline-size: 112ch;
   /* **Not a band at the top, because a document is not a section of the landing
      page.** `--site-band` is the rhythm that gives each claim on the front page
      a screen of its own, and it clamps to 12vh, which is 108 on a laptop. Above
@@ -45,6 +48,25 @@
   text-align: start;
 }
 
+/* **The head runs wider than the body, which is the one place this page wants
+   two measures rather than one.**
+ *
+ * A measure is a number of characters for *reading*, and a headline is not read
+ * that way: it is taken in. At 44px in the body's column a title gets three or
+ * four words a line, so "A palette from one brand color" broke across two lines
+ * with room to spare on both. Measured, four right edges on one page where the
+ * left edge was correctly one: the shell ended at 1138, the body at 1051, the
+ * title at 1022 and the standfirst at 933.
+ *
+ * The body keeps its own measure below, so what changes is that the head and the
+ * prose no longer pretend to be the same kind of text. This is the ordinary
+ * arrangement in print and it is why a newspaper headline spans columns the
+ * story does not.
+ */
+.documentHead {
+  max-inline-size: 100%;
+}
+
 /* Larger than a section title and smaller than the hero's, which is the whole
    scale a document needs: it is the only heading on the page at this level and
    everything under it is an `h2` the base layer already sizes.
@@ -62,7 +84,13 @@
 
 .documentLede {
   font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
-  max-inline-size: 34rem;
+  /* **In characters, and wider than the body**, for the reason the shell's own
+     comment gives about `44rem`: this was `34rem`, a length that held about 55
+     characters at the current size and a different number at any other, and it
+     stopped 118px short of the paragraph beneath it. A standfirst is read once
+     and at a larger size, so it takes a longer line than the prose does and a
+     shorter one than the headline. */
+  max-inline-size: 60ch;
   text-wrap: balance;
 }
 
@@ -70,6 +98,12 @@
    layer resets the UA margins and themes prose under `[data-prose]`, and what it
    cannot know is how far apart this particular kind of page wants its
    paragraphs. */
+/* **The measure lives here now rather than on the shell.** It is a fact about a
+   column of prose, and the head above it is not prose. */
+.documentBody {
+  max-inline-size: 72ch;
+}
+
 .documentBody > * + * {
   margin-block-start: var(--helix-space-lg);
 }
