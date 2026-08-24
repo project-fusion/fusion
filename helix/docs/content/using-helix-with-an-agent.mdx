@@ -166,7 +166,48 @@ A recipe has appearance and no behavior: no state, no form participation, no
 focus trapping, no keyboard handling. If you are adding script to one, the
 component is what you wanted.
 
-## What this skill will not tell you
+## Pointing your tool at this page
+
+**A line, not a copy.** Every tool that reads project instructions reads a file
+in your repository, and they all read a different one. What goes in it is a
+pointer to this URL rather than its contents: a copy starts going stale the
+moment it is pasted, and this page changes with the library.
+
+```md
+Helix: read https://fusion.dev/helix/docs/using-helix-with-an-agent
+before writing components, and https://fusion.dev/helix/custom-elements.json
+for the API.
+```
+
+| Tool | Where it goes |
+|---|---|
+| Claude Code | `CLAUDE.md`, or a skill in `.claude/skills/` |
+| Cursor | `.cursor/rules/` |
+| GitHub Copilot | `.github/copilot-instructions.md` |
+| Anything else | Whatever it reads. The line is the same |
+
+**We do not write those files for you**, and that is the Sovereignty Constraint
+rather than laziness: a file we generate into your repository is one you then
+maintain against our changes, and a tool that rewrites it on install is a
+dependency you did not ask for in a directory you own. The line above is yours to
+paste and yours to delete.
+
+## The one thing worth installing
+
+```json
+{
+  "mcpServers": {
+    "helix": { "command": "helix", "args": ["mcp"] }
+  }
+}
+```
+
+`helix mcp` is a subcommand of the CLI, speaking MCP over stdio, which Claude,
+Cursor, Windsurf and Zed all read. It answers the question no document can,
+which is what a given brand color derives to. It runs on your machine, talks to
+a client you chose, and has no network in it.
+
+## What this page will not tell you
 
 **Anything the manifest answers.** Property names, unions, part names, event
 names and hooks change with the library and are in a file you can fetch; a list
