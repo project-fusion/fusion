@@ -152,6 +152,11 @@ component is what you wanted.
 names and hooks change with the library and are in a file you can fetch; a list
 of them here would be a second copy going stale. Fetch the family.
 
+**What a brand color derives to.** That is computation rather than a document,
+and `helix mcp` is where it lives: an MCP server over stdio with
+`helix_audit_theme` and `helix_derive_theme`, both taking the JSON a
+`helix.theme.json` holds. It runs on your machine and nobody hosts it.
+
 **Whether a component is good for your case.** The examples are the honest
 answer to that and they are text: every family's `.md` carries them, and
 `https://fusion.dev/helix/sandbox?e=<family>.<slug>` opens one editable.

@@ -456,6 +456,31 @@ Markdown**, and links that hand the document's URL to Claude or to Cursor. The
 URL rather than the contents, because the URL stays current and a pasted copy
 starts going stale the moment it is pasted.
 
+## The one thing a document cannot answer
+
+\`\`\`sh
+helix mcp
+\`\`\`
+
+The three surfaces above are closed sets: every tag, every token, every example,
+all published and all fetchable. What none of them holds is what *your* brand
+color derives to, because the input is a color and the domain is infinite, so the
+answer has to be computed when it is asked.
+
+\`helix mcp\` serves that over stdio as an MCP server, with two tools:
+\`helix_audit_theme\`, which measures every foreground against the ground it is
+really painted on and reports each pair with its ratio and target, and
+\`helix_derive_theme\`, which returns the CSS. Both take the same JSON a
+\`helix.theme.json\` holds.
+
+**It refuses to hand back a palette that fails its own targets**, the way
+\`helix theme build\` does. Pasting one into a stylesheet is worse than reading a
+warning above it, and an agent does not read warnings.
+
+**You run it and nobody hosts it.** A server we operated would be a dependency
+you cannot exit, which the Sovereignty Constraint refuses; this is a subcommand
+of a binary you installed, talking to a client you chose, with no network in it.
+
 ## What is not here
 
 **\`llms-full.txt\`, or any other whole-library download.** Concatenating every

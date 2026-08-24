@@ -49,6 +49,14 @@ pub struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub enum Noun {
+    /// Serve the derivation to an agent, over stdio, as an MCP server.
+    ///
+    /// **A noun with no verb, and that is the shape rather than an omission.**
+    /// Every other noun here does several things to one subject; this does one
+    /// thing and the client asks for the rest over the protocol. A `helix mcp
+    /// serve` would be a word a reader types to no effect.
+    Mcp,
+
     /// Derive, verify and inspect a theme.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Theme {

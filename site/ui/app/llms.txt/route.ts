@@ -48,6 +48,7 @@ export async function GET() {
     '## Machine-readable',
     '',
     `- [Custom elements manifest](${SITE}/helix/custom-elements.json): Every tag, property with its literal union, event with its class, slot, part and custom property. The vocabulary: a tag not in it does not exist.`,
+    `- [Token set](${SITE}/helix/tokens.json): Every semantic token with its value, category and description. The closed set: a name not in it resolves to nothing and the property silently falls back.`,
     `- [One family as data](${SITE}/helix/components/button.json): Any family's \`.md\` also answers as \`.json\`, the same content structured. Swap the slug.`,
     '',
   )

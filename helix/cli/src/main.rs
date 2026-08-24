@@ -18,6 +18,7 @@ mod args;
 mod config;
 mod error;
 mod exit;
+mod mcp;
 mod style;
 mod theme;
 
@@ -40,6 +41,10 @@ fn main() {
 
     let from = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
     let outcome = match &cli.noun {
+        /* **No `--json` branch and no paint.** The protocol *is* the format, and
+        a server that honored a flag about human output would be a server whose
+        stream a client could not parse. */
+        Noun::Mcp => mcp::run(),
         Noun::Theme { verb } => match verb {
             Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint),
             Theme::Build(args) => theme::build::run(args, &from, cli.json),
