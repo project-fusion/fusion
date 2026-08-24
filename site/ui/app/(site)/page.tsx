@@ -188,7 +188,7 @@ export default function Home() {
                     panel it takes the same weight as the button beside it and
                     answers a question almost nobody has asked yet. */}
                 {product.install ? (
-                  <helix-flex direction="column" gap="sm">
+                  <helix-flex data-substrate-action direction="column" gap="sm">
                     {/* **Standard width and the large control height**, the
                         same pair the hero uses. `sm` here made the one action on
                         a panel the smallest control on the page, which is the
@@ -201,7 +201,7 @@ export default function Home() {
                     </helix-flex>
                   </helix-flex>
                 ) : (
-                  <helix-flex direction="column" gap="sm">
+                  <helix-flex data-substrate-action direction="column" gap="sm">
                     <helix-text tone="subtle" variant="caption">
                       Nothing to install yet. The shape is written down and the crates are in the
                       open.

@@ -260,6 +260,24 @@ helix-drawer {
   padding: var(--helix-space-lg);
 }
 
+/* **The action sits at the foot of the panel, not after the prose.**
+ *
+ * The grid already stretches the panels to one height, so the boxes matched and
+ * the buttons did not: Helix's paragraph runs four lines and Cortex's three, so
+ * one door was most of a line higher than the other and the pair read as
+ * lopsided. `auto` on the leading margin eats whatever height is left, which is
+ * the flex column's own way of saying "last, and against the bottom edge".
+ *
+ * On the action rather than on `:last-child`, because the recipe is shared with
+ * the services and the reasons, where the last thing in the panel is the
+ * summary. Pushing *that* down would part it from the heading it explains and
+ * bottom-align three paragraphs of different lengths, which is the same
+ * raggedness moved rather than fixed. Only a panel with a door needs its door in
+ * a fixed place. */
+[data-substrate-action] {
+  margin-block-start: auto;
+}
+
 [data-substrate-name] {
   font-size: clamp(var(--helix-text-xl), 3vw, var(--helix-text-2xl));
   letter-spacing: var(--helix-tracking-tight);
