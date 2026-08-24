@@ -34,7 +34,7 @@ import { catalog } from '../../helix/docs/src/catalog.ts'
 import { reference } from '../../helix/docs/src/reference.ts'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const OUT = join(ROOT, 'site/ui/lib/catalog.generated.json')
+const OUT = join(ROOT, 'site/ui/content/catalog/catalog.generated.json')
 const PUBLIC = join(ROOT, 'site/ui/public')
 
 const MANIFESTS = [
@@ -181,8 +181,8 @@ for (const page of docPages) {
  * pointer, which is honest and close to useless. That is the remaining half of
  * this work rather than a design: an `.md` that invented the prose would be the
  * stale parallel site the whole arrangement exists to prevent. */
-const { routes } = await import('../../site/ui/lib/routes.ts')
-const { renderCopy, copyFor } = await import('../../site/ui/lib/copy-markdown.ts')
+const { routes } = await import('../../site/ui/content/routes/routes.ts')
+const { renderCopy, copyFor } = await import('../../site/ui/utils/copy-markdown/copy-markdown.ts')
 const { findSitePage, sitePageSources } = await import('../../site/content/src/index.ts')
 const { SERVICES } = await import('../../site/ui/app/services.ts')
 let prose = 0

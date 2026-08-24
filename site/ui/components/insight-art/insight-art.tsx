@@ -1,5 +1,5 @@
-import styles from '../app/(site)/insight-card.module.css'
-import type { InsightImage } from './insights'
+import styles from '../../app/(site)/insight-card.module.css'
+import type { InsightImage } from '../../content/insights'
 
 /**
  * The top of an insight card, where a post has brought one.

@@ -1,4 +1,4 @@
-import { INSIGHTS, type Insight } from '../../../lib/insights'
+import { INSIGHTS, type Insight } from '../../../content/insights'
 import { InsightCard } from '../insight-card'
 import { InsightBrowser } from './insight-browser'
 import styles from './insights.module.css'

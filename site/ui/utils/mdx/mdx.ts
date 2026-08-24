@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import * as runtime from 'react/jsx-runtime'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
-import { PROSE_COMPONENTS } from './prose'
+import { PROSE_COMPONENTS } from '../../components/prose/prose'
 
 /**
  * MDX, compiled to React at build time.

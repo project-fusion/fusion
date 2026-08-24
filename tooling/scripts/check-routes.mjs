@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process'
  *
  * **This is what stops the markdown surface decaying into a stale parallel
  * site**, which is the failure mode of every documentation-for-models project
- * that keeps two lists. The registry in `site/ui/lib/routes.ts` is the one
+ * that keeps two lists. The registry in `site/ui/content/routes/routes.ts` is the one
  * list, the sitemap and `llms.txt` and the generator all read it, and this
  * holds the files it produced to what it says exists.
  *
@@ -40,7 +40,7 @@ const FLOOR = 40
 
 const problems = []
 
-const { routes } = await import('../../site/ui/lib/routes.ts')
+const { routes } = await import('../../site/ui/content/routes/routes.ts')
 const all = routes()
 
 if (all.length === 0) {

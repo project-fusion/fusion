@@ -1,6 +1,6 @@
-import { getFamilies } from '../../../../lib/catalog'
-import { INSIGHTS } from '../../../../lib/insights'
-import { serverTheme } from '../../../../lib/theme-engine.server'
+import { getFamilies } from '../../../../content/catalog/catalog'
+import { INSIGHTS } from '../../../../content/insights'
+import { serverTheme } from '../../../../utils/theme-engine/theme-engine.server'
 import { ThemeBuilder } from './builder'
 import { INITIAL, intentFrom, SCOPE } from './defaults'
 

@@ -1,5 +1,5 @@
-import { getFamilies } from '../../../../lib/catalog'
-import { INSIGHTS } from '../../../../lib/insights'
+import { getFamilies } from '../../../../content/catalog/catalog'
+import { INSIGHTS } from '../../../../content/insights'
 import { SandboxWorkbench } from './workbench'
 
 /**

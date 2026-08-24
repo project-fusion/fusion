@@ -3,7 +3,7 @@
 import { type DerivedTheme, initTheme, type ThemeEngine } from '@helix-io/theme'
 import type { HelixSandboxPreview } from '@helix-io/web'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { THEME_ENGINE } from '../../../../lib/theme-engine'
+import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
 import { Wordmark } from '../../../wordmark'

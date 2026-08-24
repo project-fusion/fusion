@@ -1,5 +1,5 @@
 import { navigation } from '@helix-io/docs'
-import { getFamilies } from './catalog'
+import { getFamilies } from '../catalog/catalog'
 
 /*
  * The Helix documentation sidebar: prose and reference in one tree.

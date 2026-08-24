@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { routes } from '@/lib/routes'
-import { SITE } from '@/lib/site'
+import { routes } from '@/content/routes/routes'
+import { SITE } from '@/utils/site/site'
 
 /**
  * Every page, from the route registry.

@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { InsightArt } from '../../lib/insight-art'
-import { formatDate, type Insight } from '../../lib/insights'
+import { InsightArt } from '../../components/insight-art/insight-art'
+import { formatDate, type Insight } from '../../content/insights'
 import styles from './insight-card.module.css'
 
 /**

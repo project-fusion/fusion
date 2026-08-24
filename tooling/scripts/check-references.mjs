@@ -33,7 +33,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const ROOTS = ['helix', 'cortex', 'tooling', 'docs', 'site/ui/lib', 'site/ui/app']
+const ROOTS = ['helix', 'cortex', 'tooling', 'docs', 'site/ui']
 const EXTENSIONS = /\.(css|html|json|md|mjs|rs|toml|ts|tsx|txt)$/
 const SOURCE = /\.(css|mjs|ts|tsx)$/
 

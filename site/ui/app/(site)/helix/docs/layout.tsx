@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { helixNavigation } from '@/lib/helix-nav'
+import { helixNavigation } from '@/content/helix-nav/helix-nav'
 import styles from '../components/(reference)/docs.module.css'
 import { DocsNav } from '../docs-nav'
 

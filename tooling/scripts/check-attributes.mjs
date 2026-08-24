@@ -85,7 +85,7 @@ const ALWAYS_WRITTEN = new Set([
 const ACCEPTED = new Map()
 
 /* `public/` holds build output: the sandbox frame's stylesheet is generated from
-   `lib/preview-frame.css`, which is in the source tree and is scanned. Reading
+   `preview/preview-frame.css`, which is in the source tree and is scanned. Reading
    both would report the same rule twice and would report it against a path
    nobody edits. */
 const SKIP = new Set(['node_modules', 'public'])

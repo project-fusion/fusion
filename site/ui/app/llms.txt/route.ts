@@ -1,5 +1,5 @@
-import { routeSections } from '@/lib/routes'
-import { SITE } from '@/lib/site'
+import { routeSections } from '@/content/routes/routes'
+import { SITE } from '@/utils/site/site'
 
 /**
  * The index of this site, for a model that wants one file rather than a crawl.

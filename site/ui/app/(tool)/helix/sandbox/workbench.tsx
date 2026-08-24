@@ -22,9 +22,9 @@ import type {
   HelixTreeItem,
 } from '@helix-io/web'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import type { Family } from '../../../../lib/catalog'
-import { useApiTier } from '../../../../lib/use-api-tier'
-import { useElementRef } from '../../../../lib/use-element-ref'
+import type { Family } from '../../../../content/catalog/catalog'
+import { useApiTier } from '../../../../hooks/use-api-tier/use-api-tier'
+import { useElementRef } from '../../../../hooks/use-element-ref/use-element-ref'
 import { PreferencesDrawer } from '../../../preferences'
 import { type Findable, SiteFind } from '../../../site-find'
 import { Wordmark } from '../../../wordmark'

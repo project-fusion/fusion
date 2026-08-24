@@ -1,7 +1,7 @@
 import { docSources, findPage, navigation, pages } from '@helix-io/docs'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { renderMdx } from '../../../../../lib/mdx'
+import { renderMdx } from '../../../../../utils/mdx/mdx'
 import styles from '../../components/(reference)/docs.module.css'
 import prose from '../docs-prose.module.css'
 

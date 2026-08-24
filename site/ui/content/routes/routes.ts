@@ -1,8 +1,8 @@
 import { findSitePage } from '@fusion-io/site-content'
 import { pages as docPages, navigation } from '@helix-io/docs'
-import { LANDING } from '../app/landing'
-import { getFamilies } from './catalog'
-import { INSIGHTS } from './insights'
+import { LANDING } from '../../app/landing'
+import { getFamilies } from '../catalog/catalog'
+import { INSIGHTS } from '../insights'
 
 /*
  * Every page this site serves, in one module.

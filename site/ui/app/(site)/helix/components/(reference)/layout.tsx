@@ -1,4 +1,4 @@
-import { helixNavigation } from '@/lib/helix-nav'
+import { helixNavigation } from '@/content/helix-nav/helix-nav'
 import { DocsNav } from '../../docs-nav'
 import styles from './docs.module.css'
 

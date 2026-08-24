@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { getFamilies } from '../../lib/catalog'
-import { INSIGHTS } from '../../lib/insights'
+import { getFamilies } from '../../content/catalog/catalog'
+import { INSIGHTS } from '../../content/insights'
 import styles from '../chrome.module.css'
 import { SiteNav } from '../site-nav'
 

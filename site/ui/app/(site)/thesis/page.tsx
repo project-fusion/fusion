@@ -1,5 +1,5 @@
 import { findSitePage, sitePageSources } from '@fusion-io/site-content'
-import { renderMdx } from '../../../lib/mdx'
+import { renderMdx } from '../../../utils/mdx/mdx'
 import { DocumentPage } from '../document-page'
 
 /**

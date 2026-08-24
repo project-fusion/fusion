@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getFamilies } from '../../../lib/catalog'
+import { getFamilies } from '../../../content/catalog/catalog'
 import { PRODUCTS } from '../../products'
 import { findVertical } from '../../verticals'
 import { VerticalPage } from '../vertical-page'

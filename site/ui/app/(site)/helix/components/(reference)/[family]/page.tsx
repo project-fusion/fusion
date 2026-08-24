@@ -14,8 +14,8 @@ import {
   findFamily,
   getFamilies,
   type PropertyDoc,
-} from '../../../../../../lib/catalog'
-import { sourceUrl } from '../../../../../../lib/source'
+} from '../../../../../../content/catalog/catalog'
+import { sourceUrl } from '../../../../../../utils/source/source'
 import styles from '../docs.module.css'
 import { DocumentActions } from './document-actions'
 import { ComponentPreview } from './preview'

@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const out = join(root, 'site/ui/public/sandbox')
-const entry = join(root, 'site/ui/lib/preview-frame-entry.ts')
+const entry = join(root, 'site/ui/preview/preview-frame-entry.ts')
 
 /* The layers, in the order a consumer is told to import them. `elements.css` is
    generated from the element sources and hides each tag until it upgrades. */
@@ -35,7 +35,7 @@ const layers = [
   'helix/web/elements.css',
   // The frame's own layout modes, which belong to the document rather than to
   // the site that used to render it.
-  'site/ui/lib/preview-frame.css',
+  'site/ui/preview/preview-frame.css',
 ]
 
 await rm(out, { force: true, recursive: true })

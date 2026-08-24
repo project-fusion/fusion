@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { SITE } from '@/lib/site'
+import { SITE } from '@/utils/site/site'
 
 /**
  * Open, and pointing at the index.

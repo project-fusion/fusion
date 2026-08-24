@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useState } from 'react'
-import type { Insight } from '../../../lib/insights'
+import type { Insight } from '../../../content/insights'
 import browser from '../browser.module.css'
 import styles from './insights.module.css'
 

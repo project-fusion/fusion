@@ -2,7 +2,7 @@
 
 import type { HelixMenu } from '@helix-io/web'
 import { useEffect, useRef, useState } from 'react'
-import { absolute } from '@/lib/site'
+import { absolute } from '@/utils/site/site'
 
 /*
  * The ellipsis beside a component's title, wired.

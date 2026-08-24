@@ -71,7 +71,7 @@ site/ui/public/.probe/
 *.diff.png
 
 # Derived from the manifests and the example files by `bun run catalog`.
-site/ui/lib/catalog.generated.json
+site/ui/content/catalog/catalog.generated.json
 site/ui/public/helix/components/
 site/ui/public/helix/docs/
 site/ui/public/helix/*.md
