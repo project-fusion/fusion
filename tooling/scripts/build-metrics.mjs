@@ -4,7 +4,7 @@
  * `helix/docs/content/metrics.mdx` from the measurement.
  *
  * **Generated, the way the component reference and the token reference are.**
- * [`23-helix-docs.md`](../../docs/23-helix-docs.md) asks for this directly: a
+ * [`23-helix-docs.md`](../../docs/plan/23-helix-docs.md) asks for this directly: a
  * hand-written size table is stale within a month and unfalsifiable the whole
  * time, and this one moves the moment a component gains an import. The prose
  * lives in this file rather than in the MDX for the same reason the token
@@ -75,7 +75,7 @@ const check = process.argv.includes('--check')
  * Where this page sits in Getting started, which is a path and therefore
  * ordered.
  *
- * **Computed as last rather than written down.** [`23-helix-docs.md`](../../docs/23-helix-docs.md)
+ * **Computed as last rather than written down.** [`23-helix-docs.md`](../../docs/plan/23-helix-docs.md)
  * puts Metrics at the end of that section, and the end is a position rather
  * than a number: pages were inserted into the path twice while this was being
  * built, and the second time a hardcoded 6 collided with Versioning, which

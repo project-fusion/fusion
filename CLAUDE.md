@@ -1,7 +1,7 @@
 # Working in this repo
 
 Fusion Development Group. Strategy lives in [`docs/`](docs/); start with
-[`docs/00-thesis.md`](docs/00-thesis.md).
+[`docs/plan/00-thesis.md`](docs/plan/00-thesis.md).
 
 Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 `.claude/rules/cortex.md` for `cortex/**`. To add a component, use the
@@ -80,7 +80,8 @@ Rust for backend and substrate cores. TypeScript for frontend.
 ```
 helix/     styles core headless web react icons theme cem docs gallery
 cortex/    core trace engram docs
-docs/      company strategy, numbered; two generated references, not
+docs/      plan/ is the numbered strategy; the queue and two generated
+           references sit above it, being infrastructure rather than plan
 tooling/   CI and build scripts
 .local/    per-machine scratch, gitignored
 ```
