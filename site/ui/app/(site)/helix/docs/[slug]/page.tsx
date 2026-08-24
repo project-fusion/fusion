@@ -1,6 +1,7 @@
 import { docSources, findPage, navigation, pages } from '@helix-io/docs'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { renderMdx } from '../../../../../utils/mdx/mdx'
 import styles from '../../components/(reference)/docs.module.css'
 import prose from '../docs-prose.module.css'
@@ -28,7 +29,13 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const page = findPage((await params).slug)
-  return page ? { description: page.description, title: page.title } : {}
+  return page
+    ? pageMetadata({
+        description: page.description,
+        path: `/helix/docs/${page.slug}`,
+        title: page.title,
+      })
+    : {}
 }
 
 /** The section a page is in, for the line above its title. */

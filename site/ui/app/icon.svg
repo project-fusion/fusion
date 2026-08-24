@@ -1,0 +1,47 @@
+<svg aria-label="Fusion" fill="none" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" >
+  <title>Fusion</title>
+  <g transform="translate(42.5 28) scale(2.38)">
+    <path
+      d="M0 1H72C72 10.9411 63.9411 19 54 19H18C8.05888 19 0 10.9411 0 1Z"
+      fill="url(#fusion-grad-bar-top)"
+    />
+    <path
+      d="M27.9766 19C27.9766 9.05887 36.0354 1 45.9766 1H71.9766C71.9766 10.9411 63.9177 19 53.9766 19H27.9766Z"
+      fill="url(#fusion-grad-bar-shadow)"
+    />
+    <path
+      d="M0.00390625 46C0.00390625 34.9543 8.95821 26 20.0039 26H54.0822C54.0822 36.4323 45.6252 44.8893 35.1929 44.8893H25.7129C21.2946 44.8893 17.7129 48.471 17.7129 52.8893V65.9737C17.7129 75.754 9.7843 83.6826 0.00390625 83.6826V46Z"
+      fill="url(#fusion-grad-c)"
+    />
+    <path
+      d="M0 46C0 34.9543 8.95431 26 20 26H40.2464C40.2464 36.442 31.7815 44.907 21.3395 44.907H21.0588L13.4622 45.5709C6.78541 46.1544 1.29796 51.0805 0 57.6558V46Z"
+      fill="url(#fusion-grad-c-highlight)"
+    />
+  </g>
+  <defs>
+    <linearGradient 
+      gradientTransform="translate(42.5 28) scale(2.38)" gradientUnits="userSpaceOnUse" id="fusion-grad-bar-top"
+      x1="0" x2="72" y1="10" y2="10">
+      <stop stop-color="var(--logo-color-from, var(--helix-color-primary))" />
+      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
+    </linearGradient>
+    <linearGradient 
+      gradientTransform="translate(42.5 28) scale(2.38)" gradientUnits="userSpaceOnUse" id="fusion-grad-bar-shadow"
+      x1="27.9766" x2="71.9766" y1="10" y2="10">
+      <stop stop-color="var(--logo-color-from, var(--helix-color-primary))" />
+      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
+    </linearGradient>
+    <linearGradient 
+      gradientTransform="translate(42.5 28) scale(2.38)" gradientUnits="userSpaceOnUse" id="fusion-grad-c"
+      x1="27.043" x2="27.043" y1="26" y2="83.6826">
+      <stop stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
+      <stop offset="1" stop-color="var(--logo-color-mid, var(--helix-color-primary-hover))" />
+    </linearGradient>
+    <linearGradient 
+      gradientTransform="translate(42.5 28) scale(2.38)" gradientUnits="userSpaceOnUse" id="fusion-grad-c-highlight"
+      x1="20.1232" x2="20.1232" y1="26" y2="57.6558">
+      <stop stop-color="var(--logo-color-from, var(--helix-color-primary))" />
+      <stop offset="1" stop-color="var(--logo-color-from, var(--helix-color-primary))" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+</svg>

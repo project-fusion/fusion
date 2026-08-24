@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical } from '@/content/verticals/verticals'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { getFamilies } from '../../../content/catalog/catalog'
 import { VerticalPage } from '../vertical-page'
 
@@ -27,7 +28,11 @@ const product = PRODUCTS.find((entry) => entry.href === '/helix')
  * the install line cannot drift from the card. The family count comes from the
  * manifest, which is the same source the index counts.
  */
-export const metadata = { title: product?.name ?? vertical?.name }
+export const metadata = pageMetadata({
+  description: product?.body ?? vertical?.summary ?? '',
+  path: '/helix',
+  title: product?.name ?? vertical?.name ?? 'Helix',
+})
 
 export default function Page() {
   if (!vertical || !product) {

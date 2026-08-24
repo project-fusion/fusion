@@ -1,5 +1,6 @@
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical, stageAppearance } from '@/content/verticals/verticals'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { VerticalPage } from '../vertical-page'
 import { CORTEX_MODULES } from './modules'
 
@@ -19,7 +20,11 @@ const product = PRODUCTS.find((entry) => entry.href === '/cortex')
  * difference between two that are being built and one that is not is visible
  * rather than flattened into the product's single label.
  */
-export const metadata = { title: product?.name ?? vertical?.name }
+export const metadata = pageMetadata({
+  description: product?.body ?? vertical?.summary ?? '',
+  path: '/cortex',
+  title: product?.name ?? vertical?.name ?? 'Cortex',
+})
 
 export default function Page() {
   if (!vertical) {

@@ -17,11 +17,21 @@ import { INSTALL, LANDING } from '@/content/landing/landing'
 import { PRODUCTS } from '@/content/products/products'
 import { SERVICES } from '@/content/services/services'
 import { stageAppearance } from '@/content/verticals/verticals'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { INSIGHTS } from '../../content/insights'
 import { HeroCopy } from './hero-copy'
 import { InsightCard } from './insight-card'
 import styles from './landing.module.css'
 import { Showcase } from './showcase'
+
+/* The landing page states its own, where it used to inherit the root layout's.
+   Inheriting gave it a title and a description and no canonical, which is the
+   one tag that has to name a page rather than a site. */
+export const metadata = pageMetadata({
+  description: LANDING.lede,
+  path: '/',
+  title: 'Fusion Development Group',
+})
 
 export default function Home() {
   return (

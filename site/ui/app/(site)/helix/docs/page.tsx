@@ -1,5 +1,6 @@
 import { navigation } from '@helix-io/docs'
 import Link from 'next/link'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import shell from '../components/(reference)/docs.module.css'
 import styles from './docs-index.module.css'
 
@@ -22,10 +23,11 @@ import styles from './docs-index.module.css'
  * section added to `@helix-io/docs` appears without this file being touched,
  * which is the property the registry exists to have.
  */
-export const metadata = {
+export const metadata = pageMetadata({
   description: 'Install it, theme it, and the ideas underneath.',
+  path: '/helix/docs',
   title: 'Docs',
-}
+})
 
 export default function DocsIndex() {
   return (

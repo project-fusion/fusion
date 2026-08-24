@@ -1,14 +1,16 @@
 import { findSitePage, sitePageSources } from '@fusion-io/insights'
 import { SERVICES } from '@/content/services/services'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { renderMdx } from '../../../utils/mdx/mdx'
 import documents from '../document-page.module.css'
 import styles from './services.module.css'
 
-export const metadata = {
+export const metadata = pageMetadata({
   description:
     'Three offers: an AI capability audit, a design system sprint, and conversational build. Prices stated.',
+  path: '/services',
   title: 'Services',
-}
+})
 
 /**
  * Services.

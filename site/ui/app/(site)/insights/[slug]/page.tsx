@@ -2,6 +2,7 @@ import { sitePageSources } from '@fusion-io/insights'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { findInsight, formatDate, INSIGHTS } from '../../../../content/insights'
 import { renderMdx } from '../../../../utils/mdx/mdx'
 import { DocumentPage } from '../../document-page'
@@ -22,7 +23,14 @@ export async function generateMetadata({
   if (!insight) {
     return {}
   }
-  return { description: insight.summary, title: insight.title }
+  /* `article`, which is the one place on this site the type is not `website`:
+     these have an author, a date and a subject, and the rest are pages. */
+  return pageMetadata({
+    description: insight.summary,
+    path: `/insights/${insight.slug}`,
+    title: insight.title,
+    type: 'article',
+  })
 }
 
 /**

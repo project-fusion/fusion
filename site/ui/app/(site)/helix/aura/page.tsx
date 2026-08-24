@@ -1,11 +1,13 @@
 import { AuraLab } from './aura-lab'
 import './aura.css'
+import { pageMetadata } from '@/utils/metadata/metadata'
 
-export const metadata = {
+export const metadata = pageMetadata({
   description:
     'Nine backgrounds drawn from the token layer, with the pointer response and every parameter live.',
+  path: '/helix/aura',
   title: 'Aura',
-}
+})
 
 /**
  * The Aura playground.

@@ -8,6 +8,8 @@ import './site.css'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { HelixElements } from '@/components/helix-elements/helix-elements'
+import { siteUrl } from '@/utils/metadata/metadata'
+import { SITE } from '@/utils/site/site'
 
 /** The faces `fonts.css` declares, in the order the page asks for them. */
 const FACES = [
@@ -16,12 +18,40 @@ const FACES = [
   '/fonts/funnel-display-latin.woff2',
 ]
 
+const DESCRIPTION =
+  'Intelligence and energy are collapsing in cost at the same moment. Fusion builds the stack that makes sovereignty practical.'
+
+/**
+ * The defaults every page inherits, and the base every relative URL resolves on.
+ *
+ * **`metadataBase` is the one that silently decided everything.** Without it
+ * Next drops relative image URLs rather than guessing an origin, so a card
+ * declared as `/opengraph-image` reached no crawler at all. Set here once, it is
+ * what makes `pageMetadata` able to take a path instead of asking every page to
+ * write the domain out.
+ *
+ * The `openGraph` and `twitter` blocks are defaults rather than the whole story:
+ * a page that calls `pageMetadata` replaces them with its own, and a page that
+ * forgets still unfurls as the site rather than as a bare domain. See 247.
+ */
 export const metadata: Metadata = {
-  description:
-    'Intelligence and energy are collapsing in cost at the same moment. Fusion builds the stack that makes sovereignty practical.',
+  description: DESCRIPTION,
+  metadataBase: siteUrl,
+  openGraph: {
+    description: DESCRIPTION,
+    siteName: 'Fusion',
+    title: 'Fusion Development Group',
+    type: 'website',
+    url: SITE,
+  },
   title: {
     default: 'Fusion Development Group',
     template: '%s · Fusion',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    description: DESCRIPTION,
+    title: 'Fusion Development Group',
   },
 }
 

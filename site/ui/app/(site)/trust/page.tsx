@@ -1,4 +1,5 @@
 import { findSitePage, sitePageSources } from '@fusion-io/insights'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { renderMdx } from '../../../utils/mdx/mdx'
 import { DocumentPage } from '../document-page'
 
@@ -28,7 +29,11 @@ import { DocumentPage } from '../document-page'
  */
 const page = findSitePage('/trust')
 
-export const metadata = { description: page?.description, title: 'Trust' }
+export const metadata = pageMetadata({
+  description: page?.description ?? '',
+  path: '/trust',
+  title: 'Trust',
+})
 
 export default async function Page() {
   if (!page) {

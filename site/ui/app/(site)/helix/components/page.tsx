@@ -2,6 +2,7 @@ import { ComponentArt } from '@helix-io/gallery'
 import Link from 'next/link'
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical, stageAppearance } from '@/content/verticals/verticals'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { type Family, getFamilies } from '../../../../content/catalog/catalog'
 import { ComponentBrowser } from './component-browser'
 import styles from './gallery.module.css'
@@ -14,7 +15,12 @@ const product = PRODUCTS.find((entry) => entry.href === '/helix')
    that: the masthead's Components row pointed at a page titled Helix, and
    `/helix/components` existed only as a `[family]` segment with no index above
    it, which is the one URL a reader would guess. See 189. */
-export const metadata = { title: 'Components' }
+export const metadata = pageMetadata({
+  description:
+    'Every family Helix ships, with its status, its category and the tier it is documented at.',
+  path: '/helix/components',
+  title: 'Components',
+})
 
 /*
  * Every family Helix ships, and both surfaces for each.

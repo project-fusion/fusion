@@ -1,12 +1,14 @@
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { INSIGHTS, type Insight } from '../../../content/insights'
 import { InsightCard } from '../insight-card'
 import { InsightBrowser } from './insight-browser'
 import styles from './insights.module.css'
 
-export const metadata = {
+export const metadata = pageMetadata({
   description: 'The arguments behind what we build, written where they can be checked.',
+  path: '/insights',
   title: 'Insights',
-}
+})
 
 /**
  * How the grid may be ordered, and what each one compares.

@@ -4,9 +4,11 @@
 
 import { startCase } from '@helix-io/docs'
 import { highlight } from '@helix-io/sandbox/highlight'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Fragment } from 'react'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import {
   type ApiMember,
   type Element,
@@ -533,6 +535,37 @@ function ElementApi({ element }: { element: Element }) {
 function onlyTier(examples: readonly Example[]): 'headless' | 'styled' | undefined {
   const tiers = new Set(examples.map((example) => example.tier))
   return tiers.size === 1 ? [...tiers][0] : undefined
+}
+
+/**
+ * A title and a card for each of the eighty-eight families.
+ *
+ * This route is most of the site by count, and every one of it shared the root
+ * title and the root description: a link to `Accordion` and a link to
+ * `VirtualList` unfurled identically, which is 247's complaint in its purest
+ * form. The family already carries both facts, `label` and `summary`, and the
+ * summary is written as the one sentence that says what the component is, which
+ * is exactly what a card wants.
+ *
+ * No per-family picture, because there is none to use: `helix/gallery` is
+ * compositions in TSX rather than images, and nothing on disk holds a shot per
+ * family. The site card is the honest fallback until something draws one. See
+ * 247.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ family: string }>
+}): Promise<Metadata> {
+  const family = findFamily((await params).family)
+  if (!family) {
+    return {}
+  }
+  return pageMetadata({
+    description: family.summary,
+    path: `/helix/components/${family.slug}`,
+    title: family.label,
+  })
 }
 
 export default async function FamilyDocs({

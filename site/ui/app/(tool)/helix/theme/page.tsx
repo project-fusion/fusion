@@ -1,3 +1,4 @@
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { getFamilies } from '../../../../content/catalog/catalog'
 import { INSIGHTS } from '../../../../content/insights'
 import { serverTheme } from '../../../../utils/theme-engine/theme-engine.server'
@@ -19,10 +20,11 @@ import { THEMED_PAGE_MARKUP } from './themed-page-markup.generated'
  * gives: every row of chrome around it is a row taken from the thing being
  * examined.
  */
-export const metadata = {
+export const metadata = pageMetadata({
   description: 'Describe a brand. Get a palette every pair of which has been measured.',
+  path: '/helix/theme',
   title: 'Theme builder',
-}
+})
 
 export default async function ThemePage() {
   /* Built here, on a server, and handed down, the way the sandbox page and the

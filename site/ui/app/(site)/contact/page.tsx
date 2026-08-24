@@ -1,11 +1,13 @@
 import { CONTACT, INCLUDE, NEXT } from '@/content/contact/contact'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import styles from './contact.module.css'
 
-export const metadata = {
+export const metadata = pageMetadata({
   description:
     'How to reach Fusion Development Group, what to put in the first message, and what happens after you send it.',
+  path: '/contact',
   title: 'Contact',
-}
+})
 
 export default function Page() {
   return (
