@@ -10,7 +10,7 @@ import { toolingArt } from './tooling'
  *
  * All eighty-nine families have an entry, and the five files are split by kind
  * rather than by anything the build cares about: one file of eighty-nine is hard
- * to navigate and every entry would sit beside a neighbour it has nothing to do
+ * to navigate and every entry would sit beside a neighbor it has nothing to do
  * with. The system they all obey is documented at the top of `core.tsx`.
  *
  * **Eighty-nine, not the eighty-eight folders in `helix/web/src`.** The catalog is

@@ -44,7 +44,7 @@
  * stylesheet talking to itself.
  *
  * **It covers the token names too, and the name of the check is narrower than
- * the job it does.** The boundary is the same one: every colour token the
+ * the job it does.** The boundary is the same one: every color token the
  * engine emits has to be a name `tokens.css` declares, or a themed page sets a
  * property nothing reads, which is the seed bug one level up and with thirty-six
  * more chances to happen. They agree today, measured, which is precisely the
@@ -106,7 +106,7 @@ for (const sheet of SHEETS) {
   }
   /* A public seed can also be declared outright rather than read through a
      private twin, which is how `--helix-seed-accent-hue` is written: it is an
-     angle with no colour behind it, so there is nothing for it to fall back
+     angle with no color behind it, so there is nothing for it to fall back
      through and the public name is the declaration. */
   for (const found of source.matchAll(/^\s*--helix-seed-([a-z0-9-]+)\s*:/gm)) {
     consumed.add(found[1])
@@ -171,14 +171,14 @@ for (const name of [...new Set(modelNames)].sort()) {
     problems.push(
       `the surface model names \`${name}\` as an ink or a ground and ${SHEETS[1]} does not ` +
         'declare it, so a themed page would set a property nothing reads and the ' +
-        'pairing would be measured against a colour no component can paint.',
+        'pairing would be measured against a color no component can paint.',
     )
   }
 }
 
 /* **Every other token `toCss` writes, which was the gap this check had.** It
-   held the seeds and the model's colour names and nothing else, so the whole
-   non-colour half of the emitted block was unguarded: separation, material,
+   held the seeds and the model's color names and nothing else, so the whole
+   non-color half of the emitted block was unguarded: separation, material,
    type and motion. `--helix-font-body` shipped that way and nothing read it,
    the token layer calling it `--helix-font-sans`, so setting a body face moved
    the headings and left every other word on the page alone.
@@ -186,7 +186,7 @@ for (const name of [...new Set(modelNames)].sort()) {
    **Read from what the engine emitted across every oracle intent**, where it
    used to be matched against the template literals. The templates could see a
    family and never a leaf, `--${namespace}-text-${name}` stopping the pattern at
-   the first `$`, and they could not see the colour tokens at all, those being
+   the first `$`, and they could not see the color tokens at all, those being
    written by a loop: fifty-three emitted names were outside this check. The
    trade is that a branch no intent reaches is now invisible, which is why four
    of the seventeen exist to turn on the tail of the emission. */

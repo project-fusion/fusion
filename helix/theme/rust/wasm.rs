@@ -64,21 +64,21 @@ pub fn derive(intent: &str, selectors: &str) -> Result<String, JsError> {
     Ok(serde_json::to_string(&report)?)
 }
 
-/// Reads a hex colour into its OKLCH components, as JSON.
+/// Reads a hex color into its OKLCH components, as JSON.
 ///
 /// **Throws where the TypeScript returned `NaN`**, which is a deliberate change
 /// and the same one `resolve` makes for a brand: `Number.parseInt` of something
 /// that is not hex gives `NaN`, every comparison against which is false, so a
-/// colour that could not be read travelled onward looking like a colour. A
-/// caller passing the value of a colour input never sees this.
+/// color that could not be read traveled onward looking like a color. A
+/// caller passing the value of a color input never sees this.
 ///
 /// # Errors
 ///
-/// When the string is not a hex colour.
+/// When the string is not a hex color.
 #[wasm_bindgen(js_name = hexToOklch)]
 pub fn hex_to_oklch_json(hex: &str) -> Result<String, JsError> {
     let color = crate::oklch::hex_to_oklch(hex)
-        .ok_or_else(|| JsError::new(&format!("`{hex}` is not a hex colour")))?;
+        .ok_or_else(|| JsError::new(&format!("`{hex}` is not a hex color")))?;
     Ok(serde_json::to_string(&serde_json::json!({
         "chroma": color.chroma,
         "hue": color.hue,

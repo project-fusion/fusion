@@ -12,7 +12,7 @@ type Constructor<T> = new (...args: any[]) => T
  *
  * **The first mixin in `helix/web`, and it belongs here rather than in core.**
  * `helix/core` is consumed by the headless tier, which must never take styling,
- * and these two properties are purely presentational: they carry no behaviour,
+ * and these two properties are purely presentational: they carry no behavior,
  * no ARIA and no form participation, only which rules a stylesheet applies.
  * Declaring them in core would put a treatment on the tier whose whole purpose
  * is not having one.
@@ -20,7 +20,7 @@ type Constructor<T> = new (...args: any[]) => T
  * **Why a mixin rather than inheritance.** `Button`, `IconButton` and
  * `CopyButton` all want this pair, and the styled tier cannot get it by
  * extending: each styled class extends its own base, which is what keeps a
- * control's behaviour and its presentation in one branch. `CopyButton` already
+ * control's behavior and its presentation in one branch. `CopyButton` already
  * composes `IconButton`'s stylesheet, `[HelixIconButton.styles, styles]`, which
  * is the same move for CSS; this is that move for API. Redeclared instead, the
  * three drift the first time one gains a value.
@@ -61,9 +61,9 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
      *
      * Three and an accent, not the full status set. A tag reports a state and a
      * button performs an action: a success button and a warning button are not
-     * things anybody writes, and offering them invites a page where the colour
+     * things anybody writes, and offering them invites a page where the color
      * of a control means nothing in particular. `accent` is the second
-     * emphasis, a rotation off the brand seed rather than a colour of its own,
+     * emphasis, a rotation off the brand seed rather than a color of its own,
      * so it stays in relation when somebody rethemes.
      */
     @property({ reflect: true })

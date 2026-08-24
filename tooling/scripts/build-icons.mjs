@@ -49,7 +49,7 @@ const OUT = join(ROOT, 'helix/icons/src/generated.ts')
  *
  * Bold rather than regular, which is what this drew before. Phosphor's regular
  * is a hairline next to the type it sits beside: at `icon-sm` in a tree row or
- * a listbox option it reads as a lighter grey than the words it belongs to,
+ * a listbox option it reads as a lighter gray than the words it belongs to,
  * which is the opposite of what a mark is for. Bold matches the medium weight
  * every row in this library is set in.
  *

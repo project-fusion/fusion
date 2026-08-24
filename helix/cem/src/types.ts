@@ -13,7 +13,7 @@ export type { Plugin }
  * whichever copy a consumer resolves, and decouples it from the schema's
  * version entirely.
  *
- * Only the fields Helix actually reads or writes are modelled. Everything else
+ * Only the fields Helix actually reads or writes are modeled. Everything else
  * passes through untouched.
  */
 
@@ -75,7 +75,7 @@ export interface HelixMember extends Documented {
      * Where the platform feature this is built on is specified.
      *
      * Set from `@see <url> <label>` by `helix-references`. Present only on a
-     * member whose behaviour comes from something a reader may not have met.
+     * member whose behavior comes from something a reader may not have met.
      */
     references?: { label: string; url: string }[]
   }

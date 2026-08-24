@@ -73,7 +73,7 @@ message and exits 2 before `main` sees an argument, which is the number this enu
 records rather than one it chooses. Internal is for a panic, which reaches the
 runtime rather than this function. Both are in the enum because the enum is the
 published set, and a caller writing a case for 2 should find it documented rather
-than have to discover it from clap's behaviour. */
+than have to discover it from clap's behavior. */
 const _: () = {
     assert!(Code::Usage as i32 == 2);
     assert!(Code::Internal as i32 == 4);

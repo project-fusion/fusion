@@ -24,11 +24,11 @@
   display: inline-flex;
 }
 
-/* Two axes, and the colour is the one the emphases read.
+/* Two axes, and the color is the one the emphases read.
  *
  * `emphasis` is the fill (solid, outlined, subtle, ghost) and `tone` is what
  * the button means (neutral, primary, danger). They were one property, and it
- * held a rank ladder with a colour wedged into it: `primary`, `secondary` and
+ * held a rank ladder with a color wedged into it: `primary`, `secondary` and
  * `tertiary` say how much a button matters, and `danger` says what it does. So
  * there was no way to write an outlined Delete or a Delete in a menu row, which
  * are the two commonest destructive buttons there are, and no way to write a
@@ -46,7 +46,7 @@
   --_button-edge: var(--helix-color-border);
   /* The solid fill, separate from the tone, and it has to be separate.
    *
-   * `--_button-tone` is the colour of the *ink* on every emphasis but this
+   * `--_button-tone` is the color of the *ink* on every emphasis but this
    * one: an outlined or ghost primary draws its label with it, and in dark mode
    * that is deliberately the lighter brand so the text is legible on a dark
    * page. A solid button wants the opposite, a fill dark enough to carry white,
@@ -77,7 +77,7 @@
 /* The second emphasis, and it takes the same six declarations as the first
    because a tone that behaves differently from the one beside it is a tone a
    consumer has to learn separately. What it *is* comes from the palette: a
-   rotation off the brand seed rather than a colour of its own, so it stays in
+   rotation off the brand seed rather than a color of its own, so it stays in
    relation when somebody rethemes. `--helix-seed-accent-hue` is the angle. */
 :host([tone="accent"]) {
   --_button-edge: var(--helix-color-accent);
@@ -207,7 +207,7 @@
  * [part="button"]:hover`, four class-equivalents, and an emphasis rule is
  * three, so without a hover of its own an emphasis loses its fill the moment
  * a pointer touches it. Measured on the old `danger`, which had no hover rule:
- * a red button that turned neutral grey under the pointer, in every build since
+ * a red button that turned neutral gray under the pointer, in every build since
  * it was written. */
 :host([emphasis="solid"]) [part="button"] {
   background-color: var(--button-background-color, var(--_button-fill));

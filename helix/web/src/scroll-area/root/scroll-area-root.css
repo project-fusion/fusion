@@ -22,7 +22,7 @@
  *
  * `thin` rather than a width in pixels: the two engines that implement this
  * disagree about what a number means, and a track sized in pixels on one and
- * ignored on the other is worse than the platform's own on both. Colour is the
+ * ignored on the other is worse than the platform's own on both. Color is the
  * part worth setting, and it takes tokens like everything else. */
 [part="viewport"] {
   scrollbar-color: var(--scroll-area-thumb-color, var(--helix-color-border))

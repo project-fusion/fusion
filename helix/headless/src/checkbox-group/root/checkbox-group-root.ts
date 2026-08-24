@@ -226,7 +226,7 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixFormElement) {
    *
    * So the fix that was written for "a group marked required submitted empty"
    * threw on every update in a real browser, and happy-dom's shim does not
-   * throw, so the specs passed and the behaviour never worked. Eleven of them
+   * throw, so the specs passed and the behavior never worked. Eleven of them
    * failed the moment they were run in Chromium. It is also what makes the rest
    * work: the form now refuses to submit, which fires `invalid`, which is what
    * marks the field touched and puts the message on screen.

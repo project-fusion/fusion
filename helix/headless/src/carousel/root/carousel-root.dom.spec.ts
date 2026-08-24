@@ -111,7 +111,7 @@ describe('carousel naming', () => {
   test('an emptied label leaves the host unnamed, not named with nothing', async () => {
     /* The distinction `hostAria` exists for. `ariaLabel = ''` is a name of no
        characters, which a screen reader announces as an unnamed control while
-       every check for "is it labelled" passes. This component assigned the
+       every check for "is it labeled" passes. This component assigned the
        property straight through, so a consumer emptying it on purpose, which is
        what you do when a wrapper already names the thing, got the broken half
        of that rather than the honest one. */
@@ -340,7 +340,7 @@ describe('carousel settling', () => {
 
 describe('carousel indicators', () => {
   test('the run is the dots themselves, each one its own state', async () => {
-    /* A single travelling mark was tried here and taken out again. The pill is
+    /* A single traveling mark was tried here and taken out again. The pill is
        three times a dot's width, so a mark that takes no room in the row has to
        sit over its neighbours, and the pitch had to grow from 12 to 20 to make
        space for it. The run stopped reading as a run. */

@@ -35,7 +35,7 @@ export default function Home() {
 
           It is not set as `tilt`, and `tilt` would not take if it were: the
           component resolves `terminus` first and only falls back to an angle
-          when there is no exit point to honour. The two are asking different
+          when there is no exit point to honor. The two are asking different
           questions. An angle says where the braid leaves the top edge for one
           shape of box only, and this reel is two screens tall, so its aspect
           moves with the window rather than with the width alone.
@@ -125,7 +125,7 @@ export default function Home() {
                 reader wants at this point is what the two things *are* and how
                 they arrive, which is also the half that is checkable today.
 
-                The licence stays out of it for the reason it was taken out
+                The license stays out of it for the reason it was taken out
                 before: whether a package is MIT matters to about one reader in
                 fifty and to none of them first. */}
             <helix-text as="p" data-measure tone="muted">
@@ -158,7 +158,7 @@ export default function Home() {
                     <helix-code-block label={`Install ${product.name}`}>
                       {product.install}
                     </helix-code-block>
-                    {/* No licence line. It is a fact for whoever is about to
+                    {/* No license line. It is a fact for whoever is about to
                         install, and the install page is one click away; on a
                         landing card it takes the same weight as the button
                         beside it and answers a question almost nobody asked
@@ -278,7 +278,7 @@ export default function Home() {
         {/* **No rule between them, and more room instead.** A line is one way
             to say two things are separate and whitespace is the other, and
             whitespace does not have to be looked past. The splitter that was
-            here made where the line falls a judgement a reader could take, and
+            here made where the line falls a judgment a reader could take, and
             it was still a line down the middle of a section whose two halves
             already read as two halves.
     

@@ -321,7 +321,7 @@ export class HelixBaseDateInput extends MixinControllerOpen(
        until then. A form should submit `2026-08-04,2026-08-11` however the dash
        was written, and the dash is a reading of that rather than a second value
        shape to support. Half-typed text stays verbatim, for the reason the class
-       gives about a document being edited: normalising `2026-08-0` would take
+       gives about a document being edited: normalizing `2026-08-0` would take
        the caret away mid-date. */
     const held = dates(typed)
     const whole = held.length > 0 && held.every(isIso)

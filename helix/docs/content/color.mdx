@@ -6,7 +6,7 @@ title: Color
 
 # Color
 
-Seventy-four of the library's 176 tokens are colour, which is most of what a
+Seventy-four of the library's 176 tokens are color, which is most of what a
 theme is. They are roles rather than values: nothing in Helix is named after
 what it looks like, because a name like `--brand-blue-500` stops being true the
 moment anybody rethemes.
@@ -51,12 +51,12 @@ because a code block in documentation is read rather than edited.
 
 ## OKLCH
 
-Every colour is authored in OKLCH. Equal numeric steps in sRGB are not equal
+Every color is authored in OKLCH. Equal numeric steps in sRGB are not equal
 perceptual steps, which makes both ramp generation and contrast arithmetic
 unreliable: a ramp that is even by the numbers looks uneven, and a contrast
 solver working in the wrong space cannot converge on a target it can measure.
 
-Concretely, this is what lets the theme engine take a brand colour and *solve*
+Concretely, this is what lets the theme engine take a brand color and *solve*
 for a palette rather than have someone pick one. See [Deriving a
 theme](./theming).
 

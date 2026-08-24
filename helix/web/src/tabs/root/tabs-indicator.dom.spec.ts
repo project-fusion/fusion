@@ -21,7 +21,7 @@ const markup = `
 /* Where the mark lands, which is the stylesheet's answer and so stays on this
    tier. The staging rule below selects `helix-tabs::part()`, so it reaches the
    styled element and nothing else, and the rest of Tabs, selection, keyboard,
-   refusal and the controlled contract, is behaviour and moved to the base. */
+   refusal and the controlled contract, is behavior and moved to the base. */
 if (hasLayout()) {
   describe('tabs indicator geometry', () => {
     /* Taller than its tabs, which is the case every example misses. A strip

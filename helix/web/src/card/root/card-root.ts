@@ -68,7 +68,7 @@ export class HelixCard extends HelixBaseCard {
    * - `elevated` is lifted off the page instead of framed, for a card on a
    *   colored or busy background, where a line has to compete with whatever is
    *   behind it and a shadow does not.
-   * - `filled` is told apart by its own colour, with neither edge nor lift. For
+   * - `filled` is told apart by its own color, with neither edge nor lift. For
    *   a dense surface where a border on every card is a grid of lines, and for
    *   a theme whose `separation` policy is `fill`, which pushes the surface
    *   ladder away from the page precisely so this reads.
@@ -77,7 +77,7 @@ export class HelixCard extends HelixBaseCard {
    *   second box adds a line and no meaning.
    *
    * **`filled` is new and it closes a hole the engine could already see.**
-   * `plain` clears the ground *and* the edge, so a surface with its own colour
+   * `plain` clears the ground *and* the edge, so a surface with its own color
    * and neither edge nor lift was unsayable while being one of the four things
    * a theme could ask for.
    */

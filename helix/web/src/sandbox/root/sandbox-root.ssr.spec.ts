@@ -64,7 +64,7 @@ describe('sandbox server output', () => {
     expect(hasPart(markup, 'corner')).toBe(false)
   })
 
-  test('the source pane is a labelled textarea in the served markup', () => {
+  test('the source pane is a labeled textarea in the served markup', () => {
     expect(partTag(markup, 'source')).toContain('aria-label="Example source"')
     expect(withoutStyles(markup)).toContain('<textarea')
   })

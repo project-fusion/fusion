@@ -8,7 +8,7 @@
  * loses a rule.
  *
  * It has already happened twice. `.heroInstall code` stayed in the global sheet
- * while `.heroInstall` moved, and the install line lost its type colour and its
+ * while `.heroInstall` moved, and the install line lost its type color and its
  * button sizing. Then `pageHero` was left as a bare word inside a template
  * literal on both galleries while the rule moved to a module, which took
  * `position: relative` and `min-block-size` off the hero: the hero collapsed and

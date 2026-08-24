@@ -32,7 +32,7 @@
  * and an ordinary rule of the same specificity are separated by source order,
  * so `opacity: 1` below won even for the opening frame and the scrim arrived at
  * full strength in one frame while the panel was still sliding. Measured, every
- * sample from 16ms on read 1.00 while the panel travelled 640 to 480. The exit
+ * sample from 16ms on read 1.00 while the panel traveled 640 to 480. The exit
  * faded correctly the whole time, which is what made it look like a transition
  * that only worked one way rather than one that was never starting.
  *

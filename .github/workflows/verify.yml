@@ -110,7 +110,7 @@ jobs:
       # Every ink, measured against the ground it is really painted on. The
       # stylesheets can only be read for the eleven rules that set an ink and a
       # ground together; the rest inherit theirs from a host, a part above them
-      # or the page, and only a laid-out document knows. Both colour modes,
+      # or the page, and only a laid-out document knows. Both color modes,
       # because the half not on screen is the half that fails: every finding
       # this caught on its first green run was in dark.
       - run: bun run check:contrast

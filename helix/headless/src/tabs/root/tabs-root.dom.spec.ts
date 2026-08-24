@@ -146,7 +146,7 @@ describe('tabs keyboard', () => {
   test('manual can be traversed, because a move starts from focus', async () => {
     /* Two presses from where focus actually is. Starting from the selection
        instead, the second press would compute from tab one again and land on
-       tab two a second time, so the set past the first neighbour is
+       tab two a second time, so the set past the first neighbor is
        unreachable by keyboard. */
     const host = (await mount(
       markup.replace('<helix-base-tabs ', '<helix-base-tabs manual '),

@@ -30,7 +30,7 @@ const _heights = (host: HTMLElement): number[] =>
 
 /* The stroke, the wash and the mark, which are lengths and paints this tier owns.
 
-   The behaviour is the base element's and is tested there. */
+   The behavior is the base element's and is tested there. */
 if (hasLayout()) {
   describe('sparkline geometry', () => {
     test('the path is really SVG, and not an HTML element wearing the name', async () => {

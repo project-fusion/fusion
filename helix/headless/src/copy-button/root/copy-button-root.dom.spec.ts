@@ -10,13 +10,13 @@ beforeAll(async () => {
    shortcut: what is being asserted is that the button waits for the write and
    reacts to its outcome, and a stub is the only way to make a refusal happen on
    purpose. */
-const clipboard = (behaviour: 'accept' | 'refuse') => {
+const clipboard = (behavior: 'accept' | 'refuse') => {
   const written: string[] = []
   Object.defineProperty(navigator, 'clipboard', {
     configurable: true,
     value: {
       writeText: (value: string) => {
-        if (behaviour === 'refuse') {
+        if (behavior === 'refuse') {
           return Promise.reject(new Error('denied'))
         }
         written.push(value)
@@ -33,7 +33,7 @@ const clipboard = (behaviour: 'accept' | 'refuse') => {
  * broke the day the write moved into `CopyController`: the controller is one
  * `await` deeper than the hand-rolled write it replaced, so a single
  * `await Promise.resolve()` no longer reached the end of it and two specs
- * failed on an implementation detail rather than on behaviour. A press is done
+ * failed on an implementation detail rather than on behavior. A press is done
  * when the element has settled, and a task boundary reaches past any number of
  * promises. */
 const press = async (el: Awaited<ReturnType<typeof mount>>): Promise<void> => {

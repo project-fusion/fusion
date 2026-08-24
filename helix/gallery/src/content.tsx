@@ -396,7 +396,7 @@ export const contentArt: Record<string, ReactNode> = {
         {/* The frame is a window and the picture is behind it, so the picture is
             clipped to it. Not decoration: the ridges are flush with the frame on
             three sides at rest, so the hover scale pushed them straight out and
-            the card grew a grey wedge hanging off its own edge. */}
+            the card grew a gray wedge hanging off its own edge. */}
         <clipPath id="helixArtImageFrame">
           <rect height="112" rx="8" width="224" x="48" y="44" />
         </clipPath>
@@ -430,7 +430,7 @@ export const contentArt: Record<string, ReactNode> = {
    * forbids for the reason `tree` records: a drawing depicts what the component
    * is, not what it sits next to.
    *
-   * Solid and edgeless, so they read as colour rather than as controls. An
+   * Solid and edgeless, so they read as color rather than as controls. An
    * outlined square in a column of three is a checkbox list. The weights
    * descend because the grid is monotone and has no accent, and three series
    * that differ is the fact the card has to carry.
@@ -471,7 +471,7 @@ export const contentArt: Record<string, ReactNode> = {
        * writes each path from its first point to its last, which is the one
        * gesture a line chart actually performs.
        *
-       * Staggered so the emphasised series lands last. Drawn together they
+       * Staggered so the emphasized series lands last. Drawn together they
        * cross in the same instant and the crossing is the fact this card exists
        * to show; one behind the other, the second one crosses something that is
        * already there. */}
@@ -945,7 +945,7 @@ export const contentArt: Record<string, ReactNode> = {
    * the good news.
    *
    * That is the component's whole argument drawn rather than stated. A card
-   * that emphasised the rising one, with `artSolid` or with more ink, would
+   * that emphasized the rising one, with `artSolid` or with more ink, would
    * say up is the one that matters, which is the default this component exists
    * to refuse: the judgment is `good`, the consumer sets it, and the picture
    * has no business guessing.
@@ -968,7 +968,7 @@ export const contentArt: Record<string, ReactNode> = {
        * The head was a chevron whose inner apex sat at y 63 and the shaft was a
        * rect starting at y 64, so along the shaft's own two units the head fell
        * away to a point one unit above where the shaft began: a triangular gap
-       * at the top of the arrow, widest exactly on its centre line. Meeting them
+       * at the top of the arrow, widest exactly on its center line. Meeting them
        * by dropping the apex would put the inner edges off 45 degrees against
        * outer edges that are on it, and overlapping them would darken the
        * overlap, both shapes being ink at the same alpha.

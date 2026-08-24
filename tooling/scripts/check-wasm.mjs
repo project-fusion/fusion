@@ -100,15 +100,15 @@ const near = (ours, theirs, at) => {
  * **A hue is only meaningful in proportion to its chroma**, so the arc is
  * compared rather than the angle.
  *
- * `#808080` is a pure grey: its chroma is 2.2e-8, so its hue is `atan2` of two
+ * `#808080` is a pure gray: its chroma is 2.2e-8, so its hue is `atan2` of two
  * values near zero and is not a direction so much as the residue of three cube
  * roots. Measured, the two libms put it 1.43e-7 degrees apart while agreeing on
- * the chroma to 1.11e-16, and at that chroma the whole angle moves the colour by
+ * the chroma to 1.11e-16, and at that chroma the whole angle moves the color by
  * about 1e-15 in Oklab. Comparing the angle asks a question the number cannot
  * answer.
  *
- * The arc, `chroma * Δθ` in radians, is how far the point actually travelled,
- * which is the quantity a rendered colour is made of. It is also *stricter* than
+ * The arc, `chroma * Δθ` in radians, is how far the point actually traveled,
+ * which is the quantity a rendered color is made of. It is also *stricter* than
  * the angle wherever chroma is real: a tenth of a degree at chroma 0.2 is a
  * visible move and would fail here.
  */
@@ -211,7 +211,7 @@ for (const theme of oracle.themes) {
 
 /* **The hex reader is checked against the oracle's own parse table**, which is
    the one place the boundary carries a value the theme comparison never touches:
-   the site reads a colour input with it before an intent exists. Held to the
+   the site reads a color input with it before an intent exists. Held to the
    same tolerance for the same reason, `cbrt` and `atan2` being where the two
    libms part company. */
 {

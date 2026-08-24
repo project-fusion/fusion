@@ -50,7 +50,7 @@
  * and an author rule beats a user agent rule at any specificity, so the
  * attribute did nothing at all. Measured: a photograph that had loaded, at
  * opacity 1, under a 384 by 216 stand-in painted over the whole of it. Every
- * image in the gallery was a grey rectangle.
+ * image in the gallery was a gray rectangle.
  *
  * `Megamenu` carries the same rule for the same reason and says so at greater
  * length. `:host` prefixes this one so it also outranks any later
@@ -75,13 +75,13 @@
  *
  * Measured: a slotted `Skeleton` came out 200 wide and nothing high. It has no
  * height of its own, being sized by whatever holds it, and what held it was a
- * centring flex box that gave it its content height of zero. So the stand-in
- * was a plain grey rectangle and the skeleton was never visible at all.
+ * centering flex box that gave it its content height of zero. So the stand-in
+ * was a plain gray rectangle and the skeleton was never visible at all.
  *
- * Filling is the right default here and centring is not, because everything
+ * Filling is the right default here and centering is not, because everything
  * anybody stands in for a picture with is picture-shaped: a skeleton, a blurred
- * thumbnail, a solid colour, a dominant-colour swatch. The fallback below keeps
- * centring, because what stands in for a picture that failed is a mark. */
+ * thumbnail, a solid color, a dominant-color swatch. The fallback below keeps
+ * centering, because what stands in for a picture that failed is a mark. */
 [part="placeholder"] ::slotted(*) {
   block-size: 100%;
   inline-size: 100%;

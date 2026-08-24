@@ -19,7 +19,7 @@ import type { HelixBaseSpeedDialItem } from '../item/speed-dial-item.js'
  * @description
  * **A menu, and deliberately not a new one.** Its rows are commands, which is
  * what `role="menu"` and `menuitem` exist for, so this takes them and takes the
- * behaviour with them: the arrow keys are `KeyboardNavigationController`, the
+ * behavior with them: the arrow keys are `KeyboardNavigationController`, the
  * panel is `PopoverController`, and open and closed is `MixinControllerOpen`.
  * `Menu` is built from the same pieces. What is not shared is what actually
  * differs: a dial has no submenus, no headers, no checkable rows and no long

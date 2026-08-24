@@ -261,10 +261,10 @@ const DRAWN = new Set(['checkbox', 'radio', 'switch'])
    narrowed by an attribute selector. Measured: of three rules written against
    one chart, `::part(bar)` applied and both `::part(bar)[data-series="2"]` and
    `::part(bar):nth-child(2)` were dropped at parse time, leaving four bars one
-   colour. The styled tier does it from inside its own shadow root, where a
+   color. The styled tier does it from inside its own shadow root, where a
    plain attribute selector works. Nobody outside can. #138. */
 /* `trend` is not one, and it was in this set for a whole pass. It is an arrow,
-   a metric and a judgement about which way is good news: no data source, no
+   a metric and a judgment about which way is good news: no data source, no
    `MixinChartSource`, no plot, and its only parts are `direction` and `icon`.
    Being here bought it a six-shade series palette it never reads and paint
    rules that matched nothing, which is dead CSS in a file whose whole job is to
@@ -443,7 +443,7 @@ helix-base-divider[orientation="vertical"] {
   block-size: auto;
   inline-size: 1px;
 }`,
-  /* Stacked and centred, because an empty state is a small notice and not a
+  /* Stacked and centered, because an empty state is a small notice and not a
      sentence: the heading, the line under it and the action ran together on
      one line, reading as prose with a link in it. */
   empty: `helix-base-empty {
@@ -843,7 +843,7 @@ helix-base-rating::part(mark) {
    rather than a subset of it, so they have to be stacked and not laid side by
    side. Left to the name-matching, marks became a row, track became a progress
    groove painted over the marks it is made of, and fill was a block: the
-   component rendered as half a rem of flat grey, and with the groove removed it
+   component rendered as half a rem of flat gray, and with the groove removed it
    rendered as nothing.
    
    The width of the clip is the component's own arithmetic, published as
@@ -860,7 +860,7 @@ helix-base-rating::part(marks) {
    selects nothing: ::part() reaches the part and no further, so descendants of a
    part are unreachable from outside the tree. The styled tier writes exactly
    that selector and it works there, its sheet being inside the shadow root.
-   Colour inherits across the boundary where a selector does not, so the layers
+   Color inherits across the boundary where a selector does not, so the layers
    set it and the marks take it. */
 helix-base-rating::part(track),
 helix-base-rating::part(fill) {
@@ -1054,7 +1054,7 @@ helix-base-time-picker::part(items) {
      They have to be placed.
    
      The rail also matched the branch that paints a progress groove, so before
-     any of that it was a wide grey stripe lying across the entry above it. */
+     any of that it was a wide gray stripe lying across the entry above it. */
   timeline: `/* Two rows, named rather than left implicit, because the rail below is a
    subgrid and a subgrid needs tracks to borrow. The time is the first and the
    entry is the second. */
@@ -1121,12 +1121,12 @@ helix-base-timeline-item::part(rail)::after {
 helix-base-timeline-item::part(marker) {
   align-items: center;
   /* The top of the entry's row, which is the line the mark is about. Stretched,
-     it would centre itself against the whole entry and drift down as the entry
+     it would center itself against the whole entry and drift down as the entry
      grows. */
   align-self: start;
   /* The box is the entry's first line and the mark inside it is smaller, which
      is what puts the two centres on top of each other. Sized to the mark
-     instead, a 12px square starts where a 20px line starts and its centre lands
+     instead, a 12px square starts where a 20px line starts and its center lands
      three pixels high on every row: measured, and the styled tier is at zero
      for exactly this reason. */
   block-size: 1.25rem;
@@ -1301,7 +1301,7 @@ const sheetFor = (slug, tagsUsed, usesRow, usesStack) => {
   /* A chart reads `--chart-series-N` for the nth series, so a consumer on this
      tier supplies the palette. Six shades walking the ramp, which is as many as
      a grayscale chart can keep apart: past that the reader is counting, not
-     comparing, and a chart wanting more wants colour. */
+     comparing, and a chart wanting more wants color. */
   const palette = CHART.has(slug)
     ? [
         `helix-base-${slug} {\n${[
@@ -1335,7 +1335,7 @@ const sheetFor = (slug, tagsUsed, usesRow, usesStack) => {
  * rounding says how a thing should feel and that is not this tier's to say; the
  * exceptions are shapes that are round rather than softened.
  *
- * **Grays, and only grays.** A base example is a diagram, and colour in a
+ * **Grays, and only grays.** A base example is a diagram, and color in a
  * diagram reads as meaning: a blue fill says primary and a red one says danger,
  * neither of which this tier has an opinion about. A neutral ramp says nothing
  * except where one surface ends and the next begins, which is the whole job.

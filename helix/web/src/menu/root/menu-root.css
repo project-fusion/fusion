@@ -73,7 +73,7 @@
  *
  * On `transform`, never on `translate`: the floating controller writes the
  * panel's position onto `translate`, and a keyframe animating that property took
- * the position over, so the panel travelled from the corner of the viewport
+ * the position over, so the panel traveled from the corner of the viewport
  * instead of from its anchor. Measured, the two compose in the order translate,
  * scale, transform, which means a `translateY` here is relative to wherever the
  * controller placed the panel and leaves x alone.
@@ -230,7 +230,7 @@
 /* What a collection says instead of rows: the same two lines everywhere, in the
    same voice, because a reader meeting "Loading" in a menu and a different
    arrangement of the same idea in a table is a reader learning the same thing
-   twice. Quiet and centred, since neither is content: they are the absence of
+   twice. Quiet and centered, since neither is content: they are the absence of
    it, and an absence set like a heading reads as an error. */
 [part="empty"],
 [part="loading"] {

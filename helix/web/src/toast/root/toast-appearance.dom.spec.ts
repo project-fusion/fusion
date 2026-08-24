@@ -27,7 +27,7 @@ const region = async (items = ''): Promise<HTMLElement> =>
 
 /* Stacking, the timer bar, the severity marks and the inversion, all of which this tier draws.
 
-   The behaviour is the base element's and is tested there. */
+   The behavior is the base element's and is tested there. */
 if (hasLayout()) {
   describe('toast stacking', () => {
     /* Which flex direction puts a new message nearest the edge depends on the

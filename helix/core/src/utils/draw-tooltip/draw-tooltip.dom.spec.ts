@@ -83,13 +83,13 @@ describe('a reading the pointer is resting on', () => {
   })
 })
 
-describe('the colour a cell wears', () => {
+describe('the color a cell wears', () => {
   /* A cell with no number is a column no chart drew: a note, a status, a name.
-     Given `data-series` anyway it takes a series colour and the stylesheet
+     Given `data-series` anyway it takes a series color and the stylesheet
      draws a dot, so a row reading `Note  Outage` arrived wearing series three's
      green while the legend beside the chart said series three was something
      else. */
-  test('is a series colour only where something was plotted in it', () => {
+  test('is a series color only where something was plotted in it', () => {
     const cells = [...drawn(0).querySelectorAll('[part="tooltip-cell"]')]
     expect(cells.map((one) => one.getAttribute('data-series'))).toEqual(['1', null])
   })

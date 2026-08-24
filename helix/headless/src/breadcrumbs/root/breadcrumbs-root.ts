@@ -26,7 +26,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  *   server shipped every crumb and the client removed some after hydrating. A
  *   trail that collapses therefore painted wrong on every single load, and the
  *   SSR spec asserting "hides no crumb, whatever collapse says" was recording
- *   that as correct behaviour rather than as the cost it is.
+ *   that as correct behavior rather than as the cost it is.
  * - **The consumer already wrote the crumbs.** The measurement hid some, then
  *   announced which, so that the consumer could read them back off the element
  *   and clone them into menu items. The overflow example spent 32 lines of

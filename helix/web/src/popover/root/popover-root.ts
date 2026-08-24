@@ -24,7 +24,7 @@ import { styles } from './popover-root.css.js'
  * @aliases Popper, Flyout, Overlay
  * @documentation https://helix.fusion.dev/components/popover
  *
- * @cssproperty --popover-border-color - Colour of the panel's edge.
+ * @cssproperty --popover-border-color - Color of the panel's edge.
  * @cssproperty --popover-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.

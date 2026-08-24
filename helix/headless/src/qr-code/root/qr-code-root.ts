@@ -114,7 +114,7 @@ const pathFor = (
  * any size the component is given, including one set in CSS.
  *
  * `correction` is what buys the middle slot. A code at `H` can lose thirty
- * percent of itself and still read, which is what makes covering the centre
+ * percent of itself and still read, which is what makes covering the center
  * with a mark safe; at `L` the same mark makes the code unscannable. That is
  * why the slot exists on the same element as the property, and why the default
  * moves when the slot is filled.
@@ -125,12 +125,12 @@ const pathFor = (
  * @aliases QR, Barcode, Scan code
  * @documentation https://helix.fusion.dev/components/qr-code
  *
- * @slot logo - A mark for the centre, which only reads at a high correction.
+ * @slot logo - A mark for the center, which only reads at a high correction.
  *
  * @csspart code - The square itself.
  * @csspart modules - Everything but the three corner squares.
- * @csspart finders - The three corner squares, which can take their own colour.
- * @csspart logo - The box holding the centre mark.
+ * @csspart finders - The three corner squares, which can take their own color.
+ * @csspart logo - The box holding the center mark.
  */
 @customElement('helix-base-qr-code')
 export class HelixBaseQrCode extends HelixElement {
@@ -167,7 +167,7 @@ export class HelixBaseQrCode extends HelixElement {
    * How much of the code can be lost and still read.
    *
    * `M` by default, which is the level almost every code in the world uses and
-   * costs about fifteen percent redundancy. `H` where a mark covers the centre,
+   * costs about fifteen percent redundancy. `H` where a mark covers the center,
    * chosen automatically when the slot is filled: it is the level that makes
    * covering safe, and a consumer who fills the slot has said what they want
    * without having to know that.
@@ -199,7 +199,7 @@ export class HelixBaseQrCode extends HelixElement {
     const quiet = 4
     const box = size + quiet * 2
     /* The three corner squares as their own path, so they can take their own
-       colour. Their positions are structural rather than guessed: seven by
+       color. Their positions are structural rather than guessed: seven by
        seven at each of three corners, plus the separator ring, which is what
        `isFinder` describes. Drawn square whatever the body's style is, because
        they are what a scanner locks onto first and rounding them costs

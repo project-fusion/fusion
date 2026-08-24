@@ -63,7 +63,7 @@ describe('chart legend', () => {
 
   test('the entries carry a palette index, which starts over after twenty-four', async () => {
     /* The palette is eight hues in three tones, so a legend past eight repeats
-       a hue in a different tone rather than repeating a colour. This pinned
+       a hue in a different tone rather than repeating a color. This pinned
        eight until the tokens went to twenty-four, at which point a chart of
        twelve painted series nine and its legend painted series one: the two
        disagreeing is the one thing the legend exists to prevent. */
@@ -84,7 +84,7 @@ describe('chart legend', () => {
   test('a list is a list, so a screen reader counts the series', async () => {
     const host = await legend(TRAFFIC, 'for="traffic"')
     expect(part(host, 'list')?.getAttribute('role')).toBe('list')
-    // The swatch is the colour and the colour is the one thing it cannot say.
+    // The swatch is the color and the color is the one thing it cannot say.
     expect(part(host, 'swatch')?.getAttribute('aria-hidden')).toBe('true')
   })
 

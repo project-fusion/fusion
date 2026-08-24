@@ -221,7 +221,7 @@ for (const file of ['index.tsx', 'core.tsx']) {
  *
  * **The count was checked and the ink never was.** A card with an entry passes
  * the check above whatever that entry draws, and `code` drew nothing at all: its
- * three paths carried `artOn`, which is a hover animation and not a colour, so
+ * three paths carried `artOn`, which is a hover animation and not a color, so
  * the whole card was an empty field. Four families were doing it, and one of
  * them, `code-block`, rendered part of its drawing and looked merely sparse.
  *

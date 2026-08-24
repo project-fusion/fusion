@@ -8,7 +8,7 @@
 //!
 //! Three of the intent's types are TypeScript unions, and a union is the one
 //! shape `derive` cannot be pointed at: `Color` is a hex string or a triple,
-//! `Seed` is a colour or a relationship, and `StatusSeed` is a colour or a bare
+//! `Seed` is a color or a relationship, and `StatusSeed` is a color or a bare
 //! hue. Each gets a wire enum that `serde(untagged)` *can* read, and a
 //! conversion. The rest are plain derives on the types themselves.
 //!
@@ -22,7 +22,7 @@
 //! before anyone relaxes it. `{ "hue": 30 }` is a `StatusSeed::Hue`, and
 //! `{ "lightness": 0.5, "chroma": 0.1, "hue": 30 }` is a `Color::Oklch`; with
 //! unknown fields allowed, the second matches the first with two keys thrown
-//! away, and a pinned status colour becomes a hue nudge without a word.
+//! away, and a pinned status color becomes a hue nudge without a word.
 
 use serde::de::{Deserializer, Error as _, MapAccess, Visitor};
 use serde::Deserialize;
@@ -85,7 +85,7 @@ struct HueOnly {
 #[derive(Deserialize)]
 #[serde(untagged)]
 enum StatusSeedWire {
-    /* **Colour first, and the order is load-bearing here.** A triple carries a
+    /* **Color first, and the order is load-bearing here.** A triple carries a
     `hue` of its own, so `HueOnly` would match one and drop the other two keys if
     it were tried first. `deny_unknown_fields` on `HueOnly` is what makes the
     reverse impossible; the order is what keeps the error message about the right

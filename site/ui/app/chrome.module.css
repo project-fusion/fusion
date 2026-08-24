@@ -237,7 +237,7 @@
 }
 
 /* The mark in the search row takes the brand, which is the one place a small
-   amount of colour reads as identity rather than as decoration: it is the thing
+   amount of color reads as identity rather than as decoration: it is the thing
    the eye lands on first and it is already the panel's subject. */
 .siteCommand::part(search) {
   color: var(--helix-color-primary);

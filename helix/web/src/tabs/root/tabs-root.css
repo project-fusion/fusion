@@ -114,7 +114,7 @@
   min-inline-size: 0;
 }
 
-/* One mark, travelling.
+/* One mark, traveling.
  *
  * A border on each tab can only appear here and disappear there, which reads as
  * two states rather than one thing moving. A single element that slides says
@@ -161,7 +161,7 @@
   translate: var(--indicator-x, 0) calc(var(--indicator-y, 0px) + var(--_indicator-offset, 0px));
   /* It slides and then settles: `emphasized` overshoots slightly and comes
      back, which is the breath. Width and position move together, so a mark
-     travelling to a longer tab grows as it goes rather than after it arrives. */
+     traveling to a longer tab grows as it goes rather than after it arrives. */
   transition:
     translate var(--helix-duration-normal) var(--helix-easing-emphasized),
     inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),

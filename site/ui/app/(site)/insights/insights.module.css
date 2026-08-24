@@ -22,9 +22,9 @@
  * ends. */
 /* A step off the page, and the masthead is see-through so it takes the step too.
  *
- * `.pageHero` is the page's own colour on both galleries, which is right on
+ * `.pageHero` is the page's own color on both galleries, which is right on
  * `/helix` because the lattice and its lit dots are what separate the band from
- * what follows. Insights has neither, so the hero was the same flat colour as
+ * what follows. Insights has neither, so the hero was the same flat color as
  * the grid below it and the only thing marking the band was the filter bar's
  * hairline: a heading, a search box and no edge until 448 pixels down.
  *
@@ -33,7 +33,7 @@
  * neutral ramp is not symmetric and each mode should take whichever token is
  * genuinely one step off its own page. The measurements were right and the band
  * was still too heavy: `surface-sunken` is thirteen values off white across 448
- * pixels of a hero, which is a grey panel rather than a step. `surface` is five,
+ * pixels of a hero, which is a gray panel rather than a step. `surface` is five,
  * and the band is a change in the paper rather than a block on it.
  *
  * Which also retires a workaround. Pairing two tokens through `light-dark()` to
@@ -45,7 +45,7 @@
  * the masthead is `transparent` at rest, and the hero's negative start margin
  * already pulls up by the header *plus the hairline* for precisely this case,
  * which the rule above calls out as the thing that stops being invisible the
- * day the hero takes a colour of its own. This is that day. */
+ * day the hero takes a color of its own. This is that day. */
 .insightsHero {
   background-color: var(--helix-color-surface);
 }
@@ -108,9 +108,9 @@
 
 /* **Left, with the prose under it.**
  *
- * This was centred, on the argument that a centred measure is a column the eye
+ * This was centered, on the argument that a centered measure is a column the eye
  * can find. That holds for a narrow column and stops holding at 90ch: the head
- * and the body now share an edge wide enough that a centred title starts in a
+ * and the body now share an edge wide enough that a centered title starts in a
  * different place from every line beneath it, and the reader's eye has two left
  * edges to keep. One edge, and the title, the labels and the byline all return
  * to it. */
@@ -131,7 +131,7 @@
  * column drags the whole control 44 to the left, and the hover fill goes with
  * it, since anything that hangs still has to sit inside the thing that lights
  * up. That gives a wash reaching 44 one way and 16 the other, hanging off the
- * side of a centred column with nothing under it. A resting misalignment of 29
+ * side of a centered column with nothing under it. A resting misalignment of 29
  * costs less than a moving one of 44: the first is a slightly indented label,
  * the second is a shape that looks broken every time a pointer crosses it.
  *
@@ -240,7 +240,7 @@
  *
  * `outlined` goes with the edges, since an outlined chip with no outline is
  * nothing at all. Every tag is `subtle` now and the subject keeps `primary`,
- * which is the one distinction the row was making with colour anyway. */
+ * which is the one distinction the row was making with color anyway. */
 .insightByline helix-tag {
   --tag-border-color: transparent;
 }
@@ -250,7 +250,7 @@
  * `quiet` rather than no treatment at all, because a bare anchor draws an
  * underline and that line propagates into the label the tag has slotted from
  * this tree: the chip would come out underlined through its own shadow root.
- * `quiet` is the variant that takes the decoration off, and its colour never
+ * `quiet` is the variant that takes the decoration off, and its color never
  * reaches the label, which `Tag` sets on its own host.
  *
  * `inline-flex` so the anchor is exactly the chip. Left inline it takes the

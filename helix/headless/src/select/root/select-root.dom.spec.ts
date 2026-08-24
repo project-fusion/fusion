@@ -91,7 +91,7 @@ describe('select', () => {
     )
   })
 
-  test('the inner list is named by the label, not labelled with it', async () => {
+  test('the inner list is named by the label, not labeled with it', async () => {
     /* The select already shows the words above its trigger, so the listbox
        inside the panel rendering them again put a heading in the dropdown.
        It still needs the name, which is why this is `aria-label` and not a

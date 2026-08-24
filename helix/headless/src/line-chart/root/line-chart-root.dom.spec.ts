@@ -96,7 +96,7 @@ describe('line chart', () => {
   test('a reading sits in the middle of its slot, so its name lines up under it', async () => {
     /* Spanning the full box is the obvious version and it puts the readings on
        the gridlines *between* the label columns, which are equal shares of the
-       width. Measured in a browser before this: the first name centred at a
+       width. Measured in a browser before this: the first name centered at a
        twelfth of the width with its point at zero, every label off by half a
        slot. Inset, all six centres landed on their vertices exactly.
      *

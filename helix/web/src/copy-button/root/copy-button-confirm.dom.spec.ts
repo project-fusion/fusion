@@ -26,7 +26,7 @@ if (hasLayout()) {
       const resolved = globalThis.getComputedStyle(button).color
 
       /* Resolved rather than compared to the token text: the declaration is a
-         `var()` and what matters is the colour it lands on. */
+         `var()` and what matters is the color it lands on. */
       const probe = host.ownerDocument.createElement('span')
       probe.style.color = success
       host.ownerDocument.body.append(probe)

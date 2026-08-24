@@ -157,7 +157,7 @@ const TableRow = ({ children }: { children?: ReactNode }) => {
  * declare fixed column widths summing to 650px, so they genuinely overflow and
  * genuinely scroll: measured, 650 against a 324 container at 420. The
  * difference is the tracks, not the markup, which is exactly why copying the
- * wrapper across brought none of its behaviour with it.
+ * wrapper across brought none of its behavior with it.
  *
  * Putting the attribute on the element rather than a parent would have been
  * just as inert, and it is where it would belong if these ever do need to
@@ -277,7 +277,7 @@ const tracksOf = (children: ReactNode): string | undefined => {
   }
   /* Against the narrowest long column rather than against the total, so the
      numbers stay small and readable in the inspector: a column with twice the
-     text of its neighbour asks for twice the room. */
+     text of its neighbor asks for twice the room. */
   const narrowest = Math.min(...long)
   return widths
     .map((width) =>
@@ -299,7 +299,7 @@ const tracksOf = (children: ReactNode): string | undefined => {
  * `.apiTable` is not the same case and keeps its wrapper: those tables declare
  * fixed column widths summing to 650px, so they genuinely overflow and
  * genuinely scroll. The difference is the tracks rather than the markup, which
- * is why copying the wrapper across brought none of its behaviour with it.
+ * is why copying the wrapper across brought none of its behavior with it.
  *
  * **Now that a track can be `max-content`, the grid can genuinely outgrow its
  * container**, on a narrow screen or a table of long names, so the host takes

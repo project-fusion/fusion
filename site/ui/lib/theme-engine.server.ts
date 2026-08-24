@@ -6,7 +6,7 @@
  * rendering without anybody arranging it; it is WebAssembly now and instantiates
  * asynchronously, which took the derived values out of the first paint. Measured
  * before this file: the slider ramps, which are drawn in OKLCH off the *derived*
- * primary so the track cannot promise a colour the engine will not produce,
+ * primary so the track cannot promise a color the engine will not produce,
  * appeared 287ms after navigation. 26ms of that was the module transfer and the
  * rest was hydration.
  *

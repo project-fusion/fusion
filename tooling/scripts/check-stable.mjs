@@ -22,7 +22,7 @@
  *    settled.
  *
  * What it deliberately does not check is whether the component is any good.
- * That is the judgement in the queue row, and it belongs to a person: the ten
+ * That is the judgment in the queue row, and it belongs to a person: the ten
  * that went stable first are the ones an audit read end to end and found
  * nothing substantive in, and no script would have known that.
  *
@@ -79,7 +79,7 @@ for (const family of families('helix/web/src')) {
 
   for (const part of parts(web)) {
     /* Both tiers, because a part's specs are split across them now. The
-       functional ones moved to `headless`, which is where the behaviour is, and
+       functional ones moved to `headless`, which is where the behavior is, and
        what stays in `web` is what asserts presentation. A part is covered when
        the pair exists somewhere, not when it exists here: reading only `web`
        reported eleven stable families as untested the day the specs moved, and

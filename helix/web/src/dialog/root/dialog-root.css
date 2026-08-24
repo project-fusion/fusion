@@ -104,7 +104,7 @@
  *
  * It recorded that `--helix-color-overlay` "comes out as nothing", that a
  * `var()` fallback could not rescue it because the token resolved to invalid
- * rather than absent, and it concluded with a literal colour written out by
+ * rather than absent, and it concluded with a literal color written out by
  * hand, described as the only literal in this library and as the platform's
  * price. Re-measured in Chromium 148 by putting the original declaration back
  * into a live modal's shadow root: it paints `oklab(0.15 0 0 / 0.64)`, the

@@ -117,14 +117,14 @@
  * The two are different numbers because they are different jobs: a total is the
  * figure a reader looks at, and plain text in a hole is more often a word beside
  * one. */
-[part="centre"] slot {
+[part="center"] slot {
   --stat-value-size: 24cqi;
 
   font-size: 13cqi;
 }
 
-[part="centre"] {
-  /* Centred in the plot, which it now sits inside rather than beside.
+[part="center"] {
+  /* Centered in the plot, which it now sits inside rather than beside.
    *
    * **`pointer-events: none`, and the slices stop responding without it.**
    * `inset: 0` with `margin: auto` centres a box and also stretches it: with no
@@ -166,7 +166,7 @@
   text-align: center;
 }
 
-/* Index to colour, the same twenty-four the legend maps. An attribute cannot
+/* Index to color, the same twenty-four the legend maps. An attribute cannot
    select a token, so it is one rule per slice, taken as a stroke because the
    ring is a stroke. */
 /* One rule, not twenty-four. The headless tier knows which series a mark
@@ -225,7 +225,7 @@
   font-weight: var(--helix-weight-medium);
 }
 
-/* A dot in the series colour, so a row of the bubble and a line in the drawing
+/* A dot in the series color, so a row of the bubble and a line in the drawing
    are visibly the same thing, and only where something was plotted. */
 [part="tooltip-cell"][data-series]::before {
   block-size: 0.5em;
@@ -333,7 +333,7 @@
 /* The slice under the pointer, thickened rather than recoloured.
  *
  * Recolouring would break the agreement with a legend beside it. Growing the
- * stroke keeps the colour and still says which one is being asked about, and it
+ * stroke keeps the color and still says which one is being asked about, and it
  * grows outward and inward equally because the stroke sits astride its own
  * radius, so the hole does not move.
  */
@@ -351,7 +351,7 @@
   }
 }
 
-/* Centred in the hole rather than pinned to the top.
+/* Centered in the hole rather than pinned to the top.
  *
  * The shared rule places a tooltip at the block start, which is right for a
  * chart laid out left to right: there is nothing above the plot and the box
@@ -366,7 +366,7 @@
  *
  * That curve is `cubic-bezier(0.3, 0, 0, 1.2)`, and the 1.2 is an overshoot: it
  * carries the property past its target and settles back. That is right for a
- * panel arriving or a mark travelling, where the overshoot is the motion having
+ * panel arriving or a mark traveling, where the overshoot is the motion having
  * weight, and it is wrong for a quantity, because the frames past the target are
  * a number the data does not contain. A bar that reads 15 momentarily drawn at
  * 16.8 is showing something untrue, briefly, to look nice.
@@ -435,7 +435,7 @@
  * the picture is presented.
  *
  * **The box is no longer square.** The headless tier crops the view box to the
- * band it actually draws, from the top of the ring to the centre line plus the
+ * band it actually draws, from the top of the ring to the center line plus the
  * half stroke the flat ends hang below it, so the ratio is the width over that
  * band. `--donut-chart-stroke` is already published on the plot, for the middle
  * to size itself against, and it is the only number here that moves.
@@ -452,12 +452,12 @@
   transform: rotate(180deg);
 }
 
-/* **And the middle sits at the bottom, because that is where the centre of the
-   circle now is.** Cropping put the circle's centre on the box's bottom edge,
+/* **And the middle sits at the bottom, because that is where the center of the
+   circle now is.** Cropping put the circle's center on the box's bottom edge,
    so a middle placed at fifty per cent of the plot floats inside the arc and
    over its top. Bottom-aligned it lands in the opening, which is where a
    semi-donut puts its figure. */
-:host([sweep="half"]) [part="centre"] {
+:host([sweep="half"]) [part="center"] {
   inset-block-end: 0;
   inset-block-start: auto;
   translate: -50% 0;
@@ -480,7 +480,7 @@
   );
 }
 
-:host([sweep="half"]) [part="centre"] slot {
+:host([sweep="half"]) [part="center"] slot {
   --stat-value-size: 12cqi;
 
   font-size: 6.5cqi;

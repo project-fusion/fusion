@@ -53,7 +53,7 @@ const svgOf = (host: Code): SVGElement => part(host, 'code') as unknown as SVGEl
  * Every cell either path fills, which is what "the code" means now.
  *
  * The drawing is two paths, the modules and the three corner squares, so that
- * the finders can take a colour of their own: one path is one fill. Anything
+ * the finders can take a color of their own: one path is one fill. Anything
  * asking whether the picture matches the encoder has to put them back together.
  */
 const allCells = (host: Code): Set<string> => {
@@ -164,7 +164,7 @@ describe('qr code', () => {
   test('the corner squares are their own path, and stay square', async () => {
     /* They are what a scanner locks onto first, so rounding them trades
        reliability for decoration. Separating them is also what lets them take
-       a colour of their own: one path is one fill. */
+       a color of their own: one path is one fill. */
     const host = await code('<helix-base-qr-code shape="dots" value="hello"></helix-base-qr-code>')
     const finders = svgOf(host).querySelector('[part="finders"]')?.getAttribute('d') ?? ''
     expect(finders).not.toBe('')
@@ -203,5 +203,5 @@ describe('qr code', () => {
   })
 })
 
-/* The centre mark needs a real engine: `assignedNodes` is what tells the
+/* The center mark needs a real engine: `assignedNodes` is what tells the
    element the slot was filled, and happy-dom does not report it here. */

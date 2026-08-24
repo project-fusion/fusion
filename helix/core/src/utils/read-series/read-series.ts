@@ -72,7 +72,7 @@ const isGrid = (element: Element): boolean =>
  * Reads a grid built from roles rather than from table markup.
  *
  * The shape is the same question asked of different elements: a first row of
- * column headers naming the series, a first cell per row labelling it, and
+ * column headers naming the series, a first cell per row labeling it, and
  * numbers in the rest. `helix-table` puts its columns beside its rows rather
  * than inside a header row, so the columns are looked for in the whole grid and
  * the rows are read separately.
@@ -114,7 +114,7 @@ const readGrid = (grid: Element): Series[] => {
  * cells will not parse, so a column of notes came back as a series with a name
  * and no points. Nothing drew it, which is why it went unseen, and `Legend`
  * named it anyway: a swatch in the palette against a column no chart plotted,
- * and every series after it shifted a colour.
+ * and every series after it shifted a color.
  *
  * Found the moment tables grew columns a tooltip wanted and a drawing did not,
  * which is the arrangement `readRows` exists for. */

@@ -66,7 +66,7 @@ describe('video playlist menu', () => {
     expect(entries(menu).map((one) => one.getAttribute('value'))).toEqual(['one', 'two', 'three'])
   })
 
-  test("carries each entry's still, so an episode is recognised not read", async () => {
+  test("carries each entry's still, so an episode is recognized not read", async () => {
     const { menu } = await mountMenu()
     const posters = entries(menu).map(
       (one) => one.querySelector('[part="poster"]')?.getAttribute('src') ?? null,

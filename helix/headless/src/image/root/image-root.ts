@@ -18,7 +18,7 @@ import { property, state } from 'lit/decorators.js'
  * `Skeleton` would be right and is not written here: this tier renders no other
  * component, and reaching for one would make the headless package depend on the
  * styled one. The styled tier draws the resting placeholder instead, and a
- * consumer who wants a `Skeleton`, a blurred thumbnail or a solid colour slots
+ * consumer who wants a `Skeleton`, a blurred thumbnail or a solid color slots
  * it.
  *
  * **No source is a loading state, not a fourth one.** A picture whose `src` has

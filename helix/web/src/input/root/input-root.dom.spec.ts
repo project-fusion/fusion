@@ -259,7 +259,7 @@ if (hasLayout()) {
          which generate no box, so the gap has nothing to sit between.
 
          The assertion is that a bare host is exactly its field and no taller.
-         It was `bare < labelled` first, which is true either way: an empty
+         It was `bare < labeled` first, which is true either way: an empty
          label is still shorter than a real one, so that version passed against
          the bug it was written for. Checked by putting the bug back. */
       const host = await mount('<helix-input placeholder="P"></helix-input>')

@@ -16,7 +16,7 @@ const _area = async (attrs = '', body = '<p>One</p>'): Promise<Area> => {
 
 /* The fades at the edges, which are drawn here and opted out of by giving one no depth.
 
-   The behaviour is the base element's and is tested there. */
+   The behavior is the base element's and is tested there. */
 if (hasLayout()) {
   describe('a scroll area with a page under it', () => {
     const sized = async (lines: number): Promise<Area> => {

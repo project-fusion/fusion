@@ -121,7 +121,7 @@
  * `text-align: start` because the hero centers its column and `text-align`
  * inherits straight through the shadow boundary into the field: the placeholder
  * and anything typed came out centered, which is not how a search box behaves
- * anywhere. Centring is a property of the layout here, not of the control. */
+ * anywhere. Centering is a property of the layout here, not of the control. */
 .heroSearch {
   inline-size: 100%;
   max-inline-size: calc(var(--helix-size-button) * 2 - var(--helix-border-thin));
@@ -146,7 +146,7 @@
  * control. A form on this site should still show its labels. */
 /* No background rule here, and there was one.
  *
- * It set the field to the page's colour because `Input` filled with
+ * It set the field to the page's color because `Input` filled with
  * `--helix-color-surface-sunken`, one step *below the page*, and this search
  * sits on a band one step above it: the control came out a single value from
  * what it sits on and stopped reading as a field. 154 fixed that at the source.
@@ -155,7 +155,7 @@
  * the field reads on this band with nothing written here.
  *
  * The rule survived the fix for a sentence, on the argument that the page's own
- * colour is a hole cut *through* the band where the well is a recess *in* it.
+ * color is a hole cut *through* the band where the well is a recess *in* it.
  * That is true and it was not the reason the rule existed. A consumer override
  * kept for a look nobody asked for is how a site stops demonstrating the system
  * it is built from, and the site is the first thing that would have to be right

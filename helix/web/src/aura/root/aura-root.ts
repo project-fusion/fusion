@@ -175,7 +175,7 @@ export class HelixAura extends HelixElement {
    *
    * **The fraction is measured across the whole width, and for a while it was
    * not.** The first expression corrected for the aspect once in the wrong
-   * direction and never subtracted the centre, so the value read as an offset
+   * direction and never subtracted the center, so the value read as an offset
    * from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
    * put the axis at 81.3% of the width and `0` was the only value that reached
    * the middle. The contract above is now solved against what the shader draws
@@ -784,7 +784,7 @@ export class HelixAura extends HelixElement {
        with time.
        
        Time alone is not enough, because what has to be spent by the moment the
-       ring reuses a slot is a function of *distance travelled*, not of seconds:
+       ring reuses a slot is a function of *distance traveled*, not of seconds:
        marks commit every gate length, so a brisk gesture laps the ring long
        before a two second fade has taken the oldest down, and overwriting a
        mark that is still bright is a pop at the tail.

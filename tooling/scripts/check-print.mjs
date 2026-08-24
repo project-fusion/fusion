@@ -16,7 +16,7 @@
  * The answers are four, and each family's own sheet carries the reason. Chrome
  * hides, because a printed page has no elsewhere to go and a spinner is a
  * promise nothing will keep. Surfaces flatten, because a lift is a shadow and a
- * printer turns a shadow into a grey smear. Boxes that scroll unclip, because a
+ * printer turns a shadow into a gray smear. Boxes that scroll unclip, because a
  * box that hides is a box that loses content on paper. And anything whose fill
  * *is* the information forces itself to print: a chart with no fill is a frame,
  * and a ticked checkbox whose tick is a background prints as an empty box, which

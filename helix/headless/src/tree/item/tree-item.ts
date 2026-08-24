@@ -37,7 +37,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * default. An anchor cannot contain the group, since the group holds more
  * anchors and nesting them is invalid, so the row carries `treeitem` and the
  * group becomes its sibling under a presentational wrapper. That is exactly the
- * navigation flavour of the tree pattern, and the arrangement without an `href`
+ * navigation flavor of the tree pattern, and the arrangement without an `href`
  * stays as it was: `treeitem` containing `group`, which is what an `<li>`
  * holding a `<ul>` is.
  *
@@ -305,7 +305,7 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
      * an anchor cannot contain the group: the group holds more anchors and
      * nesting them is invalid markup that no assistive technology reads the way
      * it looks. So the row becomes the `treeitem` and the group becomes its
-     * sibling, which is the navigation flavour of the pattern.
+     * sibling, which is the navigation flavor of the pattern.
      *
      * Without one, nothing changes: the wrapper is the `treeitem` and holds the
      * group, which is what an `<li>` holding a `<ul>` is, and what this was

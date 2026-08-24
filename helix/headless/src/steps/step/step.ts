@@ -116,9 +116,9 @@ export class HelixBaseStep extends HelixElement {
    * rather than losing it to the target: they did finish it, and the name and
    * the rule below still say which one is open.
    *
-   * **Three shapes, and the reader can tell them apart with the colour off.**
+   * **Three shapes, and the reader can tell them apart with the color off.**
    * An outline circle for a stage nobody has reached, the same circle with a
-   * centre for the one they are standing on, a bare check for one that is done.
+   * center for the one they are standing on, a bare check for one that is done.
    * The first two are one shape filling in, which is the progression, and the
    * check is the only mark that leaves the family because finishing is the only
    * state that is not a position in the sequence.

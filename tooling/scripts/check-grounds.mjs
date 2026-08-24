@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Checks that a component painting the page's colour lets a consumer correct it.
+ * Checks that a component painting the page's color lets a consumer correct it.
  *
  * **`--helix-color-background` is the page, and a component is not the page.**
  * Every use of it inside a component is a claim about what that component is
  * sitting on, and the claim is right exactly as often as the component is put
  * on the page and no other ground. `Timeline`'s marker made it, painted itself
- * the page colour to knock the rail out behind it, and came out darker than any
+ * the page color to knock the rail out behind it, and came out darker than any
  * surface that was not the page: a card showed it as a black disc. The
  * sparkline's ring terminus made the same one and looked identical.
  *
@@ -18,10 +18,10 @@
  * **Two ways to be right, and this holds components to one of them.**
  *
  * 1. **Be page-level chrome.** An app header, the sandbox shell: these are the
- *    page's own furniture and painting the page's colour is what they are for.
+ *    page's own furniture and painting the page's color is what they are for.
  *    Named in `CHROME` below, one line of reasoning each, because an allowlist
  *    without reasons becomes the place things go to stop being questioned.
- * 2. **Take the colour from a hook and fall back to the page.** Written
+ * 2. **Take the color from a hook and fall back to the page.** Written
  *    `var(--thing-background, var(--helix-color-background))`, the guess is
  *    still the guess and a consumer on a card can say otherwise in one
  *    declaration. That is the whole difference between a default and a
@@ -35,8 +35,8 @@
  *
  * **A mix toward the page is a tint, and is left alone.** `Tag` builds its fill
  * as `color-mix(in oklab, tone 14%, background)` and `Button` takes the page's
- * colour as the *ink* on a filled tone. Both name this token and neither is
- * painting a ground: one is deriving a colour and the other is choosing a
+ * color as the *ink* on a filled tone. Both name this token and neither is
+ * painting a ground: one is deriving a color and the other is choosing a
  * foreground. Reporting them made the check un-actionable, seventeen hits of
  * which four were the thing it was written for, so it reads the property as
  * well as the token. That they are also affected by a card is true, and is a
@@ -57,14 +57,14 @@ import { join } from 'node:path'
 const TIER = 'helix/web/src'
 const TOKEN = '--helix-color-background'
 
-/* The properties that put a colour on the page. A custom property is excluded
-   by construction: it is a name for a colour and says nothing about where the
-   colour goes, and the declaration that uses it is the one this is about. */
+/* The properties that put a color on the page. A custom property is excluded
+   by construction: it is a name for a color and says nothing about where the
+   color goes, and the declaration that uses it is the one this is about. */
 const PAINTS =
   /^\s*(background|background-color|border-color|border-block-color|border-block-end-color|border-block-start-color|border-inline-color|border-inline-end-color|border-inline-start-color|border-top-color|border-right-color|border-bottom-color|border-left-color|box-shadow|caret-color|color|fill|outline-color|stroke|text-decoration-color)\s*:/
 
 /* Page-level chrome, which is the page's furniture rather than something put on
-   it. Each of these paints the page's colour because that is what it is. */
+   it. Each of these paints the page's color because that is what it is. */
 const CHROME = new Map([
   ['app-header', 'The bar across the top of the page, which is page chrome by definition.'],
   ['sandbox', 'A development tool that owns its whole window, not a component put on a page.'],
@@ -143,5 +143,5 @@ if (problems.length > 0) {
 }
 
 console.log(
-  `grounds: ${corrected} declarations fall back to the page colour, every one of them correctable`,
+  `grounds: ${corrected} declarations fall back to the page color, every one of them correctable`,
 )

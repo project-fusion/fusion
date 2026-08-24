@@ -13,7 +13,7 @@ use crate::oklch::{lightness_for_contrast, Oklch, CONTRAST_STEPS};
 /// What the page is written in.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct NeutralInks {
-    /// The line between a surface and its neighbour.
+    /// The line between a surface and its neighbor.
     pub border: Oklch,
     /// Body text.
     pub foreground: Oklch,
@@ -42,7 +42,7 @@ pub struct NeutralInks {
 ///
 /// **What is worth checking before trusting any of that** is the one thing the
 /// port can check: the numbers themselves are asserted against the oracle, so a
-/// reader who disagrees with the reading can still rely on the behaviour.
+/// reader who disagrees with the reading can still rely on the behavior.
 ///
 /// `1.6` is not unique to `foreground`, which is a fact rather than a reading:
 /// the inverse pair uses the same multiplier, so whatever it is for, it is for

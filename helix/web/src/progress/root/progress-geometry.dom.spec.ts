@@ -27,7 +27,7 @@ const progress = async (attrs = 'value="62"'): Promise<Progress> =>
 
 /* The fill and the indeterminate segment as drawn, including what reduced motion trades them for.
 
-   The behaviour is the base element's and is tested there. */
+   The behavior is the base element's and is tested there. */
 if (hasLayout()) {
   describe('progress geometry', () => {
     test('the fill is a proportion of the track it is drawn in', async () => {
@@ -93,7 +93,7 @@ if (hasLayout()) {
     })
 
     test('reduced motion trades the segment for a hatch, which is not a quantity', async () => {
-      /* The one place the two states cannot look alike. A travelling segment
+      /* The one place the two states cannot look alike. A traveling segment
          that has been stopped is parked somewhere along the track, which is
          exactly what a value looks like, and a bar that cannot move cannot
          correct the impression.

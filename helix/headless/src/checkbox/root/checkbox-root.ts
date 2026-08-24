@@ -133,9 +133,9 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
    *
    * Called on `slotchange` and after every update, and the second is not
    * belt-and-braces: **`slotchange` does not fire when nothing is assigned.**
-   * So a checkbox labelled only by its property, which is most of them, never
+   * So a checkbox labeled only by its property, which is most of them, never
    * heard about its own label and rendered without one. Caught by the spec that
-   * asks a labelled row to be wider than a bare one.
+   * asks a labeled row to be wider than a bare one.
    */
   private syncLabelPresence(): void {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('[part="label"] slot')
@@ -156,7 +156,7 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
        nothing: the styled tier's own description claimed the pair behaved like
        a native label wrapping a checkbox, and nothing was doing that work.
 
-       Labelling is behavior, which is what earns an element here rather than a
+       Labeling is behavior, which is what earns an element here rather than a
        bare slot: the wrapper is not decoration and there is no other way to get
        it. The browser handles the forwarding, so there is no click handler to
        write and none to get wrong.

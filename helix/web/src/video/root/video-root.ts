@@ -18,7 +18,7 @@ import { styles } from './video-root.css.js'
  *
  * **The bar is over the picture, not under it.** A bar in the layout would move
  * everything below the video by its own height and would leave a strip of page
- * colour under a picture that is meant to be the whole of it. Over it, the
+ * color under a picture that is meant to be the whole of it. Over it, the
  * video is the component's size and the controls belong to it.
  *
  * **It goes when nobody is using it, and comes back for the keyboard.** Hidden

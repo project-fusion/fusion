@@ -4,11 +4,11 @@
  * element for a consumer to reach, and forwarding goes outward only: from in
  * here the box still lives in the dialog's shadow root, and a plain attribute
  * selector matches nothing. Measured by writing one and watching the panel stay
- * centred.
+ * centered.
  *
- * Against the top of the window rather than centred, which is where every
- * palette a reader has used opens. A centred one moves: the list grows and
- * shrinks as the filter narrows it, and a box centred on the viewport walks up
+ * Against the top of the window rather than centered, which is where every
+ * palette a reader has used opens. A centered one moves: the list grows and
+ * shrinks as the filter narrows it, and a box centered on the viewport walks up
  * and down the screen under the words being typed, taking the field with it.
  * Pinned at the top, only the bottom edge moves and the field stays still. */
 helix-dialog::part(dialog) {

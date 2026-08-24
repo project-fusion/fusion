@@ -28,13 +28,13 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  *
  * @description
  * Three parts: a direction that is up, down or neutral, the metric that moved,
- * and a label saying over what. The arrow carries the direction and its colour
+ * and a label saying over what. The arrow carries the direction and its color
  * carries the judgment, and the two are separate properties because they are
  * separate facts.
  *
- * **`good` is absent by default, so an unjudged trend is grey.** Every
+ * **`good` is absent by default, so an unjudged trend is gray.** Every
  * dashboard convention says up is green, and for churn, latency, error rate,
- * cost and bounce rate that convention is a lie told in the most legible colour
+ * cost and bounce rate that convention is a lie told in the most legible color
  * on the page. A component that guesses is wrong roughly a third of the time
  * and silent about it; one that waits to be told is uninformative until it is,
  * which is the cheaper failure. State the metric's polarity once and the

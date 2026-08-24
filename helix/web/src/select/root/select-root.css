@@ -145,7 +145,7 @@
  *
  * On `transform`, never on `translate`: the floating controller writes the
  * panel's position onto `translate`, and a keyframe animating that property took
- * the position over, so the panel travelled from the corner of the viewport
+ * the position over, so the panel traveled from the corner of the viewport
  * instead of from its anchor. Measured, the two compose in the order translate,
  * scale, transform, which means a `translateY` here is relative to wherever the
  * controller placed the panel and leaves x alone.

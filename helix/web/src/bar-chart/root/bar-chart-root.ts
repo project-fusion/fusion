@@ -22,7 +22,7 @@ import '../../tooltip/index.js'
  * @documentation https://helix.fusion.dev/components/bar-chart
  *
  * @cssproperty --bar-chart-band-color - The slot the pointer is resting in.
- * @cssproperty --bar-chart-line-color - A `lines` series, overriding its series colour.
+ * @cssproperty --bar-chart-line-color - A `lines` series, overriding its series color.
  * @cssproperty --bar-chart-line-width - Thickness of a `lines` series.
  * @cssproperty --bar-chart-gridline-color - One rule across the plot, under `gridlines`.
  * @cssproperty --bar-chart-bar-radius - Corner radius at the far end of a column.
@@ -98,7 +98,7 @@ export class HelixBarChart extends HelixBaseBarChart {
    *
    * The chart's treatment, which every series takes unless `outlined` or
    * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-   * of the series colour with that edge on it, and absent is the filled column,
+   * of the series color with that edge on it, and absent is the filled column,
    * per the rule that a reflected property takes no default.
    *
    * **It composes with `material` rather than competing with it.** Emphasis
@@ -132,7 +132,7 @@ export class HelixBarChart extends HelixBaseBarChart {
   @property()
   outlined?: string
 
-  /** Which series are drawn as a wash of their colour, by name. Matched as `outlined` is. */
+  /** Which series are drawn as a wash of their color, by name. Matched as `outlined` is. */
   @property()
   subtle?: string
 
@@ -141,13 +141,13 @@ export class HelixBarChart extends HelixBaseBarChart {
    *
    * **Stamped after render rather than rendered, because the tier that draws
    * the columns is the one that must not know about treatments.** The headless
-   * tier already writes `data-series` on every rect so a stylesheet can colour
+   * tier already writes `data-series` on every rect so a stylesheet can color
    * it; this reads the same mark, resolves the names against the series the
    * table gave, and writes `data-emphasis` beside it. The stylesheet does the
    * rest, so nothing about painting crosses the tier boundary.
    *
    * The mark is the palette slot rather than the series ordinal, so past the
-   * palette's width two series share one. They share a colour there too, which
+   * palette's width two series share one. They share a color there too, which
    * is the same limit arriving in a second place rather than a new one.
    */
   protected override updated(changed: PropertyValues<this>): void {

@@ -23,7 +23,7 @@
 /* Two half lines, one either side of the mark. Each reaches from the mark to
    its own step's edge and half the gap beyond, so it meets the one coming the
    other way in the middle of the gap and the rule reads as continuous without
-   any step knowing the size of its neighbour.
+   any step knowing the size of its neighbor.
 
    Under the mark rather than over it, so a line ending at the mark's edge is
    covered by it and no seam shows where the two meet. */
@@ -64,7 +64,7 @@
  * The square it occupies is not always the glyph's own size. Down a column the
  * mark shares a row with a dense button, and a twenty pixel glyph aligned to
  * the top of a thirty-two pixel control sits six pixels above the first line of
- * the name; the box is the button's and the glyph is centred in it. Every line
+ * the name; the box is the button's and the glyph is centered in it. Every line
  * offset is measured from this box rather than from the glyph. */
 [part="marker"] {
   align-items: center;
@@ -87,7 +87,7 @@
 }
 
 /* The slot is a flex item like the glyph inside it, so it needs the same
-   centring: without it the check was handed the row's leftover width and drew
+   centering: without it the check was handed the row's leftover width and drew
    as a wide flat tick. */
 [part="marker"] slot {
   align-items: center;
@@ -118,12 +118,12 @@ slot[name="marker"]::slotted(*) {
 /* A hue only where the shape already carries the meaning.
  *
  * Green on a check is confirming: the check is the shape for "finished", so the
- * colour agrees with something a reader can already read. The accent on the
+ * color agrees with something a reader can already read. The accent on the
  * target is the same bargain, and the two together let the sequence be read at
  * a glance, everything ahead of the reader staying quiet.
  *
  * Under `numeric` both go back to ink, because a digit carries no meaning of
- * its own for a colour to agree with: a green 2 would be hue used as the whole
+ * its own for a color to agree with: a green 2 would be hue used as the whole
  * signal. The list hands the ink down, and the public hooks still win over it,
  * so a consumer who wants a green 2 sets `--steps-complete-color` and gets one. */
 :host([complete]) [part="marker"] {

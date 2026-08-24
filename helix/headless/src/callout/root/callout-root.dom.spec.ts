@@ -12,7 +12,7 @@ const iconSvg = (host: HTMLElement): Element | null =>
 describe('callout tone', () => {
   test('carries the tone as an accessible name, not only as a color', async () => {
     // Someone who cannot see that the box is red still has to learn it is an
-    // error, so the icon is labelled rather than decorative.
+    // error, so the icon is labeled rather than decorative.
     const callout = await mount('<helix-base-callout tone="danger">Failed</helix-base-callout>')
     expect(iconSvg(callout)?.getAttribute('role')).toBe('img')
     expect(iconSvg(callout)?.getAttribute('aria-label')).toBe('Error')

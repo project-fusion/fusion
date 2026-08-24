@@ -77,7 +77,7 @@ export interface TooltipAt {
  * **An HTML mark rather than the `<rect>` or `<circle>` already there.**
  * `FloatingController` types its anchor as `HTMLElement` and an SVG element is
  * not one; and a slice's `<circle>` has the bounding box of the whole ring
- * rather than of its arc, so anchoring to it would point at the ring's centre
+ * rather than of its arc, so anchoring to it would point at the ring's center
  * for every slice.
  *
  * **And the arrow now follows from placement rather than from a compass.** The
@@ -132,10 +132,10 @@ export const drawTooltip = (
         <span part="tooltip-label">${row.label}</span>
         ${row.cells.map(
           (cell, index) =>
-            /* A palette colour only where something was plotted in it.
+            /* A palette color only where something was plotted in it.
              *
              * A cell with no number is a column no chart drew: a note, a status,
-             * a name. Given `data-series` anyway it takes a series colour and the
+             * a name. Given `data-series` anyway it takes a series color and the
              * stylesheet draws a dot, so a row reading `Note  Outage` arrived
              * wearing series three's green while the legend beside the chart said
              * series three was something else. */

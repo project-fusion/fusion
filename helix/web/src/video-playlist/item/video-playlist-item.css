@@ -98,7 +98,7 @@
    the same note.
  *
  * No fill of its own. It had one, and an entry with neither a poster nor
- * anything slotted came out as a grey rectangle per row, which reads as a
+ * anything slotted came out as a gray rectangle per row, which reads as a
  * thumbnail that failed rather than as a row that has none. Empty, the column is
  * space that keeps the names aligned and draws nothing. */
 [part="media"] {

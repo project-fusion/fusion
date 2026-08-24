@@ -813,7 +813,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     if (!tree || !panel || chosen === undefined) {
       return
     }
-    let cancelled = false
+    let canceled = false
     const show = async (): Promise<void> => {
       await tree.updateComplete
       const row = [...tree.querySelectorAll<HelixTreeItem>('helix-tree-item')].find(
@@ -828,13 +828,13 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           settled(undefined)
         })
       })
-      if (!cancelled) {
+      if (!canceled) {
         scrollItemIntoView(row, { padding: 8, scroller: panel })
       }
     }
     void show()
     return () => {
-      cancelled = true
+      canceled = true
     }
   }, [chosen, tree])
 

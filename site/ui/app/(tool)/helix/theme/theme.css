@@ -115,7 +115,7 @@ helix-sandbox-editor {
 /* **It transitions in, because it appears in response to something the reader
    just did.** A notice that materialises with no motion reads as having always
    been there, and the thing it is reporting, that the brand moved, is a
-   consequence of the colour they typed a moment ago.
+   consequence of the color they typed a moment ago.
 
    Keyed on the direction in the markup, so switching from lightened to darkened
    remounts and plays again rather than silently swapping a word. */

@@ -21,7 +21,7 @@
  *
  * The prose between tokens comes across as comments in the order it was
  * written, so the generated stylesheet reads the way the hand-written one did.
- * That is not decoration: most of the reasoning in this design system's colour
+ * That is not decoration: most of the reasoning in this design system's color
  * work is in those paragraphs.
  *
  * `bun run tokens:build` writes, `bun run check:tokens-layer` fails when the

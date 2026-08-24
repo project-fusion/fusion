@@ -256,7 +256,7 @@ export const FRAGMENT = `#version 300 es
     /* A curtain stands. It does not hang.
     
        This was a falloff symmetric about the ridge, which is a band with a
-       wavy centre line, and a band with vertical noise on it is an equaliser.
+       wavy center line, and a band with vertical noise on it is an equaliser.
        An aurora has a sharp lower border where the field lines reach their
        lowest, and light that thins upward from it, so the top and the bottom
        cannot be the same function. Cut hard below, drawn long above.
@@ -346,7 +346,7 @@ export const FRAGMENT = `#version 300 es
     return lit;
   }
 
-  /* Light travelling in lanes, at speed.
+  /* Light traveling in lanes, at speed.
    *
    * The one shape here that is about motion rather than about a form. Each lane
    * carries a trail with its own speed, length and phase, so the field reads as
@@ -447,7 +447,7 @@ export const FRAGMENT = `#version 300 es
          a grid however much else about them differs. */
       /* Wider spacing, because the tails are longer: at the old gap a streak's
          tail reached the next one's nose and the lane read as a dashed line
-         rather than as separate things travelling. */
+         rather than as separate things traveling. */
       float gap = mix(4.2, 3.2 + hash(vec2(id, 59.0)) * 2.2, v);
       float travel = phase + t * speed * 1.8 / gap;
       float u = s.y / gap - travel;
@@ -482,7 +482,7 @@ export const FRAGMENT = `#version 300 es
          *in front of* a head only, so there was never a round bright thing at
          the head at all, just where the profile happened to start.
     
-         The glow is centred on the head now, measured to whichever head is
+         The glow is centered on the head now, measured to whichever head is
          nearer along the lane, so it is symmetric about the nucleus the way a
          coma is. */
       float behind = (1.0 - w) * gap;
@@ -563,7 +563,7 @@ export const FRAGMENT = `#version 300 es
        which is a wave field rather than a single swell.
     
        The two are deliberately not harmonic. Close but unequal frequencies beat
-       against each other, and the slow travelling interference that produces is
+       against each other, and the slow traveling interference that produces is
        the thing worth watching. */
     float a = sin((w.y * 8.1 + w.x * 2.3) - t * 0.9 - pull * 1.4);
     float b = sin((w.y * 5.3 - w.x * 3.4) + t * 0.6 + pull * 1.0);
@@ -643,7 +643,7 @@ export const FRAGMENT = `#version 300 es
 
   /* Points adrift, and pushed aside.
    *
-   * One per cell of a coarse lattice, jittered off centre so the lattice never
+   * One per cell of a coarse lattice, jittered off center so the lattice never
    * shows, and drifting on its own small orbit. Nine cells are visited because a
    * point near a boundary has to be drawn by its neighbours too, which is what
    * stops them popping in and out at the seams.
@@ -686,7 +686,7 @@ export const FRAGMENT = `#version 300 es
            motion, it is orientation, so a field of them reads as grains of rice
            pointing every which way rather than as particles at all. Motion, if
            it is ever wanted here, has to come from the direction each mote is
-           actually travelling, and that is the wander below rather than a hash.
+           actually traveling, and that is the wander below rather than a hash.
     
            The halo stays. An order of magnitude wider and a tenth the strength,
            so a mote sits in the field rather than on top of it: a hard little
@@ -702,7 +702,7 @@ export const FRAGMENT = `#version 300 es
   /* Ink in a viscous medium, drawn through by where the pointer went.
    *
    * **The wake is one stroke, not eight marks.** Each trail point used to add a
-   * vortex of its own, rotating the sample around its own centre, which drew
+   * vortex of its own, rotating the sample around its own center, which drew
    * eight discrete swirls fading in place: a row of blobs rather than anything
    * a hand had done. The marks are a polyline now. Distance is measured to the
    * nearest *segment*, age is interpolated along it, and what a reader sees is

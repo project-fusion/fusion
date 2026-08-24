@@ -52,7 +52,7 @@ const geometry = hasLayout() ? test : (): void => {}
    indent by, so parent and child measure the same left edge, and the row has no
    padding or gap to read: `parseFloat('')` is `NaN` and the comparison against
    it can only fail. The structure these rows have, the chevron and the slots,
-   is behaviour and stays on the base. */
+   is behavior and stays on the base. */
 describe('tree item geometry', () => {
   geometry('siblings share a column, whatever they are', async () => {
     const tree = await mount(mixed)

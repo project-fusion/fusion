@@ -240,7 +240,7 @@ if (hasLayout()) {
   describe('a rating being dragged', () => {
     type Rating = HTMLElement & { value: string; updateComplete: Promise<unknown> }
 
-    const centre = (host: HTMLElement, step: number): number => {
+    const center = (host: HTMLElement, step: number): number => {
       const option = [
         ...(host.shadowRoot as ShadowRoot).querySelectorAll<HTMLElement>('[part="option"]'),
       ][step]
@@ -265,14 +265,14 @@ if (hasLayout()) {
          at 1 through every drag here and the specs would be measuring the
          controlled contract rather than the gesture. */
       const host = (await rating('default-value="1"')) as Rating
-      await send(host, 'pointerdown', centre(host, 1))
+      await send(host, 'pointerdown', center(host, 1))
       expect(host.value).toBe('1')
 
-      await send(host, 'pointermove', centre(host, 4))
+      await send(host, 'pointermove', center(host, 4))
       expect(part(host, 'marks')?.getAttribute('style')).toContain('--rating-full: 5')
       expect(host.value).toBe('1')
 
-      await send(host, 'pointerup', centre(host, 4))
+      await send(host, 'pointerup', center(host, 4))
       expect(host.value).toBe('5')
     })
 
@@ -280,15 +280,15 @@ if (hasLayout()) {
       // Not recomputed from `max` and `step`, which would be a second copy of
       // the stylesheet's arithmetic that could disagree with it.
       const host = (await rating('default-value="1" step="0.5"')) as Rating
-      await send(host, 'pointerdown', centre(host, 2))
-      await send(host, 'pointerup', centre(host, 2))
+      await send(host, 'pointerdown', center(host, 2))
+      await send(host, 'pointerup', center(host, 2))
       expect(host.value).toBe('1.5')
     })
 
     test('a drag off the end pins to the last mark rather than stopping short', async () => {
       const host = (await rating('default-value="1"')) as Rating
       const past = host.getBoundingClientRect().right + 200
-      await send(host, 'pointerdown', centre(host, 0))
+      await send(host, 'pointerdown', center(host, 0))
       await send(host, 'pointermove', past)
       await send(host, 'pointerup', past)
       expect(host.value).toBe('5')
@@ -296,9 +296,9 @@ if (hasLayout()) {
 
     test('a gesture the system takes away chooses nothing', async () => {
       const host = (await rating('value="2"')) as Rating
-      await send(host, 'pointerdown', centre(host, 4))
-      await send(host, 'pointercancel', centre(host, 4))
-      await send(host, 'pointerup', centre(host, 4))
+      await send(host, 'pointerdown', center(host, 4))
+      await send(host, 'pointercancel', center(host, 4))
+      await send(host, 'pointerup', center(host, 4))
       expect(host.value).toBe('2')
     })
 
@@ -311,8 +311,8 @@ if (hasLayout()) {
       host.addEventListener('helix-change', (event) => {
         asked = (event as CustomEvent<{ value: string }>).detail?.value
       })
-      await send(host, 'pointerdown', centre(host, 4))
-      await send(host, 'pointerup', centre(host, 4))
+      await send(host, 'pointerdown', center(host, 4))
+      await send(host, 'pointerup', center(host, 4))
       expect(asked).toBe('5')
       expect(host.value).toBe('1')
     })
@@ -327,8 +327,8 @@ if (hasLayout()) {
 
     test('and neither can a disabled one', async () => {
       const host = (await rating('disabled value="2"')) as Rating
-      await send(host, 'pointerdown', centre(host, 0))
-      await send(host, 'pointerup', centre(host, 4))
+      await send(host, 'pointerdown', center(host, 0))
+      await send(host, 'pointerup', center(host, 4))
       expect(host.value).toBe('2')
     })
   })

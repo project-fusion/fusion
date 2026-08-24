@@ -16,7 +16,7 @@ type Nav = HTMLElement & {
 /* Where the reading mark sits and how tall it is, which the stylesheet decides:
    on the base tier every section measures the same 1px and the assertion has
    nothing to tell apart. The sections it tracks, and the scrolling, are
-   behaviour and stay on the base. */
+   behavior and stay on the base. */
 if (hasLayout()) {
   describe('page nav reading position', () => {
     /* The whole component is this rule, and only a browser has the boxes to

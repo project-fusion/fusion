@@ -46,7 +46,7 @@
   inline-size: var(--legend-swatch-size, var(--helix-space-sm));
 }
 
-/* Index to colour, which is the whole of what this tier adds.
+/* Index to color, which is the whole of what this tier adds.
  *
  * Twenty-four rules rather than one, because the index arrives as an attribute
  * and an attribute cannot select a token. The tier below counts the entries and
@@ -54,7 +54,7 @@
  *
  * They are the eight hues in three tones: 1 to 8 balanced, 9 to 16 bright,
  * 17 to 24 muted. A legend that runs past eight repeats a hue in a different
- * tone rather than repeating a colour, which is the best a palette can do at
+ * tone rather than repeating a color, which is the best a palette can do at
  * that count. This said eight until the tokens went to twenty-four, at which
  * point a chart of twelve painted series nine from the palette and its legend
  * painted the same entry series one: the two disagreeing is the one thing the

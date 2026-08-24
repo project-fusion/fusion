@@ -55,7 +55,7 @@ const DIAGNOSTIC = /^(.+?)\((\d+),\d+\): error (TS\d+):/
  *
  * The marker sits above the line it describes, so an expectation is recorded
  * against the next line. Written that way rather than by line number so moving
- * a case around cannot silently point the assertion at its neighbour.
+ * a case around cannot silently point the assertion at its neighbor.
  */
 const expected = new Map()
 const lines = readFileSync(FIXTURE, 'utf8').split('\n')

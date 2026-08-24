@@ -14,7 +14,7 @@ const manifest: HelixManifest = {
       declarations: [
         {
           attributes: [{ fieldName: 'mode', name: 'mode' }],
-          cssProperties: [{ description: 'Colour of the seams.', name: '--accordion-border' }],
+          cssProperties: [{ description: 'Color of the seams.', name: '--accordion-border' }],
           description: 'What it is.\n\nAnd the reasoning, which a heading keeps.',
           events: [
             { description: 'Fired on open.', name: 'helix-open', type: { text: 'HelixOpenEvent' } },

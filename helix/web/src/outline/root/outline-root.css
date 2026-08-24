@@ -1,7 +1,7 @@
 :host {
   display: block;
 
-  /* The gutter the rail and the travelling mark share. Named once: it is both
+  /* The gutter the rail and the traveling mark share. Named once: it is both
      the mark's width and the room every link is pushed clear by, and two copies
      of a number like that drift.
    *
@@ -62,7 +62,7 @@
  * At rest it is a hairline, thinner than the rail it sits in, because a mark
  * that is only saying "you are here" does not need to be a bar. Hovering the
  * list thickens it a step, which is the list acknowledging the pointer before
- * anything has been chosen. And while it is travelling it takes the full rail,
+ * anything has been chosen. And while it is traveling it takes the full rail,
  * then settles back: a mark that swells as it leaves and thins as it lands
  * reads as a thing being carried, where one that keeps its width the whole way
  * reads as a rectangle being repositioned.
@@ -97,7 +97,7 @@
    * spring rather than the single overshoot `emphasized` gives. It was declared
    * in the token file and read by nothing at all, which the token reference
    * turned up: a curve nobody uses is a curve nobody has judged, and a mark
-   * travelling a list is the thing it was drawn for.
+   * traveling a list is the thing it was drawn for.
    *
    * Two durations, not one. The height used to move on the same curve at the
    * same rate, so a mark going to a heading that wraps to two lines arrived

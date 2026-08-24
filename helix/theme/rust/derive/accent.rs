@@ -20,13 +20,13 @@ use crate::oklch::{fit_to_gamut, Oklch, GAMUT_STEPS};
 
 /// The accent before it settles, and whether it may move at all.
 ///
-/// A pinned accent does not move: a colour is a fact. A related one is the
+/// A pinned accent does not move: a color is a fact. A related one is the
 /// brand's own lightness at a rotated hue and at most the brand's chroma, since
 /// an accent louder than the thing it accents is a second primary.
 ///
 /// # Panics
 ///
-/// If handed a [`Seed::Color`] that is not a colour, which [`resolve`] refuses,
+/// If handed a [`Seed::Color`] that is not a color, which [`resolve`] refuses,
 /// so it cannot arrive through one.
 ///
 /// [`resolve`]: crate::derive::resolve::resolve

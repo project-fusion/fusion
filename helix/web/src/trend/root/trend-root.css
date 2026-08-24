@@ -19,13 +19,13 @@
  * stopped at a 500 and only danger had ever been extended, so three of the four
  * semantic status colours could be a fill and could not be a word. Extending
  * them was #97; measured now, the worst of the four is 4.87 in the light and
- * 4.53 in the dark, so the number can carry the colour as it always should
+ * 4.53 in the dark, so the number can carry the color as it always should
  * have. Working around a token in a component would have left the same hole for
  * the next component to fall into. */
 :host {
   color: var(--trend-color, var(--_trend-color));
 
-  /* Grey until told what good means.
+  /* Gray until told what good means.
    *
    * Not a fallback that never fires: it is the state of every trend whose
    * consumer has not set `good`, and it is meant to be. See the property. */
@@ -40,7 +40,7 @@
  *
  * Written as four selectors rather than computed, because the pair is four
  * cases and CSS has no exclusive-or. Neutral matches none of them and stays
- * grey, as does any trend with no `good` set. */
+ * gray, as does any trend with no `good` set. */
 :host([direction="up"][good="up"]),
 :host([direction="down"][good="down"]) {
   --_trend-color: var(--helix-color-success);

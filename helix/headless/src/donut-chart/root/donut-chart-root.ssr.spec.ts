@@ -12,7 +12,7 @@ describe('donut chart server output', () => {
       ssr(html`<helix-base-donut-chart for="traffic"></helix-base-donut-chart>`),
     )
     expect(hasPart(markup, 'track')).toBe(true)
-    expect(hasPart(markup, 'centre')).toBe(true)
+    expect(hasPart(markup, 'center')).toBe(true)
   })
 
   test('serves no slices, there being no table to read on a server', () => {

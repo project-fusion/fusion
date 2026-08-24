@@ -5,7 +5,7 @@
  * **A surface is told apart from what is behind it by exactly one of four
  * things: a fill, an edge, a lift, or space.** A design language leads with one
  * of them, and until #141 this library could express none: of 68 border
- * declarations reaching for `--helix-color-border`, eight put the *colour*
+ * declarations reaching for `--helix-color-border`, eight put the *color*
  * behind a hook and none put the width behind one, so a border could be
  * recoloured and never removed. The floating surfaces wrote `border: none`
  * outright, so one could never be added either.
@@ -32,10 +32,10 @@
  * and that is the part a script cannot do. The audit that produced these tokens
  * found 31 elevation declarations of which 13 were not surfaces at all: a FAB
  * and its items, a switch thumb, a raised icon button, a selected chip, a
- * carousel's overlaid controls, a colour picker's handle, and four slider rings
+ * carousel's overlaid controls, a color picker's handle, and four slider rings
  * drawn as shadows. Every one is a control drawing itself rather than a surface
  * separating from a ground, and a policy that flattened them would be a bug
- * wearing a theme. The classification is a judgement, so it lives in the audit
+ * wearing a theme. The classification is a judgment, so it lives in the audit
  * and in `docs/22-theming.md` rather than in a regexp here.
  *
  * Run with `bun run check:separation` (also part of `bun run verify`).

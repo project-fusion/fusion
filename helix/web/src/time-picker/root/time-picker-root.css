@@ -48,9 +48,9 @@
 :host([mode="range"]) [part="option"][selected]::part(item) {
   /* **The inverse pair, because the muted one was measured in light only.**
      This was `foreground-muted` carrying `foreground-on-accent`, on the
-     reasoning that `foreground` was a slab of near-black in a list of grey rows
+     reasoning that `foreground` was a slab of near-black in a list of gray rows
      and the muted step measured 6.01. That figure is a light-mode figure:
-     `foreground-muted` flips to a *light* grey in dark, and a pale ink on it
+     `foreground-muted` flips to a *light* gray in dark, and a pale ink on it
      measured 2.96:1, under AA.
 
      `surface-inverse` is the token for a slab that is the opposite of the page
@@ -99,7 +99,7 @@
  * seventeen claims that somebody pressed them.
  *
  * The same box the tick occupies, so nothing shifts between a terminus and its
- * neighbour, with the dot drawn as a radius inside it. */
+ * neighbor, with the dot drawn as a radius inside it. */
 [part="option"][data-between]::part(item)::after {
   content: "";
   background-color: currentColor;

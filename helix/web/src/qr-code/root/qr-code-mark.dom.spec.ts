@@ -53,7 +53,7 @@ const svgOf = (host: Code): SVGElement => part(host, 'code') as unknown as SVGEl
  * Every cell either path fills, which is what "the code" means now.
  *
  * The drawing is two paths, the modules and the three corner squares, so that
- * the finders can take a colour of their own: one path is one fill. Anything
+ * the finders can take a color of their own: one path is one fill. Anything
  * asking whether the picture matches the encoder has to put them back together.
  */
 const allCells = (host: Code): Set<string> => {
@@ -68,7 +68,7 @@ const allCells = (host: Code): Set<string> => {
 
 /* The mark in the middle and the ink it is drawn in, which are this tier's.
 
-   The behaviour is the base element's and is tested there. */
+   The behavior is the base element's and is tested there. */
 if (hasLayout()) {
   describe('qr code with a mark in the middle', () => {
     test('it is ink on paper, and stays that way in a dark page', async () => {
@@ -92,7 +92,7 @@ if (hasLayout()) {
     const withLogo = '<helix-qr-code value="hello"><span slot="logo">F</span></helix-qr-code>'
 
     test('filling the slot raises the correction on its own', async () => {
-      /* `H` is what makes covering the centre safe: a code at that level can
+      /* `H` is what makes covering the center safe: a code at that level can
          lose thirty percent of itself and still read, and at `L` the same mark
          makes it unscannable. A consumer who filled the slot has said what they
          want without having to know that. */

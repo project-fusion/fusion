@@ -1,7 +1,7 @@
 //! The page's ladder: the five grounds a component actually names.
 //!
 //! **Only two of these used to be emitted**, and every component reading one of
-//! the other three kept the stock grey. A dropdown sits on `surface-overlay`, a
+//! the other three kept the stock gray. A dropdown sits on `surface-overlay`, a
 //! recess on `surface-sunken`, a card that lifts on `surface-raised`, so a
 //! themed panel came out unthemed exactly where a popover opened.
 
@@ -17,7 +17,7 @@ use crate::oklch::{fit_to_gamut, Oklch, GAMUT_STEPS};
 /// nobody can see is not a choice.
 ///
 /// What separates a surface, when it is neither an edge nor a lift, is how far
-/// its own colour sits from the page. So the policy scales that distance: `fill`
+/// its own color sits from the page. So the policy scales that distance: `fill`
 /// pushes the ladder away from the background, `space` collapses it onto the
 /// background so nothing but the gap tells them apart, and `border` and `shadow`
 /// leave it where it has always been because on those the edge or the lift is
@@ -35,7 +35,7 @@ pub fn ladder(mechanism: Option<Mechanism>) -> f64 {
 ///
 /// Raw values are what the intent asked for; fitted values are what can be
 /// rendered. Tokens carry the raw so they can report the difference, while every
-/// contrast solve uses the fitted version. Solving against a colour that cannot
+/// contrast solve uses the fitted version. Solving against a color that cannot
 /// be rendered and then measuring against the one that can is how a palette
 /// passes in theory and fails by a hundredth in practice.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -89,19 +89,19 @@ impl Surfaces {
 /// was briefly given to make room underneath for `sunken`. This engine shipped
 /// that rejected arrangement and worse: in light it had the page at 0.985 and
 /// `surface` at pure white, which is the two of them the wrong way round, so a
-/// themed page came out faintly grey with white cards on it where the stylesheet
-/// paints a white page with faintly grey cards.
+/// themed page came out faintly gray with white cards on it where the stylesheet
+/// paints a white page with faintly gray cards.
 ///
 /// No cast on the page, for the reason the primitive gives: it is the one
 /// surface with nothing behind it to sit against, so the trace of brand hue that
 /// makes a card feel part of the palette has nothing to do there and reads as a
-/// colour cast across the whole window.
+/// color cast across the whole window.
 ///
 /// **Every rung is taken from the stylesheet's own ladder**, since the two are
 /// meant to agree for the brand that ships and every figure here was a little
 /// off: raised and overlay sat at 0.25 against `neutral-800`'s 0.29, and sunken
 /// at 0.11 against `neutral-950`'s 0.15. Small enough to look like rounding and
-/// large enough to be a different grey.
+/// large enough to be a different gray.
 ///
 /// Stated per scheme rather than stepped off `surface`, because a step has to
 /// know which way is away and the answer is not the same for all three. Raised

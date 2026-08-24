@@ -6,7 +6,7 @@
  * stashes on a DOM node, under a key built as `"__reactProps$" + randomKey`.
  * That prefix is a React internal. It has been stable for years and the
  * failure direction is safe, since finding nothing returns the pre-hydration
- * behaviour rather than breaking anything.
+ * behavior rather than breaking anything.
  *
  * **Safe is not the same as visible.** If a React release renames it, every
  * `onhelix-*` prop goes quietly back to being dead on a server-rendered page,

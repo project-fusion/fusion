@@ -12,20 +12,20 @@
  * why each field exists, and it was never about how any of them was computed.
  */
 
-/** A colour in OKLCH. Lightness 0 to 1, chroma from 0, hue in degrees. */
+/** A color in OKLCH. Lightness 0 to 1, chroma from 0, hue in degrees. */
 export interface Oklch {
   chroma: number
   hue: number
   lightness: number
 }
 
-/** A colour a consumer supplies. Hex is accepted and converted at the edge. */
+/** A color a consumer supplies. Hex is accepted and converted at the edge. */
 export type Color = Oklch | string
 
 /**
  * How a role departs from the role it derives from.
  *
- * Written as a relationship rather than a second colour because a literal
+ * Written as a relationship rather than a second color because a literal
  * drifts out of relation the moment anybody rethemes, which is the failure of
  * every palette with two hardcoded colours in it.
  */
@@ -43,7 +43,7 @@ export interface Relation {
    * `danger` and `success` box in every hue it could reach.
    *
    * Set it to 0 to hold the angle exactly and let `collisions` report the
-   * result. A pinned accent never moves at all, a colour being a fact.
+   * result. A pinned accent never moves at all, a color being a fact.
    */
   allowance?: number
   /**
@@ -59,16 +59,16 @@ export interface Relation {
   from: 'brand'
   /**
    * Degrees around the hue circle. 180 is the complement and is what a second
-   * colour usually means, 30 is analogous, 120 is a triad.
+   * color usually means, 30 is analogous, 120 is a triad.
    */
   rotate: number
 }
 
-/** A role takes a colour, or says how it relates to one. */
+/** A role takes a color, or says how it relates to one. */
 export type Seed = Color | Relation
 
 /**
- * A status role. A colour pins it outright; an object nudges its hue within
+ * A status role. A color pins it outright; an object nudges its hue within
  * the meaning it already carries.
  *
  * **Never a `Relation`**, which is the asymmetry with `accent` and is
@@ -91,12 +91,12 @@ export interface PairingRequest {
 
 export interface ThemeIntent {
   /**
-   * The second emphasis. A colour pins it and the relationship stands aside.
+   * The second emphasis. A color pins it and the relationship stands aside.
    * Defaults to the complement, `{ from: 'brand', rotate: 180 }`.
    */
   accent?: Seed
   /**
-   * The one colour most consumers care about, and the only required input.
+   * The one color most consumers care about, and the only required input.
    */
   brand: Color
   /**
@@ -105,10 +105,10 @@ export interface ThemeIntent {
    * **This is the axis a brand's feel lives on.** Monotone, muted, restrained
    * and vivid are all chroma statements and none of them is a hue. `ceiling`
    * clamps, so 0 is monotone and roughly 0.10 is muted; `scale` multiplies
-   * what the brand supplies. Both apply to every derived colour including the
-   * brand itself, because a monotone theme is one where the brand is grey too.
+   * what the brand supplies. Both apply to every derived color including the
+   * brand itself, because a monotone theme is one where the brand is gray too.
    *
-   * Never applied to a value the consumer pinned. A pinned colour is a fact.
+   * Never applied to a value the consumer pinned. A pinned color is a fact.
    */
   chroma?: {
     ceiling?: number
@@ -145,7 +145,7 @@ export interface ThemeIntent {
    *
    * **Type is part of a theme and had no input at all.** Twenty tokens across
    * five categories, families, sizes, weights, leading and tracking, were
-   * unreachable from intent while every colour in the palette was one field
+   * unreachable from intent while every color in the palette was one field
    * away. Families are the half a consumer actually chooses; the size scale,
    * the weights and the spacing are the half that is a system, and they are
    * still fixed.
@@ -222,9 +222,9 @@ export interface ThemeIntent {
     scale?: number
   }
   /**
-   * The cast every grey carries.
+   * The cast every gray carries.
    *
-   * Chroma 0 is a dead grey and is the default, matching `primitives.css`,
+   * Chroma 0 is a dead gray and is the default, matching `primitives.css`,
    * which records why: a fixed chroma is a rising *saturation* as a surface
    * darkens, so a trace that looks right on a light page reads navy across a
    * dark one. The engine used to hardcode 0.008, the exact value the
@@ -278,7 +278,7 @@ export interface ThemeIntent {
    * Chroma follows `chroma`, because a vivid red danger inside a monotone
    * theme reads as a bug rather than as a warning. Lightness is solved against
    * `contrastTarget` like any other ink. Only the hue is held, and only
-   * because moving it changes what the colour means.
+   * because moving it changes what the color means.
    *
    * `allowance` is how far a status may rotate on its own to clear a collision,
    * which is what turns `collisions` from a finding into a repair: a red brand
@@ -302,7 +302,7 @@ export interface ThemeIntent {
      * reader re-learns per product, and that stays refused. A status that
      * ignores how loud the palette around it is has a different problem:
      * against a muted brand, danger measured six times the chroma of primary,
-     * which is a vivid red screaming on a near-grey page.
+     * which is a vivid red screaming on a near-gray page.
      *
      * 0 holds each status at its own chroma. 1 follows the palette as far as the
      * floor allows, and there is a floor: a danger quiet enough to stop reading

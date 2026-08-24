@@ -44,7 +44,7 @@ const readValues = (input: string): number[] =>
  * **No label means decorative, and that is a choice rather than an oversight.**
  * A sparkline beside a stat that already says "Sessions, 1,102" has nothing of
  * its own to announce, and an unnamed `role="img"` announces "graphic" and
- * stops. So an unlabelled sparkline is `aria-hidden`, and a labelled one is an
+ * stops. So an unlabelled sparkline is `aria-hidden`, and a labeled one is an
  * image named by its sentence.
  *
  * It goes *beside* a `Stat` rather than inside one. The plan this was built
@@ -293,7 +293,7 @@ export class HelixBaseSparkline extends HelixElement {
         ${
           /* The ramp the area is poured with, drawn here because a gradient is
              an element and elements are this tier's business, and coloured
-             above because a colour is not. Measured rather than assumed: a
+             above because a color is not. Measured rather than assumed: a
              fragment id inside a shadow root resolves within that root, so two
              sparklines on a page carrying the same id stay independent, and CSS
              `fill: url(#...)` reaches it as readily as the attribute does. */

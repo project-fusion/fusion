@@ -23,7 +23,7 @@
  *
  * A `var()` inside a custom property is substituted on the element the property
  * is *declared* on, not on the element that consumes it. Measured in Chrome
- * 148: a leaf reading an overridden `--seed` still painted the root's colour,
+ * 148: a leaf reading an overridden `--seed` still painted the root's color,
  * because the derived token had already been resolved at the root. So setting
  * `--_helix-seed-brand` on a section changes nothing, and cannot, unless the
  * declarations that read it are re-run there. Naming the scope in the selector
@@ -40,7 +40,7 @@
    * **The public names are the ones without the underscore, and that is not
    * cosmetic.** The convention here is that a single leading underscore means
    * `helix/styles` only, and `check:tokens` enforces it from the outside. These
-   * three are the *entry point to theming*: they are the only colour inputs the
+   * three are the *entry point to theming*: they are the only color inputs the
    * whole palette derives from, primary and its steps solve off the brand, the
    * twenty-four series are hue rotations of it, and the neutrals take the cast.
    * A consumer who wants a different palette has nothing else to write.
@@ -64,7 +64,7 @@
      At 0.58 this seed is `#2275e8`, which reads 4.395:1 on white and 4.395:1
      under the on-accent ink: under AA on both sides of the one pair the palette
      uses most, and shipped that way because nothing measured it. Handed the same
-     colour as a brand, `deriveTheme` solves the role down to 0.539 and clears it
+     color as a brand, `deriveTheme` solves the role down to 0.539 and clears it
      at 5.229:1 and 4.923:1.
 
      So the number here is that answer rather than a second opinion. A default
@@ -81,17 +81,17 @@
      so a fixed figure is a rising tint as the surface darkens, and a dark
      interface is mostly large flat surfaces. The brand carries the hue; the
      grays hold everything else up. */
-  /* The second colour, said as a relationship rather than as a colour.
+  /* The second color, said as a relationship rather than as a color.
    *
    * **This is what one seed could not express.** A brand says what the product
    * is; an accent says "and this other thing, which is not that". Written as an
-   * independent colour it drifts out of relation the moment somebody rethemes,
+   * independent color it drifts out of relation the moment somebody rethemes,
    * which is the whole failure of a palette with two literals in it. Written as
    * a rotation off the brand it stays in relation by construction: retheme the
    * brand and the accent follows it round the wheel.
    *
    * `--helix-seed-accent-hue` is the angle, and 180 is the complement, which is
-   * the relationship a second colour usually means. 30 or so is analogous and
+   * the relationship a second color usually means. 30 or so is analogous and
    * reads as a shade of the same idea; 120 is a triad. A consumer who wants a
    * genuinely independent second brand sets `--helix-seed-accent` outright and
    * this whole derivation stands aside, which is the case the row also asked
@@ -185,7 +185,7 @@
      lifting only that one would not have answered the report. The ladder is
      what has to stay ordered: surface 0.985, raised 0.97, sunken 0.96, each a
      step nearer the page than the last and none of them collapsed into its
-     neighbour. */
+     neighbor. */
   --_helix-neutral-200: oklch(0.96 var(--_helix-neutral-cast));
   /* 0.91, was 0.88, was 0.84. This rung and 700 below it are read by exactly
      one token, `--helix-color-border`, so moving them moves every resting
@@ -267,7 +267,7 @@
    * with it. **Lightness does not.** The first attempt offset it from the seed,
    * `calc(l + 0.14)` on every other step, and measured against a light
    * background two of the eight came out at 1.04 and 1.00 contrast: the same
-   * colour as the paper. A hue rotation changes how light a colour *looks* at a
+   * color as the paper. A hue rotation changes how light a color *looks* at a
    * fixed L, and yellow at 0.72 on white is nothing at all.
    *
    * So lightness is stated per mode and held in a band that clears 3:1 against
@@ -385,7 +385,7 @@
    * 3.58:1, `info` 3.80 and `warning` 2.63, all under the 4.5 that body text
    * needs, and none of them had a 600 to fall back to. So a semantic token
    * built on them could be a fill or a mark and could not be a word, and
-   * nothing anywhere said so: `Trend` found it by trying to colour a number.
+   * nothing anywhere said so: `Trend` found it by trying to color a number.
    *
    * **The steps differ per hue, and that is the honest part.** A 600 is defined
    * by the contrast it has to reach rather than by a fixed lightness drop,

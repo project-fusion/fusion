@@ -58,18 +58,18 @@ export class HelixBaseIcon extends HelixElement {
       return nothing
     }
 
-    // A labelled icon is content and needs a role to carry the label. An
+    // A labeled icon is content and needs a role to carry the label. An
     // unlabelled one is decoration sitting beside text that already says the
     // same thing, so it is removed from the accessibility tree rather than
     // announced twice.
-    const labelled = this.label.length > 0
+    const labeled = this.label.length > 0
     return html`<svg
       part="svg"
       fill="currentColor"
       viewBox=${icon.viewBox}
-      role=${labelled ? 'img' : nothing}
-      aria-label=${labelled ? this.label : nothing}
-      aria-hidden=${labelled ? nothing : 'true'}
+      role=${labeled ? 'img' : nothing}
+      aria-label=${labeled ? this.label : nothing}
+      aria-hidden=${labeled ? nothing : 'true'}
     >
       ${unsafeSVG(icon.content)}
     </svg>`

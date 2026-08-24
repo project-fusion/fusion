@@ -1,6 +1,6 @@
 /* A video is a dark region, and says so once.
  *
- * `color-scheme: dark` rather than a hand-picked colour on every control.
+ * `color-scheme: dark` rather than a hand-picked color on every control.
  * Every token in this library is a `light-dark()` pair and `light-dark()`
  * follows `color-scheme`, so one declaration resolves the whole subtree the way
  * a dark page would: the ink comes out light, the surfaces come out dark, and
@@ -66,7 +66,7 @@
      sits in a dark region everywhere it has ever been shown, and `surface-inverse`
      looks like the token for it and is near-white in dark mode. `surface-sunken`
      was what stood here, which is the page's own well and turns over with the
-     mode, so the letterbox bars were a light grey on a light page.
+     mode, so the letterbox bars were a light gray on a light page.
 
      The bar's ink stays `foreground`, not `foreground-media`. The host declares
      `color-scheme: dark`, so it already resolves to near-white in either mode,
@@ -81,7 +81,7 @@
 /* Over the picture, not under it.
  *
  * A bar in the layout moves everything below the video down by its own height
- * and leaves a strip of page colour under a picture meant to be the whole of
+ * and leaves a strip of page color under a picture meant to be the whole of
  * it. The gradient is the bar's own ground: a flat panel over a light frame
  * hides part of the video, and over a dark one disappears. */
 [part="controls"] {
@@ -180,7 +180,7 @@
  * This was eleven part names written out, and its own comment recorded that
  * `download` and `more` had already had to be remembered once. `rewind` and
  * `forward` were not remembered: they rendered as raw `<button>`, measured at
- * 36x29 with a grey fill and a 2px border, beside 24x24 transparent for every
+ * 36x29 with a gray fill and a 2px border, beside 24x24 transparent for every
  * control next to them. Nothing caught it, and nothing could: `check:selectors`
  * asks whether a selector has a part, which is the other direction.
  *
@@ -387,7 +387,7 @@
  
    Sized and offset from the same numbers the slider uses, so the two cannot
    drift: the ground is the track's length plus a pad at each end, and both are
-   centred on the speaker below. Written independently they did not agree, and a
+   centered on the speaker below. Written independently they did not agree, and a
    four-pixel slider inside a thirty-two pixel pill shows every pixel of it. */
 [part="sound"]:hover::before,
 [part="sound"]:focus-within::before {
@@ -532,7 +532,7 @@
  * so the line lifts while the bar is up and settles when it has gone.
  *
  * Its own ground, because a caption is light text over a picture that could be
- * anything. Centred and held to a measure rather than run edge to edge: a
+ * anything. Centered and held to a measure rather than run edge to edge: a
  * subtitle as wide as the video is a line nobody tracks back from. */
 [part="cue"] {
   background-color: var(--helix-color-overlay);
@@ -621,7 +621,7 @@
 
 /* Waiting, and saying so over the picture.
  *
- * Centred on the stage rather than in a corner, because it is standing in for
+ * Centered on the stage rather than in a corner, because it is standing in for
  * the frame that has not arrived and that is where a reader is already looking.
  * On the media surface tokens, so it reads on a picture rather than on the page:
  * whatever is behind it is a photograph, and a panel in page colours over a

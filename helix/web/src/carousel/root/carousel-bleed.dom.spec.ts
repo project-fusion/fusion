@@ -22,7 +22,7 @@ const _carousel = async (attrs = ''): Promise<Carousel> =>
 
 /* The room the scroller keeps for whatever a slide draws outside itself, which is a length this tier sets.
 
-   The behaviour is the base element's and is tested there. */
+   The behavior is the base element's and is tested there. */
 if (hasLayout()) {
   describe('the bleed the scroller keeps for a slide’s own edge', () => {
     const wide = async (): Promise<HTMLElement> => {

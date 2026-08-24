@@ -27,10 +27,10 @@
  * transparency, so nothing about the controls changes where the field is plain.
  *
  * **`in srgb`, and that is what makes the sentence above true.** These mixed in
- * oklab, which is the right space for choosing a colour between two others and
+ * oklab, which is the right space for choosing a color between two others and
  * the wrong one for restating an alpha: compositing is defined against the
  * destination, in sRGB, so reproducing "six percent of the foreground over the
- * page" as an opaque colour has to mix where the compositor would. Mixed in
+ * page" as an opaque color has to mix where the compositor would. Mixed in
  * oklab it lands on the perceptual midpoint instead, and near black that is
  * nowhere near the same place.
  *
@@ -51,13 +51,13 @@
  * It is the same shape as #145, a step that is symmetric in the measure and not
  * in the eye, and the fix is to stop measuring in the wrong space rather than to
  * tune a percentage until dark looks right.
- * It is not the page's own colour, which was tried here once and removed: the
- * page colour is a hole cut through the band, and these are recesses in it.
+ * It is not the page's own color, which was tried here once and removed: the
+ * page color is a hole cut through the band, and these are recesses in it.
  *
  * Scoped to this section, and it has to stay scoped. A background hook set on a
  * container reaches every control inside it, so a solid button put in this hero
  * would be flattened to a six percent wash. There are two links and one search
- * here and they are all of one kind; a hero that grows an emphasised control
+ * here and they are all of one kind; a hero that grows an emphasized control
  * wants the hooks moved onto the two selectors that need them. */
 .designHero {
   --button-background-color: color-mix(
@@ -68,7 +68,7 @@
   /* And the hover, because setting the fill takes the hover with it.
    *
    * Every state's rule reads `--button-background-color`, which is what makes it
-   * a fill rather than a resting colour, so a hero that set one had two controls
+   * a fill rather than a resting color, so a hero that set one had two controls
    * that did not move under the pointer at all. Measured: rest and hover both
    * `oklab(0.94 0 0)`, the same value to the last digit.
    *
@@ -134,9 +134,9 @@
 }
 
 /* `scale` and not `inline-size`, so the growth is composited and not a layout
- * pass two dozen times a second. `translate` holds the centring, which is why
+ * pass two dozen times a second. `translate` holds the centering, which is why
  * the two are separate properties here instead of one `transform`: a keyframe
- * setting `transform` would drop the centring translation and each shine would
+ * setting `transform` would drop the centering translation and each shine would
  * light half a pitch down and to the right of the dot it belongs to.
  *
  * No `prefers-reduced-motion` block, and that is the one case where its absence

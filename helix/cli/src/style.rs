@@ -1,9 +1,9 @@
-//! Colour, and the rule a tool about contrast has to follow.
+//! Color, and the rule a tool about contrast has to follow.
 //!
 //! **A tool about contrast cannot assume its own palette.** The reader has
 //! themed their terminal, and one of them has a background this tool would call
-//! a violation. So pass and fail are never carried by colour alone: the glyph
-//! and the number say it, and the colour reinforces what a reader has already
+//! a violation. So pass and fail are never carried by color alone: the glyph
+//! and the number say it, and the color reinforces what a reader has already
 //! been told.
 //!
 //! That is also why there is no red-green pair here. Red and green are the two
@@ -12,13 +12,13 @@
 
 use std::io::IsTerminal;
 
-/// Whether to colour, decided once.
+/// Whether to color, decided once.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Paint(bool);
 
 impl Paint {
     /// **Three ways off and one way on**, which is the right asymmetry: a stray
-    /// escape sequence in a log file is a real cost and a missing colour is not.
+    /// escape sequence in a log file is a real cost and a missing color is not.
     ///
     /// `NO_COLOR` is honoured by its own rule, which is presence rather than
     /// value: the specification says any non-empty value, and tools that test it
@@ -79,7 +79,7 @@ impl Paint {
     }
 }
 
-/// The glyph that carries the state, colour or no colour.
+/// The glyph that carries the state, color or no color.
 ///
 /// ASCII, because a terminal that cannot render a box-drawing character renders
 /// a replacement glyph that looks like a third state.

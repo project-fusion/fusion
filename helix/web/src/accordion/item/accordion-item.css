@@ -119,7 +119,7 @@
  * Both of those were wrong together. The spacing and the line height applied
  * only under `[data-open]`, so the moment a toggle began, the text lost its
  * padding and changed leading in one frame and reflowed to a different shape
- * while the row was still travelling: the content squashed and sprang rather
+ * while the row was still traveling: the content squashed and sprang rather
  * than sliding. What is being animated is the row's height, so everything
  * inside it has to hold still.
  *

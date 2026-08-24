@@ -201,7 +201,7 @@ try {
    * **`--eval` used to run on the frame the interaction landed**, so anything
    * reading a transitioned property read the value it was transitioning away
    * from. It cost three consecutive readings of one fix: a button whose hover
-   * fill had just been repaired measured at its resting colour twice, which
+   * fill had just been repaired measured at its resting color twice, which
    * reads as a change that did nothing. The same ordering would have made a
    * broken fix look fine, which is the worse direction.
    *

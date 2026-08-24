@@ -52,7 +52,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * `type="password"` either built the same toggle or shipped a field a reader
  * cannot check what they typed into. Neither is a slot's worth of variation:
  * one empties the value, the other flips the type, and both want the same
- * position, the same size and the same disabled behaviour. The slot stays for
+ * position, the same size and the same disabled behavior. The slot stays for
  * what actually varies, a unit or a prefix.
  *
  * Both opt in rather than following from `type`, and are booleans that default
@@ -208,7 +208,7 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
    * and focus resting on a control that is being removed lands on the body.
    *
    * Through `requestValue` like every other change, so a consumer who owns the
-   * value hears about it and decides, and a cancelled clear leaves the text
+   * value hears about it and decides, and a canceled clear leaves the text
    * where it was.
    */
   private readonly handleClear = (): void => {

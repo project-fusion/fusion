@@ -35,7 +35,7 @@
 # resolve to one even by accident.
 # **Publishing is switched off, and `vars.PUBLISHING` is the switch**, the same
 # one `release.yml` carries. Unset, this job is skipped however the pull request
-# is labelled, so a preview build cannot reach the registry while the release
+# is labeled, so a preview build cannot reach the registry while the release
 # pipeline is held. The label and the environment approval both still apply once
 # it is on: this is a third lock rather than a replacement for either.
 

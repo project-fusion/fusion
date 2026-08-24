@@ -38,7 +38,7 @@
    * Not `@starting-style`, which was tried and is a frame too early: it fires
    * when the element is first rendered, and the controller positions on a
    * microtask after that, so the entrance began at whatever the stylesheet said
-   * and travelled to the real position. `data-placed` is written once the panel
+   * and traveled to the real position. `data-placed` is written once the panel
    * is measured and placed, cleared when it closes, and left alone while it is
    * merely repositioned, so it fires exactly once per open and never mid-scroll.
    * Select already waited on it for the same reason. */

@@ -61,7 +61,7 @@ const HIDDEN = css`
  * **A box that scrolls is the base tier's, and the base tier had no way to say
  * so.** `overflow` is what creates a scrollport: without it `scrollTop` is
  * permanently zero and every scroll API on the element is inert. So a component
- * that reads `scrollTop` and cannot declare `overflow` is one whose behaviour
+ * that reads `scrollTop` and cannot declare `overflow` is one whose behavior
  * lives in somebody else's stylesheet, and six of them do exactly that.
  *
  * Measured before deciding: `helix-base-scroll-area`, the component whose

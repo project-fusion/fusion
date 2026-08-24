@@ -10,7 +10,7 @@ beforeAll(async () => {
 const markup = `<helix-base-command hotkey="mod+k" label="Commands">
   <helix-base-option value="new">New file</helix-base-option>
   <helix-base-option value="open">Open recent</helix-base-option>
-  <helix-base-option value="theme">Switch colour mode</helix-base-option>
+  <helix-base-option value="theme">Switch color mode</helix-base-option>
 </helix-base-command>`
 
 type Palette = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
@@ -169,7 +169,7 @@ if (hasLayout()) {
         changes += 1
       })
 
-      listbox(host).requestFilter('colour')
+      listbox(host).requestFilter('color')
       ;(
         host.querySelector('helix-base-option[value="theme"]') as HTMLElement & {
           select: () => void
@@ -214,7 +214,7 @@ if (hasLayout()) {
       press('k', { metaKey: true })
       await settle(host)
       // The words, not the value: an option is matched on what it says.
-      listbox(host).requestFilter('colour')
+      listbox(host).requestFilter('color')
       await settle(host)
       expect(
         [...host.querySelectorAll('helix-base-option')].filter((one) => !one.hidden).length,

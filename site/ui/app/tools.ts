@@ -43,13 +43,13 @@ export const THEME_BUILDER: PageCopy = {
   blocks: [
     {
       body: [
-        'Give it the intent inputs that `derive()` takes, a brand colour first, and it runs the real derivation rather than an approximation of it. What comes back is the complete token set and the library rendered in it, light and dark at once.',
+        'Give it the intent inputs that `derive()` takes, a brand color first, and it runs the real derivation rather than an approximation of it. What comes back is the complete token set and the library rendered in it, light and dark at once.',
       ],
       title: 'What it is',
     },
     {
       body: [
-        'Every pairing the engine solved, with its measured ratio against the ground it is actually painted on. Met, unverifiable where the ground is translucent and there is no known colour to measure against, or pinned where you supplied the colour outright and the engine did not solve for it.',
+        'Every pairing the engine solved, with its measured ratio against the ground it is actually painted on. Met, unverifiable where the ground is translucent and there is no known color to measure against, or pinned where you supplied the color outright and the engine did not solve for it.',
         'A theme with a column of unverifiable is a theme making a trade, and it should be possible to see that you made it.',
       ],
       title: 'The contrast column is the part to read',
@@ -71,7 +71,7 @@ export const AURA: PageCopy = {
     {
       body: [
         'Nine backgrounds drawn from the token layer, with the pointer response and every parameter live. The component is `helix-aura` and its API tables are at `/helix/components/aura`; this is the other half, which is the thing running at full size with the controls in reach.',
-        'It draws in WebGL. Where WebGL is refused it draws nothing and the page is the type it always was, which is the behaviour to expect rather than a fallback to configure.',
+        'It draws in WebGL. Where WebGL is refused it draws nothing and the page is the type it always was, which is the behavior to expect rather than a fallback to configure.',
       ],
       title: 'What it is',
     },

@@ -14,7 +14,7 @@ import { registerDom } from '@helix-io/testing/dom'
  *
  * Rendered rather than inspected as a `TemplateResult`, because what is being
  * asserted is the element that comes out: the attributes are what make a glyph
- * inherit its colour, stay out of the accessibility tree, and take the size the
+ * inherit its color, stay out of the accessibility tree, and take the size the
  * sheet in `helix/web` gives it.
  */
 let drawIcon: typeof import('./draw-icon.js').drawIcon
@@ -46,9 +46,9 @@ describe('a glyph a component draws itself', () => {
   })
 
   /* Two attributes, both load-bearing and neither obvious. `currentColor` is
-     what makes a mark take the colour of the text it sits in, so one glyph
+     what makes a mark take the color of the text it sits in, so one glyph
      works on every tone without the helper knowing any of them. */
-  test('takes the colour of whatever it is drawn in', () => {
+  test('takes the color of whatever it is drawn in', () => {
     expect(drawn().getAttribute('fill')).toBe('currentColor')
   })
 

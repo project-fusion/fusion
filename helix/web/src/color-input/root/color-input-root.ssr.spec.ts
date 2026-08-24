@@ -40,7 +40,7 @@ describe('input color server output', () => {
 
   test('the host carries only what the consumer wrote', () => {
     /* `format` reflected and defaulted to `hex`, so the server stamped
-       `format="hex"` onto every colour input anybody rendered and React, which
+       `format="hex"` onto every color input anybody rendered and React, which
        holds no such prop, reported a hydration mismatch for each one. */
     expect(hostAttributes(markup, 'helix-color-input')).toEqual([
       'hint',

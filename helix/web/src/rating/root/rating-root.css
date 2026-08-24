@@ -66,7 +66,7 @@
   position: absolute;
 }
 
-/* A shape, masked, so the colour above paints it and any mark works.
+/* A shape, masked, so the color above paints it and any mark works.
  *
  * The default is a star because that is what a rating is, and because the icon
  * set has none: `--rating-mark` takes any mask image, which is the seam a
@@ -106,7 +106,7 @@
  *
  * The pitch counts one gap per mark, hence `100% + gap` for a row that holds
  * one fewer gap than it holds marks, and each target then starts half a gap
- * early so it is centred on its mark rather than drifting right along the row.
+ * early so it is centered on its mark rather than drifting right along the row.
  * The two half-gaps hanging off the ends are deliberate: the alternative is
  * dead pixels between the marks, and a rating that ignores a press. */
 [part="option"] {
@@ -134,7 +134,7 @@
   line-height: 1;
 }
 
-/* A circle rather than a glyph, for a level rather than a judgement.
+/* A circle rather than a glyph, for a level rather than a judgment.
  *
  * The mask goes instead of being swapped for a round one: the mark is already
  * a box painted in `currentcolor`, so a full radius is the whole shape and a

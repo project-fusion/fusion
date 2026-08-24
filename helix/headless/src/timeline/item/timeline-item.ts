@@ -55,7 +55,7 @@ export class HelixBaseTimelineItem extends HelixElement {
   @property()
   datetime = ''
 
-  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  /** What kind of event it was, which decides the mark's color and nothing else. */
   @property({ reflect: true })
   tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
@@ -68,7 +68,7 @@ export class HelixBaseTimelineItem extends HelixElement {
    * The mark for an entry that slotted none, which the tone decides.
    *
    * Toned entries are reporting something, so they take the circle with a
-   * centre, which is `Steps` drawing the stage a reader is standing on. Untoned
+   * center, which is `Steps` drawing the stage a reader is standing on. Untoned
    * ones are just things that happened and take the open circle, which is
    * `Steps` drawing a stage nobody has reached. The same two glyphs in both
    * components rather than two that resemble each other: a shape drawn twice

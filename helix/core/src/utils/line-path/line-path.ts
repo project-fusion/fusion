@@ -74,7 +74,7 @@ const tangents = (xs: readonly number[], ys: readonly number[]): number[] => {
  * invents the values in between, so it is a reading aid rather than a neutral
  * one. `step` claims the opposite, that a reading holds until the next one, and
  * changes at the midpoint rather than at either end, since a chart's x axis is
- * an order and neither neighbour has a better claim on the moment it moved.
+ * an order and neither neighbor has a better claim on the moment it moved.
  *
  * Fewer than two points is an empty string rather than a partial path: one
  * reading is not a line, and `M0,0` alone draws nothing while still being a

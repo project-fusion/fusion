@@ -3,7 +3,7 @@
 //! **`foreground-on-accent` is a single token and there are ten grounds wearing
 //! it.** It was solved against `primary-surface` alone, so a hovered button and
 //! all four status fills carried an ink nothing had measured against them. One
-//! name has to mean one colour, so it clears the worst of them or `pairings`
+//! name has to mean one color, so it clears the worst of them or `pairings`
 //! reports that it could not, rather than the name quietly meaning something
 //! different per family.
 

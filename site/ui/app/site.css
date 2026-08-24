@@ -101,7 +101,7 @@
  *
  * Unconditional. Keyed to the open state it came off on the frame the collapse
  * started, since `helix-close` fires before the panel moves, and the panel
- * finished collapsing as an opaque rectangle of the page's colour. It is only
+ * finished collapsing as an opaque rectangle of the page's color. It is only
  * ever on screen while open or collapsing, and the sheet covers both, so it
  * never needs a ground here.
  *
@@ -139,7 +139,7 @@ helix-megamenu {
    *
    * **Neutral rather than brand, and the panel is why.** A blue tile beside a
    * blue wordmark, above rows whose only accent is where the reader currently
-   * is, spends the one colour a navigation has on saying which column a name
+   * is, spends the one color a navigation has on saying which column a name
    * belongs to. Near-black says the same thing and spends nothing.
    *
    * **It turns over with the mode, and it has to.** `surface-media` was the
@@ -149,7 +149,7 @@ helix-megamenu {
    * either ground. A near-black one is not: measured on the dark panel it came
    * out at 1.00 against the ground behind it, so the tile disappeared and left
    * a bare white letter, and the mark changed silhouette between the modes
-   * rather than changing colour. `surface-inverse` is the opposite of the page
+   * rather than changing color. `surface-inverse` is the opposite of the page
    * by construction, with `foreground-inverse` as its ink, so the tile is
    * near-black on a light panel, near-white on a dark one, and a tile in both.
    * Both stops take the same value, a monotone tile being the ask and a
@@ -278,7 +278,7 @@ helix-drawer {
 
 /* **The page opens in light and closes in it.**
  *
- * The last band was the sixth in a row on the page's own colour, so a reader
+ * The last band was the sixth in a row on the page's own color, so a reader
  * scrolling reached the one thing they are being asked to do and it looked like
  * another section. Nothing said the page had ended, and an ending is most of
  * what a closing call is for.
@@ -287,7 +287,7 @@ helix-drawer {
  * the cue. The hairline this paragraph used to credit is gone, taken out as an
  * edge the call did not need, and `[data-band]` never drew one: measured on the
  * landing page the section has no border on either side and no shadow, so
- * nothing but the colour says the page has ended.
+ * nothing but the color says the page has ended.
  *
  * **Which is why the two tokens are paired here and nowhere else.** 145 says a
  * consumer writing `light-dark()` across two surface tokens is compensating for
@@ -305,7 +305,7 @@ helix-drawer {
  * **The ground alone, with no light rising into it.** A radial wash of the
  * brand came up from below the bottom edge here, echoing the hero's aura as a
  * gradient rather than a second WebGL context. It read as a shadow: 26% of
- * primary over a near-white band is a soft grey-blue smudge along the bottom,
+ * primary over a near-white band is a soft gray-blue smudge along the bottom,
  * and a smudge under a call to action looks like a drop shadow that failed
  * rather than like a horizon. The band is the ground and the button is the
  * bright object, which is one idea instead of two. */

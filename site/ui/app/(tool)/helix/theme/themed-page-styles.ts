@@ -152,7 +152,7 @@ export const THEMED_PAGE_STYLES = css`
     }
   }
 
-  /* The header's centre and end collide before the page does: a nav is centred
+  /* The header's center and end collide before the page does: a nav is centered
      in the row, so it runs into the actions long before anything else runs out
      of room. The nav goes first, which is what a real page does at the same
      width and leaves the two things a header must keep, the name and the way

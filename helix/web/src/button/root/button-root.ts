@@ -54,7 +54,7 @@ export class HelixButton extends MixinControlSurface(HelixBaseButton) {
    * so a button carried a property called `fill` beside a property about being
    * filled, meaning different things. `separation="filled"` and
    * `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
-   * colour, and every chart in the library writes `fill` for paint, which left
+   * color, and every chart in the library writes `fill` for paint, which left
    * this the only use of the word meaning geometry.
    *
    * `Dialog` had already made the same move for the same reason, its

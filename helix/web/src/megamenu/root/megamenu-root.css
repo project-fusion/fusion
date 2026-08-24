@@ -66,7 +66,7 @@
 [part="panel"] {
   /* The page's own ground, not a raised surface. White in the light and black in
      the dark: a navigation panel is the site continuing, and `surface-overlay`
-     put a grey card in front of a black page as though the nav were a dialog.
+     put a gray card in front of a black page as though the nav were a dialog.
      
      Both are hooks so a consumer can make the panel glass, which is not an
      appearance: `full` already occupies that axis with a layout, and a band
@@ -93,7 +93,7 @@
    * consumer sets rather than only the one the system reports.
    *
    * Written out in full, not omitted: the user agent gives `[popover]` a border
-   * of its own, `solid` with no width or colour, which computes to a medium
+   * of its own, `solid` with no width or color, which computes to a medium
    * black rule. Deleting the declaration once drew a three pixel black box
    * around the panel instead of no box at all. */
   border: var(--megamenu-border-width, var(--helix-border-thin)) solid
@@ -133,7 +133,7 @@
      `[hidden]`, the panel opened in one jump: `hidden` is removed by the
      template while the popover is still closed, so the clip changed on a style
      recalc where the element was still `display: none`, and the transition it
-     started was cancelled a frame later when `showPopover` ran. Measured: a
+     started was canceled a frame later when `showPopover` ran. Measured: a
      transition existed on the frame the panel opened and was gone twenty
      milliseconds later with the clip already at rest.
    
@@ -173,7 +173,7 @@
      `display` because the closed panel is `display: none`, and `overlay`
      because leaving the top layer is what actually removes a popover from the
      screen. Transitioned discretely they hold their open value until the clip
-     has finished travelling, which is what gives the panel an exit at all.
+     has finished traveling, which is what gives the panel an exit at all.
      Without them it vanishes on the frame it is told to.
    
      `decelerate` opening: the panel arrives and settles rather than braking
@@ -284,7 +284,7 @@
   /* The contents on the page's measure rather than the band's: a row of links
      running the whole width of a wide screen is a row nobody reads across. Held
      with padding rather than a width, so the band stays edge to edge and only
-     what is in it is centred. `100%` for the same reason as above. */
+     what is in it is centered. `100%` for the same reason as above. */
   /* 80rem, not 72. Four columns and the gaps between them leave 264 each at 72,
      and a row spends 16 on its own padding and 36 on the mark, so a sentence
      gets 212: which is, to the pixel, the width of the sentences in the example

@@ -34,12 +34,12 @@
    * margin would have doubled that and made the punctuation worse. */
   background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
   border-radius: var(--helix-radii-sm);
-  /* The prose's own ink, pulled back towards it, and not a syntax colour.
+  /* The prose's own ink, pulled back towards it, and not a syntax color.
    *
    * It was `syntax-name`, which is blue: a fragment of code inside a sentence
    * is one word of that sentence, and a coloured word in running text reads as
    * a link. Nothing here is being highlighted either, so borrowing a
-   * highlighter colour was saying a thing that is not true. The fill and the
+   * highlighter color was saying a thing that is not true. The fill and the
    * face already say it is code, so the ink only has to be read.
    *
    * **It was `foreground-muted` alone and that was too far back.** Measured

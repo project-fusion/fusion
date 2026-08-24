@@ -32,7 +32,7 @@ describe('a straight line', () => {
 
 describe('a stepped line', () => {
   test('holds each reading and changes at the midpoint between them', () => {
-    /* Neither neighbour has a better claim on the moment it moved, because a
+    /* Neither neighbor has a better claim on the moment it moved, because a
        chart's x axis is an order rather than a clock. */
     expect(
       linePath(

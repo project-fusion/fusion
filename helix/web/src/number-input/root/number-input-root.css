@@ -80,7 +80,7 @@
    and `Textarea` give it, and the reason `read-only` reflects at all: a
    reflected attribute nothing selects on is one more thing written onto a host
    that a server's output never had. */
-/* Flush with its ground, which is what `transparent` says and no colour can.
+/* Flush with its ground, which is what `transparent` says and no color can.
  *
  * This named `surface` while the resting fill named `surface-sunken`, so the
  * pair was two absolute steps and only the resting one was corrected by 154.
@@ -91,7 +91,7 @@
  *
  * The resting field is a recess now, a percentage of the foreground over
  * whatever is behind it. So read-only is the absence of that recess rather than
- * a second colour: no fill, the ground showing through, distinct from the
+ * a second color: no fill, the ground showing through, distinct from the
  * resting state on every ground and needing no token to stay that way. */
 :host([read-only]) [part="field"] {
   background-color: transparent;

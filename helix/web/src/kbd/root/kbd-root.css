@@ -70,9 +70,9 @@
    *
    * `box-shadow: inset 0 -1px` draws the key's front edge along the bottom, so
    * the space a reader sees inside the cap is a pixel shorter there than the
-   * box is. Centring in the box therefore centres in the wrong rectangle and
+   * box is. Centering in the box therefore centres in the wrong rectangle and
    * the label reads high, which is the whole of what "not vertically aligned"
-   * looks like on a key whose layout measures centred to within half a pixel at
+   * looks like on a key whose layout measures centered to within half a pixel at
    * every size. Padding rather than a translate, so the box still holds it,
    * against the `align-items: center` above rather than instead of it. */
   padding-block-start: var(--helix-border-thin);

@@ -33,7 +33,7 @@ export const registerDom = (): void => {
  * `querySelectorAll` rewritten around a missing shim would be production code
  * made defensive about a capability every browser ships.
  *
- * Indexing and iteration are modelled and liveness is not: this returns an
+ * Indexing and iteration are modeled and liveness is not: this returns an
  * array where the platform returns a live `HTMLCollection`. Every caller
  * spreads it or reads an index, and a spec that needs a collection which
  * updates under it wants a real browser.
@@ -65,7 +65,7 @@ const shimTableSections = (): void => {
  * their semantics through internals so nothing lands on the host as an
  * attribute, and a spec reads them back through the `role` helper below.
  *
- * `form` and `setFormValue` are modelled with real behavior, because they are
+ * `form` and `setFormValue` are modeled with real behavior, because they are
  * the parts the components rely on. `form` resolves the nearest ancestor form,
  * which is what the platform does in the absence of a `form` attribute; the
  * attribute form of ownership is not covered. `setFormValue` records what it
@@ -77,17 +77,17 @@ const shimTableSections = (): void => {
  * the right moment, and that is what the recording proves. A spec that needs
  * the whole path from a press to a submitted field wants a real browser.
  *
- * `states` is modelled as a real set, because a component that reports a fact
+ * `states` is modeled as a real set, because a component that reports a fact
  * through `ElementInternals.states` has no other channel for it: the whole
  * point of a custom state is that it reaches a stylesheet and never the DOM, so
  * there is no attribute a spec could read instead. Feature-tested by its users
  * (`'states' in internals`), so leaving it out did not break anything; it made
  * the behavior untestable outside a browser, which is how it went in.
  *
- * `setValidity` is modelled too, for the same reason `setFormValue` is: a
+ * `setValidity` is modeled too, for the same reason `setFormValue` is: a
  * control reads its own verdict back to decide whether to show a message, so a
  * `setValidity` that records nothing leaves `internals.validity` undefined and
- * the component throws rather than the spec failing. What is modelled is the
+ * the component throws rather than the spec failing. What is modeled is the
  * bookkeeping and nothing more: the flags given are the flags returned, and
  * `valid` is true when none of them is set. Deciding what counts as a valid
  * email is the platform's job and is not attempted here.

@@ -24,7 +24,7 @@
  *
  * **The first run found four the model did not have**, of which the sharpest is
  * `foreground-on-accent` on `foreground-muted`: the time picker fills a range
- * end with the muted grey and puts the on-accent ink on it, deliberately and
+ * end with the muted gray and puts the on-accent ink on it, deliberately and
  * with the measurement in its comment, and the model had no idea.
  *
  * Run with `bun run check:pairings` (also part of `bun run verify`).
@@ -123,5 +123,5 @@ if (problems.length > 0) {
 
 console.log(
   `pairings: ${painted.size} pairs painted in one rule, ` +
-    `every one of them modelled or accounted for`,
+    `every one of them modeled or accounted for`,
 )

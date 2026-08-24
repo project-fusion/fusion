@@ -99,7 +99,7 @@
  * Slotted with a fallback rather than a property, which is the house rule for
  * content: `<helix-icon slot="filter-icon">` replaces it and the two can never
  * both show. `aria-hidden` on the wrapper, because the field already carries
- * `aria-label` and a decorative mark beside a labelled control is a second name
+ * `aria-label` and a decorative mark beside a labeled control is a second name
  * for one thing. */
 [part="filter-icon"] {
   align-items: center;

@@ -15,7 +15,7 @@ import styles from './chrome.module.css'
  *
  * Written here rather than derived from a route manifest, because Next has no
  * such thing to read at runtime and a generated one would list every preview
- * and every slug. What belongs in a palette is a judgement about what somebody
+ * and every slug. What belongs in a palette is a judgment about what somebody
  * would go looking for.
  *
  * Grouped by what a reader came for rather than by where the route sits: the
@@ -35,11 +35,11 @@ const DESTINATIONS: Findable[] = [
       { href: '/helix', label: 'Helix, the design system' },
       { href: '/cortex', label: 'Cortex, memory and provenance' },
       /* The workbench, not the component. `Sandbox` is a family like any other
-         and the catalogue already offers its reference page; this is the tool
+         and the catalog already offers its reference page; this is the tool
          that page describes, which nothing else in the palette could reach. */
       { href: '/helix/sandbox', label: 'Sandbox, the component workbench' },
       /* The other tool, and the same reasoning: `@helix-io/theme` is a package
-         rather than a component family, so the catalogue cannot offer it and
+         rather than a component family, so the catalog cannot offer it and
          nothing else in the palette could reach the thing that drives it. */
       { href: '/helix/theme', label: 'Theme builder, a palette and its audit' },
       /* Not a tool, and here for the opposite reason to the two above: nothing
@@ -132,10 +132,10 @@ const ranked =
  * outright that this is a tool and every row of chrome around it is a row taken
  * from the thing being examined, which is right. So the shared piece is the
  * palette, not the header: each header keeps its own density, its own inset and
- * its own centre, and both render this.
+ * its own center, and both render this.
  *
  * `findable` is built on a server and handed down, in both places. The
- * catalogue reads the manifest off disk and the insight registry is the whole
+ * catalog reads the manifest off disk and the insight registry is the whole
  * of the writing: a palette that imported either would pull it into the browser
  * to display a list of names. What crosses is the list.
  */
@@ -241,7 +241,7 @@ export function SiteFind({
         placeholder="Search the site"
         ref={palette}
       >
-        {/* **The catalogue arrives when it is asked for.** Every component and
+        {/* **The catalog arrives when it is asked for.** Every component and
             every article is the whole of what a palette can reach and none of
             what it should open with: a reader summoning it sees a hundred rows
             before typing a character, and a list nobody scans is a list that

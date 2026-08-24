@@ -129,7 +129,7 @@ describe('donut chart', () => {
 
   test('the middle takes whatever is slotted into it', async () => {
     const host = await chart(TRAFFIC, 'for="traffic"')
-    expect(part(host, 'centre')?.querySelector('slot')).not.toBeNull()
+    expect(part(host, 'center')?.querySelector('slot')).not.toBeNull()
   })
 })
 
@@ -188,7 +188,7 @@ describe('donut chart hole', () => {
 
   test('`none` closes the hole entirely, which is a pie', async () => {
     const host = await chart(TRAFFIC, 'for="traffic" hole="none"')
-    /* Inner edge at the centre: `r - thickness / 2` is zero, which solves to
+    /* Inner edge at the center: `r - thickness / 2` is zero, which solves to
        `r = EDGE / 2` and not to `r = 0`. A radius of zero draws nothing, and
        that was the first version of this arithmetic. */
     expect(radius(host)).toBeCloseTo(20, 6)
@@ -198,8 +198,8 @@ describe('donut chart hole', () => {
   test('a pie renders no middle, since there is nowhere to slot anything', async () => {
     /* A slot nobody can see is worse than one that is not there: a consumer
        fills it and nothing happens. */
-    expect(part(await chart(TRAFFIC, 'for="traffic" hole="none"'), 'centre')).toBeNull()
-    expect(part(await chart(TRAFFIC, 'for="traffic"'), 'centre')).not.toBeNull()
+    expect(part(await chart(TRAFFIC, 'for="traffic" hole="none"'), 'center')).toBeNull()
+    expect(part(await chart(TRAFFIC, 'for="traffic"'), 'center')).not.toBeNull()
   })
 
   test('the dash follows the radius, so the slices still close the ring', async () => {

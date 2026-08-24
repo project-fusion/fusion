@@ -9,7 +9,7 @@ import { styles } from './switch-root.css.js'
  * @summary A control that turns something on or off.
  *
  * @description
- * A thumb travelling in a groove, which is the one place in the library color
+ * A thumb traveling in a groove, which is the one place in the library color
  * is used to say "on". A checkbox does not, because a tick is legible on its
  * own; a switch has no mark, so the fill is the whole of what distinguishes the
  * two states and there is nothing else for it to be.

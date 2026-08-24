@@ -4,7 +4,7 @@
  * ARIA and its form participation, and no appearance at all. Everything below
  * is the part you own.
  *
- * Deliberately skeletal. No colour beyond `currentColor`, no type ramp and no
+ * Deliberately skeletal. No color beyond `currentColor`, no type ramp and no
  * token, because this is a diagram of what has to be styled rather than a theme
  * to copy: `@helix-io/web` is the theme, and a second one growing inside an
  * example would be a design system nobody decided on.
@@ -31,7 +31,7 @@ helix-base-checkbox::part(field) {
   gap: 0.5rem;
 }
 
-/* One cell with both children in it, so the mark is centred over the input
+/* One cell with both children in it, so the mark is centered over the input
    with no offsets to keep in step. */
 helix-base-checkbox::part(box) {
   display: grid;

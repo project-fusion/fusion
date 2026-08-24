@@ -15,7 +15,7 @@ const SHAPES = [
   },
   { body: 'Horizontal curtains, drifting. The one shape here that is a horizon.', name: 'aurora' },
   {
-    body: 'Light travelling in lanes, at speed. The pointer is an obstacle to bow around.',
+    body: 'Light traveling in lanes, at speed. The pointer is an obstacle to bow around.',
     name: 'streaks',
   },
   {
@@ -54,7 +54,7 @@ const INTERACTIONS = ['native', 'light', 'shadow', 'ripple', 'none'] as const
 /** Every knob, and the grain that is useful for what it does. */
 const KNOBS = [
   /* A full turn, because a shape has a direction and half a turn cannot
-     reverse it: streaks travelling down the frame only come from the top at
+     reverse it: streaks traveling down the frame only come from the top at
      180, which the old range could not reach. */
   { key: 'tilt', label: 'Tilt', max: 180, min: -180, step: 1 },
   /* A fraction of the width, which is the property's own unit. It replaces

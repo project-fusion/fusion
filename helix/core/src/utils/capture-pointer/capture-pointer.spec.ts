@@ -12,12 +12,12 @@ import { capturePointer } from './capture-pointer.js'
  * came to stub this method as though it were setup. Controlling the refusal is
  * the only way to assert that the drag continues past it.
  */
-const target = (behaviour: 'takes' | 'refuses') => {
+const target = (behavior: 'takes' | 'refuses') => {
   const calls: number[] = []
   const element = {
     setPointerCapture(id: number) {
       calls.push(id)
-      if (behaviour === 'refuses') {
+      if (behavior === 'refuses') {
         throw new DOMException('no active pointer', 'NotFoundError')
       }
     },
@@ -36,7 +36,7 @@ describe('taking the pointer', () => {
 describe('a platform that refuses', () => {
   /* The whole reason this exists. Called bare, the throw took out the lines
      below it, which are the ones that set the dragging flag and call
-     `preventDefault`, so a refusal cancelled the drag rather than degrading
+     `preventDefault`, so a refusal canceled the drag rather than degrading
      it. */
   test('does not throw, so the handler below the call still runs', () => {
     const { element } = target('refuses')

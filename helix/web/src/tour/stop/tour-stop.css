@@ -20,7 +20,7 @@
   max-inline-size: var(--tour-bubble-size, 22rem);
   /* The arrow hangs half outside this box, and the user agent's own
      `[popover] { overflow: auto }` was cutting that half off. Measured: the
-     arrow computed correctly at `inset-block-start: -5px`, its centre sat
+     arrow computed correctly at `inset-block-start: -5px`, its center sat
      exactly on the panel's top edge, and nothing was drawn. Said here because
      a scroll is not wanted either: the panel has a `max-inline-size` and no
      height limit, so it grows rather than scrolls, and a tour panel long enough

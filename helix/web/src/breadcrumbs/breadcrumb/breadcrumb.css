@@ -127,7 +127,7 @@
 /* The crumb itself, whether it is a link or the current page.
  *
  * A row of destinations underlined in brand blue is a trail nobody can scan, so
- * this takes the muted colour the slotted-anchor rule above already uses and
+ * this takes the muted color the slotted-anchor rule above already uses and
  * answers on hover instead. `inline-flex` so `start` and `end` sit on the
  * label's line rather than above it. */
 [part="link"] {
@@ -162,10 +162,10 @@
  *
  * That rule matches *assigned* nodes, and a crumb with `href` renders its own
  * anchor in this shadow root, where nothing assigned it. So a trail written the
- * new way lit up on hover in colour and stayed flat, while a trail written the
+ * new way lit up on hover in color and stayed flat, while a trail written the
  * old way took a background: two ways to write the same trail, behaving
  * differently, with no error anywhere. Same shape as `CopyButton`'s fallback
- * icons, which rendered at the right colour and no size at all.
+ * icons, which rendered at the right color and no size at all.
  *
  * Reading the same hook as the slotted rule, so a consumer overriding one
  * overrides both. */

@@ -48,8 +48,8 @@ describe('readRows', () => {
   })
 
   test('a non-numeric cell carries no value rather than a NaN', () => {
-    /* What the tooltip keys its series colour off. A `NaN` here would read as
-       "a number I could not parse" and take a palette colour with it. */
+    /* What the tooltip keys its series color off. A `NaN` here would read as
+       "a number I could not parse" and take a palette color with it. */
     expect(readRows(table())[0]?.cells[2]?.value).toBeUndefined()
   })
 

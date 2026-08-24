@@ -163,7 +163,7 @@ export class HelixBaseOutline extends HelixElement {
    */
   private mark(): void {
     /* A destination beats a measurement. See `handleClick`: while the page is
-       travelling to somewhere a reader asked for, what it passes on the way is
+       traveling to somewhere a reader asked for, what it passes on the way is
        not what they are reading. */
     if (this.landing) {
       return
@@ -355,7 +355,7 @@ export class HelixBaseOutline extends HelixElement {
      * not.
      *
      * The marker follows the scroll, which is right when a reader is scrolling
-     * and wrong when they have said where they are going: travelling to the
+     * and wrong when they have said where they are going: traveling to the
      * fifth section passes the second, third and fourth, each became current
      * for a frame or two on the way, and the mark stepped down the list one
      * item at a time instead of making the journey. Asked for as "it stops at
@@ -480,7 +480,7 @@ export class HelixBaseOutline extends HelixElement {
      * element, and torn down in `disconnectedCallback`, which runs every time it
      * moves. So a outline moved in the DOM, which a framework does on any
      * reorder, came back permanently frozen: `aria-current`, `current` and the
-     * travelling mark all stopped for the rest of the page's life with nothing
+     * traveling mark all stopped for the rest of the page's life with nothing
      * to say why. Guarded on `hasUpdated`, because the first connection happens
      * before the first render and there is nothing to watch yet. */
     if (this.hasUpdated) {

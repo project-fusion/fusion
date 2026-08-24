@@ -5,7 +5,7 @@ import { holdCaret, restoreValue } from './restore-value.js'
 /**
  * Keeping the caret where the reader left it across a write they did not make.
  *
- * **The platform behaviour this exists for is real here.** Assigning a
+ * **The platform behavior this exists for is real here.** Assigning a
  * different string to a text control moves the caret to the end, and happy-dom
  * does it too: measured, caret at 3 in `abcdef`, assign `abcXdef`, caret at 7.
  * So these specs exercise the actual failure rather than a description of it.
@@ -84,7 +84,7 @@ describe('putting a value back', () => {
 
 describe('a value that is already what it should be', () => {
   /* The assignment itself is what moves the caret, so the early return is
-     behaviour rather than an optimisation. */
+     behavior rather than an optimisation. */
   test('is left alone, caret included', () => {
     const control = field('same', 2)
     restoreValue(control, 'same')

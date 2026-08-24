@@ -48,12 +48,12 @@ pub fn focus_ring(brand: Oklch, ctx: &Deriving) -> Oklch {
 /// one.**
 ///
 /// A graphic answers to 3:1 under WCAG 1.4.11 rather than the 4.5 a word does,
-/// so a mark can sit close to the colour a consumer actually chose, and that
+/// so a mark can sit close to the color a consumer actually chose, and that
 /// closeness is the whole point of the token.
 ///
 /// `solve_for_all` is the wrong solver for it and measurably so. It keeps the
 /// candidate with the best worst case, which for `#c1272d` chose a lightness
-/// 0.133 away when `primary` had landed 0.025 away: the mark travelled further
+/// 0.133 away when `primary` had landed 0.025 away: the mark traveled further
 /// than the text it was supposed to stay closer than. So this walks outward from
 /// the brand's own lightness and takes the first step that clears.
 ///
@@ -97,7 +97,7 @@ pub fn brand_mark(brand: Oklch, grounds: &[Oklch]) -> Oklch {
 /// that an assertion is not asserting anything.
 ///
 /// A synthetic predicate is what makes the tie constructible. Trying to build
-/// one out of real contrast against a real ground does not work: for a mid grey
+/// one out of real contrast against a real ground does not work: for a mid gray
 /// the lighter side clears a full step earlier, so the search returns before any
 /// tie exists.
 ///

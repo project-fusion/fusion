@@ -18,7 +18,7 @@ import { styles } from './sparkline-root.css.js'
  * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
  * first and heavy in the second.
  *
- * One colour on the host, read by the line, the wash, the columns and the mark
+ * One color on the host, read by the line, the wash, the columns and the mark
  * alike, so moving `--sparkline-color` cannot leave parts of one drawing
  * disagreeing.
  *
@@ -36,10 +36,10 @@ import { styles } from './sparkline-root.css.js'
  *
  * @cssproperty --chart-terminus-hole - A fill for the middle of a `ring` terminus, which is otherwise open.
  * @cssproperty --chart-terminus-size - Size of the mark on the last reading.
- * @cssproperty --sparkline-area-opacity - How much of the line's colour the wash takes where it meets the line.
+ * @cssproperty --sparkline-area-opacity - How much of the line's color the wash takes where it meets the line.
  * @cssproperty --sparkline-bar-radius - Corner radius on a column, under `plot="bar"`.
  * @cssproperty --sparkline-block-size - Height of the drawing.
- * @cssproperty --sparkline-color - Colour of the line, the wash, the columns and the mark.
+ * @cssproperty --sparkline-color - Color of the line, the wash, the columns and the mark.
  * @cssproperty --sparkline-inline-size - Width of the drawing.
  * @cssproperty --sparkline-width - Thickness of the line, overriding `weight`.
  */
@@ -82,7 +82,7 @@ export class HelixSparkline extends HelixBaseSparkline {
    * that ends a line, so the set is the same wherever one appears. `ring` is the
    * one that asks anything of the drawing: the disc it leaves open is masked out
    * of the `<svg>`, so the line stops at the ring's inner edge rather than
-   * running on to the reading at its centre, and the middle shows whatever the
+   * running on to the reading at its center, and the middle shows whatever the
    * chart is drawn over rather than a guess at it.
    */
   @property({ reflect: true })

@@ -7,7 +7,7 @@
  * is the rest of the handler: `setPointerCapture` throws `NotFoundError` when
  * the id names no active pointer, and every one of these calls sits above the
  * lines that set the dragging flag and call `preventDefault`. So a refusal did
- * not degrade the drag, it cancelled it.
+ * not degrade the drag, it canceled it.
  *
  * That is reachable outside a test: a pointer released between the event being
  * queued and the handler running is gone by the time this is called, and a

@@ -2,7 +2,7 @@
   display: inline-flex;
 }
 
-/* Each button after the first is pulled onto its neighbour's border, so the two
+/* Each button after the first is pulled onto its neighbor's border, so the two
    share one line rather than drawing two against each other. */
 :host(:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
   margin-inline-start: calc(var(--helix-border-thin) * -1);

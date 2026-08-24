@@ -65,7 +65,7 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
    * What it is called, and says, before a press.
    *
    * Defaulted rather than left empty. An icon-only control must be named, and
-   * the name of this one is not a judgement call: every copy button in the
+   * the name of this one is not a judgment call: every copy button in the
    * world is called Copy. A consumer with a better word still sets it.
    */
   @property()

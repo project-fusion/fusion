@@ -23,7 +23,7 @@
  * module's own block sits above the first member's block by convention, so
  * every file with both looks like the fault from the pattern alone: the first
  * run reported thirty-eight, of which twenty-nine were headers doing their job.
- * A header is recognised by position rather than by a tag, because most of
+ * A header is recognized by position rather than by a tag, because most of
  * ours carry no `@file` and adding one to sixty files to satisfy a check would
  * be the check deciding the house style. Nothing but a shebang and whitespace
  * above it means it is the file's.
@@ -141,7 +141,7 @@ for (const root of ROOTS) {
         continue
       }
       /* The file's own block, which belongs above the first member's and is not
-         stranded. Recognised by having nothing but a shebang and whitespace
+         stranded. Recognized by having nothing but a shebang and whitespace
          above it. */
       const above = text
         .slice(0, open.index)

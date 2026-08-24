@@ -42,7 +42,7 @@
  * slides it, where `background-position` re-rasterises the element on every
  * frame. Same effect, same duration, same easing.
  *
- * Twice the width and travelling its own width, so the highlight enters from
+ * Twice the width and traveling its own width, so the highlight enters from
  * before the element and leaves past the end of it rather than appearing and
  * vanishing at the edges. */
 [part="skeleton"]::after {

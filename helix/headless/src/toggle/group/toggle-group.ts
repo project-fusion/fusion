@@ -240,7 +240,7 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
    * Where the group's label sits, `start` putting it on the track's line.
    *
    * Absent is above, which is what a field looks like and what almost every
-   * group wants. `start` is for a row of controls that are labelled rather than
+   * group wants. `start` is for a row of controls that are labeled rather than
    * a form of fields: a toolbar reads as one line, and a label stacked over
    * every group in it turns one row into two.
    *

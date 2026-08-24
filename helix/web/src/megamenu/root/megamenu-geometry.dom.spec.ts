@@ -42,7 +42,7 @@ const _settle = (ms: number): Promise<void> =>
    card as wide as its columns, the band spanning the page and starting under
    the bar, the wrap when a column will not hold a sentence, and the exit that
    has to finish before the panel is gone. Opening, closing, hovering, the
-   disclosure contract and the slotted trigger are behaviour and are tested on
+   disclosure contract and the slotted trigger are behavior and are tested on
    the base tier. */
 if (hasLayout()) {
   describe('a megamenu panel that has been closed', () => {
@@ -186,7 +186,7 @@ if (hasLayout()) {
     test('a plain link in a group starts where its heading does', async () => {
       /* The panel is inside the nav, so its anchors match the nav bar's own
          rule, which centres a word in a horizontal strip. Left unanswered, a
-         column of plain links came out centred under a heading that was not. */
+         column of plain links came out centered under a heading that was not. */
       const bar = (await mount(
         `<nav style="padding:40px">
           <helix-megamenu label="Products">
@@ -206,9 +206,9 @@ if (hasLayout()) {
       await host.updateComplete
 
       /* The text, not the box. A flex column stretches its children, so each of
-         these boxes spans the column whether its text is centred in it or not,
+         these boxes spans the column whether its text is centered in it or not,
          and the box edge reads the same either way: the first version of this
-         spec passed on the centred markup it was written to catch. A range over
+         spec passed on the centered markup it was written to catch. A range over
          the contents measures where the words actually start. */
       const edge = (element: Element): number => {
         const range = document.createRange()
@@ -218,7 +218,7 @@ if (hasLayout()) {
       const heading = host.querySelector('[data-megamenu-heading]') as HTMLElement
       const links = [...host.querySelectorAll('[data-navigation-item]')] as HTMLElement[]
       expect(links.map(edge)).toEqual([edge(heading), edge(heading)])
-      /* Differing lengths, so a shared edge cannot be two equal boxes centred. */
+      /* Differing lengths, so a shared edge cannot be two equal boxes centered. */
       expect(links[0].textContent).not.toBe(links[1].textContent)
     })
 

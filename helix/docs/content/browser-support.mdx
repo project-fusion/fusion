@@ -29,7 +29,7 @@ report we want, and it is not one we would have caught.
 | `ElementInternals` | Form participation, and ARIA that has to cross a shadow boundary |
 | Popover API | Every overlay: menu, tooltip, select, combobox, dialog |
 | `light-dark()` | The token layer, in 769 declarations |
-| `oklch()` | Every colour in the system |
+| `oklch()` | Every color in the system |
 | `:has()` | 74 rules, mostly relational styling of slotted content |
 | `@starting-style` | Entry transitions on overlays |
 | `:state()` | Custom states a consumer's CSS can select |
@@ -45,11 +45,11 @@ this list is.
 **`light-dark()` and the Popover API.** Everything else on that list has been
 available longer. If you need to know whether a browser can run Helix, those are
 the two to check, because they are the newest things the library assumes and
-they are load-bearing: the first is how every token expresses both colour modes
+they are load-bearing: the first is how every token expresses both color modes
 in one declaration, and the second is how every overlay is drawn in the top
 layer.
 
-Neither degrades usefully. A browser without `light-dark()` gets no colour at
+Neither degrades usefully. A browser without `light-dark()` gets no color at
 all rather than one mode; a browser without popover gets overlays that render in
 flow. This is why there is no support table with a fallback column: there is no
 partial mode to be in.

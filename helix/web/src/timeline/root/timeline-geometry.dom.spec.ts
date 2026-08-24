@@ -27,7 +27,7 @@ const three = `
 /* Where the line and the mark land, which is this tier's drawing: the
    connector is hidden on the first entry and the last by `:host(:first-child)`
    and its pair, and the mark is aligned to the title rather than to the top of
-   the entry. The list, the `<time>` and the slotted mark are behaviour and are
+   the entry. The list, the `<time>` and the slotted mark are behavior and are
    tested on the base. */
 describe('a timeline, as the stylesheet draws it', () => {
   if (hasLayout()) {

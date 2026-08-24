@@ -50,7 +50,7 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
    * Which color the band wears.
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
-   * judgement about the message, and elsewhere in this library it carries one:
+   * judgment about the message, and elsewhere in this library it carries one:
    * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and

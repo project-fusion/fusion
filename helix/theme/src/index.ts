@@ -51,11 +51,11 @@ export interface ThemeEngine {
    */
   derive(intent: ThemeIntent, selectors?: readonly string[]): DerivedTheme
   /**
-   * Reads a hex colour into its OKLCH components.
+   * Reads a hex color into its OKLCH components.
    *
-   * @throws when the string is not a hex colour. **The TypeScript engine
+   * @throws when the string is not a hex color. **The TypeScript engine
    * returned a `NaN` triple**, which every comparison is false against, so a
-   * colour that could not be read travelled onward looking like one.
+   * color that could not be read traveled onward looking like one.
    */
   hexToOklch(hex: string): Oklch
 }

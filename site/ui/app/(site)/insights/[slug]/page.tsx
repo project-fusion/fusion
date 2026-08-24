@@ -35,9 +35,9 @@ export async function generateMetadata({
  * with the title between them, and the way back belongs at the very top where a
  * reader's hand already is, as a trail rather than an arrow.
  *
- * Left, and the prose with it. Centred was the old arrangement, on the argument
- * that a centred measure is a column the eye can find, and that holds while the
- * column is narrow. At 90ch it stops: a centred head starts in a different place
+ * Left, and the prose with it. Centered was the old arrangement, on the argument
+ * that a centered measure is a column the eye can find, and that holds while the
+ * column is narrow. At 90ch it stops: a centered head starts in a different place
  * from every line beneath it, so the reader keeps two left edges instead of one.
  *
  * `align` and not only `text-align`. This is a flex column, so its children are
@@ -80,7 +80,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             share, a subscribe) the row steps around it.
 
             The recipe carries all of it. `[data-button]` is `inline-flex`,
-            centred, with a gap for the icon and a hover wash, so the chevron is
+            centered, with a gap for the icon and a hover wash, so the chevron is
             just the first child and nothing here needs a rule for any of it.
             `Button` itself takes no `href`, which is the whole reason the
             recipe exists: this is the router's own anchor wearing the control's

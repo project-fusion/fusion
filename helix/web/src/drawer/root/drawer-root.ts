@@ -30,7 +30,7 @@ import { styles } from './drawer-root.css.js'
  * @cssproperty --drawer-backdrop - Filter applied behind a `material="glass"` drawer.
  *   Follows the theme's material policy; set it to override the strength on one drawer.
  * @cssproperty --drawer-background-color - Surface behind the panel.
- * @cssproperty --drawer-border-color - Colour of the panel's edge.
+ * @cssproperty --drawer-border-color - Color of the panel's edge.
  * @cssproperty --drawer-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.

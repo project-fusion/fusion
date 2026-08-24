@@ -13,7 +13,7 @@
  * part, had no selector that could use it. Measured in Chrome 148, of three
  * rules written against one chart `::part(bar)` applied and both
  * `::part(bar)[data-series="2"]` and `::part(bar):nth-child(2)` were dropped at
- * parse time, leaving four bars one colour.
+ * parse time, leaving four bars one color.
  *
  * **The names are the seam between the tiers.** This sheet points each at a
  * semantic token, which is a decision and therefore belongs to the styled tier.

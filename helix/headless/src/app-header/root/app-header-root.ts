@@ -60,7 +60,7 @@ export class HelixBaseAppHeader extends HelixElement {
    * **Named for the region and not for what is usually in it.** It was
    * `nav-align`, which reads as a property about `Navigation` and is not: the
    * middle slot takes whatever a consumer puts there, a search field or a
-   * breadcrumb trail as readily as a nav, and a header that centred its search
+   * breadcrumb trail as readily as a nav, and a header that centered its search
    * box would have been setting `nav-align` to do it. The part is called
    * `content`, so the property is too.
    */

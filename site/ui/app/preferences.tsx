@@ -25,7 +25,7 @@ const apply = (mode: ColorMode): void => {
 /**
  * Puts the tier on the document, where CSS can act on it.
  *
- * The same shape as the colour mode above, and for a sharper reason here: a
+ * The same shape as the color mode above, and for a sharper reason here: a
  * reference page is static and server-rendered, and this preference is read
  * from `localStorage`, which the server does not have. So the page renders
  * **both** tiers and this attribute decides which one is shown. Filtering in

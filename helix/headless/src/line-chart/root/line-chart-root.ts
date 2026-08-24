@@ -178,8 +178,8 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
      *
      * Spanning 0 to 100 is the obvious version and is what this did first. The
      * labels are a grid of equal columns, the same row the bar chart uses, so
-     * each name is centred in its share of the width while the readings sat at
-     * the gridlines between those shares: measured, the first name centred at a
+     * each name is centered in its share of the width while the readings sat at
+     * the gridlines between those shares: measured, the first name centered at a
      * twelfth of the width with its point at zero. Every label was off by half
      * a slot and the error grew toward the middle.
      *

@@ -31,7 +31,7 @@ fn run(directory: &Path, args: &[&str]) -> Output {
     coloured(directory, args, false)
 }
 
-/// **The same command with colour forced on**, which is the only way one class of
+/// **The same command with color forced on**, which is the only way one class of
 /// bug is visible. See [`the_matrix_stays_aligned_when_it_is_coloured`].
 fn coloured(directory: &Path, args: &[&str], paint: bool) -> Output {
     let mut command = Command::new(binary());
@@ -314,7 +314,7 @@ fn the_matrix_stays_aligned_when_it_is_coloured() {
     assert_eq!(code(&output), 1);
 
     /* **The output has to actually be coloured, or this test is about the other
-    branch.** Without the check, breaking the thing that turns colour on makes
+    branch.** Without the check, breaking the thing that turns color on makes
     the assertions below run against plain text, where the alignment has never
     been in question: the test would go on passing while covering nothing.
     Measured by removing the force, which is how the hole was found. */

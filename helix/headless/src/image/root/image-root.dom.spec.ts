@@ -145,7 +145,7 @@ if (hasLayout()) {
        was set correctly on every path and the stand-in stayed painted over the
        picture anyway, because `display: flex` is an author rule and
        `[hidden] { display: none }` is the user agent's, and an author rule wins
-       at any specificity. Every image in the gallery was a grey rectangle under
+       at any specificity. Every image in the gallery was a gray rectangle under
        a photograph that had loaded. A box is the only thing that answers
        "is it out of the way" from the reader's side. `Megamenu` learned this
        first and its own layout spec says the same. */
@@ -170,10 +170,10 @@ if (hasLayout()) {
       expect(boxOf(host, 'fallback').height).toBe(0)
     })
 
-    test('a slotted placeholder fills the box rather than centring in it', async () => {
+    test('a slotted placeholder fills the box rather than centering in it', async () => {
       /* Measured before this rule existed: a slotted `Skeleton` came out 200
          wide and nothing high. It has no height of its own, and what held it
-         was a centring flex box, which gave it its content height of zero. The
+         was a centering flex box, which gave it its content height of zero. The
          stand-in was a plain rectangle and the skeleton was never visible. */
       const host = (await mount(
         `<helix-base-image alt="Waiting" style="inline-size:120px;--image-aspect:1/1"><i slot="placeholder"></i></helix-base-image>`,

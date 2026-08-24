@@ -61,7 +61,7 @@ const pending = new WeakMap<EventTarget, { before: unknown; label: string }>()
  * and this one has to be believed the day it is right.
  *
  * So there is no deadline. The first unanswered request is remembered, and
- * judgement waits for the second: if the state has not moved between two
+ * judgment waits for the second: if the state has not moved between two
  * requests, nothing answered either of them, whatever the timing. A control
  * asked once and never again is never accused, which is the right trade, since
  * the symptom this exists for is a control that ignores everything.
@@ -148,7 +148,7 @@ export const requestControlledChange = <T>({
     return false
   }
 
-  /* A cancelled event never reaches here, and should not: somebody refused it,
+  /* A canceled event never reaches here, and should not: somebody refused it,
      so somebody is listening, which is the opposite of what this looks for. */
   if (auditing && label !== undefined && read !== undefined) {
     auditUnanswered(host, label, next, before as T)

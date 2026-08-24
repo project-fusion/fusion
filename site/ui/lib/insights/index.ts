@@ -36,7 +36,7 @@ export type Kind = 'Decision' | 'Essay' | 'Note'
  * CDN makes it a runtime dependency of the site, which is the Sovereignty
  * Constraint applied to our own pages, and the permissive licences are the ones
  * that let you take the file rather than the link. It is also the difference
- * between two sets of terms: the Unsplash *licence* asks for no attribution,
+ * between two sets of terms: the Unsplash *license* asks for no attribution,
  * while their *API* requires it.
  */
 export interface InsightImage {
@@ -50,7 +50,7 @@ export interface InsightImage {
   /**
    * Where it came from, as a note to us rather than to a reader.
    *
-   * Nothing renders this. Recorded because the licence that made the picture
+   * Nothing renders this. Recorded because the license that made the picture
    * free is a fact about the file, and a year from now the only way to answer
    * whether it can stay is to know where it came from. Photographer and source,
    * enough to find it again.

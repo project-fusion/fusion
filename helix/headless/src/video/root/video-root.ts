@@ -895,7 +895,7 @@ export class HelixBaseVideo extends HelixElement {
    * neither, and `remote` simply being absent is what turns the control off
    * there.
    *
-   * `watchAvailability` returns an id that has to be cancelled, or the callback
+   * `watchAvailability` returns an id that has to be canceled, or the callback
    * outlives the element that owns it.
    */
   private async watchRemote(): Promise<void> {
@@ -1079,7 +1079,7 @@ export class HelixBaseVideo extends HelixElement {
     this.cued?.removeEventListener('cuechange', this.handleCue)
     this.cued = undefined
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange)
-    /* The watch outlives the element unless it is cancelled, and a callback
+    /* The watch outlives the element unless it is canceled, and a callback
        holding a removed element is a leak with a `@state` write on the end. */
     if (this.remoteWatch !== undefined) {
       void this.video?.remote?.cancelWatchAvailability?.(this.remoteWatch)

@@ -58,7 +58,7 @@ const VIEW: Box = { bottom: 100, left: 0, right: 200, top: 0 }
 
 describe('an item already in view', () => {
   /* A scroll of zero still fires a `scroll` event and still cancels a smooth
-     one already running, so the early return is behaviour rather than an
+     one already running, so the early return is behavior rather than an
      optimisation. It is also the difference from `block: 'nearest'`, which
      nudges on every keypress and makes a long list feel like it is fighting
      the reader. */

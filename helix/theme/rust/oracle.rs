@@ -577,7 +577,7 @@ fn hypot_is_exact_when_it_is_given_the_same_three_numbers() {
 ///
 /// **A per-phase test looks its token up by name, and a pinned token is the one
 /// case where that name does not hold what the phase computed.** The `pinned`
-/// theme overrides `color-primary` outright, so the primary test read a colour
+/// theme overrides `color-primary` outright, so the primary test read a color
 /// the primary phase never produced and reported the phase as broken. Filtering
 /// here rather than special-casing in five tests, because the property is about
 /// the theme rather than about any one phase.
@@ -628,7 +628,7 @@ fn assert_token(mine: &DerivedToken, theirs: &Value, at: &str) {
     in kind is the point.** The hex is what ships; the triple is an intermediate,
     and it inherits the one divergence this port has: `cbrt` and `atan2` in
     `hex_to_oklch` differ from V8's by a last place on 6 of 45 components, so a
-    brand parsed an ulp out carries that ulp into every colour derived from it.
+    brand parsed an ulp out carries that ulp into every color derived from it.
     Traced rather than assumed: `#c1272d` parses to chroma 0.189192543111386 in
     V8 and 0.18919254311138597 here, and `red`'s `color-primary` differs by
     exactly that while emitting the same six hex digits. Held to the parse
@@ -1188,7 +1188,7 @@ fn the_primary_role_lands_where_the_typescript_lands() {
 /// different hue and a different palette rather than a different digit.
 ///
 /// `red` and `amber` are in the oracle for this phase. A brand that *is* a
-/// status colour is the case twenty degrees of allowance cannot fully answer,
+/// status color is the case twenty degrees of allowance cannot fully answer,
 /// so those two exercise the search running its full width and giving up, where
 /// the blue clears on the first or second step.
 #[test]
@@ -1265,7 +1265,7 @@ fn the_hue_repair_widens_outward_and_gives_up_rather_than_settling() {
 }
 
 /// The accent, which settles after the statuses and reports `related` unless the
-/// consumer pinned a colour.
+/// consumer pinned a color.
 ///
 /// The default intent is the complement, `rotate: 180`, and on the shipped blue
 /// that lands at 80 degrees against an amber `warning` at 75. This is the phase
@@ -1322,7 +1322,7 @@ fn the_accent_lands_where_the_typescript_lands() {
 /// **Every token of every theme, in order, by name.**
 ///
 /// This is the assertion the per-phase tests above were building toward, and it
-/// subsumes most of them: a phase that derives the right colour and files it
+/// subsumes most of them: a phase that derives the right color and files it
 /// under the wrong name, or emits it in the wrong position, or does not emit it
 /// at all, is invisible to a test that looks its own token up by name. Three of
 /// those four failures produce a theme that still looks derived.
@@ -1371,7 +1371,7 @@ fn every_token_of_every_theme_matches() {
 ///
 /// So it is asserted as a rule, the way `repair_hue`'s own order is, and against
 /// a synthetic predicate rather than real contrast. Real contrast cannot produce
-/// the tie: against a mid grey the lighter side clears a full step earlier, so
+/// the tie: against a mid gray the lighter side clears a full step earlier, so
 /// the walk returns before both sides are ever true at once. The first attempt
 /// at this test tried it anyway and failed, which is the finding rather than the
 /// obstacle.

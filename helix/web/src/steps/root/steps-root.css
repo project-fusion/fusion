@@ -10,7 +10,7 @@
    reaches from the mark to its own step's edge and half the gap beyond, so it
    meets the one coming the other way in the middle of the gap. That is what
    lets the rule read as continuous without any step knowing the size of its
-   neighbour, which is the thing a step cannot know.
+   neighbor, which is the thing a step cannot know.
 
    **Each axis has one arrangement, and it is the one the rule can survive.** A
    row puts names under the marks, because beside them there is a word in the
@@ -123,12 +123,12 @@
  * shape, and a row of them reads as a row of controls rather than as a rule
  * with marks on it.
  *
- * And no colour on the digits. A green check is green because the check is
+ * And no color on the digits. A green check is green because the check is
  * already the shape for "done" and the hue only confirms it; a green 2 says
  * nothing a reader can read, because a number carries no meaning of its own for
- * a colour to agree with. It would be hue used as the whole signal, which is
- * the one thing colour must not be. So the digits are ink, and the current step
- * is a step darker rather than a different colour, which is the move the names
+ * a color to agree with. It would be hue used as the whole signal, which is
+ * the one thing color must not be. So the digits are ink, and the current step
+ * is a step darker rather than a different color, which is the move the names
  * make. The public hooks still win: a consumer who wants a green 2 gets one. */
 :host([variant="numeric"]) {
   --_steps-mark: none;

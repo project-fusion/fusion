@@ -47,17 +47,17 @@ const field = async (attrs = '', name = tag): Promise<Field> => {
 
 describe('which message a field shows', () => {
   test('the consumer’s, when they set one', async () => {
-    const host = await field('feedback="Pick a colour"')
-    expect(host.resolvedFeedback).toBe('Pick a colour')
+    const host = await field('feedback="Pick a color"')
+    expect(host.resolvedFeedback).toBe('Pick a color')
   })
 
   /* The consumer's wins outright, even over a platform verdict, because they
      said something specific about their own form and the browser said something
      generic about an input. */
   test('and theirs beats the platform’s', async () => {
-    const host = await field('feedback="Pick a colour" required')
+    const host = await field('feedback="Pick a color" required')
     host.internals.setValidity({ valueMissing: true }, 'Please fill in this field')
-    expect(host.resolvedFeedback).toBe('Pick a colour')
+    expect(host.resolvedFeedback).toBe('Pick a color')
   })
 
   /* Nothing until the reader has had a go at it. A form that greets somebody

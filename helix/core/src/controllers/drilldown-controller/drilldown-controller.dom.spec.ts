@@ -25,14 +25,14 @@ beforeAll(() => {
 /**
  * A three-level menu, written the way a consumer writes one.
  *
- * The nesting *is* the wiring: `Colour` contains the page it opens, and that
+ * The nesting *is* the wiring: `Color` contains the page it opens, and that
  * page's `Warm` contains the page *it* opens. There are no ids and nothing to
  * keep in step.
  */
 const MARKUP = `
   <div id="panel">
     <i id="file">File</i>
-    <i id="colour">Colour
+    <i id="color">Color
       <i id="warm" slot="page">Warm
         <i id="red" slot="page">Red</i>
         <i id="amber" slot="page">Amber</i>
@@ -66,7 +66,7 @@ describe('the page a reader is on', () => {
   test('starts at the top, whose rows are the ones nothing opened', () => {
     const one = scene()
     expect(one.drill.atRoot).toBe(true)
-    expect(ids(one.drill.rows)).toEqual(['file', 'colour', 'quit'])
+    expect(ids(one.drill.rows)).toEqual(['file', 'color', 'quit'])
   })
 
   test('and has no name, because the panel’s own label is the name of the place', () => {
@@ -77,23 +77,23 @@ describe('the page a reader is on', () => {
 describe('drilling into a row', () => {
   test('shows that row’s own page in place of the one showing', () => {
     const one = scene()
-    expect(one.drill.enter(one.row('colour'))).toBe(true)
+    expect(one.drill.enter(one.row('color'))).toBe(true)
     expect(ids(one.drill.rows)).toEqual(['warm', 'cool'])
   })
 
   /* The row's own text and not its subtree, because a row that opens a page
      *contains* that page's rows: `textContent` would read back the whole
-     thing, so the title of the Colour page would be "Colour Warm Red Amber
+     thing, so the title of the Color page would be "Color Warm Red Amber
      Cool". */
   test('and is named by the row’s own text, not by everything under it', () => {
     const one = scene()
-    one.drill.enter(one.row('colour'))
-    expect(one.drill.label).toBe('Colour')
+    one.drill.enter(one.row('color'))
+    expect(one.drill.label).toBe('Color')
   })
 
   test('telling the host, because nothing else would redraw the panel', () => {
     const one = scene()
-    one.drill.enter(one.row('colour'))
+    one.drill.enter(one.row('color'))
     expect(one.asked).toBe(1)
   })
 
@@ -108,7 +108,7 @@ describe('drilling into a row', () => {
 
   test('as many levels down as the markup goes', () => {
     const one = scene()
-    one.drill.enter(one.row('colour'))
+    one.drill.enter(one.row('color'))
     one.drill.enter(one.row('warm'))
     expect(ids(one.drill.rows)).toEqual(['red', 'amber'])
     expect([one.drill.label, one.drill.depth]).toEqual(['Warm', 2])
@@ -118,7 +118,7 @@ describe('drilling into a row', () => {
 describe('asking whether a row opens a page', () => {
   test('is whether anything under it is assigned to the page slot', () => {
     const one = scene()
-    expect([one.drill.hasPage(one.row('colour')), one.drill.hasPage(one.row('file'))]).toEqual([
+    expect([one.drill.hasPage(one.row('color')), one.drill.hasPage(one.row('file'))]).toEqual([
       true,
       false,
     ])
@@ -130,19 +130,19 @@ describe('going back', () => {
      expects one level. */
   test('is one level, not all the way to the top', () => {
     const one = scene()
-    one.drill.enter(one.row('colour'))
+    one.drill.enter(one.row('color'))
     one.drill.enter(one.row('warm'))
     expect(one.drill.back()).toBe(true)
-    expect([one.drill.label, ids(one.drill.rows)]).toEqual(['Colour', ['warm', 'cool']])
+    expect([one.drill.label, ids(one.drill.rows)]).toEqual(['Color', ['warm', 'cool']])
   })
 
   test('and again, which arrives at the top', () => {
     const one = scene()
-    one.drill.enter(one.row('colour'))
+    one.drill.enter(one.row('color'))
     one.drill.enter(one.row('warm'))
     one.drill.back()
     one.drill.back()
-    expect([one.drill.atRoot, ids(one.drill.rows)]).toEqual([true, ['file', 'colour', 'quit']])
+    expect([one.drill.atRoot, ids(one.drill.rows)]).toEqual([true, ['file', 'color', 'quit']])
   })
 
   test('and says so when there was nowhere to go', () => {
@@ -159,11 +159,11 @@ describe('the way back being rebuilt from the tree', () => {
      holding a reference to something detached. */
   test('means a page removed while showing lands the reader at the top', () => {
     const one = scene()
-    one.drill.enter(one.row('colour'))
+    one.drill.enter(one.row('color'))
     one.drill.enter(one.row('warm'))
     one.row('warm').remove()
     expect(one.drill.atRoot).toBe(true)
-    expect(ids(one.drill.rows)).toEqual(['file', 'colour', 'quit'])
+    expect(ids(one.drill.rows)).toEqual(['file', 'color', 'quit'])
   })
 
   /* The half the walk alone did not catch, and the likelier one: a consumer
@@ -174,9 +174,9 @@ describe('the way back being rebuilt from the tree', () => {
      detached row before reaching the top. */
   test('and so does one whose ancestor was removed, subtree and all', () => {
     const one = scene()
-    one.drill.enter(one.row('colour'))
+    one.drill.enter(one.row('color'))
     one.drill.enter(one.row('warm'))
-    one.row('colour').remove()
+    one.row('color').remove()
     expect([one.drill.atRoot, one.drill.depth, one.drill.label]).toEqual([true, 0, ''])
     expect(ids(one.drill.rows)).toEqual(['file', 'quit'])
     expect(one.drill.back()).toBe(false)
@@ -187,8 +187,8 @@ describe('the way back being rebuilt from the tree', () => {
   test('and a row moved in the markup takes its page with it', () => {
     const one = scene()
     const panel = document.getElementById('panel') as HTMLElement
-    panel.prepend(one.row('colour'))
-    one.drill.enter(one.row('colour'))
+    panel.prepend(one.row('color'))
+    one.drill.enter(one.row('color'))
     expect(ids(one.drill.rows)).toEqual(['warm', 'cool'])
   })
 })
@@ -199,7 +199,7 @@ describe('how deep the reader is', () => {
   test('is zero at the top and counts down from there', () => {
     const one = scene()
     expect(one.drill.depth).toBe(0)
-    one.drill.enter(one.row('colour'))
+    one.drill.enter(one.row('color'))
     expect(one.drill.depth).toBe(1)
     one.drill.enter(one.row('warm'))
     expect(one.drill.depth).toBe(2)
@@ -211,7 +211,7 @@ describe('closing the panel', () => {
      left is showing a reader a place they have no memory of choosing. */
   test('puts the reader back at the top, so it reopens where it opened', () => {
     const one = scene()
-    one.drill.enter(one.row('colour'))
+    one.drill.enter(one.row('color'))
     one.drill.reset()
     expect(one.drill.atRoot).toBe(true)
   })
@@ -224,7 +224,7 @@ describe('closing the panel', () => {
 
   test('as does the host going away', () => {
     const one = scene()
-    one.drill.enter(one.row('colour'))
+    one.drill.enter(one.row('color'))
     one.drill.hostDisconnected()
     expect(one.drill.atRoot).toBe(true)
   })

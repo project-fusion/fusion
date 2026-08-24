@@ -21,7 +21,7 @@
   /* The solid fill, separate from the tone, and it has to be separate.
    *
    * The same split `Button` made and for the same reason. `--_icon-button-tone`
-   * is the colour of the *ink* on every emphasis but `solid`: an outlined or
+   * is the color of the *ink* on every emphasis but `solid`: an outlined or
    * subtle primary draws its glyph with it, and in dark mode that is
    * deliberately the lighter brand so the mark is legible on a dark page. A
    * solid control wants the opposite, a fill dark enough to carry white.
@@ -56,9 +56,9 @@
  *
  * `tone` moved to `MixinControlSurface`, which `Button` and `CopyButton` take
  * as well, and Button's union has always carried `accent`: a rotation off the
- * brand seed rather than a colour of its own, so it stays in relation when
+ * brand seed rather than a color of its own, so it stays in relation when
  * somebody rethemes. Nothing about it was ever specific to a control with words
- * in it, and an icon button doing a second emphasised action wanted it.
+ * in it, and an icon button doing a second emphasized action wanted it.
  *
  * Written here rather than only widened in the type, because a value a
  * stylesheet does not answer is the quietest kind of broken: valid to write,

@@ -385,7 +385,7 @@ describe('sandbox dividers', () => {
 
        It names the property that settled rather than the word `arrangement`,
        which named nothing on this element and carried both numbers as JSON that
-       every consumer of it then ignored in favour of reading the element. */
+       every consumer of it then ignored in favor of reading the element. */
     const sandbox = (await mount(wired)) as Updatable & { split: number }
     const named: string[] = []
     sandbox.addEventListener('helix-change', (event) => {

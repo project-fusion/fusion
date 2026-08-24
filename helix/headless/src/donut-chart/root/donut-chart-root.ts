@@ -11,7 +11,7 @@ import '../../tooltip/index.js'
 
 /** The drawing's own coordinates, square because the shape has to stay round. */
 const BOX = 100
-const CENTRE = BOX / 2
+const CENTER = BOX / 2
 
 /** The outer edge of the ring, whatever its thickness. */
 const EDGE = 40
@@ -42,7 +42,7 @@ const GAP = 9999
  *
  * Derived instead, `r = EDGE - thickness / 2`, the outer edge lands on `EDGE`
  * for every value and the inner edge is `EDGE - thickness`. A pie is where the
- * inner edge reaches the centre, which solves to `thickness = EDGE`: the ring
+ * inner edge reaches the center, which solves to `thickness = EDGE`: the ring
  * is then drawn at `r = EDGE / 2` and its stroke spans the whole radius.
  *
  * `EDGE * 2` was the first answer and is the trap in this arithmetic. It gives
@@ -97,7 +97,7 @@ const THICKNESS: Record<string, number> = {
  * @aliases Pie Chart, Ring Chart, Share Chart
  * @documentation https://helix.fusion.dev/components/donut-chart
  *
- * @csspart centre - The middle of the ring, holding whatever is slotted.
+ * @csspart center - The middle of the ring, holding whatever is slotted.
  * @csspart plot - The drawing.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -144,7 +144,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
    * hole without moving the outer edge, so a chart keeps its footprint.
    *
    * **`none` is a pie**, and it is the same drawing rather than another one:
-   * the radius follows the thickness, so the inner edge reaching the centre is
+   * the radius follows the thickness, so the inner edge reaching the center is
    * what closing the hole means. A pie reads less accurately than a ring, angle
    * being harder to judge than length, but it is not *misleading* the way a bar
    * measured from anything but zero is, which is why this is a value here and
@@ -222,7 +222,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
   protected override render(): TemplateResult {
     const shares = this.shares
     const named = this.named
-    /* No middle where there is no hole. A `centre` part over a pie would put
+    /* No middle where there is no hole. A `center` part over a pie would put
        slotted content on top of the slices, and a slot nobody can see is worse
        than one that is not there: a consumer fills it and nothing happens. */
     return html`${this.renderPlot(shares, named)}
@@ -242,7 +242,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
     /* The thickness is declared here, on the box that holds both the ring and
        the middle, and not on the slices.
      *
-     * It was on each `<circle>`, and `[part="centre"]` read it to size the hole
+     * It was on each `<circle>`, and `[part="center"]` read it to size the hole
      * it fills. A custom property inherits down and never sideways, so the
      * middle, being a sibling, always got the fallback: the hole was sized as if
      * every ring were the resting thickness. At `hole="large"` that made the
@@ -259,8 +259,8 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
     >
       <svg viewBox=${this.frame} xmlns="http://www.w3.org/2000/svg">
         <circle
-          cx=${CENTRE}
-          cy=${CENTRE}
+          cx=${CENTER}
+          cy=${CENTER}
           fill="none"
           part="track"
           r=${this.radius}
@@ -269,7 +269,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
         />
         ${shares.map((share, index) => this.renderSegment(share, index))}
       </svg>
-      ${this.hole === 'none' ? nothing : html`<div part="centre"><slot></slot></div>`}
+      ${this.hole === 'none' ? nothing : html`<div part="center"><slot></slot></div>`}
       ${this.renderTooltip()}
     </div>`
   }
@@ -278,17 +278,17 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
    * The view box, cropped to what is actually drawn.
    *
    * A full turn uses the square. A half arc uses the band from the top of the
-   * ring down to the centre line, plus the half stroke its flat ends hang
+   * ring down to the center line, plus the half stroke its flat ends hang
    * below that, and cropping to it is the difference between a semi-donut and a
    * semi-donut with an empty quarter of the box under it. The outer edge is
-   * `EDGE` from the centre whatever the thickness, which is what makes this two
+   * `EDGE` from the center whatever the thickness, which is what makes this two
    * numbers rather than a measurement.
    */
   private get frame(): string {
     if (this.sweep !== 'half') {
       return `0 0 ${BOX} ${BOX}`
     }
-    return `0 ${CENTRE - EDGE} ${BOX} ${EDGE + this.thickness / 2}`
+    return `0 ${CENTER - EDGE} ${BOX} ${EDGE + this.thickness / 2}`
   }
 
   /** One slice, as a dash the length of its share. */
@@ -303,8 +303,8 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
        rotation that puts zero at the top is the stylesheet's, since it is a
        fact about how the picture is presented rather than about the numbers. */
     return svg`<circle
-      cx=${CENTRE}
-      cy=${CENTRE}
+      cx=${CENTER}
+      cy=${CENTER}
       data-active=${this.pointer.at === index ? '' : nothing}
       data-series=${seriesIndex(index)}
       fill="none"
@@ -330,7 +330,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
     if (!share) {
       return drawTooltip(this.rows, at, this.tag('tooltip'))
     }
-    /* **Outside the ring, on the slice's own bearing.** Centred in the hole was
+    /* **Outside the ring, on the slice's own bearing.** Centered in the hole was
        the first version: harmless over a donut, since the hole is empty, and it
        covers the data on a pie, and in neither case does it say *which* slice it
        means. Out here it does, and one rule serves both.
@@ -341,8 +341,8 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
      * so its arrow rests on the ring rather than in it. */
     const angle = (share.start + share.fraction / 2) * 2 * Math.PI - Math.PI / 2
     const edge = EDGE
-    const x = CENTRE + Math.cos(angle) * edge
-    const y = CENTRE + Math.sin(angle) * edge
+    const x = CENTER + Math.cos(angle) * edge
+    const y = CENTER + Math.sin(angle) * edge
     return drawTooltip(this.rows, at, this.tag('tooltip'), {
       /* The preferred side from the bearing's dominant axis, and
          `FloatingController` moves it if that side does not fit. Four fixed

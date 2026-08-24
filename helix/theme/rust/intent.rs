@@ -19,7 +19,7 @@
 
 use crate::oklch::{hex_to_oklch, Oklch};
 
-/// A colour a consumer supplies. Hex is accepted and converted at the edge.
+/// A color a consumer supplies. Hex is accepted and converted at the edge.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Color {
     Hex(String),
@@ -28,7 +28,7 @@ pub enum Color {
 
 /// **Rendered as the consumer wrote it**, which matters because these strings
 /// reach a person: `IntentError` quotes the offending value, and the CLI prints
-/// that message verbatim. `{:?}` on the enum emits `Hex("not-a-colour")`, which
+/// that message verbatim. `{:?}` on the enum emits `Hex("not-a-color")`, which
 /// names a Rust variant to somebody looking at a JSON file.
 impl std::fmt::Display for Color {
     fn fmt(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -45,7 +45,7 @@ impl std::fmt::Display for Color {
 
 /// How a role departs from the role it derives from.
 ///
-/// Written as a relationship rather than a second colour because a literal
+/// Written as a relationship rather than a second color because a literal
 /// drifts out of relation the moment anybody rethemes, which is the failure of
 /// every palette with two hardcoded colours in it.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -81,14 +81,14 @@ pub enum From {
     Brand,
 }
 
-/// A role takes a colour, or says how it relates to one.
+/// A role takes a color, or says how it relates to one.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Seed {
     Color(Color),
     Relation(Relation),
 }
 
-/// A status role. A colour pins it outright; a hue nudges it within the meaning
+/// A status role. A color pins it outright; a hue nudges it within the meaning
 /// it already carries.
 ///
 /// **Never a [`Relation`]**, which is the asymmetry with `accent` and is
@@ -117,7 +117,7 @@ pub struct PairingRequest {
 }
 
 /// How saturated the palette is, independent of which hue it is. Never applied
-/// to a value the consumer pinned, a pinned colour being a fact.
+/// to a value the consumer pinned, a pinned color being a fact.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 #[cfg_attr(
     feature = "serde",
@@ -212,7 +212,7 @@ pub struct Motion {
     pub scale: Option<f64>,
 }
 
-/// The cast every grey carries. Chroma 0 is a dead grey and is the default,
+/// The cast every gray carries. Chroma 0 is a dead gray and is the default,
 /// matching `primitives.css`: a fixed chroma is a rising *saturation* as a
 /// surface darkens, so a trace that looks right on a light page reads navy
 /// across a dark one.
@@ -333,7 +333,7 @@ pub struct Status {
 pub struct ThemeIntent {
     /// The second emphasis. Defaults to the complement of the brand.
     pub accent: Option<Seed>,
-    /// The one colour most consumers care about, and the only required input.
+    /// The one color most consumers care about, and the only required input.
     pub brand: Color,
     pub chroma: Option<Chroma>,
     /// 4.5 is WCAG AA and the default, being the figure with legal weight; 7 is
@@ -426,7 +426,7 @@ pub const STATUS_HUE: [f64; 4] = [27.0, 245.0, 155.0, 75.0];
 /// ramp, where one number for eight hues had three of them silently clipped.
 ///
 /// They exist at all because the engine was taking the *brand's* chroma for
-/// every status. A brand at 0.035 gave a danger at 0.035, a near-grey error; a
+/// every status. A brand at 0.035 gave a danger at 0.035, a near-gray error; a
 /// magenta brand at 0.257 asked amber for a chroma its hue cannot hold and got
 /// 0.115 back after clipping, a muddy beige. A status's saturation is part of
 /// what it means and is not the brand's to set.

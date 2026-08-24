@@ -67,7 +67,7 @@
  * **This was a keyframe animating `translate`, and it could not stay.** The
  * floating controller writes the panel's position onto that same property, and
  * an animation outranks an inline style for as long as it runs, so the keyframe
- * took the position over and the panel travelled from the viewport corner. The
+ * took the position over and the panel traveled from the viewport corner. The
  * offset it used to add is now the scale instead, which composes with the
  * controller's `translate` rather than fighting it.
  *
@@ -88,7 +88,7 @@
  *
  * On `transform`, never on `translate`: the floating controller writes the
  * panel's position onto `translate`, and a keyframe animating that property took
- * the position over, so the panel travelled from the corner of the viewport
+ * the position over, so the panel traveled from the corner of the viewport
  * instead of from its anchor. Measured, the two compose in the order translate,
  * scale, transform, which means a `translateY` here is relative to wherever the
  * controller placed the panel and leaves x alone.

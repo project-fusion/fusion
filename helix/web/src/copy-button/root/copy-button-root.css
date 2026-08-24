@@ -43,7 +43,7 @@ slot[hidden] {
  *
  * `::slotted()` matches assigned nodes and never fallback content, so
  * `IconButton`'s rule for a slotted icon cannot reach an icon the component
- * draws itself. Measured: both glyphs rendered, both took the right colour, and
+ * draws itself. Measured: both glyphs rendered, both took the right color, and
  * both came out 0x0, so the button was a correctly sized box containing
  * nothing. Fallback content belongs to this shadow tree and is styled from
  * inside it, which is what these two rules are.

@@ -259,7 +259,7 @@ for (const file of walk(root)) {
          is wrong when what is wrong is reaching for it at all.
          
          The skip exists so that a token definition may hold a raw value, which
-         is true and is about the right-hand side being a colour rather than a
+         is true and is about the right-hand side being a color rather than a
          `var()`. Applied to the whole line it also skipped every reference one
          token makes to another, which is where `--helix-shadow-lg` sat naming
          an ink that did not exist. Written after the skip, this check passed on

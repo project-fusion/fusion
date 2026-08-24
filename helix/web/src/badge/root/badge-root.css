@@ -18,7 +18,7 @@
   align-items: center;
   /* **`primary-surface`, not `primary`.** The ink here is
      `foreground-on-accent`, and the grounds that ink is solved against are the
-     fills: `primary` is the colour primary *text* is set in, which in a dark
+     fills: `primary` is the color primary *text* is set in, which in a dark
      scheme is a light blue. White on it measured 3.2:1, and only in dark,
      because in light the two happen to land the same way round. */
   background-color: var(--badge-background-color, var(--helix-color-primary-surface));

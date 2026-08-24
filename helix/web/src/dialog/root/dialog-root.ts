@@ -24,7 +24,7 @@ import { styles } from './dialog-root.css.js'
  *
  * @cssproperty --dialog-rise - How far the panel rises as it opens. Follows
  *   `--helix-space-lg`.
- * @cssproperty --dialog-border-color - Colour of the panel's edge.
+ * @cssproperty --dialog-border-color - Color of the panel's edge.
  * @cssproperty --dialog-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.

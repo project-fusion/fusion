@@ -15,10 +15,10 @@
 /* `grid` rather than `flex`, and the difference is the whole of 122.
  *
  * This centres an example, which is a thing made of blocks; as a flex container
- * it centred the example's *children*, one per line, laid out along the inline
+ * it centered the example's *children*, one per line, laid out along the inline
  * axis. `tour/nested` reported it: a bar of two buttons and a third control
  * under it came out as three on one line with the odd one dropped, because
- * `align-items: center` was centring boxes of different heights against each
+ * `align-items: center` was centering boxes of different heights against each
  * other. The example was right. Every example separating blocks with a
  * `margin-block-end` was, and in this one mode none of them worked, because a
  * block margin says nothing along an inline axis.

@@ -97,7 +97,7 @@ For a tree, the role moves *onto* the anchor and the group becomes its sibling:
 </div>
 ```
 
-That is the navigation flavour of the tree pattern, and it is why `href` changes
+That is the navigation flavor of the tree pattern, and it is why `href` changes
 the shape of the markup rather than only adding an attribute. Without an `href`
 nothing moves: the wrapper stays the `treeitem` and holds its group, which is
 what an `<li>` holding a `<ul>` is.
@@ -118,7 +118,7 @@ const router = useRouter()
 
 const navigate = (event) => {
   // A modified or middle press is exactly the gesture that wants the browser's
-  // own behaviour. Taking it back is taking back the reason for real anchors.
+  // own behavior. Taking it back is taking back the reason for real anchors.
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
     return
   }

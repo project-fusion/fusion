@@ -167,7 +167,7 @@ helix-card > [slot="media"] {
   text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
   text-decoration-thickness: 1px;
   /* One offset, in both states. It moved from `0.15em` to `0.28em` on hover, so
-     the underline travelled down the descenders while it thickened, and what a
+     the underline traveled down the descenders while it thickened, and what a
      reader saw was the line shifting rather than the link answering. A rule
      that changes place says "something else is here now"; a rule that thickens
      where it already was says "this one".
@@ -422,7 +422,7 @@ helix-text[tone="danger"] {
  * under the pointer has been given a hook that half works.
  */
 /* Two axes here as well, `data-button` for the fill and `data-button-tone` for
- * the colour, matching the component exactly. `data-button-tone` rather than a
+ * the color, matching the component exactly. `data-button-tone` rather than a
  * bare `data-tone` follows `data-button-width`: a second axis on a recipe carries
  * the recipe's name, and it cannot ride in the `data-button` value either,
  * because that value is the appearance and the rules below match it exactly. */
@@ -431,7 +431,7 @@ helix-text[tone="danger"] {
   /* The solid fill, separate from the tone, and it has to be separate.
    *
    * The same split `Button` makes, and it is here because the recipe was the
-   * half that never got it. `--_button-tone` is the colour of the *ink* on
+   * half that never got it. `--_button-tone` is the color of the *ink* on
    * every appearance but `solid`: an outlined or ghost primary draws its label
    * with it, and in dark mode that is deliberately the lighter brand so the
    * text is legible on a dark page. A solid button wants the opposite, a fill
@@ -601,7 +601,7 @@ helix-text[tone="danger"] {
    appearance rule is one, so without a hover of its own an appearance loses its
    fill the moment a pointer touches it. That is what happened to the old
    `danger`, which had no hover rule anywhere: a red button that turned neutral
-   grey under the pointer. */
+   gray under the pointer. */
 [data-button="solid"] {
   background-color: var(--button-background-color, var(--_button-fill));
   border-color: transparent;
@@ -801,7 +801,7 @@ helix-toggle::part(item) {
   justify-content: center;
   padding-inline: var(--helix-space-sm);
   text-decoration: none;
-  /* Nothing of its own behind it: the group's travelling thumb is the one
+  /* Nothing of its own behind it: the group's traveling thumb is the one
      surface, and this sits above it. */
   background-color: transparent;
   transition:
@@ -832,7 +832,7 @@ helix-toggle-group helix-toggle::part(item):hover {
   background-color: transparent;
 }
 
-/* The travelling thumb is behind this item, so the label goes to full strength.
+/* The traveling thumb is behind this item, so the label goes to full strength.
    Color only, and no change of weight: a heavier label is a wider one, and the
    thumb measures the item it marks. Measured, the same text came out 94.2px
    selected against 92.34 unselected, so choosing a file nudged the row it was
@@ -878,8 +878,8 @@ helix-toggle[disabled]::part(item) {
    
      A nav item that opens a panel is a button, not a link: that is the APG's
      disclosure pattern and what `Megamenu` renders for its own trigger. Wearing
-     this recipe, one came out with the UA's grey fill, its border, its
-     centre-aligned system font and an arrow cursor, sitting in a row of
+     this recipe, one came out with the UA's gray fill, its border, its
+     center-aligned system font and an arrow cursor, sitting in a row of
      anchors. The recipe had only ever been asked to dress an anchor, which has
      none of those to undo.
    
@@ -988,9 +988,9 @@ helix-toggle[disabled]::part(item) {
   inset-block-start: calc(var(--_dock-inset) + env(safe-area-inset-top));
 }
 
-/* Centred along the edge, which needs the axis it is centred on and not an
+/* Centered along the edge, which needs the axis it is centered on and not an
    inset. `translate` rather than a margin, because the box's own width is the
-   only thing that can centre it and only the browser knows that. */
+   only thing that can center it and only the browser knows that. */
 [data-dock$="-center"] {
   inset-inline-start: 50%;
   translate: -50% 0;
@@ -1056,7 +1056,7 @@ helix-toggle[disabled]::part(item) {
  * At the label's size rather than a row's: this marks a column, and a mark as
  * large as the ones down the rows would read as a fourth destination sitting
  * above the three real ones. Full strength against the subtle text beside it,
- * because a brand mark drawn in the label's grey is a brand mark apologising. */
+ * because a brand mark drawn in the label's gray is a brand mark apologising. */
 [data-megamenu-heading] > :where(helix-icon, img, svg) {
   --icon-size: var(--helix-size-icon-sm);
 
@@ -1152,8 +1152,8 @@ helix-toggle[disabled]::part(item) {
   margin-block-start: calc(var(--helix-space-xs) * -1);
 }
 
-/* No colour of its own. A mark beside every row in the panel, accented, is a
-   panel of accents: the colour stops meaning anything the moment it is on all
+/* No color of its own. A mark beside every row in the panel, accented, is a
+   panel of accents: the color stops meaning anything the moment it is on all
    of them, and it competes with the one thing in a navigation that should be
    accented, which is where you are. It inherits, so a consumer who wants one
    row marked can still say so on that row. */
@@ -1192,7 +1192,7 @@ helix-toggle[disabled]::part(item) {
  *
  * Scoped to the group so the plain links in a verticals column are covered too:
  * a panel where the marked rows do not wash and the plain ones do would read as
- * two kinds of list. What is left for those is the colour lift the same bar
+ * two kinds of list. What is left for those is the color lift the same bar
  * rule gives them, muted to full, which is emphasis enough for a bare name. */
 [data-megamenu-group] :where([data-navigation-item], a):hover {
   background-color: transparent;
@@ -1205,7 +1205,7 @@ helix-toggle[disabled]::part(item) {
  * track it. A panel is six destinations laid out in columns, and a filled bar
  * sliding around inside it is heavier than the thing it is reporting.
  *
- * Contrast rather than colour, because colour is spoken for: the mark beside
+ * Contrast rather than color, because color is spoken for: the mark beside
  * each row deliberately has none so that the accent means "where you are" and
  * nothing else, and a hover tint would put the accent on every row in turn.
  *
@@ -1219,8 +1219,8 @@ helix-toggle[disabled]::part(item) {
 /* Where you are, marked rather than filled.
  *
  * The bar above says this already for its own items: "no surface of its own,
- * the marker travelling behind it is the one surface, and a fill here as well
- * would mean two things saying the same thing." A panel has no travelling
+ * the marker traveling behind it is the one surface, and a fill here as well
+ * would mean two things saying the same thing." A panel has no traveling
  * marker, so the row said it with a tinted fill instead, which is the heaviest
  * mark in the panel spent on the one row a reader is least likely to click.
  *
@@ -1230,13 +1230,13 @@ helix-toggle[disabled]::part(item) {
  *
  * Decorative and empty, so nothing is announced twice: `aria-current="page"` is
  * on the anchor and is what a reader is told. */
-/* The name becomes the row that carries the mark, so the mark can be centred
+/* The name becomes the row that carries the mark, so the mark can be centered
    against it rather than sat on a baseline.
  
    `vertical-align: middle` was the first try and is the reason this rule
    exists: it aligns a box to the middle of the *x-height*, not of the line, so
    the dot rode high against a semibold cap-height name. A flex line has a real
-   centre. Scoped to the current row, so no other name changes its display type
+   center. Scoped to the current row, so no other name changes its display type
    for a mark it does not have, and `gap` is what sets the distance, which is
    one step wider than the margin it replaces. */
 [data-megamenu-item][aria-current="page"] > :where(strong, b) {
@@ -1278,9 +1278,9 @@ helix-toggle[disabled]::part(item) {
 /* A plain link in a group, which the comment above promised would work.
  *
  * It did not. A panel sits inside the nav, so its anchors match the nav bar's
- * own rule up there and arrived centred, full-height and nowrapping: correct
+ * own rule up there and arrived centered, full-height and nowrapping: correct
  * for a word in a horizontal bar, wrong for a stack, and the giveaway was a
- * column of links centred under a heading that was not. The nav rule is
+ * column of links centered under a heading that was not. The nav rule is
  * `:where()`, so this needs no `!important`, only to be said.
  *
  * `:not([data-megamenu-item])` keeps it off the rows above, which want the grid
@@ -1295,7 +1295,7 @@ helix-toggle[disabled]::part(item) {
 
 /* A raised thumb, the same one the toggle group uses, because it is the same
    idea: this is the one of these you are on. */
-/* No surface of its own. The marker travelling behind it is the one surface,
+/* No surface of its own. The marker traveling behind it is the one surface,
    and a fill here as well would mean two things saying the same thing. Weight
    and full-strength color are what make the current page legible before the
    marker has been measured, which cannot happen on the server. */
@@ -1316,7 +1316,7 @@ helix-toggle[disabled]::part(item) {
  * and no outline has ever shown it.
  *
  * `--outline-rail` is set by the component on its own host, so it inherits
- * out to these anchors: the gutter the rail and the travelling mark occupy is
+ * out to these anchors: the gutter the rail and the traveling mark occupy is
  * one number, named once, in the file that draws them.
  */
 

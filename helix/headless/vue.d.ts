@@ -266,7 +266,7 @@ export type HelixBaseAnnouncementVueProps = {
   /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
-judgement about the message, and elsewhere in this library it carries one:
+judgment about the message, and elsewhere in this library it carries one:
 `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
@@ -322,7 +322,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   "content-align"?: HelixBaseAppHeader["contentAlign"];
@@ -339,7 +339,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   contentAlign?: HelixBaseAppHeader["contentAlign"];
@@ -457,7 +457,7 @@ mislead in every other case.
 no value axis at all when there is one scale, because the columns are
 measured against each other and a reader needs no numbers to do that. With
 two, a reader has no way of knowing there are two, let alone which series
-is on which, so both scales are labelled the moment this is set. An
+is on which, so both scales are labeled the moment this is set. An
 unlabelled second axis is the deceptive case rather than the tidy one.
 
 The grid stays on the primary axis, since a rule measured against two
@@ -926,7 +926,7 @@ where the color is the answer rather than a setting. */
 
 **Undefaulted, because it reflects.** The two together are what stamp an
 attribute onto every host anybody renders, including the ones nobody
-configured: the server wrote `format="hex"` on every colour input on the
+configured: the server wrote `format="hex"` on every color input on the
 page, and React, holding no such prop, reported a hydration mismatch for
 each one. That is the fault `Tree.chevronPlacement` had and the reason the
 area rules say a reflected property takes no default. Hex is still what an
@@ -1160,7 +1160,7 @@ reflected none of them. */
 };
 
 export type HelixBaseColorPickerVueEvents = {
-  /** The eyedropper has closed, whether or not a colour was taken. */
+  /** The eyedropper has closed, whether or not a color was taken. */
   "helix-sample-end": HelixBaseColorPickerHelixSampleEndElementEvent;
   /** The eyedropper is opening, so anything covering the page should get out of the way. */
   "helix-sample-start": HelixBaseColorPickerHelixSampleStartElementEvent;
@@ -1441,7 +1441,7 @@ export type HelixBaseCopyButtonVueProps = {
   /** What it is called, and says, before a press.
 
 Defaulted rather than left empty. An icon-only control must be named, and
-the name of this one is not a judgement call: every copy button in the
+the name of this one is not a judgment call: every copy button in the
 world is called Copy. A consumer with a better word still sets it. */
   label?: HelixBaseCopyButton["label"];
   /** What it is called, and says, after one.
@@ -1955,7 +1955,7 @@ Absent is a ring with room for a total in it. `small` and `large` move the
 hole without moving the outer edge, so a chart keeps its footprint.
 
 **`none` is a pie**, and it is the same drawing rather than another one:
-the radius follows the thickness, so the inner edge reaching the centre is
+the radius follows the thickness, so the inner edge reaching the center is
 what closing the hole means. A pie reads less accurately than a ring, angle
 being harder to judge than length, but it is not *misleading* the way a bar
 measured from anything but zero is, which is why this is a value here and
@@ -3871,7 +3871,7 @@ which is what makes it read as dots rather than as a softened square code. */
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
-costs about fifteen percent redundancy. `H` where a mark covers the centre,
+costs about fifteen percent redundancy. `H` where a mark covers the center,
 chosen automatically when the slot is filled: it is the level that makes
 covering safe, and a consumer who fills the slot has said what they want
 without having to know that. */
@@ -5433,7 +5433,7 @@ Whatever `<time>` accepts, which is a date, a time, both, a duration or a
 week. Unset, the label is written as it was given and nothing claims to
 know what instant it names. */
   datetime?: HelixBaseTimelineItem["datetime"];
-  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  /** What kind of event it was, which decides the mark's color and nothing else. */
   tone?: HelixBaseTimelineItem["tone"];
 };
 
@@ -5547,7 +5547,7 @@ export type HelixBaseToggleGroupVueProps = {
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -5562,7 +5562,7 @@ and cannot be used to remove it. */
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -5729,7 +5729,7 @@ it changes the visible gap rather than a number the arrow then eats into. */
 
 Resolved the way `for` is, so an id in the same tree, which is what lets a
 component name a box in its own shadow root. A chart does: its bubble is
-centred on a reading, and the first and last readings sit at the ends of
+centered on a reading, and the first and last readings sit at the ends of
 the plot, so half the box hangs past the drawing and, measured on a chart
 in a 320px card, three pixels past the card itself.
 
@@ -6384,11 +6384,11 @@ export type HelixBaseVirtualListVueEvents = {};
 export type CustomCssProperties = {
   /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
   "--chart-bar-wash"?: string;
-  /** The colour of a single-series axis, taken from that series. */
+  /** The color of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;
-  /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
+  /** The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
   "--bar-chart-secondary"?: string;
-  /** The chosen colour, to paint over the transparency check. */
+  /** The chosen color, to paint over the transparency check. */
   "--color-input-swatch"?: string;
   /** The chosen brightness, 0 to 100, as a percentage. */
   "--color-picker-brightness"?: string;
@@ -6396,7 +6396,7 @@ export type CustomCssProperties = {
   "--color-picker-hue"?: string;
   /** The chosen saturation, 0 to 100, as a percentage. */
   "--color-picker-saturation"?: string;
-  /** A colour to paint: the current one on the sample, a preset's on each preset. */
+  /** A color to paint: the current one on the sample, a preset's on each preset. */
   "--color-picker-swatch"?: string;
   /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
   "--date-picker-column-count"?: string;
@@ -6518,7 +6518,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseBreadcrumbVueProps,
     HelixBaseBreadcrumbVueEvents
   >;
-  /** The host is the landmark, so 'aria-label' on it names the trail directly and there is no property mirroring one. A page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them.  'role="list"' is set explicitly on the '<ol>' even though it is already a list: removing the markers with 'list-style: none' strips list semantics in Safari, and a breadcrumb trail always removes its markers.  Items are slotted rather than wrapped, so they are '<ol>' children in the flat tree and each carries 'role="listitem"' itself.  **The trail does not measure itself, and the overflow is markup.** It held a 'collapse' property, a 'ResizeObserver' through 'CollapseController', an 'overflowed' getter and a 'helix-change' event, all to answer one question: how many crumbs fit. Removed 20 Aug 2026, because the question is the wrong one and answering it cost more than it returned.  - **It can never reach the server.** There is no width without a DOM, so the   server shipped every crumb and the client removed some after hydrating. A   trail that collapses therefore painted wrong on every single load, and the   SSR spec asserting "hides no crumb, whatever collapse says" was recording   that as correct behaviour rather than as the cost it is. - **The consumer already wrote the crumbs.** The measurement hid some, then   announced which, so that the consumer could read them back off the element   and clone them into menu items. The overflow example spent 32 lines of   JavaScript making a round trip out of data that started in its own markup. - **Nobody specifies a breadcrumb in units of fit.** Designs say "keep the   root and the current page, fold the middle", which is a fact about depth,   or "fold below this width", which is a fact CSS knows. The arithmetic was   the only thing that needed a width, and it was wrong three times in one day:   the observer watched a container that did not exist yet, the gap between   items went uncounted, and the result was still wrong at 34rem.  So the trail lays out crumbs and separators, and the consumer writes what folds: a 'helix-menu' of 'helix-menu-item's in a crumb, where the gap belongs. Server rendered, no observer, no stylesheet, and correct before the first script runs. A trail that should fold only at some widths is a container query in the consumer's own sheet, which is theirs to write and theirs to leave out.  **And the crumbs carry no marker for any of it.** There was an 'overflow' property on the crumb, which existed so the controller could tell a control from a step and so the trail could size it. With the controller gone the first use went with it, and the second is better answered by the crumb sizing whatever is slotted into it, which is true of every crumb rather than of one a consumer remembered to mark. What is left is a fact CSS can already see: the crumb with the menu in it is ':has(helix-menu)', and the middle is ':not(:first-child, [current])'. A marker would be the design rule written twice, once in the HTML and once in the sheet, with nothing keeping the two honest. */
+  /** The host is the landmark, so 'aria-label' on it names the trail directly and there is no property mirroring one. A page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them.  'role="list"' is set explicitly on the '<ol>' even though it is already a list: removing the markers with 'list-style: none' strips list semantics in Safari, and a breadcrumb trail always removes its markers.  Items are slotted rather than wrapped, so they are '<ol>' children in the flat tree and each carries 'role="listitem"' itself.  **The trail does not measure itself, and the overflow is markup.** It held a 'collapse' property, a 'ResizeObserver' through 'CollapseController', an 'overflowed' getter and a 'helix-change' event, all to answer one question: how many crumbs fit. Removed 20 Aug 2026, because the question is the wrong one and answering it cost more than it returned.  - **It can never reach the server.** There is no width without a DOM, so the   server shipped every crumb and the client removed some after hydrating. A   trail that collapses therefore painted wrong on every single load, and the   SSR spec asserting "hides no crumb, whatever collapse says" was recording   that as correct behavior rather than as the cost it is. - **The consumer already wrote the crumbs.** The measurement hid some, then   announced which, so that the consumer could read them back off the element   and clone them into menu items. The overflow example spent 32 lines of   JavaScript making a round trip out of data that started in its own markup. - **Nobody specifies a breadcrumb in units of fit.** Designs say "keep the   root and the current page, fold the middle", which is a fact about depth,   or "fold below this width", which is a fact CSS knows. The arithmetic was   the only thing that needed a width, and it was wrong three times in one day:   the observer watched a container that did not exist yet, the gap between   items went uncounted, and the result was still wrong at 34rem.  So the trail lays out crumbs and separators, and the consumer writes what folds: a 'helix-menu' of 'helix-menu-item's in a crumb, where the gap belongs. Server rendered, no observer, no stylesheet, and correct before the first script runs. A trail that should fold only at some widths is a container query in the consumer's own sheet, which is theirs to write and theirs to leave out.  **And the crumbs carry no marker for any of it.** There was an 'overflow' property on the crumb, which existed so the controller could tell a control from a step and so the trail could size it. With the controller gone the first use went with it, and the second is better answered by the crumb sizing whatever is slotted into it, which is true of every crumb rather than of one a consumer remembered to mark. What is left is a fact CSS can already see: the crumb with the menu in it is ':has(helix-menu)', and the middle is ':not(:first-child, [current])'. A marker would be the design rule written twice, once in the HTML and once in the sheet, with nothing keeping the two honest. */
   "helix-base-breadcrumbs": DefineCustomElement<
     HelixBaseBreadcrumbs,
     HelixBaseBreadcrumbsVueProps,
@@ -6680,13 +6680,13 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseIconVueProps,
     HelixBaseIconVueEvents
   >;
-  /** **An element rather than a recipe, because of the part CSS cannot do.** Reserving the box is 'aspect-ratio' and needs nothing from anybody; 'Link' and the megamenu row are recipes in 'base.css' for exactly that reason. What cannot be written as a rule is *when the picture arrived*: a stylesheet has no way to know, and no way to hear that it never will. So this owns three states and the two events that move between them, and leaves the box to the stylesheet.  **The placeholder is a slot with nothing in it by default.** A default of 'Skeleton' would be right and is not written here: this tier renders no other component, and reaching for one would make the headless package depend on the styled one. The styled tier draws the resting placeholder instead, and a consumer who wants a 'Skeleton', a blurred thumbnail or a solid colour slots it.  **No source is a loading state, not a fourth one.** A picture whose 'src' has not arrived yet is the common case for anything drawn from data, and the useful answer there is the same as for one still on the wire: stand something in its place and keep the ground reserved. So an element with no 'src' shows its placeholder and waits, rather than resolving to an empty box that has to be laid out twice.  **'alt' is a property and not an afterthought.** An empty string is a real answer, meaning the picture is decoration and a screen reader should skip it, which is why the attribute is always written even when it is empty: omitting it entirely makes a reader announce the file name instead. */
+  /** **An element rather than a recipe, because of the part CSS cannot do.** Reserving the box is 'aspect-ratio' and needs nothing from anybody; 'Link' and the megamenu row are recipes in 'base.css' for exactly that reason. What cannot be written as a rule is *when the picture arrived*: a stylesheet has no way to know, and no way to hear that it never will. So this owns three states and the two events that move between them, and leaves the box to the stylesheet.  **The placeholder is a slot with nothing in it by default.** A default of 'Skeleton' would be right and is not written here: this tier renders no other component, and reaching for one would make the headless package depend on the styled one. The styled tier draws the resting placeholder instead, and a consumer who wants a 'Skeleton', a blurred thumbnail or a solid color slots it.  **No source is a loading state, not a fourth one.** A picture whose 'src' has not arrived yet is the common case for anything drawn from data, and the useful answer there is the same as for one still on the wire: stand something in its place and keep the ground reserved. So an element with no 'src' shows its placeholder and waits, rather than resolving to an empty box that has to be laid out twice.  **'alt' is a property and not an afterthought.** An empty string is a real answer, meaning the picture is decoration and a screen reader should skip it, which is why the attribute is always written even when it is empty: omitting it entirely makes a reader announce the file name instead. */
   "helix-base-image": DefineCustomElement<
     HelixBaseImage,
     HelixBaseImageVueProps,
     HelixBaseImageVueEvents
   >;
-  /** Renders a real '<input>', so the caret, selection, autofill, spellcheck, the password manager, and the on-screen keyboard a phone chooses all come from the platform. 'delegatesFocus' puts focus on it, and it serializes into the server's markup, so the field is usable before any script loads.  **The input inside a shadow root submits nothing**, because the form is on the other side of the boundary. The host is form-associated instead and reports its own value through 'ElementInternals', which is also what carries validity and what answers a form reset.  'value' and 'defaultValue' are separate for the reason 'checked' and 'defaultChecked' are: 'value' is what is in the field now and 'defaultValue' is what the markup asked for, which is where a reset returns to and is gone the moment anyone types.  **Validity is the platform's.** The 'type' and 'required' are set on the real input and its 'validity' is copied onto the host, so an email field rejects what the browser says is not an email rather than what a regular expression here guesses. What this adds is the anchor, so 'reportValidity' points the bubble at the input rather than at the host.  'pattern', 'minlength' and 'maxlength' are forwarded with them. They were promised by this paragraph and did not exist, so a consumer following the sentence wrote an attribute on the host that reached no input and constrained nothing: the field looked as though it were checked and was not.  **'clearable' and 'reveal' are the field's, not the consumer's.** The 'end' slot used to be the answer to both, which meant every consumer of 'type="search"' built the same button and every consumer of 'type="password"' either built the same toggle or shipped a field a reader cannot check what they typed into. Neither is a slot's worth of variation: one empties the value, the other flips the type, and both want the same position, the same size and the same disabled behaviour. The slot stays for what actually varies, a unit or a prefix.  Both opt in rather than following from 'type', and are booleans that default to false. A Lit boolean property that defaults to *true* cannot be turned off from HTML at all, only from script, which is the wrong way round for revealing a password: a consumer should have to ask for it. Drawer's 'modal' defaults true for the opposite reason, that losing a focus trap by forgetting a word is worse than having to say so. */
+  /** Renders a real '<input>', so the caret, selection, autofill, spellcheck, the password manager, and the on-screen keyboard a phone chooses all come from the platform. 'delegatesFocus' puts focus on it, and it serializes into the server's markup, so the field is usable before any script loads.  **The input inside a shadow root submits nothing**, because the form is on the other side of the boundary. The host is form-associated instead and reports its own value through 'ElementInternals', which is also what carries validity and what answers a form reset.  'value' and 'defaultValue' are separate for the reason 'checked' and 'defaultChecked' are: 'value' is what is in the field now and 'defaultValue' is what the markup asked for, which is where a reset returns to and is gone the moment anyone types.  **Validity is the platform's.** The 'type' and 'required' are set on the real input and its 'validity' is copied onto the host, so an email field rejects what the browser says is not an email rather than what a regular expression here guesses. What this adds is the anchor, so 'reportValidity' points the bubble at the input rather than at the host.  'pattern', 'minlength' and 'maxlength' are forwarded with them. They were promised by this paragraph and did not exist, so a consumer following the sentence wrote an attribute on the host that reached no input and constrained nothing: the field looked as though it were checked and was not.  **'clearable' and 'reveal' are the field's, not the consumer's.** The 'end' slot used to be the answer to both, which meant every consumer of 'type="search"' built the same button and every consumer of 'type="password"' either built the same toggle or shipped a field a reader cannot check what they typed into. Neither is a slot's worth of variation: one empties the value, the other flips the type, and both want the same position, the same size and the same disabled behavior. The slot stays for what actually varies, a unit or a prefix.  Both opt in rather than following from 'type', and are booleans that default to false. A Lit boolean property that defaults to *true* cannot be turned off from HTML at all, only from script, which is the wrong way round for revealing a password: a consumer should have to ask for it. Drawer's 'modal' defaults true for the opposite reason, that losing a focus trap by forgetting a word is worse than having to say so. */
   "helix-base-input": DefineCustomElement<
     HelixBaseInput,
     HelixBaseInputVueProps,
@@ -6698,7 +6698,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseKbdVueProps,
     HelixBaseKbdVueEvents
   >;
-  /** A legend is a list, so it is a list: not part of a chart, and shared by whichever of them needs one. It takes its entries from the same table the chart reads, through 'for', so the two cannot disagree about how many series there are or what they are called.  'entries' picks which way to read that table, and the two ways are the two shapes a chart comes in. 'series' is one entry per data column, named by the header row, which is a line or a bar chart. 'categories' is one entry per body row, named by its row header, which is a donut: its slices are the rows, and it has no axis to write their names along.  **The table is resolved on the client and there is no server pass.** 'for' is an id and resolving it wants a document, which the server render does not have, so a legend ships empty and fills in on hydration. The table itself is ordinary markup and is served whole, so nothing is missing from the page before then, only from this list.  The table is watched, because a legend that goes stale when its data changes is a legend that has to be told, and nothing else in the page would know to tell it.  **Not hidden from a screen reader, though the mapping it draws is a colour one.** The argument for hiding it is real: the colours mean nothing to a reader who cannot see them, and the names are already in the table. It stays because the cost of being wrong runs one way. A duplicated list of three words is noise; a consumer who took the table out of the accessibility tree and then found the legend hidden too has a chart nobody can read, and neither decision announces itself. */
+  /** A legend is a list, so it is a list: not part of a chart, and shared by whichever of them needs one. It takes its entries from the same table the chart reads, through 'for', so the two cannot disagree about how many series there are or what they are called.  'entries' picks which way to read that table, and the two ways are the two shapes a chart comes in. 'series' is one entry per data column, named by the header row, which is a line or a bar chart. 'categories' is one entry per body row, named by its row header, which is a donut: its slices are the rows, and it has no axis to write their names along.  **The table is resolved on the client and there is no server pass.** 'for' is an id and resolving it wants a document, which the server render does not have, so a legend ships empty and fills in on hydration. The table itself is ordinary markup and is served whole, so nothing is missing from the page before then, only from this list.  The table is watched, because a legend that goes stale when its data changes is a legend that has to be told, and nothing else in the page would know to tell it.  **Not hidden from a screen reader, though the mapping it draws is a color one.** The argument for hiding it is real: the colours mean nothing to a reader who cannot see them, and the names are already in the table. It stays because the cost of being wrong runs one way. A duplicated list of three words is noise; a consumer who took the table out of the accessibility tree and then found the legend hidden too has a chart nobody can read, and neither decision announces itself. */
   "helix-base-legend": DefineCustomElement<
     HelixBaseLegend,
     HelixBaseLegendVueProps,
@@ -6824,7 +6824,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseProgressVueProps,
     HelixBaseProgressVueEvents
   >;
-  /** **The picture is one '<path>', not a grid of squares.** A code of any useful length is a thousand modules, and drawing each as its own rect is a thousand nodes for one image. Runs of adjacent dark modules are joined, so a row of eight is one horizontal move rather than eight squares.  **It is an image and says so.** 'role="img"' with a name, because what a reader with a screen reader needs is what the code is *for*, and no amount of describing the pattern gives them that. Where nothing is passed the value itself is the name, which is right far more often than it looks: most codes hold a URL, and a URL read aloud is the destination.  **The quiet zone is part of the code.** Four modules of margin are required by the specification, not a design choice, and a scanner will refuse a code that is cropped to its edge. It is drawn inside the 'viewBox' so it survives any size the component is given, including one set in CSS.  'correction' is what buys the middle slot. A code at 'H' can lose thirty percent of itself and still read, which is what makes covering the centre with a mark safe; at 'L' the same mark makes the code unscannable. That is why the slot exists on the same element as the property, and why the default moves when the slot is filled. */
+  /** **The picture is one '<path>', not a grid of squares.** A code of any useful length is a thousand modules, and drawing each as its own rect is a thousand nodes for one image. Runs of adjacent dark modules are joined, so a row of eight is one horizontal move rather than eight squares.  **It is an image and says so.** 'role="img"' with a name, because what a reader with a screen reader needs is what the code is *for*, and no amount of describing the pattern gives them that. Where nothing is passed the value itself is the name, which is right far more often than it looks: most codes hold a URL, and a URL read aloud is the destination.  **The quiet zone is part of the code.** Four modules of margin are required by the specification, not a design choice, and a scanner will refuse a code that is cropped to its edge. It is drawn inside the 'viewBox' so it survives any size the component is given, including one set in CSS.  'correction' is what buys the middle slot. A code at 'H' can lose thirty percent of itself and still read, which is what makes covering the center with a mark safe; at 'L' the same mark makes the code unscannable. That is why the slot exists on the same element as the property, and why the default moves when the slot is filled. */
   "helix-base-qr-code": DefineCustomElement<
     HelixBaseQrCode,
     HelixBaseQrCodeVueProps,
@@ -6878,7 +6878,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseSliderVueProps,
     HelixBaseSliderVueEvents
   >;
-  /** The one chart here that takes its numbers from an attribute, and the reversal is deliberate. Every other chart reads a table because a reader might want to interrogate it; nobody interrogates the squiggle next to a figure. A fourteen-row table behind a bare trend line is fourteen dates read aloud in place of the one sentence that carries the meaning, so 'values' is the list and 'label' is the sentence.  That is the library's own rule rather than a second data channel: a content property is its slot's fallback, which is why 'Tooltip' takes 'content' and 'Avatar' takes 'name'. 'for' stays for the sparkline that genuinely has a table behind it, and it wins where both are given.  **No label means decorative, and that is a choice rather than an oversight.** A sparkline beside a stat that already says "Sessions, 1,102" has nothing of its own to announce, and an unnamed 'role="img"' announces "graphic" and stops. So an unlabelled sparkline is 'aria-hidden', and a labelled one is an image named by its sentence.  It goes *beside* a 'Stat' rather than inside one. The plan this was built from called for a 'trend' slot on 'Stat'; the spec already on 'Stat' says the opposite, that a change beside a figure is a second fact, and the spec is right. 'Trend' composes the same way.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** The one chart here that takes its numbers from an attribute, and the reversal is deliberate. Every other chart reads a table because a reader might want to interrogate it; nobody interrogates the squiggle next to a figure. A fourteen-row table behind a bare trend line is fourteen dates read aloud in place of the one sentence that carries the meaning, so 'values' is the list and 'label' is the sentence.  That is the library's own rule rather than a second data channel: a content property is its slot's fallback, which is why 'Tooltip' takes 'content' and 'Avatar' takes 'name'. 'for' stays for the sparkline that genuinely has a table behind it, and it wins where both are given.  **No label means decorative, and that is a choice rather than an oversight.** A sparkline beside a stat that already says "Sessions, 1,102" has nothing of its own to announce, and an unnamed 'role="img"' announces "graphic" and stops. So an unlabelled sparkline is 'aria-hidden', and a labeled one is an image named by its sentence.  It goes *beside* a 'Stat' rather than inside one. The plan this was built from called for a 'trend' slot on 'Stat'; the spec already on 'Stat' says the opposite, that a change beside a figure is a second fact, and the spec is right. 'Trend' composes the same way.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-base-sparkline": DefineCustomElement<
     HelixBaseSparkline,
     HelixBaseSparklineVueProps,
@@ -6890,7 +6890,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseSpeedDialItemVueProps,
     HelixBaseSpeedDialItemVueEvents
   >;
-  /** **A menu, and deliberately not a new one.** Its rows are commands, which is what 'role="menu"' and 'menuitem' exist for, so this takes them and takes the behaviour with them: the arrow keys are 'KeyboardNavigationController', the panel is 'PopoverController', and open and closed is 'MixinControllerOpen'. 'Menu' is built from the same pieces. What is not shared is what actually differs: a dial has no submenus, no headers, no checkable rows and no long list to type ahead through, and shipping it as an appearance of 'Menu' would have meant defining what a dial with a submenu in it does.  **The trigger is a control the consumer slots**, and the floating action button is the usual one: 'helix-icon-button' with 'shape="circle"' and 'raised'. There is no 'helix-fab' here, and the reason is worth stating, because a component would have re-declared 'emphasis', 'tone', 'label' and a size around a control that already has all four. A round raised button is a shape, and where it sits is 'data-dock' in the base layer.  **Nothing is reserved from the keyboard.** A menu that drills has to keep the horizontal pair for going in and coming back; a dial goes nowhere, so all four arrows move through the actions and a reader who guesses either axis is answered. That is the controller's own house position, and this is a component with no reason to argue with it. */
+  /** **A menu, and deliberately not a new one.** Its rows are commands, which is what 'role="menu"' and 'menuitem' exist for, so this takes them and takes the behavior with them: the arrow keys are 'KeyboardNavigationController', the panel is 'PopoverController', and open and closed is 'MixinControllerOpen'. 'Menu' is built from the same pieces. What is not shared is what actually differs: a dial has no submenus, no headers, no checkable rows and no long list to type ahead through, and shipping it as an appearance of 'Menu' would have meant defining what a dial with a submenu in it does.  **The trigger is a control the consumer slots**, and the floating action button is the usual one: 'helix-icon-button' with 'shape="circle"' and 'raised'. There is no 'helix-fab' here, and the reason is worth stating, because a component would have re-declared 'emphasis', 'tone', 'label' and a size around a control that already has all four. A round raised button is a shape, and where it sits is 'data-dock' in the base layer.  **Nothing is reserved from the keyboard.** A menu that drills has to keep the horizontal pair for going in and coming back; a dial goes nowhere, so all four arrows move through the actions and a reader who guesses either axis is answered. That is the controller's own house position, and this is a component with no reason to argue with it. */
   "helix-base-speed-dial": DefineCustomElement<
     HelixBaseSpeedDial,
     HelixBaseSpeedDialVueProps,
@@ -6974,7 +6974,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseTabsTabVueProps,
     HelixBaseTabsTabVueEvents
   >;
-  /** A tag is a label, and optionally a label the reader can take off. 'dismissible' is what separates it from a badge: a badge reports a state the reader cannot change, a tag names something they can.  Dismissing is a request. The tag does not remove itself, because the consumer owns the list it sits in and taking the node out from under them would put their state and the document out of step. Cancelling 'helix-dismiss' is a refusal. */
+  /** A tag is a label, and optionally a label the reader can take off. 'dismissible' is what separates it from a badge: a badge reports a state the reader cannot change, a tag names something they can.  Dismissing is a request. The tag does not remove itself, because the consumer owns the list it sits in and taking the node out from under them would put their state and the document out of step. Canceling 'helix-dismiss' is a refusal. */
   "helix-base-tag": DefineCustomElement<
     HelixBaseTag,
     HelixBaseTagVueProps,
@@ -7058,7 +7058,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseTourStopVueProps,
     HelixBaseTourStopVueEvents
   >;
-  /** **'open', on 'MixinControllerOpen', where it was a bare 'expanded' boolean.** A branch showing its children is the same state a disclosure holds, and 'AccordionItem' has been on that mixin all along. Written here by hand it had neither half of what the mixin gives: 'this.expanded = !this.expanded' announced nothing, so a consumer could not know a branch had opened, and could not own the state either. 'aria-expanded' is still what the row renders, because that is the attribute a tree uses; the property is what changed, not the semantics.  An element rather than a slot because it owns state: whether it is open, whether it is selected, and whether it is the one holding focus.  A branch is any item with something slotted into 'children', detected in 'firstUpdated' rather than declared by the consumer. That is a client-side enhancement by necessity, since the server cannot inspect children, so the server renders the node as a leaf and the twisty appears on hydration. It appears rather than disappearing, which is the harmless direction.  **'href' makes the row itself the link.** A tree used as navigation is a list of links, and the row is what a reader presses: with the anchor slotted into the name instead, everything outside the words is dead, Enter does nothing, and there is no middle-click, no status bar and no open-in-new-tab. Given an 'href' the row *is* an '<a>', so the platform provides all of that and the keyboard needs no handler at all.  It changes the shape of the ARIA, which is why it is a property and not the default. An anchor cannot contain the group, since the group holds more anchors and nesting them is invalid, so the row carries 'treeitem' and the group becomes its sibling under a presentational wrapper. That is exactly the navigation flavour of the tree pattern, and the arrangement without an 'href' stays as it was: 'treeitem' containing 'group', which is what an '<li>' holding a '<ul>' is.  A consumer whose framework owns routing slots its own link instead and leaves 'href' unset. The row follows that one too, so the whole row works either way; what the anchor adds is what only a real anchor can give.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** **'open', on 'MixinControllerOpen', where it was a bare 'expanded' boolean.** A branch showing its children is the same state a disclosure holds, and 'AccordionItem' has been on that mixin all along. Written here by hand it had neither half of what the mixin gives: 'this.expanded = !this.expanded' announced nothing, so a consumer could not know a branch had opened, and could not own the state either. 'aria-expanded' is still what the row renders, because that is the attribute a tree uses; the property is what changed, not the semantics.  An element rather than a slot because it owns state: whether it is open, whether it is selected, and whether it is the one holding focus.  A branch is any item with something slotted into 'children', detected in 'firstUpdated' rather than declared by the consumer. That is a client-side enhancement by necessity, since the server cannot inspect children, so the server renders the node as a leaf and the twisty appears on hydration. It appears rather than disappearing, which is the harmless direction.  **'href' makes the row itself the link.** A tree used as navigation is a list of links, and the row is what a reader presses: with the anchor slotted into the name instead, everything outside the words is dead, Enter does nothing, and there is no middle-click, no status bar and no open-in-new-tab. Given an 'href' the row *is* an '<a>', so the platform provides all of that and the keyboard needs no handler at all.  It changes the shape of the ARIA, which is why it is a property and not the default. An anchor cannot contain the group, since the group holds more anchors and nesting them is invalid, so the row carries 'treeitem' and the group becomes its sibling under a presentational wrapper. That is exactly the navigation flavor of the tree pattern, and the arrangement without an 'href' stays as it was: 'treeitem' containing 'group', which is what an '<li>' holding a '<ul>' is.  A consumer whose framework owns routing slots its own link instead and leaves 'href' unset. The row follows that one too, so the whole row works either way; what the anchor adds is what only a real anchor can give.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-base-tree-item": DefineCustomElement<
     HelixBaseTreeItem,
     HelixBaseTreeItemVueProps,
@@ -7070,7 +7070,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseTreeVueProps,
     HelixBaseTreeVueEvents
   >;
-  /** Three parts: a direction that is up, down or neutral, the metric that moved, and a label saying over what. The arrow carries the direction and its colour carries the judgment, and the two are separate properties because they are separate facts.  **'good' is absent by default, so an unjudged trend is grey.** Every dashboard convention says up is green, and for churn, latency, error rate, cost and bounce rate that convention is a lie told in the most legible colour on the page. A component that guesses is wrong roughly a third of the time and silent about it; one that waits to be told is uninformative until it is, which is the cheaper failure. State the metric's polarity once and the component does the part that varies.  The direction is also written as a word, because a coloured arrow says nothing to a reader who is not looking at it. 'part="direction"' is what the styled tier clips out of sight and leaves in the accessibility tree.  Both the metric and the label are bare slots. An element whose only job is to assign itself a slot on connect gives its own host an attribute after upgrade, which a React consumer's server markup never had. */
+  /** Three parts: a direction that is up, down or neutral, the metric that moved, and a label saying over what. The arrow carries the direction and its color carries the judgment, and the two are separate properties because they are separate facts.  **'good' is absent by default, so an unjudged trend is gray.** Every dashboard convention says up is green, and for churn, latency, error rate, cost and bounce rate that convention is a lie told in the most legible color on the page. A component that guesses is wrong roughly a third of the time and silent about it; one that waits to be told is uninformative until it is, which is the cheaper failure. State the metric's polarity once and the component does the part that varies.  The direction is also written as a word, because a coloured arrow says nothing to a reader who is not looking at it. 'part="direction"' is what the styled tier clips out of sight and leaves in the accessibility tree.  Both the metric and the label are bare slots. An element whose only job is to assign itself a slot on connect gives its own host an attribute after upgrade, which a React consumer's server markup never had. */
   "helix-base-trend": DefineCustomElement<
     HelixBaseTrend,
     HelixBaseTrendVueProps,

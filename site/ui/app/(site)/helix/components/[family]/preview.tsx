@@ -98,11 +98,11 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
       {/* Laid out by the frame, not by this page. The preview renders into a
           document with its own layout modes; styling the pane from out here
           instead shrank the iframe to its content and clipped the example,
-          because a centred grid item does not stretch. The frame is the only
+          because a centered grid item does not stretch. The frame is the only
           thing that can lay out its own body.
           
           `padded` rather than `centered`: an example reads as a page fragment,
-          and a fragment starts where a page starts. Centred, a card floated in
+          and a fragment starts where a page starts. Centered, a card floated in
           the middle of a tall pane and a full-width component looked identical
           to one that had failed to fill it. */}
       <helix-sandbox-preview

@@ -16,7 +16,7 @@ decides what a surface sits on.
 
 | | |
 |---|---|
-| **Fill** | A different ground colour to what is behind it |
+| **Fill** | A different ground color to what is behind it |
 | **Edge** | A border |
 | **Lift** | A shadow |
 | **Space** | Nothing at all, and the gap does the work |
@@ -77,10 +77,10 @@ apart by its shadow and by covering something, so on white it is white.
 .marker { background: var(--helix-color-background); }
 ```
 
-Every use of the page's colour inside a component is a claim about what that
+Every use of the page's color inside a component is a claim about what that
 component is sitting on, and the claim is right exactly as often as the
 component is put on the page and no other ground. `Timeline`'s marker made it,
-painting itself the page colour to knock the rail out behind it, and came out
+painting itself the page color to knock the rail out behind it, and came out
 darker than any surface that was not the page: on a card it showed as a black
 disc. The sparkline's ring terminus made the same mistake and looked identical.
 
@@ -88,7 +88,7 @@ The trap is that both of those *worked*, for months, because the page is what
 anybody building a component puts it on. It fails on a card, a drawer, a toast,
 a panel or a photograph, and none of those is where a component gets built.
 
-**What to do instead:** put the colour behind a hook that defaults to the page,
+**What to do instead:** put the color behind a hook that defaults to the page,
 so a consumer whose component is not on the page can correct it. That is what
 the library requires of itself, and the same reasoning applies to anything you
 build on top.

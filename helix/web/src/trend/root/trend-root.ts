@@ -9,7 +9,7 @@ import { styles } from './trend-root.css.js'
  * @summary Which way a measurement moved, and whether that is good news.
  *
  * @description
- * The arrow takes the judgment colour and the number does not, which is the
+ * The arrow takes the judgment color and the number does not, which is the
  * opposite of the dashboard convention and is measured rather than preferred:
  * in light mode the success token is 3.8:1 on the surface, enough for a glyph
  * and short of what 13px text needs, and there is no darker green in the ramp.
@@ -23,7 +23,7 @@ import { styles } from './trend-root.css.js'
  * @aliases Delta, Change, Movement
  * @documentation https://helix.fusion.dev/components/trend
  *
- * @cssproperty --trend-color - Colour of the arrow, overriding the judgment.
+ * @cssproperty --trend-color - Color of the arrow, overriding the judgment.
  * @cssproperty --trend-icon-size - Size of the arrow.
  */
 @customElement('helix-trend')

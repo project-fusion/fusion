@@ -22,7 +22,7 @@ import '../../menu/index.js'
  * all. So the button here is two boundaries away from the rule that styles
  * every button beside it, and the same tokens are what make the two agree.
  *
- * Colour is inherited rather than named, so the bar's own colour arrives on
+ * Color is inherited rather than named, so the bar's own color arrives on
  * its own. `--video-playlist-menu-color` is there for the case where it should
  * not.
  *
@@ -32,7 +32,7 @@ import '../../menu/index.js'
  * @aliases Episode Menu, Queue Menu, Up Next
  * @documentation https://helix.fusion.dev/components/video-playlist
  *
- * @cssproperty --video-playlist-menu-color - Colour of the trigger, defaulting to the control bar's.
+ * @cssproperty --video-playlist-menu-color - Color of the trigger, defaulting to the control bar's.
  * @cssproperty --video-playlist-menu-poster - Width of an entry's still.
  * @cssproperty --video-playlist-menu-size - Size of the trigger's glyph.
  */
@@ -42,7 +42,7 @@ export class HelixVideoPlaylistMenu extends HelixBaseVideoPlaylistMenu {
      `<svg data-glyph>` with no size of its own, and the only rule that sizes
      one lives in the icon family's sheet. Without it the glyph came out 24x24
      inside a 24x24 button, filling it edge to edge beside a 16x16 fullscreen
-     icon: right colour, right button, right position, and half again too big.
+     icon: right color, right button, right position, and half again too big.
      Nothing failed, because a missing rule is not an error. */
   static override tier = 'helix-'
 

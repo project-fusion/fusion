@@ -29,7 +29,7 @@
   inline-size: 100%;
 }
 
-/* The corner squares can take their own colour, and default to the code's.
+/* The corner squares can take their own color, and default to the code's.
    Two paths rather than one so this is possible at all: a single path is one
    fill, and the finders are the part of a code a brand most often wants to
    tint. They stay square whatever the modules do, because they are what a
@@ -40,7 +40,7 @@
 
 /* The middle, for a mark that only reads at a high correction.
  *
- * Centred over the code rather than punched into it: the modules underneath are
+ * Centered over the code rather than punched into it: the modules underneath are
  * still drawn, and it is the error correction that makes the cover readable,
  * not a hole. A hole would be a code with data missing rather than data
  * obscured, and those are not the same thing to a scanner.

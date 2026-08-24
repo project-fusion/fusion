@@ -25,7 +25,7 @@
  * **What it cannot see, said plainly.** A listener added and removed in equal
  * numbers still leaks if the add runs more often than the remove:
  * `IndicatorController` added one per placement and removed one per timeout,
- * and cancelling the timeout on the next placement orphaned the listener in
+ * and canceling the timeout on the next placement orphaned the listener in
  * between. That is a counting argument about run time and this is a counting
  * argument about source text. The same is true of a `removeEventListener`
  * passed a different function object than the one that was added, which is

@@ -76,7 +76,7 @@ slot:not([name]) {
  * The block above is what makes the words truncate, and it also hands whatever
  * is slotted a text baseline to stand on. `helix-icon` is `inline-flex`, so its
  * baseline is its own bottom edge: the glyph rests on the baseline and the
- * strut's descent is left underneath it, inside a box the host is centring.
+ * strut's descent is left underneath it, inside a box the host is centering.
  * Measured on the gallery's experimental mark, a 14px icon in a 28px tag: the
  * slot came out 17.39px tall and the icon sat 5.30px from the top against
  * 8.70px from the bottom, lifted 1.7px in a mark small enough that 1.7px is the
@@ -151,7 +151,7 @@ slot:not([name])::slotted(helix-icon) {
 
 /* Inside the tag's inline padding, and not pulled past it.
  *
- * This had `margin-inline-end: calc(var(--_tag-inset) * -1)`, which cancelled
+ * This had `margin-inline-end: calc(var(--_tag-inset) * -1)`, which canceled
  * the tag's own inset so the control sat flush to the border. The intent was
  * for the tag not to grow a second inset around it; the effect was that the
  * control's hover fill and focus ring ran into the tag's edge, and a rounded
@@ -161,7 +161,7 @@ slot:not([name])::slotted(helix-icon) {
  * Pulled back by its own padding, though, and not by the tag's inset. The
  * control's four pixels are hit area rather than space, so left to sit inside
  * the inset they added to it and the gap on the right came out at the inset
- * plus four while the label's on the left was the inset exactly. Cancelling the
+ * plus four while the label's on the left was the inset exactly. Canceling the
  * padding puts the visible gap back at the inset on both sides and leaves the
  * control the same size to press. */
 [part="dismiss"] {

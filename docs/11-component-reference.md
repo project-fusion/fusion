@@ -463,7 +463,7 @@ it is measured against.
 | `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `secondary` | `secondary` | `string \| undefined` | - | `HelixBaseBarChart` | Which series are measured against a scale of their own, by name. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
-| `subtle` | `subtle` | `string \| undefined` | - | - | Which series are drawn as a wash of their colour, by name. Matched as `outlined` is. |
+| `subtle` | `subtle` | `string \| undefined` | - | - | Which series are drawn as a wash of their color, by name. Matched as `outlined` is. |
 | `wash` | `wash` | `'gradient' \| undefined` | - | - | How a column's fill is distributed across it. |
 
 #### Parts
@@ -497,7 +497,7 @@ it is measured against.
 | Property | Description |
 | --- | --- |
 | `--bar-chart-band-color` | The slot the pointer is resting in. |
-| `--bar-chart-line-color` | A `lines` series, overriding its series colour. |
+| `--bar-chart-line-color` | A `lines` series, overriding its series color. |
 | `--bar-chart-line-width` | Thickness of a `lines` series. |
 | `--bar-chart-gridline-color` | One rule across the plot, under `gridlines`. |
 | `--bar-chart-bar-radius` | Corner radius at the far end of a column. |
@@ -505,8 +505,8 @@ it is measured against.
 | `--bar-chart-block-size` | Height of the drawing. |
 | `--bar-chart-gap` | Space between the drawing and its labels. |
 | `--chart-bar-wash` | The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. |
-| `--bar-chart-axis` | The colour of a single-series axis, taken from that series. |
-| `--bar-chart-secondary` | The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. |
+| `--bar-chart-axis` | The color of a single-series axis, taken from that series. |
+| `--bar-chart-secondary` | The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. |
 
 ## Blockquote
 
@@ -1215,13 +1215,13 @@ pads its own lower rows.
 | Property | Description |
 | --- | --- |
 | `--color-input-background-color` | Fill behind the field. |
-| `--color-input-border-color` | Colour of the panel's edge. |
+| `--color-input-border-color` | Color of the panel's edge. |
 | `--color-input-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--color-input-panel-size` | Width of the panel, and so of the square. |
 | `--color-input-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 | `--color-input-swatch-radii` | Corner radius of that block. |
 | `--color-input-swatch-size` | Edge length of the block in `appearance="swatch"`. |
-| `--color-input-swatch` | The chosen colour, to paint over the transparency check. |
+| `--color-input-swatch` | The chosen color, to paint over the transparency check. |
 
 ## Color Picker
 
@@ -1287,7 +1287,7 @@ brought its own card would be a card inside a card there.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-sample-end` | `HelixSampleEndEvent` | The eyedropper has closed, whether or not a colour was taken. |
+| `helix-sample-end` | `HelixSampleEndEvent` | The eyedropper has closed, whether or not a color was taken. |
 | `helix-sample-start` | `HelixSampleStartEvent` | The eyedropper is opening, so anything covering the page should get out of the way. |
 | `helix-change` | `HelixChangeEvent` | Fired when the color changes. |
 | `helix-copy` | `HelixCopyEvent` | Fired when the color is put on the clipboard. |
@@ -1325,7 +1325,7 @@ brought its own card would be a card inside a card there.
 | `--color-picker-brightness` | The chosen brightness, 0 to 100, as a percentage. |
 | `--color-picker-hue` | The chosen hue, 0 to 360, unitless. |
 | `--color-picker-saturation` | The chosen saturation, 0 to 100, as a percentage. |
-| `--color-picker-swatch` | A colour to paint: the current one on the sample, a preset's on each preset. |
+| `--color-picker-swatch` | A color to paint: the current one on the sample, a preset's on each preset. |
 
 ## Combobox
 
@@ -1418,7 +1418,7 @@ Input, Color Input and Date Input all take.
 | Property | Description |
 | --- | --- |
 | `--combobox-background-color` | Fill behind the field. |
-| `--combobox-border-color` | Colour of the panel's edge. |
+| `--combobox-border-color` | Color of the panel's edge. |
 | `--combobox-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--combobox-control-size` | Smallest the text field shrinks to |
 | `--combobox-panel-size` | Width of the panel. Follows the field by default. |
@@ -1434,7 +1434,7 @@ Extends `HelixBaseCommand`.
 
 The palette is a dialog holding a filterable listbox, so what this tier adds
 is where that dialog sits and how the list reads inside it. It opens against
-the top of the window rather than centred, which is where every palette a
+the top of the window rather than centered, which is where every palette a
 reader has used opens: a list that grows and shrinks as it is filtered would
 otherwise walk up and down the screen under the words being typed.
 
@@ -1650,7 +1650,7 @@ whatever holds it.
 | Property | Description |
 | --- | --- |
 | `--date-input-background-color` | Fill behind the field. |
-| `--date-input-border-color` | Colour of the panel's edge. |
+| `--date-input-border-color` | Color of the panel's edge. |
 | `--date-input-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--date-input-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
@@ -1805,7 +1805,7 @@ dialog rather than being a div somebody positioned.
 | Property | Description |
 | --- | --- |
 | `--dialog-rise` | How far the panel rises as it opens. Follows `--helix-space-lg`. |
-| `--dialog-border-color` | Colour of the panel's edge. |
+| `--dialog-border-color` | Color of the panel's edge. |
 | `--dialog-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--dialog-icon-size` | How big the mark above the title is. |
 | `--dialog-inline-size` | Width of the panel. |
@@ -1850,7 +1850,7 @@ tall that is.
 
 | Property | Description |
 | --- | --- |
-| `--divider-color` | Colour of the rule. |
+| `--divider-color` | Color of the rule. |
 | `--divider-inset` | Space taken off both ends of it. |
 | `--divider-inset-end` | Off the far end only. |
 | `--divider-inset-start` | Off the near end only. |
@@ -1907,7 +1907,7 @@ larger than the default.
 
 | Part | Description |
 | --- | --- |
-| `centre` | The middle of the ring, holding whatever is slotted. |
+| `center` | The middle of the ring, holding whatever is slotted. |
 | `plot` | The drawing. |
 | `tooltip` | The bubble, forwarded from `Tooltip`. |
 | `tooltip-anchor` | The `Tooltip` element itself. |
@@ -1924,7 +1924,7 @@ larger than the default.
 | Property | Description |
 | --- | --- |
 | `--donut-chart-size` | Width and height of the ring. |
-| `--donut-chart-track-color` | Colour of the ring under the slices. |
+| `--donut-chart-track-color` | Color of the ring under the slices. |
 | `--donut-chart-stroke` | How thick the ring is drawn, derived from `hole`. |
 
 ## Drawer
@@ -1985,7 +1985,7 @@ rest is flat and the movement is what says something happened.
 | --- | --- |
 | `--drawer-backdrop` | Filter applied behind a `material="glass"` drawer. Follows the theme's material policy; set it to override the strength on one drawer. |
 | `--drawer-background-color` | Surface behind the panel. |
-| `--drawer-border-color` | Colour of the panel's edge. |
+| `--drawer-border-color` | Color of the panel's edge. |
 | `--drawer-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--drawer-inset` | Padding inside the panel. |
 | `--drawer-inset-block-start` | Padding above the content, which clears the close control. |
@@ -2586,7 +2586,7 @@ than holding one size and looking wrong in a heading.
 
 ### Root (`helix-legend`)
 
-The names a chart draws, each beside the colour it is drawn in.
+The names a chart draws, each beside the color it is drawn in.
 
 Extends `HelixBaseLegend`.
 
@@ -2597,7 +2597,7 @@ and there is no arrangement of eight names that fits every width. Set
 The eight series colours are mapped here rather than in the tier below, which
 carries the index and holds no tokens. Written as eight rules for the reason
 `Avatar.Group` writes twelve: an index in markup cannot select a token, and a
-custom property set inline would be the headless tier naming a colour.
+custom property set inline would be the headless tier naming a color.
 
 #### Properties
 
@@ -2614,7 +2614,7 @@ custom property set inline would be the headless tier naming a colour.
 | `entry` | One name and its swatch. |
 | `list` | The list itself. |
 | `name` | One series name. |
-| `swatch` | The colour a series is drawn in. |
+| `swatch` | The color a series is drawn in. |
 
 #### Custom properties
 
@@ -2622,7 +2622,7 @@ custom property set inline would be the headless tier naming a colour.
 | --- | --- |
 | `--legend-direction` | `row`, which wraps, or `column`. |
 | `--legend-gap` | Space between entries. |
-| `--legend-swatch-size` | Size of the colour patch. |
+| `--legend-swatch-size` | Size of the color patch. |
 
 ## Line Chart
 
@@ -2688,7 +2688,7 @@ answers for a shape.
 | --- | --- |
 | `--line-chart-band-color` | The slot the pointer is resting in. |
 | `--line-chart-gridline-color` | One rule across the plot, under `gridlines`. |
-| `--line-chart-area-opacity` | How much of a line's colour its wash takes. |
+| `--line-chart-area-opacity` | How much of a line's color its wash takes. |
 | `--line-chart-block-size` | Height of the drawing. |
 | `--line-chart-gap` | Space between the drawing and its labels. |
 | `--line-chart-width` | Thickness of a line. |
@@ -2959,7 +2959,7 @@ Everything about what opens it and what closes it is the base class.
 | `--megamenu-background` | The panel's own fill. |
 | `--megamenu-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--megamenu-column-size` | The narrowest a column goes before the grid wraps. |
-| `--megamenu-full-size` | How wide the band's contents may get, centred in it. |
+| `--megamenu-full-size` | How wide the band's contents may get, centered in it. |
 | `--megamenu-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 | `--megamenu-size` | How wide the panel may get. |
 | `--megamenu-top` | Where the panel starts, measured from the bar above it. |
@@ -3031,7 +3031,7 @@ one panel and reads the same on a phone as on a desk.
 | Property | Description |
 | --- | --- |
 | `--menu-background-color` | Fill of the surface. |
-| `--menu-border-color` | Colour of the panel's edge. |
+| `--menu-border-color` | Color of the panel's edge. |
 | `--menu-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--menu-max-block-size` | Tallest the surface grows before it scrolls. |
 | `--menu-min-inline-size` | Narrowest the surface gets. |
@@ -3443,7 +3443,7 @@ document is not always where the headings are.
 
 | Property | Description |
 | --- | --- |
-| `--outline-rail` | Width of the gutter the rule and the travelling mark share. |
+| `--outline-rail` | Width of the gutter the rule and the traveling mark share. |
 | `--outline-indent` | How far each level is inset from the one above. |
 
 ## Pagination
@@ -3728,7 +3728,7 @@ time.
 
 | Property | Description |
 | --- | --- |
-| `--popover-border-color` | Colour of the panel's edge. |
+| `--popover-border-color` | Color of the panel's edge. |
 | `--popover-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--popover-inline-size` | Width of the panel. |
 | `--popover-inset` | Space between the panel's edge and its contents. |
@@ -3795,7 +3795,7 @@ Encodes a short piece of text as a scannable square.
 Extends `HelixBaseQrCode`.
 
 The picture is the base tier's. What this adds is a size that can be set
-once, the colours a scanner needs, and the box that holds a centre mark.
+once, the colours a scanner needs, and the box that holds a center mark.
 
 **The ink is `currentColor` and the ground is a real fill.** A code has to be
 dark on light to read, and the pair that guarantees it is not the page's
@@ -3816,7 +3816,7 @@ So the ground is stated and the ink is the foreground it is chosen for.
 
 | Slot | Description |
 | --- | --- |
-| `logo` | A mark for the centre, which only reads at a high correction. |
+| `logo` | A mark for the center, which only reads at a high correction. |
 
 #### Parts
 
@@ -3824,8 +3824,8 @@ So the ground is stated and the ink is the foreground it is chosen for.
 | --- | --- |
 | `code` | The square itself. |
 | `modules` | Everything but the three corner squares. |
-| `finders` | The three corner squares, which can take their own colour. |
-| `logo` | The box holding the centre mark. |
+| `finders` | The three corner squares, which can take their own color. |
+| `logo` | The box holding the center mark. |
 
 #### Custom properties
 
@@ -4082,7 +4082,7 @@ Everything about what the score is and how it is chosen is the base class.
 | `--rating-mark` | The shape of one mark, as a mask image. |
 | `--rating-size` | How big one mark is. |
 | `--rating-gap` | Space between marks. |
-| `--rating-color` | The colour of a filled mark. |
+| `--rating-color` | The color of a filled mark. |
 | `--rating-empty-color` | And of an unfilled one. |
 | `--rating-full` | How many marks are wholly filled. |
 | `--rating-part` | How much of the next mark is filled, 0 to 1. |
@@ -4570,7 +4570,7 @@ from the field it came out of.
 
 | Property | Description |
 | --- | --- |
-| `--select-border-color` | Colour of the panel's edge. |
+| `--select-border-color` | Color of the panel's edge. |
 | `--select-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--select-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 | `--select-surface-max-block-size` | How tall the panel gets. |
@@ -4584,7 +4584,7 @@ Stands in for content that has not arrived.
 Extends `HelixBaseSkeleton`.
 
 A sweep rather than a pulse. A block fading in and out reads as something
-broken; a highlight travelling across it reads as work in progress, and it is
+broken; a highlight traveling across it reads as work in progress, and it is
 the same one property animating either way.
 
 #### Properties
@@ -4709,7 +4709,7 @@ lets one drawing fill a 60px slot and a 600px one, and without
 `vector-effect: non-scaling-stroke` the same line comes out hairline in the
 first and heavy in the second.
 
-One colour on the host, read by the line, the wash, the columns and the mark
+One color on the host, read by the line, the wash, the columns and the mark
 alike, so moving `--sparkline-color` cannot leave parts of one drawing
 disagreeing.
 
@@ -4749,10 +4749,10 @@ keeps it out of every other reason it might want to be bigger.
 | --- | --- |
 | `--chart-terminus-hole` | A fill for the middle of a `ring` terminus, which is otherwise open. |
 | `--chart-terminus-size` | Size of the mark on the last reading. |
-| `--sparkline-area-opacity` | How much of the line's colour the wash takes where it meets the line. |
+| `--sparkline-area-opacity` | How much of the line's color the wash takes where it meets the line. |
 | `--sparkline-bar-radius` | Corner radius on a column, under `plot="bar"`. |
 | `--sparkline-block-size` | Height of the drawing. |
-| `--sparkline-color` | Colour of the line, the wash, the columns and the mark. |
+| `--sparkline-color` | Color of the line, the wash, the columns and the mark. |
 | `--sparkline-inline-size` | Width of the drawing. |
 | `--sparkline-width` | Thickness of the line, overriding `weight`. |
 | `--chart-terminus-x` | Where the last point sits horizontally, as a percentage. |
@@ -5141,7 +5141,7 @@ A control that turns something on or off.
 
 Extends `HelixBaseSwitch`.
 
-A thumb travelling in a groove, which is the one place in the library color
+A thumb traveling in a groove, which is the one place in the library color
 is used to say "on". A checkbox does not, because a tick is legible on its
 own; a switch has no mark, so the fill is the whole of what distinguishes the
 two states and there is nothing else for it to be.
@@ -5730,7 +5730,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 | Property | Description |
 | --- | --- |
 | `--time-input-background-color` | Fill behind the field. |
-| `--time-input-border-color` | Colour of the panel's edge. |
+| `--time-input-border-color` | Color of the panel's edge. |
 | `--time-input-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--time-input-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
@@ -5853,7 +5853,7 @@ arrives at this entry from the one before.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `datetime` | `datetime` | `string` | `''` | `HelixBaseTimelineItem` | When it happened, machine-readable. |
-| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseTimelineItem` | What kind of event it was, which decides the mark's colour and nothing else. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseTimelineItem` | What kind of event it was, which decides the mark's color and nothing else. |
 
 #### Slots
 
@@ -5996,7 +5996,7 @@ costs contrast for something the mark already says.
 
 | Property | Description |
 | --- | --- |
-| `--toast-border-color` | Colour of the panel's edge. |
+| `--toast-border-color` | Color of the panel's edge. |
 | `--toast-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--toast-item-inset` | Space between the message's edge and its contents. |
 | `--toast-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
@@ -6488,7 +6488,7 @@ Which way a measurement moved, and whether that is good news.
 
 Extends `HelixBaseTrend`.
 
-The arrow takes the judgment colour and the number does not, which is the
+The arrow takes the judgment color and the number does not, which is the
 opposite of the dashboard convention and is measured rather than preferred:
 in light mode the success token is 3.8:1 on the surface, enough for a glyph
 and short of what 13px text needs, and there is no darker green in the ramp.
@@ -6521,7 +6521,7 @@ reads and the judgment is a gloss on it.
 
 | Property | Description |
 | --- | --- |
-| `--trend-color` | Colour of the arrow, overriding the judgment. |
+| `--trend-color` | Color of the arrow, overriding the judgment. |
 | `--trend-icon-size` | Size of the arrow. |
 
 ## Video
@@ -6539,7 +6539,7 @@ replace a control set that cannot be styled.
 
 **The bar is over the picture, not under it.** A bar in the layout would move
 everything below the video by its own height and would leave a strip of page
-colour under a picture that is meant to be the whole of it. Over it, the
+color under a picture that is meant to be the whole of it. Over it, the
 video is the component's size and the controls belong to it.
 
 **It goes when nobody is using it, and comes back for the keyboard.** Hidden
@@ -6770,7 +6770,7 @@ through `::slotted()` and never reaches into the node's own shadow root at
 all. So the button here is two boundaries away from the rule that styles
 every button beside it, and the same tokens are what make the two agree.
 
-Colour is inherited rather than named, so the bar's own colour arrives on
+Color is inherited rather than named, so the bar's own color arrives on
 its own. `--video-playlist-menu-color` is there for the case where it should
 not.
 
@@ -6807,7 +6807,7 @@ not.
 
 | Property | Description |
 | --- | --- |
-| `--video-playlist-menu-color` | Colour of the trigger, defaulting to the control bar's. |
+| `--video-playlist-menu-color` | Color of the trigger, defaulting to the control bar's. |
 | `--video-playlist-menu-poster` | Width of an entry's still. |
 | `--video-playlist-menu-size` | Size of the trigger's glyph. |
 

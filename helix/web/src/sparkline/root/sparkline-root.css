@@ -25,10 +25,10 @@
   overflow: visible;
 }
 
-/* The first series colour rather than the brand token, and they are nearly the
-   same colour on purpose: series 1 is the seed at hue rotation zero, held at a
+/* The first series color rather than the brand token, and they are nearly the
+   same color on purpose: series 1 is the seed at hue rotation zero, held at a
    lightness that clears a chart's ground. A sparkline is a chart, so it takes a
-   chart colour, and a page carrying one beside a line chart draws both series
+   chart color, and a page carrying one beside a line chart draws both series
    one in the same ink. Measured against the surface: 5.35 in the light and 6.57
    in the dark, where a graphic needs 3. */
 [part="line"] {
@@ -74,7 +74,7 @@
  * different one per column, which is not something a single fill can be, and
  * every charting library draws it this way for that reason.
  *
- * `currentColor` in the stops, so the wash is the line's own colour and a
+ * `currentColor` in the stops, so the wash is the line's own color and a
  * consumer cannot end up with a fill that disagrees with what it sits under.
  *
  * Decorative, and stated as such: the line carries the series and the wash says
@@ -132,7 +132,7 @@
  * forty both fill the box. Nothing here needs `vector-effect`: a fill has no
  * stroke to be stretched, so a rect in the view box's own units is exactly as
  * wide as its share of the width whatever the drawing is scaled to, which is
- * the behaviour a bar wants and the opposite of what a line wants. */
+ * the behavior a bar wants and the opposite of what a line wants. */
 [part="bar"] {
   fill: currentColor;
   rx: var(--sparkline-bar-radius, 0.5);
@@ -141,14 +141,14 @@
 /* The hole in the ring, cut out of the drawing so it is one.
  *
  * A `ring` terminus is a window onto whatever the chart is drawn over, and the
- * line ends at the reading, which is the window's centre. Something has to give
+ * line ends at the reading, which is the window's center. Something has to give
  * way, and until 21 Aug 2026 it was the window: the middle was painted with the
  * page's surface, which hid the stroke and also hid the card, the photograph or
  * the panel the chart was actually sitting on. Measured on a purple card, the
- * mark came out a disc of the page colour.
+ * mark came out a disc of the page color.
  *
  * So the drawing gives way instead. `mask-image` on the `<svg>` takes out a
- * disc of exactly the radius the ring leaves open, centred on the same two
+ * disc of exactly the radius the ring leaves open, centered on the same two
  * percentages the mark is placed with, and the stroke genuinely stops at the
  * ring's inner edge.
  *
@@ -167,7 +167,7 @@
  * them. The half pixel is a feather, since a hard stop on a curved edge aliases.
  *
  * A consumer who wants the old lid back sets `--chart-terminus-hole` to a
- * colour: the disc is still cut, and an opaque middle covers the cut. */
+ * color: the disc is still cut, and an opaque middle covers the cut. */
 :host([terminus="ring"]) [part="svg"] {
   mask-image: radial-gradient(
     circle at var(--chart-terminus-x) var(--chart-terminus-y),

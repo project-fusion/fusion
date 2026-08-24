@@ -6,7 +6,7 @@
  * rounding says how a thing should feel and that is not this tier's to say; the
  * exceptions are shapes that are round rather than softened.
  *
- * **Grays, and only grays.** A base example is a diagram, and colour in a
+ * **Grays, and only grays.** A base example is a diagram, and color in a
  * diagram reads as meaning: a blue fill says primary and a red one says danger,
  * neither of which this tier has an opinion about. A neutral ramp says nothing
  * except where one surface ends and the next begins, which is the whole job.
@@ -102,7 +102,7 @@ helix-base-rating::part(mark) {
    rather than a subset of it, so they have to be stacked and not laid side by
    side. Left to the name-matching, marks became a row, track became a progress
    groove painted over the marks it is made of, and fill was a block: the
-   component rendered as half a rem of flat grey, and with the groove removed it
+   component rendered as half a rem of flat gray, and with the groove removed it
    rendered as nothing.
    
    The width of the clip is the component's own arithmetic, published as
@@ -119,7 +119,7 @@ helix-base-rating::part(marks) {
    selects nothing: ::part() reaches the part and no further, so descendants of a
    part are unreachable from outside the tree. The styled tier writes exactly
    that selector and it works there, its sheet being inside the shadow root.
-   Colour inherits across the boundary where a selector does not, so the layers
+   Color inherits across the boundary where a selector does not, so the layers
    set it and the marks take it. */
 helix-base-rating::part(track),
 helix-base-rating::part(fill) {

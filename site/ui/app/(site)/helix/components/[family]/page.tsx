@@ -141,19 +141,19 @@ function Code({ children }: { children: string }) {
  * Colours a type annotation by what each part of it is.
  *
  * Split rather than highlighted: a type is not a program, and running a real
- * tokenizer over `'primary' | 'neutral'` would be a parser shipped to colour
+ * tokenizer over `'primary' | 'neutral'` would be a parser shipped to color
  * six words. The split keeps quoted literals whole and then treats every run of
  * identifier characters as one token, which is all the structure a type
  * annotation has.
  *
  * The palette is the library's own `syntax-*` tokens, so a type here is the
- * colour the same word would be in the sandbox's editor. That is the reason
+ * color the same word would be in the sandbox's editor. That is the reason
  * strings are not green: this set is GitHub-derived, where a string is navy and
- * green is the tag colour. Recolouring them would make the reference page
+ * green is the tag color. Recolouring them would make the reference page
  * disagree with the editor two panes away, which is worse than either choice.
  */
 /**
- * The built-in types, which are one colour between them.
+ * The built-in types, which are one color between them.
  *
  * `string` belongs here and not with the literals. It is the same kind of word
  * as `boolean`: a name the language supplies, sitting where a type goes.
@@ -353,7 +353,7 @@ function MemberTable({
           <helix-table-row key={row.name}>
             <helix-table-cell header>
               {/* The unnamed slot has no name, and printing `(default)` in the
-                identifier colour dressed an absence up as one. */}
+                identifier color dressed an absence up as one. */}
               {row.name ? (
                 <Code>{row.name}</Code>
               ) : (
@@ -683,7 +683,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                     <helix-table-cell header>
                       {/* `quiet`: a column where every row is a link does not
                           need every row underlined and blue. The variant carries
-                          the muted colour, drops the rule, and moves to full
+                          the muted color, drops the rule, and moves to full
                           foreground on hover. */}
                       <Link
                         data-link="quiet"

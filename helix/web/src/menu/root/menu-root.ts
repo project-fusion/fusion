@@ -20,7 +20,7 @@ import { styles } from './menu-root.css.js'
  * @documentation https://helix.fusion.dev/components/menu
  *
  * @cssproperty --menu-background-color - Fill of the surface.
- * @cssproperty --menu-border-color - Colour of the panel's edge.
+ * @cssproperty --menu-border-color - Color of the panel's edge.
  * @cssproperty --menu-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.

@@ -9,7 +9,7 @@ beforeAll(async () => {
 /* The one assertion about Splitter that is the stylesheet's: which of two
    rules comes last. It reads `customElements.get('helix-splitter').styles`,
    so it is about the styled element by construction and cannot follow the
-   behaviour to the base tier. */
+   behavior to the base tier. */
 describe('splitter appearance', () => {
   test('the accent is on the drag, not on the interest', async () => {
     // Hover is a question and a drag is an answer, so the rule that answers has

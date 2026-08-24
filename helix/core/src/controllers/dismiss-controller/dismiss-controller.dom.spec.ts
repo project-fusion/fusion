@@ -150,7 +150,7 @@ describe('a press outside', () => {
   })
 
   /* `composedPath` rather than `target`, so a press inside the overlay's own
-     shadow root is still recognised as inside it. */
+     shadow root is still recognized as inside it. */
   test('while one inside its shadow root does not, which `target` alone cannot see', () => {
     document.body.innerHTML = ''
     const one = overlay()

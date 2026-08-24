@@ -5,7 +5,7 @@
 //! reader re-learns per product, and that stays refused. A status that ignores
 //! how loud the palette around it is has a different problem: against a muted
 //! brand, danger measured six times the chroma of primary, which is a vivid red
-//! screaming on a near-grey page.
+//! screaming on a near-gray page.
 //!
 //! **`allowance` is the repair rather than the report.** A red brand beside a
 //! red danger carries no information, so a status may rotate away, within its
@@ -75,7 +75,7 @@ pub fn repair_hue(hue: f64, allowance: f64, clears: impl Fn(f64) -> bool) -> f64
 pub struct StatusColor {
     pub color: Oklch,
     pub name: &'static str,
-    /// True when the consumer supplied a colour outright, which is a fact rather
+    /// True when the consumer supplied a color outright, which is a fact rather
     /// than a derivation and is reported as `pinned`.
     pub pinned: bool,
 }
@@ -110,10 +110,10 @@ pub fn statuses(
     Fusion brand, and twenty degrees moves `info` by three, which is nowhere near
     enough to stop reading as informational and exactly enough to be told apart.
 
-    What 20 does not reach is a brand that *is* a status colour. Clearing a
+    What 20 does not reach is a brand that *is* a status color. Clearing a
     collision between two hues that start coincident is a chord across the hue
     circle, so the rotation it takes scales inversely with chroma. That is the
-    honest trade rather than an oversight: the allowance is a licence to bend a
+    honest trade rather than an oversight: the allowance is a license to bend a
     convention and 40 degrees of amber is not amber. */
     let allowance = intent.allowance.unwrap_or(20.0);
     let harmony = intent.harmony.unwrap_or(0.5);
@@ -122,7 +122,7 @@ pub fn statuses(
     let mut settled: Vec<Oklch> = Vec::with_capacity(STATUS_NAMES.len());
 
     for name in STATUS_NAMES {
-        /* A colour pins the status outright; a hue nudges it within the meaning
+        /* A color pins the status outright; a hue nudges it within the meaning
         it already carries. */
         if let Some(StatusSeed::Color(color)) = intent.seed(name) {
             let pinned = to_oklch(color).expect("resolve refused an unreadable pinned status");
@@ -142,7 +142,7 @@ pub fn statuses(
         };
 
         /* **Its own chroma, pulled toward the palette's loudness, never the
-        brand's outright.** Taking the brand's gave a grey danger on a muted
+        brand's outright.** Taking the brand's gave a gray danger on a muted
         brand; ignoring the brand entirely gave the opposite, danger measuring six
         times primary's chroma on the same palette, which is a red that shouts.
 

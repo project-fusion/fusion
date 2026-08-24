@@ -164,9 +164,9 @@
  *
  * `::slotted()` matches assigned nodes and fallback content is not assigned, so
  * every rule that styles a slotted trigger reaches nothing here. The button was
- * left with the browser's own: measured at 16x6 with a grey fill and a 2px
+ * left with the browser's own: measured at 16x6 with a gray fill and a 2px
  * border, against 40x40 for the `helix-icon-button` the example slots. A
- * floating action button rendering as a grey nub, and only for the consumer who
+ * floating action button rendering as a gray nub, and only for the consumer who
  * wrote the least markup.
  *
  * Same shape and the same tokens the slotted path resolves to, so a trigger a

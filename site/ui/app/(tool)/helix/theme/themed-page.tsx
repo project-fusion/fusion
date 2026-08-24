@@ -2,7 +2,7 @@
  * What the preview shows: a page somebody would ship.
  *
  * **A palette is judged in composition, not in isolation.** An earlier version
- * was a card, a callout and a row of tags, which answers "what colour is a tag"
+ * was a card, a callout and a row of tags, which answers "what color is a tag"
  * and not "would I ship this". Contrast between an ink and its ground is
  * measured by the engine and reported in the audit; what a reader is here to
  * judge is the thing the audit cannot see, which is whether the palette holds
@@ -63,7 +63,7 @@ const SHIPMENTS = [
  * one thing here that could not be any other name's mark. Two ideas, one form.
  *
  * **Drawn rather than fetched.** Three rectangles is markup, not an asset: an
- * SVG file would need loading, sizing and a licence to say the same thing, and
+ * SVG file would need loading, sizing and a license to say the same thing, and
  * `currentColor` lets one definition serve the header and the footer.
  *
  * `aria-hidden`, because the wordmark beside it is the accessible name and a
@@ -91,9 +91,9 @@ export function ThemedPage() {
       <helix-app-header className="themedHeader">
         {/* **A mark, because it is the one place the brand appears as itself.**
             Everywhere else on this page the brand is solved for a word: the
-            button fill has to carry white and the link colour has to clear the
+            button fill has to carry white and the link color has to clear the
             page as text. `--helix-color-brand-mark` answers to the 3:1 a graphic
-            owes rather than the 4.5 a word does, so a reader who picks a colour
+            owes rather than the 4.5 a word does, so a reader who picks a color
             can find it here even when every button has moved away from it. */}
         <helix-flex align="center" gap="xs" slot="start">
           <Mark />

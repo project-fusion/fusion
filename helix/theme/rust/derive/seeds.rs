@@ -10,25 +10,25 @@ use crate::derive::emphasis::Emphasis;
 use crate::derive::resolve::Resolved;
 use crate::oklch::{fit_to_gamut, oklch_to_hex, GAMUT_STEPS};
 
-/// The chroma of the loudest series colour the stylesheet's ramp holds.
+/// The chroma of the loudest series color the stylesheet's ramp holds.
 ///
 /// A `ceiling` is an absolute chroma and a seed is a multiplier, so a ceiling
 /// has to be folded in against something. Approximate by construction and it has
 /// to be: the ramp states a different chroma per hue, because sRGB is not
-/// chroma-uniform, and one multiplier cannot honour eight ceilings exactly. What
-/// it does honour is the direction and the extremes, so a ceiling of 0 gives grey
+/// chroma-uniform, and one multiplier cannot honor eight ceilings exactly. What
+/// it does honor is the direction and the extremes, so a ceiling of 0 gives gray
 /// charts.
 const LOUDEST_SERIES: f64 = 0.277;
 
 /// The four seeds, as the strings they are written as.
 ///
-/// **The brand seed is the solved primary, not the colour handed in**, and that
+/// **The brand seed is the solved primary, not the color handed in**, and that
 /// is what makes the two derivations agree: the stylesheet builds its ramp from
 /// the seed, so seeding it with the raw input would leave the CSS primary and
 /// this engine's primary two different colours on the same page.
 ///
 /// **The chroma policy has to reach the seed, or half the palette never hears
-/// about it.** This engine applies it to every colour it solves, and the
+/// about it.** This engine applies it to every color it solves, and the
 /// twenty-four series colours are not among those. Measured before it did:
 /// saturation at 20 per cent, and a bar still painted chroma 0.206.
 ///

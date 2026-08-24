@@ -1,5 +1,5 @@
 //! Defaults, validation and the chroma policy: everything that happens before a
-//! colour is solved.
+//! color is solved.
 //!
 //! This was the first forty lines of `deriveTheme` and three helpers beside it.
 //! Pulling it out makes one thing explicit that the closure hid: the policy is
@@ -31,7 +31,7 @@ pub enum IntentError {
     NotFinite { label: String, value: String },
     /// A number outside the range it is meaningful in.
     OutOfRange { label: String, message: String },
-    /// A colour that is not one. The TypeScript carried `NaN` components here.
+    /// A color that is not one. The TypeScript carried `NaN` components here.
     Unreadable { label: String, value: String },
 }
 
@@ -45,7 +45,7 @@ impl std::fmt::Display for IntentError {
             Self::Unreadable { label, value } => {
                 write!(
                     out,
-                    "{label} is not a colour this engine can read, received {value}"
+                    "{label} is not a color this engine can read, received {value}"
                 )
             }
         }
@@ -55,7 +55,7 @@ impl std::fmt::Display for IntentError {
 impl std::error::Error for IntentError {}
 
 /// The chroma policy, applied to everything this engine derives and to nothing
-/// it is handed. A pinned colour is a fact about the brand; a derived one is
+/// it is handed. A pinned color is a fact about the brand; a derived one is
 /// this palette's opinion, and the policy is what that opinion is.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Policy {
@@ -201,7 +201,7 @@ fn range(label: &str, message: &str) -> IntentError {
 /// # Errors
 ///
 /// [`IntentError`] when a number is not finite, when one is outside the range it
-/// is meaningful in, or when the brand is not a colour this engine can read.
+/// is meaningful in, or when the brand is not a color this engine can read.
 pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     let resolved = defaults(intent);
     let brand = to_oklch(&resolved.brand).ok_or_else(|| IntentError::Unreadable {
@@ -252,7 +252,7 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     /* **A pinned status that cannot be read is refused here rather than ignored
     later.** The TypeScript carried the `NaN` triple into the palette; the port
     would have fallen through and derived the status instead, which is quieter
-    and no better: a consumer who pinned a colour and got a computed one back was
+    and no better: a consumer who pinned a color and got a computed one back was
     never told. The brand is validated for the same reason two dozen lines up. */
     for name in STATUS_NAMES {
         if let Some(StatusSeed::Color(color)) = resolved.status.seed(name) {
@@ -268,7 +268,7 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     /* And a pinned accent, for the same reason and by the same reading: the
     TypeScript carries the `NaN` triple, `violations` compares against it and
     every comparison is false, so the theme reports clean. Three seeds can be
-    handed a colour and all three are checked here, which is what makes the
+    handed a color and all three are checked here, which is what makes the
     `expect` in each phase downstream a statement about this function rather
     than an assumption about its caller. */
     if let Seed::Color(color) = &resolved.accent {

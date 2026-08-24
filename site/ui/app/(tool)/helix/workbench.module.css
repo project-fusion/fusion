@@ -40,7 +40,7 @@
   /* **On hover, as asked, and it took fixing the reasons it could not be seen
      first.** Revealed-on-hover was reported as simply absent, and the cause was
      not the gate: a 16 square glyph 4px from a chevron of the same size in the
-     same grey is invisible whenever it is shown. A 24 square target, twelve
+     same gray is invisible whenever it is shown. A 24 square target, twelve
      pixels of air, and it reads. So the gate goes back.
 
      `opacity` and not `display`, so the row's width does not change as a
@@ -54,7 +54,7 @@
     opacity var(--helix-duration-fast) var(--helix-easing-standard);
 
   /* Off the chevron, which sits 4px away and is the same size and the same
-     grey. Reported as not being there at all: two 16px marks that close
+     gray. Reported as not being there at all: two 16px marks that close
      together read as one smudge rather than as a control beside a control. */
   margin-inline-end: var(--helix-space-xs);
 

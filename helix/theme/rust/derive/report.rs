@@ -3,7 +3,7 @@
 //!
 //! Two findings, and neither substitutes for the other: contrast is a token
 //! against a ground, a collision is two roles against each other. A palette can
-//! be perfectly legible and still have three statuses that look like one colour.
+//! be perfectly legible and still have three statuses that look like one color.
 
 use crate::derive::emphasis::Emphasis;
 use crate::derive::status::StatusColor;

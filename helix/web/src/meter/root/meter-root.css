@@ -95,7 +95,7 @@
  * A fill at its maximum and a fill well past it are the same picture, so the
  * words carry it and this carries what a picture can: the trailing corner
  * squares off, which is the convention for a quantity continuing past the frame
- * it is drawn in. Only the corner, because "over" is not a judgement: a hundred
+ * it is drawn in. Only the corner, because "over" is not a judgment: a hundred
  * and ten per cent of a stretch goal is good news and of a disk is not, and the
  * band is what says which. */
 [part="indicator"][data-beyond="over"] {
@@ -131,7 +131,7 @@
   z-index: var(--helix-layer-raised);
 }
 
-/* It arrives at its reading rather than travelling to it, for a reader who asked
+/* It arrives at its reading rather than traveling to it, for a reader who asked
    not to be moved. The reading is still correct: what goes is the sense of it
    moving, which is what the preference is about. */
 @media (prefers-reduced-motion: reduce) {
@@ -232,7 +232,7 @@
 /* A tick is a segment of the same circle rather than a mark placed on it: one
    unit of a hundred, pushed round to where the threshold falls. No trigonometry,
    and it stays right at any radius and any thickness. Drawn in the ground's own
-   colour rather than a line color, so it reads as a gap in the groove, which is
+   color rather than a line color, so it reads as a gap in the groove, which is
    what a scale mark on a dial is.
 
    `--meter-tick-color` is the same hook the bar's tick takes, so the two shapes

@@ -25,7 +25,7 @@ export const metadata = {
 
 export default async function ThemePage() {
   /* Built here, on a server, and handed down, the way the sandbox page and the
-     site layout both already do it: the catalogue reads the manifest off disk
+     site layout both already do it: the catalog reads the manifest off disk
      and the insight registry is the whole of the writing, so a palette that
      imported either would pull it into the browser to display a list of names.
      What crosses is the list. */

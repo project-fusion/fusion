@@ -184,7 +184,7 @@
   min-inline-size: 0;
 }
 
-/* The ramps are labelled for a screen reader and not for the eye: a hue bar
+/* The ramps are labeled for a screen reader and not for the eye: a hue bar
    needs no caption, and two lines of text would be the tallest thing beside a
    square. Clipped rather than `display: none`, which would take the name away
    from the control it names. */

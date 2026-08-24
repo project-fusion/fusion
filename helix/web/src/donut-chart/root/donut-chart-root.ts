@@ -34,7 +34,7 @@ import '../../tooltip/index.js'
  * @documentation https://helix.fusion.dev/components/donut-chart
  *
  * @cssproperty --donut-chart-size - Width and height of the ring.
- * @cssproperty --donut-chart-track-color - Colour of the ring under the slices.
+ * @cssproperty --donut-chart-track-color - Color of the ring under the slices.
  */
 @customElement('helix-donut-chart')
 export class HelixDonutChart extends HelixBaseDonutChart {

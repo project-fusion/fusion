@@ -179,7 +179,7 @@
  * This was `z-index: 0` to keep the marks off the thumb, and the control
  * computes to 10, so the marks went under the whole input and every stepped
  * slider in the library drew nothing at all. Verified by setting them red and
- * still seeing none, with `elementFromPoint` at a mark's centre returning the
+ * still seeing none, with `elementFromPoint` at a mark's center returning the
  * host: they were painted, sized, positioned and covered.
  *
  * The reason the original went below is real and does not go away by raising
@@ -187,10 +187,10 @@
  * z-index that sits between them, and a mark drawn over the input is drawn over
  * the thumb. What can sit between them is a hole. The overlay is inset by half
  * a thumb at each end, which is exactly the thumb's travel, so a fraction of
- * its own width is the thumb's centre and a radial mask there removes the mark
+ * its own width is the thumb's center and a radial mask there removes the mark
  * the thumb is standing on and nothing else.
  *
- * `currentColor` rather than a colour: only the alpha of a mask is read, and it
+ * `currentColor` rather than a color: only the alpha of a mask is read, and it
  * saves inventing a token for a value nobody sees. */
 /* biome-ignore lint/style/noDescendingSpecificity: the rule above it places `control` and `markers` in the same grid cell in one selector list, which is one decision about one layout. Reordering to satisfy this would split that pair so a single-part rule could sit between them, and the pair is the thing worth keeping together. Specificity decides here either way. */
 [part="markers"] {
@@ -330,7 +330,7 @@
   block-size: var(--_slider-thumb);
   border: none;
   border-radius: var(--helix-radii-full);
-  /* A ring of the ground's own colour, so the thumb reads against whichever
+  /* A ring of the ground's own color, so the thumb reads against whichever
      half of the track it is over.
 
      Contrast against the track is 11.25 and against the fill is 2.57, which is
@@ -342,7 +342,7 @@
      **The page is the guess, and `--slider-thumb-ring-color` is how a consumer
      says otherwise.** A separating ring has to match what the slider was put
      on, and no element can ask what is painted behind it: on a card this comes
-     out as a ring of the page's colour, which is the failure `Timeline`'s
+     out as a ring of the page's color, which is the failure `Timeline`'s
      marker and the sparkline's ring terminus both had. Neither of those could
      be fixed with a hook, because a mark that means "a gap in the thing behind
      me" should be cut rather than filled. This one is different and the hook is
@@ -378,7 +378,7 @@
      border, so leaving the declaration out leaves a border rather than none. */
   border: none;
   border-radius: var(--helix-radii-full);
-  /* A ring of the ground's own colour, so the thumb reads against whichever
+  /* A ring of the ground's own color, so the thumb reads against whichever
      half of the track it is over.
 
      Contrast against the track is 11.25 and against the fill is 2.57, which is
@@ -390,7 +390,7 @@
      **The page is the guess, and `--slider-thumb-ring-color` is how a consumer
      says otherwise.** A separating ring has to match what the slider was put
      on, and no element can ask what is painted behind it: on a card this comes
-     out as a ring of the page's colour, which is the failure `Timeline`'s
+     out as a ring of the page's color, which is the failure `Timeline`'s
      marker and the sparkline's ring terminus both had. Neither of those could
      be fixed with a hook, because a mark that means "a gap in the thing behind
      me" should be cut rather than filled. This one is different and the hook is

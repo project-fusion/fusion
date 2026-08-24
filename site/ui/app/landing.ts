@@ -34,7 +34,7 @@ export const LANDING: PageCopy = {
     },
     {
       body: [
-        'Every control beside this is a custom element from the library, rendered here rather than pictured. The palette under them is derived from one brand colour, which is why nothing had to be chosen twice.',
+        'Every control beside this is a custom element from the library, rendered here rather than pictured. The palette under them is derived from one brand color, which is why nothing had to be chosen twice.',
       ],
       kicker: 'Helix',
       title: 'Drawn by the thing it documents',

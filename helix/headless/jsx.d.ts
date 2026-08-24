@@ -494,7 +494,7 @@ export type HelixBaseAnnouncementProps = {
   /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
-judgement about the message, and elsewhere in this library it carries one:
+judgment about the message, and elsewhere in this library it carries one:
 `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
@@ -540,7 +540,7 @@ export type HelixBaseAnnouncementSolidJsProps = {
   /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
-judgement about the message, and elsewhere in this library it carries one:
+judgment about the message, and elsewhere in this library it carries one:
 `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
@@ -600,7 +600,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   "content-align"?: HelixBaseAppHeader["contentAlign"];
@@ -617,7 +617,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   contentAlign?: HelixBaseAppHeader["contentAlign"];
@@ -637,7 +637,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   "attr:content-align"?: HelixBaseAppHeader["contentAlign"];
@@ -654,7 +654,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   "prop:contentAlign"?: HelixBaseAppHeader["contentAlign"];
@@ -814,7 +814,7 @@ mislead in every other case.
 no value axis at all when there is one scale, because the columns are
 measured against each other and a reader needs no numbers to do that. With
 two, a reader has no way of knowing there are two, let alone which series
-is on which, so both scales are labelled the moment this is set. An
+is on which, so both scales are labeled the moment this is set. An
 unlabelled second axis is the deceptive case rather than the tidy one.
 
 The grid stays on the primary axis, since a rule measured against two
@@ -905,7 +905,7 @@ mislead in every other case.
 no value axis at all when there is one scale, because the columns are
 measured against each other and a reader needs no numbers to do that. With
 two, a reader has no way of knowing there are two, let alone which series
-is on which, so both scales are labelled the moment this is set. An
+is on which, so both scales are labeled the moment this is set. An
 unlabelled second axis is the deceptive case rather than the tidy one.
 
 The grid stays on the primary axis, since a rule measured against two
@@ -1766,7 +1766,7 @@ where the color is the answer rather than a setting. */
 
 **Undefaulted, because it reflects.** The two together are what stamp an
 attribute onto every host anybody renders, including the ones nobody
-configured: the server wrote `format="hex"` on every colour input on the
+configured: the server wrote `format="hex"` on every color input on the
 page, and React, holding no such prop, reported a hydration mismatch for
 each one. That is the fault `Tree.chevronPlacement` had and the reason the
 area rules say a reflected property takes no default. Hex is still what an
@@ -1897,7 +1897,7 @@ where the color is the answer rather than a setting. */
 
 **Undefaulted, because it reflects.** The two together are what stamp an
 attribute onto every host anybody renders, including the ones nobody
-configured: the server wrote `format="hex"` on every colour input on the
+configured: the server wrote `format="hex"` on every color input on the
 page, and React, holding no such prop, reported a hydration mismatch for
 each one. That is the fault `Tree.chevronPlacement` had and the reason the
 area rules say a reflected property takes no default. Hex is still what an
@@ -2131,7 +2131,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseColorPicker["name"];
 
-  /** The eyedropper has closed, whether or not a colour was taken. */
+  /** The eyedropper has closed, whether or not a color was taken. */
   "onhelix-sample-end"?: (
     e: HelixBaseColorPickerHelixSampleEndElementEvent,
   ) => void;
@@ -2248,7 +2248,7 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseColorPicker["name"];
-  /** The eyedropper has closed, whether or not a colour was taken. */
+  /** The eyedropper has closed, whether or not a color was taken. */
   "on:helix-sample-end"?: (
     e: HelixBaseColorPickerHelixSampleEndElementEvent,
   ) => void;
@@ -2761,7 +2761,7 @@ export type HelixBaseCopyButtonProps = {
   /** What it is called, and says, before a press.
 
 Defaulted rather than left empty. An icon-only control must be named, and
-the name of this one is not a judgement call: every copy button in the
+the name of this one is not a judgment call: every copy button in the
 world is called Copy. A consumer with a better word still sets it. */
   label?: HelixBaseCopyButton["label"];
   /** What it is called, and says, after one.
@@ -2847,7 +2847,7 @@ export type HelixBaseCopyButtonSolidJsProps = {
   /** What it is called, and says, before a press.
 
 Defaulted rather than left empty. An icon-only control must be named, and
-the name of this one is not a judgement call: every copy button in the
+the name of this one is not a judgment call: every copy button in the
 world is called Copy. A consumer with a better word still sets it. */
   "prop:label"?: HelixBaseCopyButton["label"];
   /** What it is called, and says, after one.
@@ -3754,7 +3754,7 @@ Absent is a ring with room for a total in it. `small` and `large` move the
 hole without moving the outer edge, so a chart keeps its footprint.
 
 **`none` is a pie**, and it is the same drawing rather than another one:
-the radius follows the thickness, so the inner edge reaching the centre is
+the radius follows the thickness, so the inner edge reaching the center is
 what closing the hole means. A pie reads less accurately than a ring, angle
 being harder to judge than length, but it is not *misleading* the way a bar
 measured from anything but zero is, which is why this is a value here and
@@ -3812,7 +3812,7 @@ Absent is a ring with room for a total in it. `small` and `large` move the
 hole without moving the outer edge, so a chart keeps its footprint.
 
 **`none` is a pie**, and it is the same drawing rather than another one:
-the radius follows the thickness, so the inner edge reaching the centre is
+the radius follows the thickness, so the inner edge reaching the center is
 what closing the hole means. A pie reads less accurately than a ring, angle
 being harder to judge than length, but it is not *misleading* the way a bar
 measured from anything but zero is, which is why this is a value here and
@@ -7421,7 +7421,7 @@ which is what makes it read as dots rather than as a softened square code. */
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
-costs about fifteen percent redundancy. `H` where a mark covers the centre,
+costs about fifteen percent redundancy. `H` where a mark covers the center,
 chosen automatically when the slot is filled: it is the level that makes
 covering safe, and a consumer who fills the slot has said what they want
 without having to know that. */
@@ -7451,7 +7451,7 @@ which is what makes it read as dots rather than as a softened square code. */
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
-costs about fifteen percent redundancy. `H` where a mark covers the centre,
+costs about fifteen percent redundancy. `H` where a mark covers the center,
 chosen automatically when the slot is filled: it is the level that makes
 covering safe, and a consumer who fills the slot has said what they want
 without having to know that. */
@@ -10413,7 +10413,7 @@ Whatever `<time>` accepts, which is a date, a time, both, a duration or a
 week. Unset, the label is written as it was given and nothing claims to
 know what instant it names. */
   datetime?: HelixBaseTimelineItem["datetime"];
-  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  /** What kind of event it was, which decides the mark's color and nothing else. */
   tone?: HelixBaseTimelineItem["tone"];
 };
 
@@ -10424,7 +10424,7 @@ Whatever `<time>` accepts, which is a date, a time, both, a duration or a
 week. Unset, the label is written as it was given and nothing claims to
 know what instant it names. */
   "prop:datetime"?: HelixBaseTimelineItem["datetime"];
-  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  /** What kind of event it was, which decides the mark's color and nothing else. */
   "prop:tone"?: HelixBaseTimelineItem["tone"];
 
   /** Set the innerHTML of the element */
@@ -10626,7 +10626,7 @@ export type HelixBaseToggleGroupProps = {
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -10641,7 +10641,7 @@ and cannot be used to remove it. */
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -10717,7 +10717,7 @@ export type HelixBaseToggleGroupSolidJsProps = {
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -10732,7 +10732,7 @@ and cannot be used to remove it. */
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -10933,7 +10933,7 @@ it changes the visible gap rather than a number the arrow then eats into. */
 
 Resolved the way `for` is, so an id in the same tree, which is what lets a
 component name a box in its own shadow root. A chart does: its bubble is
-centred on a reading, and the first and last readings sit at the ends of
+centered on a reading, and the first and last readings sit at the ends of
 the plot, so half the box hangs past the drawing and, measured on a chart
 in a 320px card, three pixels past the card itself.
 
@@ -11028,7 +11028,7 @@ it changes the visible gap rather than a number the arrow then eats into. */
 
 Resolved the way `for` is, so an id in the same tree, which is what lets a
 component name a box in its own shadow root. A chart does: its bubble is
-centred on a reading, and the first and last readings sit at the ends of
+centered on a reading, and the first and last readings sit at the ends of
 the plot, so half the box hangs past the drawing and, measured on a chart
 in a 320px card, three pixels past the card itself.
 
@@ -12368,7 +12368,7 @@ export type CustomElements = {
    * - `tone`: Which color the band wears.
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
-   * judgement about the message, and elsewhere in this library it carries one:
+   * judgment about the message, and elsewhere in this library it carries one:
    * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and
@@ -12468,7 +12468,7 @@ export type CustomElements = {
    * **Named for the region and not for what is usually in it.** It was
    * `nav-align`, which reads as a property about `Navigation` and is not: the
    * middle slot takes whatever a consumer puts there, a search field or a
-   * breadcrumb trail as readily as a nav, and a header that centred its search
+   * breadcrumb trail as readily as a nav, and a header that centered its search
    * box would have been setting `nav-align` to do it. The part is called
    * `content`, so the property is too.
    *
@@ -12741,7 +12741,7 @@ export type CustomElements = {
    * no value axis at all when there is one scale, because the columns are
    * measured against each other and a reader needs no numbers to do that. With
    * two, a reader has no way of knowing there are two, let alone which series
-   * is on which, so both scales are labelled the moment this is set. An
+   * is on which, so both scales are labeled the moment this is set. An
    * unlabelled second axis is the deceptive case rather than the tidy one.
    *
    * The grid stays on the primary axis, since a rule measured against two
@@ -12786,8 +12786,8 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
-   * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
-   * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
+   * - `--bar-chart-axis`: The color of a single-series axis, taken from that series. (default: `undefined`)
+   * - `--bar-chart-secondary`: The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -12936,7 +12936,7 @@ export type CustomElements = {
    *   server shipped every crumb and the client removed some after hydrating. A
    *   trail that collapses therefore painted wrong on every single load, and the
    *   SSR spec asserting "hides no crumb, whatever collapse says" was recording
-   *   that as correct behaviour rather than as the cost it is.
+   *   that as correct behavior rather than as the cost it is.
    * - **The consumer already wrote the crumbs.** The measurement hid some, then
    *   announced which, so that the consumer could read them back off the element
    *   and clone them into menu items. The overflow example spent 32 lines of
@@ -13779,7 +13779,7 @@ export type CustomElements = {
    *
    * **Undefaulted, because it reflects.** The two together are what stamp an
    * attribute onto every host anybody renders, including the ones nobody
-   * configured: the server wrote `format="hex"` on every colour input on the
+   * configured: the server wrote `format="hex"` on every color input on the
    * page, and React, holding no such prop, reported a hydration mismatch for
    * each one. That is the fault `Tree.chevronPlacement` had and the reason the
    * area rules say a reflected property takes no default. Hex is still what an
@@ -13943,7 +13943,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
+   * - `--color-input-swatch`: The chosen color, to paint over the transparency check. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -14077,7 +14077,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-sample-end`: The eyedropper has closed, whether or not a colour was taken.
+   * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
    * - `helix-change`: Fired when the color changes.
    * - `helix-copy`: Fired when the color is put on the clipboard.
@@ -14144,7 +14144,7 @@ export type CustomElements = {
    * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
    * - `--color-picker-hue`: The chosen hue, 0 to 360, unitless. (default: `undefined`)
    * - `--color-picker-saturation`: The chosen saturation, 0 to 100, as a percentage. (default: `undefined`)
-   * - `--color-picker-swatch`: A colour to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
+   * - `--color-picker-swatch`: A color to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -14596,7 +14596,7 @@ export type CustomElements = {
    * - `label`: What it is called, and says, before a press.
    *
    * Defaulted rather than left empty. An icon-only control must be named, and
-   * the name of this one is not a judgement call: every copy button in the
+   * the name of this one is not a judgment call: every copy button in the
    * world is called Copy. A consumer with a better word still sets it.
    * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
    *
@@ -15381,7 +15381,7 @@ export type CustomElements = {
    * hole without moving the outer edge, so a chart keeps its footprint.
    *
    * **`none` is a pie**, and it is the same drawing rather than another one:
-   * the radius follows the thickness, so the inner edge reaching the centre is
+   * the radius follows the thickness, so the inner edge reaching the center is
    * what closing the hole means. A pie reads less accurately than a ring, angle
    * being harder to judge than length, but it is not *misleading* the way a bar
    * measured from anything but zero is, which is why this is a value here and
@@ -15463,7 +15463,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `centre`: The middle of the ring, holding whatever is slotted.
+   * - `center`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
@@ -16134,7 +16134,7 @@ export type CustomElements = {
    * `Skeleton` would be right and is not written here: this tier renders no other
    * component, and reaching for one would make the headless package depend on the
    * styled one. The styled tier draws the resting placeholder instead, and a
-   * consumer who wants a `Skeleton`, a blurred thumbnail or a solid colour slots
+   * consumer who wants a `Skeleton`, a blurred thumbnail or a solid color slots
    * it.
    *
    * **No source is a loading state, not a fourth one.** A picture whose `src` has
@@ -16247,7 +16247,7 @@ export type CustomElements = {
    * `type="password"` either built the same toggle or shipped a field a reader
    * cannot check what they typed into. Neither is a slot's worth of variation:
    * one empties the value, the other flips the type, and both want the same
-   * position, the same size and the same disabled behaviour. The slot stays for
+   * position, the same size and the same disabled behavior. The slot stays for
    * what actually varies, a unit or a prefix.
    *
    * Both opt in rather than following from `type`, and are booleans that default
@@ -16480,7 +16480,7 @@ export type CustomElements = {
    * is a legend that has to be told, and nothing else in the page would know to
    * tell it.
    *
-   * **Not hidden from a screen reader, though the mapping it draws is a colour
+   * **Not hidden from a screen reader, though the mapping it draws is a color
    * one.** The argument for hiding it is real: the colours mean nothing to a
    * reader who cannot see them, and the names are already in the table. It stays
    * because the cost of being wrong runs one way. A duplicated list of three
@@ -16511,7 +16511,7 @@ export type CustomElements = {
    * - `entry`: One name and its swatch.
    * - `list`: The list itself.
    * - `name`: One series name.
-   * - `swatch`: The colour a series is drawn in.
+   * - `swatch`: The color a series is drawn in.
    */
   "helix-base-legend": Partial<
     HelixBaseLegendProps & BaseProps<HelixBaseLegend> & BaseEvents
@@ -16930,7 +16930,7 @@ export type CustomElements = {
    *
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
-   * already manages that: centring is what a caller wants when the list is being
+   * already manages that: centering is what a caller wants when the list is being
    * read as a dial rather than scanned as a list, which is what Time Picker's wheels
    * does with three of these.
    *
@@ -18732,7 +18732,7 @@ export type CustomElements = {
    * any size the component is given, including one set in CSS.
    *
    * `correction` is what buys the middle slot. A code at `H` can lose thirty
-   * percent of itself and still read, which is what makes covering the centre
+   * percent of itself and still read, which is what makes covering the center
    * with a mark safe; at `L` the same mark makes the code unscannable. That is
    * why the slot exists on the same element as the property, and why the default
    * moves when the slot is filled.
@@ -18760,7 +18760,7 @@ export type CustomElements = {
    * - `correction`: How much of the code can be lost and still read.
    *
    * `M` by default, which is the level almost every code in the world uses and
-   * costs about fifteen percent redundancy. `H` where a mark covers the centre,
+   * costs about fifteen percent redundancy. `H` where a mark covers the center,
    * chosen automatically when the slot is filled: it is the level that makes
    * covering safe, and a consumer who fills the slot has said what they want
    * without having to know that.
@@ -18769,7 +18769,7 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `logo`: A mark for the centre, which only reads at a high correction.
+   * - `logo`: A mark for the center, which only reads at a high correction.
    *
    * ## CSS Parts
    *
@@ -18777,8 +18777,8 @@ export type CustomElements = {
    *
    * - `code`: The square itself.
    * - `modules`: Everything but the three corner squares.
-   * - `finders`: The three corner squares, which can take their own colour.
-   * - `logo`: The box holding the centre mark.
+   * - `finders`: The three corner squares, which can take their own color.
+   * - `logo`: The box holding the center mark.
    */
   "helix-base-qr-code": Partial<
     HelixBaseQrCodeProps & BaseProps<HelixBaseQrCode> & BaseEvents
@@ -19742,7 +19742,7 @@ export type CustomElements = {
    * **No label means decorative, and that is a choice rather than an oversight.**
    * A sparkline beside a stat that already says "Sessions, 1,102" has nothing of
    * its own to announce, and an unnamed `role="img"` announces "graphic" and
-   * stops. So an unlabelled sparkline is `aria-hidden`, and a labelled one is an
+   * stops. So an unlabelled sparkline is `aria-hidden`, and a labeled one is an
    * image named by its sentence.
    *
    * It goes *beside* a `Stat` rather than inside one. The plan this was built
@@ -19914,7 +19914,7 @@ export type CustomElements = {
   /**
    * **A menu, and deliberately not a new one.** Its rows are commands, which is
    * what `role="menu"` and `menuitem` exist for, so this takes them and takes the
-   * behaviour with them: the arrow keys are `KeyboardNavigationController`, the
+   * behavior with them: the arrow keys are `KeyboardNavigationController`, the
    * panel is `PopoverController`, and open and closed is `MixinControllerOpen`.
    * `Menu` is built from the same pieces. What is not shared is what actually
    * differs: a dial has no submenus, no headers, no checkable rows and no long
@@ -20970,7 +20970,7 @@ export type CustomElements = {
    *
    * Dismissing is a request. The tag does not remove itself, because the consumer
    * owns the list it sits in and taking the node out from under them would put
-   * their state and the document out of step. Cancelling `helix-dismiss` is a
+   * their state and the document out of step. Canceling `helix-dismiss` is a
    * refusal.
    *
    * ## Attributes & Properties
@@ -21641,7 +21641,7 @@ export type CustomElements = {
    * Whatever `<time>` accepts, which is a date, a time, both, a duration or a
    * week. Unset, the label is written as it was given and nothing claims to
    * know what instant it names.
-   * - `tone`: What kind of event it was, which decides the mark's colour and nothing else.
+   * - `tone`: What kind of event it was, which decides the mark's color and nothing else.
    *
    * ## Slots
    *
@@ -21938,7 +21938,7 @@ export type CustomElements = {
    * - `label-placement`/`labelPlacement`: Where the group's label sits, `start` putting it on the track's line.
    *
    * Absent is above, which is what a field looks like and what almost every
-   * group wants. `start` is for a row of controls that are labelled rather than
+   * group wants. `start` is for a row of controls that are labeled rather than
    * a form of fields: a toolbar reads as one line, and a label stacked over
    * every group in it turns one row into two.
    *
@@ -22260,7 +22260,7 @@ export type CustomElements = {
    *
    * Resolved the way `for` is, so an id in the same tree, which is what lets a
    * component name a box in its own shadow root. A chart does: its bubble is
-   * centred on a reading, and the first and last readings sit at the ends of
+   * centered on a reading, and the first and last readings sit at the ends of
    * the plot, so half the box hangs past the drawing and, measured on a chart
    * in a 320px card, three pixels past the card itself.
    *
@@ -22561,7 +22561,7 @@ export type CustomElements = {
    * default. An anchor cannot contain the group, since the group holds more
    * anchors and nesting them is invalid, so the row carries `treeitem` and the
    * group becomes its sibling under a presentational wrapper. That is exactly the
-   * navigation flavour of the tree pattern, and the arrangement without an `href`
+   * navigation flavor of the tree pattern, and the arrangement without an `href`
    * stays as it was: `treeitem` containing `group`, which is what an `<li>`
    * holding a `<ul>` is.
    *
@@ -22769,13 +22769,13 @@ export type CustomElements = {
 
   /**
    * Three parts: a direction that is up, down or neutral, the metric that moved,
-   * and a label saying over what. The arrow carries the direction and its colour
+   * and a label saying over what. The arrow carries the direction and its color
    * carries the judgment, and the two are separate properties because they are
    * separate facts.
    *
-   * **`good` is absent by default, so an unjudged trend is grey.** Every
+   * **`good` is absent by default, so an unjudged trend is gray.** Every
    * dashboard convention says up is green, and for churn, latency, error rate,
-   * cost and bounce rate that convention is a lie told in the most legible colour
+   * cost and bounce rate that convention is a lie told in the most legible color
    * on the page. A component that guesses is wrong roughly a third of the time
    * and silent about it; one that waits to be told is uninformative until it is,
    * which is the cheaper failure. State the metric's polarity once and the
@@ -23527,7 +23527,7 @@ export type CustomElementsSolidJs = {
    * - `tone`: Which color the band wears.
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
-   * judgement about the message, and elsewhere in this library it carries one:
+   * judgment about the message, and elsewhere in this library it carries one:
    * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and
@@ -23630,7 +23630,7 @@ export type CustomElementsSolidJs = {
    * **Named for the region and not for what is usually in it.** It was
    * `nav-align`, which reads as a property about `Navigation` and is not: the
    * middle slot takes whatever a consumer puts there, a search field or a
-   * breadcrumb trail as readily as a nav, and a header that centred its search
+   * breadcrumb trail as readily as a nav, and a header that centered its search
    * box would have been setting `nav-align` to do it. The part is called
    * `content`, so the property is too.
    *
@@ -23915,7 +23915,7 @@ export type CustomElementsSolidJs = {
    * no value axis at all when there is one scale, because the columns are
    * measured against each other and a reader needs no numbers to do that. With
    * two, a reader has no way of knowing there are two, let alone which series
-   * is on which, so both scales are labelled the moment this is set. An
+   * is on which, so both scales are labeled the moment this is set. An
    * unlabelled second axis is the deceptive case rather than the tidy one.
    *
    * The grid stays on the primary axis, since a rule measured against two
@@ -23960,8 +23960,8 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
-   * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
-   * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
+   * - `--bar-chart-axis`: The color of a single-series axis, taken from that series. (default: `undefined`)
+   * - `--bar-chart-secondary`: The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -24119,7 +24119,7 @@ export type CustomElementsSolidJs = {
    *   server shipped every crumb and the client removed some after hydrating. A
    *   trail that collapses therefore painted wrong on every single load, and the
    *   SSR spec asserting "hides no crumb, whatever collapse says" was recording
-   *   that as correct behaviour rather than as the cost it is.
+   *   that as correct behavior rather than as the cost it is.
    * - **The consumer already wrote the crumbs.** The measurement hid some, then
    *   announced which, so that the consumer could read them back off the element
    *   and clone them into menu items. The overflow example spent 32 lines of
@@ -24992,7 +24992,7 @@ export type CustomElementsSolidJs = {
    *
    * **Undefaulted, because it reflects.** The two together are what stamp an
    * attribute onto every host anybody renders, including the ones nobody
-   * configured: the server wrote `format="hex"` on every colour input on the
+   * configured: the server wrote `format="hex"` on every color input on the
    * page, and React, holding no such prop, reported a hydration mismatch for
    * each one. That is the fault `Tree.chevronPlacement` had and the reason the
    * area rules say a reflected property takes no default. Hex is still what an
@@ -25156,7 +25156,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
+   * - `--color-input-swatch`: The chosen color, to paint over the transparency check. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -25293,7 +25293,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-sample-end`: The eyedropper has closed, whether or not a colour was taken.
+   * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
    * - `helix-change`: Fired when the color changes.
    * - `helix-copy`: Fired when the color is put on the clipboard.
@@ -25360,7 +25360,7 @@ export type CustomElementsSolidJs = {
    * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
    * - `--color-picker-hue`: The chosen hue, 0 to 360, unitless. (default: `undefined`)
    * - `--color-picker-saturation`: The chosen saturation, 0 to 100, as a percentage. (default: `undefined`)
-   * - `--color-picker-swatch`: A colour to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
+   * - `--color-picker-swatch`: A color to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -25821,7 +25821,7 @@ export type CustomElementsSolidJs = {
    * - `label`: What it is called, and says, before a press.
    *
    * Defaulted rather than left empty. An icon-only control must be named, and
-   * the name of this one is not a judgement call: every copy button in the
+   * the name of this one is not a judgment call: every copy button in the
    * world is called Copy. A consumer with a better word still sets it.
    * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
    *
@@ -26621,7 +26621,7 @@ export type CustomElementsSolidJs = {
    * hole without moving the outer edge, so a chart keeps its footprint.
    *
    * **`none` is a pie**, and it is the same drawing rather than another one:
-   * the radius follows the thickness, so the inner edge reaching the centre is
+   * the radius follows the thickness, so the inner edge reaching the center is
    * what closing the hole means. A pie reads less accurately than a ring, angle
    * being harder to judge than length, but it is not *misleading* the way a bar
    * measured from anything but zero is, which is why this is a value here and
@@ -26703,7 +26703,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `centre`: The middle of the ring, holding whatever is slotted.
+   * - `center`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
@@ -27398,7 +27398,7 @@ export type CustomElementsSolidJs = {
    * `Skeleton` would be right and is not written here: this tier renders no other
    * component, and reaching for one would make the headless package depend on the
    * styled one. The styled tier draws the resting placeholder instead, and a
-   * consumer who wants a `Skeleton`, a blurred thumbnail or a solid colour slots
+   * consumer who wants a `Skeleton`, a blurred thumbnail or a solid color slots
    * it.
    *
    * **No source is a loading state, not a fourth one.** A picture whose `src` has
@@ -27514,7 +27514,7 @@ export type CustomElementsSolidJs = {
    * `type="password"` either built the same toggle or shipped a field a reader
    * cannot check what they typed into. Neither is a slot's worth of variation:
    * one empties the value, the other flips the type, and both want the same
-   * position, the same size and the same disabled behaviour. The slot stays for
+   * position, the same size and the same disabled behavior. The slot stays for
    * what actually varies, a unit or a prefix.
    *
    * Both opt in rather than following from `type`, and are booleans that default
@@ -27753,7 +27753,7 @@ export type CustomElementsSolidJs = {
    * is a legend that has to be told, and nothing else in the page would know to
    * tell it.
    *
-   * **Not hidden from a screen reader, though the mapping it draws is a colour
+   * **Not hidden from a screen reader, though the mapping it draws is a color
    * one.** The argument for hiding it is real: the colours mean nothing to a
    * reader who cannot see them, and the names are already in the table. It stays
    * because the cost of being wrong runs one way. A duplicated list of three
@@ -27784,7 +27784,7 @@ export type CustomElementsSolidJs = {
    * - `entry`: One name and its swatch.
    * - `list`: The list itself.
    * - `name`: One series name.
-   * - `swatch`: The colour a series is drawn in.
+   * - `swatch`: The color a series is drawn in.
    */
   "helix-base-legend": Partial<
     HelixBaseLegendProps &
@@ -28215,7 +28215,7 @@ export type CustomElementsSolidJs = {
    *
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
-   * already manages that: centring is what a caller wants when the list is being
+   * already manages that: centering is what a caller wants when the list is being
    * read as a dial rather than scanned as a list, which is what Time Picker's wheels
    * does with three of these.
    *
@@ -30064,7 +30064,7 @@ export type CustomElementsSolidJs = {
    * any size the component is given, including one set in CSS.
    *
    * `correction` is what buys the middle slot. A code at `H` can lose thirty
-   * percent of itself and still read, which is what makes covering the centre
+   * percent of itself and still read, which is what makes covering the center
    * with a mark safe; at `L` the same mark makes the code unscannable. That is
    * why the slot exists on the same element as the property, and why the default
    * moves when the slot is filled.
@@ -30092,7 +30092,7 @@ export type CustomElementsSolidJs = {
    * - `correction`: How much of the code can be lost and still read.
    *
    * `M` by default, which is the level almost every code in the world uses and
-   * costs about fifteen percent redundancy. `H` where a mark covers the centre,
+   * costs about fifteen percent redundancy. `H` where a mark covers the center,
    * chosen automatically when the slot is filled: it is the level that makes
    * covering safe, and a consumer who fills the slot has said what they want
    * without having to know that.
@@ -30101,7 +30101,7 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `logo`: A mark for the centre, which only reads at a high correction.
+   * - `logo`: A mark for the center, which only reads at a high correction.
    *
    * ## CSS Parts
    *
@@ -30109,8 +30109,8 @@ export type CustomElementsSolidJs = {
    *
    * - `code`: The square itself.
    * - `modules`: Everything but the three corner squares.
-   * - `finders`: The three corner squares, which can take their own colour.
-   * - `logo`: The box holding the centre mark.
+   * - `finders`: The three corner squares, which can take their own color.
+   * - `logo`: The box holding the center mark.
    */
   "helix-base-qr-code": Partial<
     HelixBaseQrCodeProps &
@@ -31101,7 +31101,7 @@ export type CustomElementsSolidJs = {
    * **No label means decorative, and that is a choice rather than an oversight.**
    * A sparkline beside a stat that already says "Sessions, 1,102" has nothing of
    * its own to announce, and an unnamed `role="img"` announces "graphic" and
-   * stops. So an unlabelled sparkline is `aria-hidden`, and a labelled one is an
+   * stops. So an unlabelled sparkline is `aria-hidden`, and a labeled one is an
    * image named by its sentence.
    *
    * It goes *beside* a `Stat` rather than inside one. The plan this was built
@@ -31279,7 +31279,7 @@ export type CustomElementsSolidJs = {
   /**
    * **A menu, and deliberately not a new one.** Its rows are commands, which is
    * what `role="menu"` and `menuitem` exist for, so this takes them and takes the
-   * behaviour with them: the arrow keys are `KeyboardNavigationController`, the
+   * behavior with them: the arrow keys are `KeyboardNavigationController`, the
    * panel is `PopoverController`, and open and closed is `MixinControllerOpen`.
    * `Menu` is built from the same pieces. What is not shared is what actually
    * differs: a dial has no submenus, no headers, no checkable rows and no long
@@ -32377,7 +32377,7 @@ export type CustomElementsSolidJs = {
    *
    * Dismissing is a request. The tag does not remove itself, because the consumer
    * owns the list it sits in and taking the node out from under them would put
-   * their state and the document out of step. Cancelling `helix-dismiss` is a
+   * their state and the document out of step. Canceling `helix-dismiss` is a
    * refusal.
    *
    * ## Attributes & Properties
@@ -33060,7 +33060,7 @@ export type CustomElementsSolidJs = {
    * Whatever `<time>` accepts, which is a date, a time, both, a duration or a
    * week. Unset, the label is written as it was given and nothing claims to
    * know what instant it names.
-   * - `tone`: What kind of event it was, which decides the mark's colour and nothing else.
+   * - `tone`: What kind of event it was, which decides the mark's color and nothing else.
    *
    * ## Slots
    *
@@ -33369,7 +33369,7 @@ export type CustomElementsSolidJs = {
    * - `label-placement`/`labelPlacement`: Where the group's label sits, `start` putting it on the track's line.
    *
    * Absent is above, which is what a field looks like and what almost every
-   * group wants. `start` is for a row of controls that are labelled rather than
+   * group wants. `start` is for a row of controls that are labeled rather than
    * a form of fields: a toolbar reads as one line, and a label stacked over
    * every group in it turns one row into two.
    *
@@ -33700,7 +33700,7 @@ export type CustomElementsSolidJs = {
    *
    * Resolved the way `for` is, so an id in the same tree, which is what lets a
    * component name a box in its own shadow root. A chart does: its bubble is
-   * centred on a reading, and the first and last readings sit at the ends of
+   * centered on a reading, and the first and last readings sit at the ends of
    * the plot, so half the box hangs past the drawing and, measured on a chart
    * in a 320px card, three pixels past the card itself.
    *
@@ -34010,7 +34010,7 @@ export type CustomElementsSolidJs = {
    * default. An anchor cannot contain the group, since the group holds more
    * anchors and nesting them is invalid, so the row carries `treeitem` and the
    * group becomes its sibling under a presentational wrapper. That is exactly the
-   * navigation flavour of the tree pattern, and the arrangement without an `href`
+   * navigation flavor of the tree pattern, and the arrangement without an `href`
    * stays as it was: `treeitem` containing `group`, which is what an `<li>`
    * holding a `<ul>` is.
    *
@@ -34224,13 +34224,13 @@ export type CustomElementsSolidJs = {
 
   /**
    * Three parts: a direction that is up, down or neutral, the metric that moved,
-   * and a label saying over what. The arrow carries the direction and its colour
+   * and a label saying over what. The arrow carries the direction and its color
    * carries the judgment, and the two are separate properties because they are
    * separate facts.
    *
-   * **`good` is absent by default, so an unjudged trend is grey.** Every
+   * **`good` is absent by default, so an unjudged trend is gray.** Every
    * dashboard convention says up is green, and for churn, latency, error rate,
-   * cost and bounce rate that convention is a lie told in the most legible colour
+   * cost and bounce rate that convention is a lie told in the most legible color
    * on the page. A component that guesses is wrong roughly a third of the time
    * and silent about it; one that waits to be told is uninformative until it is,
    * which is the cheaper failure. State the metric's polarity once and the
@@ -34831,11 +34831,11 @@ export type CustomElementsSolidJs = {
 export type CustomCssProperties = {
   /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
   "--chart-bar-wash"?: string;
-  /** The colour of a single-series axis, taken from that series. */
+  /** The color of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;
-  /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
+  /** The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
   "--bar-chart-secondary"?: string;
-  /** The chosen colour, to paint over the transparency check. */
+  /** The chosen color, to paint over the transparency check. */
   "--color-input-swatch"?: string;
   /** The chosen brightness, 0 to 100, as a percentage. */
   "--color-picker-brightness"?: string;
@@ -34843,7 +34843,7 @@ export type CustomCssProperties = {
   "--color-picker-hue"?: string;
   /** The chosen saturation, 0 to 100, as a percentage. */
   "--color-picker-saturation"?: string;
-  /** A colour to paint: the current one on the sample, a preset's on each preset. */
+  /** A color to paint: the current one on the sample, a preset's on each preset. */
   "--color-picker-swatch"?: string;
   /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
   "--date-picker-column-count"?: string;

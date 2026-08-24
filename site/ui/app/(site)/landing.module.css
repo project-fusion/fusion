@@ -36,7 +36,7 @@
  *
  * Every band being a full viewport made the page a slideshow: a section with
  * three cards in it got the same height as one with nine, so the short ones
- * were mostly empty and the long ones were centred with their edges cut. It
+ * were mostly empty and the long ones were centered with their edges cut. It
  * also meant the length of the page said nothing about how much was on it.
  *
  * The snap went with it. `proximity` was already the careful setting, and it
@@ -105,9 +105,9 @@
   min-block-size: 100svh;
   /* `max`, not a sum. Added together the band ran twelve pixels past the
      viewport and broke the one-band-one-screen rhythm the rest of the page
-     keeps. The words are centred in the box, so all the top padding has to
+     keeps. The words are centered in the box, so all the top padding has to
      guarantee is that they clear the bar if the hero ever grows tall enough for
-     the centring to stop doing it, and the band inset is already larger than
+     the centering to stop doing it, and the band inset is already larger than
      the header at every width this clamps to. */
   padding-block-start: max(var(--site-band), var(--helix-size-header));
 }
@@ -187,21 +187,21 @@
  * dimmer switch on the thing it was added to show. */
 /* **A wash behind the words, not a curtain across one side.**
  *
- * This ran `to right`: the page's own colour at full strength on the left edge,
+ * This ran `to right`: the page's own color at full strength on the left edge,
  * still 72% of it at 46%, and gone by 78%. That was correct for a hero whose
  * words sat on the left, where the job is to keep type legible over moving
- * light. It is wrong for a centred one twice over. It washes out the left three
+ * light. It is wrong for a centered one twice over. It washes out the left three
  * quarters of the field, which is why the light read as living in the top right
  * corner, and in light mode the wash is white at full strength over a pale
  * field, which is why there was almost nothing left to see.
  *
- * Centred on the words instead, measured rather than guessed: the hero column
+ * Centered on the words instead, measured rather than guessed: the hero column
  * sits at 0.5 across and 0.25 down the two-screen box, spanning 0.125 to 0.375
  * vertically, so the ellipse is placed there and sized to cover that band.
  *
  * Weaker, too. 70% behind the type is enough to hold it off a field that is
  * itself only a wash, where 100% was protecting against a brightness the aura
- * does not reach. What the field loses at the centre it gains everywhere else,
+ * does not reach. What the field loses at the center it gains everywhere else,
  * and the everywhere else is now symmetric. */
 .reelScrim {
   background: radial-gradient(
@@ -220,15 +220,15 @@
 /* Above the light. Positioned, and that is the whole of the stacking:
    positioned elements with no `z-index` stack in tree order, and the order in
    the markup is already aura, scrim, words. */
-/* **Centred, so the light has something to be behind.**
+/* **Centered, so the light has something to be behind.**
  *
  * The column was left-aligned, which is right for a page of prose and wrong for
  * this one: the hero is a claim over a field of moving light, and a claim
  * pushed to one edge leaves the other two thirds of the field looking like
- * space nobody used. Centred, the type sits in the light rather than beside it.
+ * space nobody used. Centered, the type sits in the light rather than beside it.
  *
- * The measure comes with it. A centred column that runs the full shell gives a
- * reader a different left edge on every line, which is the failure centring is
+ * The measure comes with it. A centered column that runs the full shell gives a
+ * reader a different left edge on every line, which is the failure centering is
  * usually blamed for and is really a width problem: `.heroLede` already carries
  * `.measure`, and the title balances its own lines. */
 .heroShell {
@@ -356,9 +356,9 @@
  * that was decided rather than one that ended wherever the last card did. */
 /* **A definite height, not a floor.** `min-block-size` lets the region grow,
    and the stage's contents are twice a screen tall, so the middle row grew to
-   fit them: the band stopped being one screen and the prose, centred in a row
+   fit them: the band stopped being one screen and the prose, centered in a row
    far taller than the window, ended up below the fold. A window has a size.
-   `align-content: stretch` overrides the centring every other band wants, so
+   `align-content: stretch` overrides the centering every other band wants, so
    the rows actually divide the height rather than clustering in the middle. */
 /* **A screen means a screen you can see, not a screen's worth of pixels.**
    The masthead is sticky and takes a row in flow, so a band of exactly 100svh
@@ -366,7 +366,7 @@
    777 against a 720 window, which is a full viewport tall and not once visible
    all at once. Subtracting the header is what makes it fit.
  
-   `align-content: stretch` on this band alone, overriding the centring every
+   `align-content: stretch` on this band alone, overriding the centering every
    other band wants, or its rows cluster in the middle instead of dividing the
    height. */
 /* **The ground the panel sits on, and the panel needs one.**
@@ -428,8 +428,8 @@
  *
  * Masked at the foot rather than cut. A hard edge says the layout ran out; a
  * fade says there is more, which there is. `mask-image` and not a gradient
- * overlay, because an overlay would need the page's own background colour and
- * this panel is not that colour. */
+ * overlay, because an overlay would need the page's own background color and
+ * this panel is not that color. */
 /* The stage is a panel again, with its own edges.
  *
  * The rules top and bottom are gone, so nothing else is drawing them: a border
@@ -439,15 +439,15 @@
  *
  * Masked at the foot rather than cut. A hard edge says the layout ran out; a
  * fade says there is more, which there is. `mask-image` and not an overlay,
- * because an overlay needs the colour behind it and this panel is not the
- * page's colour. */
+ * because an overlay needs the color behind it and this panel is not the
+ * page's color. */
 .showcaseStage {
   /* **The page's own ground, lifted rather than sunk.**
    *
    * `surface-sunken` is a step *away* from the background, which on a dark page
    * is a shade of near-black and reads as depth. In the light theme the page is
    * white and there is nothing above it to step into, so the same token came
-   * out as a grey panel with a rule around it: the showcase looked like a
+   * out as a gray panel with a rule around it: the showcase looked like a
    * screenshot pasted onto the page rather than part of it.
    *
    * `surface` is white in the light theme and the raised step in the dark, so
@@ -483,7 +483,7 @@
   }
 }
 
-/* The switch and the colour share a line above the grid, and neither moves with
+/* The switch and the color share a line above the grid, and neither moves with
    it. A control that jumps to a new position when you use it is one you have to
    find again each time. */
 .showcaseSwitch {
@@ -491,7 +491,7 @@
   grid-area: switch;
 }
 
-/* The colour and its reset share the brand cell, so the switch keeps its own
+/* The color and its reset share the brand cell, so the switch keeps its own
    column and the pair stays together at the end of the row. */
 .showcaseBrand {
   align-self: center;
@@ -515,10 +515,10 @@
    showing, and the grid takes the rest so the fade lands on real content. */
 /* **No `align-items` on the grid, only on the row that wants it.**
  *
- * Centring every row centres the views row too, and the views are taller than
- * the `1fr` they are given: a centred overflow spills in both directions, so
+ * Centering every row centres the views row too, and the views are taller than
+ * the `1fr` they are given: a centered overflow spills in both directions, so
  * the first card of each view climbed over the switch and into the anchor. What
- * wanted centring was the switch beside the colour, which can ask for itself.
+ * wanted centering was the switch beside the color, which can ask for itself.
  *
  * The views row starts rather than stretches, so a short view sits under the
  * switch instead of being pulled down the panel. */

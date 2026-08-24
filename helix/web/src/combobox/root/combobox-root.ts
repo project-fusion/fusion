@@ -26,7 +26,7 @@ import { styles } from './combobox-root.css.js'
  * @documentation https://helix.fusion.dev/components/combobox
  *
  * @cssproperty --combobox-background-color - Fill behind the field.
- * @cssproperty --combobox-border-color - Colour of the panel's edge.
+ * @cssproperty --combobox-border-color - Color of the panel's edge.
  * @cssproperty --combobox-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.

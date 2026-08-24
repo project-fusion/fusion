@@ -250,7 +250,7 @@ export const overlaysArt: Record<string, ReactNode> = {
       <rect className="artInk" fillOpacity="0.28" height="6" rx="3" width="128" x="56" y="140" />
       <rect className="artScrim" height="144" rx="4" width="232" x="44" y="28" />
       <g clipPath="url(#helixArtDrawerClip)">
-        {/* Flush to the page edge, and travelling exactly the distance that
+        {/* Flush to the page edge, and traveling exactly the distance that
             clears it.
          *
          * The panel stopped at 272 against a page ending at 276, leaving a four

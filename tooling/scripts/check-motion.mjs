@@ -27,7 +27,7 @@
  * It still does not check *what* the block does, because there is no single
  * right answer and the component knows which one applies:
  *
- * - `Progress` swaps its travelling segment for a static hatch, because a
+ * - `Progress` swaps its traveling segment for a static hatch, because a
  *   stopped segment is parked somewhere and reads as a value.
  * - `Toast.Item` keeps its timer bar running, because it is the only thing
  *   saying how long is left and a 2px rule crossing once over eight seconds is

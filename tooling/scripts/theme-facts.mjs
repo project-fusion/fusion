@@ -60,7 +60,7 @@ export const pairs = new Set(
 )
 
 /**
- * Every colour name the model knows, as an ink or as a ground.
+ * Every color name the model knows, as an ink or as a ground.
  *
  * Taken from the pairs rather than from a token list, deliberately: a ground the
  * model names and no theme emits still has to be declared by the stylesheet, and

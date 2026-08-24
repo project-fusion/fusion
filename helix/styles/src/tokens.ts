@@ -176,7 +176,7 @@ export const TOKENS: Token[] = [
     'A well a value goes into: an input, a track, a groove. Told apart by its fill, inward.',
   ],
   /* **What a field is filled with, stated as a step from its ground rather than
-     as a colour.**
+     as a color.**
 
      A control that names an absolute surface is only correct on the one ground
      it was designed against, and `surface-sunken` was designed against the page.
@@ -194,7 +194,7 @@ export const TOKENS: Token[] = [
      raised, against the absolute token's 1.027 to 1.119.
 
      **It composites, which is the point and also the limit.** A translucent fill
-     takes the colour of what it sits on, so a field over a photograph is tinted
+     takes the color of what it sits on, so a field over a photograph is tinted
      by the picture rather than legible against it. That case wants an opaque
      ground and says so through the control's own background hook, which
      `check:grounds` exists to guarantee every component publishes.
@@ -324,14 +324,14 @@ export const TOKENS: Token[] = [
      Everywhere else it is solved for a word: `primary` has to clear 4.5:1 as
      text and `primary-surface` further still to carry white on a fill. A mark
      is a graphic, and WCAG 1.4.11 asks 3:1 of a graphic, so it may sit far
-     closer to the colour a consumer actually chose.
+     closer to the color a consumer actually chose.
 
      **It coincides with `primary` for the seed that ships and diverges under
      derivation**, which is the whole reason it is a token rather than a reuse:
      `@helix-io/theme` solves this one against 3 and `primary` against the
      theme's own target, so a brand that has to travel a long way to be readable
      as text travels much less here. A reader who picks a bright yellow and sees
-     olive buttons can still find their own colour on the page. */
+     olive buttons can still find their own color on the page. */
   ['color-brand-mark', 'light-dark(var(--_helix-brand-500), var(--_helix-brand-400))'],
   /* Syntax. What a token in a piece of source is, not what it means to the
      design: `keyword` is a keyword in any language, and a component asking for
@@ -392,7 +392,7 @@ export const TOKENS: Token[] = [
 
      **Twenty-four, as eight hues in three tones.** 1 to 8 are as bright as sRGB
      allows the hue to be, 9 to 16 the same hues at a balanced weight, and 17 to
-     24 the same hues drained almost to grey.
+     24 the same hues drained almost to gray.
 
      **Bright is first because it is the one to reach for**, and because the
      first eight are what a chart of three or four actually gets: a palette
@@ -411,7 +411,7 @@ export const TOKENS: Token[] = [
      **Bright moves lightness and the other two do not**, because for three of
      the eight hues there is no more chroma to be had at the balanced lightness:
      the teal, the cyan and the yellow-green cap at 0.105 there, so a brighter
-     variant at the same lightness would be the same colour, measured at a
+     variant at the same lightness would be the same color, measured at a
      difference of zero on the first attempt. Bright therefore sits wherever its
      own hue holds the most chroma while still clearing 3:1 against the
      strictest surface, which is a different lightness per hue.
@@ -435,10 +435,10 @@ export const TOKENS: Token[] = [
      these lightnesses, and they are duller by that much and by no more.
 
      **A themed seed moves the hues, so these ceilings are exact for the seed
-     that ships and approximate for any other.** A brand colour rotated far
+     that ships and approximate for any other.** A brand color rotated far
      enough could push one series back outside the gamut, where the browser maps
      it in as before. That is the cost of deriving a chart palette from one
-     colour, it is bounded and it degrades quietly rather than breaking, and it
+     color, it is bounded and it degrades quietly rather than breaking, and it
      is worth saying out loud rather than discovering.
 
      Measured by painting each into a canvas and reading the pixel back, which
@@ -462,7 +462,7 @@ export const TOKENS: Token[] = [
      closer than is comfortable. Eight series is already more than a chart
      should have, and one and eight are the least likely to sit next to each
      other, so it is recorded rather than solved: a chart needing all eight
-     distinguishable needs shape or label as well as colour, whatever the
+     distinguishable needs shape or label as well as color, whatever the
      palette does. */
   [
     'color-series-1',
@@ -531,7 +531,7 @@ export const TOKENS: Token[] = [
   /* The quiet eight, and the chroma is 0.07 rather than the 0.05 they shipped
      with.
 
-     **Muted is a treatment, not a licence to be indistinguishable.** At 0.05 the
+     **Muted is a treatment, not a license to be indistinguishable.** At 0.05 the
      closest pair of the eight measured 0.070 in OKLab in light and 0.064 in
      dark, against 0.091 and 0.142 for the vivid eight and 0.113 and 0.129 for
      the balanced eight. Half the separation of either, for a band meant to
@@ -705,7 +705,7 @@ export const TOKENS: Token[] = [
      A design language leads with one of four mechanisms, fill, border, shadow
      or space, and until now this library could express none of them: of 68
      border declarations reaching for `--helix-color-border`, eight put the
-     *colour* behind a hook and **none** put the width behind one. So a border
+     *color* behind a hook and **none** put the width behind one. So a border
      could be recoloured and never removed, and the floating surfaces wrote
      `border: none` outright, so one could never be added either. Separation was
      unthemeable in both directions.

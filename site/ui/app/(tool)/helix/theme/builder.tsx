@@ -246,7 +246,7 @@ export function ThemeBuilder({
   }, [])
 
   /* Derived on every change, which is affordable because it is a few hundred
-     lines of colour math rather than a request. `violations` is the whole
+     lines of color math rather than a request. `violations` is the whole
      product, so it has to be as live as the swatches are.
 
      **Both selectors in one call**, because deriving is the expensive half and
@@ -260,7 +260,7 @@ export function ThemeBuilder({
 
   /* **The ramps are inline, because a stylesheet cannot know the brand.** Both
      are written in OKLCH off the derived primary so the track and the palette
-     agree: a saturation ramp drawn in sRGB would promise a colour the engine
+     agree: a saturation ramp drawn in sRGB would promise a color the engine
      never produces.
 
      **Set on each slider rather than on the section for a stylesheet to route,**
@@ -486,7 +486,7 @@ export function ThemeBuilder({
                 text and cannot clear a near-white page at the same time.
 
                 Shown only when it actually moved, and only by enough to notice.
-                A swatch that always says "and here is the same colour again" is
+                A swatch that always says "and here is the same color again" is
                 a row of chrome nobody reads. */}
             {/* **Not a callout.** A callout is an interruption with a severity
                 and an icon, and this is neither: it is a caption under the
@@ -512,7 +512,7 @@ export function ThemeBuilder({
             ) : null}
 
             <helix-select
-              label="Colour scheme"
+              label="Color scheme"
               name="scheme"
               onhelix-change={(event) => setScheme(event.detail.value as 'dark' | 'light')}
               value={scheme}
@@ -542,12 +542,12 @@ export function ThemeBuilder({
             {/* **Painted through `--slider-track-image`, the hook Slider already
                 publishes for exactly this.** `ColorPicker` paints its own hue
                 and alpha channels the same way and is itself built out of
-                `helix-slider`, so a colour channel is a slider with a ramp on it
-                rather than a component of its own: it adds no behaviour, no
+                `helix-slider`, so a color channel is a slider with a ramp on it
+                rather than a component of its own: it adds no behavior, no
                 state and no API, which is the test for whether something earns
                 an element.
 
-                The ramp is the value it chooses. Saturation runs from grey to
+                The ramp is the value it chooses. Saturation runs from gray to
                 the brand at full chroma, both ends at the brand's own lightness
                 and hue, so the track shows what the slider will produce. */}
             <helix-slider
@@ -564,7 +564,7 @@ export function ThemeBuilder({
             ></helix-slider>
 
             {/* The whole wheel, starting at the brand, so a reader is choosing
-                a direction off their own colour and not an abstract number. */}
+                a direction off their own color and not an abstract number. */}
             <helix-slider
               className="themeChannel"
               label="Accent angle"

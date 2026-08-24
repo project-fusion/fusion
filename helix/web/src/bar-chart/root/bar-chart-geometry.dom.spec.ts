@@ -36,7 +36,7 @@ const _labels = (host: HTMLElement): string[] =>
 
 /* What the drawing measures, which is the stylesheet's stroke and the SVG it is drawn in.
 
-   The behaviour is the base element's and is tested there. */
+   The behavior is the base element's and is tested there. */
 if (hasLayout()) {
   describe('bar chart geometry', () => {
     test('the baseline keeps its weight whatever the box', async () => {

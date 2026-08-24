@@ -8,7 +8,7 @@ import { styles } from './qr-code-root.css.js'
  *
  * @description
  * The picture is the base tier's. What this adds is a size that can be set
- * once, the colours a scanner needs, and the box that holds a centre mark.
+ * once, the colours a scanner needs, and the box that holds a center mark.
  *
  * **The ink is `currentColor` and the ground is a real fill.** A code has to be
  * dark on light to read, and the pair that guarantees it is not the page's

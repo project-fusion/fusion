@@ -498,7 +498,7 @@ export class HelixBaseListbox extends MixinCollection(
    *
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
-   * already manages that: centring is what a caller wants when the list is being
+   * already manages that: centering is what a caller wants when the list is being
    * read as a dial rather than scanned as a list, which is what Time Picker's wheels
    * does with three of these.
    *

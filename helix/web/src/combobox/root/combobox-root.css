@@ -39,7 +39,7 @@
  * none, so a form does not jump as the first choice is made.
  *
  * The block padding arrives with the wrapping. At a fixed height the tags are
- * centred by `align-items` and need none; once the box can grow, nothing is
+ * centered by `align-items` and need none; once the box can grow, nothing is
  * holding them off the border. */
 [part="field"]:has([part="tags"]) {
   block-size: auto;
@@ -151,7 +151,7 @@
 }
 
 /* Named with `:hover` as well, or a focused field under the pointer takes the
-   hover border back and reads as a grey edge inside a blue ring. Being focused
+   hover border back and reads as a gray edge inside a blue ring. Being focused
    outranks being pointed at, so it has to say so. Input records the same. */
 :host(:focus-within) [part="field"],
 :host(:focus-within) [part="field"]:hover {
@@ -207,7 +207,7 @@ slot[name="end"]::slotted(*) {
 /* The panel, in the house shape every floating surface here takes. `border: none`
  * said rather than left out, for the reason Popover, Menu and Select all record:
  * the UA stylesheet gives `[popover]` `border: solid`, so dropping the
- * declaration leaves three pixels of medium grey rather than none at all.
+ * declaration leaves three pixels of medium gray rather than none at all.
  *
  * The field's width, from the controller rather than from a percentage: the
  * panel is positioned `fixed`, so `100%` would be the viewport and not the
@@ -267,7 +267,7 @@ slot[name="end"]::slotted(*) {
 
 /* The same wash a hovered option takes, and for the reason that block records
    at length: a step on the surface ladder painted the highlight in the panel's
-   own colour and it vanished. The row is standing in for an option, so it
+   own color and it vanished. The row is standing in for an option, so it
    highlights like one. */
 [part="create"]:hover {
   background-color: light-dark(

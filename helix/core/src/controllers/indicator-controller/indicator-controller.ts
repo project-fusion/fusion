@@ -7,7 +7,7 @@ export interface IndicatorOptions {
   /** The element that is currently marked, or nothing if none is. */
   active: () => HTMLElement | null | undefined
 
-  /** The travelling mark. Positioned against the surface. */
+  /** The traveling mark. Positioned against the surface. */
   indicator: () => HTMLElement | null | undefined
 
   /**
@@ -22,7 +22,7 @@ export interface IndicatorOptions {
 }
 
 /**
- * Measures the marked child and writes the geometry onto a travelling mark.
+ * Measures the marked child and writes the geometry onto a traveling mark.
  *
  * **Four components had written this and the copies had diverged.** `Navigation`,
  * `Tabs`, `Toggle.Group` and `Outline` each measured an active child and wrote

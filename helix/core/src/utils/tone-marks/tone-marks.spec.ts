@@ -29,7 +29,7 @@ describe('the marks a status tone carries', () => {
     }
   })
 
-  test('each tone has its own glyph, so colour is never the only difference', () => {
+  test('each tone has its own glyph, so color is never the only difference', () => {
     const glyphs = Object.values(TONE_MARKS).map((mark) => mark.icon)
     expect(new Set(glyphs).size).toBe(glyphs.length)
   })

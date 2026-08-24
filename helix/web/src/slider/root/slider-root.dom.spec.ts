@@ -111,7 +111,7 @@ describe('slider markers', () => {
     expect(part(host, 'markers')).toBeNull()
   })
 
-  test('a labelled mark says the value it stands at', async () => {
+  test('a labeled mark says the value it stands at', async () => {
     const host = (await mount(
       '<helix-slider label="A" marker-labels markers="3" max="100" min="0" step="50"></helix-slider>',
     )) as Updatable

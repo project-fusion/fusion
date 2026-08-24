@@ -3,7 +3,7 @@
  * Measures every ink against the ground it is really painted on.
  *
  * **This is the two thirds `check:pairings` cannot see.** That one reads the
- * stylesheets and can only recognise a rule that sets an ink *and* a ground
+ * stylesheets and can only recognize a rule that sets an ink *and* a ground
  * together: eleven do, where 165 set only an ink and 112 only a ground, and the
  * rest inherit their ground from a host, a part above them or the page. No scan
  * of the text resolves that. Laying the page out does.
@@ -20,7 +20,7 @@
  *   opaque thing measured rather than this element's ground. The walk goes up
  *   the tree collecting every partly-opaque layer and composites them in order
  *   onto the first fully opaque one it finds.
- * - **A reading taken during a transition is the previous value.** Colour
+ * - **A reading taken during a transition is the previous value.** Color
  *   changes here run 120ms, so a measurement taken while one is in flight
  *   reports the mode the page was in a moment ago. Nothing is read until the
  *   frame has settled.
@@ -94,7 +94,7 @@ const origin = `http://127.0.0.1:${server.address().port}`
    carries the argument: the model is Rust now, and the regular expression that
    used to stand in for it missed every status ink's grounds. */
 
-/** Every token the model names, which the page resolves to a colour per mode. */
+/** Every token the model names, which the page resolves to a color per mode. */
 const named = [...new Set([...pairs].flatMap((pair) => pair.split(' on ')))]
 
 const examples = []
@@ -202,7 +202,7 @@ for (const mode of ['light', 'dark']) {
          across 509 examples and called it a pass.
 
          `tokens.css` records the same lesson from the other side: painting the
-         colour and reading the pixel back is the only way to get sRGB out of
+         color and reading the pixel back is the only way to get sRGB out of
          these, and reading the three numbers inside an `oklch()` as if they were
          RGB is how earlier attempts produced figures that meant nothing. */
         const swatch = document.createElement('canvas')
@@ -215,7 +215,7 @@ for (const mode of ['light', 'dark']) {
             return null
           }
           /* A value the browser refuses leaves `fillStyle` at what it held, so a
-           colour it could not read would otherwise arrive as this sentinel. */
+           color it could not read would otherwise arrive as this sentinel. */
           brush.fillStyle = '#010203'
           brush.fillStyle = value
           if (brush.fillStyle === '#010203' && !/^#010203$/i.test(value.trim())) {
@@ -302,7 +302,7 @@ for (const mode of ['light', 'dark']) {
             const style = getComputedStyle(node)
             /* **A masked background is ink in the shape of a glyph, not a ground.**
              Date Input draws its calendar with `background-color: currentColor` under a
-             `mask-image`, so the colour lands only where the mask allows and the element
+             `mask-image`, so the color lands only where the mask allows and the element
              covers nothing. Composited as a ground it made the icon its own backdrop and
              read 1:1. */
             const masked = style.maskImage !== 'none' && style.maskImage !== ''
@@ -345,10 +345,10 @@ for (const mode of ['light', 'dark']) {
          and ancestry walks straight past to the page: that read a wordmark over a
          dark band as white on white and called it 1:1.
 
-         Paint order is what settles it, so the stack at the text's own centre is
+         Paint order is what settles it, so the stack at the text's own center is
          read independently, piercing shadow roots the same way. Where the two
          agree the reading stands. Where a painter that is not an ancestor lies
-         between the text and its ground, nothing is claimed: the colour behind a
+         between the text and its ground, nothing is claimed: the color behind a
          transparent bar belongs to whoever put the bar there, which is
          `model.ts`'s unbounded ground arriving by another route. */
         /* A shadow root's own `elementsFromPoint` reports the outer stack
@@ -399,9 +399,9 @@ for (const mode of ['light', 'dark']) {
        A glyph is a graphic, so the bar is 1.4.11's 3:1 rather than 1.4.3's 4.5.
 
        Only a drawing that resolves to a single paint is read. An icon is one
-       colour by construction, inherited through `currentColor`; a chart is not,
+       color by construction, inherited through `currentColor`; a chart is not,
        and the root `<svg>` of one carries a paint its bars all override, so
-       measuring it would report a colour that is nowhere on screen. Where the
+       measuring it would report a color that is nowhere on screen. Where the
        drawing has more than one, this says so rather than guessing. */
         /* Read off the live palette rather than written down here, so a theme that
          moves its rules moves this with them. */
@@ -520,7 +520,7 @@ for (const mode of ['light', 'dark']) {
     measured += result.measured
     offscreen += result.offscreen
     unresolved += result.unresolved
-    /* A colour can belong to more than one token, so every combination counts as
+    /* A color can belong to more than one token, so every combination counts as
        having been seen: this is a coverage report and not a guarantee. */
     for (const pair of result.pairs) {
       const [ink, ground] = pair.split('|')
@@ -558,7 +558,7 @@ if (findings.length > 0) {
 
 console.log(
   `contrast: ${measured} inks measured against the ground they are painted on, ` +
-    `across ${examples.length} examples in both colour modes, every one clearing its target` +
+    `across ${examples.length} examples in both color modes, every one clearing its target` +
     (unresolved > 0 ? `. ${unresolved} sit on an unbounded ground and cannot be` : '') +
     (offscreen > 0 ? `, ${offscreen} below the fold` : ''),
 )
@@ -569,7 +569,7 @@ console.log(
 const unpainted = [...pairs].filter((pair) => !painted.has(pair)).sort()
 if (unpainted.length > 0) {
   console.log(
-    `contrast: ${pairs.size - unpainted.length} of ${pairs.size} modelled pairs ` +
+    `contrast: ${pairs.size - unpainted.length} of ${pairs.size} modeled pairs ` +
       `appear in an example. No example paints ${unpainted.length}, so nothing here ` +
       'measures them:',
   )

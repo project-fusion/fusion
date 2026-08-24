@@ -37,7 +37,7 @@ import { property } from 'lit/decorators.js'
 export class HelixBaseNavigation extends HelixElement {
   /* The mark, and the RTL sign and border correction that came with it. This
      was hand-written and had neither: the distance was measured from the
-     physical left and applied from the inline-start edge, so it travelled the
+     physical left and applied from the inline-start edge, so it traveled the
      wrong way in a right-to-left document. */
   private readonly indicator = new IndicatorController(this, {
     active: () => this.items.find((item) => item.getAttribute('aria-current') === 'page'),

@@ -46,7 +46,7 @@ export const docPages: DocPage[] = [
     title: 'Color',
   },
   {
-    description: 'One attribute, two modes, and no token restated to honour it.',
+    description: 'One attribute, two modes, and no token restated to honor it.',
     section: 'Foundations',
     slug: 'color-modes',
     title: 'Color modes',

@@ -165,7 +165,7 @@ describe('combobox', () => {
     )
   })
 
-  test('the list is named by the label, not labelled with it', async () => {
+  test('the list is named by the label, not labeled with it', async () => {
     const host = await combobox()
     const listbox = part(host as HTMLElement, 'listbox') as HTMLElement
     expect(listbox.getAttribute('aria-label')).toBe('Options')

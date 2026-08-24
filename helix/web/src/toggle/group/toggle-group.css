@@ -10,7 +10,7 @@
 
 /* The label inside the track, with a rule after it.
  *
- * The track is already a centred flex row, so the label needs no alignment of
+ * The track is already a centered flex row, so the label needs no alignment of
  * its own beyond being told not to take a field label's block margin. The rule
  * is what separates a word that names the set from a segment that can be
  * pressed, and it is inset from the track's own padding so it does not run the
@@ -20,9 +20,9 @@
   margin-block: 0;
   /* **The padding is what was holding the word up, not the margin.** A field
      label carries four pixels under it as its gap to the control below, and
-     centring the label's *box* against the track then leaves its text half that
+     centering the label's *box* against the track then leaves its text half that
      above the segments' text: measured at 2.1 pixels, which is plainly visible
-     and is what a box-to-box check misses. Centre the text by leaving the box
+     and is what a box-to-box check misses. Center the text by leaving the box
      nothing to be lopsided about. */
   padding-block: 0;
   padding-inline-start: var(--helix-space-xs);
@@ -42,7 +42,7 @@
  *
  * `baseline` would be the obvious alignment and is the wrong one: the track is
  * a control with padding and a border, so its first line box sits lower than a
- * bare label's and the word rides high against it. Centre is what puts the two
+ * bare label's and the word rides high against it. Center is what puts the two
  * on the same optical line.
  *
  * The row gap is `sm` rather than the stack's `2xs`, because horizontal space

@@ -273,7 +273,7 @@ slot[name="icon"]::slotted(*) {
   /* Along the top edge and edge to edge, so it reads as the message's own
      border thickening rather than as a bar laid inside it. Square, because the
      item clips it: a radius here would round the draining end as well, and a
-     corner travelling across the top is a shape rather than a measure. */
+     corner traveling across the top is a shape rather than a measure. */
   inset-block-start: 0;
   inset-inline: 0;
   position: absolute;
@@ -307,7 +307,7 @@ slot[name="icon"]::slotted(*) {
  * 1e-05s. So the bar was being hidden to avoid a failure that could not happen.
  *
  * It stays visible, because it is the only thing saying how long is left and a
- * 2px rule travelling once over the message's own lifetime is closer to a clock
+ * 2px rule traveling once over the message's own lifetime is closer to a clock
  * than to an animation. What the preference is about is motion that surprises,
  * and this is the message's duration drawn at the speed of the message. */
 
@@ -373,7 +373,7 @@ slot[name="icon"]::slotted(*) {
  * cascade, which is what the prepended rule was arranged to allow.
  *
  * The row below still ends at `visibility: hidden`, so the box leaves the
- * accessibility tree once it has finished travelling. */
+ * accessibility tree once it has finished traveling. */
 :host([hidden]:not([hidden="until-found"])) {
   display: grid;
 }

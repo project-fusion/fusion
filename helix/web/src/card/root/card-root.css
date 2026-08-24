@@ -50,12 +50,12 @@
   --card-shadow: var(--helix-shadow-md);
 }
 
-/* Told apart by its own colour and nothing else, which is the fourth mechanism
+/* Told apart by its own color and nothing else, which is the fourth mechanism
    `ThemeIntent.separation` has always carried and no component could ask for.
    The ground stays, both the edge and the lift go: `plain` below clears the
    ground as well, so between them there was no way to say "a surface, quietly".
 
-   Nothing here states a colour. The base already fills with
+   Nothing here states a color. The base already fills with
    `--helix-color-surface`, one rung off the page, and a theme whose policy is
    `fill` pushes that ladder further away exactly so this reads without a line. */
 :host([separation="filled"]) {
@@ -175,7 +175,7 @@ slot[name="footer"]::slotted(*) {
   background-color: var(--card-background-color, var(--helix-material-translucent));
 }
 
-/* Print: the lift is a shadow, which printers drop into a grey smear; the edge carries it.
+/* Print: the lift is a shadow, which printers drop into a gray smear; the edge carries it.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
  * on a component's behalf and every family says it for itself. See 165. */

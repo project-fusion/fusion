@@ -316,7 +316,7 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
     }
   }
 
-  /* A cancelled pointer is the system taking the gesture away, which is not the
+  /* A canceled pointer is the system taking the gesture away, which is not the
      reader choosing. Put the marks back to the value they already held. */
   private readonly handleDragCancel = (event: PointerEvent): void => {
     if (this.dragging !== event.pointerId) {

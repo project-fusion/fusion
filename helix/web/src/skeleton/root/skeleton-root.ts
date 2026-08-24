@@ -9,7 +9,7 @@ import { styles } from './skeleton-root.css.js'
  *
  * @description
  * A sweep rather than a pulse. A block fading in and out reads as something
- * broken; a highlight travelling across it reads as work in progress, and it is
+ * broken; a highlight traveling across it reads as work in progress, and it is
  * the same one property animating either way.
  *
  * @since 0.1.0

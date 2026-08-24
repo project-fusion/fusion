@@ -304,7 +304,7 @@ would catch. */
   /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
-judgement about the message, and elsewhere in this library it carries one:
+judgment about the message, and elsewhere in this library it carries one:
 `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
@@ -399,7 +399,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   "content-align"?: HelixAppHeader["contentAlign"];
@@ -416,7 +416,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   contentAlign?: HelixAppHeader["contentAlign"];
@@ -497,7 +497,7 @@ wants.
 
 **The fraction is measured across the whole width, and for a while it was
 not.** The first expression corrected for the aspect once in the wrong
-direction and never subtracted the centre, so the value read as an offset
+direction and never subtracted the center, so the value read as an offset
 from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
 put the axis at 81.3% of the width and `0` was the only value that reached
 the middle. The contract above is now solved against what the shader draws
@@ -631,7 +631,7 @@ is *this series* made of, and how much ink does *this series* claim. */
 
 The chart's treatment, which every series takes unless `outlined` or
 `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-of the series colour with that edge on it, and absent is the filled column,
+of the series color with that edge on it, and absent is the filled column,
 per the rule that a reflected property takes no default.
 
 **It composes with `material` rather than competing with it.** Emphasis
@@ -658,7 +658,7 @@ Per series and not per bar, because a bar is a mark inside a drawing and
 nobody writes markup for one, which is the same reason `material` sits on
 the chart. */
   outlined?: HelixBarChart["outlined"];
-  /** Which series are drawn as a wash of their colour, by name. Matched as `outlined` is. */
+  /** Which series are drawn as a wash of their color, by name. Matched as `outlined` is. */
   subtle?: HelixBarChart["subtle"];
   /** The id of the table to read.
 
@@ -740,7 +740,7 @@ mislead in every other case.
 no value axis at all when there is one scale, because the columns are
 measured against each other and a reader needs no numbers to do that. With
 two, a reader has no way of knowing there are two, let alone which series
-is on which, so both scales are labelled the moment this is set. An
+is on which, so both scales are labeled the moment this is set. An
 unlabelled second axis is the deceptive case rather than the tidy one.
 
 The grid stays on the primary axis, since a rule measured against two
@@ -820,7 +820,7 @@ opened "Width and not weight", which is a sentence a name should not need:
 so a button carried a property called `fill` beside a property about being
 filled, meaning different things. `separation="filled"` and
 `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
-colour, and every chart in the library writes `fill` for paint, which left
+color, and every chart in the library writes `fill` for paint, which left
 this the only use of the word meaning geometry.
 
 `Dialog` had already made the same move for the same reason, its
@@ -867,9 +867,9 @@ absence, which each control names for itself, `outlined` on `Button` and
 
 Three and an accent, not the full status set. A tag reports a state and a
 button performs an action: a success button and a warning button are not
-things anybody writes, and offering them invites a page where the colour
+things anybody writes, and offering them invites a page where the color
 of a control means nothing in particular. `accent` is the second
-emphasis, a rotation off the brand seed rather than a colour of its own,
+emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   tone?: HelixButton["tone"];
   /** What activating the button does to its form. */
@@ -974,7 +974,7 @@ cannot keep saying both.
 - `elevated` is lifted off the page instead of framed, for a card on a
   colored or busy background, where a line has to compete with whatever is
   behind it and a shadow does not.
-- `filled` is told apart by its own colour, with neither edge nor lift. For
+- `filled` is told apart by its own color, with neither edge nor lift. For
   a dense surface where a border on every card is a grid of lines, and for
   a theme whose `separation` policy is `fill`, which pushes the surface
   ladder away from the page precisely so this reads.
@@ -983,7 +983,7 @@ cannot keep saying both.
   second box adds a line and no meaning.
 
 **`filled` is new and it closes a hole the engine could already see.**
-`plain` clears the ground *and* the edge, so a surface with its own colour
+`plain` clears the ground *and* the edge, so a surface with its own color
 and neither edge nor lift was unsayable while being one of the four things
 a theme could ask for. */
   separation?: HelixCard["separation"];
@@ -1523,7 +1523,7 @@ where the color is the answer rather than a setting. */
 
 **Undefaulted, because it reflects.** The two together are what stamp an
 attribute onto every host anybody renders, including the ones nobody
-configured: the server wrote `format="hex"` on every colour input on the
+configured: the server wrote `format="hex"` on every color input on the
 page, and React, holding no such prop, reported a hydration mismatch for
 each one. That is the fault `Tree.chevronPlacement` had and the reason the
 area rules say a reflected property takes no default. Hex is still what an
@@ -1706,7 +1706,7 @@ reflected none of them. */
 };
 
 export type HelixColorPickerVueEvents = {
-  /** The eyedropper has closed, whether or not a colour was taken. */
+  /** The eyedropper has closed, whether or not a color was taken. */
   "helix-sample-end": HelixColorPickerHelixSampleEndElementEvent;
   /** The eyedropper is opening, so anything covering the page should get out of the way. */
   "helix-sample-start": HelixColorPickerHelixSampleStartElementEvent;
@@ -1995,9 +1995,9 @@ absence, which each control names for itself, `outlined` on `Button` and
 
 Three and an accent, not the full status set. A tag reports a state and a
 button performs an action: a success button and a warning button are not
-things anybody writes, and offering them invites a page where the colour
+things anybody writes, and offering them invites a page where the color
 of a control means nothing in particular. `accent` is the second
-emphasis, a rotation off the brand seed rather than a colour of its own,
+emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   tone?: HelixCopyButton["tone"];
   /** What goes on the clipboard. */
@@ -2005,7 +2005,7 @@ so it stays in relation when somebody rethemes. */
   /** What it is called, and says, before a press.
 
 Defaulted rather than left empty. An icon-only control must be named, and
-the name of this one is not a judgement call: every copy button in the
+the name of this one is not a judgment call: every copy button in the
 world is called Copy. A consumer with a better word still sets it. */
   label?: HelixCopyButton["label"];
   /** What it is called, and says, after one.
@@ -2534,7 +2534,7 @@ Absent is a ring with room for a total in it. `small` and `large` move the
 hole without moving the outer edge, so a chart keeps its footprint.
 
 **`none` is a pie**, and it is the same drawing rather than another one:
-the radius follows the thickness, so the inner edge reaching the centre is
+the radius follows the thickness, so the inner edge reaching the center is
 what closing the hole means. A pie reads less accurately than a ring, angle
 being harder to judge than length, but it is not *misleading* the way a bar
 measured from anything but zero is, which is why this is a value here and
@@ -2852,7 +2852,7 @@ export type HelixIconButtonVueProps = {
 
 `emphasis` says how filled it is and `tone` says what it means; neither of
 them says what shape it is, and folding a shape into either would put a
-control's outline in the same word as its colour. A rounded square is the
+control's outline in the same word as its color. A rounded square is the
 resting one because that is what a control in a row of controls should be.
 
 `circle` is the floating action button, and it is the reason this exists: a
@@ -2889,9 +2889,9 @@ absence, which each control names for itself, `outlined` on `Button` and
 
 Three and an accent, not the full status set. A tag reports a state and a
 button performs an action: a success button and a warning button are not
-things anybody writes, and offering them invites a page where the colour
+things anybody writes, and offering them invites a page where the color
 of a control means nothing in particular. `accent` is the second
-emphasis, a rotation off the brand seed rather than a colour of its own,
+emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   tone?: HelixIconButton["tone"];
   /** What activating the button does to its form. */
@@ -4541,7 +4541,7 @@ which is what makes it read as dots rather than as a softened square code. */
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
-costs about fifteen percent redundancy. `H` where a mark covers the centre,
+costs about fifteen percent redundancy. `H` where a mark covers the center,
 chosen automatically when the slot is filled: it is the level that makes
 covering safe, and a consumer who fills the slot has said what they want
 without having to know that. */
@@ -4716,7 +4716,7 @@ export type HelixRatingVueProps = {
 
 `marks` is the star, and is what a rating means to most readers. `dots`
 drops the glyph for a plain circle, which says how much rather than how
-good: a star carries a judgement that a level of spice, a difficulty or a
+good: a star carries a judgment that a level of spice, a difficulty or a
 confidence has not earned.
 
 Both are one shape repeated and clipped to the score, so halves work in
@@ -4855,7 +4855,7 @@ export type HelixSandboxPreviewHelixConsoleElementEvent =
 export type HelixSandboxPreviewVueProps = {
   /** Which half of the palette the frame renders in.
 
-**The frame is a document and a document has its own colour mode.** Setting
+**The frame is a document and a document has its own color mode.** Setting
 `data-color-mode` on this element styles this element, and the contents of
 an iframe inherit nothing from it: measured, a frame under a host carrying
 the attribute had it unset on its own root. Left alone the frame follows
@@ -4869,7 +4869,7 @@ including every one of the 24 series colours a chart reads. */
   "color-mode"?: HelixSandboxPreview["colorMode"];
   /** Which half of the palette the frame renders in.
 
-**The frame is a document and a document has its own colour mode.** Setting
+**The frame is a document and a document has its own color mode.** Setting
 `data-color-mode` on this element styles this element, and the contents of
 an iframe inherit nothing from it: measured, a frame under a host carrying
 the attribute had it unset on its own root. Left alone the frame follows
@@ -5347,7 +5347,7 @@ The shapes come from `helix/web/src/chart/terminus.css`, shared with every other
 that ends a line, so the set is the same wherever one appears. `ring` is the
 one that asks anything of the drawing: the disc it leaves open is masked out
 of the `<svg>`, so the line stops at the ring's inner edge rather than
-running on to the reading at its centre, and the middle shows whatever the
+running on to the reading at its center, and the middle shows whatever the
 chart is drawn over rather than a guess at it. */
   terminus?: HelixSparkline["terminus"];
   /** What the readings are drawn as.
@@ -6463,7 +6463,7 @@ Whatever `<time>` accepts, which is a date, a time, both, a duration or a
 week. Unset, the label is written as it was given and nothing claims to
 know what instant it names. */
   datetime?: HelixTimelineItem["datetime"];
-  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  /** What kind of event it was, which decides the mark's color and nothing else. */
   tone?: HelixTimelineItem["tone"];
 };
 
@@ -6613,7 +6613,7 @@ being four of a kind rather than four of three kinds. */
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -6628,7 +6628,7 @@ and cannot be used to remove it. */
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -6792,7 +6792,7 @@ it changes the visible gap rather than a number the arrow then eats into. */
 
 Resolved the way `for` is, so an id in the same tree, which is what lets a
 component name a box in its own shadow root. A chart does: its bubble is
-centred on a reading, and the first and last readings sit at the ends of
+centered on a reading, and the first and last readings sit at the ends of
 the plot, so half the box hangs past the drawing and, measured on a chart
 in a 320px card, three pixels past the card itself.
 
@@ -7495,7 +7495,7 @@ export type CustomCssProperties = {
   "--badge-ring-color"?: string;
   /** The slot the pointer is resting in. */
   "--bar-chart-band-color"?: string;
-  /** A `lines` series, overriding its series colour. */
+  /** A `lines` series, overriding its series color. */
   "--bar-chart-line-color"?: string;
   /** Thickness of a `lines` series. */
   "--bar-chart-line-width"?: string;
@@ -7511,9 +7511,9 @@ export type CustomCssProperties = {
   "--bar-chart-gap"?: string;
   /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
   "--chart-bar-wash"?: string;
-  /** The colour of a single-series axis, taken from that series. */
+  /** The color of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;
-  /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
+  /** The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
   "--bar-chart-secondary"?: string;
   /** Size of the quoted passage. */
   "--blockquote-size"?: string;
@@ -7595,7 +7595,7 @@ export type CustomCssProperties = {
   "--code-padding"?: string;
   /** Fill behind the field. */
   "--color-input-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--color-input-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--color-input-border-width"?: string;
@@ -7607,7 +7607,7 @@ export type CustomCssProperties = {
   "--color-input-swatch-radii"?: string;
   /** Edge length of the block in `appearance="swatch"`. */
   "--color-input-swatch-size"?: string;
-  /** The chosen colour, to paint over the transparency check. */
+  /** The chosen color, to paint over the transparency check. */
   "--color-input-swatch"?: string;
   /** Inset of the rows under the square, and the bottom. */
   "--color-picker-inset"?: string;
@@ -7625,11 +7625,11 @@ export type CustomCssProperties = {
   "--color-picker-hue"?: string;
   /** The chosen saturation, 0 to 100, as a percentage. */
   "--color-picker-saturation"?: string;
-  /** A colour to paint: the current one on the sample, a preset's on each preset. */
+  /** A color to paint: the current one on the sample, a preset's on each preset. */
   "--color-picker-swatch"?: string;
   /** Fill behind the field. */
   "--combobox-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--combobox-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--combobox-border-width"?: string;
@@ -7645,7 +7645,7 @@ export type CustomCssProperties = {
   "--command-list-size"?: string;
   /** Fill behind the field. */
   "--date-input-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--date-input-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--date-input-border-width"?: string;
@@ -7667,7 +7667,7 @@ export type CustomCssProperties = {
   "--date-picker-column-count"?: string;
   /** How far the panel rises as it opens. Follows `--helix-space-lg`. */
   "--dialog-rise"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--dialog-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--dialog-border-width"?: string;
@@ -7681,7 +7681,7 @@ export type CustomCssProperties = {
   "--dialog-scrim"?: string;
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--dialog-shadow"?: string;
-  /** Colour of the rule. */
+  /** Color of the rule. */
   "--divider-color"?: string;
   /** Space taken off both ends of it. */
   "--divider-inset"?: string;
@@ -7695,7 +7695,7 @@ export type CustomCssProperties = {
   "--divider-thickness"?: string;
   /** Width and height of the ring. */
   "--donut-chart-size"?: string;
-  /** Colour of the ring under the slices. */
+  /** Color of the ring under the slices. */
   "--donut-chart-track-color"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
   "--donut-chart-stroke"?: string;
@@ -7703,7 +7703,7 @@ export type CustomCssProperties = {
   "--drawer-backdrop"?: string;
   /** Surface behind the panel. */
   "--drawer-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--drawer-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--drawer-border-width"?: string;
@@ -7761,13 +7761,13 @@ export type CustomCssProperties = {
   "--legend-direction"?: string;
   /** Space between entries. */
   "--legend-gap"?: string;
-  /** Size of the colour patch. */
+  /** Size of the color patch. */
   "--legend-swatch-size"?: string;
   /** The slot the pointer is resting in. */
   "--line-chart-band-color"?: string;
   /** One rule across the plot, under `gridlines`. */
   "--line-chart-gridline-color"?: string;
-  /** How much of a line's colour its wash takes. */
+  /** How much of a line's color its wash takes. */
   "--line-chart-area-opacity"?: string;
   /** Height of the drawing. */
   "--line-chart-block-size"?: string;
@@ -7799,7 +7799,7 @@ export type CustomCssProperties = {
   "--megamenu-border-width"?: string;
   /** The narrowest a column goes before the grid wraps. */
   "--megamenu-column-size"?: string;
-  /** How wide the band's contents may get, centred in it. */
+  /** How wide the band's contents may get, centered in it. */
   "--megamenu-full-size"?: string;
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--megamenu-shadow"?: string;
@@ -7813,7 +7813,7 @@ export type CustomCssProperties = {
   "--menu-item-hover-color"?: string;
   /** Fill of the surface. */
   "--menu-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--menu-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--menu-border-width"?: string;
@@ -7855,7 +7855,7 @@ export type CustomCssProperties = {
   "--option-active-color"?: string;
   /** Corner radius of the row. A listbox and a select flatten it. */
   "--option-radii"?: string;
-  /** Width of the gutter the rule and the travelling mark share. */
+  /** Width of the gutter the rule and the traveling mark share. */
   "--outline-rail"?: string;
   /** How far each level is inset from the one above. */
   "--outline-indent"?: string;
@@ -7869,7 +7869,7 @@ export type CustomCssProperties = {
   "--pagination-size"?: string;
   /** Space between one box and the next. */
   "--pin-gap"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--popover-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--popover-border-width"?: string;
@@ -7931,7 +7931,7 @@ export type CustomCssProperties = {
   "--rating-size"?: string;
   /** Space between marks. */
   "--rating-gap"?: string;
-  /** The colour of a filled mark. */
+  /** The color of a filled mark. */
   "--rating-color"?: string;
   /** And of an unfilled one. */
   "--rating-empty-color"?: string;
@@ -7979,7 +7979,7 @@ export type CustomCssProperties = {
   "--scroll-area-thumb-color"?: string;
   /** And its track. */
   "--scroll-area-track-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--select-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--select-border-width"?: string;
@@ -8015,13 +8015,13 @@ export type CustomCssProperties = {
   "--chart-terminus-hole"?: string;
   /** Size of the mark on the last reading. */
   "--chart-terminus-size"?: string;
-  /** How much of the line's colour the wash takes where it meets the line. */
+  /** How much of the line's color the wash takes where it meets the line. */
   "--sparkline-area-opacity"?: string;
   /** Corner radius on a column, under `plot="bar"`. */
   "--sparkline-bar-radius"?: string;
   /** Height of the drawing. */
   "--sparkline-block-size"?: string;
-  /** Colour of the line, the wash, the columns and the mark. */
+  /** Color of the line, the wash, the columns and the mark. */
   "--sparkline-color"?: string;
   /** Width of the drawing. */
   "--sparkline-inline-size"?: string;
@@ -8093,7 +8093,7 @@ export type CustomCssProperties = {
   "--textarea-background-color"?: string;
   /** Fill behind the field. */
   "--time-input-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--time-input-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--time-input-border-width"?: string;
@@ -8117,7 +8117,7 @@ export type CustomCssProperties = {
   "--timeline-rail-size"?: string;
   /** Space between one entry and the next. */
   "--timeline-gap"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--toast-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--toast-border-width"?: string;
@@ -8171,7 +8171,7 @@ export type CustomCssProperties = {
   "--tree-chevron-order"?: string;
   /** Set from `chevron-placement`; the space before the chevron. */
   "--tree-chevron-gap"?: string;
-  /** Colour of the arrow, overriding the judgment. */
+  /** Color of the arrow, overriding the judgment. */
   "--trend-color"?: string;
   /** Size of the arrow. */
   "--trend-icon-size"?: string;
@@ -8179,7 +8179,7 @@ export type CustomCssProperties = {
   "--video-playlist-item-background-color"?: string;
   /** Width of the thumbnail column. */
   "--video-playlist-media-size"?: string;
-  /** Colour of the trigger, defaulting to the control bar's. */
+  /** Color of the trigger, defaulting to the control bar's. */
   "--video-playlist-menu-color"?: string;
   /** Width of an entry's still. */
   "--video-playlist-menu-poster"?: string;
@@ -8361,7 +8361,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixComboboxVueProps,
     HelixComboboxVueEvents
   >;
-  /** The palette is a dialog holding a filterable listbox, so what this tier adds is where that dialog sits and how the list reads inside it. It opens against the top of the window rather than centred, which is where every palette a reader has used opens: a list that grows and shrinks as it is filtered would otherwise walk up and down the screen under the words being typed. */
+  /** The palette is a dialog holding a filterable listbox, so what this tier adds is where that dialog sits and how the list reads inside it. It opens against the top of the window rather than centered, which is where every palette a reader has used opens: a list that grows and shrinks as it is filtered would otherwise walk up and down the screen under the words being typed. */
   "helix-command": DefineCustomElement<
     HelixCommand,
     HelixCommandVueProps,
@@ -8475,7 +8475,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixKbdVueProps,
     HelixKbdVueEvents
   >;
-  /** A row that wraps, because a legend sits under a chart as wide as the chart and there is no arrangement of eight names that fits every width. Set '--legend-direction' to 'column' where it sits beside one instead.  The eight series colours are mapped here rather than in the tier below, which carries the index and holds no tokens. Written as eight rules for the reason 'Avatar.Group' writes twelve: an index in markup cannot select a token, and a custom property set inline would be the headless tier naming a colour. */
+  /** A row that wraps, because a legend sits under a chart as wide as the chart and there is no arrangement of eight names that fits every width. Set '--legend-direction' to 'column' where it sits beside one instead.  The eight series colours are mapped here rather than in the tier below, which carries the index and holds no tokens. Written as eight rules for the reason 'Avatar.Group' writes twelve: an index in markup cannot select a token, and a custom property set inline would be the headless tier naming a color. */
   "helix-legend": DefineCustomElement<
     HelixLegend,
     HelixLegendVueProps,
@@ -8601,7 +8601,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixProgressVueProps,
     HelixProgressVueEvents
   >;
-  /** The picture is the base tier's. What this adds is a size that can be set once, the colours a scanner needs, and the box that holds a centre mark.  **The ink is 'currentColor' and the ground is a real fill.** A code has to be dark on light to read, and the pair that guarantees it is not the page's foreground and background: those invert together in dark mode, and a code drawn light-on-dark is refused by a good half of the scanners in the world. So the ground is stated and the ink is the foreground it is chosen for. */
+  /** The picture is the base tier's. What this adds is a size that can be set once, the colours a scanner needs, and the box that holds a center mark.  **The ink is 'currentColor' and the ground is a real fill.** A code has to be dark on light to read, and the pair that guarantees it is not the page's foreground and background: those invert together in dark mode, and a code drawn light-on-dark is refused by a good half of the scanners in the world. So the ground is stated and the ink is the foreground it is chosen for. */
   "helix-qr-code": DefineCustomElement<
     HelixQrCode,
     HelixQrCodeVueProps,
@@ -8679,7 +8679,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixSelectVueProps,
     HelixSelectVueEvents
   >;
-  /** A sweep rather than a pulse. A block fading in and out reads as something broken; a highlight travelling across it reads as work in progress, and it is the same one property animating either way. */
+  /** A sweep rather than a pulse. A block fading in and out reads as something broken; a highlight traveling across it reads as work in progress, and it is the same one property animating either way. */
   "helix-skeleton": DefineCustomElement<
     HelixSkeleton,
     HelixSkeletonVueProps,
@@ -8691,7 +8691,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixSliderVueProps,
     HelixSliderVueEvents
   >;
-  /** Sized in 'em' by default, so a sparkline set beside a figure is a figure-sized thing and one set in a table row is a row-sized thing. The type scale is absolute and cannot say "a little wider than this".  The stroke does not scale with the box. 'preserveAspectRatio="none"' is what lets one drawing fill a 60px slot and a 600px one, and without 'vector-effect: non-scaling-stroke' the same line comes out hairline in the first and heavy in the second.  One colour on the host, read by the line, the wash, the columns and the mark alike, so moving '--sparkline-color' cannot leave parts of one drawing disagreeing.  The line's weight is set in 'em' rather than pixels, so it grows with the drawing the way the drawing grows with its type. A fixed 1.5px was the first version and left a 200 pixel sparkline wearing a hairline: 'vector-effect' keeps a stroke out of the view box's stretch, which is the point, and it also keeps it out of every other reason it might want to be bigger. */
+  /** Sized in 'em' by default, so a sparkline set beside a figure is a figure-sized thing and one set in a table row is a row-sized thing. The type scale is absolute and cannot say "a little wider than this".  The stroke does not scale with the box. 'preserveAspectRatio="none"' is what lets one drawing fill a 60px slot and a 600px one, and without 'vector-effect: non-scaling-stroke' the same line comes out hairline in the first and heavy in the second.  One color on the host, read by the line, the wash, the columns and the mark alike, so moving '--sparkline-color' cannot leave parts of one drawing disagreeing.  The line's weight is set in 'em' rather than pixels, so it grows with the drawing the way the drawing grows with its type. A fixed 1.5px was the first version and left a 200 pixel sparkline wearing a hairline: 'vector-effect' keeps a stroke out of the view box's stretch, which is the point, and it also keeps it out of every other reason it might want to be bigger. */
   "helix-sparkline": DefineCustomElement<
     HelixSparkline,
     HelixSparklineVueProps,
@@ -8738,7 +8738,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixStepVueProps,
     HelixStepVueEvents
   >;
-  /** A thumb travelling in a groove, which is the one place in the library color is used to say "on". A checkbox does not, because a tick is legible on its own; a switch has no mark, so the fill is the whole of what distinguishes the two states and there is nothing else for it to be.  The input itself is the hit target and is drawn as the track, stretched over it and invisible, so the press, the focus and the label forwarding are all the platform's while the picture is ours.  **Its height is '--helix-size-switch', which is one step above the checkbox's** at every density rather than the same as it. A checkbox is a box with a mark in it; a switch is a track with a thumb inside it, and at the checkbox's height the thumb has two pixels of groove around it and the whole control reads as a small dash. The width follows the height, so setting '--switch-height' widens it too and the proportion is not something a consumer has to keep. */
+  /** A thumb traveling in a groove, which is the one place in the library color is used to say "on". A checkbox does not, because a tick is legible on its own; a switch has no mark, so the fill is the whole of what distinguishes the two states and there is nothing else for it to be.  The input itself is the hit target and is drawn as the track, stretched over it and invisible, so the press, the focus and the label forwarding are all the platform's while the picture is ours.  **Its height is '--helix-size-switch', which is one step above the checkbox's** at every density rather than the same as it. A checkbox is a box with a mark in it; a switch is a track with a thumb inside it, and at the checkbox's height the thumb has two pixels of groove around it and the whole control reads as a small dash. The width follows the height, so setting '--switch-height' widens it too and the proportion is not something a consumer has to keep. */
   "helix-switch": DefineCustomElement<
     HelixSwitch,
     HelixSwitchVueProps,
@@ -8888,7 +8888,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixTreeVueProps,
     HelixTreeVueEvents
   >;
-  /** The arrow takes the judgment colour and the number does not, which is the opposite of the dashboard convention and is measured rather than preferred: in light mode the success token is 3.8:1 on the surface, enough for a glyph and short of what 13px text needs, and there is no darker green in the ramp. The number therefore keeps the page's own foreground and stays the most legible thing here, which is right anyway, since the number is what a reader reads and the judgment is a gloss on it. */
+  /** The arrow takes the judgment color and the number does not, which is the opposite of the dashboard convention and is measured rather than preferred: in light mode the success token is 3.8:1 on the surface, enough for a glyph and short of what 13px text needs, and there is no darker green in the ramp. The number therefore keeps the page's own foreground and stays the most legible thing here, which is right anyway, since the number is what a reader reads and the judgment is a gloss on it. */
   "helix-trend": DefineCustomElement<
     HelixTrend,
     HelixTrendVueProps,
@@ -8900,7 +8900,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixVideoPlaylistItemVueProps,
     HelixVideoPlaylistItemVueEvents
   >;
-  /** Presentation only: a control-bar button drawn like the ones beside it, and a menu that opens over the picture rather than under it. The base class holds where the playlist is, what the entries are, and what choosing announces.  The trigger's declarations are 'Video''s control rule written out a second time, which is not duplication that could be avoided. That rule is '[part="controls"] :where(a, button)' inside 'Video''s shadow root, and this element sits in its light DOM: a shadow rule reaches an assigned node only through '::slotted()' and never reaches into the node's own shadow root at all. So the button here is two boundaries away from the rule that styles every button beside it, and the same tokens are what make the two agree.  Colour is inherited rather than named, so the bar's own colour arrives on its own. '--video-playlist-menu-color' is there for the case where it should not. */
+  /** Presentation only: a control-bar button drawn like the ones beside it, and a menu that opens over the picture rather than under it. The base class holds where the playlist is, what the entries are, and what choosing announces.  The trigger's declarations are 'Video''s control rule written out a second time, which is not duplication that could be avoided. That rule is '[part="controls"] :where(a, button)' inside 'Video''s shadow root, and this element sits in its light DOM: a shadow rule reaches an assigned node only through '::slotted()' and never reaches into the node's own shadow root at all. So the button here is two boundaries away from the rule that styles every button beside it, and the same tokens are what make the two agree.  Color is inherited rather than named, so the bar's own color arrives on its own. '--video-playlist-menu-color' is there for the case where it should not. */
   "helix-video-playlist-menu": DefineCustomElement<
     HelixVideoPlaylistMenu,
     HelixVideoPlaylistMenuVueProps,
@@ -8912,7 +8912,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixVideoPlaylistVueProps,
     HelixVideoPlaylistVueEvents
   >;
-  /** The player is the base tier's. What this adds is the bar: where it sits, when it is there, and what the two ranges look like, which is the whole reason to replace a control set that cannot be styled.  **The bar is over the picture, not under it.** A bar in the layout would move everything below the video by its own height and would leave a strip of page colour under a picture that is meant to be the whole of it. Over it, the video is the component's size and the controls belong to it.  **It goes when nobody is using it, and comes back for the keyboard.** Hidden once a playing video has gone 'idle-delay' without being touched, shown again the moment the pointer moves, and shown whenever anything inside it has focus, which is what keeps it reachable without a pointer. A paused video keeps its bar, because a reader who stopped it is deciding what to do next. */
+  /** The player is the base tier's. What this adds is the bar: where it sits, when it is there, and what the two ranges look like, which is the whole reason to replace a control set that cannot be styled.  **The bar is over the picture, not under it.** A bar in the layout would move everything below the video by its own height and would leave a strip of page color under a picture that is meant to be the whole of it. Over it, the video is the component's size and the controls belong to it.  **It goes when nobody is using it, and comes back for the keyboard.** Hidden once a playing video has gone 'idle-delay' without being touched, shown again the moment the pointer moves, and shown whenever anything inside it has focus, which is what keeps it reachable without a pointer. A paused video keeps its bar, because a reader who stopped it is deciding what to do next. */
   "helix-video": DefineCustomElement<
     HelixVideo,
     HelixVideoVueProps,

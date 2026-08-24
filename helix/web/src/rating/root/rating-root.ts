@@ -20,7 +20,7 @@ import { styles } from './rating-root.css.js'
  * @cssproperty --rating-mark - The shape of one mark, as a mask image.
  * @cssproperty --rating-size - How big one mark is.
  * @cssproperty --rating-gap - Space between marks.
- * @cssproperty --rating-color - The colour of a filled mark.
+ * @cssproperty --rating-color - The color of a filled mark.
  * @cssproperty --rating-empty-color - And of an unfilled one.
  *
  * @slot mark - The shape of a mark, cloned into every position. Left empty, the
@@ -35,7 +35,7 @@ export class HelixRating extends HelixBaseRating {
    *
    * `marks` is the star, and is what a rating means to most readers. `dots`
    * drops the glyph for a plain circle, which says how much rather than how
-   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * good: a star carries a judgment that a level of spice, a difficulty or a
    * confidence has not earned.
    *
    * Both are one shape repeated and clipped to the score, so halves work in

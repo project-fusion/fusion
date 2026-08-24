@@ -22,7 +22,7 @@
  *
  * **What it cannot catch, said plainly.** A check whose corpus is intact and
  * whose predicate has gone stale still reports its corpus and still passes.
- * `check:art` would have survived this. The only real defence there is that
+ * `check:art` would have survived this. The only real defense there is that
  * each check counts its assertions, which is a property of how each one is
  * written and not something another script can impose.
  *
@@ -43,7 +43,7 @@ const checks = Object.keys(scripts)
      `check:metrics` is the third of the generated-file comparisons and is
      exempt with them, even though its line does carry a real tally. What
      guards a generator is that its output is committed and read, the same
-     defence `check:reference` and `check:tokens-reference` have; running it
+     defense `check:reference` and `check:tokens-reference` have; running it
      here would measure every family a second time for fifteen seconds and
      learn nothing the first run did not. */
   .filter(

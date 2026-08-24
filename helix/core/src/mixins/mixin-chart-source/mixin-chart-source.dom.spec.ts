@@ -205,10 +205,10 @@ describe('the numbers and the words', () => {
   })
 })
 
-describe('the palette a series takes its colour from', () => {
+describe('the palette a series takes its color from', () => {
   /* Four families held the same `const PALETTE = 24` and the legend held a
      fifth: when it went from eight to twenty-four, one was missed and drew
-     every ninth series in the first colour again while the legend beside it
+     every ninth series in the first color again while the legend beside it
      named the ninth. A number two files have to agree on is a number that will
      stop agreeing. */
   test('counts from one, because the properties are named from one', () => {
@@ -220,7 +220,7 @@ describe('the palette a series takes its colour from', () => {
     expect(seriesIndex(PALETTE + 1)).toBe(2)
   })
 
-  test('so every series has a colour, however many there are', () => {
+  test('so every series has a color, however many there are', () => {
     for (let series = 0; series < PALETTE * 3; series += 1) {
       const slot = seriesIndex(series)
       expect(slot).toBeGreaterThanOrEqual(1)

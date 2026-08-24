@@ -321,8 +321,8 @@ fn material(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
              var(--{namespace}-color-surface) {}%, transparent);",
             (opacity * 100.0).round()
         ));
-        /* **The scalar as well as the colour**, because the two halves of
-        material reach different things. The colour is what a translucent
+        /* **The scalar as well as the color**, because the two halves of
+        material reach different things. The color is what a translucent
         *surface* is filled with; the scalar is what every wash drawn at its own
         strength gets multiplied by, which is how a chart's area and a faded
         group follow the same policy as a glass header. Emitting one and not the

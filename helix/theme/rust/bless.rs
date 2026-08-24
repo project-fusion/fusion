@@ -36,7 +36,7 @@ use crate::oklch::{
 };
 
 /* Hexes a reader could actually pick, plus the shapes that break parsers: the
-three digit form, the extremes, and a grey where chroma is zero and the hue
+three digit form, the extremes, and a gray where chroma is zero and the hue
 `atan2` returns is arbitrary. */
 const HEXES: [&str; 15] = [
     "#000000", "#ffffff", "#808080", "#3b82f6", "#f00", "#0f0", "#00f", "#fff", "#123456",

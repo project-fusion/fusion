@@ -20,7 +20,7 @@ const _control = (box: Checkbox): HTMLInputElement => part(box, 'control') as HT
 
 /* Where the box, its mark and its message sit, which is this tier's arrangement.
 
-   The behaviour is the base element's and is tested there. */
+   The behavior is the base element's and is tested there. */
 if (hasLayout()) {
   describe('checkbox geometry', () => {
     test('an unlabelled box carries no gap after it', async () => {
@@ -37,8 +37,8 @@ if (hasLayout()) {
       const bare = (await mount(
         '<helix-checkbox></helix-checkbox><helix-checkbox label="Accept"></helix-checkbox>',
       )) as HTMLElement
-      const labelled = bare.nextElementSibling as HTMLElement
-      await (labelled as Updatable).updateComplete
+      const labeled = bare.nextElementSibling as HTMLElement
+      await (labeled as Updatable).updateComplete
 
       const rowOf = (host: HTMLElement): number =>
         (part(host, 'field') as HTMLElement).getBoundingClientRect().width
@@ -48,8 +48,8 @@ if (hasLayout()) {
       expect(boxOf(bare)).toBeGreaterThan(0)
       // The row is the box and nothing else, to within a subpixel.
       expect(Math.abs(rowOf(bare) - boxOf(bare))).toBeLessThan(1)
-      // And a labelled one is wider, so the collapse is not hiding real labels.
-      expect(rowOf(labelled)).toBeGreaterThan(rowOf(bare))
+      // And a labeled one is wider, so the collapse is not hiding real labels.
+      expect(rowOf(labeled)).toBeGreaterThan(rowOf(bare))
     })
 
     test('slotted words keep the room, with no property set', async () => {

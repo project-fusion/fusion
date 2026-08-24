@@ -1,4 +1,4 @@
-//! The surface model, ported from `src/model.ts`: what a colour token is for,
+//! The surface model, ported from `src/model.ts`: what a color token is for,
 //! and what lands on what.
 //!
 //! **This is the foundation the components are built on rather than a record of
@@ -77,7 +77,7 @@ pub const TINTS: [&str; 2] = ["color-primary-subtle", "color-accent-subtle"];
 /// Filled grounds, every one of which carries `foreground-on-accent`.
 ///
 /// **The hover states are grounds too, and they were the gap.** A filled button
-/// under a pointer is a different colour with the same text on it, and the ink
+/// under a pointer is a different color with the same text on it, and the ink
 /// was solved against the resting fill alone. Six families times two states is
 /// twelve grounds, of which exactly one was being checked.
 pub const FILLS: [&str; 12] = [
@@ -215,9 +215,9 @@ pub static INKS: LazyLock<Vec<Ink>> = LazyLock::new(|| {
     solved: `primary` moves its lightness to clear 4.5 as text, and
     `primary-surface` moves further still to carry white on a fill. A mark is
     neither, and under WCAG 1.4.11 a graphic answers to 3:1, so it can sit far
-    closer to the colour the consumer actually typed. Which is also what makes it
+    closer to the color the consumer actually typed. Which is also what makes it
     worth a token rather than a reuse of `primary`: a reader who picks a bright
-    yellow and sees olive buttons has no way to find their own colour anywhere on
+    yellow and sees olive buttons has no way to find their own color anywhere on
     the page otherwise. */
     inks.push(Ink {
         contrast: Contrast::Component,

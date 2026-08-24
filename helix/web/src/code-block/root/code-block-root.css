@@ -83,7 +83,7 @@
      step is the difference between black and not-quite.
 
      Which is an argument about a block of code *on a page*, and a block of code
-     inside a card or a drawer is a slab of the page's colour sitting on
+     inside a card or a drawer is a slab of the page's color sitting on
      something else. `--code-block-background` is how that is said, and the
      reasoning above is why the page stays the default rather than becoming a
      `transparent` that would take the border's meaning with it. */
@@ -119,7 +119,7 @@
   line-height: var(--helix-leading-normal);
 }
 
-/* Print: a fill that is a slab of grey on paper; the border frames it instead.
+/* Print: a fill that is a slab of gray on paper; the border frames it instead.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
  * on a component's behalf and every family says it for itself. See 165. */

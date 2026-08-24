@@ -64,7 +64,7 @@ const DWELL = 7000
 const BRAND = '#3b82f6'
 
 /**
- * Re-derives from one colour and puts the result on the panel.
+ * Re-derives from one color and puts the result on the panel.
  *
  * **All of it comes from the engine, including the seed.** This file used to
  * carry a hand-written bridge and a comment explaining that the two derivations
@@ -105,7 +105,7 @@ const restyle = (
 }
 
 /**
- * Paints the panel, and again whenever the colour mode moves. Returns its own
+ * Paints the panel, and again whenever the color mode moves. Returns its own
  * teardown.
  *
  * Lifted out of the effect that used to hold it, because that effect is now
@@ -263,10 +263,10 @@ export function Showcase(): React.ReactElement {
         <helix-flex direction="column" gap="md">
           <helix-text variant="label">Helix</helix-text>
           <helix-text as="h3" class={styles.anchorTitle}>
-            One brand colour in. A whole palette out.
+            One brand color in. A whole palette out.
           </helix-text>
           <helix-text>
-            Every surface, border and text colour on this page is derived from a single value, and
+            Every surface, border and text color on this page is derived from a single value, and
             each one is checked against the ground it lands on.
           </helix-text>
           <helix-flex>
@@ -293,7 +293,7 @@ export function Showcase(): React.ReactElement {
       </helix-toggle-group>
 
       {/* On the switch's own line, because it belongs to the panel rather than
-          to any one view: changing the colour with Data showing and finding the
+          to any one view: changing the color with Data showing and finding the
           control gone would be the same fault the switch avoids. */}
       {/* **`aria-label` rather than `label`, which is the field mixin's own
           distinction: `label` means a visible label and `aria-label` means a
@@ -316,7 +316,7 @@ export function Showcase(): React.ReactElement {
       <helix-tooltip class={styles.showcaseReset} content="Back to the Fusion blue">
         <helix-icon-button
           disabled={brand === BRAND || undefined}
-          label="Reset the brand colour"
+          label="Reset the brand color"
           onClick={() => setBrand(BRAND)}
         >
           <helix-icon name="arrow-counter-clockwise"></helix-icon>
@@ -331,7 +331,7 @@ export function Showcase(): React.ReactElement {
                 would fill in. Fields first, then the two that are settings. */}
           <helix-card class={`showcaseCard ${styles.showcaseTall}`} separation="outlined">
             <helix-flex direction="column" gap="md">
-              <helix-select default-value="dark" label="Colour mode" name="mode">
+              <helix-select default-value="dark" label="Color mode" name="mode">
                 <helix-icon name="caret-down" slot="indicator"></helix-icon>
                 <helix-option value="system">System</helix-option>
                 <helix-option value="light">Light</helix-option>
@@ -552,7 +552,7 @@ export function Showcase(): React.ReactElement {
                   had been doing both jobs: the wash is how a bar is shaded and
                   the emphasis is how much ink it claims. Outlined bars with a
                   gradient in them read as a chart rather than as a block of
-                  colour, which is what a showcase wants. */}
+                  color, which is what a showcase wants. */}
               <helix-bar-chart
                 class={styles.showcaseBars}
                 emphasis="outlined"

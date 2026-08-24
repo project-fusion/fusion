@@ -19,14 +19,14 @@ const theme = derive({ brand: '#2563eb' })
 derived from it or from the design language, and a theme that sets one field is
 a valid theme.
 
-## Colour
+## Color
 
 | Field | Decides |
 |---|---|
-| `brand` | The one colour most consumers care about. Required |
+| `brand` | The one color most consumers care about. Required |
 | `accent` | The second emphasis. Defaults to the complement, `{ from: 'brand', rotate: 180 }` |
-| `neutral` | The grey ramp, which can be tinted toward the brand |
-| `status` | `info`, `success`, `warning`, `danger`. A colour pins one; an object nudges its hue within the meaning it already carries |
+| `neutral` | The gray ramp, which can be tinted toward the brand |
+| `status` | `info`, `success`, `warning`, `danger`. A color pins one; an object nudges its hue within the meaning it already carries |
 | `chroma` | How saturated the palette is, independent of hue |
 | `scheme` | `'light'` or `'dark'`, for a theme that is only one |
 | `tokens` | Literal overrides, by token name, for the cases nothing else reaches |
@@ -38,9 +38,9 @@ re-learn per product.
 **`chroma` is the axis a brand's feel lives on.** Monotone, muted, restrained
 and vivid are all chroma statements and none of them is a hue. `ceiling` clamps,
 so 0 is monotone and roughly 0.10 is muted; `scale` multiplies what the brand
-supplies. Both apply to every derived colour including the brand itself, because
-a monotone theme is one where the brand is grey too. Never applied to a value
-you pinned: a pinned colour is a fact.
+supplies. Both apply to every derived color including the brand itself, because
+a monotone theme is one where the brand is gray too. Never applied to a value
+you pinned: a pinned color is a fact.
 
 ## The guarantee
 

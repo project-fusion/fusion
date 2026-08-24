@@ -99,7 +99,7 @@ export class HelixSandboxPreview extends HelixElement {
   /**
    * Which half of the palette the frame renders in.
    *
-   * **The frame is a document and a document has its own colour mode.** Setting
+   * **The frame is a document and a document has its own color mode.** Setting
    * `data-color-mode` on this element styles this element, and the contents of
    * an iframe inherit nothing from it: measured, a frame under a host carrying
    * the attribute had it unset on its own root. Left alone the frame follows

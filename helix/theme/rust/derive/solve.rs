@@ -7,7 +7,7 @@
 //! surface list, so it is that list applied rather than a different solver.
 //!
 //! Worth separating for that reason alone. Everything downstream calls one of
-//! these two, so a mistake here is a mistake in every colour the theme emits,
+//! these two, so a mistake here is a mistake in every color the theme emits,
 //! and a pure function is one that can be tested without deriving anything.
 
 use crate::derive::Cast;
@@ -24,14 +24,14 @@ use crate::oklch::{
 /// page and left it failing on the tinted badge it also sits in.
 ///
 /// One candidate per ground, then the one whose *weakest* pairing is strongest.
-/// Not the average and not the first that passes: a token is one colour standing
+/// Not the average and not the first that passes: a token is one color standing
 /// on every ground the model gives it, so the ground it does worst on is the one
 /// that decides whether it works.
 ///
 /// **Grounds arrive fitted.** Both the candidate search and the worst-case
 /// measurement use them as given, so a caller passing raw ones solves against a
-/// colour that cannot be rendered and then measures against the same
-/// unrenderable colour: self-consistent, and wrong by however far the fit moves.
+/// color that cannot be rendered and then measures against the same
+/// unrenderable color: self-consistent, and wrong by however far the fit moves.
 /// `solve_for_all` satisfies this by construction, `Surfaces::solved_against`
 /// returning fitted values, which is why it went unstated until `on_accent`
 /// arrived with a ground list of its own.
@@ -49,7 +49,7 @@ pub fn solve_against(grounds: &[Oklch], sample: Cast, target: f64) -> Oklch {
 
     /* `f64::min` where the TypeScript writes `Math.min`, and the two disagree on
     `NaN`: JavaScript propagates it, Rust returns the other operand. It cannot
-    arise here, every ratio being finite for a colour that resolved, and the
+    arise here, every ratio being finite for a color that resolved, and the
     validation in `resolve` is what makes that true. */
     let worst_case = |candidate: Oklch| {
         let fitted = fit_to_gamut(candidate, GAMUT_STEPS);

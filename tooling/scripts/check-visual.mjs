@@ -92,7 +92,7 @@ const page = (family) => {
   return (
     '<!doctype html><meta charset="utf-8"><title>base</title>' +
     /* A fixed ground and a fixed inset, so a component that draws to its own
-       edge is not cropped and the page's own colour is never the thing under
+       edge is not cropped and the page's own color is never the thing under
        test. `color-scheme` is declared because the base sheets resolve their
        grays through `light-dark()`. */
     '<style>:root{color-scheme:light}' +
@@ -220,7 +220,7 @@ for (const family of families) {
   }
 
   const diff = new PNG({ height: before.height, width: before.width })
-  /* `threshold` is per-pixel colour distance, not a budget of pixels. Zero
+  /* `threshold` is per-pixel color distance, not a budget of pixels. Zero
      tolerated pixels, because this only ever compares Linux to Linux and a
      single moved pixel is the fault it exists to catch. The threshold is off
      the floor only so a renderer's own dithering does not read as a change. */

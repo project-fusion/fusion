@@ -40,25 +40,25 @@ const host = (): { addController: () => void; requestUpdate: () => void; updates
 describe('a token read where there is no canvas to convert with', () => {
   /* Which is a server, and every caller is drawing into a canvas, so there is
      nothing there to draw either. */
-  test('answers the fallback rather than a colour it guessed', () => {
+  test('answers the fallback rather than a color it guessed', () => {
     const one = host()
-    const colour = new TokenColorController(one as never)
-    colour.hostConnected()
-    expect(colour.read('--helix-color-foreground', [0.1, 0.2, 0.3])).toEqual([0.1, 0.2, 0.3])
-    colour.hostDisconnected()
+    const color = new TokenColorController(one as never)
+    color.hostConnected()
+    expect(color.read('--helix-color-foreground', [0.1, 0.2, 0.3])).toEqual([0.1, 0.2, 0.3])
+    color.hostDisconnected()
   })
 
   /* A copy, not the caller's own array. Every caller here is writing into a
      shader, and one that normalises the triple it was handed would be
      rewriting the fallback it passes on the next frame. */
   test('and a copy of it, so a caller writing into the triple keeps its own', () => {
-    const colour = new TokenColorController(host() as never)
-    colour.hostConnected()
+    const color = new TokenColorController(host() as never)
+    color.hostConnected()
     const fallback: [number, number, number] = [0.1, 0.2, 0.3]
-    const read = colour.read('--helix-color-foreground', fallback)
+    const read = color.read('--helix-color-foreground', fallback)
     read[0] = 1
     expect(fallback[0]).toBe(0.1)
-    colour.hostDisconnected()
+    color.hostDisconnected()
   })
 
   test('before it has connected at all, which is where a server is', () => {
@@ -69,36 +69,36 @@ describe('a token read where there is no canvas to convert with', () => {
 describe('the probe a token is resolved against', () => {
   test('is put on the page, and drawn nowhere', () => {
     const before = document.body.children.length
-    const colour = new TokenColorController(host() as never)
-    colour.hostConnected()
+    const color = new TokenColorController(host() as never)
+    color.hostConnected()
     const probe = document.body.lastElementChild as HTMLElement
     expect(document.body.children.length).toBe(before + 1)
     expect(probe.style.display).toBe('none')
-    colour.hostDisconnected()
+    color.hostDisconnected()
   })
 
   test('and taken away again when the host leaves', () => {
     const before = document.body.children.length
-    const colour = new TokenColorController(host() as never)
-    colour.hostConnected()
-    colour.hostDisconnected()
+    const color = new TokenColorController(host() as never)
+    color.hostConnected()
+    color.hostDisconnected()
     expect(document.body.children.length).toBe(before)
   })
 })
 
 describe('the palette moving underneath the host', () => {
-  /* The colour mode is an attribute and the system's answer is a media query.
+  /* The color mode is an attribute and the system's answer is a media query.
      Watching only the first leaves a reader on system light with the dark
      palette, which is the half that is easy to miss because a developer
      toggling the site's own control never sees it. */
   test('is noticed when the document changes its mode', async () => {
     const one = host()
-    const colour = new TokenColorController(one as never)
-    colour.hostConnected()
+    const color = new TokenColorController(one as never)
+    color.hostConnected()
     document.documentElement.setAttribute('data-color-mode', 'dark')
     await new Promise((done) => setTimeout(done, 0))
     expect(one.updates).toBe(1)
-    colour.hostDisconnected()
+    color.hostDisconnected()
     document.documentElement.removeAttribute('data-color-mode')
   })
 
@@ -106,22 +106,22 @@ describe('the palette moving underneath the host', () => {
      holds its last frame and no re-render repaints it. */
   test('and the host is told, not merely asked to update', async () => {
     let told = 0
-    const colour = new TokenColorController(host() as never, () => {
+    const color = new TokenColorController(host() as never, () => {
       told += 1
     })
-    colour.hostConnected()
+    color.hostConnected()
     document.documentElement.setAttribute('data-color-mode', 'dark')
     await new Promise((done) => setTimeout(done, 0))
     expect(told).toBe(1)
-    colour.hostDisconnected()
+    color.hostDisconnected()
     document.documentElement.removeAttribute('data-color-mode')
   })
 
   test('and stops being watched once the host leaves', async () => {
     const one = host()
-    const colour = new TokenColorController(one as never)
-    colour.hostConnected()
-    colour.hostDisconnected()
+    const color = new TokenColorController(one as never)
+    color.hostConnected()
+    color.hostDisconnected()
     document.documentElement.setAttribute('data-color-mode', 'dark')
     await new Promise((done) => setTimeout(done, 0))
     expect(one.updates).toBe(0)
@@ -144,12 +144,12 @@ describe('the operating system’s own answer', () => {
     })) as never
     try {
       const one = host()
-      const colour = new TokenColorController(one as never)
-      colour.hostConnected()
+      const color = new TokenColorController(one as never)
+      color.hostConnected()
       expect(listeners).toHaveLength(1)
       listeners[0]?.()
       expect(one.updates).toBe(1)
-      colour.hostDisconnected()
+      color.hostDisconnected()
     } finally {
       window.matchMedia = real
     }
@@ -165,9 +165,9 @@ describe('the operating system’s own answer', () => {
       removeEventListener: (name: string) => released.push(name),
     })) as never
     try {
-      const colour = new TokenColorController(host() as never)
-      colour.hostConnected()
-      colour.hostDisconnected()
+      const color = new TokenColorController(host() as never)
+      color.hostConnected()
+      color.hostDisconnected()
       expect(released).toEqual(['change'])
     } finally {
       window.matchMedia = real

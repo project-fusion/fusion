@@ -29,7 +29,7 @@ import '../../tooltip/index.js'
  *
  * @cssproperty --line-chart-band-color - The slot the pointer is resting in.
  * @cssproperty --line-chart-gridline-color - One rule across the plot, under `gridlines`.
- * @cssproperty --line-chart-area-opacity - How much of a line's colour its wash takes.
+ * @cssproperty --line-chart-area-opacity - How much of a line's color its wash takes.
  * @cssproperty --line-chart-block-size - Height of the drawing.
  * @cssproperty --line-chart-gap - Space between the drawing and its labels.
  * @cssproperty --line-chart-width - Thickness of a line.

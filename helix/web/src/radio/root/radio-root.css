@@ -273,11 +273,11 @@
     translate var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Weight and height carry the choice, not a wash of colour.
+/* Weight and height carry the choice, not a wash of color.
  *
  * A chosen chip goes solid and comes forward, which is what a pressed key does
  * and reads at a glance across a row of five. Tinting the background instead
- * says "this one is a slightly different colour", a hue a reader has to
+ * says "this one is a slightly different color", a hue a reader has to
  * interpret rather than a state they can see. */
 :host([variant="chip"][selected]) [part="item"] {
   background-color: var(--helix-color-surface-inverse);

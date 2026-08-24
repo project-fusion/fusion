@@ -14,7 +14,7 @@ import { styles } from './command-root.css.js'
  * @description
  * The palette is a dialog holding a filterable listbox, so what this tier adds
  * is where that dialog sits and how the list reads inside it. It opens against
- * the top of the window rather than centred, which is where every palette a
+ * the top of the window rather than centered, which is where every palette a
  * reader has used opens: a list that grows and shrinks as it is filtered would
  * otherwise walk up and down the screen under the words being typed.
  *

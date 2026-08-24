@@ -31,7 +31,7 @@ describe('dialog', () => {
   test('it renders a real dialog element, not a div with a role', async () => {
     /* The whole design rests on this: the top layer, the backdrop, Escape and
        inert-behind are the platform's, and none of them are available to a div
-       however it is labelled. */
+       however it is labeled. */
     const host = await dialog()
     expect((part(host, 'dialog') as HTMLElement).tagName.toLowerCase()).toBe('dialog')
   })
@@ -221,7 +221,7 @@ describe('dialog framing', () => {
     expect(icon.assignedNodes().length).toBe(0)
   })
 
-  test('centring is one property for the panel, not one per region', async () => {
+  test('centering is one property for the panel, not one per region', async () => {
     // The regions are never mixed: a dialog that asks a short question centers
     // all four together, and one holding a form runs all four from the start.
     const host = await framed('align="center"')

@@ -142,7 +142,7 @@ slot[name="children"]::slotted(*) {
    list that twitches. The surface says it.
 
    **A different surface from hover, which it was not.** Both painted
-   `surface-raised` over the same foreground, so a pointer travelling down the
+   `surface-raised` over the same foreground, so a pointer traveling down the
    tree made every row it crossed look chosen and the row that actually was
    became impossible to find. `sunken` is a step further from the page in light
    and in dark alike, which reads as settled where `raised` reads as answering
@@ -170,7 +170,7 @@ slot[name="children"]::slotted(*) {
 }
 
 /* A row that is a link is still a row. An `<a>` arrives underlined and in the
-   link colour, and neither belongs on something already shaped like a row: the
+   link color, and neither belongs on something already shaped like a row: the
    selection wash and the hover say what it does, and a column of blue
    underlined rows reads as prose that has been marked up rather than as a list
    to move around in. */

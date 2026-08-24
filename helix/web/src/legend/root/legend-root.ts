@@ -6,7 +6,7 @@ import { styles as seriesStyles } from '../../chart/series.css.js'
 import { styles } from './legend-root.css.js'
 
 /**
- * @summary The names a chart draws, each beside the colour it is drawn in.
+ * @summary The names a chart draws, each beside the color it is drawn in.
  *
  * @description
  * A row that wraps, because a legend sits under a chart as wide as the chart
@@ -16,7 +16,7 @@ import { styles } from './legend-root.css.js'
  * The eight series colours are mapped here rather than in the tier below, which
  * carries the index and holds no tokens. Written as eight rules for the reason
  * `Avatar.Group` writes twelve: an index in markup cannot select a token, and a
- * custom property set inline would be the headless tier naming a colour.
+ * custom property set inline would be the headless tier naming a color.
  *
  * @since 0.1.0
  * @status experimental
@@ -26,7 +26,7 @@ import { styles } from './legend-root.css.js'
  *
  * @cssproperty --legend-direction - `row`, which wraps, or `column`.
  * @cssproperty --legend-gap - Space between entries.
- * @cssproperty --legend-swatch-size - Size of the colour patch.
+ * @cssproperty --legend-swatch-size - Size of the color patch.
  */
 @customElement('helix-legend')
 export class HelixLegend extends HelixBaseLegend {

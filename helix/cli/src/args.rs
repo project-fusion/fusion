@@ -8,7 +8,7 @@
 //!
 //! **Two global flags and no more.** `--json` and `--no-color` are about the
 //! *channel* rather than the command, so they belong to the binary; everything
-//! else belongs to a verb. A global flag that only some verbs honour is a
+//! else belongs to a verb. A global flag that only some verbs honor is a
 //! promise the help text makes and the code does not keep.
 
 use std::path::PathBuf;
@@ -38,9 +38,9 @@ pub struct Cli {
     #[arg(long, global = true)]
     pub json: bool,
 
-    /// Never colour the output.
+    /// Never color the output.
     ///
-    /// Colour is already off when stdout is not a terminal and when `NO_COLOR`
+    /// Color is already off when stdout is not a terminal and when `NO_COLOR`
     /// is set. This is the third way, for a terminal that reports itself capable
     /// and is not.
     #[arg(long, global = true)]
@@ -121,7 +121,7 @@ pub struct Init {
     #[arg(long, short, value_name = "PATH")]
     pub out: Option<PathBuf>,
 
-    /// The brand colour to seed it with.
+    /// The brand color to seed it with.
     #[arg(long, default_value = "#3b82f6", value_name = "HEX")]
     pub brand: String,
 

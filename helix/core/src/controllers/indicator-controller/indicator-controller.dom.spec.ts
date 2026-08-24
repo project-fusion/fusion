@@ -3,7 +3,7 @@ import { registerDom } from '@helix-io/testing/dom'
 import { IndicatorController } from './indicator-controller.js'
 
 /**
- * Measuring the marked child and writing the geometry onto a travelling mark.
+ * Measuring the marked child and writing the geometry onto a traveling mark.
  *
  * **Four components had written this and the copies had diverged.**
  * `Navigation`, `Tabs`, `Toggle.Group` and `Outline` each measured an active

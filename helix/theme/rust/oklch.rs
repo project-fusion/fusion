@@ -1,6 +1,6 @@
-//! OKLCH colour math, ported from `src/oklch.ts`.
+//! OKLCH color math, ported from `src/oklch.ts`.
 //!
-//! Theme derivation depends on a perceptual colour space. Equal numeric steps in
+//! Theme derivation depends on a perceptual color space. Equal numeric steps in
 //! sRGB are not equal perceptual steps, which makes both scale generation and
 //! contrast targeting unreliable. Everything here exists so that
 //! [`lightness_for_contrast`] can be correct.
@@ -17,7 +17,7 @@
 //! for `f32` would differ in the last place at exactly the point a bisection is
 //! deciding which half to keep.
 
-/// A colour in OKLCH. Lightness 0 to 1, chroma from 0, hue in degrees.
+/// A color in OKLCH. Lightness 0 to 1, chroma from 0, hue in degrees.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Oklch {
     pub chroma: f64,
@@ -38,7 +38,7 @@ fn clamp01(n: f64) -> f64 {
 }
 
 /// OKLCH to linear sRGB, via `Oklab`. Coefficients from Björn Ottosson's
-/// definition of the `Oklab` colour space.
+/// definition of the `Oklab` color space.
 #[must_use]
 pub fn oklch_to_linear_rgb(color: Oklch) -> LinearRgb {
     let rad = color.hue * std::f64::consts::PI / 180.0;
@@ -56,7 +56,7 @@ pub fn oklch_to_linear_rgb(color: Oklch) -> LinearRgb {
     }
 }
 
-/// True when the colour falls outside the sRGB gamut and would be clipped.
+/// True when the color falls outside the sRGB gamut and would be clipped.
 #[must_use]
 pub fn is_out_of_gamut(color: Oklch) -> bool {
     let rgb = oklch_to_linear_rgb(color);
@@ -103,9 +103,9 @@ fn srgb_to_linear(channel: f64) -> f64 {
 /// A `#rgb` or `#rrggbb` string to OKLCH, the inverse of [`oklch_to_hex`].
 ///
 /// **Hex is the fixed point, not OKLCH.** `hex_to_oklch(oklch_to_hex(c))`
-/// returns `c` only when `c` can be rendered: `oklch_to_hex` clips, so a colour
-/// outside the sRGB gamut comes back as the colour that can be shown instead.
-/// What does hold exactly is the other direction, which is the property a colour
+/// returns `c` only when `c` can be rendered: `oklch_to_hex` clips, so a color
+/// outside the sRGB gamut comes back as the color that can be shown instead.
+/// What does hold exactly is the other direction, which is the property a color
 /// a reader picked actually needs.
 ///
 /// Returns `None` for anything that is not three or six hex digits, where the
@@ -120,7 +120,7 @@ this file is a port of, harder for every future reader. */
 #[must_use]
 pub fn hex_to_oklch(hex: &str) -> Option<Oklch> {
     /* One `#`, not any number of them. `trim_start_matches` strips every leading
-    one, so `##abc` parsed here and produced a colour where the TypeScript's
+    one, so `##abc` parsed here and produced a color where the TypeScript's
     single `.replace('#', '')` leaves `#abc` and refuses. Accepting a typo the
     engine being ported rejects is the wrong direction for a port to differ in. */
     let trimmed = hex.trim();
@@ -177,10 +177,10 @@ pub fn contrast_ratio(a: Oklch, b: Oklch) -> f64 {
     ratio(relative_luminance(a), relative_luminance(b))
 }
 
-/// Relative luminance of the colour as it will actually ship.
+/// Relative luminance of the color as it will actually ship.
 ///
 /// **The float is solved and the hex is delivered, and they are not the same
-/// colour.** `oklch_to_hex` rounds each channel to a byte, and a byte of
+/// color.** `oklch_to_hex` rounds each channel to a byte, and a byte of
 /// rounding moves the luminance: solved in continuous space and measured after
 /// rounding, three emitted inks came out at 4.4885, 4.4891 and 4.4905 against a
 /// target of 4.5. The quantisation here is `oklch_to_hex`'s own, byte for byte,
@@ -208,11 +208,11 @@ pub const GAMUT_STEPS: u32 = 20;
 /// How many halvings each direction of the contrast search takes.
 pub const CONTRAST_STEPS: u32 = 24;
 
-/// Reduces chroma until the colour falls inside the sRGB gamut, preserving
+/// Reduces chroma until the color falls inside the sRGB gamut, preserving
 /// lightness and hue.
 ///
 /// Without this, any seed chroma at an extreme lightness silently produces a
-/// clipped colour: a near-white surface with a hint of brand tint pushes a
+/// clipped color: a near-white surface with a hint of brand tint pushes a
 /// channel above 1.0 and gets truncated on the way to hex, which breaks both the
 /// intended hue and the contrast that was solved for.
 #[must_use]
@@ -304,13 +304,13 @@ fn search_direction(
 /// `background`.
 ///
 /// This is the function the whole theming product rests on. It is what lets a
-/// user pick a brand colour and receive a palette whose every foreground and
+/// user pick a brand color and receive a palette whose every foreground and
 /// background pair is accessible **by construction**, rather than generated and
 /// then audited.
 ///
 /// **Both directions are tried unless one is pinned.** Whether light or dark
 /// text works better on a given surface is not knowable from the background's
-/// luminance alone: a mid-tone brand colour often fails white text and passes
+/// luminance alone: a mid-tone brand color often fails white text and passes
 /// black, and a luminance-threshold heuristic picks wrong exactly there. When
 /// both sides pass, the least extreme result wins.
 ///

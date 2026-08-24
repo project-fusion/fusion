@@ -30,7 +30,7 @@
   --site-inset: var(--helix-space-2xl);
 
   /* Both rails the same width, which is what centres the column between them.
-     They were 15 and 13, so the middle track was two rem off centre and the
+     They were 15 and 13, so the middle track was two rem off center and the
      prose inside it inherited the error. Equal is not a coincidence to be
      maintained by hand: it is one number used twice. */
   --docs-rail: 15rem;
@@ -247,10 +247,10 @@
   color: var(--helix-color-foreground);
 }
 
-/* A property's name, in the library's identifier colour rather than the brand's.
+/* A property's name, in the library's identifier color rather than the brand's.
  *
- * It was `tone="primary"`, which is the colour of a link and of a filled
- * button: the first column of six tables was shouting in the one colour the
+ * It was `tone="primary"`, which is the color of a link and of a filled
+ * button: the first column of six tables was shouting in the one color the
  * page uses for things a reader can act on, and none of them were. */
 /* The table scrolls sideways rather than colliding with itself.
  *
@@ -349,7 +349,7 @@
 }
 
 /* And the type beside it, coloured by what each part of it is. The tokens are
-   the library's own, so a type on this page is the colour the same word takes
+   the library's own, so a type on this page is the color the same word takes
    in the sandbox's editor. */
 /* A type wraps rather than scrolls.
  *
@@ -424,7 +424,7 @@
 
 /* A literal value is green. That is `syntax-tag` rather than `syntax-string`,
    which is navy in this GitHub-derived set: the token names describe an
-   editor's grammar, and what is wanted here is the colour.
+   editor's grammar, and what is wanted here is the color.
  *
  * Held back toward the text around it. At full strength a union of six literals
  * is six bright green words in a table cell, which is louder than the prose
@@ -442,7 +442,7 @@
   font-style: italic;
 }
 
-/* And every built-in is one colour, `string` alongside `boolean`. They are the
+/* And every built-in is one color, `string` alongside `boolean`. They are the
    same kind of word, and separating them made a union of literals read as a
    list of primitives. */
 .apiType [data-token="builtin"] {

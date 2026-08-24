@@ -30,7 +30,7 @@ describe('icon rendering', () => {
     expect(svg(icon)?.hasAttribute('role')).toBe(false)
   })
 
-  test('a labelled icon becomes content with a name', async () => {
+  test('a labeled icon becomes content with a name', async () => {
     const icon = await mount('<helix-base-icon name="x" label="Dismiss"></helix-base-icon>')
     expect(svg(icon)?.getAttribute('role')).toBe('img')
     expect(svg(icon)?.getAttribute('aria-label')).toBe('Dismiss')

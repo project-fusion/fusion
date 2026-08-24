@@ -21,7 +21,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * - **Monotone throughout.** There is no accent. Emphasis is `artSolid`, which
  *   is `surface-inverse`: a near-black plate in light and a near-white one in
  *   dark, carrying `foreground-inverse` for anything on it. Color here was
- *   only ever saying "this one is emphasised", on about half the grid, which
+ *   only ever saying "this one is emphasized", on about half the grid, which
  *   weight says as well and more quietly.
  * - **Every card sits on the same dot lattice**, drawn once in `index.tsx` at
  *   16 units, which is `space-md`. It shows through the sparse drawings and is
@@ -211,7 +211,7 @@ export const coreArt: Record<string, ReactNode> = {
   /**
    * A 40 pixel avatar and two lines, at 40% and 70% of the row.
    *
-   * The sweep is the component's own: a straight band, travelling leftward,
+   * The sweep is the component's own: a straight band, traveling leftward,
    * 1.4s ease-in-out, continuous. It was skewed and resting once, which looked
    * better and was four separate departures from `helix-skeleton-sweep`.
    *

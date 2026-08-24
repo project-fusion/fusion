@@ -39,7 +39,7 @@ export class HelixIconButton extends MixinControlSurface(HelixBaseIconButton) {
    *
    * `emphasis` says how filled it is and `tone` says what it means; neither of
    * them says what shape it is, and folding a shape into either would put a
-   * control's outline in the same word as its colour. A rounded square is the
+   * control's outline in the same word as its color. A rounded square is the
    * resting one because that is what a control in a row of controls should be.
    *
    * `circle` is the floating action button, and it is the reason this exists: a

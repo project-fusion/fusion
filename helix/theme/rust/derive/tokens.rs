@@ -67,7 +67,7 @@ pub fn derive_tokens(resolved: &Resolved) -> Derived {
     }
 }
 
-/// What the colour phases produced, before any of it is named.
+/// What the color phases produced, before any of it is named.
 ///
 /// Split from the assembly because the two answer different questions: this is
 /// "which colours does this intent imply", and [`assemble`] is "what does the
@@ -174,7 +174,7 @@ fn assemble(
         This emitted `color-primary-foreground` and nothing consumed it: every
         component putting text on the brand asks for
         `--helix-color-foreground-on-accent`, so the engine and the token layer
-        were naming the same colour differently and a themed page kept the stock
+        were naming the same color differently and a themed page kept the stock
         one. The token layer has 135 names and this has a handful, so the handful
         moved. */
         against("color-foreground-on-accent", *on_accent, primary.filled),

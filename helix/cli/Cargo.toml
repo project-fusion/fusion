@@ -16,7 +16,7 @@ path = "src/main.rs"
 
 [dependencies]
 # **The derivation is a library and this is a caller.** A binary that scaffolds
-# projects is not the home of colour math, so `helix-theme` stays its own crate
+# projects is not the home of color math, so `helix-theme` stays its own crate
 # and keeps its WASM wrapper buildable without dragging the command surface into
 # `@helix-io/theme`.
 helix-theme = { path = "../theme", features = ["serde"] }

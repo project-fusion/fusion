@@ -145,7 +145,7 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
    *
    * Resolved the way `for` is, so an id in the same tree, which is what lets a
    * component name a box in its own shadow root. A chart does: its bubble is
-   * centred on a reading, and the first and last readings sit at the ends of
+   * centered on a reading, and the first and last readings sit at the ends of
    * the plot, so half the box hangs past the drawing and, measured on a chart
    * in a 320px card, three pixels past the card itself.
    *
@@ -258,9 +258,9 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     boundary: (): readonly (Element | null)[] => [this, this.named],
     /* The declared gap plus the arrow's own reach, so the gap is to the point.
      *
-     * A square of side `n` rotated forty-five degrees about its own centre
-     * reaches `n / sqrt(2)` from that centre, and the arrow is placed with its
-     * centre on the bubble's edge, so that is exactly how far past the edge the
+     * A square of side `n` rotated forty-five degrees about its own center
+     * reaches `n / sqrt(2)` from that center, and the arrow is placed with its
+     * center on the bubble's edge, so that is exactly how far past the edge the
      * tip goes. Read from the element rather than assumed, because
      * `--tooltip-arrow-size` is a hook and a theme may have moved it.
      *
@@ -658,9 +658,9 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
        * Measured, one page, two identical tooltips:
        *
        *   CLOSED  bare host     (none)
-       *   CLOSED  labelled host Description B
+       *   CLOSED  labeled host Description B
        *   OPEN    bare host     Description A
-       *   OPEN    labelled host Description B
+       *   OPEN    labeled host Description B
        *
        * Only when `for` is set, because only then is this host the thing being
        * referenced. Wrapping, it is an ancestor of the trigger and naming it

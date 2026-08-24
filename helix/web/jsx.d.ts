@@ -549,7 +549,7 @@ would catch. */
   /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
-judgement about the message, and elsewhere in this library it carries one:
+judgment about the message, and elsewhere in this library it carries one:
 `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
@@ -593,7 +593,7 @@ would catch. */
   /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
-judgement about the message, and elsewhere in this library it carries one:
+judgment about the message, and elsewhere in this library it carries one:
 `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
 none of that. It set a color, the live region stayed polite either way, and
@@ -690,7 +690,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   "content-align"?: HelixAppHeader["contentAlign"];
@@ -707,7 +707,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   contentAlign?: HelixAppHeader["contentAlign"];
@@ -782,7 +782,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   "attr:content-align"?: HelixAppHeader["contentAlign"];
@@ -799,7 +799,7 @@ the wordmark and the actions happen to measure.
 **Named for the region and not for what is usually in it.** It was
 `nav-align`, which reads as a property about `Navigation` and is not: the
 middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centred its search
+breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   "prop:contentAlign"?: HelixAppHeader["contentAlign"];
@@ -883,7 +883,7 @@ wants.
 
 **The fraction is measured across the whole width, and for a while it was
 not.** The first expression corrected for the aspect once in the wrong
-direction and never subtracted the centre, so the value read as an offset
+direction and never subtracted the center, so the value read as an offset
 from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
 put the axis at 81.3% of the width and `0` was the only value that reached
 the middle. The contract above is now solved against what the shader draws
@@ -983,7 +983,7 @@ wants.
 
 **The fraction is measured across the whole width, and for a while it was
 not.** The first expression corrected for the aspect once in the wrong
-direction and never subtracted the centre, so the value read as an offset
+direction and never subtracted the center, so the value read as an offset
 from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
 put the axis at 81.3% of the width and `0` was the only value that reached
 the middle. The contract above is now solved against what the shader draws
@@ -1171,7 +1171,7 @@ is *this series* made of, and how much ink does *this series* claim. */
 
 The chart's treatment, which every series takes unless `outlined` or
 `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-of the series colour with that edge on it, and absent is the filled column,
+of the series color with that edge on it, and absent is the filled column,
 per the rule that a reflected property takes no default.
 
 **It composes with `material` rather than competing with it.** Emphasis
@@ -1198,7 +1198,7 @@ Per series and not per bar, because a bar is a mark inside a drawing and
 nobody writes markup for one, which is the same reason `material` sits on
 the chart. */
   outlined?: HelixBarChart["outlined"];
-  /** Which series are drawn as a wash of their colour, by name. Matched as `outlined` is. */
+  /** Which series are drawn as a wash of their color, by name. Matched as `outlined` is. */
   subtle?: HelixBarChart["subtle"];
   /** The id of the table to read.
 
@@ -1280,7 +1280,7 @@ mislead in every other case.
 no value axis at all when there is one scale, because the columns are
 measured against each other and a reader needs no numbers to do that. With
 two, a reader has no way of knowing there are two, let alone which series
-is on which, so both scales are labelled the moment this is set. An
+is on which, so both scales are labeled the moment this is set. An
 unlabelled second axis is the deceptive case rather than the tidy one.
 
 The grid stays on the primary axis, since a rule measured against two
@@ -1343,7 +1343,7 @@ is *this series* made of, and how much ink does *this series* claim. */
 
 The chart's treatment, which every series takes unless `outlined` or
 `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-of the series colour with that edge on it, and absent is the filled column,
+of the series color with that edge on it, and absent is the filled column,
 per the rule that a reflected property takes no default.
 
 **It composes with `material` rather than competing with it.** Emphasis
@@ -1370,7 +1370,7 @@ Per series and not per bar, because a bar is a mark inside a drawing and
 nobody writes markup for one, which is the same reason `material` sits on
 the chart. */
   "prop:outlined"?: HelixBarChart["outlined"];
-  /** Which series are drawn as a wash of their colour, by name. Matched as `outlined` is. */
+  /** Which series are drawn as a wash of their color, by name. Matched as `outlined` is. */
   "prop:subtle"?: HelixBarChart["subtle"];
   /** The id of the table to read.
 
@@ -1452,7 +1452,7 @@ mislead in every other case.
 no value axis at all when there is one scale, because the columns are
 measured against each other and a reader needs no numbers to do that. With
 two, a reader has no way of knowing there are two, let alone which series
-is on which, so both scales are labelled the moment this is set. An
+is on which, so both scales are labeled the moment this is set. An
 unlabelled second axis is the deceptive case rather than the tidy one.
 
 The grid stays on the primary axis, since a rule measured against two
@@ -1591,7 +1591,7 @@ opened "Width and not weight", which is a sentence a name should not need:
 so a button carried a property called `fill` beside a property about being
 filled, meaning different things. `separation="filled"` and
 `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
-colour, and every chart in the library writes `fill` for paint, which left
+color, and every chart in the library writes `fill` for paint, which left
 this the only use of the word meaning geometry.
 
 `Dialog` had already made the same move for the same reason, its
@@ -1638,9 +1638,9 @@ absence, which each control names for itself, `outlined` on `Button` and
 
 Three and an accent, not the full status set. A tag reports a state and a
 button performs an action: a success button and a warning button are not
-things anybody writes, and offering them invites a page where the colour
+things anybody writes, and offering them invites a page where the color
 of a control means nothing in particular. `accent` is the second
-emphasis, a rotation off the brand seed rather than a colour of its own,
+emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   tone?: HelixButton["tone"];
   /** What activating the button does to its form. */
@@ -1729,7 +1729,7 @@ opened "Width and not weight", which is a sentence a name should not need:
 so a button carried a property called `fill` beside a property about being
 filled, meaning different things. `separation="filled"` and
 `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
-colour, and every chart in the library writes `fill` for paint, which left
+color, and every chart in the library writes `fill` for paint, which left
 this the only use of the word meaning geometry.
 
 `Dialog` had already made the same move for the same reason, its
@@ -1776,9 +1776,9 @@ absence, which each control names for itself, `outlined` on `Button` and
 
 Three and an accent, not the full status set. A tag reports a state and a
 button performs an action: a success button and a warning button are not
-things anybody writes, and offering them invites a page where the colour
+things anybody writes, and offering them invites a page where the color
 of a control means nothing in particular. `accent` is the second
-emphasis, a rotation off the brand seed rather than a colour of its own,
+emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   "prop:tone"?: HelixButton["tone"];
   /** What activating the button does to its form. */
@@ -1900,7 +1900,7 @@ cannot keep saying both.
 - `elevated` is lifted off the page instead of framed, for a card on a
   colored or busy background, where a line has to compete with whatever is
   behind it and a shadow does not.
-- `filled` is told apart by its own colour, with neither edge nor lift. For
+- `filled` is told apart by its own color, with neither edge nor lift. For
   a dense surface where a border on every card is a grid of lines, and for
   a theme whose `separation` policy is `fill`, which pushes the surface
   ladder away from the page precisely so this reads.
@@ -1909,7 +1909,7 @@ cannot keep saying both.
   second box adds a line and no meaning.
 
 **`filled` is new and it closes a hole the engine could already see.**
-`plain` clears the ground *and* the edge, so a surface with its own colour
+`plain` clears the ground *and* the edge, so a surface with its own color
 and neither edge nor lift was unsayable while being one of the four things
 a theme could ask for. */
   separation?: HelixCard["separation"];
@@ -1976,7 +1976,7 @@ cannot keep saying both.
 - `elevated` is lifted off the page instead of framed, for a card on a
   colored or busy background, where a line has to compete with whatever is
   behind it and a shadow does not.
-- `filled` is told apart by its own colour, with neither edge nor lift. For
+- `filled` is told apart by its own color, with neither edge nor lift. For
   a dense surface where a border on every card is a grid of lines, and for
   a theme whose `separation` policy is `fill`, which pushes the surface
   ladder away from the page precisely so this reads.
@@ -1985,7 +1985,7 @@ cannot keep saying both.
   second box adds a line and no meaning.
 
 **`filled` is new and it closes a hole the engine could already see.**
-`plain` clears the ground *and* the edge, so a surface with its own colour
+`plain` clears the ground *and* the edge, so a surface with its own color
 and neither edge nor lift was unsayable while being one of the four things
 a theme could ask for. */
   "prop:separation"?: HelixCard["separation"];
@@ -2908,7 +2908,7 @@ where the color is the answer rather than a setting. */
 
 **Undefaulted, because it reflects.** The two together are what stamp an
 attribute onto every host anybody renders, including the ones nobody
-configured: the server wrote `format="hex"` on every colour input on the
+configured: the server wrote `format="hex"` on every color input on the
 page, and React, holding no such prop, reported a hydration mismatch for
 each one. That is the fault `Tree.chevronPlacement` had and the reason the
 area rules say a reflected property takes no default. Hex is still what an
@@ -3039,7 +3039,7 @@ where the color is the answer rather than a setting. */
 
 **Undefaulted, because it reflects.** The two together are what stamp an
 attribute onto every host anybody renders, including the ones nobody
-configured: the server wrote `format="hex"` on every colour input on the
+configured: the server wrote `format="hex"` on every color input on the
 page, and React, holding no such prop, reported a hydration mismatch for
 each one. That is the fault `Tree.chevronPlacement` had and the reason the
 area rules say a reflected property takes no default. Hex is still what an
@@ -3222,7 +3222,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixColorPicker["name"];
 
-  /** The eyedropper has closed, whether or not a colour was taken. */
+  /** The eyedropper has closed, whether or not a color was taken. */
   "onhelix-sample-end"?: (
     e: HelixColorPickerHelixSampleEndElementEvent,
   ) => void;
@@ -3339,7 +3339,7 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixColorPicker["name"];
-  /** The eyedropper has closed, whether or not a colour was taken. */
+  /** The eyedropper has closed, whether or not a color was taken. */
   "on:helix-sample-end"?: (
     e: HelixColorPickerHelixSampleEndElementEvent,
   ) => void;
@@ -3860,9 +3860,9 @@ absence, which each control names for itself, `outlined` on `Button` and
 
 Three and an accent, not the full status set. A tag reports a state and a
 button performs an action: a success button and a warning button are not
-things anybody writes, and offering them invites a page where the colour
+things anybody writes, and offering them invites a page where the color
 of a control means nothing in particular. `accent` is the second
-emphasis, a rotation off the brand seed rather than a colour of its own,
+emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   tone?: HelixCopyButton["tone"];
   /** What goes on the clipboard. */
@@ -3870,7 +3870,7 @@ so it stays in relation when somebody rethemes. */
   /** What it is called, and says, before a press.
 
 Defaulted rather than left empty. An icon-only control must be named, and
-the name of this one is not a judgement call: every copy button in the
+the name of this one is not a judgment call: every copy button in the
 world is called Copy. A consumer with a better word still sets it. */
   label?: HelixCopyButton["label"];
   /** What it is called, and says, after one.
@@ -3970,9 +3970,9 @@ absence, which each control names for itself, `outlined` on `Button` and
 
 Three and an accent, not the full status set. A tag reports a state and a
 button performs an action: a success button and a warning button are not
-things anybody writes, and offering them invites a page where the colour
+things anybody writes, and offering them invites a page where the color
 of a control means nothing in particular. `accent` is the second
-emphasis, a rotation off the brand seed rather than a colour of its own,
+emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   "prop:tone"?: HelixCopyButton["tone"];
   /** What goes on the clipboard. */
@@ -3980,7 +3980,7 @@ so it stays in relation when somebody rethemes. */
   /** What it is called, and says, before a press.
 
 Defaulted rather than left empty. An icon-only control must be named, and
-the name of this one is not a judgement call: every copy button in the
+the name of this one is not a judgment call: every copy button in the
 world is called Copy. A consumer with a better word still sets it. */
   "prop:label"?: HelixCopyButton["label"];
   /** What it is called, and says, after one.
@@ -4902,7 +4902,7 @@ Absent is a ring with room for a total in it. `small` and `large` move the
 hole without moving the outer edge, so a chart keeps its footprint.
 
 **`none` is a pie**, and it is the same drawing rather than another one:
-the radius follows the thickness, so the inner edge reaching the centre is
+the radius follows the thickness, so the inner edge reaching the center is
 what closing the hole means. A pie reads less accurately than a ring, angle
 being harder to judge than length, but it is not *misleading* the way a bar
 measured from anything but zero is, which is why this is a value here and
@@ -4960,7 +4960,7 @@ Absent is a ring with room for a total in it. `small` and `large` move the
 hole without moving the outer edge, so a chart keeps its footprint.
 
 **`none` is a pie**, and it is the same drawing rather than another one:
-the radius follows the thickness, so the inner edge reaching the centre is
+the radius follows the thickness, so the inner edge reaching the center is
 what closing the hole means. A pie reads less accurately than a ring, angle
 being harder to judge than length, but it is not *misleading* the way a bar
 measured from anything but zero is, which is why this is a value here and
@@ -5522,7 +5522,7 @@ export type HelixIconButtonProps = {
 
 `emphasis` says how filled it is and `tone` says what it means; neither of
 them says what shape it is, and folding a shape into either would put a
-control's outline in the same word as its colour. A rounded square is the
+control's outline in the same word as its color. A rounded square is the
 resting one because that is what a control in a row of controls should be.
 
 `circle` is the floating action button, and it is the reason this exists: a
@@ -5559,9 +5559,9 @@ absence, which each control names for itself, `outlined` on `Button` and
 
 Three and an accent, not the full status set. A tag reports a state and a
 button performs an action: a success button and a warning button are not
-things anybody writes, and offering them invites a page where the colour
+things anybody writes, and offering them invites a page where the color
 of a control means nothing in particular. `accent` is the second
-emphasis, a rotation off the brand seed rather than a colour of its own,
+emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   tone?: HelixIconButton["tone"];
   /** What activating the button does to its form. */
@@ -5639,7 +5639,7 @@ export type HelixIconButtonSolidJsProps = {
 
 `emphasis` says how filled it is and `tone` says what it means; neither of
 them says what shape it is, and folding a shape into either would put a
-control's outline in the same word as its colour. A rounded square is the
+control's outline in the same word as its color. A rounded square is the
 resting one because that is what a control in a row of controls should be.
 
 `circle` is the floating action button, and it is the reason this exists: a
@@ -5676,9 +5676,9 @@ absence, which each control names for itself, `outlined` on `Button` and
 
 Three and an accent, not the full status set. A tag reports a state and a
 button performs an action: a success button and a warning button are not
-things anybody writes, and offering them invites a page where the colour
+things anybody writes, and offering them invites a page where the color
 of a control means nothing in particular. `accent` is the second
-emphasis, a rotation off the brand seed rather than a colour of its own,
+emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   "prop:tone"?: HelixIconButton["tone"];
   /** What activating the button does to its form. */
@@ -8787,7 +8787,7 @@ which is what makes it read as dots rather than as a softened square code. */
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
-costs about fifteen percent redundancy. `H` where a mark covers the centre,
+costs about fifteen percent redundancy. `H` where a mark covers the center,
 chosen automatically when the slot is filled: it is the level that makes
 covering safe, and a consumer who fills the slot has said what they want
 without having to know that. */
@@ -8817,7 +8817,7 @@ which is what makes it read as dots rather than as a softened square code. */
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
-costs about fifteen percent redundancy. `H` where a mark covers the centre,
+costs about fifteen percent redundancy. `H` where a mark covers the center,
 chosen automatically when the slot is filled: it is the level that makes
 covering safe, and a consumer who fills the slot has said what they want
 without having to know that. */
@@ -9136,7 +9136,7 @@ export type HelixRatingProps = {
 
 `marks` is the star, and is what a rating means to most readers. `dots`
 drops the glyph for a plain circle, which says how much rather than how
-good: a star carries a judgement that a level of spice, a difficulty or a
+good: a star carries a judgment that a level of spice, a difficulty or a
 confidence has not earned.
 
 Both are one shape repeated and clipped to the score, so halves work in
@@ -9266,7 +9266,7 @@ export type HelixRatingSolidJsProps = {
 
 `marks` is the star, and is what a rating means to most readers. `dots`
 drops the glyph for a plain circle, which says how much rather than how
-good: a star carries a judgement that a level of spice, a difficulty or a
+good: a star carries a judgment that a level of spice, a difficulty or a
 confidence has not earned.
 
 Both are one shape repeated and clipped to the score, so halves work in
@@ -9407,7 +9407,7 @@ export type HelixSandboxPreviewHelixConsoleElementEvent =
 export type HelixSandboxPreviewProps = {
   /** Which half of the palette the frame renders in.
 
-**The frame is a document and a document has its own colour mode.** Setting
+**The frame is a document and a document has its own color mode.** Setting
 `data-color-mode` on this element styles this element, and the contents of
 an iframe inherit nothing from it: measured, a frame under a host carrying
 the attribute had it unset on its own root. Left alone the frame follows
@@ -9421,7 +9421,7 @@ including every one of the 24 series colours a chart reads. */
   "color-mode"?: HelixSandboxPreview["colorMode"];
   /** Which half of the palette the frame renders in.
 
-**The frame is a document and a document has its own colour mode.** Setting
+**The frame is a document and a document has its own color mode.** Setting
 `data-color-mode` on this element styles this element, and the contents of
 an iframe inherit nothing from it: measured, a frame under a host carrying
 the attribute had it unset on its own root. Left alone the frame follows
@@ -9453,7 +9453,7 @@ including every one of the 24 series colours a chart reads. */
 export type HelixSandboxPreviewSolidJsProps = {
   /** Which half of the palette the frame renders in.
 
-**The frame is a document and a document has its own colour mode.** Setting
+**The frame is a document and a document has its own color mode.** Setting
 `data-color-mode` on this element styles this element, and the contents of
 an iframe inherit nothing from it: measured, a frame under a host carrying
 the attribute had it unset on its own root. Left alone the frame follows
@@ -9467,7 +9467,7 @@ including every one of the 24 series colours a chart reads. */
   "attr:color-mode"?: HelixSandboxPreview["colorMode"];
   /** Which half of the palette the frame renders in.
 
-**The frame is a document and a document has its own colour mode.** Setting
+**The frame is a document and a document has its own color mode.** Setting
 `data-color-mode` on this element styles this element, and the contents of
 an iframe inherit nothing from it: measured, a frame under a host carrying
 the attribute had it unset on its own root. Left alone the frame follows
@@ -10335,7 +10335,7 @@ The shapes come from `helix/web/src/chart/terminus.css`, shared with every other
 that ends a line, so the set is the same wherever one appears. `ring` is the
 one that asks anything of the drawing: the disc it leaves open is masked out
 of the `<svg>`, so the line stops at the ring's inner edge rather than
-running on to the reading at its centre, and the middle shows whatever the
+running on to the reading at its center, and the middle shows whatever the
 chart is drawn over rather than a guess at it. */
   terminus?: HelixSparkline["terminus"];
   /** What the readings are drawn as.
@@ -10446,7 +10446,7 @@ The shapes come from `helix/web/src/chart/terminus.css`, shared with every other
 that ends a line, so the set is the same wherever one appears. `ring` is the
 one that asks anything of the drawing: the disc it leaves open is masked out
 of the `<svg>`, so the line stops at the ring's inner edge rather than
-running on to the reading at its centre, and the middle shows whatever the
+running on to the reading at its center, and the middle shows whatever the
 chart is drawn over rather than a guess at it. */
   "prop:terminus"?: HelixSparkline["terminus"];
   /** What the readings are drawn as.
@@ -12504,7 +12504,7 @@ Whatever `<time>` accepts, which is a date, a time, both, a duration or a
 week. Unset, the label is written as it was given and nothing claims to
 know what instant it names. */
   datetime?: HelixTimelineItem["datetime"];
-  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  /** What kind of event it was, which decides the mark's color and nothing else. */
   tone?: HelixTimelineItem["tone"];
 };
 
@@ -12515,7 +12515,7 @@ Whatever `<time>` accepts, which is a date, a time, both, a duration or a
 week. Unset, the label is written as it was given and nothing claims to
 know what instant it names. */
   "prop:datetime"?: HelixTimelineItem["datetime"];
-  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  /** What kind of event it was, which decides the mark's color and nothing else. */
   "prop:tone"?: HelixTimelineItem["tone"];
 
   /** Set the innerHTML of the element */
@@ -12753,7 +12753,7 @@ being four of a kind rather than four of three kinds. */
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -12768,7 +12768,7 @@ and cannot be used to remove it. */
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -12856,7 +12856,7 @@ being four of a kind rather than four of three kinds. */
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -12871,7 +12871,7 @@ and cannot be used to remove it. */
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
-group wants. `start` is for a row of controls that are labelled rather than
+group wants. `start` is for a row of controls that are labeled rather than
 a form of fields: a toolbar reads as one line, and a label stacked over
 every group in it turns one row into two.
 
@@ -13069,7 +13069,7 @@ it changes the visible gap rather than a number the arrow then eats into. */
 
 Resolved the way `for` is, so an id in the same tree, which is what lets a
 component name a box in its own shadow root. A chart does: its bubble is
-centred on a reading, and the first and last readings sit at the ends of
+centered on a reading, and the first and last readings sit at the ends of
 the plot, so half the box hangs past the drawing and, measured on a chart
 in a 320px card, three pixels past the card itself.
 
@@ -13164,7 +13164,7 @@ it changes the visible gap rather than a number the arrow then eats into. */
 
 Resolved the way `for` is, so an id in the same tree, which is what lets a
 component name a box in its own shadow root. A chart does: its bubble is
-centred on a reading, and the first and last readings sit at the ends of
+centered on a reading, and the first and last readings sit at the ends of
 the plot, so half the box hangs past the drawing and, measured on a chart
 in a 320px card, three pixels past the card itself.
 
@@ -14569,7 +14569,7 @@ export type CustomElements = {
    * - `tone`: Which color the band wears.
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
-   * judgement about the message, and elsewhere in this library it carries one:
+   * judgment about the message, and elsewhere in this library it carries one:
    * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and
@@ -14709,7 +14709,7 @@ export type CustomElements = {
    * **Named for the region and not for what is usually in it.** It was
    * `nav-align`, which reads as a property about `Navigation` and is not: the
    * middle slot takes whatever a consumer puts there, a search field or a
-   * breadcrumb trail as readily as a nav, and a header that centred its search
+   * breadcrumb trail as readily as a nav, and a header that centered its search
    * box would have been setting `nav-align` to do it. The part is called
    * `content`, so the property is too.
    *
@@ -14853,7 +14853,7 @@ export type CustomElements = {
    *
    * **The fraction is measured across the whole width, and for a while it was
    * not.** The first expression corrected for the aspect once in the wrong
-   * direction and never subtracted the centre, so the value read as an offset
+   * direction and never subtracted the center, so the value read as an offset
    * from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
    * put the axis at 81.3% of the width and `0` was the only value that reached
    * the middle. The contract above is now solved against what the shader draws
@@ -15085,7 +15085,7 @@ export type CustomElements = {
    *
    * The chart's treatment, which every series takes unless `outlined` or
    * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-   * of the series colour with that edge on it, and absent is the filled column,
+   * of the series color with that edge on it, and absent is the filled column,
    * per the rule that a reflected property takes no default.
    *
    * **It composes with `material` rather than competing with it.** Emphasis
@@ -15110,7 +15110,7 @@ export type CustomElements = {
    * Per series and not per bar, because a bar is a mark inside a drawing and
    * nobody writes markup for one, which is the same reason `material` sits on
    * the chart.
-   * - `subtle`: Which series are drawn as a wash of their colour, by name. Matched as `outlined` is.
+   * - `subtle`: Which series are drawn as a wash of their color, by name. Matched as `outlined` is.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -15186,7 +15186,7 @@ export type CustomElements = {
    * no value axis at all when there is one scale, because the columns are
    * measured against each other and a reader needs no numbers to do that. With
    * two, a reader has no way of knowing there are two, let alone which series
-   * is on which, so both scales are labelled the moment this is set. An
+   * is on which, so both scales are labeled the moment this is set. An
    * unlabelled second axis is the deceptive case rather than the tidy one.
    *
    * The grid stays on the primary axis, since a rule measured against two
@@ -15219,7 +15219,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--bar-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
-   * - `--bar-chart-line-color`: A `lines` series, overriding its series colour. (default: `undefined`)
+   * - `--bar-chart-line-color`: A `lines` series, overriding its series color. (default: `undefined`)
    * - `--bar-chart-line-width`: Thickness of a `lines` series. (default: `undefined`)
    * - `--bar-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
@@ -15227,8 +15227,8 @@ export type CustomElements = {
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
    * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
-   * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
-   * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
+   * - `--bar-chart-axis`: The color of a single-series axis, taken from that series. (default: `undefined`)
+   * - `--bar-chart-secondary`: The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -15448,7 +15448,7 @@ export type CustomElements = {
    * so a button carried a property called `fill` beside a property about being
    * filled, meaning different things. `separation="filled"` and
    * `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
-   * colour, and every chart in the library writes `fill` for paint, which left
+   * color, and every chart in the library writes `fill` for paint, which left
    * this the only use of the word meaning geometry.
    *
    * `Dialog` had already made the same move for the same reason, its
@@ -15493,9 +15493,9 @@ export type CustomElements = {
    *
    * Three and an accent, not the full status set. A tag reports a state and a
    * button performs an action: a success button and a warning button are not
-   * things anybody writes, and offering them invites a page where the colour
+   * things anybody writes, and offering them invites a page where the color
    * of a control means nothing in particular. `accent` is the second
-   * emphasis, a rotation off the brand seed rather than a colour of its own,
+   * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
@@ -15710,7 +15710,7 @@ export type CustomElements = {
    * - `elevated` is lifted off the page instead of framed, for a card on a
    *   colored or busy background, where a line has to compete with whatever is
    *   behind it and a shadow does not.
-   * - `filled` is told apart by its own colour, with neither edge nor lift. For
+   * - `filled` is told apart by its own color, with neither edge nor lift. For
    *   a dense surface where a border on every card is a grid of lines, and for
    *   a theme whose `separation` policy is `fill`, which pushes the surface
    *   ladder away from the page precisely so this reads.
@@ -15719,7 +15719,7 @@ export type CustomElements = {
    *   second box adds a line and no meaning.
    *
    * **`filled` is new and it closes a hole the engine could already see.**
-   * `plain` clears the ground *and* the edge, so a surface with its own colour
+   * `plain` clears the ground *and* the edge, so a surface with its own color
    * and neither edge nor lift was unsayable while being one of the four things
    * a theme could ask for.
    * - `material`: What the card is made of.
@@ -16396,7 +16396,7 @@ export type CustomElements = {
    *
    * **Undefaulted, because it reflects.** The two together are what stamp an
    * attribute onto every host anybody renders, including the ones nobody
-   * configured: the server wrote `format="hex"` on every colour input on the
+   * configured: the server wrote `format="hex"` on every color input on the
    * page, and React, holding no such prop, reported a hydration mismatch for
    * each one. That is the fault `Tree.chevronPlacement` had and the reason the
    * area rules say a reflected property takes no default. Hex is still what an
@@ -16522,13 +16522,13 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--color-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--color-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--color-input-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--color-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--color-input-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    * - `--color-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
    * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
-   * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
+   * - `--color-input-swatch`: The chosen color, to paint over the transparency check. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16651,7 +16651,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-sample-end`: The eyedropper has closed, whether or not a colour was taken.
+   * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
    * - `helix-change`: Fired when the color changes.
    * - `helix-copy`: Fired when the color is put on the clipboard.
@@ -16723,7 +16723,7 @@ export type CustomElements = {
    * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
    * - `--color-picker-hue`: The chosen hue, 0 to 360, unitless. (default: `undefined`)
    * - `--color-picker-saturation`: The chosen saturation, 0 to 100, as a percentage. (default: `undefined`)
-   * - `--color-picker-swatch`: A colour to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
+   * - `--color-picker-swatch`: A color to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16955,7 +16955,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--combobox-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--combobox-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--combobox-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--combobox-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--combobox-control-size`: Smallest the text field shrinks to (default: `undefined`)
    * - `--combobox-panel-size`: Width of the panel. Follows the field by default. (default: `undefined`)
@@ -16984,7 +16984,7 @@ export type CustomElements = {
   /**
    * The palette is a dialog holding a filterable listbox, so what this tier adds
    * is where that dialog sits and how the list reads inside it. It opens against
-   * the top of the window rather than centred, which is where every palette a
+   * the top of the window rather than centered, which is where every palette a
    * reader has used opens: a list that grows and shrinks as it is filtered would
    * otherwise walk up and down the screen under the words being typed.
    *
@@ -17104,15 +17104,15 @@ export type CustomElements = {
    *
    * Three and an accent, not the full status set. A tag reports a state and a
    * button performs an action: a success button and a warning button are not
-   * things anybody writes, and offering them invites a page where the colour
+   * things anybody writes, and offering them invites a page where the color
    * of a control means nothing in particular. `accent` is the second
-   * emphasis, a rotation off the brand seed rather than a colour of its own,
+   * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
    * - `value`: What goes on the clipboard.
    * - `label`: What it is called, and says, before a press.
    *
    * Defaulted rather than left empty. An icon-only control must be named, and
-   * the name of this one is not a judgement call: every copy button in the
+   * the name of this one is not a judgment call: every copy button in the
    * world is called Copy. A consumer with a better word still sets it.
    * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
    *
@@ -17462,7 +17462,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--date-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--date-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--date-input-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--date-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--date-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
@@ -17750,7 +17750,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--dialog-rise`: How far the panel rises as it opens. Follows `--helix-space-lg`. (default: `undefined`)
-   * - `--dialog-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--dialog-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--dialog-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
@@ -17802,7 +17802,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--divider-color`: Colour of the rule. (default: `undefined`)
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
    * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
    * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
@@ -17861,7 +17861,7 @@ export type CustomElements = {
    * hole without moving the outer edge, so a chart keeps its footprint.
    *
    * **`none` is a pie**, and it is the same drawing rather than another one:
-   * the radius follows the thickness, so the inner edge reaching the centre is
+   * the radius follows the thickness, so the inner edge reaching the center is
    * what closing the hole means. A pie reads less accurately than a ring, angle
    * being harder to judge than length, but it is not *misleading* the way a bar
    * measured from anything but zero is, which is why this is a value here and
@@ -17926,14 +17926,14 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
-   * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
+   * - `--donut-chart-track-color`: Color of the ring under the slices. (default: `undefined`)
    * - `--donut-chart-stroke`: How thick the ring is drawn, derived from `hole`. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `centre`: The middle of the ring, holding whatever is slotted.
+   * - `center`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
@@ -18045,7 +18045,7 @@ export type CustomElements = {
    *
    * - `--drawer-backdrop`: Filter applied behind a `material="glass"` drawer. Follows the theme's material policy; set it to override the strength on one drawer. (default: `undefined`)
    * - `--drawer-background-color`: Surface behind the panel. (default: `undefined`)
-   * - `--drawer-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--drawer-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--drawer-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
    * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
@@ -18471,7 +18471,7 @@ export type CustomElements = {
    *
    * `emphasis` says how filled it is and `tone` says what it means; neither of
    * them says what shape it is, and folding a shape into either would put a
-   * control's outline in the same word as its colour. A rounded square is the
+   * control's outline in the same word as its color. A rounded square is the
    * resting one because that is what a control in a row of controls should be.
    *
    * `circle` is the floating action button, and it is the reason this exists: a
@@ -18505,9 +18505,9 @@ export type CustomElements = {
    *
    * Three and an accent, not the full status set. A tag reports a state and a
    * button performs an action: a success button and a warning button are not
-   * things anybody writes, and offering them invites a page where the colour
+   * things anybody writes, and offering them invites a page where the color
    * of a control means nothing in particular. `accent` is the second
-   * emphasis, a rotation off the brand seed rather than a colour of its own,
+   * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
@@ -18977,7 +18977,7 @@ export type CustomElements = {
    * The eight series colours are mapped here rather than in the tier below, which
    * carries the index and holds no tokens. Written as eight rules for the reason
    * `Avatar.Group` writes twelve: an index in markup cannot select a token, and a
-   * custom property set inline would be the headless tier naming a colour.
+   * custom property set inline would be the headless tier naming a color.
    *
    * ## Attributes & Properties
    *
@@ -19017,7 +19017,7 @@ export type CustomElements = {
    *
    * - `--legend-direction`: `row`, which wraps, or `column`. (default: `undefined`)
    * - `--legend-gap`: Space between entries. (default: `undefined`)
-   * - `--legend-swatch-size`: Size of the colour patch. (default: `undefined`)
+   * - `--legend-swatch-size`: Size of the color patch. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -19026,7 +19026,7 @@ export type CustomElements = {
    * - `entry`: One name and its swatch.
    * - `list`: The list itself.
    * - `name`: One series name.
-   * - `swatch`: The colour a series is drawn in.
+   * - `swatch`: The color a series is drawn in.
    */
   "helix-legend": Partial<
     HelixLegendProps & BaseProps<HelixLegend> & BaseEvents
@@ -19141,7 +19141,7 @@ export type CustomElements = {
    *
    * - `--line-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
    * - `--line-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
-   * - `--line-chart-area-opacity`: How much of a line's colour its wash takes. (default: `undefined`)
+   * - `--line-chart-area-opacity`: How much of a line's color its wash takes. (default: `undefined`)
    * - `--line-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--line-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
    * - `--line-chart-width`: Thickness of a line. (default: `undefined`)
@@ -19411,7 +19411,7 @@ export type CustomElements = {
    *
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
-   * already manages that: centring is what a caller wants when the list is being
+   * already manages that: centering is what a caller wants when the list is being
    * read as a dial rather than scanned as a list, which is what Time Picker's wheels
    * does with three of these.
    *
@@ -19633,7 +19633,7 @@ export type CustomElements = {
    * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
    * - `--megamenu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
-   * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
+   * - `--megamenu-full-size`: How wide the band's contents may get, centered in it. (default: `undefined`)
    * - `--megamenu-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-top`: Where the panel starts, measured from the bar above it. (default: `undefined`)
@@ -19857,7 +19857,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
-   * - `--menu-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--menu-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--menu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--menu-max-block-size`: Tallest the surface grows before it scrolls. (default: `undefined`)
    * - `--menu-min-inline-size`: Narrowest the surface gets. (default: `undefined`)
@@ -20387,7 +20387,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--outline-rail`: Width of the gutter the rule and the travelling mark share. (default: `undefined`)
+   * - `--outline-rail`: Width of the gutter the rule and the traveling mark share. (default: `undefined`)
    * - `--outline-indent`: How far each level is inset from the one above. (default: `undefined`)
    *
    * ## CSS Parts
@@ -20894,7 +20894,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--popover-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--popover-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--popover-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
    * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
@@ -20999,7 +20999,7 @@ export type CustomElements = {
 
   /**
    * The picture is the base tier's. What this adds is a size that can be set
-   * once, the colours a scanner needs, and the box that holds a centre mark.
+   * once, the colours a scanner needs, and the box that holds a center mark.
    *
    * **The ink is `currentColor` and the ground is a real fill.** A code has to be
    * dark on light to read, and the pair that guarantees it is not the page's
@@ -21030,7 +21030,7 @@ export type CustomElements = {
    * - `correction`: How much of the code can be lost and still read.
    *
    * `M` by default, which is the level almost every code in the world uses and
-   * costs about fifteen percent redundancy. `H` where a mark covers the centre,
+   * costs about fifteen percent redundancy. `H` where a mark covers the center,
    * chosen automatically when the slot is filled: it is the level that makes
    * covering safe, and a consumer who fills the slot has said what they want
    * without having to know that.
@@ -21039,7 +21039,7 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `logo`: A mark for the centre, which only reads at a high correction.
+   * - `logo`: A mark for the center, which only reads at a high correction.
    *
    * ## CSS Custom Properties
    *
@@ -21058,8 +21058,8 @@ export type CustomElements = {
    *
    * - `code`: The square itself.
    * - `modules`: Everything but the three corner squares.
-   * - `finders`: The three corner squares, which can take their own colour.
-   * - `logo`: The box holding the centre mark.
+   * - `finders`: The three corner squares, which can take their own color.
+   * - `logo`: The box holding the center mark.
    */
   "helix-qr-code": Partial<
     HelixQrCodeProps & BaseProps<HelixQrCode> & BaseEvents
@@ -21350,7 +21350,7 @@ export type CustomElements = {
    *
    * `marks` is the star, and is what a rating means to most readers. `dots`
    * drops the glyph for a plain circle, which says how much rather than how
-   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * good: a star carries a judgment that a level of spice, a difficulty or a
    * confidence has not earned.
    *
    * Both are one shape repeated and clipped to the score, so halves work in
@@ -21508,7 +21508,7 @@ export type CustomElements = {
    * - `--rating-mark`: The shape of one mark, as a mask image. (default: `undefined`)
    * - `--rating-size`: How big one mark is. (default: `undefined`)
    * - `--rating-gap`: Space between marks. (default: `undefined`)
-   * - `--rating-color`: The colour of a filled mark. (default: `undefined`)
+   * - `--rating-color`: The color of a filled mark. (default: `undefined`)
    * - `--rating-empty-color`: And of an unfilled one. (default: `undefined`)
    * - `--rating-full`: How many marks are wholly filled. (default: `undefined`)
    * - `--rating-part`: How much of the next mark is filled, 0 to 1. (default: `undefined`)
@@ -21580,7 +21580,7 @@ export type CustomElements = {
    *
    * - `color-mode`/`colorMode`: Which half of the palette the frame renders in.
    *
-   * **The frame is a document and a document has its own colour mode.** Setting
+   * **The frame is a document and a document has its own color mode.** Setting
    * `data-color-mode` on this element styles this element, and the contents of
    * an iframe inherit nothing from it: measured, a frame under a host carrying
    * the attribute had it unset on its own root. Left alone the frame follows
@@ -22171,7 +22171,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--select-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--select-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--select-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--select-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--select-surface-max-block-size`: How tall the panel gets. (default: `undefined`)
@@ -22197,7 +22197,7 @@ export type CustomElements = {
 
   /**
    * A sweep rather than a pulse. A block fading in and out reads as something
-   * broken; a highlight travelling across it reads as work in progress, and it is
+   * broken; a highlight traveling across it reads as work in progress, and it is
    * the same one property animating either way.
    *
    * ## Attributes & Properties
@@ -22421,7 +22421,7 @@ export type CustomElements = {
    * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
    * first and heavy in the second.
    *
-   * One colour on the host, read by the line, the wash, the columns and the mark
+   * One color on the host, read by the line, the wash, the columns and the mark
    * alike, so moving `--sparkline-color` cannot leave parts of one drawing
    * disagreeing.
    *
@@ -22464,7 +22464,7 @@ export type CustomElements = {
    * that ends a line, so the set is the same wherever one appears. `ring` is the
    * one that asks anything of the drawing: the disc it leaves open is masked out
    * of the `<svg>`, so the line stops at the ring's inner edge rather than
-   * running on to the reading at its centre, and the middle shows whatever the
+   * running on to the reading at its center, and the middle shows whatever the
    * chart is drawn over rather than a guess at it.
    * - `plot`: What the readings are drawn as.
    *
@@ -22543,10 +22543,10 @@ export type CustomElements = {
    *
    * - `--chart-terminus-hole`: A fill for the middle of a `ring` terminus, which is otherwise open. (default: `undefined`)
    * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
-   * - `--sparkline-area-opacity`: How much of the line's colour the wash takes where it meets the line. (default: `undefined`)
+   * - `--sparkline-area-opacity`: How much of the line's color the wash takes where it meets the line. (default: `undefined`)
    * - `--sparkline-bar-radius`: Corner radius on a column, under `plot="bar"`. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
-   * - `--sparkline-color`: Colour of the line, the wash, the columns and the mark. (default: `undefined`)
+   * - `--sparkline-color`: Color of the line, the wash, the columns and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
    * - `--sparkline-width`: Thickness of the line, overriding `weight`. (default: `undefined`)
    * - `--chart-terminus-x`: Where the last point sits horizontally, as a percentage. (default: `undefined`)
@@ -23072,7 +23072,7 @@ export type CustomElements = {
   "helix-step": Partial<HelixStepProps & BaseProps<HelixStep> & BaseEvents>;
 
   /**
-   * A thumb travelling in a groove, which is the one place in the library color
+   * A thumb traveling in a groove, which is the one place in the library color
    * is used to say "on". A checkbox does not, because a tick is legible on its
    * own; a switch has no mark, so the fill is the whole of what distinguishes the
    * two states and there is nothing else for it to be.
@@ -24023,7 +24023,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--time-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--time-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--time-input-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--time-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--time-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
@@ -24284,7 +24284,7 @@ export type CustomElements = {
    * Whatever `<time>` accepts, which is a date, a time, both, a duration or a
    * week. Unset, the label is written as it was given and nothing claims to
    * know what instant it names.
-   * - `tone`: What kind of event it was, which decides the mark's colour and nothing else.
+   * - `tone`: What kind of event it was, which decides the mark's color and nothing else.
    *
    * ## Slots
    *
@@ -24414,7 +24414,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--toast-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--toast-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--toast-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
    * - `--toast-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
@@ -24539,7 +24539,7 @@ export type CustomElements = {
    * - `label-placement`/`labelPlacement`: Where the group's label sits, `start` putting it on the track's line.
    *
    * Absent is above, which is what a field looks like and what almost every
-   * group wants. `start` is for a row of controls that are labelled rather than
+   * group wants. `start` is for a row of controls that are labeled rather than
    * a form of fields: a toolbar reads as one line, and a label stacked over
    * every group in it turns one row into two.
    *
@@ -24822,7 +24822,7 @@ export type CustomElements = {
    *
    * Resolved the way `for` is, so an id in the same tree, which is what lets a
    * component name a box in its own shadow root. A chart does: its bubble is
-   * centred on a reading, and the first and last readings sit at the ends of
+   * centered on a reading, and the first and last readings sit at the ends of
    * the plot, so half the box hangs past the drawing and, measured on a chart
    * in a 320px card, three pixels past the card itself.
    *
@@ -25268,7 +25268,7 @@ export type CustomElements = {
   "helix-tree": Partial<HelixTreeProps & BaseProps<HelixTree> & BaseEvents>;
 
   /**
-   * The arrow takes the judgment colour and the number does not, which is the
+   * The arrow takes the judgment color and the number does not, which is the
    * opposite of the dashboard convention and is measured rather than preferred:
    * in light mode the success token is 3.8:1 on the surface, enough for a glyph
    * and short of what 13px text needs, and there is no darker green in the ramp.
@@ -25306,7 +25306,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--trend-color`: Colour of the arrow, overriding the judgment. (default: `undefined`)
+   * - `--trend-color`: Color of the arrow, overriding the judgment. (default: `undefined`)
    * - `--trend-icon-size`: Size of the arrow. (default: `undefined`)
    *
    * ## CSS Parts
@@ -25399,7 +25399,7 @@ export type CustomElements = {
    * all. So the button here is two boundaries away from the rule that styles
    * every button beside it, and the same tokens are what make the two agree.
    *
-   * Colour is inherited rather than named, so the bar's own colour arrives on
+   * Color is inherited rather than named, so the bar's own color arrives on
    * its own. `--video-playlist-menu-color` is there for the case where it should
    * not.
    *
@@ -25432,7 +25432,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--video-playlist-menu-color`: Colour of the trigger, defaulting to the control bar's. (default: `undefined`)
+   * - `--video-playlist-menu-color`: Color of the trigger, defaulting to the control bar's. (default: `undefined`)
    * - `--video-playlist-menu-poster`: Width of an entry's still. (default: `undefined`)
    * - `--video-playlist-menu-size`: Size of the trigger's glyph. (default: `undefined`)
    *
@@ -25523,7 +25523,7 @@ export type CustomElements = {
    *
    * **The bar is over the picture, not under it.** A bar in the layout would move
    * everything below the video by its own height and would leave a strip of page
-   * colour under a picture that is meant to be the whole of it. Over it, the
+   * color under a picture that is meant to be the whole of it. Over it, the
    * video is the component's size and the controls belong to it.
    *
    * **It goes when nobody is using it, and comes back for the keyboard.** Hidden
@@ -25912,7 +25912,7 @@ export type CustomElementsSolidJs = {
    * - `tone`: Which color the band wears.
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
-   * judgement about the message, and elsewhere in this library it carries one:
+   * judgment about the message, and elsewhere in this library it carries one:
    * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
    * none of that. It set a color, the live region stayed polite either way, and
@@ -26055,7 +26055,7 @@ export type CustomElementsSolidJs = {
    * **Named for the region and not for what is usually in it.** It was
    * `nav-align`, which reads as a property about `Navigation` and is not: the
    * middle slot takes whatever a consumer puts there, a search field or a
-   * breadcrumb trail as readily as a nav, and a header that centred its search
+   * breadcrumb trail as readily as a nav, and a header that centered its search
    * box would have been setting `nav-align` to do it. The part is called
    * `content`, so the property is too.
    *
@@ -26202,7 +26202,7 @@ export type CustomElementsSolidJs = {
    *
    * **The fraction is measured across the whole width, and for a while it was
    * not.** The first expression corrected for the aspect once in the wrong
-   * direction and never subtracted the centre, so the value read as an offset
+   * direction and never subtracted the center, so the value read as an offset
    * from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
    * put the axis at 81.3% of the width and `0` was the only value that reached
    * the middle. The contract above is now solved against what the shader draws
@@ -26447,7 +26447,7 @@ export type CustomElementsSolidJs = {
    *
    * The chart's treatment, which every series takes unless `outlined` or
    * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-   * of the series colour with that edge on it, and absent is the filled column,
+   * of the series color with that edge on it, and absent is the filled column,
    * per the rule that a reflected property takes no default.
    *
    * **It composes with `material` rather than competing with it.** Emphasis
@@ -26472,7 +26472,7 @@ export type CustomElementsSolidJs = {
    * Per series and not per bar, because a bar is a mark inside a drawing and
    * nobody writes markup for one, which is the same reason `material` sits on
    * the chart.
-   * - `subtle`: Which series are drawn as a wash of their colour, by name. Matched as `outlined` is.
+   * - `subtle`: Which series are drawn as a wash of their color, by name. Matched as `outlined` is.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -26548,7 +26548,7 @@ export type CustomElementsSolidJs = {
    * no value axis at all when there is one scale, because the columns are
    * measured against each other and a reader needs no numbers to do that. With
    * two, a reader has no way of knowing there are two, let alone which series
-   * is on which, so both scales are labelled the moment this is set. An
+   * is on which, so both scales are labeled the moment this is set. An
    * unlabelled second axis is the deceptive case rather than the tidy one.
    *
    * The grid stays on the primary axis, since a rule measured against two
@@ -26581,7 +26581,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--bar-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
-   * - `--bar-chart-line-color`: A `lines` series, overriding its series colour. (default: `undefined`)
+   * - `--bar-chart-line-color`: A `lines` series, overriding its series color. (default: `undefined`)
    * - `--bar-chart-line-width`: Thickness of a `lines` series. (default: `undefined`)
    * - `--bar-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
@@ -26589,8 +26589,8 @@ export type CustomElementsSolidJs = {
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
    * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
-   * - `--bar-chart-axis`: The colour of a single-series axis, taken from that series. (default: `undefined`)
-   * - `--bar-chart-secondary`: The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
+   * - `--bar-chart-axis`: The color of a single-series axis, taken from that series. (default: `undefined`)
+   * - `--bar-chart-secondary`: The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -26825,7 +26825,7 @@ export type CustomElementsSolidJs = {
    * so a button carried a property called `fill` beside a property about being
    * filled, meaning different things. `separation="filled"` and
    * `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
-   * colour, and every chart in the library writes `fill` for paint, which left
+   * color, and every chart in the library writes `fill` for paint, which left
    * this the only use of the word meaning geometry.
    *
    * `Dialog` had already made the same move for the same reason, its
@@ -26870,9 +26870,9 @@ export type CustomElementsSolidJs = {
    *
    * Three and an accent, not the full status set. A tag reports a state and a
    * button performs an action: a success button and a warning button are not
-   * things anybody writes, and offering them invites a page where the colour
+   * things anybody writes, and offering them invites a page where the color
    * of a control means nothing in particular. `accent` is the second
-   * emphasis, a rotation off the brand seed rather than a colour of its own,
+   * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
@@ -27093,7 +27093,7 @@ export type CustomElementsSolidJs = {
    * - `elevated` is lifted off the page instead of framed, for a card on a
    *   colored or busy background, where a line has to compete with whatever is
    *   behind it and a shadow does not.
-   * - `filled` is told apart by its own colour, with neither edge nor lift. For
+   * - `filled` is told apart by its own color, with neither edge nor lift. For
    *   a dense surface where a border on every card is a grid of lines, and for
    *   a theme whose `separation` policy is `fill`, which pushes the surface
    *   ladder away from the page precisely so this reads.
@@ -27102,7 +27102,7 @@ export type CustomElementsSolidJs = {
    *   second box adds a line and no meaning.
    *
    * **`filled` is new and it closes a hole the engine could already see.**
-   * `plain` clears the ground *and* the edge, so a surface with its own colour
+   * `plain` clears the ground *and* the edge, so a surface with its own color
    * and neither edge nor lift was unsayable while being one of the four things
    * a theme could ask for.
    * - `material`: What the card is made of.
@@ -27795,7 +27795,7 @@ export type CustomElementsSolidJs = {
    *
    * **Undefaulted, because it reflects.** The two together are what stamp an
    * attribute onto every host anybody renders, including the ones nobody
-   * configured: the server wrote `format="hex"` on every colour input on the
+   * configured: the server wrote `format="hex"` on every color input on the
    * page, and React, holding no such prop, reported a hydration mismatch for
    * each one. That is the fault `Tree.chevronPlacement` had and the reason the
    * area rules say a reflected property takes no default. Hex is still what an
@@ -27921,13 +27921,13 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--color-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--color-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--color-input-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--color-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--color-input-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    * - `--color-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
    * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
-   * - `--color-input-swatch`: The chosen colour, to paint over the transparency check. (default: `undefined`)
+   * - `--color-input-swatch`: The chosen color, to paint over the transparency check. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -28053,7 +28053,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-sample-end`: The eyedropper has closed, whether or not a colour was taken.
+   * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
    * - `helix-change`: Fired when the color changes.
    * - `helix-copy`: Fired when the color is put on the clipboard.
@@ -28125,7 +28125,7 @@ export type CustomElementsSolidJs = {
    * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
    * - `--color-picker-hue`: The chosen hue, 0 to 360, unitless. (default: `undefined`)
    * - `--color-picker-saturation`: The chosen saturation, 0 to 100, as a percentage. (default: `undefined`)
-   * - `--color-picker-swatch`: A colour to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
+   * - `--color-picker-swatch`: A color to paint: the current one on the sample, a preset's on each preset. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -28360,7 +28360,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--combobox-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--combobox-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--combobox-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--combobox-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--combobox-control-size`: Smallest the text field shrinks to (default: `undefined`)
    * - `--combobox-panel-size`: Width of the panel. Follows the field by default. (default: `undefined`)
@@ -28392,7 +28392,7 @@ export type CustomElementsSolidJs = {
   /**
    * The palette is a dialog holding a filterable listbox, so what this tier adds
    * is where that dialog sits and how the list reads inside it. It opens against
-   * the top of the window rather than centred, which is where every palette a
+   * the top of the window rather than centered, which is where every palette a
    * reader has used opens: a list that grows and shrinks as it is filtered would
    * otherwise walk up and down the screen under the words being typed.
    *
@@ -28515,15 +28515,15 @@ export type CustomElementsSolidJs = {
    *
    * Three and an accent, not the full status set. A tag reports a state and a
    * button performs an action: a success button and a warning button are not
-   * things anybody writes, and offering them invites a page where the colour
+   * things anybody writes, and offering them invites a page where the color
    * of a control means nothing in particular. `accent` is the second
-   * emphasis, a rotation off the brand seed rather than a colour of its own,
+   * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
    * - `value`: What goes on the clipboard.
    * - `label`: What it is called, and says, before a press.
    *
    * Defaulted rather than left empty. An icon-only control must be named, and
-   * the name of this one is not a judgement call: every copy button in the
+   * the name of this one is not a judgment call: every copy button in the
    * world is called Copy. A consumer with a better word still sets it.
    * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
    *
@@ -28876,7 +28876,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--date-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--date-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--date-input-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--date-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--date-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
@@ -29170,7 +29170,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--dialog-rise`: How far the panel rises as it opens. Follows `--helix-space-lg`. (default: `undefined`)
-   * - `--dialog-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--dialog-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--dialog-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
@@ -29225,7 +29225,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--divider-color`: Colour of the rule. (default: `undefined`)
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
    * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
    * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
@@ -29287,7 +29287,7 @@ export type CustomElementsSolidJs = {
    * hole without moving the outer edge, so a chart keeps its footprint.
    *
    * **`none` is a pie**, and it is the same drawing rather than another one:
-   * the radius follows the thickness, so the inner edge reaching the centre is
+   * the radius follows the thickness, so the inner edge reaching the center is
    * what closing the hole means. A pie reads less accurately than a ring, angle
    * being harder to judge than length, but it is not *misleading* the way a bar
    * measured from anything but zero is, which is why this is a value here and
@@ -29352,14 +29352,14 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
-   * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
+   * - `--donut-chart-track-color`: Color of the ring under the slices. (default: `undefined`)
    * - `--donut-chart-stroke`: How thick the ring is drawn, derived from `hole`. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `centre`: The middle of the ring, holding whatever is slotted.
+   * - `center`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
@@ -29474,7 +29474,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--drawer-backdrop`: Filter applied behind a `material="glass"` drawer. Follows the theme's material policy; set it to override the strength on one drawer. (default: `undefined`)
    * - `--drawer-background-color`: Surface behind the panel. (default: `undefined`)
-   * - `--drawer-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--drawer-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--drawer-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
    * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
@@ -29921,7 +29921,7 @@ export type CustomElementsSolidJs = {
    *
    * `emphasis` says how filled it is and `tone` says what it means; neither of
    * them says what shape it is, and folding a shape into either would put a
-   * control's outline in the same word as its colour. A rounded square is the
+   * control's outline in the same word as its color. A rounded square is the
    * resting one because that is what a control in a row of controls should be.
    *
    * `circle` is the floating action button, and it is the reason this exists: a
@@ -29955,9 +29955,9 @@ export type CustomElementsSolidJs = {
    *
    * Three and an accent, not the full status set. A tag reports a state and a
    * button performs an action: a success button and a warning button are not
-   * things anybody writes, and offering them invites a page where the colour
+   * things anybody writes, and offering them invites a page where the color
    * of a control means nothing in particular. `accent` is the second
-   * emphasis, a rotation off the brand seed rather than a colour of its own,
+   * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
    * - `type`: What activating the button does to its form.
    * - `label`: Accessible name, for a button whose content is not text.
@@ -30444,7 +30444,7 @@ export type CustomElementsSolidJs = {
    * The eight series colours are mapped here rather than in the tier below, which
    * carries the index and holds no tokens. Written as eight rules for the reason
    * `Avatar.Group` writes twelve: an index in markup cannot select a token, and a
-   * custom property set inline would be the headless tier naming a colour.
+   * custom property set inline would be the headless tier naming a color.
    *
    * ## Attributes & Properties
    *
@@ -30484,7 +30484,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--legend-direction`: `row`, which wraps, or `column`. (default: `undefined`)
    * - `--legend-gap`: Space between entries. (default: `undefined`)
-   * - `--legend-swatch-size`: Size of the colour patch. (default: `undefined`)
+   * - `--legend-swatch-size`: Size of the color patch. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -30493,7 +30493,7 @@ export type CustomElementsSolidJs = {
    * - `entry`: One name and its swatch.
    * - `list`: The list itself.
    * - `name`: One series name.
-   * - `swatch`: The colour a series is drawn in.
+   * - `swatch`: The color a series is drawn in.
    */
   "helix-legend": Partial<
     HelixLegendProps &
@@ -30611,7 +30611,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--line-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
    * - `--line-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
-   * - `--line-chart-area-opacity`: How much of a line's colour its wash takes. (default: `undefined`)
+   * - `--line-chart-area-opacity`: How much of a line's color its wash takes. (default: `undefined`)
    * - `--line-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--line-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
    * - `--line-chart-width`: Thickness of a line. (default: `undefined`)
@@ -30889,7 +30889,7 @@ export type CustomElementsSolidJs = {
    *
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
-   * already manages that: centring is what a caller wants when the list is being
+   * already manages that: centering is what a caller wants when the list is being
    * read as a dial rather than scanned as a list, which is what Time Picker's wheels
    * does with three of these.
    *
@@ -31117,7 +31117,7 @@ export type CustomElementsSolidJs = {
    * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
    * - `--megamenu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
-   * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
+   * - `--megamenu-full-size`: How wide the band's contents may get, centered in it. (default: `undefined`)
    * - `--megamenu-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-top`: Where the panel starts, measured from the bar above it. (default: `undefined`)
@@ -31347,7 +31347,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--menu-background-color`: Fill of the surface. (default: `undefined`)
-   * - `--menu-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--menu-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--menu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--menu-max-block-size`: Tallest the surface grows before it scrolls. (default: `undefined`)
    * - `--menu-min-inline-size`: Narrowest the surface gets. (default: `undefined`)
@@ -31896,7 +31896,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--outline-rail`: Width of the gutter the rule and the travelling mark share. (default: `undefined`)
+   * - `--outline-rail`: Width of the gutter the rule and the traveling mark share. (default: `undefined`)
    * - `--outline-indent`: How far each level is inset from the one above. (default: `undefined`)
    *
    * ## CSS Parts
@@ -32418,7 +32418,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--popover-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--popover-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--popover-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
    * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
@@ -32529,7 +32529,7 @@ export type CustomElementsSolidJs = {
 
   /**
    * The picture is the base tier's. What this adds is a size that can be set
-   * once, the colours a scanner needs, and the box that holds a centre mark.
+   * once, the colours a scanner needs, and the box that holds a center mark.
    *
    * **The ink is `currentColor` and the ground is a real fill.** A code has to be
    * dark on light to read, and the pair that guarantees it is not the page's
@@ -32560,7 +32560,7 @@ export type CustomElementsSolidJs = {
    * - `correction`: How much of the code can be lost and still read.
    *
    * `M` by default, which is the level almost every code in the world uses and
-   * costs about fifteen percent redundancy. `H` where a mark covers the centre,
+   * costs about fifteen percent redundancy. `H` where a mark covers the center,
    * chosen automatically when the slot is filled: it is the level that makes
    * covering safe, and a consumer who fills the slot has said what they want
    * without having to know that.
@@ -32569,7 +32569,7 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `logo`: A mark for the centre, which only reads at a high correction.
+   * - `logo`: A mark for the center, which only reads at a high correction.
    *
    * ## CSS Custom Properties
    *
@@ -32588,8 +32588,8 @@ export type CustomElementsSolidJs = {
    *
    * - `code`: The square itself.
    * - `modules`: Everything but the three corner squares.
-   * - `finders`: The three corner squares, which can take their own colour.
-   * - `logo`: The box holding the centre mark.
+   * - `finders`: The three corner squares, which can take their own color.
+   * - `logo`: The box holding the center mark.
    */
   "helix-qr-code": Partial<
     HelixQrCodeProps &
@@ -32896,7 +32896,7 @@ export type CustomElementsSolidJs = {
    *
    * `marks` is the star, and is what a rating means to most readers. `dots`
    * drops the glyph for a plain circle, which says how much rather than how
-   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * good: a star carries a judgment that a level of spice, a difficulty or a
    * confidence has not earned.
    *
    * Both are one shape repeated and clipped to the score, so halves work in
@@ -33054,7 +33054,7 @@ export type CustomElementsSolidJs = {
    * - `--rating-mark`: The shape of one mark, as a mask image. (default: `undefined`)
    * - `--rating-size`: How big one mark is. (default: `undefined`)
    * - `--rating-gap`: Space between marks. (default: `undefined`)
-   * - `--rating-color`: The colour of a filled mark. (default: `undefined`)
+   * - `--rating-color`: The color of a filled mark. (default: `undefined`)
    * - `--rating-empty-color`: And of an unfilled one. (default: `undefined`)
    * - `--rating-full`: How many marks are wholly filled. (default: `undefined`)
    * - `--rating-part`: How much of the next mark is filled, 0 to 1. (default: `undefined`)
@@ -33129,7 +33129,7 @@ export type CustomElementsSolidJs = {
    *
    * - `color-mode`/`colorMode`: Which half of the palette the frame renders in.
    *
-   * **The frame is a document and a document has its own colour mode.** Setting
+   * **The frame is a document and a document has its own color mode.** Setting
    * `data-color-mode` on this element styles this element, and the contents of
    * an iframe inherit nothing from it: measured, a frame under a host carrying
    * the attribute had it unset on its own root. Left alone the frame follows
@@ -33741,7 +33741,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--select-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--select-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--select-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--select-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--select-surface-max-block-size`: How tall the panel gets. (default: `undefined`)
@@ -33770,7 +33770,7 @@ export type CustomElementsSolidJs = {
 
   /**
    * A sweep rather than a pulse. A block fading in and out reads as something
-   * broken; a highlight travelling across it reads as work in progress, and it is
+   * broken; a highlight traveling across it reads as work in progress, and it is
    * the same one property animating either way.
    *
    * ## Attributes & Properties
@@ -34000,7 +34000,7 @@ export type CustomElementsSolidJs = {
    * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
    * first and heavy in the second.
    *
-   * One colour on the host, read by the line, the wash, the columns and the mark
+   * One color on the host, read by the line, the wash, the columns and the mark
    * alike, so moving `--sparkline-color` cannot leave parts of one drawing
    * disagreeing.
    *
@@ -34043,7 +34043,7 @@ export type CustomElementsSolidJs = {
    * that ends a line, so the set is the same wherever one appears. `ring` is the
    * one that asks anything of the drawing: the disc it leaves open is masked out
    * of the `<svg>`, so the line stops at the ring's inner edge rather than
-   * running on to the reading at its centre, and the middle shows whatever the
+   * running on to the reading at its center, and the middle shows whatever the
    * chart is drawn over rather than a guess at it.
    * - `plot`: What the readings are drawn as.
    *
@@ -34122,10 +34122,10 @@ export type CustomElementsSolidJs = {
    *
    * - `--chart-terminus-hole`: A fill for the middle of a `ring` terminus, which is otherwise open. (default: `undefined`)
    * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
-   * - `--sparkline-area-opacity`: How much of the line's colour the wash takes where it meets the line. (default: `undefined`)
+   * - `--sparkline-area-opacity`: How much of the line's color the wash takes where it meets the line. (default: `undefined`)
    * - `--sparkline-bar-radius`: Corner radius on a column, under `plot="bar"`. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
-   * - `--sparkline-color`: Colour of the line, the wash, the columns and the mark. (default: `undefined`)
+   * - `--sparkline-color`: Color of the line, the wash, the columns and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
    * - `--sparkline-width`: Thickness of the line, overriding `weight`. (default: `undefined`)
    * - `--chart-terminus-x`: Where the last point sits horizontally, as a percentage. (default: `undefined`)
@@ -34675,7 +34675,7 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * A thumb travelling in a groove, which is the one place in the library color
+   * A thumb traveling in a groove, which is the one place in the library color
    * is used to say "on". A checkbox does not, because a tick is legible on its
    * own; a switch has no mark, so the fill is the whole of what distinguishes the
    * two states and there is nothing else for it to be.
@@ -35658,7 +35658,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--time-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--time-input-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--time-input-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--time-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--time-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
@@ -35925,7 +35925,7 @@ export type CustomElementsSolidJs = {
    * Whatever `<time>` accepts, which is a date, a time, both, a duration or a
    * week. Unset, the label is written as it was given and nothing claims to
    * know what instant it names.
-   * - `tone`: What kind of event it was, which decides the mark's colour and nothing else.
+   * - `tone`: What kind of event it was, which decides the mark's color and nothing else.
    *
    * ## Slots
    *
@@ -36061,7 +36061,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--toast-border-color`: Colour of the panel's edge. (default: `undefined`)
+   * - `--toast-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--toast-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
    * - `--toast-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
@@ -36194,7 +36194,7 @@ export type CustomElementsSolidJs = {
    * - `label-placement`/`labelPlacement`: Where the group's label sits, `start` putting it on the track's line.
    *
    * Absent is above, which is what a field looks like and what almost every
-   * group wants. `start` is for a row of controls that are labelled rather than
+   * group wants. `start` is for a row of controls that are labeled rather than
    * a form of fields: a toolbar reads as one line, and a label stacked over
    * every group in it turns one row into two.
    *
@@ -36486,7 +36486,7 @@ export type CustomElementsSolidJs = {
    *
    * Resolved the way `for` is, so an id in the same tree, which is what lets a
    * component name a box in its own shadow root. A chart does: its bubble is
-   * centred on a reading, and the first and last readings sit at the ends of
+   * centered on a reading, and the first and last readings sit at the ends of
    * the plot, so half the box hangs past the drawing and, measured on a chart
    * in a 320px card, three pixels past the card itself.
    *
@@ -36945,7 +36945,7 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * The arrow takes the judgment colour and the number does not, which is the
+   * The arrow takes the judgment color and the number does not, which is the
    * opposite of the dashboard convention and is measured rather than preferred:
    * in light mode the success token is 3.8:1 on the surface, enough for a glyph
    * and short of what 13px text needs, and there is no darker green in the ramp.
@@ -36983,7 +36983,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--trend-color`: Colour of the arrow, overriding the judgment. (default: `undefined`)
+   * - `--trend-color`: Color of the arrow, overriding the judgment. (default: `undefined`)
    * - `--trend-icon-size`: Size of the arrow. (default: `undefined`)
    *
    * ## CSS Parts
@@ -37084,7 +37084,7 @@ export type CustomElementsSolidJs = {
    * all. So the button here is two boundaries away from the rule that styles
    * every button beside it, and the same tokens are what make the two agree.
    *
-   * Colour is inherited rather than named, so the bar's own colour arrives on
+   * Color is inherited rather than named, so the bar's own color arrives on
    * its own. `--video-playlist-menu-color` is there for the case where it should
    * not.
    *
@@ -37117,7 +37117,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--video-playlist-menu-color`: Colour of the trigger, defaulting to the control bar's. (default: `undefined`)
+   * - `--video-playlist-menu-color`: Color of the trigger, defaulting to the control bar's. (default: `undefined`)
    * - `--video-playlist-menu-poster`: Width of an entry's still. (default: `undefined`)
    * - `--video-playlist-menu-size`: Size of the trigger's glyph. (default: `undefined`)
    *
@@ -37214,7 +37214,7 @@ export type CustomElementsSolidJs = {
    *
    * **The bar is over the picture, not under it.** A bar in the layout would move
    * everything below the video by its own height and would leave a strip of page
-   * colour under a picture that is meant to be the whole of it. Over it, the
+   * color under a picture that is meant to be the whole of it. Over it, the
    * video is the component's size and the controls belong to it.
    *
    * **It goes when nobody is using it, and comes back for the keyboard.** Hidden
@@ -37473,7 +37473,7 @@ export type CustomCssProperties = {
   "--badge-ring-color"?: string;
   /** The slot the pointer is resting in. */
   "--bar-chart-band-color"?: string;
-  /** A `lines` series, overriding its series colour. */
+  /** A `lines` series, overriding its series color. */
   "--bar-chart-line-color"?: string;
   /** Thickness of a `lines` series. */
   "--bar-chart-line-width"?: string;
@@ -37489,9 +37489,9 @@ export type CustomCssProperties = {
   "--bar-chart-gap"?: string;
   /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
   "--chart-bar-wash"?: string;
-  /** The colour of a single-series axis, taken from that series. */
+  /** The color of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;
-  /** The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
+  /** The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
   "--bar-chart-secondary"?: string;
   /** Size of the quoted passage. */
   "--blockquote-size"?: string;
@@ -37573,7 +37573,7 @@ export type CustomCssProperties = {
   "--code-padding"?: string;
   /** Fill behind the field. */
   "--color-input-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--color-input-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--color-input-border-width"?: string;
@@ -37585,7 +37585,7 @@ export type CustomCssProperties = {
   "--color-input-swatch-radii"?: string;
   /** Edge length of the block in `appearance="swatch"`. */
   "--color-input-swatch-size"?: string;
-  /** The chosen colour, to paint over the transparency check. */
+  /** The chosen color, to paint over the transparency check. */
   "--color-input-swatch"?: string;
   /** Inset of the rows under the square, and the bottom. */
   "--color-picker-inset"?: string;
@@ -37603,11 +37603,11 @@ export type CustomCssProperties = {
   "--color-picker-hue"?: string;
   /** The chosen saturation, 0 to 100, as a percentage. */
   "--color-picker-saturation"?: string;
-  /** A colour to paint: the current one on the sample, a preset's on each preset. */
+  /** A color to paint: the current one on the sample, a preset's on each preset. */
   "--color-picker-swatch"?: string;
   /** Fill behind the field. */
   "--combobox-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--combobox-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--combobox-border-width"?: string;
@@ -37623,7 +37623,7 @@ export type CustomCssProperties = {
   "--command-list-size"?: string;
   /** Fill behind the field. */
   "--date-input-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--date-input-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--date-input-border-width"?: string;
@@ -37645,7 +37645,7 @@ export type CustomCssProperties = {
   "--date-picker-column-count"?: string;
   /** How far the panel rises as it opens. Follows `--helix-space-lg`. */
   "--dialog-rise"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--dialog-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--dialog-border-width"?: string;
@@ -37659,7 +37659,7 @@ export type CustomCssProperties = {
   "--dialog-scrim"?: string;
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--dialog-shadow"?: string;
-  /** Colour of the rule. */
+  /** Color of the rule. */
   "--divider-color"?: string;
   /** Space taken off both ends of it. */
   "--divider-inset"?: string;
@@ -37673,7 +37673,7 @@ export type CustomCssProperties = {
   "--divider-thickness"?: string;
   /** Width and height of the ring. */
   "--donut-chart-size"?: string;
-  /** Colour of the ring under the slices. */
+  /** Color of the ring under the slices. */
   "--donut-chart-track-color"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
   "--donut-chart-stroke"?: string;
@@ -37681,7 +37681,7 @@ export type CustomCssProperties = {
   "--drawer-backdrop"?: string;
   /** Surface behind the panel. */
   "--drawer-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--drawer-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--drawer-border-width"?: string;
@@ -37739,13 +37739,13 @@ export type CustomCssProperties = {
   "--legend-direction"?: string;
   /** Space between entries. */
   "--legend-gap"?: string;
-  /** Size of the colour patch. */
+  /** Size of the color patch. */
   "--legend-swatch-size"?: string;
   /** The slot the pointer is resting in. */
   "--line-chart-band-color"?: string;
   /** One rule across the plot, under `gridlines`. */
   "--line-chart-gridline-color"?: string;
-  /** How much of a line's colour its wash takes. */
+  /** How much of a line's color its wash takes. */
   "--line-chart-area-opacity"?: string;
   /** Height of the drawing. */
   "--line-chart-block-size"?: string;
@@ -37777,7 +37777,7 @@ export type CustomCssProperties = {
   "--megamenu-border-width"?: string;
   /** The narrowest a column goes before the grid wraps. */
   "--megamenu-column-size"?: string;
-  /** How wide the band's contents may get, centred in it. */
+  /** How wide the band's contents may get, centered in it. */
   "--megamenu-full-size"?: string;
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--megamenu-shadow"?: string;
@@ -37791,7 +37791,7 @@ export type CustomCssProperties = {
   "--menu-item-hover-color"?: string;
   /** Fill of the surface. */
   "--menu-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--menu-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--menu-border-width"?: string;
@@ -37833,7 +37833,7 @@ export type CustomCssProperties = {
   "--option-active-color"?: string;
   /** Corner radius of the row. A listbox and a select flatten it. */
   "--option-radii"?: string;
-  /** Width of the gutter the rule and the travelling mark share. */
+  /** Width of the gutter the rule and the traveling mark share. */
   "--outline-rail"?: string;
   /** How far each level is inset from the one above. */
   "--outline-indent"?: string;
@@ -37847,7 +37847,7 @@ export type CustomCssProperties = {
   "--pagination-size"?: string;
   /** Space between one box and the next. */
   "--pin-gap"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--popover-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--popover-border-width"?: string;
@@ -37909,7 +37909,7 @@ export type CustomCssProperties = {
   "--rating-size"?: string;
   /** Space between marks. */
   "--rating-gap"?: string;
-  /** The colour of a filled mark. */
+  /** The color of a filled mark. */
   "--rating-color"?: string;
   /** And of an unfilled one. */
   "--rating-empty-color"?: string;
@@ -37957,7 +37957,7 @@ export type CustomCssProperties = {
   "--scroll-area-thumb-color"?: string;
   /** And its track. */
   "--scroll-area-track-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--select-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--select-border-width"?: string;
@@ -37993,13 +37993,13 @@ export type CustomCssProperties = {
   "--chart-terminus-hole"?: string;
   /** Size of the mark on the last reading. */
   "--chart-terminus-size"?: string;
-  /** How much of the line's colour the wash takes where it meets the line. */
+  /** How much of the line's color the wash takes where it meets the line. */
   "--sparkline-area-opacity"?: string;
   /** Corner radius on a column, under `plot="bar"`. */
   "--sparkline-bar-radius"?: string;
   /** Height of the drawing. */
   "--sparkline-block-size"?: string;
-  /** Colour of the line, the wash, the columns and the mark. */
+  /** Color of the line, the wash, the columns and the mark. */
   "--sparkline-color"?: string;
   /** Width of the drawing. */
   "--sparkline-inline-size"?: string;
@@ -38071,7 +38071,7 @@ export type CustomCssProperties = {
   "--textarea-background-color"?: string;
   /** Fill behind the field. */
   "--time-input-background-color"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--time-input-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--time-input-border-width"?: string;
@@ -38095,7 +38095,7 @@ export type CustomCssProperties = {
   "--timeline-rail-size"?: string;
   /** Space between one entry and the next. */
   "--timeline-gap"?: string;
-  /** Colour of the panel's edge. */
+  /** Color of the panel's edge. */
   "--toast-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--toast-border-width"?: string;
@@ -38149,7 +38149,7 @@ export type CustomCssProperties = {
   "--tree-chevron-order"?: string;
   /** Set from `chevron-placement`; the space before the chevron. */
   "--tree-chevron-gap"?: string;
-  /** Colour of the arrow, overriding the judgment. */
+  /** Color of the arrow, overriding the judgment. */
   "--trend-color"?: string;
   /** Size of the arrow. */
   "--trend-icon-size"?: string;
@@ -38157,7 +38157,7 @@ export type CustomCssProperties = {
   "--video-playlist-item-background-color"?: string;
   /** Width of the thumbnail column. */
   "--video-playlist-media-size"?: string;
-  /** Colour of the trigger, defaulting to the control bar's. */
+  /** Color of the trigger, defaulting to the control bar's. */
   "--video-playlist-menu-color"?: string;
   /** Width of an entry's still. */
   "--video-playlist-menu-poster"?: string;

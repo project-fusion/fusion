@@ -17,8 +17,8 @@
  *
  * Chosen so each one changes a different phase: the scheme flips the whole
  * ladder, the separation policy scales it, a ceiling of 0 makes every derived
- * colour grey, AAA moves every solved lightness, and a brand that *is* a status
- * colour is the case the hue repair cannot fully answer and reports instead.
+ * color gray, AAA moves every solved lightness, and a brand that *is* a status
+ * color is the case the hue repair cannot fully answer and reports instead.
  */
 export const INTENTS = [
   { intent: { brand: '#3b82f6' }, label: 'default' },

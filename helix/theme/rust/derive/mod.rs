@@ -67,7 +67,7 @@ impl Origin {
 /// One emitted token.
 #[derive(Clone, Debug, PartialEq)]
 pub struct DerivedToken {
-    /// True when chroma had to be reduced to bring the colour into the sRGB
+    /// True when chroma had to be reduced to bring the color into the sRGB
     /// gamut. Informational, not a failure: `value` is always in gamut.
     pub chroma_reduced: bool,
     /// Measured contrast against the pairing surface, where one is meaningful.
@@ -92,7 +92,7 @@ pub struct Cast {
 }
 
 impl Cast {
-    /// The colour this cast becomes at a given lightness.
+    /// The color this cast becomes at a given lightness.
     #[must_use]
     pub fn at(self, lightness: f64) -> Oklch {
         Oklch {
@@ -102,7 +102,7 @@ impl Cast {
         }
     }
 
-    /// The cast a colour carries, dropping the lightness it happens to have.
+    /// The cast a color carries, dropping the lightness it happens to have.
     #[must_use]
     pub fn of(color: Oklch) -> Self {
         Self {
@@ -202,7 +202,7 @@ impl Deriving {
     }
 }
 
-/// Builds a token, fitting the colour into the sRGB gamut first so that both the
+/// Builds a token, fitting the color into the sRGB gamut first so that both the
 /// emitted hex and the recorded contrast describe what actually ships.
 #[must_use]
 pub fn token(name: &str, raw: Oklch, origin: Origin, against: Option<Oklch>) -> DerivedToken {

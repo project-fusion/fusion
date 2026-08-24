@@ -305,7 +305,7 @@ describe('a tree item that is a link', () => {
   test('and the row is the treeitem, since an anchor cannot hold the group', async () => {
     /* The group holds more anchors and nesting them is invalid. So the row
        carries the semantics and the wrapper drops to `none`, which is the
-       navigation flavour of the pattern. */
+       navigation flavor of the pattern. */
     const tree = await mount(linked)
     const item = itemNamed(tree, 'button')
     expect(part(item, 'item')?.getAttribute('role')).toBe('none')

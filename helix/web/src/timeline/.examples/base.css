@@ -6,7 +6,7 @@
  * rounding says how a thing should feel and that is not this tier's to say; the
  * exceptions are shapes that are round rather than softened.
  *
- * **Grays, and only grays.** A base example is a diagram, and colour in a
+ * **Grays, and only grays.** A base example is a diagram, and color in a
  * diagram reads as meaning: a blue fill says primary and a red one says danger,
  * neither of which this tier has an opinion about. A neutral ramp says nothing
  * except where one surface ends and the next begins, which is the whole job.
@@ -130,12 +130,12 @@ helix-base-timeline-item::part(rail)::after {
 helix-base-timeline-item::part(marker) {
   align-items: center;
   /* The top of the entry's row, which is the line the mark is about. Stretched,
-     it would centre itself against the whole entry and drift down as the entry
+     it would center itself against the whole entry and drift down as the entry
      grows. */
   align-self: start;
   /* The box is the entry's first line and the mark inside it is smaller, which
      is what puts the two centres on top of each other. Sized to the mark
-     instead, a 12px square starts where a 20px line starts and its centre lands
+     instead, a 12px square starts where a 20px line starts and its center lands
      three pixels high on every row: measured, and the styled tier is at zero
      for exactly this reason. */
   block-size: 1.25rem;

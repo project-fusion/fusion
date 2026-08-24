@@ -14,7 +14,7 @@ type Constructor<T> = new (...args: any[]) => T
  * Here rather than in each chart, which is what it was. Four families held the
  * same `const PALETTE = 24` and the legend held a fifth: when the palette went
  * from eight to twenty-four, one of them was missed and drew every ninth series
- * in the first colour again while the legend beside it named the ninth. A
+ * in the first color again while the legend beside it named the ninth. A
  * number two files have to agree on is a number that will stop agreeing.
  */
 export const PALETTE = 24
@@ -57,31 +57,31 @@ export const seriesIndex = (depth: number): number => (depth % PALETTE) + 1
  * styled tier, and a consumer on `headless` sets the same names to whatever
  * they like. The base examples set them to a ramp of grays.
  *
- * @cssproperty --chart-series - The colour of the mark this is set on. Written by the component, read by the sheet that paints.
- * @cssproperty --chart-series-1 - The colour of series 1. The styled tier points it at a palette token.
- * @cssproperty --chart-series-2 - The colour of series 2. The styled tier points it at a palette token.
- * @cssproperty --chart-series-3 - The colour of series 3. The styled tier points it at a palette token.
- * @cssproperty --chart-series-4 - The colour of series 4. The styled tier points it at a palette token.
- * @cssproperty --chart-series-5 - The colour of series 5. The styled tier points it at a palette token.
- * @cssproperty --chart-series-6 - The colour of series 6. The styled tier points it at a palette token.
- * @cssproperty --chart-series-7 - The colour of series 7. The styled tier points it at a palette token.
- * @cssproperty --chart-series-8 - The colour of series 8. The styled tier points it at a palette token.
- * @cssproperty --chart-series-9 - The colour of series 9. The styled tier points it at a palette token.
- * @cssproperty --chart-series-10 - The colour of series 10. The styled tier points it at a palette token.
- * @cssproperty --chart-series-11 - The colour of series 11. The styled tier points it at a palette token.
- * @cssproperty --chart-series-12 - The colour of series 12. The styled tier points it at a palette token.
- * @cssproperty --chart-series-13 - The colour of series 13. The styled tier points it at a palette token.
- * @cssproperty --chart-series-14 - The colour of series 14. The styled tier points it at a palette token.
- * @cssproperty --chart-series-15 - The colour of series 15. The styled tier points it at a palette token.
- * @cssproperty --chart-series-16 - The colour of series 16. The styled tier points it at a palette token.
- * @cssproperty --chart-series-17 - The colour of series 17. The styled tier points it at a palette token.
- * @cssproperty --chart-series-18 - The colour of series 18. The styled tier points it at a palette token.
- * @cssproperty --chart-series-19 - The colour of series 19. The styled tier points it at a palette token.
- * @cssproperty --chart-series-20 - The colour of series 20. The styled tier points it at a palette token.
- * @cssproperty --chart-series-21 - The colour of series 21. The styled tier points it at a palette token.
- * @cssproperty --chart-series-22 - The colour of series 22. The styled tier points it at a palette token.
- * @cssproperty --chart-series-23 - The colour of series 23. The styled tier points it at a palette token.
- * @cssproperty --chart-series-24 - The colour of series 24. The styled tier points it at a palette token.
+ * @cssproperty --chart-series - The color of the mark this is set on. Written by the component, read by the sheet that paints.
+ * @cssproperty --chart-series-1 - The color of series 1. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-2 - The color of series 2. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-3 - The color of series 3. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-4 - The color of series 4. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-5 - The color of series 5. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-6 - The color of series 6. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-7 - The color of series 7. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-8 - The color of series 8. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-9 - The color of series 9. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-10 - The color of series 10. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-11 - The color of series 11. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-12 - The color of series 12. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-13 - The color of series 13. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-14 - The color of series 14. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-15 - The color of series 15. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-16 - The color of series 16. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-17 - The color of series 17. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-18 - The color of series 18. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-19 - The color of series 19. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-20 - The color of series 20. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-21 - The color of series 21. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-22 - The color of series 22. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-23 - The color of series 23. The styled tier points it at a palette token.
+ * @cssproperty --chart-series-24 - The color of series 24. The styled tier points it at a palette token.
  */
 export declare class MixinChartSourceInterface {
   /**
@@ -136,7 +136,7 @@ export declare class MixinChartSourceInterface {
  * **A mixin rather than a controller**, by the rule the tier notes give: it
  * introduces `for` and `label`, which a consumer writes. `SourceController` is
  * the other half and stays a controller, because resolving an id and watching
- * for changes is behaviour nobody calls.
+ * for changes is behavior nobody calls.
  *
  * **`Legend` deliberately does not take this.** It reads a table and has no
  * drawing to title, so `label` would be API it never uses, and a mixin applied

@@ -48,7 +48,7 @@ export interface SiteEssay {
   /**
    * Where the picture came from, as a note to us rather than to a reader.
    *
-   * Nothing renders it. Recorded because the licence that made the picture free
+   * Nothing renders it. Recorded because the license that made the picture free
    * is a fact about the file, and a year from now the only way to answer
    * whether it can stay is to know where it came from.
    */

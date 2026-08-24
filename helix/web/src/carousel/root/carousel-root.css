@@ -75,7 +75,7 @@
  *
  * **Both on the same edge with the same alignment will overlap**, because they
  * are two items in one grid cell and always were. That is what the two
- * different defaults exist to avoid, and centring both is a consumer asking for
+ * different defaults exist to avoid, and centering both is a consumer asking for
  * them in the same place. Move one, or give them different edges. */
 [part="indicators"] {
   --_carousel-indicators-along: start;
@@ -323,7 +323,7 @@
   --_carousel-per-view: 4;
 }
 
-/* Five is the last step, and the ceiling is a judgement rather than a limit of
+/* Five is the last step, and the ceiling is a judgment rather than a limit of
    the arithmetic. A track divided six ways gives each slide under a sixth of
    the page, which is a column of headlines rather than a card, and a carousel
    whose slides cannot hold their own content is a scroller with dots. */
@@ -352,7 +352,7 @@
 /* The dots, at the spacing they have always had: `space-xs` across on a
    `space-2xs` gap, so the run is tight and reads as one object.
 
-   A travelling mark was tried here instead, on the argument that one thing
+   A traveling mark was tried here instead, on the argument that one thing
    moving is more legible than two things resizing, and it is not: the pill is
    three times a dot's width, so a mark that does not take room in the row has to
    sit over its neighbours, and the pitch had to go from 12 to 20 to make space
@@ -397,7 +397,7 @@
  *
  * It grew on the inline axis wherever it was, so a column of dots beside the
  * slides had one lying on its side across the column: an oval pointing the way
- * the reader is not travelling. Beside the track it lengthens on the block axis
+ * the reader is not traveling. Beside the track it lengthens on the block axis
  * instead, and the transition follows it, or the growth is instant on the one
  * axis and animated on the other. */
 :host([indicator-placement="inline-start"]) [part="indicator"],

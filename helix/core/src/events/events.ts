@@ -221,7 +221,7 @@ export class HelixSampleStartEvent extends Event {
   }
 }
 
-/** The eyedropper closing, whether or not a colour was taken. */
+/** The eyedropper closing, whether or not a color was taken. */
 export class HelixSampleEndEvent extends Event {
   static readonly eventName = 'helix-sample-end'
 

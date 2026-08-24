@@ -298,14 +298,14 @@ export const formsArt: Record<string, ReactNode> = {
    * Two marks in one place, which is the component.
    *
    * The clipboard is the resting state and the check is the confirmation, and
-   * they sit on the same centre because that is exactly how the element renders
+   * they sit on the same center because that is exactly how the element renders
    * them: one grid cell, one hidden. Drawn side by side the picture would
    * promise a button that grows on a press, which is the thing the stylesheet
    * exists to prevent.
    */
   'copy-button': (
     <>
-      {/* The button holds the centre and everything it holds is inside it.
+      {/* The button holds the center and everything it holds is inside it.
        *
        * Balancing the pair's bounding box put the clipboard at 130 to 170 and
        * the tick beyond it, which centres the ink and reads left-heavy: the

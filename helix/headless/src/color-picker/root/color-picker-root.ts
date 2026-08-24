@@ -92,7 +92,7 @@ interface EyeDropperConstructor {
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://helix.fusion.dev/components/color-picker
  *
- * @event {HelixSampleEndEvent} helix-sample-end - The eyedropper has closed, whether or not a colour was taken.
+ * @event {HelixSampleEndEvent} helix-sample-end - The eyedropper has closed, whether or not a color was taken.
  * @event {HelixSampleStartEvent} helix-sample-start - The eyedropper is opening, so anything covering the page should get out of the way.
  *
  * @event {HelixChangeEvent} helix-change - Fired when the color changes.
@@ -118,7 +118,7 @@ interface EyeDropperConstructor {
  * @cssproperty --color-picker-brightness - The chosen brightness, 0 to 100, as a percentage.
  * @cssproperty --color-picker-hue - The chosen hue, 0 to 360, unitless.
  * @cssproperty --color-picker-saturation - The chosen saturation, 0 to 100, as a percentage.
- * @cssproperty --color-picker-swatch - A colour to paint: the current one on the sample, a preset's on each preset.
+ * @cssproperty --color-picker-swatch - A color to paint: the current one on the sample, a preset's on each preset.
  */
 @customElement('helix-base-color-picker')
 export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement) {
@@ -224,7 +224,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
    * Whether the tools row holds anything at all.
    *
    * The group is withheld rather than rendered empty, because it is an element
-   * with a role and a name: an empty group labelled "Color tools" announces
+   * with a role and a name: an empty group labeled "Color tools" announces
    * nothing, and the footer cannot tell it is empty either, so the row kept its
    * padding with nothing in it.
    */
@@ -322,7 +322,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
         this.move({ ...parsed, alpha: this.color.alpha })
       }
     } catch {
-      /* Cancelling is how this is normally left, and the platform reports it as
+      /* Canceling is how this is normally left, and the platform reports it as
          a rejection. There is nothing to recover from and nothing to say. */
     }
     this.dispatchEvent(new HelixSampleEndEvent())
@@ -417,7 +417,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
    *
    * Taking both is not belt and braces. The drag needs the first and a keyboard
    * step or a programmatic set is only guaranteed the second, and the handler
-   * is idempotent: the same value applied twice is the same colour.
+   * is idempotent: the same value applied twice is the same color.
    */
   private takeChannel(channel: 'alpha' | 'hue', event: Event): void {
     event.stopPropagation()

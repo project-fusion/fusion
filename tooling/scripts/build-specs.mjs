@@ -12,7 +12,7 @@
  * **Splitting was on and had to come off.** It emitted Lit and anything two
  * families shared once instead of into every bundle, which is the right instinct
  * and is not worth what it costs here: a family's entry now imports *both*
- * tiers, because its behaviour is specified in `helix/headless` and its
+ * tiers, because its behavior is specified in `helix/headless` and its
  * appearance in `helix/web`, and the styled class extends the base one. An
  * `extends` clause is evaluated the moment its module runs, so when the two land
  * in different chunks neither can go first, and every entry dies on

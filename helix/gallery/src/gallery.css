@@ -2,7 +2,7 @@
  * The card art, and the whole of what this package draws.
  *
  * **Kept beside the TSX because neither half is the drawing.** Every figure in
- * `src/*.tsx` is geometry and class names, and every colour, every surface step
+ * `src/*.tsx` is geometry and class names, and every color, every surface step
  * and all thirteen motions are here: split across two packages, a drawing would
  * name a class nothing defined and read as a component that failed to render.
  * They version together for the same reason they ship together.
@@ -132,7 +132,7 @@
  * selected date, a slider's fill, every solid button, a toast's leading edge.
  * Color there was decoration rather than information: forty of the fifty-four
  * families have no semantic color, so the accent was only ever saying "this
- * one is emphasised", which weight says just as well and more quietly.
+ * one is emphasized", which weight says just as well and more quietly.
  *
  * `surface-inverse` rather than `foreground`, because the thing being drawn is
  * a filled control rather than a mark: it is the mode's opposite, so it is a
@@ -544,7 +544,7 @@
   }
 }
 
-/* draw — a stroke retracing itself, for the cards whose subject is a line.
+/* draw: a stroke retracing itself, for the cards whose subject is a line.
  *
  * Three drawings are a path and nothing else: a code fragment's slash, a
  * sparkline, and a line chart's two series. Every archetype above moves a shape
@@ -563,7 +563,7 @@
  *
  * **`pathLength="1"` is required on anything wearing this**, and it is the one
  * way to get it wrong. The dash pattern is in path units, so a path that has
- * not normalised its length takes a one-unit dash and renders as a dotted line.
+ * not normalized its length takes a one-unit dash and renders as a dotted line.
  * That is loud rather than silent, which is why it is a note and not a check.
  *
  * **This is the one animation in the file that is not composited**, against the

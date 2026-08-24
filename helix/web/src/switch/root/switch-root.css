@@ -62,7 +62,7 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Travelling rather than appearing, which is the whole of what a switch says:
+/* Traveling rather than appearing, which is the whole of what a switch says:
    the same thing moved rather than a different thing shown.
  
    A hairline rather than a shadow, and the reason is that a shadow is not

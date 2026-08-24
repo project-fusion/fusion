@@ -84,7 +84,7 @@ export interface Product {
    * white: anywhere else the hole takes the ground behind it, and a letter on a
    * coloured field has to stay light on every ground it lands on.
    *
-   * **The drawing carries no colour decision.** The tile is a gradient between
+   * **The drawing carries no color decision.** The tile is a gradient between
    * `--logo-color-from` and `--logo-color-to` and the letter is
    * `--logo-color-knockout`, each falling back to what the wordmark uses, which
    * is why the panel can render these as a near-black tile on a light ground

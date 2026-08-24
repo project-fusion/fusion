@@ -14,7 +14,7 @@ export default function SandboxPage() {
   const families = getFamilies()
   /* **Built here, on a server, and handed down**, which is the same thing
      `(site)/layout.tsx` does for `SiteNav` and for the same reason: the
-     catalogue reads the manifest off disk and the insight registry is the whole
+     catalog reads the manifest off disk and the insight registry is the whole
      of the writing, so a palette that imported either would pull it into the
      browser to display a list of names. What crosses is the list.
    *

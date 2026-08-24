@@ -96,7 +96,7 @@ fn matrix(theme: &Theme, source: &str, paint: Paint) {
         /* **The measurement and the target on every row, passing or not.** A
         table that prints a number only where it failed makes the reader trust a
         blank, and a pair that cleared its target by a hundredth is the one worth
-        seeing before somebody nudges a colour. */
+        seeing before somebody nudges a color. */
         let measured = pairing
             .ratio
             .map_or_else(|| "  -  ".to_owned(), |ratio| format!("{ratio:5.2}"));
@@ -124,7 +124,7 @@ fn matrix(theme: &Theme, source: &str, paint: Paint) {
     /* **Collisions are a second finding and are printed as one.** Contrast is a
     token against a ground; a collision is two roles against each other, and a
     palette can be perfectly legible with three statuses that look like one
-    colour. Folding them into the same count would hide that. */
+    color. Folding them into the same count would hide that. */
     if !theme.collisions.is_empty() {
         println!();
         for line in &theme.collisions {

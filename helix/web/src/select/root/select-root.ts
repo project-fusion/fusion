@@ -34,7 +34,7 @@ import '../../option/index.js'
  * @aliases Dropdown, Picker
  * @documentation https://helix.fusion.dev/components/select
  *
- * @cssproperty --select-border-color - Colour of the panel's edge.
+ * @cssproperty --select-border-color - Color of the panel's edge.
  * @cssproperty --select-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.

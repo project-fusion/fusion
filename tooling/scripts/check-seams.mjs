@@ -33,7 +33,7 @@
  * reported "0 families compose another" as a pass, which is what `check:floors`
  * exists to catch and did.
  *
- * `icon` is exempt too, and that is a judgement rather than an oversight. It is
+ * `icon` is exempt too, and that is a judgment rather than an oversight. It is
  * a leaf that takes a name and draws it, it appears in fourteen families, and
  * there is no version of "render a different icon element" that a consumer
  * wants and `--icon-size` plus their own icon element does not already give

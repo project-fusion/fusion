@@ -9,14 +9,14 @@ import { tags } from '@lezer/highlight'
  * **The stock mode colours nothing in the commands this documentation actually
  * contains.** It knows sh: builtins, keywords, redirects, quoting, comments.
  * Every shell fence here is `bun add @helix-io/web`, and to that mode `bun` is
- * an ordinary word, so all three blocks came out entirely grey. A highlighter
+ * an ordinary word, so all three blocks came out entirely gray. A highlighter
  * that returns the input unchanged is not highlighting.
  *
  * So this delegates first and only relabels what the mode declined to classify.
  * A bare word in command position, which is the start of a line or whatever
- * follows a pipe or a `&&`, becomes `command`. Anything the mode does recognise
+ * follows a pipe or a `&&`, becomes `command`. Anything the mode does recognize
  * keeps the mode's answer, which is why `export` stays a keyword and `cd` stays
- * a builtin rather than being flattened into the same colour by a wrapper that
+ * a builtin rather than being flattened into the same color by a wrapper that
  * guessed first and asked afterwards.
  *
  * **Delegating first is what stops this becoming a second grammar.** The
@@ -25,7 +25,7 @@ import { tags } from '@lezer/highlight'
  * the mode would learn a builtin and this would go on calling it a command.
  * Nothing here knows a single shell word.
  *
- * `command` is tagged `keyword` rather than given a colour of its own, because
+ * `command` is tagged `keyword` rather than given a color of its own, because
  * the palette in the site's stylesheet is a fixed set of `tok-` classes and a
  * new one would paint nothing until that file learned about it. A command is
  * the verb of its line, which is the job `keyword` already does for `export`.
@@ -37,7 +37,7 @@ import { tags } from '@lezer/highlight'
  * One character at a time, because that is how the mode emits them: measured,
  * `cd site && bun run dev` comes back as `cd`, `site`, `&`, `&`, `bun`, and a
  * pattern written for the `&&` a reader sees never matches anything. It cost
- * the first version of this: `bun` after a `&&` stayed grey while the same word
+ * the first version of this: `bun` after a `&&` stayed gray while the same word
  * at the start of a line was a command.
  */
 const OPENS = /^[|&;({!]+$/

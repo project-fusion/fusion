@@ -454,7 +454,7 @@ export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) 
      * The listener is on the host and the host holds the previous and next
      * buttons as well, so Enter and Space pressed on one of those were read as
      * "choose the focused day" and then `preventDefault()`ed: the button's own
-     * activation was cancelled and the month never moved. Every arrow was taken
+     * activation was canceled and the month never moved. Every arrow was taken
      * from them too. */
     const path = event.composedPath()
     const grid = this.renderRoot?.querySelector('[part="grid"]')

@@ -6,7 +6,7 @@ import { property } from 'lit/decorators.js'
 const PALETTE = 24
 
 /**
- * @summary The names a chart draws, each beside the colour it is drawn in.
+ * @summary The names a chart draws, each beside the color it is drawn in.
  *
  * @description
  * A legend is a list, so it is a list: not part of a chart, and shared by
@@ -30,7 +30,7 @@ const PALETTE = 24
  * is a legend that has to be told, and nothing else in the page would know to
  * tell it.
  *
- * **Not hidden from a screen reader, though the mapping it draws is a colour
+ * **Not hidden from a screen reader, though the mapping it draws is a color
  * one.** The argument for hiding it is real: the colours mean nothing to a
  * reader who cannot see them, and the names are already in the table. It stays
  * because the cost of being wrong runs one way. A duplicated list of three
@@ -47,7 +47,7 @@ const PALETTE = 24
  * @csspart entry - One name and its swatch.
  * @csspart list - The list itself.
  * @csspart name - One series name.
- * @csspart swatch - The colour a series is drawn in.
+ * @csspart swatch - The color a series is drawn in.
  */
 @customElement('helix-base-legend')
 export class HelixBaseLegend extends HelixElement {
@@ -92,12 +92,12 @@ export class HelixBaseLegend extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* The index rather than the colour, because a colour is a token and the
+    /* The index rather than the color, because a color is a token and the
        headless tier holds none. The styled tier maps one to the other, and it
        starts over after twenty-four.
      *
      * The palette is eight hues in three tones, so a legend of nine repeats the
-     * first hue in a brighter tone rather than repeating a colour outright. It
+     * first hue in a brighter tone rather than repeating a color outright. It
      * is still a hue collision and a chart with nine series has a worse problem
      * than the palette does; twenty-four is where it stops being able to help. */
     return html`<ul part="list" role="list">

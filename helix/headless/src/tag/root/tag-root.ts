@@ -13,7 +13,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * Dismissing is a request. The tag does not remove itself, because the consumer
  * owns the list it sits in and taking the node out from under them would put
- * their state and the document out of step. Cancelling `helix-dismiss` is a
+ * their state and the document out of step. Canceling `helix-dismiss` is a
  * refusal.
  *
  * @since 0.1.0

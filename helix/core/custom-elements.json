@@ -1019,7 +1019,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Measures the marked child and writes the geometry onto a travelling mark.\n\n**Four components had written this and the copies had diverged.** `Navigation`,\n`Tabs`, `Toggle.Group` and `Outline` each measured an active child and wrote\na position onto an indicator, and two of them had bugs the others did not.\n`Outline`'s own comment counted the repetition rather than resolving it, and\nthe audit found the same shape independently in all four.\n\nWhat the copies disagreed about, and what this settles:\n\n**The inline axis is signed.** In a right-to-left document the distance is\nmeasured from the surface's right edge and applied as a negative translation,\nbecause the mark travels from the inline start and the inline start is on the\nright. `Navigation` measured from the physical left and applied it from the\ninline-start edge with an unsigned offset, so its marker went the wrong way\nin RTL. That is the bug this extraction exists to stop repeating.\n\n**The border has to come off both axes.** `getBoundingClientRect` gives the\nborder box and the containing block is the padding box, so a surface with a\nborder of its own puts the mark one border-width out. `Tabs` and\n`Toggle.Group` each did this arithmetic separately, `Outline` did the block\nhalf with `clientTop`, and `Navigation` did neither. `clientLeft` and `clientTop`\nare the border widths, already resolved, which is why they are used here\nrather than parsing `borderLeftWidth`.\n\n**Nothing is written until there is something to measure.** A zero-width box\nis a component whose children have not upgraded yet, and writing zeroes would\npark the mark at the origin and leave it there. The `data-placed` attribute is\nwhat a stylesheet waits for, so a mark fades in where it belongs rather than\nsliding from the corner on first paint.\n\nThe four custom properties are the contract. What a component does with them\nis its own business, which is how one controller serves a bar under a tab, a\npill filling it, and a rule down the side of a contents page.\n\n**Declared here because this is what writes them.** They carry a measurement\nno stylesheet can take, they are read by whoever draws the mark, and `core`\nships no CSS, so there is no reader inside this package and nothing about\nthem is private. `check:hooks` pairs a `@cssproperty` with a rule that reads\none, in both directions, and the underscore these used to carry was what\nexempted them from it.",
+          "description": "Measures the marked child and writes the geometry onto a traveling mark.\n\n**Four components had written this and the copies had diverged.** `Navigation`,\n`Tabs`, `Toggle.Group` and `Outline` each measured an active child and wrote\na position onto an indicator, and two of them had bugs the others did not.\n`Outline`'s own comment counted the repetition rather than resolving it, and\nthe audit found the same shape independently in all four.\n\nWhat the copies disagreed about, and what this settles:\n\n**The inline axis is signed.** In a right-to-left document the distance is\nmeasured from the surface's right edge and applied as a negative translation,\nbecause the mark travels from the inline start and the inline start is on the\nright. `Navigation` measured from the physical left and applied it from the\ninline-start edge with an unsigned offset, so its marker went the wrong way\nin RTL. That is the bug this extraction exists to stop repeating.\n\n**The border has to come off both axes.** `getBoundingClientRect` gives the\nborder box and the containing block is the padding box, so a surface with a\nborder of its own puts the mark one border-width out. `Tabs` and\n`Toggle.Group` each did this arithmetic separately, `Outline` did the block\nhalf with `clientTop`, and `Navigation` did neither. `clientLeft` and `clientTop`\nare the border widths, already resolved, which is why they are used here\nrather than parsing `borderLeftWidth`.\n\n**Nothing is written until there is something to measure.** A zero-width box\nis a component whose children have not upgraded yet, and writing zeroes would\npark the mark at the origin and leave it there. The `data-placed` attribute is\nwhat a stylesheet waits for, so a mark fades in where it belongs rather than\nsliding from the corner on first paint.\n\nThe four custom properties are the contract. What a component does with them\nis its own business, which is how one controller serves a bar under a tab, a\npill filling it, and a rule down the side of a contents page.\n\n**Declared here because this is what writes them.** They carry a measurement\nno stylesheet can take, they are read by whoever draws the mark, and `core`\nships no CSS, so there is no reader inside this package and nothing about\nthem is private. `check:hooks` pairs a `@cssproperty` with a rule that reads\none, in both directions, and the underscore these used to carry was what\nexempted them from it.",
           "name": "IndicatorController",
           "cssProperties": [
             {
@@ -1897,7 +1897,7 @@
         },
         {
           "kind": "class",
-          "description": "The eyedropper closing, whether or not a colour was taken.",
+          "description": "The eyedropper closing, whether or not a color was taken.",
           "name": "HelixSampleEndEvent",
           "members": [
             {
@@ -3874,7 +3874,7 @@
             "text": "number"
           },
           "default": "24",
-          "description": "How many colours the series palette has, and so where it starts over.\n\nHere rather than in each chart, which is what it was. Four families held the\nsame `const PALETTE = 24` and the legend held a fifth: when the palette went\nfrom eight to twenty-four, one of them was missed and drew every ninth series\nin the first colour again while the legend beside it named the ninth. A\nnumber two files have to agree on is a number that will stop agreeing."
+          "description": "How many colours the series palette has, and so where it starts over.\n\nHere rather than in each chart, which is what it was. Four families held the\nsame `const PALETTE = 24` and the legend held a fifth: when the palette went\nfrom eight to twenty-four, one of them was missed and drew every ninth series\nin the first color again while the legend beside it named the ninth. A\nnumber two files have to agree on is a number that will stop agreeing."
         },
         {
           "kind": "function",
@@ -3900,103 +3900,103 @@
           "name": "MixinChartSourceInterface",
           "cssProperties": [
             {
-              "description": "The colour of the mark this is set on. Written by the component, read by the sheet that paints.",
+              "description": "The color of the mark this is set on. Written by the component, read by the sheet that paints.",
               "name": "--chart-series"
             },
             {
-              "description": "The colour of series 1. The styled tier points it at a palette token.",
+              "description": "The color of series 1. The styled tier points it at a palette token.",
               "name": "--chart-series-1"
             },
             {
-              "description": "The colour of series 2. The styled tier points it at a palette token.",
+              "description": "The color of series 2. The styled tier points it at a palette token.",
               "name": "--chart-series-2"
             },
             {
-              "description": "The colour of series 3. The styled tier points it at a palette token.",
+              "description": "The color of series 3. The styled tier points it at a palette token.",
               "name": "--chart-series-3"
             },
             {
-              "description": "The colour of series 4. The styled tier points it at a palette token.",
+              "description": "The color of series 4. The styled tier points it at a palette token.",
               "name": "--chart-series-4"
             },
             {
-              "description": "The colour of series 5. The styled tier points it at a palette token.",
+              "description": "The color of series 5. The styled tier points it at a palette token.",
               "name": "--chart-series-5"
             },
             {
-              "description": "The colour of series 6. The styled tier points it at a palette token.",
+              "description": "The color of series 6. The styled tier points it at a palette token.",
               "name": "--chart-series-6"
             },
             {
-              "description": "The colour of series 7. The styled tier points it at a palette token.",
+              "description": "The color of series 7. The styled tier points it at a palette token.",
               "name": "--chart-series-7"
             },
             {
-              "description": "The colour of series 8. The styled tier points it at a palette token.",
+              "description": "The color of series 8. The styled tier points it at a palette token.",
               "name": "--chart-series-8"
             },
             {
-              "description": "The colour of series 9. The styled tier points it at a palette token.",
+              "description": "The color of series 9. The styled tier points it at a palette token.",
               "name": "--chart-series-9"
             },
             {
-              "description": "The colour of series 10. The styled tier points it at a palette token.",
+              "description": "The color of series 10. The styled tier points it at a palette token.",
               "name": "--chart-series-10"
             },
             {
-              "description": "The colour of series 11. The styled tier points it at a palette token.",
+              "description": "The color of series 11. The styled tier points it at a palette token.",
               "name": "--chart-series-11"
             },
             {
-              "description": "The colour of series 12. The styled tier points it at a palette token.",
+              "description": "The color of series 12. The styled tier points it at a palette token.",
               "name": "--chart-series-12"
             },
             {
-              "description": "The colour of series 13. The styled tier points it at a palette token.",
+              "description": "The color of series 13. The styled tier points it at a palette token.",
               "name": "--chart-series-13"
             },
             {
-              "description": "The colour of series 14. The styled tier points it at a palette token.",
+              "description": "The color of series 14. The styled tier points it at a palette token.",
               "name": "--chart-series-14"
             },
             {
-              "description": "The colour of series 15. The styled tier points it at a palette token.",
+              "description": "The color of series 15. The styled tier points it at a palette token.",
               "name": "--chart-series-15"
             },
             {
-              "description": "The colour of series 16. The styled tier points it at a palette token.",
+              "description": "The color of series 16. The styled tier points it at a palette token.",
               "name": "--chart-series-16"
             },
             {
-              "description": "The colour of series 17. The styled tier points it at a palette token.",
+              "description": "The color of series 17. The styled tier points it at a palette token.",
               "name": "--chart-series-17"
             },
             {
-              "description": "The colour of series 18. The styled tier points it at a palette token.",
+              "description": "The color of series 18. The styled tier points it at a palette token.",
               "name": "--chart-series-18"
             },
             {
-              "description": "The colour of series 19. The styled tier points it at a palette token.",
+              "description": "The color of series 19. The styled tier points it at a palette token.",
               "name": "--chart-series-19"
             },
             {
-              "description": "The colour of series 20. The styled tier points it at a palette token.",
+              "description": "The color of series 20. The styled tier points it at a palette token.",
               "name": "--chart-series-20"
             },
             {
-              "description": "The colour of series 21. The styled tier points it at a palette token.",
+              "description": "The color of series 21. The styled tier points it at a palette token.",
               "name": "--chart-series-21"
             },
             {
-              "description": "The colour of series 22. The styled tier points it at a palette token.",
+              "description": "The color of series 22. The styled tier points it at a palette token.",
               "name": "--chart-series-22"
             },
             {
-              "description": "The colour of series 23. The styled tier points it at a palette token.",
+              "description": "The color of series 23. The styled tier points it at a palette token.",
               "name": "--chart-series-23"
             },
             {
-              "description": "The colour of series 24. The styled tier points it at a palette token.",
+              "description": "The color of series 24. The styled tier points it at a palette token.",
               "name": "--chart-series-24"
             }
           ],
@@ -4066,7 +4066,7 @@
         },
         {
           "kind": "mixin",
-          "description": "The half of a chart that is about finding its numbers rather than drawing.\n\nFour families had written this out separately, and the row that asked for it\nset the bar: two copies is a coincidence and three is a pattern. There were\nfive copies of `for`, four of `label` and three of the caption fallback by the\ntime the line and donut charts landed, which is why this arrives now and not\nwhen the second chart did.\n\n**A mixin rather than a controller**, by the rule the tier notes give: it\nintroduces `for` and `label`, which a consumer writes. `SourceController` is\nthe other half and stays a controller, because resolving an id and watching\nfor changes is behaviour nobody calls.\n\n**`Legend` deliberately does not take this.** It reads a table and has no\ndrawing to title, so `label` would be API it never uses, and a mixin applied\nfor four fifths of a fit is how a shared thing starts drifting.",
+          "description": "The half of a chart that is about finding its numbers rather than drawing.\n\nFour families had written this out separately, and the row that asked for it\nset the bar: two copies is a coincidence and three is a pattern. There were\nfive copies of `for`, four of `label` and three of the caption fallback by the\ntime the line and donut charts landed, which is why this arrives now and not\nwhen the second chart did.\n\n**A mixin rather than a controller**, by the rule the tier notes give: it\nintroduces `for` and `label`, which a consumer writes. `SourceController` is\nthe other half and stays a controller, because resolving an id and watching\nfor changes is behavior nobody calls.\n\n**`Legend` deliberately does not take this.** It reads a table and has no\ndrawing to title, so `label` would be API it never uses, and a mixin applied\nfor four fifths of a fit is how a shared thing starts drifting.",
           "name": "MixinChartSource",
           "members": [
             {
@@ -5988,7 +5988,7 @@
               }
             }
           ],
-          "description": "Takes the pointer for a drag, and carries on if the platform refuses.\n\n**Capture is an enhancement, and the drag has to survive losing it.** What it\nbuys is events continuing to arrive once the pointer leaves the target, which\nmatters because a thin divider is easy to outrun. What it costs, called bare,\nis the rest of the handler: `setPointerCapture` throws `NotFoundError` when\nthe id names no active pointer, and every one of these calls sits above the\nlines that set the dragging flag and call `preventDefault`. So a refusal did\nnot degrade the drag, it cancelled it.\n\nThat is reachable outside a test: a pointer released between the event being\nqueued and the handler running is gone by the time this is called, and a\nsynthetic `pointerdown` has no active pointer at all. The browser spec run\nreported four of those as uncaught page errors, and three splitter specs had\neach stubbed the method to get past it, which is the shape of a workaround\nthat has been in place long enough to read as setup.\n\nReturns whether it took, for the callers that then ask `hasPointerCapture`\nbefore believing a move belongs to them."
+          "description": "Takes the pointer for a drag, and carries on if the platform refuses.\n\n**Capture is an enhancement, and the drag has to survive losing it.** What it\nbuys is events continuing to arrive once the pointer leaves the target, which\nmatters because a thin divider is easy to outrun. What it costs, called bare,\nis the rest of the handler: `setPointerCapture` throws `NotFoundError` when\nthe id names no active pointer, and every one of these calls sits above the\nlines that set the dragging flag and call `preventDefault`. So a refusal did\nnot degrade the drag, it canceled it.\n\nThat is reachable outside a test: a pointer released between the event being\nqueued and the handler running is gone by the time this is called, and a\nsynthetic `pointerdown` has no active pointer at all. The browser spec run\nreported four of those as uncaught page errors, and three splitter specs had\neach stubbed the method to get past it, which is the shape of a workaround\nthat has been in place long enough to read as setup.\n\nReturns whether it took, for the callers that then ask `hasPointerCapture`\nbefore believing a move belongs to them."
         }
       ],
       "exports": [
@@ -6193,7 +6193,7 @@
               }
             }
           ],
-          "description": "What a pointer resting on a reading shows, as `Tooltip` pointed at a mark.\n\n**A chart does not draw its own tooltip, and the top layer is why.** `Tooltip`\nrenders `popover=\"manual\"` through `PopoverController`, so it clears every\nstacking context and every `overflow` on the page. A box drawn by the chart is\n`position: absolute` inside the plot and is confined to the chart's own\ncontext, so it is clipped by, or layered under, whatever sits beside the\nchart. Escaping that means reimplementing `PopoverController`, which is\n`Tooltip` with extra steps and a second copy of the hard part.\n\n**`for` was already the anchor and needed nothing added.** It resolves through\n`getRootNode().getElementById()`, and a chart's shadow root *is* a\n`ShadowRoot`, so a chart names an element inside itself and `Tooltip` finds\nit. What the chart provides is an invisible mark at the reading's point.\n\n**An HTML mark rather than the `<rect>` or `<circle>` already there.**\n`FloatingController` types its anchor as `HTMLElement` and an SVG element is\nnot one; and a slice's `<circle>` has the bounding box of the whole ring\nrather than of its arc, so anchoring to it would point at the ring's centre\nfor every slice.\n\n**And the arrow now follows from placement rather than from a compass.** The\nchart says which side it prefers and `FloatingController` moves it if that\nside does not fit, which is how a slice at any bearing gets a bubble that\npoints at it. Four hard-coded sides could not express a bearing, which is what\nmade the donut's arrow miss its own ring.\n\n**It shows the table's text and not the chart's numbers.** `$128k` is what the\ncell says and `128000` is what the drawing measured. Every cell of the row is\nhere, including columns nothing was plotted from, because a note beside the\nfigures is most of the reason to want a tooltip.\n\n**Hidden from assistive technology, on purpose.** The table is the accessible\nrepresentation and the drawing is `aria-hidden`; a reader on a keyboard gets\nthe table, which they can reach, rather than a tooltip which they cannot."
+          "description": "What a pointer resting on a reading shows, as `Tooltip` pointed at a mark.\n\n**A chart does not draw its own tooltip, and the top layer is why.** `Tooltip`\nrenders `popover=\"manual\"` through `PopoverController`, so it clears every\nstacking context and every `overflow` on the page. A box drawn by the chart is\n`position: absolute` inside the plot and is confined to the chart's own\ncontext, so it is clipped by, or layered under, whatever sits beside the\nchart. Escaping that means reimplementing `PopoverController`, which is\n`Tooltip` with extra steps and a second copy of the hard part.\n\n**`for` was already the anchor and needed nothing added.** It resolves through\n`getRootNode().getElementById()`, and a chart's shadow root *is* a\n`ShadowRoot`, so a chart names an element inside itself and `Tooltip` finds\nit. What the chart provides is an invisible mark at the reading's point.\n\n**An HTML mark rather than the `<rect>` or `<circle>` already there.**\n`FloatingController` types its anchor as `HTMLElement` and an SVG element is\nnot one; and a slice's `<circle>` has the bounding box of the whole ring\nrather than of its arc, so anchoring to it would point at the ring's center\nfor every slice.\n\n**And the arrow now follows from placement rather than from a compass.** The\nchart says which side it prefers and `FloatingController` moves it if that\nside does not fit, which is how a slice at any bearing gets a bubble that\npoints at it. Four hard-coded sides could not express a bearing, which is what\nmade the donut's arrow miss its own ring.\n\n**It shows the table's text and not the chart's numbers.** `$128k` is what the\ncell says and `128000` is what the drawing measured. Every cell of the row is\nhere, including columns nothing was plotted from, because a note beside the\nfigures is most of the reason to want a tooltip.\n\n**Hidden from assistive technology, on purpose.** The table is the accessible\nrepresentation and the drawing is `aria-hidden`; a reader on a keyboard gets\nthe table, which they can reach, rather than a tooltip which they cannot."
         }
       ],
       "exports": [
@@ -6350,7 +6350,7 @@
               }
             }
           ],
-          "description": "Writes a host's semantics onto its `ElementInternals`.\n\nOnto internals rather than onto the host, which is the whole point: an\nattribute written at upgrade is markup a React consumer's server output never\nhad, and hydration reports the difference. Internals carry the same meaning\nto the accessibility tree and leave the element as the consumer wrote it.\n\n**Empty means absent, and that is the trap this exists for.** Assigning `''`\nto `ariaLabel` is not the same as not naming the element: it is a name of no\ncharacters, which a screen reader announces as an unnamed control while every\ncheck for \"is it labelled\" passes. Every caller had written\n`this.label === '' ? null : this.label` and one of them would eventually not.\n\n**Element references are feature-tested rather than assumed.** They are the\nonly way a host in the light DOM can point at a node in its own shadow root,\nan IDREF cannot cross that boundary, and the plain `element.aria*Elements`\nreflection drops the reference where `ElementInternals` keeps it. Older\nengines have neither, and assigning to a property they do not implement is a\nsilent no-op rather than an error, so the guard is what makes the absence\nvisible to anything reading this.\n\nOmitted keys are left alone, so a component that sets its role once in\n`willUpdate` and its references later in `updated` does not have to repeat\nitself or risk clearing what the other call wrote."
+          "description": "Writes a host's semantics onto its `ElementInternals`.\n\nOnto internals rather than onto the host, which is the whole point: an\nattribute written at upgrade is markup a React consumer's server output never\nhad, and hydration reports the difference. Internals carry the same meaning\nto the accessibility tree and leave the element as the consumer wrote it.\n\n**Empty means absent, and that is the trap this exists for.** Assigning `''`\nto `ariaLabel` is not the same as not naming the element: it is a name of no\ncharacters, which a screen reader announces as an unnamed control while every\ncheck for \"is it labeled\" passes. Every caller had written\n`this.label === '' ? null : this.label` and one of them would eventually not.\n\n**Element references are feature-tested rather than assumed.** They are the\nonly way a host in the light DOM can point at a node in its own shadow root,\nan IDREF cannot cross that boundary, and the plain `element.aria*Elements`\nreflection drops the reference where `ElementInternals` keeps it. Older\nengines have neither, and assigning to a property they do not implement is a\nsilent no-op rather than an error, so the guard is what makes the absence\nvisible to anything reading this.\n\nOmitted keys are left alone, so a component that sets its role once in\n`willUpdate` and its references later in `updated` does not have to repeat\nitself or risk clearing what the other call wrote."
         }
       ],
       "exports": [
@@ -6457,7 +6457,7 @@
               }
             }
           ],
-          "description": "Builds an SVG path through a set of points.\n\nShared by every chart that draws a line, so the choice of curve is one\nimplementation rather than one per chart. Pure: it takes points and returns a\nstring, and knows nothing about elements or lifecycles.\n\n`straight` joins the readings and claims nothing between them, which is why\nit is the default. `smooth` is easier to follow across a long series and\ninvents the values in between, so it is a reading aid rather than a neutral\none. `step` claims the opposite, that a reading holds until the next one, and\nchanges at the midpoint rather than at either end, since a chart's x axis is\nan order and neither neighbour has a better claim on the moment it moved.\n\nFewer than two points is an empty string rather than a partial path: one\nreading is not a line, and `M0,0` alone draws nothing while still being a\npath element that looks like it should."
+          "description": "Builds an SVG path through a set of points.\n\nShared by every chart that draws a line, so the choice of curve is one\nimplementation rather than one per chart. Pure: it takes points and returns a\nstring, and knows nothing about elements or lifecycles.\n\n`straight` joins the readings and claims nothing between them, which is why\nit is the default. `smooth` is easier to follow across a long series and\ninvents the values in between, so it is a reading aid rather than a neutral\none. `step` claims the opposite, that a reading holds until the next one, and\nchanges at the midpoint rather than at either end, since a chart's x axis is\nan order and neither neighbor has a better claim on the moment it moved.\n\nFewer than two points is an empty string rather than a partial path: one\nreading is not a line, and `M0,0` alone draws nothing while still being a\npath element that looks like it should."
         }
       ],
       "exports": [

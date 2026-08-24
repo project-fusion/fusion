@@ -60,10 +60,10 @@
 
 /* A ring rather than a disc.
  *
- * A column of filled circles is a column of traffic lights: the colour is the
+ * A column of filled circles is a column of traffic lights: the color is the
  * loudest thing on the card and it is saying something small, which is what
  * kind of event this was. A ring in the tone with the mark drawn inside it in
- * the same colour reads as an annotation on the line rather than a warning, and
+ * the same color reads as an annotation on the line rather than a warning, and
  * an entry with nothing slotted still gets a dot, because a ring with nothing
  * in it is a hole. */
 [part="marker"] {
@@ -81,7 +81,7 @@
    *
    * The mark is a glyph now, drawn inside a box Phosphor already balanced, and
    * the lift became an error of exactly its own size. Measured across all four
-   * entries at a 14px title: the mark sat 1.4 pixels above the centre of its
+   * entries at a 14px title: the mark sat 1.4 pixels above the center of its
    * own label, on every row, which is `0.1em` to the pixel.
    */
   /* Round, and it cuts nothing.
@@ -91,11 +91,11 @@
    * continuously and stopped being true when the line was split: the connector
    * is `grid-row: 1`, above the mark, and the rail is offset down by the mark's
    * own size, so neither is ever drawn in the space the mark occupies. It was
-   * masking nothing and painting the page's colour onto a component that cannot
+   * masking nothing and painting the page's color onto a component that cannot
    * know it is on a page. On a card it came out darker than the surface it sat
    * on, which is what it looked like: a hole rather than a mark.
    *
-   * A component must not paint the colour of something it does not own. The
+   * A component must not paint the color of something it does not own. The
    * mark is transparent now and is correct on a card, a drawer, a toast and a
    * photograph without being told which it is.
    *

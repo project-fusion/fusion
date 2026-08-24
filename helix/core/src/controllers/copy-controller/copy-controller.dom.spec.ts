@@ -4,7 +4,7 @@ import { registerDom } from '@helix-io/testing/dom'
 /**
  * Putting text on the clipboard, and holding a confirmation for a moment.
  *
- * A controller rather than a component, because copying is a behaviour and not
+ * A controller rather than a component, because copying is a behavior and not
  * a shape: Color's chip is a swatch that copies and a copy button is a button
  * that copies, and those have nothing in common to look at. What they share is
  * the write, the confirmation, the timer that ends it and the event that

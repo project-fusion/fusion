@@ -69,7 +69,7 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @csspart surface - The floating panel.
  * @csspart picker - The color picker inside it.
  *
- * @cssproperty --color-input-swatch - The chosen colour, to paint over the transparency check.
+ * @cssproperty --color-input-swatch - The chosen color, to paint over the transparency check.
  */
 @customElement('helix-base-color-input')
 export class HelixBaseColorInput extends MixinControllerOpen(
@@ -104,7 +104,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
    *
    * **Undefaulted, because it reflects.** The two together are what stamp an
    * attribute onto every host anybody renders, including the ones nobody
-   * configured: the server wrote `format="hex"` on every colour input on the
+   * configured: the server wrote `format="hex"` on every color input on the
    * page, and React, holding no such prop, reported a hydration mismatch for
    * each one. That is the fault `Tree.chevronPlacement` had and the reason the
    * area rules say a reflected property takes no default. Hex is still what an

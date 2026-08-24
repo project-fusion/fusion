@@ -27,7 +27,7 @@ pub struct Emphasis {
     pub subtle: Oklch,
 }
 
-/// Solves a role from its base colour.
+/// Solves a role from its base color.
 #[must_use]
 pub fn emphasis(base: Oklch, ctx: &Deriving) -> Emphasis {
     let dark = ctx.scheme == Scheme::Dark;
@@ -40,7 +40,7 @@ pub fn emphasis(base: Oklch, ctx: &Deriving) -> Emphasis {
     page alone came out at 4.25:1 on the one ground a consumer most expects it to
     work on.
 
-    No cycle: the tint depends on the base colour and the scheme, never on the
+    No cycle: the tint depends on the base color and the scheme, never on the
     solved ink, so it is computed first and solved against. */
     let subtle = Oklch {
         chroma: base.chroma.min(ctx.policy.apply(0.06)),

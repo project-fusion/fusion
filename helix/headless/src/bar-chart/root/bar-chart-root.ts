@@ -77,8 +77,8 @@ const HEIGHT = 100
  * @csspart tooltip-name - A column's name inside the tooltip.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
- * @cssproperty --bar-chart-axis - The colour of a single-series axis, taken from that series.
- * @cssproperty --bar-chart-secondary - The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138.
+ * @cssproperty --bar-chart-axis - The color of a single-series axis, taken from that series.
+ * @cssproperty --bar-chart-secondary - The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138.
  */
 @customElement('helix-base-bar-chart')
 export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
@@ -161,7 +161,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
    * no value axis at all when there is one scale, because the columns are
    * measured against each other and a reader needs no numbers to do that. With
    * two, a reader has no way of knowing there are two, let alone which series
-   * is on which, so both scales are labelled the moment this is set. An
+   * is on which, so both scales are labeled the moment this is set. An
    * unlabelled second axis is the deceptive case rather than the tidy one.
    *
    * The grid stays on the primary axis, since a rule measured against two
@@ -281,8 +281,8 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
             ...[...ticks(domain), ...ticks(other)].map((level) => level.toLocaleString().length),
           )
 
-    /* The second axis wears its series' colour when exactly one series is on it,
-       which is the case worth helping and the only one a single colour can
+    /* The second axis wears its series' color when exactly one series is on it,
+       which is the case worth helping and the only one a single color can
        describe honestly: with two sharing it, painting the axis either of their
        colours says it belongs to that one.
      *
@@ -330,11 +330,11 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
        two different numbers and they stopped being the same the moment one
        series could be a line. `depth` is its place in the slot, so the columns
        stand shoulder to shoulder with no gap where a line was; `tone` is its
-       place in the palette, so it keeps the colour the legend gives it.
+       place in the palette, so it keeps the color the legend gives it.
      *
        Passing the first for both is what the first version did, and it was
        visible: with `Target` drawn as a line, `Forecast` moved up into its slot
-       *and* into its colour, so a chart of four series painted three columns in
+       *and* into its color, so a chart of four series painted three columns in
        the first three colours and the line in the third one as well. */
     const scaled = this.scaled
     const own = (one: Series): boolean => scaled.has(one.name.trim().toLowerCase())
@@ -354,9 +354,9 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
        the right way to draw a group, which is why the split stays whether
        anything is outlined or not.
 
-       Centred in the stride rather than flush against it, so the gap between two
+       Centered in the stride rather than flush against it, so the gap between two
        columns is the same size everywhere and the group sits where it did. One
-       series has no neighbour to be separated from and keeps the full stride. */
+       series has no neighbor to be separated from and keeps the full stride. */
     const stride = (slot * 0.72) / Math.max(columns.length, 1)
     const gap = columns.length > 1 ? stride * 0.08 : 0
     const thickness = stride - gap
@@ -364,7 +364,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     /* **The geometry is computed for the axis it is drawn on, not rotated onto
        it.** The first version turned the whole plot with `rotate: 90deg`, which
        is the shorter CSS and does not work: a rotation is about the element's
-       own centre, so the drawing left its grid cell entirely and the labels,
+       own center, so the drawing left its grid cell entirely and the labels,
        which are a separate row, stayed where they were. What it produced was
        one column floating beside a list of names.
      *
@@ -617,7 +617,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
    * changes its mind.
    *
    * `data-series` keeps the index the series has among *all* of them, not among
-   * the lines, so the colour a line takes is the colour the legend gives it and
+   * the lines, so the color a line takes is the color the legend gives it and
    * moving a column between marks does not repaint the chart.
    */
   protected renderLine(

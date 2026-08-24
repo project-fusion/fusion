@@ -140,7 +140,7 @@
 /* What a collection says instead of rows: the same two lines everywhere, in the
    same voice, because a reader meeting "Loading" in a menu and a different
    arrangement of the same idea in a table is a reader learning the same thing
-   twice. Quiet and centred, since neither is content: they are the absence of
+   twice. Quiet and centered, since neither is content: they are the absence of
    it, and an absence set like a heading reads as an error. */
 [part="empty"],
 [part="loading"] {
