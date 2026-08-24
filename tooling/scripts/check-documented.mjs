@@ -81,7 +81,21 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-/** Every documentation page in the repository, by domain. */
+/**
+ * Everything in this repository that tells somebody what the API is.
+ *
+ * **The published pages and the files that instruct an agent, which is the same
+ * problem twice.** `.claude/rules/helix.md` and the skills beside it are read by
+ * a machine that then writes code, and they drifted worse than the documentation
+ * did: the rules file documented regenerating React wrappers in a directory that
+ * has never existed, named `SourceChange` as an event nothing dispatches, and
+ * illustrated a naming convention with `Card.Header` nine hundred lines above its
+ * own note that Card's header became a slot. The skill carried `appearance` and a
+ * group rule the rules file had corrected a week earlier.
+ *
+ * A page that is wrong misleads a reader who can push back. A rule that is wrong
+ * is read by something that cannot, and it is read first.
+ */
 const pages = () => {
   const found = []
   for (const domain of readdirSync(ROOT, { withFileTypes: true })) {
@@ -97,6 +111,28 @@ const pages = () => {
         found.push(join(content, file))
       }
     }
+  }
+
+  const rules = join(ROOT, '.claude', 'rules')
+  if (existsSync(rules)) {
+    for (const file of readdirSync(rules)) {
+      if (file.endsWith('.md')) {
+        found.push(join(rules, file))
+      }
+    }
+  }
+  const skills = join(ROOT, '.claude', 'skills')
+  if (existsSync(skills)) {
+    for (const skill of readdirSync(skills, { withFileTypes: true })) {
+      const card = join(skills, skill.name, 'SKILL.md')
+      if (skill.isDirectory() && existsSync(card)) {
+        found.push(card)
+      }
+    }
+  }
+  const root = join(ROOT, 'CLAUDE.md')
+  if (existsSync(root)) {
+    found.push(root)
   }
   return found
 }
@@ -249,15 +285,40 @@ if (tags.size === 0) {
   process.exit(1)
 }
 
-/** A mention that says the thing is gone is allowed to name it. */
+/**
+ * A mention that says the thing does not work is allowed to name it.
+ *
+ * Two shapes, and the second was found by widening this check to the rules files.
+ * **Historical**: a sentence saying the thing was removed. **Counter-example**: a
+ * sentence naming the wrong thing in order to warn about it, which the rules file
+ * and the root `CLAUDE.md` do deliberately three times, with `onhelix-opne` as a
+ * typo that compiles clean, `HelixOpen` as the event `onHelixOpen` binds and
+ * nobody dispatches, and one package name the naming rule refuses.
+ *
+ * All three are the check working on prose that is correct, so exempting them is
+ * not a loosening. A check with three permanent false positives is one people
+ * learn to skip, and then it holds nothing at all.
+ */
 const HISTORICAL =
-  /\b(was|were|used to|no longer|removed|refused|gone|deleted|instead of|rather than|gained|renamed)\b/i
+  /\b(was|were|used to|no longer|removed|refused|gone|deleted|instead of|rather than|gained|renamed|nobody|nothing|invented|never|typo|cannot)\b/i
+
+/**
+ * Whether the name is the object of an immediate negation: `not` then the name.
+ *
+ * Narrower than the list above, and it catches the shape that list cannot reach
+ * without exempting the word "not" everywhere. Only the twenty characters in
+ * front of the match, so a "not" earlier in the same sentence does not license a
+ * name at the end of it.
+ */
+const NEGATED = (before) => /\b(not|never|no)\b[\s`'"(]*$/i.test(before.slice(-20))
 
 for (const page of pages()) {
   const text = readFileSync(page, 'utf8')
   const where = page.slice(ROOT.length + 1)
   /** The sentence a match sits in, for the historical test. */
   const around = (at) => text.slice(Math.max(0, at - 220), at + 220)
+  /** Whether a mention here is prose explaining that the thing is not real. */
+  const explained = (at) => HISTORICAL.test(around(at)) || NEGATED(text.slice(0, at))
 
   /* In markup and in a selector. The second is how an override example is
      written and is the form the first version of this check let through. */
@@ -266,7 +327,7 @@ for (const page of pages()) {
   )) {
     const tag = match[1] ?? match[2]
     checked += 1
-    if (!tags.has(tag) && !HISTORICAL.test(around(match.index))) {
+    if (!tags.has(tag) && !explained(match.index)) {
       problems.push(`${where}: \`${tag}\` is not a tag any manifest declares.`)
     }
   }
@@ -284,7 +345,7 @@ for (const page of pages()) {
       continue
     }
     checked += 1
-    if (!HISTORICAL.test(around(match.index))) {
+    if (!explained(match.index)) {
       problems.push(`${where}: \`${name}\` is not a hook \`${family}\` declares.`)
     }
   }
@@ -298,7 +359,7 @@ for (const page of pages()) {
     if (name.startsWith('--helix-seed-') || tokens.has(name)) {
       continue
     }
-    if (!HISTORICAL.test(around(match.index))) {
+    if (!explained(match.index)) {
       problems.push(`${where}: \`${name}\` is not a token \`@helix-io/styles\` declares.`)
     }
   }
@@ -306,14 +367,14 @@ for (const page of pages()) {
   for (const match of text.matchAll(/onhelix-([a-z][a-z0-9-]*)/g)) {
     checked += 1
     const name = `helix-${match[1]}`
-    if (!events.has(name) && !HISTORICAL.test(around(match.index))) {
+    if (!events.has(name) && !explained(match.index)) {
       problems.push(`${where}: \`on${name}\` binds \`${name}\`, which nothing dispatches.`)
     }
   }
 
   for (const match of text.matchAll(/addEventListener\(\s*'(helix-[a-z0-9-]+)'/g)) {
     checked += 1
-    if (!events.has(match[1]) && !HISTORICAL.test(around(match.index))) {
+    if (!events.has(match[1]) && !explained(match.index)) {
       problems.push(`${where}: listens for \`${match[1]}\`, which nothing dispatches.`)
     }
   }
@@ -328,12 +389,12 @@ for (const page of pages()) {
     const name = specifier.split('/').slice(0, 2).join('/')
     checked += 1
     if (!packages.has(name)) {
-      if (!HISTORICAL.test(around(match.index))) {
+      if (!explained(match.index)) {
         problems.push(`${where}: \`${name}\` is not a package in this workspace.`)
       }
       continue
     }
-    if (specifier === name || HISTORICAL.test(around(match.index))) {
+    if (specifier === name || explained(match.index)) {
       continue
     }
     try {
@@ -351,7 +412,7 @@ for (const page of pages()) {
   for (const match of text.matchAll(/dispatch(?:es|ed|ing)?\s+`([A-Za-z][\w-]*)`/g)) {
     const name = match[1]
     checked += 1
-    if (!events.has(name) && !exports_.has(name) && !HISTORICAL.test(around(match.index))) {
+    if (!events.has(name) && !exports_.has(name) && !explained(match.index)) {
       problems.push(`${where}: says \`${name}\` is dispatched, and nothing dispatches it.`)
     }
   }
@@ -360,7 +421,7 @@ for (const page of pages()) {
      not ours to verify, and a bare capitalised word in prose is a sentence. */
   for (const match of text.matchAll(/`((?:Helix|Mixin|With)[A-Z][A-Za-z0-9]*)`/g)) {
     checked += 1
-    if (!exports_.has(match[1]) && !HISTORICAL.test(around(match.index))) {
+    if (!exports_.has(match[1]) && !explained(match.index)) {
       problems.push(`${where}: \`${match[1]}\` is not a name the workspace exports.`)
     }
   }
@@ -374,5 +435,5 @@ if (problems.length > 0) {
 }
 
 console.log(
-  `documented: ${checked} API references across ${pages().length} pages, every tag, token, event, hook, package and exported name real`,
+  `documented: ${checked} API references across ${pages().length} pages, every tag, token, event, hook, package, subpath and exported name real`,
 )

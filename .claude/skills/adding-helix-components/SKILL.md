@@ -24,8 +24,13 @@ procedure.
 - **Family and parts.** A part per folder:
   `helix/<tier>/src/<family>/<part>/<family>-<part>.ts`. `Root` is the family's
   primary element.
-- **Groups are parts** where homogeneous (`Radio.Group`). A container holding
-  mixed content is its own family (`Toolbar`).
+- **A group is a part when it reports a form value** (`Radio.Group`,
+  `Toggle.Group`), and its own family when it does not (`Checkbox Group`,
+  `Button Group`). A container holding mixed content is its own family
+  (`Toolbar`). This read "where homogeneous" until `.claude/rules/helix.md`
+  corrected it on 15 Aug 2026: that is a fact about the members rather than about
+  the group, and by it two shipped families were violations. The correction
+  reached the rules file and not this one.
 - **Form-associated?** Extend `HelixFormElement`, not `HelixElement`.
   `formAssociated` must be a class field: it cannot be a controller.
 - **Reuse a mixin** if the component has open, checked, value, disabled, or
@@ -57,7 +62,10 @@ undefined there.
 `helix/web/src/<family>/<part>/<family>-<part>.ts` plus a sibling `.css`.
 
 - Class `Helix<Family><Part>` extending the base, tag `helix-<family>-<part>`.
-- Presentation only: `appearance`, `tone`, `dense`.
+- Presentation only, and the properties are the visual axes: `emphasis`,
+  `material`, `separation`, `tone`. **`appearance` is refused outright** by
+  `check:axes` and is not a word this library uses; `dense` is not one either,
+  since size comes from `data-density` on the region.
 - Styles in the `.css` file, imported as `./​<family>-<part>.css.js`:
 
 ```ts
@@ -97,9 +105,11 @@ expect(scope.getElementById(element.getAttribute('aria-labelledby'))).toBe(title
 bun run check && bun run verify
 ```
 
-`build` runs `styles` and `analyze`; `helix/react` regenerates its wrappers from
-the manifest. Inspect the generated wrapper and confirm props and typed event
-callbacks appear as expected.
+`build` runs `styles` and `analyze`, and `analyze` is what regenerates the
+framework typings: `jsx.d.ts`, `vue.d.ts` and `svelte.d.ts`, in `helix/web`,
+emitted by cem plugins. **There are no React wrappers and there is no
+`helix/react`.** Inspect the generated typings and confirm the properties and the
+typed event callbacks appear as expected.
 
 If the linter rejects the component, it is naming a missing convention. Fix the
 component rather than the linter.
