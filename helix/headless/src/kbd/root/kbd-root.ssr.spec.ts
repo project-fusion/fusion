@@ -5,12 +5,12 @@ import '../index.js'
 
 describe('kbd server output', () => {
   test('the key is in the served markup', () => {
-    expect(partTag(ssr(html`<helix-base-kbd>K</helix-base-kbd>`), 'kbd')).toContain('<kbd')
+    expect(partTag(ssr(html`<helix-headless-kbd>K</helix-headless-kbd>`), 'kbd')).toContain('<kbd')
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    expect(hostAttributes(ssr(html`<helix-base-kbd>K</helix-base-kbd>`), 'helix-base-kbd')).toEqual(
-      [],
-    )
+    expect(
+      hostAttributes(ssr(html`<helix-headless-kbd>K</helix-headless-kbd>`), 'helix-headless-kbd'),
+    ).toEqual([])
   })
 })

@@ -9,7 +9,7 @@ import { caretLeft } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { HelixBaseDrilldownItem } from '../item/drilldown-item.js'
+import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
 
 /**
  * @summary A stack of pages, one showing at a time, with a way back.
@@ -52,8 +52,8 @@ import { HelixBaseDrilldownItem } from '../item/drilldown-item.js'
  * @csspart page - The region the rows are in.
  * @csspart title - The name of the page showing.
  */
-@customElement('helix-base-drilldown')
-export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
+@customElement('helix-headless-drilldown')
+export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   /** Accessible name for the region. */
   @property()
   /* Not "Menu", which is what it was: this component's own description is built
@@ -76,7 +76,7 @@ export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
   @state()
   private direction: 'back' | 'forward' = 'forward'
 
-  private readonly drilldown = new DrilldownController<HelixBaseDrilldownItem>(this, {
+  private readonly drilldown = new DrilldownController<HelixHeadlessDrilldownItem>(this, {
     isRow: (element: Element): boolean =>
       'isDrilldownItem' in element && element.isDrilldownItem === true,
     root: () => [...this.children],
@@ -84,7 +84,7 @@ export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
   })
 
   /** The rows on the page showing, which is what the keys move over. */
-  private get items(): HelixBaseDrilldownItem[] {
+  private get items(): HelixHeadlessDrilldownItem[] {
     return this.drilldown.rows.filter((item) => !item.disabled)
   }
 
@@ -110,7 +110,7 @@ export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
   }
 
   /** Shows a row's page, and puts focus on the first row of it. */
-  private enter(item: HelixBaseDrilldownItem): void {
+  private enter(item: HelixHeadlessDrilldownItem): void {
     if (!this.drilldown.enter(item)) {
       return
     }
@@ -149,7 +149,7 @@ export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
 
   private readonly handleSelect = (event: Event): void => {
     const item = event.target
-    if (!(item instanceof HelixBaseDrilldownItem) || !this.items.includes(item)) {
+    if (!(item instanceof HelixHeadlessDrilldownItem) || !this.items.includes(item)) {
       return
     }
     /* A row with a page drills rather than announcing. The event is stopped so
@@ -228,7 +228,7 @@ export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
        only, since the server has no tree to walk. */
     const page = this.drilldown.page
     for (const child of this.children) {
-      if (!(child instanceof HelixBaseDrilldownItem)) {
+      if (!(child instanceof HelixHeadlessDrilldownItem)) {
         continue
       }
       this.mark(child, page, page === null)
@@ -240,14 +240,14 @@ export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
 
   /** Walks the tree marking which rows are on the page showing. */
   private mark(
-    item: HelixBaseDrilldownItem,
-    page: HelixBaseDrilldownItem | null,
+    item: HelixHeadlessDrilldownItem,
+    page: HelixHeadlessDrilldownItem | null,
     onPage: boolean,
   ): void {
     item.onPage = onPage
     item.showingPage = item === page
     for (const child of item.children) {
-      if (child instanceof HelixBaseDrilldownItem && child.slot === 'page') {
+      if (child instanceof HelixHeadlessDrilldownItem && child.slot === 'page') {
         this.mark(child, page, item === page)
       }
     }
@@ -275,6 +275,6 @@ export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-drilldown': HelixBaseDrilldown
+    'helix-headless-drilldown': HelixHeadlessDrilldown
   }
 }

@@ -28,10 +28,10 @@ export const startCase = (slug: string): string =>
     )
     .join(' ')
 
-/** `helix-app-header` becomes `App Header`, `helix-base-card` becomes `Card`. */
+/** `helix-app-header` becomes `App Header`, `helix-headless-card` becomes `Card`. */
 export const displayName = (tagName: string): string =>
-  startCase(tagName.replace(/^helix-(?:base-)?/, ''))
+  startCase(tagName.replace(/^helix-(?:headless-)?/, ''))
 
 /** Which tier a tag belongs to, read from the prefix rather than the manifest. */
 export const tierOf = (tagName: string): 'headless' | 'styled' =>
-  tagName.startsWith('helix-base-') ? 'headless' : 'styled'
+  tagName.startsWith('helix-headless-') ? 'headless' : 'styled'

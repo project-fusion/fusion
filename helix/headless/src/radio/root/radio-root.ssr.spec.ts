@@ -29,15 +29,15 @@ import '../index.js'
    assertion nobody maintains. */
 describe('radio server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
-    expect(withoutStyles(ssr(html`<helix-base-radio></helix-base-radio>`))).toContain(
-      'helix-base-radio',
+    expect(withoutStyles(ssr(html`<helix-headless-radio></helix-headless-radio>`))).toContain(
+      'helix-headless-radio',
     )
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-base-radio></helix-base-radio>`),
-      'helix-base-radio',
+      ssr(html`<helix-headless-radio></helix-headless-radio>`),
+      'helix-headless-radio',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

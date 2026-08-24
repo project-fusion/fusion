@@ -7,7 +7,7 @@ describe('list server output', () => {
   test('the rows are in the served markup', () => {
     const markup = withoutStyles(
       ssr(
-        html`<helix-base-list><helix-base-list-item>One</helix-base-list-item></helix-base-list>`,
+        html`<helix-headless-list><helix-headless-list-item>One</helix-headless-list-item></helix-headless-list>`,
       ),
     )
     expect(markup).toContain('One')
@@ -15,9 +15,9 @@ describe('list server output', () => {
 
   test('neither the list nor a row carries an attribute the consumer did not write', () => {
     const markup = ssr(
-      html`<helix-base-list label="Files"><helix-base-list-item>x</helix-base-list-item></helix-base-list>`,
+      html`<helix-headless-list label="Files"><helix-headless-list-item>x</helix-headless-list-item></helix-headless-list>`,
     )
-    expect(hostAttributes(markup, 'helix-base-list')).toEqual(['label'])
-    expect(hostAttributes(markup, 'helix-base-list-item')).toEqual([])
+    expect(hostAttributes(markup, 'helix-headless-list')).toEqual(['label'])
+    expect(hostAttributes(markup, 'helix-headless-list-item')).toEqual([])
   })
 })

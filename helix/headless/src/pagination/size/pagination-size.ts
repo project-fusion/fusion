@@ -68,8 +68,8 @@ import '../../select/index.js'
  *
  * @event {HelixChangeEvent} helix-change - Fired before the size changes, and cancelable. The only way to refuse one.
  */
-@customElement('helix-base-pagination-size')
-export class HelixBasePaginationSize extends HelixElement {
+@customElement('helix-headless-pagination-size')
+export class HelixHeadlessPaginationSize extends HelixElement {
   /**
    * The sizes offered, comma separated.
    *
@@ -246,6 +246,6 @@ export class HelixBasePaginationSize extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-pagination-size': HelixBasePaginationSize
+    'helix-headless-pagination-size': HelixHeadlessPaginationSize
   }
 }

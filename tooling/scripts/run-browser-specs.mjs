@@ -58,12 +58,14 @@ const server = createServer(async (request, response) => {
     response.writeHead(200, { 'content-type': 'text/html' })
     response.end(
       '<!doctype html><meta charset="utf-8"><title>specs</title>' +
-        '<link rel="stylesheet" href="/base.css">',
+        '<link rel="stylesheet" href="/headless.css">',
     )
     return
   }
   try {
-    const body = await readFile(path === '/base.css' ? base : join(specs, path.replace(/^\/+/, '')))
+    const body = await readFile(
+      path === '/headless.css' ? base : join(specs, path.replace(/^\/+/, '')),
+    )
     response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'text/plain' })
     response.end(body)
   } catch {

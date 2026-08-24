@@ -1,6 +1,6 @@
 /* Server only, which is what makes this free. The highlighter is a Lezer parse
    and a tree walk, so it runs during the build and the page ships coloured
-   markup with no client JavaScript spent on it. `helix/web` never sees it. */
+   markup with no client JavaScript spent on it. `helix/styled` never sees it. */
 
 import { startCase } from '@helix-io/docs'
 import { highlight } from '@helix-io/sandbox/highlight'
@@ -556,7 +556,7 @@ export default async function FamilyDocs({
      value when the address said something. Validated against the two literals
      before it reaches a script tag. See 211. */
   const asked = (await searchParams).tier
-  const forced = asked === 'base' || asked === 'styled' ? asked : undefined
+  const forced = asked === 'headless' || asked === 'styled' ? asked : undefined
   if (!family) {
     notFound()
   }
@@ -580,8 +580,8 @@ export default async function FamilyDocs({
           // biome-ignore lint/security/noDangerouslySetInnerHtml: one of two literals this file chose
           dangerouslySetInnerHTML={{
             __html:
-              forced === 'base'
-                ? "document.documentElement.dataset.apiTier='base'"
+              forced === 'headless'
+                ? "document.documentElement.dataset.apiTier='headless'"
                 : 'delete document.documentElement.dataset.apiTier',
           }}
         />
@@ -642,7 +642,7 @@ export default async function FamilyDocs({
                 <span
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: markup this build produced from its own source
                   dangerouslySetInnerHTML={{
-                    __html: highlight(`import '@helix-io/web/${family.slug}'`, 'js'),
+                    __html: highlight(`import '@helix-io/styled/${family.slug}'`, 'js'),
                   }}
                 />
               </helix-code-block>

@@ -120,8 +120,8 @@ interface EyeDropperConstructor {
  * @cssproperty --color-picker-saturation - The chosen saturation, 0 to 100, as a percentage.
  * @cssproperty --color-picker-swatch - A color to paint: the current one on the sample, a preset's on each preset.
  */
-@customElement('helix-base-color-picker')
-export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement) {
+@customElement('helix-headless-color-picker')
+export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElement) {
   /**
    * Whether the current selection fails validation.
    *
@@ -441,7 +441,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderTools(): TemplateResult {
@@ -568,6 +568,6 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-color-picker': HelixBaseColorPicker
+    'helix-headless-color-picker': HelixHeadlessColorPicker
   }
 }

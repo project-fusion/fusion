@@ -9,11 +9,11 @@ import { list } from '@helix-io/icons'
 import { nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
-import type { HelixBaseVideoPlaylistItem } from '../item/video-playlist-item.js'
-import { HelixBaseVideoPlaylist } from '../root/video-playlist-root.js'
+import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
+import { HelixHeadlessVideoPlaylist } from '../root/video-playlist-root.js'
 import '../../menu/index.js'
 
-const ITEMS = 'helix-video-playlist-item, helix-base-video-playlist-item'
+const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
 
 /**
  * @summary The playlist's entries, as a menu inside the player's control bar.
@@ -67,8 +67,8 @@ const ITEMS = 'helix-video-playlist-item, helix-base-video-playlist-item'
  *
  * @event {HelixSelectEvent} helix-select - Fired with the chosen entry's value. The playlist listens for it.
  */
-@customElement('helix-base-video-playlist-menu')
-export class HelixBaseVideoPlaylistMenu extends HelixElement {
+@customElement('helix-headless-video-playlist-menu')
+export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   /**
    * The menu's accessible name, and its trigger's.
    *
@@ -116,17 +116,17 @@ export class HelixBaseVideoPlaylistMenu extends HelixElement {
    * server, and the server has no tree to walk anyway. Held here instead, set
    * after the first update, and `undefined` on the server, where an empty menu
    * is the honest output. */
-  #playlist: HelixBaseVideoPlaylist | undefined
+  #playlist: HelixHeadlessVideoPlaylist | undefined
 
   /** The playlist this menu belongs to, found upward through the slots. */
-  private get playlist(): HelixBaseVideoPlaylist | undefined {
+  private get playlist(): HelixHeadlessVideoPlaylist | undefined {
     return this.#playlist
   }
 
   /** The playlist's entries, in the order it holds them. */
-  private get entries(): HelixBaseVideoPlaylistItem[] {
+  private get entries(): HelixHeadlessVideoPlaylistItem[] {
     const playlist = this.playlist
-    return playlist ? [...playlist.querySelectorAll<HelixBaseVideoPlaylistItem>(ITEMS)] : []
+    return playlist ? [...playlist.querySelectorAll<HelixHeadlessVideoPlaylistItem>(ITEMS)] : []
   }
 
   /**
@@ -152,7 +152,7 @@ export class HelixBaseVideoPlaylistMenu extends HelixElement {
    * can see.
    */
   private watch(): void {
-    this.#playlist ??= closestInstance(this, HelixBaseVideoPlaylist) ?? undefined
+    this.#playlist ??= closestInstance(this, HelixHeadlessVideoPlaylist) ?? undefined
     const playlist = this.#playlist
     if (!playlist || this.#observer) {
       return
@@ -233,6 +233,6 @@ export class HelixBaseVideoPlaylistMenu extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-video-playlist-menu': HelixBaseVideoPlaylistMenu
+    'helix-headless-video-playlist-menu': HelixHeadlessVideoPlaylistMenu
   }
 }

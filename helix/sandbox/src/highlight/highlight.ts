@@ -49,7 +49,7 @@ const escapeHtml = (text: string): string =>
  * on a server with no DOM at all, which is what lets a static page ship
  * highlighted code with no client JavaScript spent on it.
  *
- * **Here rather than in `helix/web`, and that is the whole point.** A code block
+ * **Here rather than in `helix/styled`, and that is the whole point.** A code block
  * is a component and must not carry a parser: CodeMirror is about 4 MB
  * installed, and a `dependencies` entry is paid by every consumer whether or
  * not they import it. This package already carries those grammars for the

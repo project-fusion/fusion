@@ -31,8 +31,8 @@ import { property } from 'lit/decorators.js'
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
  */
-@customElement('helix-base-card')
-export class HelixBaseCard extends HelixElement {
+@customElement('helix-headless-card')
+export class HelixHeadlessCard extends HelixElement {
   /**
    * Puts the media after the content instead of before it.
    *
@@ -78,6 +78,6 @@ export class HelixBaseCard extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-card': HelixBaseCard
+    'helix-headless-card': HelixHeadlessCard
   }
 }

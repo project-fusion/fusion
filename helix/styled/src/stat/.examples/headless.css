@@ -1,0 +1,74 @@
+/* What the headless tier asks a consumer to write for Stat.
+ *
+ * Deliberately skeletal: a diagram of what has to be styled, not a theme to
+ * copy. No token, because `headless` does not depend on `helix/styles` and a
+ * consumer taking that tier has none to reach for. No corner radius, because
+ * rounding says how a thing should feel and that is not this tier's to say; the
+ * exceptions are shapes that are round rather than softened.
+ *
+ * **Grays, and only grays.** A headless example is a diagram, and color in a
+ * diagram reads as meaning: a blue fill says primary and a red one says danger,
+ * neither of which this tier has an opinion about. A neutral ramp says nothing
+ * except where one surface ends and the next begins, which is the whole job.
+ *
+ * Named by role rather than numbered, because a number implies a scale somebody
+ * maintains and this is seven values in one file. Underscored, because they are
+ * declared and read in that same file and never leave it, which is the one case
+ * the sigil is for: `check:hooks` pairs a public name with an `@cssproperty`
+ * and would otherwise ask this example to publish its own palette. Written through
+ * `light-dark()` with `color-scheme` declared, so the sandbox's dark mode gets
+ * a sheet that inverts rather than a pale card on a dark page: the headless tier
+ * has no theming and this is the cheapest honest substitute.
+ *
+ * A part with no rule below is one the platform already renders acceptably. A
+ * wrong rule is worse than none: the first checkbox sheet painted a box and left
+ * the input at `appearance: auto`, so the browser drew its own control and
+ * nothing written for it was ever visible. */
+
+:root {
+  color-scheme: light dark;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+helix-headless-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-stat {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin-inline-end: 2rem;
+}
+
+helix-headless-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+/* No parts at all, so the arrangement is the host and its children. */
+helix-headless-stat-group {
+  display: flex;
+  gap: 1.5rem;
+}
+
+helix-headless-stat {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.25rem;
+}
+
+helix-headless-stat [slot="label"] {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+}

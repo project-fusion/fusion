@@ -32,7 +32,7 @@ const layers = [
   'helix/styles/src/tokens.css',
   'helix/styles/src/primitives.css',
   'helix/styles/src/base.css',
-  'helix/web/elements.css',
+  'helix/styled/elements.css',
   // The frame's own layout modes, which belong to the document rather than to
   // the site that used to render it.
   'site/ui/preview/preview-frame.css',

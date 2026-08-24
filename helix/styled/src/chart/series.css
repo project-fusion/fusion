@@ -1,0 +1,65 @@
+/**
+ * The series palette, as hooks a consumer can replace.
+ *
+ * **Every chart reads `--chart-series`, and the mark that carries it is the one
+ * the headless tier wrote it on.** That tier knows which series a bar belongs
+ * to and CSS cannot count it, so it writes `--chart-series:
+ * var(--chart-series-3)` onto the rectangle and the rule below is one line
+ * rather than twenty-four.
+ *
+ * It replaced twenty-four rules per chart keyed on `[data-series]`, which
+ * worked and could not be reached from outside: `::part()` takes no attribute
+ * selector, so a consumer with the index right in front of them, written on the
+ * part, had no selector that could use it. Measured in Chrome 148, of three
+ * rules written against one chart `::part(bar)` applied and both
+ * `::part(bar)[data-series="2"]` and `::part(bar):nth-child(2)` were dropped at
+ * parse time, leaving four bars one color.
+ *
+ * **The names are the seam between the tiers.** This sheet points each at a
+ * semantic token, which is a decision and therefore belongs to the styled tier.
+ * A consumer on `headless` has no tokens and sets the same twenty-four to
+ * whatever they like, which is what the headless examples do with a ramp of grays.
+ * Before this, the headless bar chart named `--helix-color-series-*` directly:
+ * correct here, and a reference to nothing on the tier that is meant to stand
+ * alone.
+ *
+ * Twenty-four because that is where `seriesIndex` wraps, and the legend maps
+ * the same twenty-four so a swatch and its line agree by construction.
+ */
+:host {
+  --chart-series-1: var(--helix-color-series-1);
+  --chart-series-2: var(--helix-color-series-2);
+  --chart-series-3: var(--helix-color-series-3);
+  --chart-series-4: var(--helix-color-series-4);
+  --chart-series-5: var(--helix-color-series-5);
+  --chart-series-6: var(--helix-color-series-6);
+  --chart-series-7: var(--helix-color-series-7);
+  --chart-series-8: var(--helix-color-series-8);
+  --chart-series-9: var(--helix-color-series-9);
+  --chart-series-10: var(--helix-color-series-10);
+  --chart-series-11: var(--helix-color-series-11);
+  --chart-series-12: var(--helix-color-series-12);
+  --chart-series-13: var(--helix-color-series-13);
+  --chart-series-14: var(--helix-color-series-14);
+  --chart-series-15: var(--helix-color-series-15);
+  --chart-series-16: var(--helix-color-series-16);
+  --chart-series-17: var(--helix-color-series-17);
+  --chart-series-18: var(--helix-color-series-18);
+  --chart-series-19: var(--helix-color-series-19);
+  --chart-series-20: var(--helix-color-series-20);
+  --chart-series-21: var(--helix-color-series-21);
+  --chart-series-22: var(--helix-color-series-22);
+  --chart-series-23: var(--helix-color-series-23);
+  --chart-series-24: var(--helix-color-series-24);
+}
+
+/* Print: the shared chart parts, for the same reason.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    box-shadow: none;
+    print-color-adjust: exact;
+  }
+}

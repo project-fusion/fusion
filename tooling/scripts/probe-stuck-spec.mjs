@@ -68,7 +68,7 @@ if (family === undefined || family.startsWith('--')) {
 }
 
 /** Every DOM spec that family has, on either tier. */
-const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/web/src')]
+const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/styled/src')]
 const specs = []
 for (const source of SOURCES) {
   const folder = join(source, family)
@@ -155,12 +155,14 @@ const server = createServer(async (request, response) => {
     response.writeHead(200, { 'content-type': 'text/html' })
     response.end(
       '<!doctype html><meta charset="utf-8"><title>specs</title>' +
-        '<link rel="stylesheet" href="/base.css">',
+        '<link rel="stylesheet" href="/headless.css">',
     )
     return
   }
   try {
-    const body = await readFile(path === '/base.css' ? base : join(out, path.replace(/^\/+/, '')))
+    const body = await readFile(
+      path === '/headless.css' ? base : join(out, path.replace(/^\/+/, '')),
+    )
     response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'text/plain' })
     response.end(body)
   } catch {

@@ -76,7 +76,7 @@
  * lightening, none of which a hardcoded rgba could.
  *
  * Ink is the exception and stays a percentage of `foreground`, for the reason
- * the button's own fill gives in `base.css`: a percentage of the foreground is
+ * the button's own fill gives in `headless.css`: a percentage of the foreground is
  * a step away from whatever it sits on in either mode, which a fixed neutral
  * cannot be. Three steps only — 0.12, 0.28, 0.55 — and the top one is
  * deliberately short of the real text color, because a solid bar standing in

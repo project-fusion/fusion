@@ -7,10 +7,10 @@ beforeAll(async () => {
 })
 
 const markup = `
-  <helix-base-list label="Files">
-    <helix-base-list-item><span>One</span></helix-base-list-item>
-    <helix-base-list-item><span>Two</span></helix-base-list-item>
-  </helix-base-list>`
+  <helix-headless-list label="Files">
+    <helix-headless-list-item><span>One</span></helix-headless-list-item>
+    <helix-headless-list-item><span>Two</span></helix-headless-list-item>
+  </helix-headless-list>`
 
 describe('list', () => {
   test('is a list, so the rows are counted rather than read as loose passages', async () => {

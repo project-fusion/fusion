@@ -8,7 +8,7 @@ import {
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixBaseTreeItem } from '../item/tree-item.js'
+import { HelixHeadlessTreeItem } from '../item/tree-item.js'
 
 /** Keys the tree handles, per the APG tree pattern. */
 const KEYS = new Set([
@@ -48,8 +48,8 @@ const KEYS = new Set([
  * @event {HelixChangeEvent} helix-change - Fired before the current node moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
  */
-@customElement('helix-base-tree')
-export class HelixBaseTree extends MixinCollection(MixinControllerActive(HelixElement)) {
+@customElement('helix-headless-tree')
+export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(HelixElement)) {
   /** Accessible name for the tree. */
   @property()
   label = 'Tree'
@@ -69,18 +69,18 @@ export class HelixBaseTree extends MixinCollection(MixinControllerActive(HelixEl
    * `instanceof` stays as the type guard because a consumer can write either
    * tag and neither selector proves what the element is.
    */
-  private get items(): HelixBaseTreeItem[] {
-    return [...this.querySelectorAll('helix-tree-item, helix-base-tree-item')].filter(
-      (node): node is HelixBaseTreeItem => node instanceof HelixBaseTreeItem,
+  private get items(): HelixHeadlessTreeItem[] {
+    return [...this.querySelectorAll('helix-tree-item, helix-headless-tree-item')].filter(
+      (node): node is HelixHeadlessTreeItem => node instanceof HelixHeadlessTreeItem,
     )
   }
 
   /** Items a reader can actually reach: not inside a collapsed branch. */
-  private get visibleItems(): HelixBaseTreeItem[] {
+  private get visibleItems(): HelixHeadlessTreeItem[] {
     return this.items.filter((item) => {
       let parent = item.parentElement
       while (parent && parent !== this) {
-        if (parent instanceof HelixBaseTreeItem && !parent.open) {
+        if (parent instanceof HelixHeadlessTreeItem && !parent.open) {
           return false
         }
         parent = parent.parentElement
@@ -126,7 +126,7 @@ export class HelixBaseTree extends MixinCollection(MixinControllerActive(HelixEl
       let level = 1
       let parent = item.parentElement
       while (parent && parent !== this) {
-        if (parent instanceof HelixBaseTreeItem) {
+        if (parent instanceof HelixHeadlessTreeItem) {
           level += 1
         }
         parent = parent.parentElement
@@ -135,14 +135,14 @@ export class HelixBaseTree extends MixinCollection(MixinControllerActive(HelixEl
     }
   }
 
-  private move(from: HelixBaseTreeItem, delta: number): void {
+  private move(from: HelixHeadlessTreeItem, delta: number): void {
     const visible = this.visibleItems
     const index = visible.indexOf(from)
     const next = visible[Math.min(visible.length - 1, Math.max(0, index + delta))]
     this.focusOn(next)
   }
 
-  private focusOn(item: HelixBaseTreeItem | undefined): void {
+  private focusOn(item: HelixHeadlessTreeItem | undefined): void {
     if (!item) {
       return
     }
@@ -173,7 +173,7 @@ export class HelixBaseTree extends MixinCollection(MixinControllerActive(HelixEl
      * `closestInstance` walks up by identity and crosses shadow roots on the
      * way, which is the util that exists for exactly this. `closest('*')` was
      * also a no-op: it returns the element it was called on. */
-    const current = closestInstance(event.target as Element | null, HelixBaseTreeItem)
+    const current = closestInstance(event.target as Element | null, HelixHeadlessTreeItem)
     if (!current || !this.items.includes(current) || !KEYS.has(event.key)) {
       return
     }
@@ -200,8 +200,8 @@ export class HelixBaseTree extends MixinCollection(MixinControllerActive(HelixEl
         current.requestOpen(false)
         this.syncItems()
       } else {
-        const parent = closestInstance(current.parentElement, HelixBaseTreeItem)
-        this.focusOn(parent instanceof HelixBaseTreeItem ? parent : undefined)
+        const parent = closestInstance(current.parentElement, HelixHeadlessTreeItem)
+        this.focusOn(parent instanceof HelixHeadlessTreeItem ? parent : undefined)
       }
     } else {
       if (current.isBranch) {
@@ -290,6 +290,6 @@ export class HelixBaseTree extends MixinCollection(MixinControllerActive(HelixEl
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-tree': HelixBaseTree
+    'helix-headless-tree': HelixHeadlessTree
   }
 }

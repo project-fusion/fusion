@@ -10,7 +10,7 @@
  *
  * The stamping has to happen either way. `bun pm pack` rewrites a
  * `workspace:*` dependency to the version in the depended-on package's own
- * manifest, so `@helix-io/web` ships a hard requirement on whatever
+ * manifest, so `@helix-io/styled` ships a hard requirement on whatever
  * `@helix-io/core` said at pack time. Every manifest in the domain is therefore
  * written before anything is packed, and the only question was ever whether
  * that edit is also committed. It buys nothing, so it is not.

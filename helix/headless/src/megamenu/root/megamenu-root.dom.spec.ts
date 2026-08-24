@@ -10,7 +10,7 @@ type Section = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
 
 const section = async (label = 'Products'): Promise<Section> => {
   const host = (await mount(
-    `<helix-base-megamenu label="${label}"><a href="/one">One</a></helix-base-megamenu>`,
+    `<helix-headless-megamenu label="${label}"><a href="/one">One</a></helix-headless-megamenu>`,
   )) as Section
   await host.updateComplete
   return host
@@ -46,7 +46,7 @@ describe('a megamenu taking a destination', () => {
        the difference never shows up. The handler under test cannot tell the
        two apart, so the fragment costs the spec nothing. */
     const host = (await mount(
-      `<helix-base-megamenu label="Products"><a href="#one">One</a></helix-base-megamenu>`,
+      `<helix-headless-megamenu label="Products"><a href="#one">One</a></helix-headless-megamenu>`,
     )) as Section
     await host.updateComplete
     /* Detail 0, which is a keyboard press: a mouse click on the trigger is
@@ -190,7 +190,7 @@ describe('a megamenu opening on hover', () => {
 
   test('open-on="click" hears no pointer at all', async () => {
     const host = (await mount(
-      `<helix-base-megamenu open-on="click" label="Products"><a href="/one">One</a></helix-base-megamenu>`,
+      `<helix-headless-megamenu open-on="click" label="Products"><a href="/one">One</a></helix-headless-megamenu>`,
     )) as Section
     await host.updateComplete
 
@@ -250,8 +250,8 @@ describe('a megamenu', () => {
        whatever container the consumer used. */
     const bar = (await mount(
       `<nav>
-        <helix-base-megamenu id="a" label="A"><a href="/a">A</a></helix-base-megamenu>
-        <helix-base-megamenu id="b" label="B"><a href="/b">B</a></helix-base-megamenu>
+        <helix-headless-megamenu id="a" label="A"><a href="/a">A</a></helix-headless-megamenu>
+        <helix-headless-megamenu id="b" label="B"><a href="/b">B</a></helix-headless-megamenu>
       </nav>`,
     )) as HTMLElement
     const first = bar.querySelector('#a') as Section
@@ -273,8 +273,8 @@ describe('a megamenu', () => {
     // The other closes through `requestOpen`, which announces first.
     const bar = (await mount(
       `<nav>
-        <helix-base-megamenu id="a" label="A"><a href="/a">A</a></helix-base-megamenu>
-        <helix-base-megamenu id="b" label="B"><a href="/b">B</a></helix-base-megamenu>
+        <helix-headless-megamenu id="a" label="A"><a href="/a">A</a></helix-headless-megamenu>
+        <helix-headless-megamenu id="b" label="B"><a href="/b">B</a></helix-headless-megamenu>
       </nav>`,
     )) as HTMLElement
     const first = bar.querySelector('#a') as Section
@@ -295,7 +295,7 @@ describe('a megamenu', () => {
 describe('a megamenu whose trigger the consumer slotted', () => {
   const slotted = async (): Promise<Section> => {
     const host = (await mount(
-      `<helix-base-megamenu label="Products"><button slot="trigger" type="button">Products</button><a href="/one">One</a></helix-base-megamenu>`,
+      `<helix-headless-megamenu label="Products"><button slot="trigger" type="button">Products</button><a href="/one">One</a></helix-headless-megamenu>`,
     )) as Section
     await host.updateComplete
     return host

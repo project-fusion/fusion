@@ -9,18 +9,19 @@ beforeAll(async () => {
 type Updatable = HTMLElement & { updateComplete: Promise<unknown> }
 
 const markup = `
-  <helix-base-tabs default-active="one">
-    <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
-    <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
-    <helix-base-tabs-tab disabled value="three">Three</helix-base-tabs-tab>
-    <helix-base-tabs-panel slot="panels" value="one">First</helix-base-tabs-panel>
-    <helix-base-tabs-panel slot="panels" value="two">Second</helix-base-tabs-panel>
-    <helix-base-tabs-panel slot="panels" value="three">Third</helix-base-tabs-panel>
-  </helix-base-tabs>`
+  <helix-headless-tabs default-active="one">
+    <helix-headless-tabs-tab value="one">One</helix-headless-tabs-tab>
+    <helix-headless-tabs-tab value="two">Two</helix-headless-tabs-tab>
+    <helix-headless-tabs-tab disabled value="three">Three</helix-headless-tabs-tab>
+    <helix-headless-tabs-panel slot="panels" value="one">First</helix-headless-tabs-panel>
+    <helix-headless-tabs-panel slot="panels" value="two">Second</helix-headless-tabs-panel>
+    <helix-headless-tabs-panel slot="panels" value="three">Third</helix-headless-tabs-panel>
+  </helix-headless-tabs>`
 
-const tabs = (host: HTMLElement) => [...host.querySelectorAll('helix-base-tabs-tab')] as Updatable[]
+const tabs = (host: HTMLElement) =>
+  [...host.querySelectorAll('helix-headless-tabs-tab')] as Updatable[]
 const panels = (host: HTMLElement) =>
-  [...host.querySelectorAll('helix-base-tabs-panel')] as Updatable[]
+  [...host.querySelectorAll('helix-headless-tabs-panel')] as Updatable[]
 
 describe('tabs selection', () => {
   test('shows the panel matching the selected tab', async () => {
@@ -135,7 +136,7 @@ describe('tabs keyboard', () => {
 
   test('manual holds selection until the tab is chosen', async () => {
     const host = (await mount(
-      markup.replace('<helix-base-tabs ', '<helix-base-tabs manual '),
+      markup.replace('<helix-headless-tabs ', '<helix-headless-tabs manual '),
     )) as Updatable
     press(host, 'ArrowRight')
     await host.updateComplete
@@ -149,7 +150,7 @@ describe('tabs keyboard', () => {
        tab two a second time, so the set past the first neighbor is
        unreachable by keyboard. */
     const host = (await mount(
-      markup.replace('<helix-base-tabs ', '<helix-base-tabs manual '),
+      markup.replace('<helix-headless-tabs ', '<helix-headless-tabs manual '),
     )) as Updatable
     /* Focus is what moves in `manual`, and selection is what does not, so the
        assertion has to be on focus. Recorded rather than read back from
@@ -203,7 +204,7 @@ describe('tabs selection can be refused', () => {
     const started = host.active
 
     host.addEventListener('helix-change', (event) => event.preventDefault())
-    const other = [...host.querySelectorAll('helix-base-tabs-tab')].find(
+    const other = [...host.querySelectorAll('helix-headless-tabs-tab')].find(
       (tab) => tab.getAttribute('value') !== started,
     ) as HTMLElement
     other.dispatchEvent(
@@ -222,16 +223,16 @@ describe('tabs selection can be refused', () => {
     // The hand-written fallback was `?? tabs[0]`, which took whatever was
     // first, so a set opening on a disabled tab showed it as current and
     // brought its panel with it.
-    document.body.innerHTML = `<helix-base-tabs label="Set">
-      <helix-base-tabs-tab disabled value="a">A</helix-base-tabs-tab>
-      <helix-base-tabs-tab value="b">B</helix-base-tabs-tab>
-      <helix-base-tabs-panel slot="panels" value="a">A</helix-base-tabs-panel>
-      <helix-base-tabs-panel slot="panels" value="b">B</helix-base-tabs-panel>
-    </helix-base-tabs>`
+    document.body.innerHTML = `<helix-headless-tabs label="Set">
+      <helix-headless-tabs-tab disabled value="a">A</helix-headless-tabs-tab>
+      <helix-headless-tabs-tab value="b">B</helix-headless-tabs-tab>
+      <helix-headless-tabs-panel slot="panels" value="a">A</helix-headless-tabs-panel>
+      <helix-headless-tabs-panel slot="panels" value="b">B</helix-headless-tabs-panel>
+    </helix-headless-tabs>`
     const host = document.body.firstElementChild as Updatable
     await host.updateComplete
 
-    const tabs = [...host.querySelectorAll('helix-base-tabs-tab')] as (HTMLElement & {
+    const tabs = [...host.querySelectorAll('helix-headless-tabs-tab')] as (HTMLElement & {
       selected: boolean
     })[]
     expect(tabs[0]?.selected).toBe(false)
@@ -245,10 +246,10 @@ describe('tabs, controlled and uncontrolled', () => {
      tab strip could not be owned by the thing rendering it. */
   test('writing active hands the set to the consumer, and it stays put', async () => {
     const host = (await mount(
-      `<helix-base-tabs active="one">
-        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
-        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
-      </helix-base-tabs>`,
+      `<helix-headless-tabs active="one">
+        <helix-headless-tabs-tab value="one">One</helix-headless-tabs-tab>
+        <helix-headless-tabs-tab value="two">Two</helix-headless-tabs-tab>
+      </helix-headless-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
     ;(tabs(host)[1] as unknown as { select(): void }).select()
@@ -261,10 +262,10 @@ describe('tabs, controlled and uncontrolled', () => {
 
   test('the change is still announced, so the consumer knows what to set', async () => {
     const host = (await mount(
-      `<helix-base-tabs active="one">
-        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
-        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
-      </helix-base-tabs>`,
+      `<helix-headless-tabs active="one">
+        <helix-headless-tabs-tab value="one">One</helix-headless-tabs-tab>
+        <helix-headless-tabs-tab value="two">Two</helix-headless-tabs-tab>
+      </helix-headless-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
     let asked = ''
@@ -278,10 +279,10 @@ describe('tabs, controlled and uncontrolled', () => {
 
   test('default-active seeds instead, and the set then owns itself', async () => {
     const host = (await mount(
-      `<helix-base-tabs default-active="one">
-        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
-        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
-      </helix-base-tabs>`,
+      `<helix-headless-tabs default-active="one">
+        <helix-headless-tabs-tab value="one">One</helix-headless-tabs-tab>
+        <helix-headless-tabs-tab value="two">Two</helix-headless-tabs-tab>
+      </helix-headless-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
     ;(tabs(host)[1] as unknown as { select(): void }).select()
@@ -292,10 +293,10 @@ describe('tabs, controlled and uncontrolled', () => {
   test('reading active always gives the real tab, in either mode', async () => {
     // The point of one property rather than two: nobody has to ask which.
     const host = (await mount(
-      `<helix-base-tabs default-active="two">
-        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
-        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
-      </helix-base-tabs>`,
+      `<helix-headless-tabs default-active="two">
+        <helix-headless-tabs-tab value="one">One</helix-headless-tabs-tab>
+        <helix-headless-tabs-tab value="two">Two</helix-headless-tabs-tab>
+      </helix-headless-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
     expect(host.active).toBe('two')
@@ -308,10 +309,10 @@ describe('tabs modes are decided once', () => {
        write afterwards moves the set and leaves it owning itself, which is what
        both a native control and anyone reading this code would expect. */
     const host = (await mount(
-      `<helix-base-tabs default-active="one">
-        <helix-base-tabs-tab value="one">One</helix-base-tabs-tab>
-        <helix-base-tabs-tab value="two">Two</helix-base-tabs-tab>
-      </helix-base-tabs>`,
+      `<helix-headless-tabs default-active="one">
+        <helix-headless-tabs-tab value="one">One</helix-headless-tabs-tab>
+        <helix-headless-tabs-tab value="two">Two</helix-headless-tabs-tab>
+      </helix-headless-tabs>`,
     )) as Updatable & { active: string }
     await host.updateComplete
 

@@ -10,7 +10,7 @@ type Entry = HTMLElement & { current: boolean; text: string; updateComplete: Pro
 
 const entry = async (attributes = 'value="a"', inner = 'His Girl Friday'): Promise<Entry> =>
   (await mount(
-    `<helix-base-video-playlist-item ${attributes}>${inner}</helix-base-video-playlist-item>`,
+    `<helix-headless-video-playlist-item ${attributes}>${inner}</helix-headless-video-playlist-item>`,
   )) as Entry
 
 /**

@@ -15,8 +15,8 @@ import { magnifyingGlass } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { HelixBaseOptionGroup } from '../../option/group/option-group.js'
-import { HelixBaseOption } from '../../option/root/option-root.js'
+import { HelixHeadlessOptionGroup } from '../../option/group/option-group.js'
+import { HelixHeadlessOption } from '../../option/root/option-root.js'
 
 /** The keys that move within a list, which is every key that moves at all. */
 const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
@@ -34,7 +34,7 @@ const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
  */
 const matched = new Map<Element, Range[]>()
 
-/** What the marks are called in `CSS.highlights`, and in `base.css`. */
+/** What the marks are called in `CSS.highlights`, and in `headless.css`. */
 const HIGHLIGHT = 'helix-filter-match'
 
 /*
@@ -47,7 +47,7 @@ const HIGHLIGHT = 'helix-filter-match'
  * nothing is removed, so an option holding a link or an icon is marked as
  * readily as one holding a bare word.
  *
- * The rule that paints it lives in `base.css` rather than in a component's
+ * The rule that paints it lives in `headless.css` rather than in a component's
  * styles, which is not a choice either: a highlight is styled from the tree its
  * text lives in, and that text lives in the consumer's document.
  */
@@ -186,8 +186,8 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @csspart search - The region holding the field that narrows the list.
  * @csspart search-field - The field itself.
  */
-@customElement('helix-base-listbox')
-export class HelixBaseListbox extends MixinCollection(
+@customElement('helix-headless-listbox')
+export class HelixHeadlessListbox extends MixinCollection(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
   /**
@@ -311,7 +311,7 @@ export class HelixBaseListbox extends MixinCollection(
    * list and its options and the keyboard has to move through a grouped list
    * exactly as it moves through a flat one.
    */
-  get options(): HelixBaseOption[] {
+  get options(): HelixHeadlessOption[] {
     return this.collect(this.children)
   }
 
@@ -330,10 +330,10 @@ export class HelixBaseListbox extends MixinCollection(
    * which is the argument for building the pieces separately rather than
    * discovering it inside a finished Select.
    */
-  private collect(nodes: Iterable<Element>): HelixBaseOption[] {
-    const found: HelixBaseOption[] = []
+  private collect(nodes: Iterable<Element>): HelixHeadlessOption[] {
+    const found: HelixHeadlessOption[] = []
     for (const node of nodes) {
-      if (node instanceof HelixBaseOption) {
+      if (node instanceof HelixHeadlessOption) {
         found.push(node)
       } else if (node instanceof HTMLSlotElement) {
         found.push(...this.collect(node.assignedElements({ flatten: true })))
@@ -345,11 +345,11 @@ export class HelixBaseListbox extends MixinCollection(
   }
 
   /** The groups, found the same way and for the same reason. */
-  private get groups(): HelixBaseOptionGroup[] {
-    const found: HelixBaseOptionGroup[] = []
+  private get groups(): HelixHeadlessOptionGroup[] {
+    const found: HelixHeadlessOptionGroup[] = []
     const walk = (nodes: Iterable<Element>): void => {
       for (const node of nodes) {
-        if (node instanceof HelixBaseOptionGroup) {
+        if (node instanceof HelixHeadlessOptionGroup) {
           found.push(node)
         }
         if (node instanceof HTMLSlotElement) {
@@ -364,7 +364,7 @@ export class HelixBaseListbox extends MixinCollection(
   }
 
   /** The options a filter has left showing. */
-  private get shown(): HelixBaseOption[] {
+  private get shown(): HelixHeadlessOption[] {
     return this.options.filter((option) => !option.hidden)
   }
 
@@ -886,6 +886,6 @@ export class HelixBaseListbox extends MixinCollection(
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-listbox': HelixBaseListbox
+    'helix-headless-listbox': HelixHeadlessListbox
   }
 }

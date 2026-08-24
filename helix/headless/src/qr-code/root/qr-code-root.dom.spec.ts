@@ -72,7 +72,7 @@ describe('qr code', () => {
        the path back into cells is the only comparison that proves the drawing
        and the encoding agree. */
     const host = await code(
-      '<helix-base-qr-code value="https://helix.fusion.dev"></helix-base-qr-code>',
+      '<helix-headless-qr-code value="https://helix.fusion.dev"></helix-headless-qr-code>',
     )
     const drawn = allCells(host)
     expect(drawn).toEqual(expected('https://helix.fusion.dev', 'M'))
@@ -83,7 +83,7 @@ describe('qr code', () => {
     // A useful code is a thousand modules. One node per module is a thousand
     // nodes for one picture.
     const host = await code(
-      '<helix-base-qr-code value="https://helix.fusion.dev"></helix-base-qr-code>',
+      '<helix-headless-qr-code value="https://helix.fusion.dev"></helix-headless-qr-code>',
     )
     const d = svgOf(host).querySelector('path')?.getAttribute('d') ?? ''
     const subpaths = d.split('M').length - 1
@@ -94,7 +94,7 @@ describe('qr code', () => {
     /* Required by the specification rather than chosen: a scanner refuses a
        code cropped to its edge. In the `viewBox` so it scales with the code
        and not with whatever box the component was given. */
-    const host = await code('<helix-base-qr-code value="hello"></helix-base-qr-code>')
+    const host = await code('<helix-headless-qr-code value="hello"></helix-headless-qr-code>')
     const size = encode('hello', { border: 0, ecc: 'M' }).size
     expect(svgOf(host).getAttribute('viewBox')).toBe(`0 0 ${size + 8} ${size + 8}`)
     expect(svgOf(host).querySelector('path')?.getAttribute('transform')).toBe('translate(4 4)')
@@ -103,19 +103,21 @@ describe('qr code', () => {
   test('it is an image, and its name is what the code is for', async () => {
     // Describing the pattern would tell a reader nothing. Where nothing is
     // passed the value is the name, and a value is almost always a URL.
-    const host = await code('<helix-base-qr-code value="https://fusion.dev"></helix-base-qr-code>')
+    const host = await code(
+      '<helix-headless-qr-code value="https://fusion.dev"></helix-headless-qr-code>',
+    )
     expect(svgOf(host).getAttribute('role')).toBe('img')
     expect(svgOf(host).getAttribute('aria-label')).toBe('https://fusion.dev')
 
     const named = await code(
-      '<helix-base-qr-code label="Our site" value="https://fusion.dev"></helix-base-qr-code>',
+      '<helix-headless-qr-code label="Our site" value="https://fusion.dev"></helix-headless-qr-code>',
     )
     expect(svgOf(named).getAttribute('aria-label')).toBe('Our site')
   })
 
   test('correction is `M` unless asked otherwise', async () => {
     const host = await code(
-      '<helix-base-qr-code correction="L" value="hello"></helix-base-qr-code>',
+      '<helix-headless-qr-code correction="L" value="hello"></helix-headless-qr-code>',
     )
     const drawn = allCells(host)
     expect(drawn).toEqual(expected('hello', 'L'))
@@ -143,7 +145,7 @@ describe('qr code', () => {
 
     for (const shape of ['dots', 'rounded']) {
       const host = await code(
-        `<helix-base-qr-code shape="${shape}" value="${value}"></helix-base-qr-code>`,
+        `<helix-headless-qr-code shape="${shape}" value="${value}"></helix-headless-qr-code>`,
       )
       const d = svgOf(host).querySelector('[part="modules"]')?.getAttribute('d') ?? ''
       const drawn = new Set(
@@ -154,7 +156,7 @@ describe('qr code', () => {
       expect(drawn).toEqual(body)
     }
 
-    const square = await code(`<helix-base-qr-code value="${value}"></helix-base-qr-code>`)
+    const square = await code(`<helix-headless-qr-code value="${value}"></helix-headless-qr-code>`)
     const d = svgOf(square).querySelector('[part="modules"]')?.getAttribute('d') ?? ''
     const starts = [...d.matchAll(/M(\d+) (\d+)/g)].map(([, x, y]) => `${x},${y}`)
     expect(starts.length).toBeLessThan(body.size)
@@ -165,7 +167,9 @@ describe('qr code', () => {
     /* They are what a scanner locks onto first, so rounding them trades
        reliability for decoration. Separating them is also what lets them take
        a color of their own: one path is one fill. */
-    const host = await code('<helix-base-qr-code shape="dots" value="hello"></helix-base-qr-code>')
+    const host = await code(
+      '<helix-headless-qr-code shape="dots" value="hello"></helix-headless-qr-code>',
+    )
     const finders = svgOf(host).querySelector('[part="finders"]')?.getAttribute('d') ?? ''
     expect(finders).not.toBe('')
     // A run-joined square path uses `h`; an arc-drawn one uses `a`.
@@ -174,7 +178,7 @@ describe('qr code', () => {
   })
 
   test('the finders are in the three corners the specification puts them', async () => {
-    const host = await code('<helix-base-qr-code value="hello"></helix-base-qr-code>')
+    const host = await code('<helix-headless-qr-code value="hello"></helix-headless-qr-code>')
     const size = encode('hello', { border: 0, ecc: 'M' }).size
     const starts = [
       ...(svgOf(host).querySelector('[part="finders"]')?.getAttribute('d') ?? '').matchAll(
@@ -190,12 +194,12 @@ describe('qr code', () => {
   })
 
   test('nothing is drawn for nothing, rather than an empty square', async () => {
-    const host = await code('<helix-base-qr-code value=""></helix-base-qr-code>')
+    const host = await code('<helix-headless-qr-code value=""></helix-headless-qr-code>')
     expect(part(host, 'code')).toBeNull()
   })
 
   test('a code that changes is re-encoded', async () => {
-    const host = await code('<helix-base-qr-code value="one"></helix-base-qr-code>')
+    const host = await code('<helix-headless-qr-code value="one"></helix-headless-qr-code>')
     const before = svgOf(host).querySelector('path')?.getAttribute('d')
     ;(host as HTMLElement & { value: string }).value = 'two'
     await host.updateComplete

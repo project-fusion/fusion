@@ -7,7 +7,7 @@ beforeAll(async () => {
 })
 
 const meter = async (attrs = ''): Promise<HTMLElement> =>
-  mount(`<helix-base-meter label="Disk" ${attrs}></helix-base-meter>`)
+  mount(`<helix-headless-meter label="Disk" ${attrs}></helix-headless-meter>`)
 
 const band = (host: HTMLElement): string | null =>
   part(host, 'indicator')?.getAttribute('data-band') ?? null
@@ -200,7 +200,7 @@ describe('meter drawn round', () => {
     attrs: string,
   ): Promise<HTMLElement & { updateComplete: Promise<unknown> }> => {
     const host = (await mount(
-      `<helix-base-meter label="Disk" ${attrs}></helix-base-meter>`,
+      `<helix-headless-meter label="Disk" ${attrs}></helix-headless-meter>`,
     )) as HTMLElement & {
       updateComplete: Promise<unknown>
     }

@@ -5,7 +5,7 @@
  *
  * **This exists to close a build warning, and the warning was right.** The site
  * used to reach out of its own project with `join(process.cwd(), '..', '..')`
- * to find the manifests and `helix/web/src/<family>/.examples`. Turbopack
+ * to find the manifests and `helix/styled/src/<family>/.examples`. Turbopack
  * cannot statically scope a path like that, so it traced the whole repository
  * into the server bundle, public folder and all, and said so on every build:
  * "this is usually unintentional and leads to all source files being deployed
@@ -38,13 +38,13 @@ const OUT = join(ROOT, 'site/ui/content/catalog/catalog.generated.json')
 const PUBLIC = join(ROOT, 'site/ui/public')
 
 const MANIFESTS = [
-  'helix/web/custom-elements.json',
+  'helix/styled/custom-elements.json',
   'helix/headless/custom-elements.json',
   'helix/sandbox/custom-elements.json',
 ]
 
 /** Where the example files sit, one folder per family. */
-const EXAMPLES = join(ROOT, 'helix/web/src')
+const EXAMPLES = join(ROOT, 'helix/styled/src')
 
 const manifests = MANIFESTS.map((path) => {
   const file = join(ROOT, path)

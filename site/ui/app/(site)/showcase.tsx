@@ -642,7 +642,7 @@ export function Showcase(): React.ReactElement {
           </helix-callout>
 
           <helix-code-block label="Install Helix">
-            {"bun add @helix-io/web\nimport '@helix-io/web/card'"}
+            {"bun add @helix-io/styled\nimport '@helix-io/styled/card'"}
           </helix-code-block>
 
           <helix-card class="showcaseCard" separation="outlined">

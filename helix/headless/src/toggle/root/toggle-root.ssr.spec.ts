@@ -29,15 +29,15 @@ import '../index.js'
    assertion nobody maintains. */
 describe('toggle server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
-    expect(withoutStyles(ssr(html`<helix-base-toggle></helix-base-toggle>`))).toContain(
-      'helix-base-toggle',
+    expect(withoutStyles(ssr(html`<helix-headless-toggle></helix-headless-toggle>`))).toContain(
+      'helix-headless-toggle',
     )
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-base-toggle></helix-base-toggle>`),
-      'helix-base-toggle',
+      ssr(html`<helix-headless-toggle></helix-headless-toggle>`),
+      'helix-headless-toggle',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

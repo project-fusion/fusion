@@ -234,12 +234,12 @@ for (const file of walk(root)) {
    * copying it would get a stylesheet resolving to nothing.
    *
    * Read off the markup rather than the filename: a stylesheet is exempt when
-   * the example beside it renders a `helix-base-` element, which is the thing
-   * that makes it a base example. `base.css` would be a convention to remember;
+   * the example beside it renders a `helix-headless-` element, which is the thing
+   * that makes it a headless example. `headless.css` would be a convention to remember;
    * this is the fact itself. */
   if (rel.includes('.examples') && file.endsWith('.css')) {
     const markup = file.replace(/\.css$/, '.html')
-    if (existsSync(markup) && readFileSync(markup, 'utf8').includes('<helix-base-')) {
+    if (existsSync(markup) && readFileSync(markup, 'utf8').includes('<helix-headless-')) {
       continue
     }
   }
@@ -359,7 +359,7 @@ for (const file of walk(root)) {
  * the honest treatment of the rest.
  */
 const FAMILIES = new Set(
-  readdirSync('helix/web/src', { withFileTypes: true })
+  readdirSync('helix/styled/src', { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name),
 )

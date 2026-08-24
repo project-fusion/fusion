@@ -7,11 +7,11 @@ beforeAll(async () => {
   await import('../../option/index.js')
 })
 
-const markup = `<helix-base-command hotkey="mod+k" label="Commands">
-  <helix-base-option value="new">New file</helix-base-option>
-  <helix-base-option value="open">Open recent</helix-base-option>
-  <helix-base-option value="theme">Switch color mode</helix-base-option>
-</helix-base-command>`
+const markup = `<helix-headless-command hotkey="mod+k" label="Commands">
+  <helix-headless-option value="new">New file</helix-headless-option>
+  <helix-headless-option value="open">Open recent</helix-headless-option>
+  <helix-headless-option value="theme">Switch color mode</helix-headless-option>
+</helix-headless-command>`
 
 type Palette = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
 
@@ -143,8 +143,8 @@ if (hasLayout()) {
 
       const withOne = await palette(
         markup.replace(
-          '</helix-base-command>',
-          '<span slot="footer">Esc to close</span></helix-base-command>',
+          '</helix-headless-command>',
+          '<span slot="footer">Esc to close</span></helix-headless-command>',
         ),
       )
       expect((part(withOne, 'footer') as HTMLElement).hidden).toBe(false)
@@ -171,7 +171,7 @@ if (hasLayout()) {
 
       listbox(host).requestFilter('color')
       ;(
-        host.querySelector('helix-base-option[value="theme"]') as HTMLElement & {
+        host.querySelector('helix-headless-option[value="theme"]') as HTMLElement & {
           select: () => void
         }
       ).select()
@@ -188,7 +188,9 @@ if (hasLayout()) {
       press('k', { metaKey: true })
       await settle(host)
       ;(
-        host.querySelector('helix-base-option[value="new"]') as HTMLElement & { select: () => void }
+        host.querySelector('helix-headless-option[value="new"]') as HTMLElement & {
+          select: () => void
+        }
       ).select()
       await settle(host)
       expect(host.open).toBe(false)
@@ -200,7 +202,9 @@ if (hasLayout()) {
       await settle(host)
       host.addEventListener('helix-select', (event) => event.preventDefault())
       ;(
-        host.querySelector('helix-base-option[value="new"]') as HTMLElement & { select: () => void }
+        host.querySelector('helix-headless-option[value="new"]') as HTMLElement & {
+          select: () => void
+        }
       ).select()
       await settle(host)
       expect(host.open).toBe(true)
@@ -217,13 +221,13 @@ if (hasLayout()) {
       listbox(host).requestFilter('color')
       await settle(host)
       expect(
-        [...host.querySelectorAll('helix-base-option')].filter((one) => !one.hidden).length,
+        [...host.querySelectorAll('helix-headless-option')].filter((one) => !one.hidden).length,
       ).toBe(1)
 
       press('k', { metaKey: true })
       await settle(host)
       expect(
-        [...host.querySelectorAll('helix-base-option')].filter((one) => !one.hidden).length,
+        [...host.querySelectorAll('helix-headless-option')].filter((one) => !one.hidden).length,
       ).toBe(3)
     })
   })

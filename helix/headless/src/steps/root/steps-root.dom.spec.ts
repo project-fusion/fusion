@@ -9,11 +9,11 @@ beforeAll(async () => {
 type Steps = HTMLElement & { updateComplete: Promise<unknown> }
 
 const steps = async (attrs = ''): Promise<Steps> => {
-  const host = (await mount(`<helix-base-steps ${attrs}>
-    <helix-base-step complete>Details</helix-base-step>
-    <helix-base-step current>Payment</helix-base-step>
-    <helix-base-step>Review</helix-base-step>
-  </helix-base-steps>`)) as Steps
+  const host = (await mount(`<helix-headless-steps ${attrs}>
+    <helix-headless-step complete>Details</helix-headless-step>
+    <helix-headless-step current>Payment</helix-headless-step>
+    <helix-headless-step>Review</helix-headless-step>
+  </helix-headless-steps>`)) as Steps
   await host.updateComplete
   return host
 }
@@ -32,7 +32,7 @@ describe('steps', () => {
 
   test('each step is an item, and only the current one says so', async () => {
     const host = await steps()
-    const all = [...host.querySelectorAll('helix-base-step')] as HTMLElement[]
+    const all = [...host.querySelectorAll('helix-headless-step')] as HTMLElement[]
     for (const step of all) {
       await (step as unknown as Steps).updateComplete
     }
@@ -46,7 +46,7 @@ describe('steps', () => {
        the path data, since that is what actually differs. */
     const host = await steps()
     const marks: string[] = []
-    for (const step of [...host.querySelectorAll('helix-base-step')] as HTMLElement[]) {
+    for (const step of [...host.querySelectorAll('helix-headless-step')] as HTMLElement[]) {
       await (step as unknown as Steps).updateComplete
       const svgs = step.shadowRoot?.querySelectorAll('svg') ?? []
       expect(svgs).toHaveLength(1)
@@ -59,11 +59,11 @@ describe('steps', () => {
     // The target is only where the reader happens to be standing; the name and
     // the rule still say which stage is open.
     const host = (await mount(
-      `<helix-base-steps><helix-base-step complete>A</helix-base-step>
-       <helix-base-step complete current>B</helix-base-step></helix-base-steps>`,
+      `<helix-headless-steps><helix-headless-step complete>A</helix-headless-step>
+       <helix-headless-step complete current>B</helix-headless-step></helix-headless-steps>`,
     )) as Steps
     await host.updateComplete
-    const [done, back] = [...host.querySelectorAll('helix-base-step')] as HTMLElement[]
+    const [done, back] = [...host.querySelectorAll('helix-headless-step')] as HTMLElement[]
     for (const step of [done, back]) {
       await (step as unknown as Steps).updateComplete
     }
@@ -76,7 +76,7 @@ describe('steps', () => {
     /* Two halves rather than one line, because a line to the next mark has to
        know how far away it is and a step knows only its own size. */
     const host = await steps()
-    for (const step of [...host.querySelectorAll('helix-base-step')] as HTMLElement[]) {
+    for (const step of [...host.querySelectorAll('helix-headless-step')] as HTMLElement[]) {
       await (step as unknown as Steps).updateComplete
       expect(step.shadowRoot?.querySelector('[part="lead"]')).not.toBeNull()
       expect(step.shadowRoot?.querySelector('[part="trail"]')).not.toBeNull()
@@ -87,10 +87,10 @@ describe('steps', () => {
     /* Both true is a reader reviewing a stage they already finished. A stepper
        that treats them as one state loses the check the moment they go back. */
     const host = (await mount(
-      `<helix-base-steps><helix-base-step complete current>Details</helix-base-step></helix-base-steps>`,
+      `<helix-headless-steps><helix-headless-step complete current>Details</helix-headless-step></helix-headless-steps>`,
     )) as Steps
     await host.updateComplete
-    const step = host.querySelector('helix-base-step') as HTMLElement
+    const step = host.querySelector('helix-headless-step') as HTMLElement
     await (step as unknown as Steps).updateComplete
     expect(internals(step).ariaCurrent).toBe('step')
     expect(step.shadowRoot?.querySelector('svg')).not.toBeNull()
@@ -100,23 +100,23 @@ describe('steps', () => {
 describe('a step is pressable, and only its name is', () => {
   const one = async (attrs = ''): Promise<HTMLElement> => {
     const host = (await mount(
-      `<helix-base-steps><helix-base-step ${attrs}>Payment</helix-base-step></helix-base-steps>`,
+      `<helix-headless-steps><helix-headless-step ${attrs}>Payment</helix-headless-step></helix-headless-steps>`,
     )) as Steps
     await host.updateComplete
-    const step = host.querySelector('helix-base-step') as HTMLElement
+    const step = host.querySelector('helix-headless-step') as HTMLElement
     await (step as unknown as Steps).updateComplete
     return step
   }
 
   test('the button is the name, and it is the library’s own button', async () => {
-    /* `helix-base-button` rather than a `<button>` reset here: the hover wash, the
+    /* `helix-headless-button` rather than a `<button>` reset here: the hover wash, the
        focus ring and the disabled treatment are decisions it already carries,
        and a second copy of them is a second copy to keep in step.
        The marker is `aria-hidden` decoration and stays outside it, so wrapping
        it would add hit area and no meaning. */
     const step = await one('value="pay"')
     const label = part(step, 'label') as HTMLElement
-    expect(label.tagName).toBe('HELIX-BASE-BUTTON')
+    expect(label.tagName).toBe('HELIX-HEADLESS-BUTTON')
     expect(label.getAttribute('appearance')).toBe('ghost')
     expect(step.shadowRoot?.querySelector('[part="marker"]')?.tagName).toBe('SPAN')
   })
@@ -157,17 +157,17 @@ describe('a step is pressable, and only its name is', () => {
 
 describe('the list can hold which step is current', () => {
   const seq = async (attrs = ''): Promise<Steps> => {
-    const host = (await mount(`<helix-base-steps ${attrs}>
-      <helix-base-step complete value="one">One</helix-base-step>
-      <helix-base-step value="two">Two</helix-base-step>
-      <helix-base-step value="three">Three</helix-base-step>
-    </helix-base-steps>`)) as Steps
+    const host = (await mount(`<helix-headless-steps ${attrs}>
+      <helix-headless-step complete value="one">One</helix-headless-step>
+      <helix-headless-step value="two">Two</helix-headless-step>
+      <helix-headless-step value="three">Three</helix-headless-step>
+    </helix-headless-steps>`)) as Steps
     await host.updateComplete
     return host
   }
 
   const currents = (host: Steps): boolean[] =>
-    [...host.querySelectorAll('helix-base-step')].map((one) => one.hasAttribute('current'))
+    [...host.querySelectorAll('helix-headless-step')].map((one) => one.hasAttribute('current'))
 
   test('`default-active` puts it on the step that owns the value', async () => {
     const host = await seq('default-active="two"')
@@ -180,7 +180,7 @@ describe('the list can hold which step is current', () => {
        are still finished, while "everything before the active one" says only
        the first is. */
     const host = await seq('default-active="one"')
-    const steps = [...host.querySelectorAll('helix-base-step')]
+    const steps = [...host.querySelectorAll('helix-headless-step')]
     expect(steps.map((one) => one.hasAttribute('complete'))).toEqual([true, false, false])
     expect(currents(host)).toEqual([true, false, false])
   })
@@ -189,17 +189,17 @@ describe('the list can hold which step is current', () => {
     /* The case a server renders. This element would have to count its slotted
        children to know which one is third, and the server has none, so leaving
        them alone is what stops the whole sequence flashing on hydration. */
-    const host = (await mount(`<helix-base-steps>
-      <helix-base-step complete value="one">One</helix-base-step>
-      <helix-base-step current value="two">Two</helix-base-step>
-    </helix-base-steps>`)) as Steps
+    const host = (await mount(`<helix-headless-steps>
+      <helix-headless-step complete value="one">One</helix-headless-step>
+      <helix-headless-step current value="two">Two</helix-headless-step>
+    </helix-headless-steps>`)) as Steps
     await host.updateComplete
     expect(currents(host)).toEqual([false, true])
   })
 
   test('pressing a step moves it, uncontrolled', async () => {
     const host = await seq('default-active="one"')
-    const third = host.querySelectorAll('helix-base-step')[2] as HTMLElement
+    const third = host.querySelectorAll('helix-headless-step')[2] as HTMLElement
     await (third as unknown as Steps).updateComplete
     ;(part(third, 'label') as HTMLElement).click()
     await host.updateComplete
@@ -215,7 +215,7 @@ describe('the list can hold which step is current', () => {
     host.addEventListener('helix-change', (event) => {
       said.push((event as CustomEvent<{ value: string }>).detail.value)
     })
-    const third = host.querySelectorAll('helix-base-step')[2] as HTMLElement
+    const third = host.querySelectorAll('helix-headless-step')[2] as HTMLElement
     await (third as unknown as Steps).updateComplete
     ;(part(third, 'label') as HTMLElement).click()
     await host.updateComplete

@@ -24,8 +24,8 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
  */
-@customElement('helix-base-toggle')
-export class HelixBaseToggle extends HelixElement {
+@customElement('helix-headless-toggle')
+export class HelixHeadlessToggle extends HelixElement {
   /** Identifies the item to the group. */
   @property()
   value = ''
@@ -86,6 +86,6 @@ export class HelixBaseToggle extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-toggle': HelixBaseToggle
+    'helix-headless-toggle': HelixHeadlessToggle
   }
 }

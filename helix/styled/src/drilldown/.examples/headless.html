@@ -1,0 +1,35 @@
+<!-- @summary The same drilldown on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-headless-drilldown
+  class="panel"
+  label="Settings"
+>
+  <helix-headless-drilldown-item value="appearance">
+    Appearance
+    <helix-headless-drilldown-item
+      slot="page"
+      value="theme"
+    >Theme</helix-headless-drilldown-item>
+    <helix-headless-drilldown-item
+      slot="page"
+      value="density"
+    >Density</helix-headless-drilldown-item>
+  </helix-headless-drilldown-item>
+  <helix-headless-drilldown-item value="editor">
+    Editor
+    <helix-headless-drilldown-item
+      slot="page"
+      value="tabs"
+    >Tab size</helix-headless-drilldown-item>
+    <helix-headless-drilldown-item
+      slot="page"
+      value="wrap"
+    >Word wrap</helix-headless-drilldown-item>
+  </helix-headless-drilldown-item>
+  <helix-headless-drilldown-item value="about">About</helix-headless-drilldown-item>
+</helix-headless-drilldown>

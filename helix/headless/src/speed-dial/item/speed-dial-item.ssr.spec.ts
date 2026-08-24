@@ -30,14 +30,14 @@ import '../index.js'
 describe('speed dial item server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
     expect(
-      withoutStyles(ssr(html`<helix-base-speed-dial-item></helix-base-speed-dial-item>`)),
-    ).toContain('helix-base-speed-dial-item')
+      withoutStyles(ssr(html`<helix-headless-speed-dial-item></helix-headless-speed-dial-item>`)),
+    ).toContain('helix-headless-speed-dial-item')
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-base-speed-dial-item></helix-base-speed-dial-item>`),
-      'helix-base-speed-dial-item',
+      ssr(html`<helix-headless-speed-dial-item></helix-headless-speed-dial-item>`),
+      'helix-headless-speed-dial-item',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

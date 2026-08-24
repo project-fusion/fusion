@@ -21,11 +21,11 @@ const settle = async (host: Updatable): Promise<void> => {
 }
 
 const list = async (extra = ''): Promise<Updatable> => {
-  document.body.innerHTML = `<helix-base-listbox label="L" name="c" ${extra}>
-    <helix-base-option value="one">Alpha</helix-base-option>
-    <helix-base-option value="two">Beta</helix-base-option>
-    <helix-base-option value="three">Gamma</helix-base-option>
-  </helix-base-listbox>`
+  document.body.innerHTML = `<helix-headless-listbox label="L" name="c" ${extra}>
+    <helix-headless-option value="one">Alpha</helix-headless-option>
+    <helix-headless-option value="two">Beta</helix-headless-option>
+    <helix-headless-option value="three">Gamma</helix-headless-option>
+  </helix-headless-listbox>`
   const host = document.body.firstElementChild as Updatable
   await settle(host)
   return host
@@ -187,10 +187,10 @@ describe('listbox filtering', () => {
     /* CSS cannot do this: the rule would be `:host(:has(...))`, which is
        dropped at parse time. The listbox can, because it did the hiding. Left
        showing, the picture was a heading over nothing. */
-    document.body.innerHTML = `<helix-base-listbox label="L">
-      <helix-base-option-group label="One"><helix-base-option value="a">Alpha</helix-base-option></helix-base-option-group>
-      <helix-base-option-group label="Two"><helix-base-option value="b">Beta</helix-base-option></helix-base-option-group>
-    </helix-base-listbox>`
+    document.body.innerHTML = `<helix-headless-listbox label="L">
+      <helix-headless-option-group label="One"><helix-headless-option value="a">Alpha</helix-headless-option></helix-headless-option-group>
+      <helix-headless-option-group label="Two"><helix-headless-option value="b">Beta</helix-headless-option></helix-headless-option-group>
+    </helix-headless-listbox>`
     const host = document.body.firstElementChild as Updatable & { filter: string }
     await settle(host)
     host.filter = 'alph'
@@ -267,11 +267,11 @@ if (hasLayout()) {
   describe('listbox active descendant', () => {
     const listbox = async (): Promise<HTMLElement> => {
       const host = (await mount(
-        `<helix-base-listbox label="Owner" default-value="a">
-          <helix-base-option value="a">Ross</helix-base-option>
-          <helix-base-option value="b">Sam</helix-base-option>
-          <helix-base-option value="c">Kit</helix-base-option>
-        </helix-base-listbox>`,
+        `<helix-headless-listbox label="Owner" default-value="a">
+          <helix-headless-option value="a">Ross</helix-headless-option>
+          <helix-headless-option value="b">Sam</helix-headless-option>
+          <helix-headless-option value="c">Kit</helix-headless-option>
+        </helix-headless-listbox>`,
       )) as HTMLElement
       await settle(host as Updatable)
       return host
@@ -349,15 +349,15 @@ if (hasLayout()) {
          keyboard and not with a mouse, for as long as it has existed. Every
          spec for it chose by key or by method, which is exactly why. */
       const host = (await mount(
-        `<helix-base-listbox label="Owner">
-          <helix-base-option value="one">One</helix-base-option>
-          <helix-base-option value="two">Two</helix-base-option>
-        </helix-base-listbox>`,
+        `<helix-headless-listbox label="Owner">
+          <helix-headless-option value="one">One</helix-headless-option>
+          <helix-headless-option value="two">Two</helix-headless-option>
+        </helix-headless-listbox>`,
       )) as Updatable & { value: string }
       await host.updateComplete
 
       const option = (host as HTMLElement).querySelector(
-        'helix-base-option[value="two"]',
+        'helix-headless-option[value="two"]',
       ) as HTMLElement
       await (option as unknown as { updateComplete: Promise<boolean> }).updateComplete
       const row = option.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null
@@ -379,11 +379,11 @@ if (hasLayout()) {
       [...(CSS.highlights.get('helix-filter-match') ?? [])].map((range) => range.toString())
 
     const filtered = async (needle: string): Promise<HTMLElement> => {
-      document.body.innerHTML = `<helix-base-listbox aria-label="L">
-        <helix-base-option value="rs">Rust</helix-base-option>
-        <helix-base-option value="rb">Ruby</helix-base-option>
-        <helix-base-option value="go">Go</helix-base-option>
-      </helix-base-listbox>`
+      document.body.innerHTML = `<helix-headless-listbox aria-label="L">
+        <helix-headless-option value="rs">Rust</helix-headless-option>
+        <helix-headless-option value="rb">Ruby</helix-headless-option>
+        <helix-headless-option value="go">Go</helix-headless-option>
+      </helix-headless-listbox>`
       const host = document.body.firstElementChild as HTMLElement & {
         requestFilter: (next: string) => boolean
         updateComplete: Promise<boolean>

@@ -3,12 +3,12 @@ import { hasPart, hostAttributes, partTag, ssr } from '@helix-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const field = html`<helix-base-number-input
+const field = html`<helix-headless-number-input
   default-value="3"
   label="Guests"
   max="9"
   min="1"
-></helix-base-number-input>`
+></helix-headless-number-input>`
 
 describe('input number server output', () => {
   test('the field and both steppers ship, so it works before any script loads', () => {
@@ -31,16 +31,16 @@ describe('input number server output', () => {
   })
 
   test('a stepper at its bound ships spent, rather than becoming so on hydration', () => {
-    const floor = html`<helix-base-number-input
+    const floor = html`<helix-headless-number-input
       default-value="1"
       label="Guests"
       min="1"
-    ></helix-base-number-input>`
+    ></helix-headless-number-input>`
     expect(partTag(ssr(floor), 'decrement')).toContain('disabled')
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(field), 'helix-base-number-input')).toEqual([
+    expect(hostAttributes(ssr(field), 'helix-headless-number-input')).toEqual([
       'default-value',
       'label',
       'max',

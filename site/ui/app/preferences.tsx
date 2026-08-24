@@ -83,7 +83,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
     const asked = new URLSearchParams(window.location.search).get('tier')
     if (storedTier) {
       setTier(storedTier)
-      if (asked !== 'base' && asked !== 'styled') {
+      if (asked !== 'headless' && asked !== 'styled') {
         applyTier(storedTier)
       }
     }
@@ -148,7 +148,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           onhelix-change={(event) => chooseTier(event.detail.value as ApiTier)}
           value={tier}
         >
-          <helix-toggle value="base">Base</helix-toggle>
+          <helix-toggle value="headless">Headless</helix-toggle>
           <helix-toggle value="styled">Styled</helix-toggle>
         </helix-toggle-group>
       </helix-flex>

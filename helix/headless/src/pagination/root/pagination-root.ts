@@ -152,8 +152,8 @@ const fill = (
  *
  * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. The only way to refuse one.
  */
-@customElement('helix-base-pagination')
-export class HelixBasePagination extends HelixElement {
+@customElement('helix-headless-pagination')
+export class HelixHeadlessPagination extends HelixElement {
   /**
    * How many pages there are in total.
    *
@@ -741,6 +741,6 @@ export class HelixBasePagination extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-pagination': HelixBasePagination
+    'helix-headless-pagination': HelixHeadlessPagination
   }
 }

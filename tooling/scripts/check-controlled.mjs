@@ -132,7 +132,7 @@ if (problems.length > 0) {
 
 /* Second half: every controlled property says so, and every property that says
    so is one. */
-const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/web/src']
+const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/styled/src']
 
 const walk = (dir, found = []) => {
   for (const entry of readdirSync(dir)) {

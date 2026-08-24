@@ -31,8 +31,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart indicator - The count, or the dot when there is no value.
  */
-@customElement('helix-base-badge')
-export class HelixBaseBadge extends HelixElement {
+@customElement('helix-headless-badge')
+export class HelixHeadlessBadge extends HelixElement {
   /** The count or short text to show. Absent shows a dot, zero shows nothing. */
   @property()
   value = ''
@@ -105,6 +105,6 @@ export class HelixBaseBadge extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-badge': HelixBaseBadge
+    'helix-headless-badge': HelixHeadlessBadge
   }
 }

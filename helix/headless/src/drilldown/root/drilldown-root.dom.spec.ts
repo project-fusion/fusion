@@ -14,17 +14,17 @@ type Stack = HTMLElement & { back(): boolean; updateComplete: Promise<boolean> }
 
 const stack = async (): Promise<Stack> =>
   (await mount(
-    `<helix-base-drilldown label="Settings">
-      <helix-base-drilldown-item value="appearance">Appearance
-        <helix-base-drilldown-item slot="page" value="theme">Theme</helix-base-drilldown-item>
-      </helix-base-drilldown-item>
-      <helix-base-drilldown-item value="about">About</helix-base-drilldown-item>
-    </helix-base-drilldown>`,
+    `<helix-headless-drilldown label="Settings">
+      <helix-headless-drilldown-item value="appearance">Appearance
+        <helix-headless-drilldown-item slot="page" value="theme">Theme</helix-headless-drilldown-item>
+      </helix-headless-drilldown-item>
+      <helix-headless-drilldown-item value="about">About</helix-headless-drilldown-item>
+    </helix-headless-drilldown>`,
   )) as Stack
 
 /** The rows a reader can see, which is the whole of what a page is. */
 const showing = (host: HTMLElement): string[] =>
-  [...host.querySelectorAll('helix-base-drilldown-item')]
+  [...host.querySelectorAll('helix-headless-drilldown-item')]
     .filter((item) => (item as Item).onPage)
     .map((item) => (item as Item).value)
 
@@ -53,7 +53,7 @@ describe('drilldown', () => {
     host.addEventListener('helix-select', (event) => {
       heard = (event as CustomEvent<{ value: string }>).detail.value
     })
-    await press(host, host.querySelector('helix-base-drilldown-item') as Element)
+    await press(host, host.querySelector('helix-headless-drilldown-item') as Element)
     expect(showing(host)).toEqual(['theme'])
     expect(heard).toBe('')
   })
@@ -75,7 +75,7 @@ describe('drilldown', () => {
     // The direction is the stack's to know: both moves replace one page with
     // another, and nothing downstream can tell them apart without being told.
     const host = await stack()
-    await press(host, host.querySelector('helix-base-drilldown-item') as Element)
+    await press(host, host.querySelector('helix-headless-drilldown-item') as Element)
     expect(host.getAttribute('data-direction')).toBe('forward')
     expect(host.hasAttribute('data-drilled')).toBe(true)
 
@@ -95,7 +95,7 @@ describe('drilldown', () => {
     // Nothing to go back to at the top, so no bar and no empty title.
     const host = await stack()
     expect(host.shadowRoot?.querySelector('[part="header"]')).toBeNull()
-    await press(host, host.querySelector('helix-base-drilldown-item') as Element)
+    await press(host, host.querySelector('helix-headless-drilldown-item') as Element)
     expect(host.shadowRoot?.querySelector('[part="title"]')?.textContent?.trim()).toBe('Appearance')
   })
 })

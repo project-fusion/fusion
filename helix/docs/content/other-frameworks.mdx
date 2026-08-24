@@ -53,15 +53,15 @@ telling us: it is either a gap in this page or a gap in the library.
 
 ## Typings
 
-`@helix-io/web/jsx` is the base for anything JSX-shaped, and Svelte's own
+`@helix-io/styled/jsx` is the base for anything JSX-shaped, and Svelte's own
 typings are built from it. If your framework needs a different shape, the
-manifest ships as `@helix-io/web/custom-elements.json` and describes every tag,
+manifest ships as `@helix-io/styled/custom-elements.json` and describes every tag,
 prop, event and part, which is what all of ours are generated from.
 
 ## Registration
 
 ```ts
-import '@helix-io/web'
+import '@helix-io/styled'
 ```
 
 Once, anywhere that runs in the browser. See [Installation](./installation) for

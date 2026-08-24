@@ -6,7 +6,7 @@ import '../index.js'
 describe('megamenu server output', () => {
   test('the trigger ships closed, which is what a fresh load shows', () => {
     const markup = withoutStyles(
-      ssr(html`<helix-base-megamenu label="Products"></helix-base-megamenu>`),
+      ssr(html`<helix-headless-megamenu label="Products"></helix-headless-megamenu>`),
     )
     expect(markup).toContain('aria-expanded="false"')
     expect(hasPart(markup, 'trigger')).toBe(true)
@@ -17,7 +17,7 @@ describe('megamenu server output', () => {
        JavaScript both get, and so nothing has to arrive after hydration for the
        navigation to be complete. */
     const markup = withoutStyles(
-      ssr(html`<helix-base-megamenu label="Products"></helix-base-megamenu>`),
+      ssr(html`<helix-headless-megamenu label="Products"></helix-headless-megamenu>`),
     )
     expect(hasPart(markup, 'panel')).toBe(true)
     expect(markup).toContain('hidden')
@@ -27,7 +27,7 @@ describe('megamenu server output', () => {
     // `open` is state and does not reflect: a copied host that came back
     // declaring it would latch controlled and freeze, which the value mixins
     // record at length.
-    const markup = ssr(html`<helix-base-megamenu label="Products"></helix-base-megamenu>`)
-    expect(hostAttributes(markup, 'helix-base-megamenu')).toEqual(['label'])
+    const markup = ssr(html`<helix-headless-megamenu label="Products"></helix-headless-megamenu>`)
+    expect(hostAttributes(markup, 'helix-headless-megamenu')).toEqual(['label'])
   })
 })

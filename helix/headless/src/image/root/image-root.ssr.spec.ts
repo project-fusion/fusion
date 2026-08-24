@@ -3,7 +3,7 @@ import { hasPart, partTag, ssr, withoutStyles } from '@helix-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const pier = html`<helix-base-image alt="A pier" src="/pier.jpg"></helix-base-image>`
+const pier = html`<helix-headless-image alt="A pier" src="/pier.jpg"></helix-headless-image>`
 
 describe('image server output', () => {
   test('ships the picture, so the browser can start fetching it', () => {
@@ -22,7 +22,7 @@ describe('image server output', () => {
   })
 
   test('a decorative picture ships an empty alt rather than none', () => {
-    const mark = html`<helix-base-image alt="" src="/rule.svg"></helix-base-image>`
+    const mark = html`<helix-headless-image alt="" src="/rule.svg"></helix-headless-image>`
     expect(partTag(ssr(mark), 'image')).toContain('alt=""')
   })
 

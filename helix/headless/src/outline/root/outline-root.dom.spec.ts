@@ -19,14 +19,14 @@ describe('page nav', () => {
        points at the old id. Marking nothing is right; failing to render is
        not. */
     const nav = (await mount(
-      `<helix-base-outline label="On this page"><a href="#gone">Gone</a></helix-base-outline>`,
+      `<helix-headless-outline label="On this page"><a href="#gone">Gone</a></helix-headless-outline>`,
     )) as Nav
     await nav.updateComplete
     expect(nav.querySelector('a')?.hasAttribute('aria-current')).toBe(false)
   })
 
   test('nothing is marked before anything has been measured', async () => {
-    const nav = (await mount('<helix-base-outline></helix-base-outline>')) as Nav
+    const nav = (await mount('<helix-headless-outline></helix-headless-outline>')) as Nav
     await nav.updateComplete
     expect(nav.current).toBe('')
   })
@@ -34,12 +34,12 @@ describe('page nav', () => {
 describe('outline scrolling', () => {
   const page = async (attrs = '') => {
     const nav = (await mount(
-      `<div><helix-base-outline ${attrs} label="On this page">` +
+      `<div><helix-headless-outline ${attrs} label="On this page">` +
         '<a href="#one">One</a><a href="#two">Two</a>' +
-        '</helix-base-outline>' +
+        '</helix-headless-outline>' +
         '<section id="one"><h2>One</h2></section><section id="two"><h2>Two</h2></section></div>',
     )) as HTMLElement
-    const outline = nav.querySelector('helix-base-outline') as Nav
+    const outline = nav.querySelector('helix-headless-outline') as Nav
     await outline.updateComplete
     return { outline, root: nav }
   }
@@ -104,8 +104,8 @@ describe('outline scrolling', () => {
     const { root } = await page('behavior="smooth"')
     const stale = document.createElement('a')
     stale.setAttribute('href', '#gone')
-    root.querySelector('helix-base-outline')?.append(stale)
-    await (root.querySelector('helix-base-outline') as Nav).updateComplete
+    root.querySelector('helix-headless-outline')?.append(stale)
+    await (root.querySelector('helix-headless-outline') as Nav).updateComplete
     const event = new MouseEvent('click', { bubbles: true, button: 0, cancelable: true })
     stale.dispatchEvent(event)
     expect(event.defaultPrevented).toBe(false)

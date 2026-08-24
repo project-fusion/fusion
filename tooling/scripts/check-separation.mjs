@@ -45,7 +45,7 @@ import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const SOURCE = join(ROOT, 'helix/web/src')
+const SOURCE = join(ROOT, 'helix/styled/src')
 
 const PAIRS = [
   { edge: '--helix-border-floating', kind: 'floating', lift: '--helix-shadow-floating' },

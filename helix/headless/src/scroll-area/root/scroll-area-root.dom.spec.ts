@@ -10,7 +10,7 @@ type Area = HTMLElement & { updateComplete: Promise<unknown> }
 
 const area = async (attrs = '', body = '<p>One</p>'): Promise<Area> => {
   const host = (await mount(
-    `<helix-base-scroll-area ${attrs}>${body}</helix-base-scroll-area>`,
+    `<helix-headless-scroll-area ${attrs}>${body}</helix-headless-scroll-area>`,
   )) as Area
   await host.updateComplete
   return host
@@ -41,7 +41,7 @@ describe('a scroll area', () => {
 })
 
 /**
- * The box scrolls on this tier, with no stylesheet from `helix/web` involved.
+ * The box scrolls on this tier, with no stylesheet from `helix/styled` involved.
  *
  * **This is the one thing no other spec can see.** Every browser assertion
  * about scrolling in this library runs against the styled tier, whose sheet

@@ -32,8 +32,10 @@ const NEGATIVE = `<table id="negative">
 </table>`
 
 const chart = async (table: string, attributes = ''): Promise<HTMLElement> => {
-  await mount(`<div>${table}<helix-base-donut-chart ${attributes}></helix-base-donut-chart></div>`)
-  const host = document.querySelector('helix-base-donut-chart') as HTMLElement & {
+  await mount(
+    `<div>${table}<helix-headless-donut-chart ${attributes}></helix-headless-donut-chart></div>`,
+  )
+  const host = document.querySelector('helix-headless-donut-chart') as HTMLElement & {
     updateComplete: Promise<unknown>
   }
   await host.updateComplete
@@ -153,7 +155,7 @@ describe('donut chart tooltip', () => {
 
   test('nothing is shown until a pointer is on a slice', async () => {
     const host = await chart(TRAFFIC, 'for="traffic"')
-    expect(host.shadowRoot?.querySelector('helix-base-tooltip')).toBeNull()
+    expect(host.shadowRoot?.querySelector('helix-headless-tooltip')).toBeNull()
   })
 
   test('the slice under the pointer is marked, so the ring says which one too', async () => {

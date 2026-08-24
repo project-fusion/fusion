@@ -1,7 +1,7 @@
 'use client'
 
+import type { HelixSandboxPreview } from '@helix-io/styled'
 import { type DerivedTheme, initTheme, type ThemeEngine } from '@helix-io/theme'
-import type { HelixSandboxPreview } from '@helix-io/web'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
 import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'

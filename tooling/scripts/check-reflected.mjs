@@ -43,7 +43,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const TIERS = ['helix/headless/src', 'helix/web/src']
+const TIERS = ['helix/headless/src', 'helix/styled/src']
 
 /** Values that mean "nothing was said", rather than a choice made for a consumer. */
 const RESTING = new Set(['false', "''", '""', 'undefined', 'null'])

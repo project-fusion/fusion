@@ -31,8 +31,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
  */
-@customElement('helix-base-tag')
-export class HelixBaseTag extends MixinDismissible(HelixElement) {
+@customElement('helix-headless-tag')
+export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
   /* "Remove" rather than the mixin's "Dismiss". A tag is taken out of a set,
      which is a different act from closing a message, and the control's name is
      what a screen-reader user hears. */
@@ -60,6 +60,6 @@ export class HelixBaseTag extends MixinDismissible(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-tag': HelixBaseTag
+    'helix-headless-tag': HelixHeadlessTag
   }
 }

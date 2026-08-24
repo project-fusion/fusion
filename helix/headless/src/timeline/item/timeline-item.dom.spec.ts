@@ -11,7 +11,7 @@ const entry = async (
   inner = '<span slot="time">March</span>Shipped',
 ): Promise<HTMLElement> =>
   (await mount(
-    `<helix-base-timeline-item ${attributes}>${inner}</helix-base-timeline-item>`,
+    `<helix-headless-timeline-item ${attributes}>${inner}</helix-headless-timeline-item>`,
   )) as HTMLElement
 
 /**

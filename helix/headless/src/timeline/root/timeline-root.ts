@@ -39,8 +39,8 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The entries.
  */
-@customElement('helix-base-timeline')
-export class HelixBaseTimeline extends HelixElement {
+@customElement('helix-headless-timeline')
+export class HelixHeadlessTimeline extends HelixElement {
   /** Names the record, for a reader arriving at it out of context. */
   @property()
   label = ''
@@ -60,6 +60,6 @@ export class HelixBaseTimeline extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-timeline': HelixBaseTimeline
+    'helix-headless-timeline': HelixHeadlessTimeline
   }
 }

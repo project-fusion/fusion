@@ -32,8 +32,8 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when the action is chosen.
  */
-@customElement('helix-base-speed-dial-item')
-export class HelixBaseSpeedDialItem extends HelixElement {
+@customElement('helix-headless-speed-dial-item')
+export class HelixHeadlessSpeedDialItem extends HelixElement {
   /** What this action stands for, carried in the event when it is chosen. */
   @property()
   value = ''
@@ -104,6 +104,6 @@ export class HelixBaseSpeedDialItem extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-speed-dial-item': HelixBaseSpeedDialItem
+    'helix-headless-speed-dial-item': HelixHeadlessSpeedDialItem
   }
 }

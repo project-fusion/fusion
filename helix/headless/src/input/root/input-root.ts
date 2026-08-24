@@ -80,8 +80,8 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @csspart icon - A glyph this component draws.
  * @csspart reveal - The button that shows and hides a password.
  */
-@customElement('helix-base-input')
-export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+@customElement('helix-headless-input')
+export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
@@ -374,6 +374,6 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-input': HelixBaseInput
+    'helix-headless-input': HelixHeadlessInput
   }
 }

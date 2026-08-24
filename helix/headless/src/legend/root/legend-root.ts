@@ -49,8 +49,8 @@ const PALETTE = 24
  * @csspart name - One series name.
  * @csspart swatch - The color a series is drawn in.
  */
-@customElement('helix-base-legend')
-export class HelixBaseLegend extends HelixElement {
+@customElement('helix-headless-legend')
+export class HelixHeadlessLegend extends HelixElement {
   /**
    * Which way to read the table.
    *
@@ -126,6 +126,6 @@ export class HelixBaseLegend extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-legend': HelixBaseLegend
+    'helix-headless-legend': HelixHeadlessLegend
   }
 }

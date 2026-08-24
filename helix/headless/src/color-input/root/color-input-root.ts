@@ -71,8 +71,8 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  *
  * @cssproperty --color-input-swatch - The chosen color, to paint over the transparency check.
  */
-@customElement('helix-base-color-input')
-export class HelixBaseColorInput extends MixinControllerOpen(
+@customElement('helix-headless-color-input')
+export class HelixHeadlessColorInput extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
   /**
@@ -344,7 +344,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderPicker(): TemplateResult {
@@ -422,6 +422,6 @@ export class HelixBaseColorInput extends MixinControllerOpen(
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-color-input': HelixBaseColorInput
+    'helix-headless-color-input': HelixHeadlessColorInput
   }
 }

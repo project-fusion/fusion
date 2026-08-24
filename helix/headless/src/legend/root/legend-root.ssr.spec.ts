@@ -9,14 +9,19 @@ describe('chart legend server output', () => {
        this is the one component here that genuinely cannot be served whole. The
        table it reads is ordinary markup and is served in full, so what is
        missing before hydration is this list and nothing a reader needs. */
-    const markup = withoutStyles(ssr(html`<helix-base-legend for="traffic"></helix-base-legend>`))
+    const markup = withoutStyles(
+      ssr(html`<helix-headless-legend for="traffic"></helix-headless-legend>`),
+    )
     expect(markup).toContain('part="list"')
     expect(markup).not.toContain('part="entry"')
   })
 
   test('the host carries nothing the consumer did not write', () => {
     expect(
-      hostAttributes(ssr(html`<helix-base-legend></helix-base-legend>`), 'helix-base-legend'),
+      hostAttributes(
+        ssr(html`<helix-headless-legend></helix-headless-legend>`),
+        'helix-headless-legend',
+      ),
     ).toEqual([])
   })
 
@@ -27,8 +32,8 @@ describe('chart legend server output', () => {
        is the one the template wrote. */
     expect(
       hostAttributes(
-        ssr(html`<helix-base-legend for="traffic"></helix-base-legend>`),
-        'helix-base-legend',
+        ssr(html`<helix-headless-legend for="traffic"></helix-headless-legend>`),
+        'helix-headless-legend',
       ),
     ).toEqual(['for'])
   })

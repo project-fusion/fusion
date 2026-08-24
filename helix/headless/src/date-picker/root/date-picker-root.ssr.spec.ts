@@ -3,11 +3,11 @@ import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@helix-io/
 import { html } from 'lit'
 import '../index.js'
 
-const calendar = html`<helix-base-date-picker
+const calendar = html`<helix-headless-date-picker
   label="Choose a date"
   default-month="2026-08"
   value="2026-08-14"
-></helix-base-date-picker>`
+></helix-headless-date-picker>`
 
 describe('calendar server output', () => {
   test('the month is rendered on the server, not built on the client', () => {
@@ -21,7 +21,7 @@ describe('calendar server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(calendar), 'helix-base-date-picker')).toEqual([
+    expect(hostAttributes(ssr(calendar), 'helix-headless-date-picker')).toEqual([
       'default-month',
       'label',
       'value',
@@ -37,9 +37,9 @@ describe('calendar as a form control, on the server', () => {
     expect(
       hostAttributes(
         ssr(
-          html`<helix-base-date-picker label="When" name="when" value="2026-08-14"></helix-base-date-picker>`,
+          html`<helix-headless-date-picker label="When" name="when" value="2026-08-14"></helix-headless-date-picker>`,
         ),
-        'helix-base-date-picker',
+        'helix-headless-date-picker',
       ),
     ).toEqual(['label', 'name', 'value'])
   })
@@ -47,7 +47,9 @@ describe('calendar as a form control, on the server', () => {
   test('the grid still serves, which becoming a form control must not change', () => {
     expect(
       hasPart(
-        ssr(html`<helix-base-date-picker default-month="2026-08"></helix-base-date-picker>`),
+        ssr(
+          html`<helix-headless-date-picker default-month="2026-08"></helix-headless-date-picker>`,
+        ),
         'grid',
       ),
     ).toBe(true)

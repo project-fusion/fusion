@@ -35,8 +35,8 @@ import { property } from 'lit/decorators.js'
  * @csspart item - The row itself.
  * @csspart label - The words.
  */
-@customElement('helix-base-drilldown-item')
-export class HelixBaseDrilldownItem extends HelixElement {
+@customElement('helix-headless-drilldown-item')
+export class HelixHeadlessDrilldownItem extends HelixElement {
   /** Whether the row can be reached at all. */
   @property({ reflect: true, type: Boolean })
   disabled = false
@@ -128,6 +128,6 @@ export class HelixBaseDrilldownItem extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-drilldown-item': HelixBaseDrilldownItem
+    'helix-headless-drilldown-item': HelixHeadlessDrilldownItem
   }
 }

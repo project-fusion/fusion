@@ -5,7 +5,7 @@ import '../index.js'
 
 describe('option server output', () => {
   test('the row and its words are in the served markup', () => {
-    const markup = ssr(html`<helix-base-option value="ross">Ross</helix-base-option>`)
+    const markup = ssr(html`<helix-headless-option value="ross">Ross</helix-headless-option>`)
     expect(hasPart(markup, 'item')).toBe(true)
     expect(withoutStyles(markup)).toContain('Ross')
   })
@@ -15,15 +15,15 @@ describe('option server output', () => {
     // attribute, so the host is the consumer"s markup and hydration agrees.
     expect(
       hostAttributes(
-        ssr(html`<helix-base-option value="ross">Ross</helix-base-option>`),
-        'helix-base-option',
+        ssr(html`<helix-headless-option value="ross">Ross</helix-headless-option>`),
+        'helix-headless-option',
       ),
     ).toEqual(['value'])
   })
 
   test('a group serves its own label, which is not one of its options', () => {
     const markup = ssr(
-      html`<helix-base-option-group label="Engineering"></helix-base-option-group>`,
+      html`<helix-headless-option-group label="Engineering"></helix-headless-option-group>`,
     )
     expect(withoutStyles(markup)).toContain('Engineering')
     expect(hasPart(markup, 'items')).toBe(true)

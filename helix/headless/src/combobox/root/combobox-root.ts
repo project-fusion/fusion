@@ -13,7 +13,7 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
-import type { HelixBaseListbox } from '../../listbox/root/listbox-root.js'
+import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 /* Side-effect import, because this renders a listbox in its own shadow root and
    a custom element registers on import. The path is relative, so this registers
    the base listbox and the styled file's identical import registers the styled
@@ -138,8 +138,8 @@ const isInsertion = (event: Event): boolean =>
  * @event {HelixOpenEvent} helix-open - Fired when the panel opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
  */
-@customElement('helix-base-combobox')
-export class HelixBaseCombobox extends MixinControllerOpen(
+@customElement('helix-headless-combobox')
+export class HelixHeadlessCombobox extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
   /** Text shown while nothing has been chosen. */
@@ -248,8 +248,8 @@ export class HelixBaseCombobox extends MixinControllerOpen(
   @state()
   private suggestion = ''
 
-  private get listbox(): HelixBaseListbox | null {
-    return this.renderRoot?.querySelector<HelixBaseListbox>('[part="listbox"]') ?? null
+  private get listbox(): HelixHeadlessListbox | null {
+    return this.renderRoot?.querySelector<HelixHeadlessListbox>('[part="listbox"]') ?? null
   }
 
   protected readonly panel = new PopoverController(this, {
@@ -640,7 +640,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderListbox(): TemplateResult {
@@ -672,7 +672,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderTag(option: { text: string; value: string }): TemplateResult {
@@ -756,6 +756,6 @@ export class HelixBaseCombobox extends MixinControllerOpen(
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-combobox': HelixBaseCombobox
+    'helix-headless-combobox': HelixHeadlessCombobox
   }
 }

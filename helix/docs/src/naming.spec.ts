@@ -23,12 +23,12 @@ describe('naming', () => {
 
   test('a tag drops its prefix, and its tier', () => {
     expect(displayName('helix-app-header')).toBe('App Header')
-    expect(displayName('helix-base-card')).toBe('Card')
+    expect(displayName('helix-headless-card')).toBe('Card')
     expect(displayName('helix-qr-code')).toBe('QR Code')
   })
 
   test('the tier is read from the prefix, not from a manifest', () => {
-    expect(tierOf('helix-base-card')).toBe('headless')
+    expect(tierOf('helix-headless-card')).toBe('headless')
     expect(tierOf('helix-card')).toBe('styled')
   })
 })

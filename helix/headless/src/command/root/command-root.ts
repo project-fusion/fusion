@@ -8,7 +8,7 @@ import {
 import type { PropertyValues, TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
-import type { HelixBaseListbox } from '../../listbox/root/listbox-root.js'
+import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 /* Side-effect imports, because this renders both in its own shadow root and a
    custom element registers on import. The paths are relative, so this registers
    the base pair and the styled file's identical imports register the styled
@@ -82,8 +82,8 @@ const parse = (hotkey: string) => {
  * @event {HelixOpenEvent} helix-open - Fired when the palette opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
  */
-@customElement('helix-base-command')
-export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
+@customElement('helix-headless-command')
+export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   /** Accessible name for the overlay, which has no visible heading. */
   @property()
   label = 'Commands'
@@ -117,8 +117,8 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
   @state()
   private footed = false
 
-  private get listbox(): HelixBaseListbox | null {
-    return this.renderRoot?.querySelector<HelixBaseListbox>('[part="listbox"]') ?? null
+  private get listbox(): HelixHeadlessListbox | null {
+    return this.renderRoot?.querySelector<HelixHeadlessListbox>('[part="listbox"]') ?? null
   }
 
   /**
@@ -230,7 +230,7 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
       event instanceof KeyboardEvent
         ? this.activeOption
         : (event.target as Element | null)?.closest?.(
-            '[data-active], helix-option, helix-base-option',
+            '[data-active], helix-option, helix-headless-option',
           )
     const alternate = (row as { alternate?: string } | null)?.alternate
     if (row === null || row === undefined || !alternate) {
@@ -281,7 +281,7 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
          key to summon a search expects to be typing in it, and the dialog would
          otherwise put focus on itself. */
       this.renderRoot
-        .querySelector<HelixBaseListbox>('[part="listbox"]')
+        .querySelector<HelixHeadlessListbox>('[part="listbox"]')
         ?.renderRoot?.querySelector<HTMLInputElement>('[part="search-field"]')
         ?.focus()
     } else {
@@ -296,7 +296,7 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderDialog(): TemplateResult {
@@ -344,6 +344,6 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-command': HelixBaseCommand
+    'helix-headless-command': HelixHeadlessCommand
   }
 }

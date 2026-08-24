@@ -8,7 +8,7 @@ title: Installation
 # Installation
 
 ```sh
-bun add @helix-io/web @helix-io/styles
+bun add @helix-io/styled @helix-io/styles
 ```
 
 `@helix-io/styles` is not optional and not a peer dependency by accident. The
@@ -21,7 +21,7 @@ rather than an unthemed version of itself.
 ```ts
 import '@helix-io/styles/tokens.css'
 import '@helix-io/styles/base.css'
-import '@helix-io/web/elements.css'
+import '@helix-io/styled/elements.css'
 ```
 
 Three files, and each one needs what is above it.
@@ -48,7 +48,7 @@ order is visible in one place and stays that way.
 ## Register the elements
 
 ```ts
-import '@helix-io/web'
+import '@helix-io/styled'
 ```
 
 A side-effect import. It calls `customElements.define` for every element, once,
@@ -59,8 +59,8 @@ the module with it.
 You can register a subset instead, from a subpath:
 
 ```ts
-import '@helix-io/web/button'
-import '@helix-io/web/dialog'
+import '@helix-io/styled/button'
+import '@helix-io/styled/dialog'
 ```
 
 Worth doing when you use a handful of components. Not worth doing in the belief

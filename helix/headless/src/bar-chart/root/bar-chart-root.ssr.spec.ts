@@ -9,7 +9,7 @@ describe('bar chart server output', () => {
        and is served whole, so what is missing before hydration is the drawing
        and nothing a reader needs. */
     const markup = withoutStyles(
-      ssr(html`<helix-base-bar-chart for="revenue"></helix-base-bar-chart>`),
+      ssr(html`<helix-headless-bar-chart for="revenue"></helix-headless-bar-chart>`),
     )
     expect(markup).toContain('part="plot"')
     expect(markup).not.toContain('part="bar"')
@@ -18,8 +18,8 @@ describe('bar chart server output', () => {
   test('the host carries nothing the consumer did not write', () => {
     expect(
       hostAttributes(
-        ssr(html`<helix-base-bar-chart></helix-base-bar-chart>`),
-        'helix-base-bar-chart',
+        ssr(html`<helix-headless-bar-chart></helix-headless-bar-chart>`),
+        'helix-headless-bar-chart',
       ),
     ).toEqual([])
   })

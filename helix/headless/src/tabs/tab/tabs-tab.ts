@@ -24,8 +24,8 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen.
  */
-@customElement('helix-base-tabs-tab')
-export class HelixBaseTabsTab extends HelixElement {
+@customElement('helix-headless-tabs-tab')
+export class HelixHeadlessTabsTab extends HelixElement {
   /** Identifies the tab, and pairs it with the panel of the same value. */
   @property()
   value = ''
@@ -80,6 +80,6 @@ export class HelixBaseTabsTab extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-tabs-tab': HelixBaseTabsTab
+    'helix-headless-tabs-tab': HelixHeadlessTabsTab
   }
 }

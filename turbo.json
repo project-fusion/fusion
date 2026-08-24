@@ -22,7 +22,7 @@
       // package's `build` runs. Declared so a cached build restores both.
       "outputs": ["dist/**", "wasm/**", ".next/**", "!.next/cache/**"]
     },
-    // The fourth layer is `helix/web/elements.css` and it was not in `inputs`,
+    // The fourth layer is `helix/styled/elements.css` and it was not in `inputs`,
     // so editing any component stylesheet did not invalidate this. `dependsOn`
     // orders the two tasks and ordering is not invalidation: the sandbox
     // stylesheet, which is also what the browser spec runner serves as its
@@ -41,8 +41,8 @@
         "lib/routes.ts",
         "$TURBO_ROOT$/helix/headless/custom-elements.json",
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
-        "$TURBO_ROOT$/helix/web/custom-elements.json",
-        "$TURBO_ROOT$/helix/web/src/*/.examples/**",
+        "$TURBO_ROOT$/helix/styled/custom-elements.json",
+        "$TURBO_ROOT$/helix/styled/src/*/.examples/**",
         "$TURBO_ROOT$/tooling/scripts/build-catalog.mjs"
       ],
       "outputs": [
@@ -63,7 +63,7 @@
         "lib/preview-frame.css",
         "app/fonts/**",
         "$TURBO_ROOT$/helix/styles/src/*.css",
-        "$TURBO_ROOT$/helix/web/elements.css",
+        "$TURBO_ROOT$/helix/styled/elements.css",
         "$TURBO_ROOT$/tooling/scripts/build-frame.mjs"
       ],
       "outputs": ["public/sandbox/**"]

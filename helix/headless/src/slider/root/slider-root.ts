@@ -77,8 +77,8 @@ import { property } from 'lit/decorators.js'
  * @cssproperty --slider-marker-at - Where one marker sits, as a percentage of the track.
  * @cssproperty --slider-to - Where the filled span ends, as a percentage of the track.
  */
-@customElement('helix-base-slider')
-export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormElement)) {
+@customElement('helix-headless-slider')
+export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFormElement)) {
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
@@ -463,6 +463,6 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-slider': HelixBaseSlider
+    'helix-headless-slider': HelixHeadlessSlider
   }
 }

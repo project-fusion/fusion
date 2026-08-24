@@ -9,9 +9,9 @@ beforeAll(async () => {
 type Splitter = HTMLElement & { position: number; updateComplete: Promise<unknown> }
 
 const splitter = async (attrs = ''): Promise<Splitter> => {
-  const host = (await mount(`<helix-base-splitter ${attrs}>
+  const host = (await mount(`<helix-headless-splitter ${attrs}>
     <div slot="start">one</div><div slot="end">two</div>
-  </helix-base-splitter>`)) as Splitter
+  </helix-headless-splitter>`)) as Splitter
   await host.updateComplete
   return host
 }
@@ -143,13 +143,13 @@ const nested = async (
   outer = '',
   inner = 'orientation="vertical"',
 ): Promise<[Splitter, Splitter]> => {
-  const host = (await mount(`<helix-base-splitter ${outer}>
+  const host = (await mount(`<helix-headless-splitter ${outer}>
     <div slot="start">one</div>
-    <helix-base-splitter slot="end" ${inner}>
+    <helix-headless-splitter slot="end" ${inner}>
       <div slot="start">two</div><div slot="end">three</div>
-    </helix-base-splitter>
-  </helix-base-splitter>`)) as Splitter
-  const within = host.querySelector('helix-base-splitter') as Splitter
+    </helix-headless-splitter>
+  </helix-headless-splitter>`)) as Splitter
+  const within = host.querySelector('helix-headless-splitter') as Splitter
   await host.updateComplete
   await within.updateComplete
   await host.updateComplete
@@ -618,10 +618,10 @@ describe('a press that moves nothing', () => {
  * A splitter under a tag this package has never heard of.
  *
  * **This is the case a tag match cannot answer, and it was the fault.**
- * `findOuter` matched `'helix-splitter, helix-base-splitter'`, and only
- * `@helix-io/web` registers the first: a headless package naming a styled one
- * by string. Subclassing a base element under a third tag is exactly what this
- * tier exists to allow and exactly what `helix/web` itself does, and under one
+ * `findOuter` matched `'helix-splitter, helix-headless-splitter'`, and only
+ * `@helix-io/styled` registers the first: a headless package naming a styled one
+ * by string. Subclassing a headless element under a third tag is exactly what this
+ * tier exists to allow and exactly what `helix/styled` itself does, and under one
  * the lookup returned null, so a nested splitter simply had no corner and
  * nothing said why.
  *
@@ -631,10 +631,10 @@ describe('a press that moves nothing', () => {
  */
 describe('a splitter a consumer has subclassed', () => {
   test('still finds the one it crosses, whatever either of them is called', async () => {
-    const { HelixBaseSplitter } = await import('./splitter-root.js')
+    const { HelixHeadlessSplitter } = await import('./splitter-root.js')
     for (const tag of ['probe-splitter-outer', 'probe-splitter-inner']) {
       if (!customElements.get(tag)) {
-        customElements.define(tag, class extends HelixBaseSplitter {})
+        customElements.define(tag, class extends HelixHeadlessSplitter {})
       }
     }
     const host = (await mount(`<probe-splitter-outer>

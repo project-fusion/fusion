@@ -44,8 +44,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to close it.
  */
-@customElement('helix-base-announcement')
-export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
+@customElement('helix-headless-announcement')
+export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   /**
    * Which color the band wears.
    *
@@ -139,7 +139,7 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
         /* A plain `<button>`, the way `Menu` renders its way back and every
            other in-shadow control in the library.
 
-           It was `helix-base-icon-button`, which is the headless tier and
+           It was `helix-headless-icon-button`, which is the headless tier and
            therefore ships no CSS at all, so the `<button>` inside it kept the
            browser's own border and gray fill and the dismiss control read as a
            form button dropped into a message bar. The styled tier could not
@@ -167,6 +167,6 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-announcement': HelixBaseAnnouncement
+    'helix-headless-announcement': HelixHeadlessAnnouncement
   }
 }

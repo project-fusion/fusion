@@ -7,7 +7,7 @@ describe('timeline server output', () => {
   test('an entry ships with its mark, its line and its time', () => {
     const markup = withoutStyles(
       ssr(
-        html`<helix-base-timeline-item datetime="2026-08-19T09:12">Deployed</helix-base-timeline-item>`,
+        html`<helix-headless-timeline-item datetime="2026-08-19T09:12">Deployed</helix-headless-timeline-item>`,
       ),
     )
     expect(hasPart(markup, 'marker')).toBe(true)
@@ -20,15 +20,15 @@ describe('timeline server output', () => {
        by the list: there is nothing to work out on the client, so a record is
        complete and correctly joined up before any script runs. */
     const markup = withoutStyles(
-      ssr(html`<helix-base-timeline label="History">
-        <helix-base-timeline-item datetime="2026-08-19">Deployed</helix-base-timeline-item>
-      </helix-base-timeline>`),
+      ssr(html`<helix-headless-timeline label="History">
+        <helix-headless-timeline-item datetime="2026-08-19">Deployed</helix-headless-timeline-item>
+      </helix-headless-timeline>`),
     )
     expect(markup).toContain('Deployed')
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    const markup = ssr(html`<helix-base-timeline label="History"></helix-base-timeline>`)
-    expect(hostAttributes(markup, 'helix-base-timeline')).toEqual(['label'])
+    const markup = ssr(html`<helix-headless-timeline label="History"></helix-headless-timeline>`)
+    expect(hostAttributes(markup, 'helix-headless-timeline')).toEqual(['label'])
   })
 })

@@ -18,6 +18,12 @@ import type { HelixDeclaration, HelixManifest, HelixMember } from '@helix-io/cem
 import { displayName, startCase, tierOf } from './naming.js'
 import { place } from './reference.js'
 
+/* The headless twin's slug, and the suffix every other one carries. Named
+   because the sort and the label both ask, and a tier that has been renamed
+   once can be renamed again. */
+const HEADLESS = 'headless'
+const HEADLESS_SUFFIX = /\.headless$/
+
 export interface ApiMember {
   description: string
   name: string
@@ -88,8 +94,8 @@ export interface Example {
    * Which tier the example shows, read from what it renders.
    *
    * Off the markup rather than off the filename, the same test `check:tokens`
-   * uses to know a base example's stylesheet may write raw values: an example
-   * is a base one when it renders a `helix-base-` element. A `base.html`
+   * uses to know a headless example's stylesheet may write raw values: an example
+   * is a base one when it renders a `helix-headless-` element. A `headless.html`
    * convention would be a second place to remember, and this is the fact.
    */
   tier: 'headless' | 'styled'
@@ -259,21 +265,42 @@ const examplesOf = (
   return (
     sources
       .filter((source) => source.family === slug)
-      /* `default` first, then alphabetical by slug.
+      /* `default` first, then alphabetical, with each headless twin directly
+         behind the example it mirrors.
 
          By slug, not by filename. This used to compare `compact-counts.html`
          against `compact.html`, where `-` precedes `.` and so the longer name
          sorted first, which is a list ordered by a file extension no reader
          ever sees. The extension is not part of an example's identity:
          `compact` and `compact-counts` are what the tabs say, and `compact`
-         comes first. */
-      .sort((a, b) =>
-        a.slug === 'default' ? -1 : b.slug === 'default' ? 1 : a.slug.localeCompare(b.slug),
-      )
+         comes first.
+
+         **Pairing on the mirrored name, because sorting on the raw slug only
+         ever worked by luck.** The twin used to be called `base`, and `base`
+         sorts before every family's other examples, so it landed under
+         `default` and looked deliberate. Renaming the tier to `headless` moved
+         it to the end of the list and broke two specs that had been reading
+         that accident as the rule. What the pairing is for is that the tabs
+         show the same list on both tiers, which is what `mirrored` below is
+         computing anyway: sort on it and the position is a consequence of the
+         relationship rather than of where the tier's name falls in the
+         alphabet. */
+      .sort((a, b) => {
+        const pairOf = (slug: string) =>
+          slug === HEADLESS ? 'default' : slug.replace(HEADLESS_SUFFIX, '')
+        const twin = (slug: string) => (slug === HEADLESS || HEADLESS_SUFFIX.test(slug) ? 1 : 0)
+        const left = pairOf(a.slug)
+        const right = pairOf(b.slug)
+        if (left !== right) {
+          return left === 'default' ? -1 : right === 'default' ? 1 : left.localeCompare(right)
+        }
+        return twin(a.slug) - twin(b.slug)
+      })
       .map((source) => {
         /* Which styled example this one is the headless twin of. `base` is the
          twin of `default`, and `<name>.base` of `<name>`. */
-        const mirrored = source.slug === 'base' ? 'default' : source.slug.replace(/\.base$/, '')
+        const mirrored =
+          source.slug === HEADLESS ? 'default' : source.slug.replace(HEADLESS_SUFFIX, '')
         return {
           css: source.css,
           description: described.get(source.slug) ?? '',
@@ -281,17 +308,17 @@ const examplesOf = (
           /* The canonical example reads as "Preview": it is the component's
            headline, not a named variant sitting beside the others.
 
-           **A base example takes the name of the one it mirrors**, so the two
+           **A headless example takes the name of the one it mirrors**, so the two
            tiers show the same list rather than a list that changes its labels
-           when a reader changes a preference. `base.html` is the headless
+           when a reader changes a preference. `headless.html` is the headless
            twin of `default.html` and reads "Preview" like it; a later
-           `cards.base.html` would read "Cards". Only one of a pair is ever on
+           `cards.headless.html` would read "Cards". Only one of a pair is ever on
            screen, the tier deciding which, so there is nothing to disambiguate
            and a differing name would be the only thing suggesting they are
            different examples. */
           label: mirrored === 'default' ? 'Preview' : startCase(mirrored),
           slug: source.slug,
-          tier: (source.html.includes('<helix-base-') ? 'headless' : 'styled') as
+          tier: (source.html.includes('<helix-headless-') ? 'headless' : 'styled') as
             | 'headless'
             | 'styled',
         }

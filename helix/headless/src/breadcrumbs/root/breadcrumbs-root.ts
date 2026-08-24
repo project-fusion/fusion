@@ -67,8 +67,8 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  *
  * @csspart list - The ordered list.
  */
-@customElement('helix-base-breadcrumbs')
-export class HelixBaseBreadcrumbs extends HelixElement {
+@customElement('helix-headless-breadcrumbs')
+export class HelixHeadlessBreadcrumbs extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host through internals, so the landmark is the element itself and
@@ -88,6 +88,6 @@ export class HelixBaseBreadcrumbs extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-breadcrumbs': HelixBaseBreadcrumbs
+    'helix-headless-breadcrumbs': HelixHeadlessBreadcrumbs
   }
 }

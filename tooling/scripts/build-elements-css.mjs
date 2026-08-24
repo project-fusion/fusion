@@ -51,7 +51,7 @@ writeFileSync(
  *
  * Import once, beside the base layer, in any app that uses Helix elements:
  *
- *   import '@helix-io/web/elements.css'
+ *   import '@helix-io/styled/elements.css'
  *
  * Without it, every component renders as unstyled light-DOM content until its
  * definition loads and then snaps into place. With it, the element reserves its

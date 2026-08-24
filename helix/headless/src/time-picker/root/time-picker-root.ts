@@ -9,7 +9,7 @@ import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 /* Side-effect imports, because this renders these in its own shadow root and a
    custom element registers on import. The paths are relative, so this registers
-   the base elements and the styled file's identical imports register the styled
+   the headless elements and the styled file's identical imports register the styled
    ones; `tier` picks which names the template asks for. */
 import '../../listbox/index.js'
 import '../../option/index.js'
@@ -108,8 +108,8 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart empty - What it says when nothing matches, forwarded from the listbox.
  * @csspart option - One time in it. Carries `data-between` inside a range.
  */
-@customElement('helix-base-time-picker')
-export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) {
+@customElement('helix-headless-time-picker')
+export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormElement) {
   /**
    * Whether the current selection fails validation.
    *
@@ -561,7 +561,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderList(): TemplateResult {
@@ -601,6 +601,6 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-time-picker': HelixBaseTimePicker
+    'helix-headless-time-picker': HelixHeadlessTimePicker
   }
 }

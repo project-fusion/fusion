@@ -83,8 +83,8 @@ import '../../button/index.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when the step is pressed.
  */
-@customElement('helix-base-step')
-export class HelixBaseStep extends HelixElement {
+@customElement('helix-headless-step')
+export class HelixHeadlessStep extends HelixElement {
   /** Whether the reader has finished this stage. */
   @property({ reflect: true, type: Boolean })
   complete = false
@@ -150,7 +150,7 @@ export class HelixBaseStep extends HelixElement {
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderLabel(): TemplateResult {
@@ -192,6 +192,6 @@ export class HelixBaseStep extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-step': HelixBaseStep
+    'helix-headless-step': HelixHeadlessStep
   }
 }

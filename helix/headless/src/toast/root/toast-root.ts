@@ -41,8 +41,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart region - The stack the messages are in.
  */
-@customElement('helix-base-toast')
-export class HelixBaseToast extends HelixElement {
+@customElement('helix-headless-toast')
+export class HelixHeadlessToast extends HelixElement {
   /** Accessible name for the region, such as "Notifications". */
   @property()
   label = 'Notifications'
@@ -98,6 +98,6 @@ export class HelixBaseToast extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-toast': HelixBaseToast
+    'helix-headless-toast': HelixHeadlessToast
   }
 }

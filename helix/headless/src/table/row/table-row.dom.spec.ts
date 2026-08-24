@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 const row = async (): Promise<HTMLElement> =>
   (await mount(
-    '<helix-base-table-row><helix-base-table-cell>solid</helix-base-table-cell></helix-base-table-row>',
+    '<helix-headless-table-row><helix-headless-table-cell>solid</helix-headless-table-cell></helix-headless-table-row>',
   )) as HTMLElement
 
 /**

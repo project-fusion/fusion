@@ -76,7 +76,7 @@ const AXES = {
      that clears its target and so sits on the AA floor: headroom over 4.5 runs
      0.17 for `primary` down to zero for `success` and `warning`, against 2.70
      for `foreground`. A quieter danger has nowhere to go, so the cross product
-     `base.css` feared has one populated column and these two are values here. */
+     `headless.css` feared has one populated column and these two are values here. */
   tone: [
     'accent',
     'danger',
@@ -156,7 +156,7 @@ const seenLengths = new Set()
 const declaresAxis = new Map()
 const inGroups = new Map()
 
-for (const tier of ['headless', 'web']) {
+for (const tier of ['headless', 'styled']) {
   const manifest = JSON.parse(
     readFileSync(join(ROOT, `helix/${tier}/custom-elements.json`), 'utf8'),
   )

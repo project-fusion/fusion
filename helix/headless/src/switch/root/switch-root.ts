@@ -45,8 +45,8 @@ import { property } from 'lit/decorators.js'
  * @csspart thumb - The part that moves.
  * @csspart label - The words beside it.
  */
-@customElement('helix-base-switch')
-export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixFormElement)) {
+@customElement('helix-headless-switch')
+export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(HelixFormElement)) {
   /** Value submitted when the switch is on. */
   @property()
   value = 'on'
@@ -141,6 +141,6 @@ export class HelixBaseSwitch extends MixinControllerChecked(MixinField(HelixForm
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-switch': HelixBaseSwitch
+    'helix-headless-switch': HelixHeadlessSwitch
   }
 }

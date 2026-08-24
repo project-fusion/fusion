@@ -10,7 +10,7 @@ type Slider = HTMLElement & { value: string; updateComplete: Promise<unknown> }
 
 const slider = async (attrs = ''): Promise<Slider> => {
   const host = (await mount(
-    `<helix-base-slider label="Price" ${attrs}></helix-base-slider>`,
+    `<helix-headless-slider label="Price" ${attrs}></helix-headless-slider>`,
   )) as Slider
   await host.updateComplete
   return host

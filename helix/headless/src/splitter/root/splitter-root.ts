@@ -128,8 +128,8 @@ import { property, state } from 'lit/decorators.js'
  * @cssproperty --splitter-corner-at - Where a nested splitter crosses this one, as a percentage.
  * @cssproperty --splitter-position - Where the divider sits, as a percentage of the box.
  */
-@customElement('helix-base-splitter')
-export class HelixBaseSplitter extends HelixElement {
+@customElement('helix-headless-splitter')
+export class HelixHeadlessSplitter extends HelixElement {
   /**
    * Which way the panes are laid out.
    *
@@ -329,17 +329,17 @@ export class HelixBaseSplitter extends HelixElement {
    * Not `@state`, because the array is mutated in place. `cross` and `uncross`
    * request the update themselves.
    */
-  private crossings: Array<{ at: number; by: HelixBaseSplitter }> = []
+  private crossings: Array<{ at: number; by: HelixHeadlessSplitter }> = []
 
   /** The splitter this one is nested in, once it has found it. */
-  private outer: HelixBaseSplitter | null = null
+  private outer: HelixHeadlessSplitter | null = null
 
   /** The last position announced upward, so an unchanged one costs nothing. */
   private crossedAt: number | undefined = undefined
 
   /** The two boxes a corner drag is measured against, taken once. */
   private cornerOrigin: {
-    by: HelixBaseSplitter
+    by: HelixHeadlessSplitter
     inner: { length: number; start: number }
     outer: { length: number; start: number }
   } | null = null
@@ -662,7 +662,7 @@ export class HelixBaseSplitter extends HelixElement {
    * corner and drives them both. Nothing is read back, so neither has to know
    * anything about the other's state.
    */
-  cross(by: HelixBaseSplitter, at: number): void {
+  cross(by: HelixHeadlessSplitter, at: number): void {
     const found = this.crossings.find((crossing) => crossing.by === by)
     if (found) {
       if (found.at === at) {
@@ -676,7 +676,7 @@ export class HelixBaseSplitter extends HelixElement {
   }
 
   /** Forgets a nested splitter that has left the tree. See `cross`. */
-  uncross(by: HelixBaseSplitter): void {
+  uncross(by: HelixHeadlessSplitter): void {
     const at = this.crossings.findIndex((crossing) => crossing.by === by)
     if (at === -1) {
       return
@@ -698,10 +698,10 @@ export class HelixBaseSplitter extends HelixElement {
    *
    * **By identity rather than by tag, which `closestInstance` exists for and
    * counts this file in its own documentation.** It matched
-   * `'helix-splitter, helix-base-splitter'`, and only `@helix-io/web` registers
+   * `'helix-splitter, helix-headless-splitter'`, and only `@helix-io/styled` registers
    * the first of those: a headless package naming a styled one by string. Under
-   * any third tag, which is exactly what subclassing a base element is for and
-   * what `helix/web` itself does, the lookup returned null and a nested
+   * any third tag, which is exactly what subclassing a headless element is for and
+   * what `helix/styled` itself does, the lookup returned null and a nested
    * splitter had no corner, with no error anywhere.
    *
    * It also crosses shadow boundaries, which `closest` does not: a splitter
@@ -710,7 +710,7 @@ export class HelixBaseSplitter extends HelixElement {
    * for anything composable.
    */
   private findOuter(): void {
-    const outer = closestInstance(this.parentElement, HelixBaseSplitter)
+    const outer = closestInstance(this.parentElement, HelixHeadlessSplitter)
     if (!outer || outer === this || outer.vertical === this.vertical) {
       // Parallel dividers never meet, so there is no corner to take hold of.
       return

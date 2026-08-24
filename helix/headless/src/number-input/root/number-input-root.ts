@@ -91,8 +91,8 @@ const SCRUB_FINE = 16
  * @csspart increment-mark - The glyph on the step up control.
  * @csspart label - The name over the field, which is also the scrub grip.
  */
-@customElement('helix-base-number-input')
-export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+@customElement('helix-headless-number-input')
+export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(HelixFormElement)) {
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
@@ -576,6 +576,6 @@ const decimals = (value: number): number => {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-number-input': HelixBaseNumberInput
+    'helix-headless-number-input': HelixHeadlessNumberInput
   }
 }

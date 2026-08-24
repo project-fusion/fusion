@@ -57,16 +57,16 @@ export interface Series {
  * `[role="row"]` matches a hand-rolled grid and matches nothing at all in this
  * library's own table, and a selector of the tag matches ours and nothing
  * anybody else builds. Neither alone is the answer. */
-const ROWS = 'helix-table-row, helix-base-table-row, [role="row"]'
+const ROWS = 'helix-table-row, helix-headless-table-row, [role="row"]'
 const CELLS =
-  'helix-table-cell, helix-base-table-cell, [role="cell"], [role="gridcell"], [role="rowheader"]'
-const COLUMNS = 'helix-table-column, helix-base-table-column, [role="columnheader"]'
+  'helix-table-cell, helix-headless-table-cell, [role="cell"], [role="gridcell"], [role="rowheader"]'
+const COLUMNS = 'helix-table-column, helix-headless-table-column, [role="columnheader"]'
 
 /** Whether an element is a grid rather than a document table. */
 const isGrid = (element: Element): boolean =>
   element.getAttribute('role') === 'table' ||
   element.getAttribute('role') === 'grid' ||
-  /^helix-(base-)?table$/i.test(element.tagName)
+  /^helix-(headless-)?table$/i.test(element.tagName)
 
 /**
  * Reads a grid built from roles rather than from table markup.

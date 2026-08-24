@@ -13,13 +13,13 @@ import { hasLayout, mount, part, registerDom, type Updatable } from '@helix-io/t
  * This spec did not do it, and that is the whole of why the family could not be
  * run in a browser: measuring moved what was being measured, the two settled
  * into a 378/379 oscillation, and the loop runs on microtasks so no timer could
- * interrupt it. The base example next door has carried these two rules since it
+ * interrupt it. The headless example next door has carried these two rules since it
  * was written, which is where the shape of this came from.
  *
  * `::part()` because it is the published door into a shadow root, and a
  * document rule beats a shadow one, so nothing here is fighting the component.
  */
-const VIEWPORT = `helix-base-virtual-list::part(viewport) {
+const VIEWPORT = `helix-headless-virtual-list::part(viewport) {
   block-size: 12rem;
   overflow-y: auto;
 }`
@@ -61,9 +61,9 @@ const settle = async (host: Updatable): Promise<void> => {
 /** A list of `count` rows, with the data as JSON the way a consumer writes it. */
 const list = async (count: number, extra = ''): Promise<Updatable> => {
   const rows = Array.from({ length: count }, (_, at) => ({ name: `Row ${at + 1}` }))
-  document.body.innerHTML = `<helix-base-virtual-list for="rows" estimate="32" label="Rows" ${extra}>
+  document.body.innerHTML = `<helix-headless-virtual-list for="rows" estimate="32" label="Rows" ${extra}>
       <template><div class="row"><span data-field="name"></span></div></template>
-    </helix-base-virtual-list>
+    </helix-headless-virtual-list>
     <script id="rows" type="application/json">${JSON.stringify(rows)}</script>`
   const host = document.body.firstElementChild as Updatable
   await settle(host)
@@ -107,16 +107,16 @@ describe('virtual list', () => {
   })
 
   test('a source that is missing or malformed draws nothing rather than throwing', async () => {
-    document.body.innerHTML = `<helix-base-virtual-list for="absent" label="Rows">
+    document.body.innerHTML = `<helix-headless-virtual-list for="absent" label="Rows">
         <template><div data-field="name"></div></template>
-      </helix-base-virtual-list>`
+      </helix-headless-virtual-list>`
     const host = document.body.firstElementChild as Updatable
     await settle(host)
     expect(drawn(host)).toHaveLength(0)
 
-    document.body.innerHTML = `<helix-base-virtual-list for="bad" label="Rows">
+    document.body.innerHTML = `<helix-headless-virtual-list for="bad" label="Rows">
         <template><div data-field="name"></div></template>
-      </helix-base-virtual-list>
+      </helix-headless-virtual-list>
       <script id="bad" type="application/json">{ not json</script>`
     const broken = document.body.firstElementChild as Updatable
     await settle(broken)
@@ -136,9 +136,9 @@ if (hasLayout()) {
       /* Without them a box that scrolls for twenty rows while claiming two
          thousand gives a thumb the size of the track, and dragging it means
          nothing. The two spacers plus the drawn rows are the real length. */
-      const host = await mount(`<helix-base-virtual-list for="tall" estimate="32" label="Rows">
+      const host = await mount(`<helix-headless-virtual-list for="tall" estimate="32" label="Rows">
           <template><div style="block-size: 32px"></div></template>
-        </helix-base-virtual-list>
+        </helix-headless-virtual-list>
         <script id="tall" type="application/json">${JSON.stringify(
           Array.from({ length: 1000 }, (_, at) => ({ name: String(at) })),
         )}</script>`)

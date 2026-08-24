@@ -10,7 +10,7 @@ type Item = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
 
 const message = async (attributes = ''): Promise<Item> =>
   (await mount(
-    `<helix-base-toast-item ${attributes}>Project saved</helix-base-toast-item>`,
+    `<helix-headless-toast-item ${attributes}>Project saved</helix-headless-toast-item>`,
   )) as Item
 
 /**

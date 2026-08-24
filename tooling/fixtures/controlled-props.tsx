@@ -12,8 +12,8 @@
  * are the same kind of silent, and the second is the one that reaches a
  * consumer as "the library will not let me write correct code".
  */
-import '@helix-io/web/jsx'
-import type { HelixInput } from '@helix-io/web'
+import '@helix-io/styled/jsx'
+import type { HelixInput } from '@helix-io/styled'
 import type { Ref } from 'react'
 
 // The trap: `value` is a claim of ownership, and nothing here answers it.

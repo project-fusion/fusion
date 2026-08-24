@@ -12,15 +12,16 @@ type Playlist = HTMLElement & { active: string; updateComplete: Promise<boolean>
 
 /** The composition the menu is designed for: it sits in the player's bar. */
 const mountMenu = async (): Promise<{ menu: Menu; playlist: Playlist }> => {
-  const playlist = (await mount(`<helix-base-video-playlist default-active="one" label="Episodes">
-    <helix-base-video label="Player" slot="player">
-      <helix-base-video-playlist-menu slot="controls"></helix-base-video-playlist-menu>
-    </helix-base-video>
-    <helix-base-video-playlist-item poster="/one.jpg" src="/one.mp4" value="one">One</helix-base-video-playlist-item>
-    <helix-base-video-playlist-item poster="/two.jpg" src="/two.mp4" value="two">Two</helix-base-video-playlist-item>
-    <helix-base-video-playlist-item disabled src="/three.mp4" value="three">Three</helix-base-video-playlist-item>
-  </helix-base-video-playlist>`)) as Playlist
-  const menu = playlist.querySelector<Menu>('helix-base-video-playlist-menu')
+  const playlist =
+    (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes">
+    <helix-headless-video label="Player" slot="player">
+      <helix-headless-video-playlist-menu slot="controls"></helix-headless-video-playlist-menu>
+    </helix-headless-video>
+    <helix-headless-video-playlist-item poster="/one.jpg" src="/one.mp4" value="one">One</helix-headless-video-playlist-item>
+    <helix-headless-video-playlist-item poster="/two.jpg" src="/two.mp4" value="two">Two</helix-headless-video-playlist-item>
+    <helix-headless-video-playlist-item disabled src="/three.mp4" value="three">Three</helix-headless-video-playlist-item>
+  </helix-headless-video-playlist>`)) as Playlist
+  const menu = playlist.querySelector<Menu>('helix-headless-video-playlist-menu')
   if (!menu) {
     throw new Error('the menu did not upgrade')
   }
@@ -34,7 +35,7 @@ const mountMenu = async (): Promise<{ menu: Menu; playlist: Playlist }> => {
 
 /** The menu items the menu rendered, which are the playlist's entries. */
 const entries = (menu: Menu): HTMLElement[] => [
-  ...(menu.shadowRoot?.querySelectorAll<HTMLElement>('helix-base-menu-item') ?? []),
+  ...(menu.shadowRoot?.querySelectorAll<HTMLElement>('helix-headless-menu-item') ?? []),
 ]
 
 describe('video playlist menu', () => {
@@ -56,7 +57,7 @@ describe('video playlist menu', () => {
      * the truth. That is not a weaker test of this bug: with `controls` set
      * there is no bar, so there is no `controls` slot, and this fails. */
     const { playlist } = await mountMenu()
-    const player = playlist.querySelector('helix-base-video')
+    const player = playlist.querySelector('helix-headless-video')
     const slots = [...(player?.shadowRoot?.querySelectorAll('slot') ?? [])].map((one) => one.name)
     expect(slots).toContain('controls')
   })
@@ -156,7 +157,7 @@ describe('video playlist menu', () => {
 
   test('re-reads when an entry is added after it rendered', async () => {
     const { menu, playlist } = await mountMenu()
-    const added = document.createElement('helix-base-video-playlist-item')
+    const added = document.createElement('helix-headless-video-playlist-item')
     added.setAttribute('value', 'four')
     added.setAttribute('src', '/four.mp4')
     playlist.append(added)

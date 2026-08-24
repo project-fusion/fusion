@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Screenshots every base example and compares it to a committed baseline.
+ * Screenshots every headless example and compares it to a committed baseline.
  *
  * **The one fault class nothing else here can see.** A 233 pixel chevron, a
  * callout drawn as a black half-circle, an indicator translated through its own
@@ -10,22 +10,22 @@
  * already right. See 148.
  *
  * **The corpus was built for something else and is better for it.** Each
- * `.examples/base.html` renders one family's headless tier against
- * `base.css`, a hand-written sheet with no token, no theme and a fixed
+ * `.examples/headless.html` renders one family's headless tier against
+ * `headless.css`, a hand-written sheet with no token, no theme and a fixed
  * seven-value gray ramp. That is the determinism a screenshot comparison needs,
  * and the styled tier cannot offer it while theming is in flight: a seed change
  * would redraw all eighty-three baselines and say nothing about any component.
  *
  * **Linux only, and that is a decision rather than a limitation.** Text
  * rasterisation, subpixel antialiasing and the default font stack all differ
- * between macOS and the `ubuntu-latest` this runs on, and no base example sets
+ * between macOS and the `ubuntu-latest` this runs on, and no headless example sets
  * `font-family`, so a baseline taken here and compared there differs on nearly
  * every glyph. Rather than tune a threshold until real faults fit under it, the
  * comparison never crosses platforms: the baselines are Linux, the check runs
  * on Linux, and on anything else it says so and exits clean. To refresh them
  * from a Mac, run this in the same container CI uses.
  *
- * Baselines live beside the example they picture, `\`.examples/base.png\``, which
+ * Baselines live beside the example they picture, `\`.examples/headless.png\``, which
  * `check:examples` ignores because it reads only `.html` and `.css`.
  *
  * ```
@@ -46,7 +46,7 @@ import { chromium } from 'playwright'
 import { PNG } from 'pngjs'
 
 const root = resolve(import.meta.dirname, '../..')
-const SOURCE = join(root, 'helix/web/src')
+const SOURCE = join(root, 'helix/styled/src')
 const FRAME = join(root, 'site/ui/public/sandbox/frame.js')
 
 /* The family is the first argument that is not a flag, rather than the first
@@ -60,7 +60,7 @@ const update = args.includes('--update')
 
 if (process.platform !== 'linux') {
   console.log(
-    `visual: skipped on ${process.platform}. Baselines are Linux, because no base example sets a ` +
+    `visual: skipped on ${process.platform}. Baselines are Linux, because no headless example sets a ` +
       'font and the default stack differs by platform, so a comparison that crossed them would ' +
       'differ on nearly every glyph. CI is where this runs.',
   )
@@ -73,13 +73,17 @@ if (!existsSync(FRAME)) {
 }
 
 const families = readdirSync(SOURCE, { withFileTypes: true })
-  .filter((one) => one.isDirectory() && existsSync(join(SOURCE, one.name, '.examples/base.html')))
+  .filter(
+    (one) => one.isDirectory() && existsSync(join(SOURCE, one.name, '.examples/headless.html')),
+  )
   .map((one) => one.name)
   .filter((name) => only === undefined || name === only)
   .sort()
 
 if (families.length === 0) {
-  console.error(only ? `visual: no base example for ${only}.` : 'visual: no base examples found.')
+  console.error(
+    only ? `visual: no headless example for ${only}.` : 'visual: no headless examples found.',
+  )
   process.exit(1)
 }
 
@@ -88,7 +92,7 @@ if (families.length === 0) {
    page is assembled here rather than read from a file so nothing has to be
    written into the tree to take a picture of it. */
 const page = (family) => {
-  const html = readFileSync(join(SOURCE, family, '.examples/base.html'), 'utf8')
+  const html = readFileSync(join(SOURCE, family, '.examples/headless.html'), 'utf8')
   return (
     '<!doctype html><meta charset="utf-8"><title>base</title>' +
     /* A fixed ground and a fixed inset, so a component that draws to its own
@@ -126,7 +130,7 @@ const server = createServer((request, response) => {
   }
   const [, family, sheet] = example
   if (sheet !== undefined) {
-    const file = join(SOURCE, family, '.examples/base.css')
+    const file = join(SOURCE, family, '.examples/headless.css')
     response.writeHead(200, { 'content-type': TYPES['.css'] })
     response.end(existsSync(file) ? readFileSync(file) : '')
     return
@@ -144,7 +148,7 @@ const tab = await browser.newPage({ viewport: { height: 800, width: 640 } })
 /* Nothing leaves this machine, and that is a correctness rule rather than a
  * courtesy.
  *
- * Three base examples name assets on other people's servers: `image` and
+ * Three headless examples name assets on other people's servers: `image` and
  * `video` load a photograph from Unsplash, and `video` and `video-playlist`
  * load clips from MDN. Left open, a baseline records whatever those hosts
  * happened to return, so the check goes red the day one of them is slow, is
@@ -183,7 +187,7 @@ for (const family of families) {
   })
 
   const shot = await tab.screenshot({ fullPage: true })
-  const baseline = join(SOURCE, family, '.examples/base.png')
+  const baseline = join(SOURCE, family, '.examples/headless.png')
 
   if (update) {
     mkdirSync(dirname(baseline), { recursive: true })
@@ -232,7 +236,7 @@ for (const family of families) {
     writeFileSync(where, PNG.sync.write(diff))
     changed.push(
       `${family}: ${moved} pixels moved. The marked difference is at ` +
-        `helix/web/src/${family}/.examples/base.diff.png. If the change was meant, ` +
+        `helix/styled/src/${family}/.examples/base.diff.png. If the change was meant, ` +
         '`bun run visual:update` takes the new picture and the review is the diff on the baseline.',
     )
   }
@@ -242,7 +246,7 @@ await browser.close()
 server.close()
 
 if (changed.length > 0) {
-  console.error(`Base examples have moved (${changed.length}):\n\n  ${changed.join('\n  ')}\n`)
+  console.error(`Headless examples have moved (${changed.length}):\n\n  ${changed.join('\n  ')}\n`)
   process.exit(1)
 }
 
@@ -255,4 +259,4 @@ if (written.length > 0) {
   process.exit(0)
 }
 
-console.log(`visual: ${compared} base examples, every one pixel for pixel with its baseline`)
+console.log(`visual: ${compared} headless examples, every one pixel for pixel with its baseline`)

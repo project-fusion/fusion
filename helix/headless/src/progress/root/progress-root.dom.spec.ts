@@ -24,7 +24,7 @@ const within = (actual: number, expected: number, tolerance: number): boolean =>
 
 const progress = async (attrs = 'value="62"'): Promise<Progress> =>
   (await mount(
-    `<helix-base-progress label="Uploading" ${attrs}></helix-base-progress>`,
+    `<helix-headless-progress label="Uploading" ${attrs}></helix-headless-progress>`,
   )) as Progress
 
 describe('progress', () => {

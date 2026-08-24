@@ -42,8 +42,8 @@
  * Two things are deliberately outside it. `helix/styles` is excluded because
  * its primitives are a scale, and `check:tokens` says in as many words that a
  * rung with no reader is fine: `--_helix-neutral-500` is not dead, it is a step
- * nothing has needed yet. And `.examples/` is excluded because a base example's
- * gray palette is emitted whole for every family by `build-base-examples.mjs`,
+ * nothing has needed yet. And `.examples/` is excluded because a headless example's
+ * gray palette is emitted whole for every family by `build-headless-examples.mjs`,
  * so a family that uses four of the seven is not a fault in the example.
  *
  * Run with `bun run check:hooks` (also part of `bun run verify`).
@@ -55,7 +55,7 @@ import { extname, join } from 'node:path'
    hooks without declaring any, which is exactly the pairing that made Button's
    go missing: the declaration stayed in one tier and the rule moved to
    another. */
-const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/styles/src', 'helix/web/src']
+const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/styles/src', 'helix/styled/src']
 
 const walk = (dir, found = []) => {
   for (const entry of readdirSync(dir)) {

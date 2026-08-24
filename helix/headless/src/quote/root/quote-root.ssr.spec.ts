@@ -5,14 +5,17 @@ import '../index.js'
 
 describe('quote server output', () => {
   test('the quotation is in the served markup', () => {
-    expect(partTag(ssr(html`<helix-base-quote>said so</helix-base-quote>`), 'quote')).toContain(
-      '<q',
-    )
+    expect(
+      partTag(ssr(html`<helix-headless-quote>said so</helix-headless-quote>`), 'quote'),
+    ).toContain('<q')
   })
 
   test('the host carries nothing the consumer did not write', () => {
     expect(
-      hostAttributes(ssr(html`<helix-base-quote>x</helix-base-quote>`), 'helix-base-quote'),
+      hostAttributes(
+        ssr(html`<helix-headless-quote>x</helix-headless-quote>`),
+        'helix-headless-quote',
+      ),
     ).toEqual([])
   })
 })

@@ -3,10 +3,10 @@ import { hostAttributes, partTag, ssr, withoutStyles } from '@helix-io/testing/s
 import { html } from 'lit'
 import '../index.js'
 
-const bar = html`<helix-base-navigation label="Sections">
+const bar = html`<helix-headless-navigation label="Sections">
   <a aria-current="page" data-navigation-item href="/design">Design</a>
   <a data-navigation-item href="/mind">Mind</a>
-</helix-base-navigation>`
+</helix-headless-navigation>`
 
 describe('nav bar server output', () => {
   test('the landmark and its name are served', () => {
@@ -21,6 +21,6 @@ describe('nav bar server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(bar), 'helix-base-navigation')).toEqual(['label'])
+    expect(hostAttributes(ssr(bar), 'helix-headless-navigation')).toEqual(['label'])
   })
 })

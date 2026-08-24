@@ -47,7 +47,7 @@ what some pages need. See [Recipes](./recipes) for what the base layer provides.
 <script type="importmap">
   {
     "imports": {
-      "@helix-io/web": "/vendor/helix/web/dist/index.js",
+      "@helix-io/styled": "/vendor/helix/styled/dist/index.js",
       "@helix-io/core": "/vendor/helix/core/dist/index.js",
       "@helix-io/icons": "/vendor/helix/icons/dist/index.js",
       "lit": "/vendor/lit/index.js"
@@ -55,7 +55,7 @@ what some pages need. See [Recipes](./recipes) for what the base layer provides.
   }
 </script>
 <script type="module">
-  import '@helix-io/web'
+  import '@helix-io/styled'
 </script>
 ```
 
@@ -78,8 +78,8 @@ landing page.
 You can narrow it by importing subpaths instead:
 
 ```js
-import '@helix-io/web/button'
-import '@helix-io/web/dialog'
+import '@helix-io/styled/button'
+import '@helix-io/styled/dialog'
 ```
 
 Each still pulls its own dependencies, so this is a reduction rather than a
@@ -102,7 +102,7 @@ control](./state-and-control).
   rel="stylesheet"
 />
 <link
-  href="/vendor/helix/web/elements.css"
+  href="/vendor/helix/styled/elements.css"
   rel="stylesheet"
 />
 ```

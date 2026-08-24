@@ -171,11 +171,11 @@ if (promote !== undefined) {
  * Removes the source maps from a packed tarball, and their references with them.
  *
  * **Every map we ship is inert, measured rather than assumed.** Packed for real:
- * 1,158 maps across `@helix-io/core`, `@helix-io/headless` and `@helix-io/web`,
+ * 1,158 maps across `@helix-io/core`, `@helix-io/headless` and `@helix-io/styled`,
  * **none with `sourcesContent`, and all 1,158 naming a `sources` path that is
  * not in the tarball**. `files` is `custom-elements.json` plus `dist`, so
  * `package/src/` has no entries at all. The trade this was meant to buy, a
- * consumer stepping into `HelixBaseButton` and getting our TypeScript, was
+ * consumer stepping into `HelixHeadlessButton` and getting our TypeScript, was
  * never on offer: it is cost with nothing bought.
  *
  * **Four peers, unpacked the same day.** MUI, Base UI and Web Awesome ship zero
@@ -192,7 +192,7 @@ if (promote !== undefined) {
  *
  * **Here rather than in `tsconfig`**, because the maps work in this repository
  * and only stop working once packed: `dist/tag/root/tag-root.js.map` resolves to
- * `helix/web/src/tag/root/tag-root.ts`, which is there, and `declarationMap` is
+ * `helix/styled/src/tag/root/tag-root.ts`, which is there, and `declarationMap` is
  * what lands go-to-definition on the source for `site/ui` and every
  * cross-package import. Turning the compiler options off would strip the tarball
  * and take that with it.

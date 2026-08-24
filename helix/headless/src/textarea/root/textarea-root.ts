@@ -40,8 +40,8 @@ import { property } from 'lit/decorators.js'
  * @csspart field - The box holding the control.
  * @csspart control - The textarea itself.
  */
-@customElement('helix-base-textarea')
-export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
+@customElement('helix-headless-textarea')
+export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
@@ -276,6 +276,6 @@ export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixForm
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-textarea': HelixBaseTextarea
+    'helix-headless-textarea': HelixHeadlessTextarea
   }
 }

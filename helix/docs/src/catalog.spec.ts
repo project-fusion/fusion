@@ -34,8 +34,8 @@ const manifest: HelixManifest = {
       path: 'src/pagination/root/pagination-root.ts',
     },
     {
-      declarations: [{ name: 'HelixBasePagination', tagName: 'helix-base-pagination' }],
-      path: 'src/pagination/root/base-pagination-root.ts',
+      declarations: [{ name: 'HelixHeadlessPagination', tagName: 'helix-headless-pagination' }],
+      path: 'src/pagination/root/headless-pagination-root.ts',
     },
     {
       declarations: [{ name: 'HelixQrCode', tagName: 'helix-qr-code' }],
@@ -57,8 +57,8 @@ const examples: ExampleSource[] = [
   {
     css: 'a{}',
     family: 'pagination',
-    html: '<helix-base-pagination></helix-base-pagination>',
-    slug: 'base',
+    html: '<helix-headless-pagination></helix-headless-pagination>',
+    slug: 'headless',
   },
   { css: '', family: 'qr-code', html: '<helix-qr-code></helix-qr-code>', slug: 'default' },
 ]
@@ -82,12 +82,12 @@ describe('catalog', () => {
   test('elements are styled first, then headless', () => {
     expect(pagination?.elements.map((element) => element.tagName)).toEqual([
       'helix-pagination',
-      'helix-base-pagination',
+      'helix-headless-pagination',
     ])
     expect(pagination?.elements.map((element) => element.tier)).toEqual(['styled', 'headless'])
   })
 
-  test('a base element loses the prefix in its label', () => {
+  test('a headless element loses the prefix in its label', () => {
     expect(pagination?.elements[1]?.label).toBe('Pagination')
   })
 
@@ -122,7 +122,7 @@ describe('examples', () => {
   test('default leads, then alphabetical by slug', () => {
     expect(pagination?.examples.map((example) => example.slug)).toEqual([
       'default',
-      'base',
+      'headless',
       'compact',
       'compact-counts',
       'window',
@@ -130,7 +130,7 @@ describe('examples', () => {
   })
 
   // The canonical example is the component's headline, not a named variant,
-  // and a base example takes the name of the one it mirrors so the two tiers
+  // and a headless example takes the name of the one it mirrors so the two tiers
   // show the same list.
   test('the canonical example and its headless twin are both Preview', () => {
     expect(pagination?.examples[0]?.label).toBe('Preview')
@@ -139,7 +139,7 @@ describe('examples', () => {
   })
 
   // Off the markup rather than off the filename, the same test `check:tokens`
-  // uses to know a base example's stylesheet may write raw values.
+  // uses to know a headless example's stylesheet may write raw values.
   test('the tier comes from what the example renders', () => {
     expect(pagination?.examples.map((example) => example.tier)).toEqual([
       'styled',

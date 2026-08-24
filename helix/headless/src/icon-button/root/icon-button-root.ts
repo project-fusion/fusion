@@ -1,5 +1,5 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseButton } from '../../button/root/button-root.js'
+import { HelixHeadlessButton } from '../../button/root/button-root.js'
 
 /**
  * @summary A button whose content is an icon, and which must be named.
@@ -13,8 +13,8 @@ import { HelixBaseButton } from '../../button/root/button-root.js'
  * and having a component that says so is what makes it reviewable.
  *
  * **Registered, so it can be rendered and not only subclassed.** The styled
- * icon button extended `HelixBaseButton` directly, which left no
- * `helix-base-icon-button` for anything to use: a headless consumer wanting an
+ * icon button extended `HelixHeadlessButton` directly, which left no
+ * `helix-headless-icon-button` for anything to use: a headless consumer wanting an
  * icon button had a button and a naming convention. Anything in this tier that
  * needs one, such as an announcement's dismiss control, can now render it
  * without reaching into the styled tier for a tag that would never upgrade.
@@ -33,11 +33,11 @@ import { HelixBaseButton } from '../../button/root/button-root.js'
  *
  * @csspart button - The inner button or anchor.
  */
-@customElement('helix-base-icon-button')
-export class HelixBaseIconButton extends HelixBaseButton {}
+@customElement('helix-headless-icon-button')
+export class HelixHeadlessIconButton extends HelixHeadlessButton {}
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-icon-button': HelixBaseIconButton
+    'helix-headless-icon-button': HelixHeadlessIconButton
   }
 }

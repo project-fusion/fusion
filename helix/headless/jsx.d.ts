@@ -1,114 +1,6 @@
 import type {
   EDGES,
   Helix,
-  HelixBaseAccordion,
-  HelixBaseAccordionItem,
-  HelixBaseAnnouncement,
-  HelixBaseAppHeader,
-  HelixBaseAvatar,
-  HelixBaseAvatarGroup,
-  HelixBaseBadge,
-  HelixBaseBarChart,
-  HelixBaseBlockquote,
-  HelixBaseBreadcrumb,
-  HelixBaseBreadcrumbs,
-  HelixBaseButton,
-  HelixBaseButtonGroup,
-  HelixBaseCallout,
-  HelixBaseCard,
-  HelixBaseCarousel,
-  HelixBaseCheckbox,
-  HelixBaseCheckboxGroup,
-  HelixBaseCode,
-  HelixBaseCodeBlock,
-  HelixBaseColorInput,
-  HelixBaseColorPicker,
-  HelixBaseCombobox,
-  HelixBaseCommand,
-  HelixBaseCopyButton,
-  HelixBaseDateInput,
-  HelixBaseDatePicker,
-  HelixBaseDialog,
-  HelixBaseDivider,
-  HelixBaseDonutChart,
-  HelixBaseDrawer,
-  HelixBaseDrilldown,
-  HelixBaseDrilldownItem,
-  HelixBaseEmpty,
-  HelixBaseFileInput,
-  HelixBaseIcon,
-  HelixBaseIconButton,
-  HelixBaseImage,
-  HelixBaseInput,
-  HelixBaseKbd,
-  HelixBaseLegend,
-  HelixBaseLineChart,
-  HelixBaseList,
-  HelixBaseListItem,
-  HelixBaseListbox,
-  HelixBaseLoader,
-  HelixBaseMegamenu,
-  HelixBaseMenu,
-  HelixBaseMenuItem,
-  HelixBaseMeter,
-  HelixBaseNavigation,
-  HelixBaseNumberInput,
-  HelixBaseOption,
-  HelixBaseOptionGroup,
-  HelixBaseOutline,
-  HelixBasePagination,
-  HelixBasePaginationSize,
-  HelixBasePaginationSummary,
-  HelixBasePinInput,
-  HelixBasePopover,
-  HelixBaseProgress,
-  HelixBaseQrCode,
-  HelixBaseQuote,
-  HelixBaseRadio,
-  HelixBaseRadioGroup,
-  HelixBaseRating,
-  HelixBaseScrollArea,
-  HelixBaseSelect,
-  HelixBaseSkeleton,
-  HelixBaseSlider,
-  HelixBaseSparkline,
-  HelixBaseSpeedDial,
-  HelixBaseSpeedDialItem,
-  HelixBaseSplitter,
-  HelixBaseStat,
-  HelixBaseStatGroup,
-  HelixBaseStep,
-  HelixBaseSteps,
-  HelixBaseSwitch,
-  HelixBaseTable,
-  HelixBaseTableCell,
-  HelixBaseTableColumn,
-  HelixBaseTableRow,
-  HelixBaseTabs,
-  HelixBaseTabsPanel,
-  HelixBaseTabsTab,
-  HelixBaseTag,
-  HelixBaseTextarea,
-  HelixBaseTimeInput,
-  HelixBaseTimePicker,
-  HelixBaseTimeline,
-  HelixBaseTimelineItem,
-  HelixBaseToast,
-  HelixBaseToastItem,
-  HelixBaseToggle,
-  HelixBaseToggleGroup,
-  HelixBaseToolbar,
-  HelixBaseTooltip,
-  HelixBaseTour,
-  HelixBaseTourStop,
-  HelixBaseTree,
-  HelixBaseTreeItem,
-  HelixBaseTrend,
-  HelixBaseVideo,
-  HelixBaseVideoPlaylist,
-  HelixBaseVideoPlaylistItem,
-  HelixBaseVideoPlaylistMenu,
-  HelixBaseVirtualList,
   HelixChangeEvent,
   HelixCloseEvent,
   HelixCompleteEvent,
@@ -118,6 +10,114 @@ import type {
   HelixErrorEvent,
   HelixFilterEvent,
   HelixFormElement,
+  HelixHeadlessAccordion,
+  HelixHeadlessAccordionItem,
+  HelixHeadlessAnnouncement,
+  HelixHeadlessAppHeader,
+  HelixHeadlessAvatar,
+  HelixHeadlessAvatarGroup,
+  HelixHeadlessBadge,
+  HelixHeadlessBarChart,
+  HelixHeadlessBlockquote,
+  HelixHeadlessBreadcrumb,
+  HelixHeadlessBreadcrumbs,
+  HelixHeadlessButton,
+  HelixHeadlessButtonGroup,
+  HelixHeadlessCallout,
+  HelixHeadlessCard,
+  HelixHeadlessCarousel,
+  HelixHeadlessCheckbox,
+  HelixHeadlessCheckboxGroup,
+  HelixHeadlessCode,
+  HelixHeadlessCodeBlock,
+  HelixHeadlessColorInput,
+  HelixHeadlessColorPicker,
+  HelixHeadlessCombobox,
+  HelixHeadlessCommand,
+  HelixHeadlessCopyButton,
+  HelixHeadlessDateInput,
+  HelixHeadlessDatePicker,
+  HelixHeadlessDialog,
+  HelixHeadlessDivider,
+  HelixHeadlessDonutChart,
+  HelixHeadlessDrawer,
+  HelixHeadlessDrilldown,
+  HelixHeadlessDrilldownItem,
+  HelixHeadlessEmpty,
+  HelixHeadlessFileInput,
+  HelixHeadlessIcon,
+  HelixHeadlessIconButton,
+  HelixHeadlessImage,
+  HelixHeadlessInput,
+  HelixHeadlessKbd,
+  HelixHeadlessLegend,
+  HelixHeadlessLineChart,
+  HelixHeadlessList,
+  HelixHeadlessListItem,
+  HelixHeadlessListbox,
+  HelixHeadlessLoader,
+  HelixHeadlessMegamenu,
+  HelixHeadlessMenu,
+  HelixHeadlessMenuItem,
+  HelixHeadlessMeter,
+  HelixHeadlessNavigation,
+  HelixHeadlessNumberInput,
+  HelixHeadlessOption,
+  HelixHeadlessOptionGroup,
+  HelixHeadlessOutline,
+  HelixHeadlessPagination,
+  HelixHeadlessPaginationSize,
+  HelixHeadlessPaginationSummary,
+  HelixHeadlessPinInput,
+  HelixHeadlessPopover,
+  HelixHeadlessProgress,
+  HelixHeadlessQrCode,
+  HelixHeadlessQuote,
+  HelixHeadlessRadio,
+  HelixHeadlessRadioGroup,
+  HelixHeadlessRating,
+  HelixHeadlessScrollArea,
+  HelixHeadlessSelect,
+  HelixHeadlessSkeleton,
+  HelixHeadlessSlider,
+  HelixHeadlessSparkline,
+  HelixHeadlessSpeedDial,
+  HelixHeadlessSpeedDialItem,
+  HelixHeadlessSplitter,
+  HelixHeadlessStat,
+  HelixHeadlessStatGroup,
+  HelixHeadlessStep,
+  HelixHeadlessSteps,
+  HelixHeadlessSwitch,
+  HelixHeadlessTable,
+  HelixHeadlessTableCell,
+  HelixHeadlessTableColumn,
+  HelixHeadlessTableRow,
+  HelixHeadlessTabs,
+  HelixHeadlessTabsPanel,
+  HelixHeadlessTabsTab,
+  HelixHeadlessTag,
+  HelixHeadlessTextarea,
+  HelixHeadlessTimeInput,
+  HelixHeadlessTimePicker,
+  HelixHeadlessTimeline,
+  HelixHeadlessTimelineItem,
+  HelixHeadlessToast,
+  HelixHeadlessToastItem,
+  HelixHeadlessToggle,
+  HelixHeadlessToggleGroup,
+  HelixHeadlessToolbar,
+  HelixHeadlessTooltip,
+  HelixHeadlessTour,
+  HelixHeadlessTourStop,
+  HelixHeadlessTree,
+  HelixHeadlessTreeItem,
+  HelixHeadlessTrend,
+  HelixHeadlessVideo,
+  HelixHeadlessVideoPlaylist,
+  HelixHeadlessVideoPlaylistItem,
+  HelixHeadlessVideoPlaylistMenu,
+  HelixHeadlessVirtualList,
   HelixInputEvent,
   HelixLoadEvent,
   HelixNavigateEvent,
@@ -330,19 +330,19 @@ type BaseEvents = {
   onPaste?: (event: ClipboardEvent) => void;
 };
 
-/** `HelixBaseAccordionItem` component event */
-export type HelixBaseAccordionItemElementEvent<E = Event> = TypedEvent<
-  HelixBaseAccordionItem,
+/** `HelixHeadlessAccordionItem` component event */
+export type HelixHeadlessAccordionItemElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessAccordionItem,
   E
 >;
 /** `helix-close` event type */
-export type HelixBaseAccordionItemHelixCloseElementEvent =
-  HelixBaseAccordionItemElementEvent<HelixCloseEvent>;
+export type HelixHeadlessAccordionItemHelixCloseElementEvent =
+  HelixHeadlessAccordionItemElementEvent<HelixCloseEvent>;
 /** `helix-open` event type */
-export type HelixBaseAccordionItemHelixOpenElementEvent =
-  HelixBaseAccordionItemElementEvent<HelixOpenEvent>;
+export type HelixHeadlessAccordionItemHelixOpenElementEvent =
+  HelixHeadlessAccordionItemElementEvent<HelixOpenEvent>;
 
-export type HelixBaseAccordionItemProps = {
+export type HelixHeadlessAccordionItemProps = {
   /** Where the open indicator sits, or whether there is one.
 
 `auto` resolves to `end`, which is where a reader scanning a list of
@@ -351,7 +351,7 @@ indicator is found once at the edge rather than shifting with the text.
 `start` is for a tree-like reading, where the indicator leads the label.
 `none` is for a row that carries its own affordance and would otherwise
 have two. */
-  "chevron-placement"?: HelixBaseAccordionItem["chevronPlacement"];
+  "chevron-placement"?: HelixHeadlessAccordionItem["chevronPlacement"];
   /** Where the open indicator sits, or whether there is one.
 
 `auto` resolves to `end`, which is where a reader scanning a list of
@@ -360,7 +360,7 @@ indicator is found once at the edge rather than shifting with the text.
 `start` is for a tree-like reading, where the indicator leads the label.
 `none` is for a row that carries its own affordance and would otherwise
 have two. */
-  chevronPlacement?: HelixBaseAccordionItem["chevronPlacement"];
+  chevronPlacement?: HelixHeadlessAccordionItem["chevronPlacement"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -383,19 +383,21 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseAccordionItem["open"];
+  open?: HelixHeadlessAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseAccordionItem["defaultOpen"];
+  "default-open"?: HelixHeadlessAccordionItem["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseAccordionItem["defaultOpen"];
+  defaultOpen?: HelixHeadlessAccordionItem["defaultOpen"];
 
   /** Fired before the section closes, and cancelable. */
-  "onhelix-close"?: (e: HelixBaseAccordionItemHelixCloseElementEvent) => void;
+  "onhelix-close"?: (
+    e: HelixHeadlessAccordionItemHelixCloseElementEvent,
+  ) => void;
   /** Fired when the item opens or closes. */
-  "onhelix-open"?: (e: HelixBaseAccordionItemHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessAccordionItemHelixOpenElementEvent) => void;
 };
 
-export type HelixBaseAccordionItemSolidJsProps = {
+export type HelixHeadlessAccordionItemSolidJsProps = {
   /** Where the open indicator sits, or whether there is one.
 
 `auto` resolves to `end`, which is where a reader scanning a list of
@@ -404,7 +406,7 @@ indicator is found once at the edge rather than shifting with the text.
 `start` is for a tree-like reading, where the indicator leads the label.
 `none` is for a row that carries its own affordance and would otherwise
 have two. */
-  "attr:chevron-placement"?: HelixBaseAccordionItem["chevronPlacement"];
+  "attr:chevron-placement"?: HelixHeadlessAccordionItem["chevronPlacement"];
   /** Where the open indicator sits, or whether there is one.
 
 `auto` resolves to `end`, which is where a reader scanning a list of
@@ -413,7 +415,7 @@ indicator is found once at the edge rather than shifting with the text.
 `start` is for a tree-like reading, where the indicator leads the label.
 `none` is for a row that carries its own affordance and would otherwise
 have two. */
-  "prop:chevronPlacement"?: HelixBaseAccordionItem["chevronPlacement"];
+  "prop:chevronPlacement"?: HelixHeadlessAccordionItem["chevronPlacement"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -436,15 +438,19 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseAccordionItem["open"];
+  "prop:open"?: HelixHeadlessAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseAccordionItem["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessAccordionItem["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseAccordionItem["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessAccordionItem["defaultOpen"];
   /** Fired before the section closes, and cancelable. */
-  "on:helix-close"?: (e: HelixBaseAccordionItemHelixCloseElementEvent) => void;
+  "on:helix-close"?: (
+    e: HelixHeadlessAccordionItemHelixCloseElementEvent,
+  ) => void;
   /** Fired when the item opens or closes. */
-  "on:helix-open"?: (e: HelixBaseAccordionItemHelixOpenElementEvent) => void;
+  "on:helix-open"?: (
+    e: HelixHeadlessAccordionItemHelixOpenElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -452,7 +458,7 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-export type HelixBaseAccordionProps = {
+export type HelixHeadlessAccordionProps = {
   /** How many sections may be open at once.
 
 Absent is `multiple`, so nothing closes unexpectedly and the default costs
@@ -461,10 +467,10 @@ close the last; `single-collapsible` keeps at most one and lets it close.
 
 A union rather than a mode plus a `collapsible` boolean, which would make
 `collapsible` alongside `multiple` expressible and meaningless. */
-  mode?: HelixBaseAccordion["mode"];
+  mode?: HelixHeadlessAccordion["mode"];
 };
 
-export type HelixBaseAccordionSolidJsProps = {
+export type HelixHeadlessAccordionSolidJsProps = {
   /** How many sections may be open at once.
 
 Absent is `multiple`, so nothing closes unexpectedly and the default costs
@@ -473,7 +479,7 @@ close the last; `single-collapsible` keeps at most one and lets it close.
 
 A union rather than a mode plus a `collapsible` boolean, which would make
 `collapsible` alongside `multiple` expressible and meaningless. */
-  "prop:mode"?: HelixBaseAccordion["mode"];
+  "prop:mode"?: HelixHeadlessAccordion["mode"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -481,16 +487,16 @@ A union rather than a mode plus a `collapsible` boolean, which would make
   textContent?: string | number;
 };
 
-/** `HelixBaseAnnouncement` component event */
-export type HelixBaseAnnouncementElementEvent<E = Event> = TypedEvent<
-  HelixBaseAnnouncement,
+/** `HelixHeadlessAnnouncement` component event */
+export type HelixHeadlessAnnouncementElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessAnnouncement,
   E
 >;
 /** `helix-dismiss` event type */
-export type HelixBaseAnnouncementHelixDismissElementEvent =
-  HelixBaseAnnouncementElementEvent<HelixDismissEvent>;
+export type HelixHeadlessAnnouncementHelixDismissElementEvent =
+  HelixHeadlessAnnouncementElementEvent<HelixDismissEvent>;
 
-export type HelixBaseAnnouncementProps = {
+export type HelixHeadlessAnnouncementProps = {
   /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
@@ -512,31 +518,31 @@ so a consumer can put a band back to it from markup, and `surface` is the
 one value that is not a color: it lifts the band onto the surface step
 instead of the sunken one, for a strip carrying something that is not a
 state at all. */
-  tone?: HelixBaseAnnouncement["tone"];
+  tone?: HelixHeadlessAnnouncement["tone"];
   /** Whether it offers a control to take it away. */
-  dismissible?: HelixBaseAnnouncement["dismissible"];
+  dismissible?: HelixHeadlessAnnouncement["dismissible"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  "dismiss-label"?: HelixBaseAnnouncement["dismissLabel"];
+  "dismiss-label"?: HelixHeadlessAnnouncement["dismissLabel"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  dismissLabel?: HelixBaseAnnouncement["dismissLabel"];
+  dismissLabel?: HelixHeadlessAnnouncement["dismissLabel"];
 
   /** Fired when the reader asks to close it. */
   "onhelix-dismiss"?: (
-    e: HelixBaseAnnouncementHelixDismissElementEvent,
+    e: HelixHeadlessAnnouncementHelixDismissElementEvent,
   ) => void;
 };
 
-export type HelixBaseAnnouncementSolidJsProps = {
+export type HelixHeadlessAnnouncementSolidJsProps = {
   /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
@@ -558,26 +564,26 @@ so a consumer can put a band back to it from markup, and `surface` is the
 one value that is not a color: it lifts the band onto the surface step
 instead of the sunken one, for a strip carrying something that is not a
 state at all. */
-  "prop:tone"?: HelixBaseAnnouncement["tone"];
+  "prop:tone"?: HelixHeadlessAnnouncement["tone"];
   /** Whether it offers a control to take it away. */
-  "prop:dismissible"?: HelixBaseAnnouncement["dismissible"];
+  "prop:dismissible"?: HelixHeadlessAnnouncement["dismissible"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  "attr:dismiss-label"?: HelixBaseAnnouncement["dismissLabel"];
+  "attr:dismiss-label"?: HelixHeadlessAnnouncement["dismissLabel"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  "prop:dismissLabel"?: HelixBaseAnnouncement["dismissLabel"];
+  "prop:dismissLabel"?: HelixHeadlessAnnouncement["dismissLabel"];
   /** Fired when the reader asks to close it. */
   "on:helix-dismiss"?: (
-    e: HelixBaseAnnouncementHelixDismissElementEvent,
+    e: HelixHeadlessAnnouncementHelixDismissElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -586,7 +592,7 @@ would catch. */
   textContent?: string | number;
 };
 
-export type HelixBaseAppHeaderProps = {
+export type HelixHeadlessAppHeaderProps = {
   /** Where the middle region sits in the bar.
 
 Centered by default, which reads as the site's spine when the navigation is
@@ -603,7 +609,7 @@ middle slot takes whatever a consumer puts there, a search field or a
 breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
-  "content-align"?: HelixBaseAppHeader["contentAlign"];
+  "content-align"?: HelixHeadlessAppHeader["contentAlign"];
   /** Where the middle region sits in the bar.
 
 Centered by default, which reads as the site's spine when the navigation is
@@ -620,10 +626,10 @@ middle slot takes whatever a consumer puts there, a search field or a
 breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
-  contentAlign?: HelixBaseAppHeader["contentAlign"];
+  contentAlign?: HelixHeadlessAppHeader["contentAlign"];
 };
 
-export type HelixBaseAppHeaderSolidJsProps = {
+export type HelixHeadlessAppHeaderSolidJsProps = {
   /** Where the middle region sits in the bar.
 
 Centered by default, which reads as the site's spine when the navigation is
@@ -640,7 +646,7 @@ middle slot takes whatever a consumer puts there, a search field or a
 breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
-  "attr:content-align"?: HelixBaseAppHeader["contentAlign"];
+  "attr:content-align"?: HelixHeadlessAppHeader["contentAlign"];
   /** Where the middle region sits in the bar.
 
 Centered by default, which reads as the site's spine when the navigation is
@@ -657,7 +663,7 @@ middle slot takes whatever a consumer puts there, a search field or a
 breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
-  "prop:contentAlign"?: HelixBaseAppHeader["contentAlign"];
+  "prop:contentAlign"?: HelixHeadlessAppHeader["contentAlign"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -665,24 +671,24 @@ box would have been setting `nav-align` to do it. The part is called
   textContent?: string | number;
 };
 
-export type HelixBaseAvatarGroupProps = {
+export type HelixHeadlessAvatarGroupProps = {
   /** Accessible name for the set, such as "Reviewers". */
-  label?: HelixBaseAvatarGroup["label"];
+  label?: HelixHeadlessAvatarGroup["label"];
   /** How many avatars are shown before the rest become a count.
 
 Zero or less shows all of them, which is what an unset limit means and is
 more useful than refusing to render. */
-  max?: HelixBaseAvatarGroup["max"];
+  max?: HelixHeadlessAvatarGroup["max"];
 };
 
-export type HelixBaseAvatarGroupSolidJsProps = {
+export type HelixHeadlessAvatarGroupSolidJsProps = {
   /** Accessible name for the set, such as "Reviewers". */
-  "prop:label"?: HelixBaseAvatarGroup["label"];
+  "prop:label"?: HelixHeadlessAvatarGroup["label"];
   /** How many avatars are shown before the rest become a count.
 
 Zero or less shows all of them, which is what an unset limit means and is
 more useful than refusing to render. */
-  "prop:max"?: HelixBaseAvatarGroup["max"];
+  "prop:max"?: HelixHeadlessAvatarGroup["max"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -690,33 +696,33 @@ more useful than refusing to render. */
   textContent?: string | number;
 };
 
-/** `HelixBaseAvatar` component event */
-export type HelixBaseAvatarElementEvent<E = Event> = TypedEvent<
-  HelixBaseAvatar,
+/** `HelixHeadlessAvatar` component event */
+export type HelixHeadlessAvatarElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessAvatar,
   E
 >;
 
-export type HelixBaseAvatarProps = {
+export type HelixHeadlessAvatarProps = {
   /** Image to show. Falls back to the slot, or to initials, if it fails. */
-  src?: HelixBaseAvatar["src"];
+  src?: HelixHeadlessAvatar["src"];
   /** Name of the person or entity. Used for the label and the initials. */
-  name?: HelixBaseAvatar["name"];
+  name?: HelixHeadlessAvatar["name"];
 
   /** Relayed from the image once it has loaded. */
-  onload?: (e: HelixBaseAvatarElementEvent) => void;
+  onload?: (e: HelixHeadlessAvatarElementEvent) => void;
   /** Relayed from the image when it fails. */
-  onerror?: (e: HelixBaseAvatarElementEvent) => void;
+  onerror?: (e: HelixHeadlessAvatarElementEvent) => void;
 };
 
-export type HelixBaseAvatarSolidJsProps = {
+export type HelixHeadlessAvatarSolidJsProps = {
   /** Image to show. Falls back to the slot, or to initials, if it fails. */
-  "prop:src"?: HelixBaseAvatar["src"];
+  "prop:src"?: HelixHeadlessAvatar["src"];
   /** Name of the person or entity. Used for the label and the initials. */
-  "prop:name"?: HelixBaseAvatar["name"];
+  "prop:name"?: HelixHeadlessAvatar["name"];
   /** Relayed from the image once it has loaded. */
-  "on:load"?: (e: HelixBaseAvatarElementEvent) => void;
+  "on:load"?: (e: HelixHeadlessAvatarElementEvent) => void;
   /** Relayed from the image when it fails. */
-  "on:error"?: (e: HelixBaseAvatarElementEvent) => void;
+  "on:error"?: (e: HelixHeadlessAvatarElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -724,22 +730,22 @@ export type HelixBaseAvatarSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseBadgeProps = {
+export type HelixHeadlessBadgeProps = {
   /** The count or short text to show. Absent shows a dot, zero shows nothing. */
-  value?: HelixBaseBadge["value"];
+  value?: HelixHeadlessBadge["value"];
   /** Cap for a numeric value. Past it the indicator reads `{max}+`. */
-  max?: HelixBaseBadge["max"];
+  max?: HelixHeadlessBadge["max"];
   /** Accessible name. Required for a dot, which has no text to read. */
-  label?: HelixBaseBadge["label"];
+  label?: HelixHeadlessBadge["label"];
 };
 
-export type HelixBaseBadgeSolidJsProps = {
+export type HelixHeadlessBadgeSolidJsProps = {
   /** The count or short text to show. Absent shows a dot, zero shows nothing. */
-  "prop:value"?: HelixBaseBadge["value"];
+  "prop:value"?: HelixHeadlessBadge["value"];
   /** Cap for a numeric value. Past it the indicator reads `{max}+`. */
-  "prop:max"?: HelixBaseBadge["max"];
+  "prop:max"?: HelixHeadlessBadge["max"];
   /** Accessible name. Required for a dot, which has no text to read. */
-  "prop:label"?: HelixBaseBadge["label"];
+  "prop:label"?: HelixHeadlessBadge["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -747,14 +753,14 @@ export type HelixBaseBadgeSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseBarChartProps = {
+export type HelixHeadlessBarChartProps = {
   /** Whether the categories run down the side rather than along the bottom.
 
 Absent is columns. `horizontal` is the one to reach for when the category
 names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
-  direction?: HelixBaseBarChart["direction"];
+  direction?: HelixHeadlessBarChart["direction"];
   /** Which rules are drawn across the plot, if any.
 
 Absent draws none. `value` rules the axis the columns are *measured* on,
@@ -774,7 +780,7 @@ of many thin bars, where the eye has stopped counting.
 
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
-  gridlines?: HelixBaseBarChart["gridlines"];
+  gridlines?: HelixHeadlessBarChart["gridlines"];
   /** Which series are drawn as a line instead of as columns, by name.
 
 Space separated, matched against the column headings the table gives, so a
@@ -795,7 +801,7 @@ A line among columns still measures from zero, because the columns do and
 they share the axis. That is the trade for comparability, and it is why
 this is a bar chart that can carry a line rather than a line chart that can
 carry columns. */
-  lines?: HelixBaseBarChart["lines"];
+  lines?: HelixHeadlessBarChart["lines"];
   /** Which series are measured against a scale of their own, by name.
 
 Space separated and matched the way `lines` is, against the column headings
@@ -821,7 +827,7 @@ The grid stays on the primary axis, since a rule measured against two
 scales at once is a rule that means nothing. The tooltip is unaffected: it
 has always shown every column's own number, which is the reader's way out
 of any scale question the picture raises. */
-  secondary?: HelixBaseBarChart["secondary"];
+  secondary?: HelixHeadlessBarChart["secondary"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -830,22 +836,22 @@ shadow root names a table in that root rather than in the document. A
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  for?: HelixBaseBarChart["for"];
+  for?: HelixHeadlessBarChart["for"];
   /** The drawing's name, for a pointer resting on it.
 
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
-  label?: HelixBaseBarChart["label"];
+  label?: HelixHeadlessBarChart["label"];
 };
 
-export type HelixBaseBarChartSolidJsProps = {
+export type HelixHeadlessBarChartSolidJsProps = {
   /** Whether the categories run down the side rather than along the bottom.
 
 Absent is columns. `horizontal` is the one to reach for when the category
 names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
-  "prop:direction"?: HelixBaseBarChart["direction"];
+  "prop:direction"?: HelixHeadlessBarChart["direction"];
   /** Which rules are drawn across the plot, if any.
 
 Absent draws none. `value` rules the axis the columns are *measured* on,
@@ -865,7 +871,7 @@ of many thin bars, where the eye has stopped counting.
 
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
-  "prop:gridlines"?: HelixBaseBarChart["gridlines"];
+  "prop:gridlines"?: HelixHeadlessBarChart["gridlines"];
   /** Which series are drawn as a line instead of as columns, by name.
 
 Space separated, matched against the column headings the table gives, so a
@@ -886,7 +892,7 @@ A line among columns still measures from zero, because the columns do and
 they share the axis. That is the trade for comparability, and it is why
 this is a bar chart that can carry a line rather than a line chart that can
 carry columns. */
-  "prop:lines"?: HelixBaseBarChart["lines"];
+  "prop:lines"?: HelixHeadlessBarChart["lines"];
   /** Which series are measured against a scale of their own, by name.
 
 Space separated and matched the way `lines` is, against the column headings
@@ -912,7 +918,7 @@ The grid stays on the primary axis, since a rule measured against two
 scales at once is a rule that means nothing. The tooltip is unaffected: it
 has always shown every column's own number, which is the reader's way out
 of any scale question the picture raises. */
-  "prop:secondary"?: HelixBaseBarChart["secondary"];
+  "prop:secondary"?: HelixHeadlessBarChart["secondary"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -921,12 +927,12 @@ shadow root names a table in that root rather than in the document. A
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  "prop:for"?: HelixBaseBarChart["for"];
+  "prop:for"?: HelixHeadlessBarChart["for"];
   /** The drawing's name, for a pointer resting on it.
 
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
-  "prop:label"?: HelixBaseBarChart["label"];
+  "prop:label"?: HelixHeadlessBarChart["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -934,14 +940,14 @@ words and is already written. */
   textContent?: string | number;
 };
 
-export type HelixBaseBlockquoteProps = {
+export type HelixHeadlessBlockquoteProps = {
   /** URL identifying where the passage came from. */
-  cite?: HelixBaseBlockquote["cite"];
+  cite?: HelixHeadlessBlockquote["cite"];
 };
 
-export type HelixBaseBlockquoteSolidJsProps = {
+export type HelixHeadlessBlockquoteSolidJsProps = {
   /** URL identifying where the passage came from. */
-  "prop:cite"?: HelixBaseBlockquote["cite"];
+  "prop:cite"?: HelixHeadlessBlockquote["cite"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -949,34 +955,34 @@ export type HelixBaseBlockquoteSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseBreadcrumbProps = {
+export type HelixHeadlessBreadcrumbProps = {
   /** Whether this item is the page the reader is on. */
-  current?: HelixBaseBreadcrumb["current"];
+  current?: HelixHeadlessBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
 
 Empty rather than optional and unreflected: an `href` written onto every
 host would be a link to the current page on every crumb nobody asked to be
 one, and nothing selects on it. */
-  href?: HelixBaseBreadcrumb["href"];
+  href?: HelixHeadlessBreadcrumb["href"];
   /** Where the link opens, for the rare crumb that leaves the site. */
-  target?: HelixBaseBreadcrumb["target"];
+  target?: HelixHeadlessBreadcrumb["target"];
   /** What the link declares about where it goes. The consumer's decision. */
-  rel?: HelixBaseBreadcrumb["rel"];
+  rel?: HelixHeadlessBreadcrumb["rel"];
 };
 
-export type HelixBaseBreadcrumbSolidJsProps = {
+export type HelixHeadlessBreadcrumbSolidJsProps = {
   /** Whether this item is the page the reader is on. */
-  "prop:current"?: HelixBaseBreadcrumb["current"];
+  "prop:current"?: HelixHeadlessBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
 
 Empty rather than optional and unreflected: an `href` written onto every
 host would be a link to the current page on every crumb nobody asked to be
 one, and nothing selects on it. */
-  "prop:href"?: HelixBaseBreadcrumb["href"];
+  "prop:href"?: HelixHeadlessBreadcrumb["href"];
   /** Where the link opens, for the rare crumb that leaves the site. */
-  "prop:target"?: HelixBaseBreadcrumb["target"];
+  "prop:target"?: HelixHeadlessBreadcrumb["target"];
   /** What the link declares about where it goes. The consumer's decision. */
-  "prop:rel"?: HelixBaseBreadcrumb["rel"];
+  "prop:rel"?: HelixHeadlessBreadcrumb["rel"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -984,29 +990,29 @@ one, and nothing selects on it. */
   textContent?: string | number;
 };
 
-export type HelixBaseBreadcrumbsProps = {};
+export type HelixHeadlessBreadcrumbsProps = {};
 
-export type HelixBaseBreadcrumbsSolidJsProps = {
+export type HelixHeadlessBreadcrumbsSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
   textContent?: string | number;
 };
 
-export type HelixBaseButtonGroupProps = {
+export type HelixHeadlessButtonGroupProps = {
   /** Accessible name for the group.
 
 On the host through internals, so an author's `aria-label` still overrides
 it and nothing lands on the host that a consumer's markup did not have. */
-  label?: HelixBaseButtonGroup["label"];
+  label?: HelixHeadlessButtonGroup["label"];
 };
 
-export type HelixBaseButtonGroupSolidJsProps = {
+export type HelixHeadlessButtonGroupSolidJsProps = {
   /** Accessible name for the group.
 
 On the host through internals, so an author's `aria-label` still overrides
 it and nothing lands on the host that a consumer's markup did not have. */
-  "prop:label"?: HelixBaseButtonGroup["label"];
+  "prop:label"?: HelixHeadlessButtonGroup["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1014,15 +1020,15 @@ it and nothing lands on the host that a consumer's markup did not have. */
   textContent?: string | number;
 };
 
-export type HelixBaseButtonProps = {
+export type HelixHeadlessButtonProps = {
   /** What activating the button does to its form. */
-  type?: HelixBaseButton["type"];
+  type?: HelixHeadlessButton["type"];
   /** Accessible name, for a button whose content is not text.
 
 Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
-  label?: HelixBaseButton["label"];
+  label?: HelixHeadlessButton["label"];
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -1038,11 +1044,11 @@ the same way `label` becomes `aria-label` in there.
 `commandFor` spells its attribute out, because Lit lowercases a property
 name to derive one rather than dash-casing it, and what a consumer writes
 is the platform's `commandfor`. */
-  command?: HelixBaseButton["command"];
+  command?: HelixHeadlessButton["command"];
   /** The id of the element the command is sent to. */
-  commandfor?: HelixBaseButton["commandFor"];
+  commandfor?: HelixHeadlessButton["commandFor"];
   /** The id of the element the command is sent to. */
-  commandFor?: HelixBaseButton["commandFor"];
+  commandFor?: HelixHeadlessButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1053,7 +1059,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseButton["disabled"];
+  disabled?: HelixHeadlessButton["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1071,7 +1077,7 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseButton["name"];
+  name?: HelixHeadlessButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -1082,18 +1088,18 @@ and the stop lands on the inner control inside the shadow root.
 
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
-  focusable?: HelixBaseButton["focusable"];
+  focusable?: HelixHeadlessButton["focusable"];
 };
 
-export type HelixBaseButtonSolidJsProps = {
+export type HelixHeadlessButtonSolidJsProps = {
   /** What activating the button does to its form. */
-  "prop:type"?: HelixBaseButton["type"];
+  "prop:type"?: HelixHeadlessButton["type"];
   /** Accessible name, for a button whose content is not text.
 
 Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
-  "prop:label"?: HelixBaseButton["label"];
+  "prop:label"?: HelixHeadlessButton["label"];
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -1109,11 +1115,11 @@ the same way `label` becomes `aria-label` in there.
 `commandFor` spells its attribute out, because Lit lowercases a property
 name to derive one rather than dash-casing it, and what a consumer writes
 is the platform's `commandfor`. */
-  "prop:command"?: HelixBaseButton["command"];
+  "prop:command"?: HelixHeadlessButton["command"];
   /** The id of the element the command is sent to. */
-  "attr:commandfor"?: HelixBaseButton["commandFor"];
+  "attr:commandfor"?: HelixHeadlessButton["commandFor"];
   /** The id of the element the command is sent to. */
-  "prop:commandFor"?: HelixBaseButton["commandFor"];
+  "prop:commandFor"?: HelixHeadlessButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1124,7 +1130,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseButton["disabled"];
+  "prop:disabled"?: HelixHeadlessButton["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1142,7 +1148,7 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseButton["name"];
+  "prop:name"?: HelixHeadlessButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -1153,7 +1159,7 @@ and the stop lands on the inner control inside the shadow root.
 
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
-  "prop:focusable"?: HelixBaseButton["focusable"];
+  "prop:focusable"?: HelixHeadlessButton["focusable"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1161,7 +1167,7 @@ anything a consumer sets. */
   textContent?: string | number;
 };
 
-export type HelixBaseCalloutProps = {
+export type HelixHeadlessCalloutProps = {
   /** What kind of attention the passage needs.
 
 **`severity` was a sixth spelling of `tone`**, which is the axis for what a
@@ -1169,10 +1175,10 @@ thing means, and a subset of it: a callout reports a status and never a
 brand role, so it takes four of the seven. One word per axis is the whole
 of the registry, and two words for one axis is how `tone` had drifted into
 five incompatible value sets before anything held it. */
-  tone?: HelixBaseCallout["tone"];
+  tone?: HelixHeadlessCallout["tone"];
 };
 
-export type HelixBaseCalloutSolidJsProps = {
+export type HelixHeadlessCalloutSolidJsProps = {
   /** What kind of attention the passage needs.
 
 **`severity` was a sixth spelling of `tone`**, which is the axis for what a
@@ -1180,7 +1186,7 @@ thing means, and a subset of it: a callout reports a status and never a
 brand role, so it takes four of the seven. One word per axis is the whole
 of the registry, and two words for one axis is how `tone` had drifted into
 five incompatible value sets before anything held it. */
-  "prop:tone"?: HelixBaseCallout["tone"];
+  "prop:tone"?: HelixHeadlessCallout["tone"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1188,7 +1194,7 @@ five incompatible value sets before anything held it. */
   textContent?: string | number;
 };
 
-export type HelixBaseCardProps = {
+export type HelixHeadlessCardProps = {
   /** Puts the media after the content instead of before it.
 
 **A figure that concludes a card is the same region as one that opens it**,
@@ -1200,7 +1206,7 @@ twice what this says once.
 
 Reflected and undefaulted, so a card that has not asked reads as a card
 with no attribute on it and the stylesheet only describes the departure. */
-  "media-placement"?: HelixBaseCard["mediaPlacement"];
+  "media-placement"?: HelixHeadlessCard["mediaPlacement"];
   /** Puts the media after the content instead of before it.
 
 **A figure that concludes a card is the same region as one that opens it**,
@@ -1212,10 +1218,10 @@ twice what this says once.
 
 Reflected and undefaulted, so a card that has not asked reads as a card
 with no attribute on it and the stylesheet only describes the departure. */
-  mediaPlacement?: HelixBaseCard["mediaPlacement"];
+  mediaPlacement?: HelixHeadlessCard["mediaPlacement"];
 };
 
-export type HelixBaseCardSolidJsProps = {
+export type HelixHeadlessCardSolidJsProps = {
   /** Puts the media after the content instead of before it.
 
 **A figure that concludes a card is the same region as one that opens it**,
@@ -1227,7 +1233,7 @@ twice what this says once.
 
 Reflected and undefaulted, so a card that has not asked reads as a card
 with no attribute on it and the stylesheet only describes the departure. */
-  "attr:media-placement"?: HelixBaseCard["mediaPlacement"];
+  "attr:media-placement"?: HelixHeadlessCard["mediaPlacement"];
   /** Puts the media after the content instead of before it.
 
 **A figure that concludes a card is the same region as one that opens it**,
@@ -1239,7 +1245,7 @@ twice what this says once.
 
 Reflected and undefaulted, so a card that has not asked reads as a card
 with no attribute on it and the stylesheet only describes the departure. */
-  "prop:mediaPlacement"?: HelixBaseCard["mediaPlacement"];
+  "prop:mediaPlacement"?: HelixHeadlessCard["mediaPlacement"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1247,18 +1253,18 @@ with no attribute on it and the stylesheet only describes the departure. */
   textContent?: string | number;
 };
 
-/** `HelixBaseCarousel` component event */
-export type HelixBaseCarouselElementEvent<E = Event> = TypedEvent<
-  HelixBaseCarousel,
+/** `HelixHeadlessCarousel` component event */
+export type HelixHeadlessCarouselElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessCarousel,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseCarouselHelixSelectElementEvent =
-  HelixBaseCarouselElementEvent<HelixSelectEvent>;
+export type HelixHeadlessCarouselHelixSelectElementEvent =
+  HelixHeadlessCarouselElementEvent<HelixSelectEvent>;
 
-export type HelixBaseCarouselProps = {
+export type HelixHeadlessCarouselProps = {
   /** Accessible name for the carousel. */
-  label?: HelixBaseCarousel["label"];
+  label?: HelixHeadlessCarousel["label"];
   /** The slide in view, counted from zero.
 
 Reading gives the real slide, in either mode. Writing sets it, the way a
@@ -1272,7 +1278,7 @@ The same contract the four mixins carry, written out here rather than
 extracted, because a slide is addressed by position and every one of those
 mixins is keyed by a name. One consumer is not a mixin: if a second numeric
 state turns up, this is what it is extracted from. */
-  index?: HelixBaseCarousel["index"];
+  index?: HelixHeadlessCarousel["index"];
   /** Which way the track runs.
 
 Behavior rather than presentation, which is why it is here: the scroll
@@ -1285,17 +1291,17 @@ A vertical track needs a height, which a horizontal one does not: width
 comes from the page and height does not, so the styled tier gives it
 `--carousel-block-size` and a consumer sets that to whatever the slides
 want. */
-  orientation?: HelixBaseCarousel["orientation"];
+  orientation?: HelixHeadlessCarousel["orientation"];
   /** Slide to start on, where nothing declared one. */
-  "default-index"?: HelixBaseCarousel["defaultIndex"];
+  "default-index"?: HelixHeadlessCarousel["defaultIndex"];
   /** Slide to start on, where nothing declared one. */
-  defaultIndex?: HelixBaseCarousel["defaultIndex"];
+  defaultIndex?: HelixHeadlessCarousel["defaultIndex"];
   /** Whether moving past either end wraps to the other. */
-  loop?: HelixBaseCarousel["loop"];
+  loop?: HelixHeadlessCarousel["loop"];
   /** Whether the carousel advances on its own. */
-  autoplay?: HelixBaseCarousel["autoplay"];
+  autoplay?: HelixHeadlessCarousel["autoplay"];
   /** How long each slide is held, in milliseconds. */
-  interval?: HelixBaseCarousel["interval"];
+  interval?: HelixHeadlessCarousel["interval"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 **Here rather than on the styled tier, because it decides how many places
@@ -1312,7 +1318,7 @@ No default, because it reflects. A reflected property with a value writes
 its attribute on upgrade, and the host then carries something a consumer's
 server markup never had, which React reports as a mismatch. The one-across
 case is the absent attribute, and the styles read it that way. */
-  "per-view"?: HelixBaseCarousel["perView"];
+  "per-view"?: HelixHeadlessCarousel["perView"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 **Here rather than on the styled tier, because it decides how many places
@@ -1329,15 +1335,15 @@ No default, because it reflects. A reflected property with a value writes
 its attribute on upgrade, and the host then carries something a consumer's
 server markup never had, which React reports as a mismatch. The one-across
 case is the absent attribute, and the styles read it that way. */
-  perView?: HelixBaseCarousel["perView"];
+  perView?: HelixHeadlessCarousel["perView"];
 
   /** Fired when the slide in view changes, with its index. */
-  "onhelix-select"?: (e: HelixBaseCarouselHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessCarouselHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseCarouselSolidJsProps = {
+export type HelixHeadlessCarouselSolidJsProps = {
   /** Accessible name for the carousel. */
-  "prop:label"?: HelixBaseCarousel["label"];
+  "prop:label"?: HelixHeadlessCarousel["label"];
   /** The slide in view, counted from zero.
 
 Reading gives the real slide, in either mode. Writing sets it, the way a
@@ -1351,7 +1357,7 @@ The same contract the four mixins carry, written out here rather than
 extracted, because a slide is addressed by position and every one of those
 mixins is keyed by a name. One consumer is not a mixin: if a second numeric
 state turns up, this is what it is extracted from. */
-  "prop:index"?: HelixBaseCarousel["index"];
+  "prop:index"?: HelixHeadlessCarousel["index"];
   /** Which way the track runs.
 
 Behavior rather than presentation, which is why it is here: the scroll
@@ -1364,17 +1370,17 @@ A vertical track needs a height, which a horizontal one does not: width
 comes from the page and height does not, so the styled tier gives it
 `--carousel-block-size` and a consumer sets that to whatever the slides
 want. */
-  "prop:orientation"?: HelixBaseCarousel["orientation"];
+  "prop:orientation"?: HelixHeadlessCarousel["orientation"];
   /** Slide to start on, where nothing declared one. */
-  "attr:default-index"?: HelixBaseCarousel["defaultIndex"];
+  "attr:default-index"?: HelixHeadlessCarousel["defaultIndex"];
   /** Slide to start on, where nothing declared one. */
-  "prop:defaultIndex"?: HelixBaseCarousel["defaultIndex"];
+  "prop:defaultIndex"?: HelixHeadlessCarousel["defaultIndex"];
   /** Whether moving past either end wraps to the other. */
-  "prop:loop"?: HelixBaseCarousel["loop"];
+  "prop:loop"?: HelixHeadlessCarousel["loop"];
   /** Whether the carousel advances on its own. */
-  "prop:autoplay"?: HelixBaseCarousel["autoplay"];
+  "prop:autoplay"?: HelixHeadlessCarousel["autoplay"];
   /** How long each slide is held, in milliseconds. */
-  "prop:interval"?: HelixBaseCarousel["interval"];
+  "prop:interval"?: HelixHeadlessCarousel["interval"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 **Here rather than on the styled tier, because it decides how many places
@@ -1391,7 +1397,7 @@ No default, because it reflects. A reflected property with a value writes
 its attribute on upgrade, and the host then carries something a consumer's
 server markup never had, which React reports as a mismatch. The one-across
 case is the absent attribute, and the styles read it that way. */
-  "attr:per-view"?: HelixBaseCarousel["perView"];
+  "attr:per-view"?: HelixHeadlessCarousel["perView"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 **Here rather than on the styled tier, because it decides how many places
@@ -1408,9 +1414,9 @@ No default, because it reflects. A reflected property with a value writes
 its attribute on upgrade, and the host then carries something a consumer's
 server markup never had, which React reports as a mismatch. The one-across
 case is the absent attribute, and the styles read it that way. */
-  "prop:perView"?: HelixBaseCarousel["perView"];
+  "prop:perView"?: HelixHeadlessCarousel["perView"];
   /** Fired when the slide in view changes, with its index. */
-  "on:helix-select"?: (e: HelixBaseCarouselHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessCarouselHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1418,26 +1424,26 @@ case is the absent attribute, and the styles read it that way. */
   textContent?: string | number;
 };
 
-/** `HelixBaseCheckboxGroup` component event */
-export type HelixBaseCheckboxGroupElementEvent<E = Event> = TypedEvent<
-  HelixBaseCheckboxGroup,
+/** `HelixHeadlessCheckboxGroup` component event */
+export type HelixHeadlessCheckboxGroupElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessCheckboxGroup,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseCheckboxGroupHelixChangeElementEvent =
-  HelixBaseCheckboxGroupElementEvent<HelixChangeEvent>;
+export type HelixHeadlessCheckboxGroupHelixChangeElementEvent =
+  HelixHeadlessCheckboxGroupElementEvent<HelixChangeEvent>;
 
-export type HelixBaseCheckboxGroupProps = {
+export type HelixHeadlessCheckboxGroupProps = {
   /** The checked values, comma separated. */
-  value?: HelixBaseCheckboxGroup["value"];
+  value?: HelixHeadlessCheckboxGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseCheckboxGroup["hint"];
+  hint?: HelixHeadlessCheckboxGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseCheckboxGroup["feedback"];
+  feedback?: HelixHeadlessCheckboxGroup["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseCheckboxGroup["label"];
+  label?: HelixHeadlessCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseCheckboxGroup["required"];
+  required?: HelixHeadlessCheckboxGroup["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1448,7 +1454,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseCheckboxGroup["disabled"];
+  disabled?: HelixHeadlessCheckboxGroup["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1466,23 +1472,25 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseCheckboxGroup["name"];
+  name?: HelixHeadlessCheckboxGroup["name"];
 
   /** Fired when any box changes, with the whole set. */
-  "onhelix-change"?: (e: HelixBaseCheckboxGroupHelixChangeElementEvent) => void;
+  "onhelix-change"?: (
+    e: HelixHeadlessCheckboxGroupHelixChangeElementEvent,
+  ) => void;
 };
 
-export type HelixBaseCheckboxGroupSolidJsProps = {
+export type HelixHeadlessCheckboxGroupSolidJsProps = {
   /** The checked values, comma separated. */
-  "prop:value"?: HelixBaseCheckboxGroup["value"];
+  "prop:value"?: HelixHeadlessCheckboxGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseCheckboxGroup["hint"];
+  "prop:hint"?: HelixHeadlessCheckboxGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseCheckboxGroup["feedback"];
+  "prop:feedback"?: HelixHeadlessCheckboxGroup["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseCheckboxGroup["label"];
+  "prop:label"?: HelixHeadlessCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseCheckboxGroup["required"];
+  "prop:required"?: HelixHeadlessCheckboxGroup["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1493,7 +1501,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseCheckboxGroup["disabled"];
+  "prop:disabled"?: HelixHeadlessCheckboxGroup["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1511,10 +1519,10 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseCheckboxGroup["name"];
+  "prop:name"?: HelixHeadlessCheckboxGroup["name"];
   /** Fired when any box changes, with the whole set. */
   "on:helix-change"?: (
-    e: HelixBaseCheckboxGroupHelixChangeElementEvent,
+    e: HelixHeadlessCheckboxGroupHelixChangeElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -1523,22 +1531,22 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseCheckbox` component event */
-export type HelixBaseCheckboxElementEvent<E = Event> = TypedEvent<
-  HelixBaseCheckbox,
+/** `HelixHeadlessCheckbox` component event */
+export type HelixHeadlessCheckboxElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessCheckbox,
   E
 >;
 /** `helix-toggle` event type */
-export type HelixBaseCheckboxHelixToggleElementEvent =
-  HelixBaseCheckboxElementEvent<HelixToggleEvent>;
+export type HelixHeadlessCheckboxHelixToggleElementEvent =
+  HelixHeadlessCheckboxElementEvent<HelixToggleEvent>;
 
-export type HelixBaseCheckboxProps = {
+export type HelixHeadlessCheckboxProps = {
   /** Value submitted when the box is checked. */
-  value?: HelixBaseCheckbox["value"];
+  value?: HelixHeadlessCheckbox["value"];
   /** Whether the box shows as neither checked nor unchecked.
 
 Presentation only. It never submits, and the first change resolves it. */
-  indeterminate?: HelixBaseCheckbox["indeterminate"];
+  indeterminate?: HelixHeadlessCheckbox["indeterminate"];
   /** Whether the control is checked.
 
 One property rather than two. Reading gives the real state whichever
@@ -1549,19 +1557,19 @@ same shape all four of these mixins have, for the reason given on
 
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `data-checked` carries the resolved state for stylesheets. */
-  checked?: HelixBaseCheckbox["checked"];
+  checked?: HelixHeadlessCheckbox["checked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
-  "default-checked"?: HelixBaseCheckbox["defaultChecked"];
+  "default-checked"?: HelixHeadlessCheckbox["defaultChecked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
-  defaultChecked?: HelixBaseCheckbox["defaultChecked"];
+  defaultChecked?: HelixHeadlessCheckbox["defaultChecked"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseCheckbox["hint"];
+  hint?: HelixHeadlessCheckbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseCheckbox["feedback"];
+  feedback?: HelixHeadlessCheckbox["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseCheckbox["label"];
+  label?: HelixHeadlessCheckbox["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseCheckbox["required"];
+  required?: HelixHeadlessCheckbox["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1572,7 +1580,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseCheckbox["disabled"];
+  disabled?: HelixHeadlessCheckbox["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1590,21 +1598,21 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseCheckbox["name"];
+  name?: HelixHeadlessCheckbox["name"];
 
   /** Fired before the state changes, and cancelable. */
-  "onhelix-toggle"?: (e: HelixBaseCheckboxHelixToggleElementEvent) => void;
+  "onhelix-toggle"?: (e: HelixHeadlessCheckboxHelixToggleElementEvent) => void;
   /** Relayed from the input once the state has changed. */
-  onchange?: (e: HelixBaseCheckboxElementEvent) => void;
+  onchange?: (e: HelixHeadlessCheckboxElementEvent) => void;
 };
 
-export type HelixBaseCheckboxSolidJsProps = {
+export type HelixHeadlessCheckboxSolidJsProps = {
   /** Value submitted when the box is checked. */
-  "prop:value"?: HelixBaseCheckbox["value"];
+  "prop:value"?: HelixHeadlessCheckbox["value"];
   /** Whether the box shows as neither checked nor unchecked.
 
 Presentation only. It never submits, and the first change resolves it. */
-  "prop:indeterminate"?: HelixBaseCheckbox["indeterminate"];
+  "prop:indeterminate"?: HelixHeadlessCheckbox["indeterminate"];
   /** Whether the control is checked.
 
 One property rather than two. Reading gives the real state whichever
@@ -1615,19 +1623,19 @@ same shape all four of these mixins have, for the reason given on
 
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `data-checked` carries the resolved state for stylesheets. */
-  "prop:checked"?: HelixBaseCheckbox["checked"];
+  "prop:checked"?: HelixHeadlessCheckbox["checked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
-  "bool:default-checked"?: HelixBaseCheckbox["defaultChecked"];
+  "bool:default-checked"?: HelixHeadlessCheckbox["defaultChecked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
-  "prop:defaultChecked"?: HelixBaseCheckbox["defaultChecked"];
+  "prop:defaultChecked"?: HelixHeadlessCheckbox["defaultChecked"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseCheckbox["hint"];
+  "prop:hint"?: HelixHeadlessCheckbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseCheckbox["feedback"];
+  "prop:feedback"?: HelixHeadlessCheckbox["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseCheckbox["label"];
+  "prop:label"?: HelixHeadlessCheckbox["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseCheckbox["required"];
+  "prop:required"?: HelixHeadlessCheckbox["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1638,7 +1646,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseCheckbox["disabled"];
+  "prop:disabled"?: HelixHeadlessCheckbox["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1656,11 +1664,11 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseCheckbox["name"];
+  "prop:name"?: HelixHeadlessCheckbox["name"];
   /** Fired before the state changes, and cancelable. */
-  "on:helix-toggle"?: (e: HelixBaseCheckboxHelixToggleElementEvent) => void;
+  "on:helix-toggle"?: (e: HelixHeadlessCheckboxHelixToggleElementEvent) => void;
   /** Relayed from the input once the state has changed. */
-  "on:change"?: (e: HelixBaseCheckboxElementEvent) => void;
+  "on:change"?: (e: HelixHeadlessCheckboxElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1668,9 +1676,9 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseCodeBlockProps = {
+export type HelixHeadlessCodeBlockProps = {
   /** What to call this block, usually a file name or a language. */
-  label?: HelixBaseCodeBlock["label"];
+  label?: HelixHeadlessCodeBlock["label"];
   /** Whether to leave the copy button off.
 
 Negative, which is not a style choice. A boolean attribute is true whenever
@@ -1679,7 +1687,7 @@ off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
 `novalidate` and `nomodule` and `noreferrer` among them. */
-  "no-copy"?: HelixBaseCodeBlock["noCopy"];
+  "no-copy"?: HelixHeadlessCodeBlock["noCopy"];
   /** Whether to leave the copy button off.
 
 Negative, which is not a style choice. A boolean attribute is true whenever
@@ -1688,12 +1696,12 @@ off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
 `novalidate` and `nomodule` and `noreferrer` among them. */
-  noCopy?: HelixBaseCodeBlock["noCopy"];
+  noCopy?: HelixHeadlessCodeBlock["noCopy"];
 };
 
-export type HelixBaseCodeBlockSolidJsProps = {
+export type HelixHeadlessCodeBlockSolidJsProps = {
   /** What to call this block, usually a file name or a language. */
-  "prop:label"?: HelixBaseCodeBlock["label"];
+  "prop:label"?: HelixHeadlessCodeBlock["label"];
   /** Whether to leave the copy button off.
 
 Negative, which is not a style choice. A boolean attribute is true whenever
@@ -1702,7 +1710,7 @@ off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
 `novalidate` and `nomodule` and `noreferrer` among them. */
-  "bool:no-copy"?: HelixBaseCodeBlock["noCopy"];
+  "bool:no-copy"?: HelixHeadlessCodeBlock["noCopy"];
   /** Whether to leave the copy button off.
 
 Negative, which is not a style choice. A boolean attribute is true whenever
@@ -1711,7 +1719,7 @@ off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
 `novalidate` and `nomodule` and `noreferrer` among them. */
-  "prop:noCopy"?: HelixBaseCodeBlock["noCopy"];
+  "prop:noCopy"?: HelixHeadlessCodeBlock["noCopy"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1719,31 +1727,31 @@ round. The platform already writes booleans like this for the same reason,
   textContent?: string | number;
 };
 
-export type HelixBaseCodeProps = {};
+export type HelixHeadlessCodeProps = {};
 
-export type HelixBaseCodeSolidJsProps = {
+export type HelixHeadlessCodeSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
   textContent?: string | number;
 };
 
-/** `HelixBaseColorInput` component event */
-export type HelixBaseColorInputElementEvent<E = Event> = TypedEvent<
-  HelixBaseColorInput,
+/** `HelixHeadlessColorInput` component event */
+export type HelixHeadlessColorInputElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessColorInput,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseColorInputHelixChangeElementEvent =
-  HelixBaseColorInputElementEvent<HelixChangeEvent>;
+export type HelixHeadlessColorInputHelixChangeElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixChangeEvent>;
 /** `helix-open` event type */
-export type HelixBaseColorInputHelixOpenElementEvent =
-  HelixBaseColorInputElementEvent<HelixOpenEvent>;
+export type HelixHeadlessColorInputHelixOpenElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseColorInputHelixCloseElementEvent =
-  HelixBaseColorInputElementEvent<HelixCloseEvent>;
+export type HelixHeadlessColorInputHelixCloseElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixCloseEvent>;
 
-export type HelixBaseColorInputProps = {
+export type HelixHeadlessColorInputProps = {
   /** Whether the field is a text box with a swatch on it, or only the swatch.
 
 `swatch` is the native control's shape: a block of color that opens a
@@ -1759,9 +1767,9 @@ readable and typeable exactly once, in whichever of the two is present.
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
 where the color is the answer rather than a setting. */
-  variant?: HelixBaseColorInput["variant"];
+  variant?: HelixHeadlessColorInput["variant"];
   /** Whether the color carries an alpha channel. */
-  alpha?: HelixBaseColorInput["alpha"];
+  alpha?: HelixHeadlessColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
 
 **Undefaulted, because it reflects.** The two together are what stamp an
@@ -1772,19 +1780,19 @@ each one. That is the fault `Tree.chevronPlacement` had and the reason the
 area rules say a reflected property takes no default. Hex is still what an
 unset one writes; the difference is that the resting arrangement is the
 attribute's absence rather than a value spelled out. */
-  format?: HelixBaseColorInput["format"];
+  format?: HelixHeadlessColorInput["format"];
   /** Whether the reader may change the format from the panel. */
-  "no-format"?: HelixBaseColorInput["noFormat"];
+  "no-format"?: HelixHeadlessColorInput["noFormat"];
   /** Whether the reader may change the format from the panel. */
-  noFormat?: HelixBaseColorInput["noFormat"];
+  noFormat?: HelixHeadlessColorInput["noFormat"];
   /** What the field says before a color is in it. */
-  placeholder?: HelixBaseColorInput["placeholder"];
+  placeholder?: HelixHeadlessColorInput["placeholder"];
   /** Colors offered under the picker, as a comma-separated list. */
-  swatches?: HelixBaseColorInput["swatches"];
+  swatches?: HelixHeadlessColorInput["swatches"];
   /** Accessible name for the control that opens the panel. */
-  "trigger-label"?: HelixBaseColorInput["triggerLabel"];
+  "trigger-label"?: HelixHeadlessColorInput["triggerLabel"];
   /** Accessible name for the control that opens the panel. */
-  triggerLabel?: HelixBaseColorInput["triggerLabel"];
+  triggerLabel?: HelixHeadlessColorInput["triggerLabel"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -1807,15 +1815,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseColorInput["open"];
+  open?: HelixHeadlessColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseColorInput["defaultOpen"];
+  "default-open"?: HelixHeadlessColorInput["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseColorInput["defaultOpen"];
+  defaultOpen?: HelixHeadlessColorInput["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseColorInput["defaultValue"];
+  "default-value"?: HelixHeadlessColorInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseColorInput["defaultValue"];
+  defaultValue?: HelixHeadlessColorInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -1827,15 +1835,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseColorInput["value"];
+  value?: HelixHeadlessColorInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseColorInput["hint"];
+  hint?: HelixHeadlessColorInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseColorInput["feedback"];
+  feedback?: HelixHeadlessColorInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseColorInput["label"];
+  label?: HelixHeadlessColorInput["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseColorInput["required"];
+  required?: HelixHeadlessColorInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1846,7 +1854,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseColorInput["disabled"];
+  disabled?: HelixHeadlessColorInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1864,17 +1872,19 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseColorInput["name"];
+  name?: HelixHeadlessColorInput["name"];
 
   /** Fired when the color changes. */
-  "onhelix-change"?: (e: HelixBaseColorInputHelixChangeElementEvent) => void;
+  "onhelix-change"?: (
+    e: HelixHeadlessColorInputHelixChangeElementEvent,
+  ) => void;
   /** Fired when the panel opens. */
-  "onhelix-open"?: (e: HelixBaseColorInputHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessColorInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixBaseColorInputHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessColorInputHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseColorInputSolidJsProps = {
+export type HelixHeadlessColorInputSolidJsProps = {
   /** Whether the field is a text box with a swatch on it, or only the swatch.
 
 `swatch` is the native control's shape: a block of color that opens a
@@ -1890,9 +1900,9 @@ readable and typeable exactly once, in whichever of the two is present.
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
 where the color is the answer rather than a setting. */
-  "prop:variant"?: HelixBaseColorInput["variant"];
+  "prop:variant"?: HelixHeadlessColorInput["variant"];
   /** Whether the color carries an alpha channel. */
-  "prop:alpha"?: HelixBaseColorInput["alpha"];
+  "prop:alpha"?: HelixHeadlessColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
 
 **Undefaulted, because it reflects.** The two together are what stamp an
@@ -1903,19 +1913,19 @@ each one. That is the fault `Tree.chevronPlacement` had and the reason the
 area rules say a reflected property takes no default. Hex is still what an
 unset one writes; the difference is that the resting arrangement is the
 attribute's absence rather than a value spelled out. */
-  "prop:format"?: HelixBaseColorInput["format"];
+  "prop:format"?: HelixHeadlessColorInput["format"];
   /** Whether the reader may change the format from the panel. */
-  "bool:no-format"?: HelixBaseColorInput["noFormat"];
+  "bool:no-format"?: HelixHeadlessColorInput["noFormat"];
   /** Whether the reader may change the format from the panel. */
-  "prop:noFormat"?: HelixBaseColorInput["noFormat"];
+  "prop:noFormat"?: HelixHeadlessColorInput["noFormat"];
   /** What the field says before a color is in it. */
-  "prop:placeholder"?: HelixBaseColorInput["placeholder"];
+  "prop:placeholder"?: HelixHeadlessColorInput["placeholder"];
   /** Colors offered under the picker, as a comma-separated list. */
-  "prop:swatches"?: HelixBaseColorInput["swatches"];
+  "prop:swatches"?: HelixHeadlessColorInput["swatches"];
   /** Accessible name for the control that opens the panel. */
-  "attr:trigger-label"?: HelixBaseColorInput["triggerLabel"];
+  "attr:trigger-label"?: HelixHeadlessColorInput["triggerLabel"];
   /** Accessible name for the control that opens the panel. */
-  "prop:triggerLabel"?: HelixBaseColorInput["triggerLabel"];
+  "prop:triggerLabel"?: HelixHeadlessColorInput["triggerLabel"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -1938,15 +1948,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseColorInput["open"];
+  "prop:open"?: HelixHeadlessColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseColorInput["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessColorInput["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseColorInput["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessColorInput["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseColorInput["defaultValue"];
+  "attr:default-value"?: HelixHeadlessColorInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseColorInput["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessColorInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -1958,15 +1968,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseColorInput["value"];
+  "prop:value"?: HelixHeadlessColorInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseColorInput["hint"];
+  "prop:hint"?: HelixHeadlessColorInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseColorInput["feedback"];
+  "prop:feedback"?: HelixHeadlessColorInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseColorInput["label"];
+  "prop:label"?: HelixHeadlessColorInput["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseColorInput["required"];
+  "prop:required"?: HelixHeadlessColorInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1977,7 +1987,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseColorInput["disabled"];
+  "prop:disabled"?: HelixHeadlessColorInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1995,13 +2005,15 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseColorInput["name"];
+  "prop:name"?: HelixHeadlessColorInput["name"];
   /** Fired when the color changes. */
-  "on:helix-change"?: (e: HelixBaseColorInputHelixChangeElementEvent) => void;
+  "on:helix-change"?: (
+    e: HelixHeadlessColorInputHelixChangeElementEvent,
+  ) => void;
   /** Fired when the panel opens. */
-  "on:helix-open"?: (e: HelixBaseColorInputHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessColorInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixBaseColorInputHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessColorInputHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2009,25 +2021,25 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseColorPicker` component event */
-export type HelixBaseColorPickerElementEvent<E = Event> = TypedEvent<
-  HelixBaseColorPicker,
+/** `HelixHeadlessColorPicker` component event */
+export type HelixHeadlessColorPickerElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessColorPicker,
   E
 >;
 /** `helix-sample-end` event type */
-export type HelixBaseColorPickerHelixSampleEndElementEvent =
-  HelixBaseColorPickerElementEvent<HelixSampleEndEvent>;
+export type HelixHeadlessColorPickerHelixSampleEndElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixSampleEndEvent>;
 /** `helix-sample-start` event type */
-export type HelixBaseColorPickerHelixSampleStartElementEvent =
-  HelixBaseColorPickerElementEvent<HelixSampleStartEvent>;
+export type HelixHeadlessColorPickerHelixSampleStartElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixSampleStartEvent>;
 /** `helix-change` event type */
-export type HelixBaseColorPickerHelixChangeElementEvent =
-  HelixBaseColorPickerElementEvent<HelixChangeEvent>;
+export type HelixHeadlessColorPickerHelixChangeElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixChangeEvent>;
 /** `helix-copy` event type */
-export type HelixBaseColorPickerHelixCopyElementEvent =
-  HelixBaseColorPickerElementEvent<HelixCopyEvent>;
+export type HelixHeadlessColorPickerHelixCopyElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixCopyEvent>;
 
-export type HelixBaseColorPickerProps = {
+export type HelixHeadlessColorPickerProps = {
   /** Whether the current selection fails validation.
 
 A flag rather than a message, which is the split Date Picker already drew and
@@ -2036,17 +2048,17 @@ the field that wraps one owns the label, the hint and the feedback, and a
 second message inside the panel would be the same error said twice. What is
 left for the picker is the one thing the field cannot draw from outside, the
 mark on the answer itself. */
-  invalid?: HelixBaseColorPicker["invalid"];
+  invalid?: HelixHeadlessColorPicker["invalid"];
   /** Whether the color carries an alpha channel.
 
 Off by default, because it widens every value written, and a consumer who
 did not ask for transparency should not have to strip a byte off each one. */
-  alpha?: HelixBaseColorPicker["alpha"];
+  alpha?: HelixHeadlessColorPicker["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
 
 Only what is written. Everything is read whatever this says, so a picker on
 `hex` still takes an `rgb()` handed to it and stores the hex for it. */
-  format?: HelixBaseColorPicker["format"];
+  format?: HelixHeadlessColorPicker["format"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the color as text and lets it be typed or pasted, which is
@@ -2060,7 +2072,7 @@ answer to which one is authoritative or which has the caret. The other way
 round was considered, Color Input dropping its own field and letting this be
 the only one, and it is worse for a form: the value cannot be read or pasted
 without opening a panel. */
-  "no-value"?: HelixBaseColorPicker["noValue"];
+  "no-value"?: HelixHeadlessColorPicker["noValue"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the color as text and lets it be typed or pasted, which is
@@ -2074,21 +2086,21 @@ answer to which one is authoritative or which has the caret. The other way
 round was considered, Color Input dropping its own field and letting this be
 the only one, and it is worse for a form: the value cannot be read or pasted
 without opening a panel. */
-  noValue?: HelixBaseColorPicker["noValue"];
+  noValue?: HelixHeadlessColorPicker["noValue"];
   /** Whether the reader may change the format. */
-  "no-format"?: HelixBaseColorPicker["noFormat"];
+  "no-format"?: HelixHeadlessColorPicker["noFormat"];
   /** Whether the reader may change the format. */
-  noFormat?: HelixBaseColorPicker["noFormat"];
+  noFormat?: HelixHeadlessColorPicker["noFormat"];
   /** Whether the eyedropper is offered where the browser has one. */
-  "no-eyedropper"?: HelixBaseColorPicker["noEyedropper"];
+  "no-eyedropper"?: HelixHeadlessColorPicker["noEyedropper"];
   /** Whether the eyedropper is offered where the browser has one. */
-  noEyedropper?: HelixBaseColorPicker["noEyedropper"];
+  noEyedropper?: HelixHeadlessColorPicker["noEyedropper"];
   /** Colors offered under the picker, as a comma-separated list. */
-  swatches?: HelixBaseColorPicker["swatches"];
+  swatches?: HelixHeadlessColorPicker["swatches"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseColorPicker["defaultValue"];
+  "default-value"?: HelixHeadlessColorPicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseColorPicker["defaultValue"];
+  defaultValue?: HelixHeadlessColorPicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -2100,7 +2112,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseColorPicker["value"];
+  value?: HelixHeadlessColorPicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -2111,7 +2123,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseColorPicker["disabled"];
+  disabled?: HelixHeadlessColorPicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -2129,23 +2141,25 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseColorPicker["name"];
+  name?: HelixHeadlessColorPicker["name"];
 
   /** The eyedropper has closed, whether or not a color was taken. */
   "onhelix-sample-end"?: (
-    e: HelixBaseColorPickerHelixSampleEndElementEvent,
+    e: HelixHeadlessColorPickerHelixSampleEndElementEvent,
   ) => void;
   /** The eyedropper is opening, so anything covering the page should get out of the way. */
   "onhelix-sample-start"?: (
-    e: HelixBaseColorPickerHelixSampleStartElementEvent,
+    e: HelixHeadlessColorPickerHelixSampleStartElementEvent,
   ) => void;
   /** Fired when the color changes. */
-  "onhelix-change"?: (e: HelixBaseColorPickerHelixChangeElementEvent) => void;
+  "onhelix-change"?: (
+    e: HelixHeadlessColorPickerHelixChangeElementEvent,
+  ) => void;
   /** Fired when the color is put on the clipboard. */
-  "onhelix-copy"?: (e: HelixBaseColorPickerHelixCopyElementEvent) => void;
+  "onhelix-copy"?: (e: HelixHeadlessColorPickerHelixCopyElementEvent) => void;
 };
 
-export type HelixBaseColorPickerSolidJsProps = {
+export type HelixHeadlessColorPickerSolidJsProps = {
   /** Whether the current selection fails validation.
 
 A flag rather than a message, which is the split Date Picker already drew and
@@ -2154,17 +2168,17 @@ the field that wraps one owns the label, the hint and the feedback, and a
 second message inside the panel would be the same error said twice. What is
 left for the picker is the one thing the field cannot draw from outside, the
 mark on the answer itself. */
-  "prop:invalid"?: HelixBaseColorPicker["invalid"];
+  "prop:invalid"?: HelixHeadlessColorPicker["invalid"];
   /** Whether the color carries an alpha channel.
 
 Off by default, because it widens every value written, and a consumer who
 did not ask for transparency should not have to strip a byte off each one. */
-  "prop:alpha"?: HelixBaseColorPicker["alpha"];
+  "prop:alpha"?: HelixHeadlessColorPicker["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
 
 Only what is written. Everything is read whatever this says, so a picker on
 `hex` still takes an `rgb()` handed to it and stores the hex for it. */
-  "prop:format"?: HelixBaseColorPicker["format"];
+  "prop:format"?: HelixHeadlessColorPicker["format"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the color as text and lets it be typed or pasted, which is
@@ -2178,7 +2192,7 @@ answer to which one is authoritative or which has the caret. The other way
 round was considered, Color Input dropping its own field and letting this be
 the only one, and it is worse for a form: the value cannot be read or pasted
 without opening a panel. */
-  "bool:no-value"?: HelixBaseColorPicker["noValue"];
+  "bool:no-value"?: HelixHeadlessColorPicker["noValue"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the color as text and lets it be typed or pasted, which is
@@ -2192,21 +2206,21 @@ answer to which one is authoritative or which has the caret. The other way
 round was considered, Color Input dropping its own field and letting this be
 the only one, and it is worse for a form: the value cannot be read or pasted
 without opening a panel. */
-  "prop:noValue"?: HelixBaseColorPicker["noValue"];
+  "prop:noValue"?: HelixHeadlessColorPicker["noValue"];
   /** Whether the reader may change the format. */
-  "bool:no-format"?: HelixBaseColorPicker["noFormat"];
+  "bool:no-format"?: HelixHeadlessColorPicker["noFormat"];
   /** Whether the reader may change the format. */
-  "prop:noFormat"?: HelixBaseColorPicker["noFormat"];
+  "prop:noFormat"?: HelixHeadlessColorPicker["noFormat"];
   /** Whether the eyedropper is offered where the browser has one. */
-  "bool:no-eyedropper"?: HelixBaseColorPicker["noEyedropper"];
+  "bool:no-eyedropper"?: HelixHeadlessColorPicker["noEyedropper"];
   /** Whether the eyedropper is offered where the browser has one. */
-  "prop:noEyedropper"?: HelixBaseColorPicker["noEyedropper"];
+  "prop:noEyedropper"?: HelixHeadlessColorPicker["noEyedropper"];
   /** Colors offered under the picker, as a comma-separated list. */
-  "prop:swatches"?: HelixBaseColorPicker["swatches"];
+  "prop:swatches"?: HelixHeadlessColorPicker["swatches"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseColorPicker["defaultValue"];
+  "attr:default-value"?: HelixHeadlessColorPicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseColorPicker["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessColorPicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -2218,7 +2232,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseColorPicker["value"];
+  "prop:value"?: HelixHeadlessColorPicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -2229,7 +2243,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseColorPicker["disabled"];
+  "prop:disabled"?: HelixHeadlessColorPicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -2247,19 +2261,21 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseColorPicker["name"];
+  "prop:name"?: HelixHeadlessColorPicker["name"];
   /** The eyedropper has closed, whether or not a color was taken. */
   "on:helix-sample-end"?: (
-    e: HelixBaseColorPickerHelixSampleEndElementEvent,
+    e: HelixHeadlessColorPickerHelixSampleEndElementEvent,
   ) => void;
   /** The eyedropper is opening, so anything covering the page should get out of the way. */
   "on:helix-sample-start"?: (
-    e: HelixBaseColorPickerHelixSampleStartElementEvent,
+    e: HelixHeadlessColorPickerHelixSampleStartElementEvent,
   ) => void;
   /** Fired when the color changes. */
-  "on:helix-change"?: (e: HelixBaseColorPickerHelixChangeElementEvent) => void;
+  "on:helix-change"?: (
+    e: HelixHeadlessColorPickerHelixChangeElementEvent,
+  ) => void;
   /** Fired when the color is put on the clipboard. */
-  "on:helix-copy"?: (e: HelixBaseColorPickerHelixCopyElementEvent) => void;
+  "on:helix-copy"?: (e: HelixHeadlessColorPickerHelixCopyElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2267,27 +2283,27 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseCombobox` component event */
-export type HelixBaseComboboxElementEvent<E = Event> = TypedEvent<
-  HelixBaseCombobox,
+/** `HelixHeadlessCombobox` component event */
+export type HelixHeadlessComboboxElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessCombobox,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseComboboxHelixChangeElementEvent =
-  HelixBaseComboboxElementEvent<HelixChangeEvent>;
+export type HelixHeadlessComboboxHelixChangeElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixChangeEvent>;
 /** `helix-create` event type */
-export type HelixBaseComboboxHelixCreateElementEvent =
-  HelixBaseComboboxElementEvent<HelixCreateEvent>;
+export type HelixHeadlessComboboxHelixCreateElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixCreateEvent>;
 /** `helix-open` event type */
-export type HelixBaseComboboxHelixOpenElementEvent =
-  HelixBaseComboboxElementEvent<HelixOpenEvent>;
+export type HelixHeadlessComboboxHelixOpenElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseComboboxHelixCloseElementEvent =
-  HelixBaseComboboxElementEvent<HelixCloseEvent>;
+export type HelixHeadlessComboboxHelixCloseElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixCloseEvent>;
 
-export type HelixBaseComboboxProps = {
+export type HelixHeadlessComboboxProps = {
   /** Text shown while nothing has been chosen. */
-  placeholder?: HelixBaseCombobox["placeholder"];
+  placeholder?: HelixHeadlessCombobox["placeholder"];
   /** Whether more than one option can be chosen.
 
 The list already does the work: `value` comes apart on commas, a press
@@ -2296,29 +2312,29 @@ this adds is the tags, and keeping the panel open between picks.
 
 A comma is therefore not available inside an option's value, which is the
 listbox's contract and not this element's to change. */
-  multiple?: HelixBaseCombobox["multiple"];
+  multiple?: HelixHeadlessCombobox["multiple"];
   /** Whether the reader may answer with something the list does not hold.
 
 The row appears while what is typed matches no option's words exactly, so
 it is offered next to near misses too: a reader typing "Ruby on Rails" with
 "Ruby" in the list wants the one they are typing, not the one they are
 halfway through. */
-  creatable?: HelixBaseCombobox["creatable"];
+  creatable?: HelixHeadlessCombobox["creatable"];
   /** Whether the field finishes the word as it is typed.
 
 `suggest` rather than `autocomplete`, which is a real HTML attribute this
 element already sets on the input it renders, and two things of one name
 meaning different things on the same control is a question a consumer
 should not have to ask. */
-  suggest?: HelixBaseCombobox["suggest"];
+  suggest?: HelixHeadlessCombobox["suggest"];
   /** What the create row says, before the words it would add. */
-  "create-label"?: HelixBaseCombobox["createLabel"];
+  "create-label"?: HelixHeadlessCombobox["createLabel"];
   /** What the create row says, before the words it would add. */
-  createLabel?: HelixBaseCombobox["createLabel"];
+  createLabel?: HelixHeadlessCombobox["createLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
-  "remove-label"?: HelixBaseCombobox["removeLabel"];
+  "remove-label"?: HelixHeadlessCombobox["removeLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
-  removeLabel?: HelixBaseCombobox["removeLabel"];
+  removeLabel?: HelixHeadlessCombobox["removeLabel"];
   /** How many tags to draw before the rest become a count. `multiple` only.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -2331,7 +2347,7 @@ The remainder is counted rather than hidden. `+3` is a fact a reader can act
 on, where a row that silently stops is a field that appears to have lost
 what was put in it. Date Input and Time Input carry the same property and
 the same reasoning. */
-  "max-tags"?: HelixBaseCombobox["maxTags"];
+  "max-tags"?: HelixHeadlessCombobox["maxTags"];
   /** How many tags to draw before the rest become a count. `multiple` only.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -2344,24 +2360,24 @@ The remainder is counted rather than hidden. `+3` is a fact a reader can act
 on, where a row that silently stops is a field that appears to have lost
 what was put in it. Date Input and Time Input carry the same property and
 the same reasoning. */
-  maxTags?: HelixBaseCombobox["maxTags"];
+  maxTags?: HelixHeadlessCombobox["maxTags"];
   /** Accessible name for the list, which has no visible one of its own. */
-  "list-label"?: HelixBaseCombobox["listLabel"];
+  "list-label"?: HelixHeadlessCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
-  listLabel?: HelixBaseCombobox["listLabel"];
+  listLabel?: HelixHeadlessCombobox["listLabel"];
   /** Whether the options are still on their way.
 
 Passed straight to the list, which is where the rows are and so where the
 message belongs. */
-  loading?: HelixBaseCombobox["loading"];
+  loading?: HelixHeadlessCombobox["loading"];
   /** What the list says while they are on their way. */
-  "loading-text"?: HelixBaseCombobox["loadingText"];
+  "loading-text"?: HelixHeadlessCombobox["loadingText"];
   /** What the list says while they are on their way. */
-  loadingText?: HelixBaseCombobox["loadingText"];
+  loadingText?: HelixHeadlessCombobox["loadingText"];
   /** Words shown where the filter has hidden everything. */
-  "empty-text"?: HelixBaseCombobox["emptyText"];
+  "empty-text"?: HelixHeadlessCombobox["emptyText"];
   /** Words shown where the filter has hidden everything. */
-  emptyText?: HelixBaseCombobox["emptyText"];
+  emptyText?: HelixHeadlessCombobox["emptyText"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -2384,15 +2400,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseCombobox["open"];
+  open?: HelixHeadlessCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseCombobox["defaultOpen"];
+  "default-open"?: HelixHeadlessCombobox["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseCombobox["defaultOpen"];
+  defaultOpen?: HelixHeadlessCombobox["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseCombobox["defaultValue"];
+  "default-value"?: HelixHeadlessCombobox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseCombobox["defaultValue"];
+  defaultValue?: HelixHeadlessCombobox["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -2404,15 +2420,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseCombobox["value"];
+  value?: HelixHeadlessCombobox["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseCombobox["hint"];
+  hint?: HelixHeadlessCombobox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseCombobox["feedback"];
+  feedback?: HelixHeadlessCombobox["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseCombobox["label"];
+  label?: HelixHeadlessCombobox["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseCombobox["required"];
+  required?: HelixHeadlessCombobox["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -2423,7 +2439,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseCombobox["disabled"];
+  disabled?: HelixHeadlessCombobox["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -2441,21 +2457,21 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseCombobox["name"];
+  name?: HelixHeadlessCombobox["name"];
 
   /** Fired when the chosen option changes. */
-  "onhelix-change"?: (e: HelixBaseComboboxHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessComboboxHelixChangeElementEvent) => void;
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
-  "onhelix-create"?: (e: HelixBaseComboboxHelixCreateElementEvent) => void;
+  "onhelix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
-  "onhelix-open"?: (e: HelixBaseComboboxHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessComboboxHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixBaseComboboxHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessComboboxHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseComboboxSolidJsProps = {
+export type HelixHeadlessComboboxSolidJsProps = {
   /** Text shown while nothing has been chosen. */
-  "prop:placeholder"?: HelixBaseCombobox["placeholder"];
+  "prop:placeholder"?: HelixHeadlessCombobox["placeholder"];
   /** Whether more than one option can be chosen.
 
 The list already does the work: `value` comes apart on commas, a press
@@ -2464,29 +2480,29 @@ this adds is the tags, and keeping the panel open between picks.
 
 A comma is therefore not available inside an option's value, which is the
 listbox's contract and not this element's to change. */
-  "prop:multiple"?: HelixBaseCombobox["multiple"];
+  "prop:multiple"?: HelixHeadlessCombobox["multiple"];
   /** Whether the reader may answer with something the list does not hold.
 
 The row appears while what is typed matches no option's words exactly, so
 it is offered next to near misses too: a reader typing "Ruby on Rails" with
 "Ruby" in the list wants the one they are typing, not the one they are
 halfway through. */
-  "prop:creatable"?: HelixBaseCombobox["creatable"];
+  "prop:creatable"?: HelixHeadlessCombobox["creatable"];
   /** Whether the field finishes the word as it is typed.
 
 `suggest` rather than `autocomplete`, which is a real HTML attribute this
 element already sets on the input it renders, and two things of one name
 meaning different things on the same control is a question a consumer
 should not have to ask. */
-  "prop:suggest"?: HelixBaseCombobox["suggest"];
+  "prop:suggest"?: HelixHeadlessCombobox["suggest"];
   /** What the create row says, before the words it would add. */
-  "attr:create-label"?: HelixBaseCombobox["createLabel"];
+  "attr:create-label"?: HelixHeadlessCombobox["createLabel"];
   /** What the create row says, before the words it would add. */
-  "prop:createLabel"?: HelixBaseCombobox["createLabel"];
+  "prop:createLabel"?: HelixHeadlessCombobox["createLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
-  "attr:remove-label"?: HelixBaseCombobox["removeLabel"];
+  "attr:remove-label"?: HelixHeadlessCombobox["removeLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
-  "prop:removeLabel"?: HelixBaseCombobox["removeLabel"];
+  "prop:removeLabel"?: HelixHeadlessCombobox["removeLabel"];
   /** How many tags to draw before the rest become a count. `multiple` only.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -2499,7 +2515,7 @@ The remainder is counted rather than hidden. `+3` is a fact a reader can act
 on, where a row that silently stops is a field that appears to have lost
 what was put in it. Date Input and Time Input carry the same property and
 the same reasoning. */
-  "attr:max-tags"?: HelixBaseCombobox["maxTags"];
+  "attr:max-tags"?: HelixHeadlessCombobox["maxTags"];
   /** How many tags to draw before the rest become a count. `multiple` only.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -2512,24 +2528,24 @@ The remainder is counted rather than hidden. `+3` is a fact a reader can act
 on, where a row that silently stops is a field that appears to have lost
 what was put in it. Date Input and Time Input carry the same property and
 the same reasoning. */
-  "prop:maxTags"?: HelixBaseCombobox["maxTags"];
+  "prop:maxTags"?: HelixHeadlessCombobox["maxTags"];
   /** Accessible name for the list, which has no visible one of its own. */
-  "attr:list-label"?: HelixBaseCombobox["listLabel"];
+  "attr:list-label"?: HelixHeadlessCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
-  "prop:listLabel"?: HelixBaseCombobox["listLabel"];
+  "prop:listLabel"?: HelixHeadlessCombobox["listLabel"];
   /** Whether the options are still on their way.
 
 Passed straight to the list, which is where the rows are and so where the
 message belongs. */
-  "prop:loading"?: HelixBaseCombobox["loading"];
+  "prop:loading"?: HelixHeadlessCombobox["loading"];
   /** What the list says while they are on their way. */
-  "attr:loading-text"?: HelixBaseCombobox["loadingText"];
+  "attr:loading-text"?: HelixHeadlessCombobox["loadingText"];
   /** What the list says while they are on their way. */
-  "prop:loadingText"?: HelixBaseCombobox["loadingText"];
+  "prop:loadingText"?: HelixHeadlessCombobox["loadingText"];
   /** Words shown where the filter has hidden everything. */
-  "attr:empty-text"?: HelixBaseCombobox["emptyText"];
+  "attr:empty-text"?: HelixHeadlessCombobox["emptyText"];
   /** Words shown where the filter has hidden everything. */
-  "prop:emptyText"?: HelixBaseCombobox["emptyText"];
+  "prop:emptyText"?: HelixHeadlessCombobox["emptyText"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -2552,15 +2568,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseCombobox["open"];
+  "prop:open"?: HelixHeadlessCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseCombobox["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessCombobox["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseCombobox["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessCombobox["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseCombobox["defaultValue"];
+  "attr:default-value"?: HelixHeadlessCombobox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseCombobox["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessCombobox["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -2572,15 +2588,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseCombobox["value"];
+  "prop:value"?: HelixHeadlessCombobox["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseCombobox["hint"];
+  "prop:hint"?: HelixHeadlessCombobox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseCombobox["feedback"];
+  "prop:feedback"?: HelixHeadlessCombobox["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseCombobox["label"];
+  "prop:label"?: HelixHeadlessCombobox["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseCombobox["required"];
+  "prop:required"?: HelixHeadlessCombobox["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -2591,7 +2607,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseCombobox["disabled"];
+  "prop:disabled"?: HelixHeadlessCombobox["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -2609,15 +2625,15 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseCombobox["name"];
+  "prop:name"?: HelixHeadlessCombobox["name"];
   /** Fired when the chosen option changes. */
-  "on:helix-change"?: (e: HelixBaseComboboxHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessComboboxHelixChangeElementEvent) => void;
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
-  "on:helix-create"?: (e: HelixBaseComboboxHelixCreateElementEvent) => void;
+  "on:helix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
-  "on:helix-open"?: (e: HelixBaseComboboxHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessComboboxHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixBaseComboboxHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessComboboxHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2625,36 +2641,36 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseCommand` component event */
-export type HelixBaseCommandElementEvent<E = Event> = TypedEvent<
-  HelixBaseCommand,
+/** `HelixHeadlessCommand` component event */
+export type HelixHeadlessCommandElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessCommand,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseCommandHelixSelectElementEvent =
-  HelixBaseCommandElementEvent<HelixSelectEvent>;
+export type HelixHeadlessCommandHelixSelectElementEvent =
+  HelixHeadlessCommandElementEvent<HelixSelectEvent>;
 /** `helix-open` event type */
-export type HelixBaseCommandHelixOpenElementEvent =
-  HelixBaseCommandElementEvent<HelixOpenEvent>;
+export type HelixHeadlessCommandHelixOpenElementEvent =
+  HelixHeadlessCommandElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseCommandHelixCloseElementEvent =
-  HelixBaseCommandElementEvent<HelixCloseEvent>;
+export type HelixHeadlessCommandHelixCloseElementEvent =
+  HelixHeadlessCommandElementEvent<HelixCloseEvent>;
 
-export type HelixBaseCommandProps = {
+export type HelixHeadlessCommandProps = {
   /** Accessible name for the overlay, which has no visible heading. */
-  label?: HelixBaseCommand["label"];
+  label?: HelixHeadlessCommand["label"];
   /** Shown in the field before anything is typed. */
-  placeholder?: HelixBaseCommand["placeholder"];
+  placeholder?: HelixHeadlessCommand["placeholder"];
   /** Words shown where the filter has matched nothing. */
-  "empty-text"?: HelixBaseCommand["emptyText"];
+  "empty-text"?: HelixHeadlessCommand["emptyText"];
   /** Words shown where the filter has matched nothing. */
-  emptyText?: HelixBaseCommand["emptyText"];
+  emptyText?: HelixHeadlessCommand["emptyText"];
   /** The key that opens it, as `mod+k` or `shift+p` or plain `k`.
 
 Empty turns it off, for a consumer who opens the palette from a button or
 from their own shortcut handler. There is no list of defaults to fight
 with: one key, said once. */
-  hotkey?: HelixBaseCommand["hotkey"];
+  hotkey?: HelixHeadlessCommand["hotkey"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -2677,35 +2693,35 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseCommand["open"];
+  open?: HelixHeadlessCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseCommand["defaultOpen"];
+  "default-open"?: HelixHeadlessCommand["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseCommand["defaultOpen"];
+  defaultOpen?: HelixHeadlessCommand["defaultOpen"];
 
   /** Fired when a command is chosen. */
-  "onhelix-select"?: (e: HelixBaseCommandHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
   /** Fired when the palette opens. */
-  "onhelix-open"?: (e: HelixBaseCommandHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessCommandHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixBaseCommandHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessCommandHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseCommandSolidJsProps = {
+export type HelixHeadlessCommandSolidJsProps = {
   /** Accessible name for the overlay, which has no visible heading. */
-  "prop:label"?: HelixBaseCommand["label"];
+  "prop:label"?: HelixHeadlessCommand["label"];
   /** Shown in the field before anything is typed. */
-  "prop:placeholder"?: HelixBaseCommand["placeholder"];
+  "prop:placeholder"?: HelixHeadlessCommand["placeholder"];
   /** Words shown where the filter has matched nothing. */
-  "attr:empty-text"?: HelixBaseCommand["emptyText"];
+  "attr:empty-text"?: HelixHeadlessCommand["emptyText"];
   /** Words shown where the filter has matched nothing. */
-  "prop:emptyText"?: HelixBaseCommand["emptyText"];
+  "prop:emptyText"?: HelixHeadlessCommand["emptyText"];
   /** The key that opens it, as `mod+k` or `shift+p` or plain `k`.
 
 Empty turns it off, for a consumer who opens the palette from a button or
 from their own shortcut handler. There is no list of defaults to fight
 with: one key, said once. */
-  "prop:hotkey"?: HelixBaseCommand["hotkey"];
+  "prop:hotkey"?: HelixHeadlessCommand["hotkey"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -2728,17 +2744,17 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseCommand["open"];
+  "prop:open"?: HelixHeadlessCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseCommand["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessCommand["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseCommand["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessCommand["defaultOpen"];
   /** Fired when a command is chosen. */
-  "on:helix-select"?: (e: HelixBaseCommandHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
   /** Fired when the palette opens. */
-  "on:helix-open"?: (e: HelixBaseCommandHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessCommandHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixBaseCommandHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessCommandHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2746,36 +2762,36 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-/** `HelixBaseCopyButton` component event */
-export type HelixBaseCopyButtonElementEvent<E = Event> = TypedEvent<
-  HelixBaseCopyButton,
+/** `HelixHeadlessCopyButton` component event */
+export type HelixHeadlessCopyButtonElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessCopyButton,
   E
 >;
 /** `helix-copy` event type */
-export type HelixBaseCopyButtonHelixCopyElementEvent =
-  HelixBaseCopyButtonElementEvent<HelixCopyEvent>;
+export type HelixHeadlessCopyButtonHelixCopyElementEvent =
+  HelixHeadlessCopyButtonElementEvent<HelixCopyEvent>;
 
-export type HelixBaseCopyButtonProps = {
+export type HelixHeadlessCopyButtonProps = {
   /** What goes on the clipboard. */
-  value?: HelixBaseCopyButton["value"];
+  value?: HelixHeadlessCopyButton["value"];
   /** What it is called, and says, before a press.
 
 Defaulted rather than left empty. An icon-only control must be named, and
 the name of this one is not a judgment call: every copy button in the
 world is called Copy. A consumer with a better word still sets it. */
-  label?: HelixBaseCopyButton["label"];
+  label?: HelixHeadlessCopyButton["label"];
   /** What it is called, and says, after one.
 
 `attribute` written out, because Lit lowercases a property name rather than
 dash-casing it, and `copiedlabel` is not what anyone would type. */
-  "copied-label"?: HelixBaseCopyButton["copiedLabel"];
+  "copied-label"?: HelixHeadlessCopyButton["copiedLabel"];
   /** What it is called, and says, after one.
 
 `attribute` written out, because Lit lowercases a property name rather than
 dash-casing it, and `copiedlabel` is not what anyone would type. */
-  copiedLabel?: HelixBaseCopyButton["copiedLabel"];
+  copiedLabel?: HelixHeadlessCopyButton["copiedLabel"];
   /** What activating the button does to its form. */
-  type?: HelixBaseCopyButton["type"];
+  type?: HelixHeadlessCopyButton["type"];
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -2791,11 +2807,11 @@ the same way `label` becomes `aria-label` in there.
 `commandFor` spells its attribute out, because Lit lowercases a property
 name to derive one rather than dash-casing it, and what a consumer writes
 is the platform's `commandfor`. */
-  command?: HelixBaseCopyButton["command"];
+  command?: HelixHeadlessCopyButton["command"];
   /** The id of the element the command is sent to. */
-  commandfor?: HelixBaseCopyButton["commandFor"];
+  commandfor?: HelixHeadlessCopyButton["commandFor"];
   /** The id of the element the command is sent to. */
-  commandFor?: HelixBaseCopyButton["commandFor"];
+  commandFor?: HelixHeadlessCopyButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -2806,7 +2822,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseCopyButton["disabled"];
+  disabled?: HelixHeadlessCopyButton["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -2824,7 +2840,7 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseCopyButton["name"];
+  name?: HelixHeadlessCopyButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -2835,33 +2851,33 @@ and the stop lands on the inner control inside the shadow root.
 
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
-  focusable?: HelixBaseCopyButton["focusable"];
+  focusable?: HelixHeadlessCopyButton["focusable"];
 
   /** Fired after the clipboard write succeeds. */
-  "onhelix-copy"?: (e: HelixBaseCopyButtonHelixCopyElementEvent) => void;
+  "onhelix-copy"?: (e: HelixHeadlessCopyButtonHelixCopyElementEvent) => void;
 };
 
-export type HelixBaseCopyButtonSolidJsProps = {
+export type HelixHeadlessCopyButtonSolidJsProps = {
   /** What goes on the clipboard. */
-  "prop:value"?: HelixBaseCopyButton["value"];
+  "prop:value"?: HelixHeadlessCopyButton["value"];
   /** What it is called, and says, before a press.
 
 Defaulted rather than left empty. An icon-only control must be named, and
 the name of this one is not a judgment call: every copy button in the
 world is called Copy. A consumer with a better word still sets it. */
-  "prop:label"?: HelixBaseCopyButton["label"];
+  "prop:label"?: HelixHeadlessCopyButton["label"];
   /** What it is called, and says, after one.
 
 `attribute` written out, because Lit lowercases a property name rather than
 dash-casing it, and `copiedlabel` is not what anyone would type. */
-  "attr:copied-label"?: HelixBaseCopyButton["copiedLabel"];
+  "attr:copied-label"?: HelixHeadlessCopyButton["copiedLabel"];
   /** What it is called, and says, after one.
 
 `attribute` written out, because Lit lowercases a property name rather than
 dash-casing it, and `copiedlabel` is not what anyone would type. */
-  "prop:copiedLabel"?: HelixBaseCopyButton["copiedLabel"];
+  "prop:copiedLabel"?: HelixHeadlessCopyButton["copiedLabel"];
   /** What activating the button does to its form. */
-  "prop:type"?: HelixBaseCopyButton["type"];
+  "prop:type"?: HelixHeadlessCopyButton["type"];
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -2877,11 +2893,11 @@ the same way `label` becomes `aria-label` in there.
 `commandFor` spells its attribute out, because Lit lowercases a property
 name to derive one rather than dash-casing it, and what a consumer writes
 is the platform's `commandfor`. */
-  "prop:command"?: HelixBaseCopyButton["command"];
+  "prop:command"?: HelixHeadlessCopyButton["command"];
   /** The id of the element the command is sent to. */
-  "attr:commandfor"?: HelixBaseCopyButton["commandFor"];
+  "attr:commandfor"?: HelixHeadlessCopyButton["commandFor"];
   /** The id of the element the command is sent to. */
-  "prop:commandFor"?: HelixBaseCopyButton["commandFor"];
+  "prop:commandFor"?: HelixHeadlessCopyButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -2892,7 +2908,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseCopyButton["disabled"];
+  "prop:disabled"?: HelixHeadlessCopyButton["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -2910,7 +2926,7 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseCopyButton["name"];
+  "prop:name"?: HelixHeadlessCopyButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -2921,9 +2937,9 @@ and the stop lands on the inner control inside the shadow root.
 
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
-  "prop:focusable"?: HelixBaseCopyButton["focusable"];
+  "prop:focusable"?: HelixHeadlessCopyButton["focusable"];
   /** Fired after the clipboard write succeeds. */
-  "on:helix-copy"?: (e: HelixBaseCopyButtonHelixCopyElementEvent) => void;
+  "on:helix-copy"?: (e: HelixHeadlessCopyButtonHelixCopyElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2931,34 +2947,34 @@ anything a consumer sets. */
   textContent?: string | number;
 };
 
-/** `HelixBaseDateInput` component event */
-export type HelixBaseDateInputElementEvent<E = Event> = TypedEvent<
-  HelixBaseDateInput,
+/** `HelixHeadlessDateInput` component event */
+export type HelixHeadlessDateInputElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessDateInput,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseDateInputHelixChangeElementEvent =
-  HelixBaseDateInputElementEvent<HelixChangeEvent>;
+export type HelixHeadlessDateInputHelixChangeElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixChangeEvent>;
 /** `helix-open` event type */
-export type HelixBaseDateInputHelixOpenElementEvent =
-  HelixBaseDateInputElementEvent<HelixOpenEvent>;
+export type HelixHeadlessDateInputHelixOpenElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseDateInputHelixCloseElementEvent =
-  HelixBaseDateInputElementEvent<HelixCloseEvent>;
+export type HelixHeadlessDateInputHelixCloseElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixCloseEvent>;
 
-export type HelixBaseDateInputProps = {
+export type HelixHeadlessDateInputProps = {
   /** How many dates can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
 number, and both are carried as one comma-separated value: a form field
 submits a string, and two fields for one question is a different control. */
-  mode?: HelixBaseDateInput["mode"];
+  mode?: HelixHeadlessDateInput["mode"];
   /** How many months the calendar shows, side by side.
 
 Worth more than one mainly for a range, where picking a start in March and
 an end in April otherwise means paging between them and losing sight of the
 first. The panel is sized by its content, so this widens it. */
-  months?: HelixBaseDateInput["months"];
+  months?: HelixHeadlessDateInput["months"];
   /** How many dates are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -2970,7 +2986,7 @@ dates would push everything below it down a line at a time.
 The remainder is counted rather than hidden. "3 more" is a fact a reader can
 act on, where a row that silently stops is a field that appears to have lost
 what was put in it, and the count is what tells them there is more to see. */
-  "max-tags"?: HelixBaseDateInput["maxTags"];
+  "max-tags"?: HelixHeadlessDateInput["maxTags"];
   /** How many dates are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -2982,23 +2998,23 @@ dates would push everything below it down a line at a time.
 The remainder is counted rather than hidden. "3 more" is a fact a reader can
 act on, where a row that silently stops is a field that appears to have lost
 what was put in it, and the count is what tells them there is more to see. */
-  maxTags?: HelixBaseDateInput["maxTags"];
+  maxTags?: HelixHeadlessDateInput["maxTags"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
-  min?: HelixBaseDateInput["min"];
+  min?: HelixHeadlessDateInput["min"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
-  max?: HelixBaseDateInput["max"];
+  max?: HelixHeadlessDateInput["max"];
   /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
-  "disable-dates"?: HelixBaseDateInput["disableDates"];
+  "disable-dates"?: HelixHeadlessDateInput["disableDates"];
   /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
-  disableDates?: HelixBaseDateInput["disableDates"];
+  disableDates?: HelixHeadlessDateInput["disableDates"];
   /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
-  "disable-days"?: HelixBaseDateInput["disableDays"];
+  "disable-days"?: HelixHeadlessDateInput["disableDays"];
   /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
-  disableDays?: HelixBaseDateInput["disableDays"];
+  disableDays?: HelixHeadlessDateInput["disableDays"];
   /** First column of the week in the calendar, `0` for Sunday through `6`. */
-  "first-day-of-week"?: HelixBaseDateInput["firstDayOfWeek"];
+  "first-day-of-week"?: HelixHeadlessDateInput["firstDayOfWeek"];
   /** First column of the week in the calendar, `0` for Sunday through `6`. */
-  firstDayOfWeek?: HelixBaseDateInput["firstDayOfWeek"];
+  firstDayOfWeek?: HelixHeadlessDateInput["firstDayOfWeek"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
 **The field renders when it is idle and holds the value when it is being
@@ -3021,7 +3037,7 @@ rather than reading it, or where the ISO form is itself the point.
 
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
-  "date-style"?: HelixBaseDateInput["dateStyle"];
+  "date-style"?: HelixHeadlessDateInput["dateStyle"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
 **The field renders when it is idle and holds the value when it is being
@@ -3044,15 +3060,15 @@ rather than reading it, or where the ISO form is itself the point.
 
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
-  dateStyle?: HelixBaseDateInput["dateStyle"];
+  dateStyle?: HelixHeadlessDateInput["dateStyle"];
   /** Language tag the calendar names its months and days in. */
-  locale?: HelixBaseDateInput["locale"];
+  locale?: HelixHeadlessDateInput["locale"];
   /** What the field says before a date is in it. */
-  placeholder?: HelixBaseDateInput["placeholder"];
+  placeholder?: HelixHeadlessDateInput["placeholder"];
   /** Accessible name for the control that opens the calendar. */
-  "trigger-label"?: HelixBaseDateInput["triggerLabel"];
+  "trigger-label"?: HelixHeadlessDateInput["triggerLabel"];
   /** Accessible name for the control that opens the calendar. */
-  triggerLabel?: HelixBaseDateInput["triggerLabel"];
+  triggerLabel?: HelixHeadlessDateInput["triggerLabel"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -3075,15 +3091,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseDateInput["open"];
+  open?: HelixHeadlessDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseDateInput["defaultOpen"];
+  "default-open"?: HelixHeadlessDateInput["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseDateInput["defaultOpen"];
+  defaultOpen?: HelixHeadlessDateInput["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseDateInput["defaultValue"];
+  "default-value"?: HelixHeadlessDateInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseDateInput["defaultValue"];
+  defaultValue?: HelixHeadlessDateInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -3095,15 +3111,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseDateInput["value"];
+  value?: HelixHeadlessDateInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseDateInput["hint"];
+  hint?: HelixHeadlessDateInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseDateInput["feedback"];
+  feedback?: HelixHeadlessDateInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseDateInput["label"];
+  label?: HelixHeadlessDateInput["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseDateInput["required"];
+  required?: HelixHeadlessDateInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3114,7 +3130,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseDateInput["disabled"];
+  disabled?: HelixHeadlessDateInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -3132,29 +3148,29 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseDateInput["name"];
+  name?: HelixHeadlessDateInput["name"];
 
   /** Fired when the date changes. */
-  "onhelix-change"?: (e: HelixBaseDateInputHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessDateInputHelixChangeElementEvent) => void;
   /** Fired when the calendar opens. */
-  "onhelix-open"?: (e: HelixBaseDateInputHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessDateInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixBaseDateInputHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessDateInputHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseDateInputSolidJsProps = {
+export type HelixHeadlessDateInputSolidJsProps = {
   /** How many dates can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
 number, and both are carried as one comma-separated value: a form field
 submits a string, and two fields for one question is a different control. */
-  "prop:mode"?: HelixBaseDateInput["mode"];
+  "prop:mode"?: HelixHeadlessDateInput["mode"];
   /** How many months the calendar shows, side by side.
 
 Worth more than one mainly for a range, where picking a start in March and
 an end in April otherwise means paging between them and losing sight of the
 first. The panel is sized by its content, so this widens it. */
-  "prop:months"?: HelixBaseDateInput["months"];
+  "prop:months"?: HelixHeadlessDateInput["months"];
   /** How many dates are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -3166,7 +3182,7 @@ dates would push everything below it down a line at a time.
 The remainder is counted rather than hidden. "3 more" is a fact a reader can
 act on, where a row that silently stops is a field that appears to have lost
 what was put in it, and the count is what tells them there is more to see. */
-  "attr:max-tags"?: HelixBaseDateInput["maxTags"];
+  "attr:max-tags"?: HelixHeadlessDateInput["maxTags"];
   /** How many dates are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -3178,23 +3194,23 @@ dates would push everything below it down a line at a time.
 The remainder is counted rather than hidden. "3 more" is a fact a reader can
 act on, where a row that silently stops is a field that appears to have lost
 what was put in it, and the count is what tells them there is more to see. */
-  "prop:maxTags"?: HelixBaseDateInput["maxTags"];
+  "prop:maxTags"?: HelixHeadlessDateInput["maxTags"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
-  "prop:min"?: HelixBaseDateInput["min"];
+  "prop:min"?: HelixHeadlessDateInput["min"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
-  "prop:max"?: HelixBaseDateInput["max"];
+  "prop:max"?: HelixHeadlessDateInput["max"];
   /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
-  "attr:disable-dates"?: HelixBaseDateInput["disableDates"];
+  "attr:disable-dates"?: HelixHeadlessDateInput["disableDates"];
   /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
-  "prop:disableDates"?: HelixBaseDateInput["disableDates"];
+  "prop:disableDates"?: HelixHeadlessDateInput["disableDates"];
   /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
-  "attr:disable-days"?: HelixBaseDateInput["disableDays"];
+  "attr:disable-days"?: HelixHeadlessDateInput["disableDays"];
   /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
-  "prop:disableDays"?: HelixBaseDateInput["disableDays"];
+  "prop:disableDays"?: HelixHeadlessDateInput["disableDays"];
   /** First column of the week in the calendar, `0` for Sunday through `6`. */
-  "attr:first-day-of-week"?: HelixBaseDateInput["firstDayOfWeek"];
+  "attr:first-day-of-week"?: HelixHeadlessDateInput["firstDayOfWeek"];
   /** First column of the week in the calendar, `0` for Sunday through `6`. */
-  "prop:firstDayOfWeek"?: HelixBaseDateInput["firstDayOfWeek"];
+  "prop:firstDayOfWeek"?: HelixHeadlessDateInput["firstDayOfWeek"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
 **The field renders when it is idle and holds the value when it is being
@@ -3217,7 +3233,7 @@ rather than reading it, or where the ISO form is itself the point.
 
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
-  "attr:date-style"?: HelixBaseDateInput["dateStyle"];
+  "attr:date-style"?: HelixHeadlessDateInput["dateStyle"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
 **The field renders when it is idle and holds the value when it is being
@@ -3240,15 +3256,15 @@ rather than reading it, or where the ISO form is itself the point.
 
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
-  "prop:dateStyle"?: HelixBaseDateInput["dateStyle"];
+  "prop:dateStyle"?: HelixHeadlessDateInput["dateStyle"];
   /** Language tag the calendar names its months and days in. */
-  "prop:locale"?: HelixBaseDateInput["locale"];
+  "prop:locale"?: HelixHeadlessDateInput["locale"];
   /** What the field says before a date is in it. */
-  "prop:placeholder"?: HelixBaseDateInput["placeholder"];
+  "prop:placeholder"?: HelixHeadlessDateInput["placeholder"];
   /** Accessible name for the control that opens the calendar. */
-  "attr:trigger-label"?: HelixBaseDateInput["triggerLabel"];
+  "attr:trigger-label"?: HelixHeadlessDateInput["triggerLabel"];
   /** Accessible name for the control that opens the calendar. */
-  "prop:triggerLabel"?: HelixBaseDateInput["triggerLabel"];
+  "prop:triggerLabel"?: HelixHeadlessDateInput["triggerLabel"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -3271,15 +3287,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseDateInput["open"];
+  "prop:open"?: HelixHeadlessDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseDateInput["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessDateInput["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseDateInput["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessDateInput["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseDateInput["defaultValue"];
+  "attr:default-value"?: HelixHeadlessDateInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseDateInput["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessDateInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -3291,15 +3307,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseDateInput["value"];
+  "prop:value"?: HelixHeadlessDateInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseDateInput["hint"];
+  "prop:hint"?: HelixHeadlessDateInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseDateInput["feedback"];
+  "prop:feedback"?: HelixHeadlessDateInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseDateInput["label"];
+  "prop:label"?: HelixHeadlessDateInput["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseDateInput["required"];
+  "prop:required"?: HelixHeadlessDateInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3310,7 +3326,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseDateInput["disabled"];
+  "prop:disabled"?: HelixHeadlessDateInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -3328,13 +3344,15 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseDateInput["name"];
+  "prop:name"?: HelixHeadlessDateInput["name"];
   /** Fired when the date changes. */
-  "on:helix-change"?: (e: HelixBaseDateInputHelixChangeElementEvent) => void;
+  "on:helix-change"?: (
+    e: HelixHeadlessDateInputHelixChangeElementEvent,
+  ) => void;
   /** Fired when the calendar opens. */
-  "on:helix-open"?: (e: HelixBaseDateInputHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessDateInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixBaseDateInputHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessDateInputHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3342,35 +3360,35 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseDatePicker` component event */
-export type HelixBaseDatePickerElementEvent<E = Event> = TypedEvent<
-  HelixBaseDatePicker,
+/** `HelixHeadlessDatePicker` component event */
+export type HelixHeadlessDatePickerElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessDatePicker,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseDatePickerHelixChangeElementEvent =
-  HelixBaseDatePickerElementEvent<HelixChangeEvent>;
+export type HelixHeadlessDatePickerHelixChangeElementEvent =
+  HelixHeadlessDatePickerElementEvent<HelixChangeEvent>;
 /** `helix-navigate` event type */
-export type HelixBaseDatePickerHelixNavigateElementEvent =
-  HelixBaseDatePickerElementEvent<HelixNavigateEvent>;
+export type HelixHeadlessDatePickerHelixNavigateElementEvent =
+  HelixHeadlessDatePickerElementEvent<HelixNavigateEvent>;
 
-export type HelixBaseDatePickerProps = {
+export type HelixHeadlessDatePickerProps = {
   /** How many dates can be held at once. */
-  mode?: HelixBaseDatePicker["mode"];
+  mode?: HelixHeadlessDatePicker["mode"];
   /** How many months to show, side by side. */
-  months?: HelixBaseDatePicker["months"];
+  months?: HelixHeadlessDatePicker["months"];
   /** Locale for month and day names. Absent uses the runtime's own. */
-  locale?: HelixBaseDatePicker["locale"];
+  locale?: HelixHeadlessDatePicker["locale"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
-  "disable-dates"?: HelixBaseDatePicker["disableDates"];
+  "disable-dates"?: HelixHeadlessDatePicker["disableDates"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
-  disableDates?: HelixBaseDatePicker["disableDates"];
+  disableDates?: HelixHeadlessDatePicker["disableDates"];
   /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
-  "disable-days"?: HelixBaseDatePicker["disableDays"];
+  "disable-days"?: HelixHeadlessDatePicker["disableDays"];
   /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
-  disableDays?: HelixBaseDatePicker["disableDays"];
+  disableDays?: HelixHeadlessDatePicker["disableDays"];
   /** Whether the current selection fails validation. */
-  invalid?: HelixBaseDatePicker["invalid"];
+  invalid?: HelixHeadlessDatePicker["invalid"];
   /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
 
 Separate from `value` on purpose, so paging selects nothing and a consumer
@@ -3378,7 +3396,7 @@ can drive the view. It said that and could not do it: the calendar wrote
 this when the reader paged, so a consumer holding it was overwritten and
 never told. Reading gives the month on show; writing declares it theirs,
 and `default-month` seeds one the calendar owns. */
-  month?: HelixBaseDatePicker["month"];
+  month?: HelixHeadlessDatePicker["month"];
   /** Accessible name for the control that pages back.
 
 A property because this is the one component in the library that takes a
@@ -3386,7 +3404,7 @@ A property because this is the one component in the library that takes a
 them: a calendar rendering its own month names in Japanese still announced
 its controls in English. `attribute:` spelled out, since Lit lowercases a
 camelCase name rather than dash-casing it. */
-  "previous-label"?: HelixBaseDatePicker["previousLabel"];
+  "previous-label"?: HelixHeadlessDatePicker["previousLabel"];
   /** Accessible name for the control that pages back.
 
 A property because this is the one component in the library that takes a
@@ -3394,29 +3412,29 @@ A property because this is the one component in the library that takes a
 them: a calendar rendering its own month names in Japanese still announced
 its controls in English. `attribute:` spelled out, since Lit lowercases a
 camelCase name rather than dash-casing it. */
-  previousLabel?: HelixBaseDatePicker["previousLabel"];
+  previousLabel?: HelixHeadlessDatePicker["previousLabel"];
   /** Accessible name for the control that pages forward. */
-  "next-label"?: HelixBaseDatePicker["nextLabel"];
+  "next-label"?: HelixHeadlessDatePicker["nextLabel"];
   /** Accessible name for the control that pages forward. */
-  nextLabel?: HelixBaseDatePicker["nextLabel"];
+  nextLabel?: HelixHeadlessDatePicker["nextLabel"];
   /** Month to open on, where nothing declared one. */
-  "default-month"?: HelixBaseDatePicker["defaultMonth"];
+  "default-month"?: HelixHeadlessDatePicker["defaultMonth"];
   /** Month to open on, where nothing declared one. */
-  defaultMonth?: HelixBaseDatePicker["defaultMonth"];
+  defaultMonth?: HelixHeadlessDatePicker["defaultMonth"];
   /** Earliest selectable date, as `YYYY-MM-DD`. */
-  min?: HelixBaseDatePicker["min"];
+  min?: HelixHeadlessDatePicker["min"];
   /** Latest selectable date, as `YYYY-MM-DD`. */
-  max?: HelixBaseDatePicker["max"];
+  max?: HelixHeadlessDatePicker["max"];
   /** Accessible name for the grid. */
-  label?: HelixBaseDatePicker["label"];
+  label?: HelixHeadlessDatePicker["label"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "first-day-of-week"?: HelixBaseDatePicker["firstDayOfWeek"];
+  "first-day-of-week"?: HelixHeadlessDatePicker["firstDayOfWeek"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  firstDayOfWeek?: HelixBaseDatePicker["firstDayOfWeek"];
+  firstDayOfWeek?: HelixHeadlessDatePicker["firstDayOfWeek"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseDatePicker["defaultValue"];
+  "default-value"?: HelixHeadlessDatePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseDatePicker["defaultValue"];
+  defaultValue?: HelixHeadlessDatePicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -3428,7 +3446,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseDatePicker["value"];
+  value?: HelixHeadlessDatePicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3439,7 +3457,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseDatePicker["disabled"];
+  disabled?: HelixHeadlessDatePicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -3457,33 +3475,35 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseDatePicker["name"];
+  name?: HelixHeadlessDatePicker["name"];
 
   /** Fired before the dates change, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseDatePickerHelixChangeElementEvent) => void;
+  "onhelix-change"?: (
+    e: HelixHeadlessDatePickerHelixChangeElementEvent,
+  ) => void;
   /** Fired before the month on show changes, and cancelable. */
   "onhelix-navigate"?: (
-    e: HelixBaseDatePickerHelixNavigateElementEvent,
+    e: HelixHeadlessDatePickerHelixNavigateElementEvent,
   ) => void;
 };
 
-export type HelixBaseDatePickerSolidJsProps = {
+export type HelixHeadlessDatePickerSolidJsProps = {
   /** How many dates can be held at once. */
-  "prop:mode"?: HelixBaseDatePicker["mode"];
+  "prop:mode"?: HelixHeadlessDatePicker["mode"];
   /** How many months to show, side by side. */
-  "prop:months"?: HelixBaseDatePicker["months"];
+  "prop:months"?: HelixHeadlessDatePicker["months"];
   /** Locale for month and day names. Absent uses the runtime's own. */
-  "prop:locale"?: HelixBaseDatePicker["locale"];
+  "prop:locale"?: HelixHeadlessDatePicker["locale"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
-  "attr:disable-dates"?: HelixBaseDatePicker["disableDates"];
+  "attr:disable-dates"?: HelixHeadlessDatePicker["disableDates"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
-  "prop:disableDates"?: HelixBaseDatePicker["disableDates"];
+  "prop:disableDates"?: HelixHeadlessDatePicker["disableDates"];
   /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
-  "attr:disable-days"?: HelixBaseDatePicker["disableDays"];
+  "attr:disable-days"?: HelixHeadlessDatePicker["disableDays"];
   /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
-  "prop:disableDays"?: HelixBaseDatePicker["disableDays"];
+  "prop:disableDays"?: HelixHeadlessDatePicker["disableDays"];
   /** Whether the current selection fails validation. */
-  "prop:invalid"?: HelixBaseDatePicker["invalid"];
+  "prop:invalid"?: HelixHeadlessDatePicker["invalid"];
   /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
 
 Separate from `value` on purpose, so paging selects nothing and a consumer
@@ -3491,7 +3511,7 @@ can drive the view. It said that and could not do it: the calendar wrote
 this when the reader paged, so a consumer holding it was overwritten and
 never told. Reading gives the month on show; writing declares it theirs,
 and `default-month` seeds one the calendar owns. */
-  "prop:month"?: HelixBaseDatePicker["month"];
+  "prop:month"?: HelixHeadlessDatePicker["month"];
   /** Accessible name for the control that pages back.
 
 A property because this is the one component in the library that takes a
@@ -3499,7 +3519,7 @@ A property because this is the one component in the library that takes a
 them: a calendar rendering its own month names in Japanese still announced
 its controls in English. `attribute:` spelled out, since Lit lowercases a
 camelCase name rather than dash-casing it. */
-  "attr:previous-label"?: HelixBaseDatePicker["previousLabel"];
+  "attr:previous-label"?: HelixHeadlessDatePicker["previousLabel"];
   /** Accessible name for the control that pages back.
 
 A property because this is the one component in the library that takes a
@@ -3507,29 +3527,29 @@ A property because this is the one component in the library that takes a
 them: a calendar rendering its own month names in Japanese still announced
 its controls in English. `attribute:` spelled out, since Lit lowercases a
 camelCase name rather than dash-casing it. */
-  "prop:previousLabel"?: HelixBaseDatePicker["previousLabel"];
+  "prop:previousLabel"?: HelixHeadlessDatePicker["previousLabel"];
   /** Accessible name for the control that pages forward. */
-  "attr:next-label"?: HelixBaseDatePicker["nextLabel"];
+  "attr:next-label"?: HelixHeadlessDatePicker["nextLabel"];
   /** Accessible name for the control that pages forward. */
-  "prop:nextLabel"?: HelixBaseDatePicker["nextLabel"];
+  "prop:nextLabel"?: HelixHeadlessDatePicker["nextLabel"];
   /** Month to open on, where nothing declared one. */
-  "attr:default-month"?: HelixBaseDatePicker["defaultMonth"];
+  "attr:default-month"?: HelixHeadlessDatePicker["defaultMonth"];
   /** Month to open on, where nothing declared one. */
-  "prop:defaultMonth"?: HelixBaseDatePicker["defaultMonth"];
+  "prop:defaultMonth"?: HelixHeadlessDatePicker["defaultMonth"];
   /** Earliest selectable date, as `YYYY-MM-DD`. */
-  "prop:min"?: HelixBaseDatePicker["min"];
+  "prop:min"?: HelixHeadlessDatePicker["min"];
   /** Latest selectable date, as `YYYY-MM-DD`. */
-  "prop:max"?: HelixBaseDatePicker["max"];
+  "prop:max"?: HelixHeadlessDatePicker["max"];
   /** Accessible name for the grid. */
-  "prop:label"?: HelixBaseDatePicker["label"];
+  "prop:label"?: HelixHeadlessDatePicker["label"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "attr:first-day-of-week"?: HelixBaseDatePicker["firstDayOfWeek"];
+  "attr:first-day-of-week"?: HelixHeadlessDatePicker["firstDayOfWeek"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "prop:firstDayOfWeek"?: HelixBaseDatePicker["firstDayOfWeek"];
+  "prop:firstDayOfWeek"?: HelixHeadlessDatePicker["firstDayOfWeek"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseDatePicker["defaultValue"];
+  "attr:default-value"?: HelixHeadlessDatePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseDatePicker["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessDatePicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -3541,7 +3561,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseDatePicker["value"];
+  "prop:value"?: HelixHeadlessDatePicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3552,7 +3572,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseDatePicker["disabled"];
+  "prop:disabled"?: HelixHeadlessDatePicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -3570,12 +3590,14 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseDatePicker["name"];
+  "prop:name"?: HelixHeadlessDatePicker["name"];
   /** Fired before the dates change, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseDatePickerHelixChangeElementEvent) => void;
+  "on:helix-change"?: (
+    e: HelixHeadlessDatePickerHelixChangeElementEvent,
+  ) => void;
   /** Fired before the month on show changes, and cancelable. */
   "on:helix-navigate"?: (
-    e: HelixBaseDatePickerHelixNavigateElementEvent,
+    e: HelixHeadlessDatePickerHelixNavigateElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -3584,21 +3606,21 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseDialog` component event */
-export type HelixBaseDialogElementEvent<E = Event> = TypedEvent<
-  HelixBaseDialog,
+/** `HelixHeadlessDialog` component event */
+export type HelixHeadlessDialogElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessDialog,
   E
 >;
 /** `helix-open` event type */
-export type HelixBaseDialogHelixOpenElementEvent =
-  HelixBaseDialogElementEvent<HelixOpenEvent>;
+export type HelixHeadlessDialogHelixOpenElementEvent =
+  HelixHeadlessDialogElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseDialogHelixCloseElementEvent =
-  HelixBaseDialogElementEvent<HelixCloseEvent>;
+export type HelixHeadlessDialogHelixCloseElementEvent =
+  HelixHeadlessDialogElementEvent<HelixCloseEvent>;
 
-export type HelixBaseDialogProps = {
+export type HelixHeadlessDialogProps = {
   /** Accessible name for the dialog. */
-  label?: HelixBaseDialog["label"];
+  label?: HelixHeadlessDialog["label"];
   /** Whether Escape can close it.
 
 Off for a dialog that must be answered. It does not disable the close
@@ -3614,7 +3636,7 @@ to build the half that was missing.
 A persistent dialog does not ignore that press. It answers it: see
 `refuse`, which is the only way a dialog that will not be dismissed can say
 so at the moment a reader asks. */
-  persistent?: HelixBaseDialog["persistent"];
+  persistent?: HelixHeadlessDialog["persistent"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -3637,21 +3659,21 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseDialog["open"];
+  open?: HelixHeadlessDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseDialog["defaultOpen"];
+  "default-open"?: HelixHeadlessDialog["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseDialog["defaultOpen"];
+  defaultOpen?: HelixHeadlessDialog["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixBaseDialogHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessDialogHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixBaseDialogHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessDialogHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseDialogSolidJsProps = {
+export type HelixHeadlessDialogSolidJsProps = {
   /** Accessible name for the dialog. */
-  "prop:label"?: HelixBaseDialog["label"];
+  "prop:label"?: HelixHeadlessDialog["label"];
   /** Whether Escape can close it.
 
 Off for a dialog that must be answered. It does not disable the close
@@ -3667,7 +3689,7 @@ to build the half that was missing.
 A persistent dialog does not ignore that press. It answers it: see
 `refuse`, which is the only way a dialog that will not be dismissed can say
 so at the moment a reader asks. */
-  "prop:persistent"?: HelixBaseDialog["persistent"];
+  "prop:persistent"?: HelixHeadlessDialog["persistent"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -3690,15 +3712,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseDialog["open"];
+  "prop:open"?: HelixHeadlessDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseDialog["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessDialog["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseDialog["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessDialog["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixBaseDialogHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessDialogHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixBaseDialogHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessDialogHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3706,9 +3728,9 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-export type HelixBaseDividerProps = {
+export type HelixHeadlessDividerProps = {
   /** Which way the rule runs. */
-  orientation?: HelixBaseDivider["orientation"];
+  orientation?: HelixHeadlessDivider["orientation"];
   /** Whether the rule is announced as a separator.
 
 Off by default, and out of the accessibility tree. Most rules on a page
@@ -3721,12 +3743,12 @@ be turned off: `decorative="false"` parses as `true`, which would put the
 quiet default out of reach from HTML and leave it settable only as a
 property. An opt-in is absent by default, which every reflected property
 here has to be. */
-  announced?: HelixBaseDivider["announced"];
+  announced?: HelixHeadlessDivider["announced"];
 };
 
-export type HelixBaseDividerSolidJsProps = {
+export type HelixHeadlessDividerSolidJsProps = {
   /** Which way the rule runs. */
-  "prop:orientation"?: HelixBaseDivider["orientation"];
+  "prop:orientation"?: HelixHeadlessDivider["orientation"];
   /** Whether the rule is announced as a separator.
 
 Off by default, and out of the accessibility tree. Most rules on a page
@@ -3739,7 +3761,7 @@ be turned off: `decorative="false"` parses as `true`, which would put the
 quiet default out of reach from HTML and leave it settable only as a
 property. An opt-in is absent by default, which every reflected property
 here has to be. */
-  "prop:announced"?: HelixBaseDivider["announced"];
+  "prop:announced"?: HelixHeadlessDivider["announced"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3747,7 +3769,7 @@ here has to be. */
   textContent?: string | number;
 };
 
-export type HelixBaseDonutChartProps = {
+export type HelixHeadlessDonutChartProps = {
   /** How much is left open in the middle.
 
 Absent is a ring with room for a total in it. `small` and `large` move the
@@ -3765,7 +3787,7 @@ the bar chart's baseline is not a property at all.
 which needs the radius: reading a custom property means `getComputedStyle`,
 which is client-only, so a server would have drawn a different ring than
 the client. A plot's proportions are markup for the same reason `curve` is. */
-  hole?: HelixBaseDonutChart["hole"];
+  hole?: HelixHeadlessDonutChart["hole"];
   /** How much of the circle the whole occupies.
 
 Absent is the full turn. `half` is a semi-donut: the same shares spread
@@ -3788,7 +3810,7 @@ Reflected, because the stylesheet has three things to say about it: the
 rotation that puts the first slice at nine o'clock, the aspect ratio of a
 box that is no longer square, and where the middle sits once the bottom of
 the circle is not drawn. */
-  sweep?: HelixBaseDonutChart["sweep"];
+  sweep?: HelixHeadlessDonutChart["sweep"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -3797,15 +3819,15 @@ shadow root names a table in that root rather than in the document. A
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  for?: HelixBaseDonutChart["for"];
+  for?: HelixHeadlessDonutChart["for"];
   /** The drawing's name, for a pointer resting on it.
 
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
-  label?: HelixBaseDonutChart["label"];
+  label?: HelixHeadlessDonutChart["label"];
 };
 
-export type HelixBaseDonutChartSolidJsProps = {
+export type HelixHeadlessDonutChartSolidJsProps = {
   /** How much is left open in the middle.
 
 Absent is a ring with room for a total in it. `small` and `large` move the
@@ -3823,7 +3845,7 @@ the bar chart's baseline is not a property at all.
 which needs the radius: reading a custom property means `getComputedStyle`,
 which is client-only, so a server would have drawn a different ring than
 the client. A plot's proportions are markup for the same reason `curve` is. */
-  "prop:hole"?: HelixBaseDonutChart["hole"];
+  "prop:hole"?: HelixHeadlessDonutChart["hole"];
   /** How much of the circle the whole occupies.
 
 Absent is the full turn. `half` is a semi-donut: the same shares spread
@@ -3846,7 +3868,7 @@ Reflected, because the stylesheet has three things to say about it: the
 rotation that puts the first slice at nine o'clock, the aspect ratio of a
 box that is no longer square, and where the middle sits once the bottom of
 the circle is not drawn. */
-  "prop:sweep"?: HelixBaseDonutChart["sweep"];
+  "prop:sweep"?: HelixHeadlessDonutChart["sweep"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -3855,12 +3877,12 @@ shadow root names a table in that root rather than in the document. A
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  "prop:for"?: HelixBaseDonutChart["for"];
+  "prop:for"?: HelixHeadlessDonutChart["for"];
   /** The drawing's name, for a pointer resting on it.
 
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
-  "prop:label"?: HelixBaseDonutChart["label"];
+  "prop:label"?: HelixHeadlessDonutChart["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3868,28 +3890,28 @@ words and is already written. */
   textContent?: string | number;
 };
 
-/** `HelixBaseDrawer` component event */
-export type HelixBaseDrawerElementEvent<E = Event> = TypedEvent<
-  HelixBaseDrawer,
+/** `HelixHeadlessDrawer` component event */
+export type HelixHeadlessDrawerElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessDrawer,
   E
 >;
 /** `helix-close` event type */
-export type HelixBaseDrawerHelixCloseElementEvent =
-  HelixBaseDrawerElementEvent<HelixCloseEvent>;
+export type HelixHeadlessDrawerHelixCloseElementEvent =
+  HelixHeadlessDrawerElementEvent<HelixCloseEvent>;
 /** `helix-open` event type */
-export type HelixBaseDrawerHelixOpenElementEvent =
-  HelixBaseDrawerElementEvent<HelixOpenEvent>;
+export type HelixHeadlessDrawerHelixOpenElementEvent =
+  HelixHeadlessDrawerElementEvent<HelixOpenEvent>;
 
-export type HelixBaseDrawerProps = {
+export type HelixHeadlessDrawerProps = {
   /** Which edge the drawer comes from.
 
 Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
 beside `:host([placement="end"])` rather than as a value written here: a
 default assigned to the property would reflect onto every host and put a
 `placement="end"` into markup no consumer wrote. */
-  placement?: HelixBaseDrawer["placement"];
+  placement?: HelixHeadlessDrawer["placement"];
   /** Accessible name for the panel. */
-  label?: HelixBaseDrawer["label"];
+  label?: HelixHeadlessDrawer["label"];
   /** Whether the drawer blocks the page behind it.
 
 Turning this off removes the focus trap and the scrim together, because
@@ -3901,7 +3923,7 @@ Not reflected. It stays `true` by default, since a drawer that silently
 lost its focus trap because a consumer forgot a word would be worse than an
 attribute on the host, and nothing selects on it: the scrim is rendered or
 not, rather than shown or hidden by CSS. */
-  modal?: HelixBaseDrawer["modal"];
+  modal?: HelixHeadlessDrawer["modal"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -3924,28 +3946,28 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseDrawer["open"];
+  open?: HelixHeadlessDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseDrawer["defaultOpen"];
+  "default-open"?: HelixHeadlessDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseDrawer["defaultOpen"];
+  defaultOpen?: HelixHeadlessDrawer["defaultOpen"];
 
   /** Fired before the panel closes, and cancelable. */
-  "onhelix-close"?: (e: HelixBaseDrawerHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessDrawerHelixCloseElementEvent) => void;
   /** Fired when the drawer opens or closes. */
-  "onhelix-open"?: (e: HelixBaseDrawerHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessDrawerHelixOpenElementEvent) => void;
 };
 
-export type HelixBaseDrawerSolidJsProps = {
+export type HelixHeadlessDrawerSolidJsProps = {
   /** Which edge the drawer comes from.
 
 Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
 beside `:host([placement="end"])` rather than as a value written here: a
 default assigned to the property would reflect onto every host and put a
 `placement="end"` into markup no consumer wrote. */
-  "prop:placement"?: HelixBaseDrawer["placement"];
+  "prop:placement"?: HelixHeadlessDrawer["placement"];
   /** Accessible name for the panel. */
-  "prop:label"?: HelixBaseDrawer["label"];
+  "prop:label"?: HelixHeadlessDrawer["label"];
   /** Whether the drawer blocks the page behind it.
 
 Turning this off removes the focus trap and the scrim together, because
@@ -3957,7 +3979,7 @@ Not reflected. It stays `true` by default, since a drawer that silently
 lost its focus trap because a consumer forgot a word would be worse than an
 attribute on the host, and nothing selects on it: the scrim is rendered or
 not, rather than shown or hidden by CSS. */
-  "prop:modal"?: HelixBaseDrawer["modal"];
+  "prop:modal"?: HelixHeadlessDrawer["modal"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -3980,15 +4002,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseDrawer["open"];
+  "prop:open"?: HelixHeadlessDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseDrawer["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseDrawer["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessDrawer["defaultOpen"];
   /** Fired before the panel closes, and cancelable. */
-  "on:helix-close"?: (e: HelixBaseDrawerHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessDrawerHelixCloseElementEvent) => void;
   /** Fired when the drawer opens or closes. */
-  "on:helix-open"?: (e: HelixBaseDrawerHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessDrawerHelixOpenElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3996,24 +4018,24 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-/** `HelixBaseDrilldownItem` component event */
-export type HelixBaseDrilldownItemElementEvent<E = Event> = TypedEvent<
-  HelixBaseDrilldownItem,
+/** `HelixHeadlessDrilldownItem` component event */
+export type HelixHeadlessDrilldownItemElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessDrilldownItem,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseDrilldownItemHelixSelectElementEvent =
-  HelixBaseDrilldownItemElementEvent<HelixSelectEvent>;
+export type HelixHeadlessDrilldownItemHelixSelectElementEvent =
+  HelixHeadlessDrilldownItemElementEvent<HelixSelectEvent>;
 
-export type HelixBaseDrilldownItemProps = {
+export type HelixHeadlessDrilldownItemProps = {
   /** Whether the row can be reached at all. */
-  disabled?: HelixBaseDrilldownItem["disabled"];
+  disabled?: HelixHeadlessDrilldownItem["disabled"];
   /** Identifies the row to whatever is listening. */
-  value?: HelixBaseDrilldownItem["value"];
+  value?: HelixHeadlessDrilldownItem["value"];
   /** Whether the page showing is the one this row is on. Written by the stack. */
-  onPage?: HelixBaseDrilldownItem["onPage"];
+  onPage?: HelixHeadlessDrilldownItem["onPage"];
   /** Whether this row's own page is the one showing. Written by the stack. */
-  showingPage?: HelixBaseDrilldownItem["showingPage"];
+  showingPage?: HelixHeadlessDrilldownItem["showingPage"];
   /** Whether this row holds the region's tab stop. Written by the stack.
 
 A drill-down keeps one stop and moves within it on the arrows, so every
@@ -4025,21 +4047,23 @@ No attribute, the same as `Button`'s: this is coordination between
 elements, and writing `tabindex` onto a host the consumer rendered is a
 change a React consumer's hydration reports and does not patch up. The stop
 lands inside this shadow root instead. */
-  focusable?: HelixBaseDrilldownItem["focusable"];
+  focusable?: HelixHeadlessDrilldownItem["focusable"];
 
   /** Fired when the row is chosen. */
-  "onhelix-select"?: (e: HelixBaseDrilldownItemHelixSelectElementEvent) => void;
+  "onhelix-select"?: (
+    e: HelixHeadlessDrilldownItemHelixSelectElementEvent,
+  ) => void;
 };
 
-export type HelixBaseDrilldownItemSolidJsProps = {
+export type HelixHeadlessDrilldownItemSolidJsProps = {
   /** Whether the row can be reached at all. */
-  "prop:disabled"?: HelixBaseDrilldownItem["disabled"];
+  "prop:disabled"?: HelixHeadlessDrilldownItem["disabled"];
   /** Identifies the row to whatever is listening. */
-  "prop:value"?: HelixBaseDrilldownItem["value"];
+  "prop:value"?: HelixHeadlessDrilldownItem["value"];
   /** Whether the page showing is the one this row is on. Written by the stack. */
-  "prop:onPage"?: HelixBaseDrilldownItem["onPage"];
+  "prop:onPage"?: HelixHeadlessDrilldownItem["onPage"];
   /** Whether this row's own page is the one showing. Written by the stack. */
-  "prop:showingPage"?: HelixBaseDrilldownItem["showingPage"];
+  "prop:showingPage"?: HelixHeadlessDrilldownItem["showingPage"];
   /** Whether this row holds the region's tab stop. Written by the stack.
 
 A drill-down keeps one stop and moves within it on the arrows, so every
@@ -4051,10 +4075,10 @@ No attribute, the same as `Button`'s: this is coordination between
 elements, and writing `tabindex` onto a host the consumer rendered is a
 change a React consumer's hydration reports and does not patch up. The stop
 lands inside this shadow root instead. */
-  "prop:focusable"?: HelixBaseDrilldownItem["focusable"];
+  "prop:focusable"?: HelixHeadlessDrilldownItem["focusable"];
   /** Fired when the row is chosen. */
   "on:helix-select"?: (
-    e: HelixBaseDrilldownItemHelixSelectElementEvent,
+    e: HelixHeadlessDrilldownItemHelixSelectElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -4063,64 +4087,66 @@ lands inside this shadow root instead. */
   textContent?: string | number;
 };
 
-/** `HelixBaseDrilldown` component event */
-export type HelixBaseDrilldownElementEvent<E = Event> = TypedEvent<
-  HelixBaseDrilldown,
+/** `HelixHeadlessDrilldown` component event */
+export type HelixHeadlessDrilldownElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessDrilldown,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseDrilldownHelixSelectElementEvent =
-  HelixBaseDrilldownElementEvent<HelixSelectEvent>;
+export type HelixHeadlessDrilldownHelixSelectElementEvent =
+  HelixHeadlessDrilldownElementEvent<HelixSelectEvent>;
 
-export type HelixBaseDrilldownProps = {
+export type HelixHeadlessDrilldownProps = {
   /** Accessible name for the region. */
-  label?: HelixBaseDrilldown["label"];
+  label?: HelixHeadlessDrilldown["label"];
   /** What the control returning from a page reads. */
-  "back-label"?: HelixBaseDrilldown["backLabel"];
+  "back-label"?: HelixHeadlessDrilldown["backLabel"];
   /** What the control returning from a page reads. */
-  backLabel?: HelixBaseDrilldown["backLabel"];
+  backLabel?: HelixHeadlessDrilldown["backLabel"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  loading?: HelixBaseDrilldown["loading"];
+  loading?: HelixHeadlessDrilldown["loading"];
   /** What is said while they are on their way. */
-  "loading-text"?: HelixBaseDrilldown["loadingText"];
+  "loading-text"?: HelixHeadlessDrilldown["loadingText"];
   /** What is said while they are on their way. */
-  loadingText?: HelixBaseDrilldown["loadingText"];
+  loadingText?: HelixHeadlessDrilldown["loadingText"];
   /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixBaseDrilldown["emptyText"];
+  "empty-text"?: HelixHeadlessDrilldown["emptyText"];
   /** What is said where there are none, and none are coming. */
-  emptyText?: HelixBaseDrilldown["emptyText"];
+  emptyText?: HelixHeadlessDrilldown["emptyText"];
 
   /** Fired when a row with no page is chosen. */
-  "onhelix-select"?: (e: HelixBaseDrilldownHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessDrilldownHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseDrilldownSolidJsProps = {
+export type HelixHeadlessDrilldownSolidJsProps = {
   /** Accessible name for the region. */
-  "prop:label"?: HelixBaseDrilldown["label"];
+  "prop:label"?: HelixHeadlessDrilldown["label"];
   /** What the control returning from a page reads. */
-  "attr:back-label"?: HelixBaseDrilldown["backLabel"];
+  "attr:back-label"?: HelixHeadlessDrilldown["backLabel"];
   /** What the control returning from a page reads. */
-  "prop:backLabel"?: HelixBaseDrilldown["backLabel"];
+  "prop:backLabel"?: HelixHeadlessDrilldown["backLabel"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  "prop:loading"?: HelixBaseDrilldown["loading"];
+  "prop:loading"?: HelixHeadlessDrilldown["loading"];
   /** What is said while they are on their way. */
-  "attr:loading-text"?: HelixBaseDrilldown["loadingText"];
+  "attr:loading-text"?: HelixHeadlessDrilldown["loadingText"];
   /** What is said while they are on their way. */
-  "prop:loadingText"?: HelixBaseDrilldown["loadingText"];
+  "prop:loadingText"?: HelixHeadlessDrilldown["loadingText"];
   /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixBaseDrilldown["emptyText"];
+  "attr:empty-text"?: HelixHeadlessDrilldown["emptyText"];
   /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixBaseDrilldown["emptyText"];
+  "prop:emptyText"?: HelixHeadlessDrilldown["emptyText"];
   /** Fired when a row with no page is chosen. */
-  "on:helix-select"?: (e: HelixBaseDrilldownHelixSelectElementEvent) => void;
+  "on:helix-select"?: (
+    e: HelixHeadlessDrilldownHelixSelectElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4128,34 +4154,34 @@ say that without the component knowing what a row looks like. */
   textContent?: string | number;
 };
 
-export type HelixBaseEmptyProps = {
+export type HelixHeadlessEmptyProps = {
   /** Whether the state is announced when it appears.
 
 On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  "no-announce"?: HelixBaseEmpty["noAnnounce"];
+  "no-announce"?: HelixHeadlessEmpty["noAnnounce"];
   /** Whether the state is announced when it appears.
 
 On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  noAnnounce?: HelixBaseEmpty["noAnnounce"];
+  noAnnounce?: HelixHeadlessEmpty["noAnnounce"];
 };
 
-export type HelixBaseEmptySolidJsProps = {
+export type HelixHeadlessEmptySolidJsProps = {
   /** Whether the state is announced when it appears.
 
 On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  "bool:no-announce"?: HelixBaseEmpty["noAnnounce"];
+  "bool:no-announce"?: HelixHeadlessEmpty["noAnnounce"];
   /** Whether the state is announced when it appears.
 
 On by default: an empty view almost always replaces something that was
 loading. Turn it off for one that was on the page from the start, which
 has nothing to announce because nothing changed. */
-  "prop:noAnnounce"?: HelixBaseEmpty["noAnnounce"];
+  "prop:noAnnounce"?: HelixHeadlessEmpty["noAnnounce"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4163,40 +4189,40 @@ has nothing to announce because nothing changed. */
   textContent?: string | number;
 };
 
-/** `HelixBaseFileInput` component event */
-export type HelixBaseFileInputElementEvent<E = Event> = TypedEvent<
-  HelixBaseFileInput,
+/** `HelixHeadlessFileInput` component event */
+export type HelixHeadlessFileInputElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessFileInput,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseFileInputHelixChangeElementEvent =
-  HelixBaseFileInputElementEvent<HelixChangeEvent>;
+export type HelixHeadlessFileInputHelixChangeElementEvent =
+  HelixHeadlessFileInputElementEvent<HelixChangeEvent>;
 
-export type HelixBaseFileInputProps = {
+export type HelixHeadlessFileInputProps = {
   /** Which files the picker offers, as a native `accept` list. */
-  accept?: HelixBaseFileInput["accept"];
+  accept?: HelixHeadlessFileInput["accept"];
   /** Whether more than one file can be chosen. */
-  multiple?: HelixBaseFileInput["multiple"];
+  multiple?: HelixHeadlessFileInput["multiple"];
   /** Which camera or microphone a mobile picker should offer, if any. */
-  capture?: HelixBaseFileInput["capture"];
+  capture?: HelixHeadlessFileInput["capture"];
   /** What the trigger reads, where nothing is slotted into it. */
-  "trigger-label"?: HelixBaseFileInput["triggerLabel"];
+  "trigger-label"?: HelixHeadlessFileInput["triggerLabel"];
   /** What the trigger reads, where nothing is slotted into it. */
-  triggerLabel?: HelixBaseFileInput["triggerLabel"];
+  triggerLabel?: HelixHeadlessFileInput["triggerLabel"];
   /** Language tag the sizes are written in. Absent uses the runtime's own. */
-  locale?: HelixBaseFileInput["locale"];
+  locale?: HelixHeadlessFileInput["locale"];
   /** What the control removing one file is called, per file. */
-  "remove-label"?: HelixBaseFileInput["removeLabel"];
+  "remove-label"?: HelixHeadlessFileInput["removeLabel"];
   /** What the control removing one file is called, per file. */
-  removeLabel?: HelixBaseFileInput["removeLabel"];
+  removeLabel?: HelixHeadlessFileInput["removeLabel"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseFileInput["hint"];
+  hint?: HelixHeadlessFileInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseFileInput["feedback"];
+  feedback?: HelixHeadlessFileInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseFileInput["label"];
+  label?: HelixHeadlessFileInput["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseFileInput["required"];
+  required?: HelixHeadlessFileInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4207,7 +4233,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseFileInput["disabled"];
+  disabled?: HelixHeadlessFileInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -4225,37 +4251,37 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseFileInput["name"];
+  name?: HelixHeadlessFileInput["name"];
 
   /** Fired when the chosen files change, with their names. */
-  "onhelix-change"?: (e: HelixBaseFileInputHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessFileInputHelixChangeElementEvent) => void;
 };
 
-export type HelixBaseFileInputSolidJsProps = {
+export type HelixHeadlessFileInputSolidJsProps = {
   /** Which files the picker offers, as a native `accept` list. */
-  "prop:accept"?: HelixBaseFileInput["accept"];
+  "prop:accept"?: HelixHeadlessFileInput["accept"];
   /** Whether more than one file can be chosen. */
-  "prop:multiple"?: HelixBaseFileInput["multiple"];
+  "prop:multiple"?: HelixHeadlessFileInput["multiple"];
   /** Which camera or microphone a mobile picker should offer, if any. */
-  "prop:capture"?: HelixBaseFileInput["capture"];
+  "prop:capture"?: HelixHeadlessFileInput["capture"];
   /** What the trigger reads, where nothing is slotted into it. */
-  "attr:trigger-label"?: HelixBaseFileInput["triggerLabel"];
+  "attr:trigger-label"?: HelixHeadlessFileInput["triggerLabel"];
   /** What the trigger reads, where nothing is slotted into it. */
-  "prop:triggerLabel"?: HelixBaseFileInput["triggerLabel"];
+  "prop:triggerLabel"?: HelixHeadlessFileInput["triggerLabel"];
   /** Language tag the sizes are written in. Absent uses the runtime's own. */
-  "prop:locale"?: HelixBaseFileInput["locale"];
+  "prop:locale"?: HelixHeadlessFileInput["locale"];
   /** What the control removing one file is called, per file. */
-  "attr:remove-label"?: HelixBaseFileInput["removeLabel"];
+  "attr:remove-label"?: HelixHeadlessFileInput["removeLabel"];
   /** What the control removing one file is called, per file. */
-  "prop:removeLabel"?: HelixBaseFileInput["removeLabel"];
+  "prop:removeLabel"?: HelixHeadlessFileInput["removeLabel"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseFileInput["hint"];
+  "prop:hint"?: HelixHeadlessFileInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseFileInput["feedback"];
+  "prop:feedback"?: HelixHeadlessFileInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseFileInput["label"];
+  "prop:label"?: HelixHeadlessFileInput["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseFileInput["required"];
+  "prop:required"?: HelixHeadlessFileInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4266,7 +4292,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseFileInput["disabled"];
+  "prop:disabled"?: HelixHeadlessFileInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -4284,9 +4310,11 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseFileInput["name"];
+  "prop:name"?: HelixHeadlessFileInput["name"];
   /** Fired when the chosen files change, with their names. */
-  "on:helix-change"?: (e: HelixBaseFileInputHelixChangeElementEvent) => void;
+  "on:helix-change"?: (
+    e: HelixHeadlessFileInputHelixChangeElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4294,15 +4322,15 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseIconButtonProps = {
+export type HelixHeadlessIconButtonProps = {
   /** What activating the button does to its form. */
-  type?: HelixBaseIconButton["type"];
+  type?: HelixHeadlessIconButton["type"];
   /** Accessible name, for a button whose content is not text.
 
 Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
-  label?: HelixBaseIconButton["label"];
+  label?: HelixHeadlessIconButton["label"];
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -4318,11 +4346,11 @@ the same way `label` becomes `aria-label` in there.
 `commandFor` spells its attribute out, because Lit lowercases a property
 name to derive one rather than dash-casing it, and what a consumer writes
 is the platform's `commandfor`. */
-  command?: HelixBaseIconButton["command"];
+  command?: HelixHeadlessIconButton["command"];
   /** The id of the element the command is sent to. */
-  commandfor?: HelixBaseIconButton["commandFor"];
+  commandfor?: HelixHeadlessIconButton["commandFor"];
   /** The id of the element the command is sent to. */
-  commandFor?: HelixBaseIconButton["commandFor"];
+  commandFor?: HelixHeadlessIconButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4333,7 +4361,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseIconButton["disabled"];
+  disabled?: HelixHeadlessIconButton["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -4351,7 +4379,7 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseIconButton["name"];
+  name?: HelixHeadlessIconButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -4362,18 +4390,18 @@ and the stop lands on the inner control inside the shadow root.
 
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
-  focusable?: HelixBaseIconButton["focusable"];
+  focusable?: HelixHeadlessIconButton["focusable"];
 };
 
-export type HelixBaseIconButtonSolidJsProps = {
+export type HelixHeadlessIconButtonSolidJsProps = {
   /** What activating the button does to its form. */
-  "prop:type"?: HelixBaseIconButton["type"];
+  "prop:type"?: HelixHeadlessIconButton["type"];
   /** Accessible name, for a button whose content is not text.
 
 Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
-  "prop:label"?: HelixBaseIconButton["label"];
+  "prop:label"?: HelixHeadlessIconButton["label"];
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -4389,11 +4417,11 @@ the same way `label` becomes `aria-label` in there.
 `commandFor` spells its attribute out, because Lit lowercases a property
 name to derive one rather than dash-casing it, and what a consumer writes
 is the platform's `commandfor`. */
-  "prop:command"?: HelixBaseIconButton["command"];
+  "prop:command"?: HelixHeadlessIconButton["command"];
   /** The id of the element the command is sent to. */
-  "attr:commandfor"?: HelixBaseIconButton["commandFor"];
+  "attr:commandfor"?: HelixHeadlessIconButton["commandFor"];
   /** The id of the element the command is sent to. */
-  "prop:commandFor"?: HelixBaseIconButton["commandFor"];
+  "prop:commandFor"?: HelixHeadlessIconButton["commandFor"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4404,7 +4432,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseIconButton["disabled"];
+  "prop:disabled"?: HelixHeadlessIconButton["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -4422,7 +4450,7 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseIconButton["name"];
+  "prop:name"?: HelixHeadlessIconButton["name"];
   /** Whether the button holds its group's tab stop.
 
 A toolbar keeps one tab stop across its children, and the obvious way to do
@@ -4433,7 +4461,7 @@ and the stop lands on the inner control inside the shadow root.
 
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
-  "prop:focusable"?: HelixBaseIconButton["focusable"];
+  "prop:focusable"?: HelixHeadlessIconButton["focusable"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4441,18 +4469,18 @@ anything a consumer sets. */
   textContent?: string | number;
 };
 
-export type HelixBaseIconProps = {
+export type HelixHeadlessIconProps = {
   /** Name of the icon in the Helix set. */
-  name?: HelixBaseIcon["name"];
+  name?: HelixHeadlessIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
-  label?: HelixBaseIcon["label"];
+  label?: HelixHeadlessIcon["label"];
 };
 
-export type HelixBaseIconSolidJsProps = {
+export type HelixHeadlessIconSolidJsProps = {
   /** Name of the icon in the Helix set. */
-  "prop:name"?: HelixBaseIcon["name"];
+  "prop:name"?: HelixHeadlessIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
-  "prop:label"?: HelixBaseIcon["label"];
+  "prop:label"?: HelixHeadlessIcon["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4460,36 +4488,36 @@ export type HelixBaseIconSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseImage` component event */
-export type HelixBaseImageElementEvent<E = Event> = TypedEvent<
-  HelixBaseImage,
+/** `HelixHeadlessImage` component event */
+export type HelixHeadlessImageElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessImage,
   E
 >;
 /** `helix-load` event type */
-export type HelixBaseImageHelixLoadElementEvent =
-  HelixBaseImageElementEvent<HelixLoadEvent>;
+export type HelixHeadlessImageHelixLoadElementEvent =
+  HelixHeadlessImageElementEvent<HelixLoadEvent>;
 /** `helix-error` event type */
-export type HelixBaseImageHelixErrorElementEvent =
-  HelixBaseImageElementEvent<HelixErrorEvent>;
+export type HelixHeadlessImageHelixErrorElementEvent =
+  HelixHeadlessImageElementEvent<HelixErrorEvent>;
 
-export type HelixBaseImageProps = {
+export type HelixHeadlessImageProps = {
   /** Where the picture is. */
-  src?: HelixBaseImage["src"];
+  src?: HelixHeadlessImage["src"];
   /** What it shows, for a reader who cannot see it.
 
 Empty is a real answer and means decoration. Omitting the attribute is not
 the same thing: a reader with nothing to read announces the file name. */
-  alt?: HelixBaseImage["alt"];
+  alt?: HelixHeadlessImage["alt"];
   /** Whether to wait until it is nearly on screen.
 
 `lazy` by default, which is the opposite of the platform's, because a
 picture worth putting in a component is usually below the fold and the one
 that is not is the exception worth writing down. */
-  loading?: HelixBaseImage["loading"];
+  loading?: HelixHeadlessImage["loading"];
   /** The candidate widths, passed through to the picture. */
-  srcset?: HelixBaseImage["srcset"];
+  srcset?: HelixHeadlessImage["srcset"];
   /** How much of the line it will take, passed through to the picture. */
-  sizes?: HelixBaseImage["sizes"];
+  sizes?: HelixHeadlessImage["sizes"];
   /** How urgently to fetch it, for the one picture that is the page.
 
 The hero of a page is usually its largest contentful paint, and the fix is
@@ -4497,7 +4525,7 @@ two attributes rather than one: `loading="eager"` stops it waiting for the
 viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
-  "fetch-priority"?: HelixBaseImage["fetchPriority"];
+  "fetch-priority"?: HelixHeadlessImage["fetchPriority"];
   /** How urgently to fetch it, for the one picture that is the page.
 
 The hero of a page is usually its largest contentful paint, and the fix is
@@ -4505,7 +4533,7 @@ two attributes rather than one: `loading="eager"` stops it waiting for the
 viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
-  fetchPriority?: HelixBaseImage["fetchPriority"];
+  fetchPriority?: HelixHeadlessImage["fetchPriority"];
   /** Whether the picture is on its way, here, or never coming.
 
 Read-only to a consumer: it is a report rather than a setting.
@@ -4521,32 +4549,32 @@ different name a re-parse cannot mistake for a declaration, and it is what
 
 `loading` writes nothing, because it is where every image starts and the
 resting state of a mirror is the attribute's absence. */
-  status?: HelixBaseImage["status"];
+  status?: HelixHeadlessImage["status"];
 
   /** The picture arrived. */
-  "onhelix-load"?: (e: HelixBaseImageHelixLoadElementEvent) => void;
+  "onhelix-load"?: (e: HelixHeadlessImageHelixLoadElementEvent) => void;
   /** It is not coming. */
-  "onhelix-error"?: (e: HelixBaseImageHelixErrorElementEvent) => void;
+  "onhelix-error"?: (e: HelixHeadlessImageHelixErrorElementEvent) => void;
 };
 
-export type HelixBaseImageSolidJsProps = {
+export type HelixHeadlessImageSolidJsProps = {
   /** Where the picture is. */
-  "prop:src"?: HelixBaseImage["src"];
+  "prop:src"?: HelixHeadlessImage["src"];
   /** What it shows, for a reader who cannot see it.
 
 Empty is a real answer and means decoration. Omitting the attribute is not
 the same thing: a reader with nothing to read announces the file name. */
-  "prop:alt"?: HelixBaseImage["alt"];
+  "prop:alt"?: HelixHeadlessImage["alt"];
   /** Whether to wait until it is nearly on screen.
 
 `lazy` by default, which is the opposite of the platform's, because a
 picture worth putting in a component is usually below the fold and the one
 that is not is the exception worth writing down. */
-  "prop:loading"?: HelixBaseImage["loading"];
+  "prop:loading"?: HelixHeadlessImage["loading"];
   /** The candidate widths, passed through to the picture. */
-  "prop:srcset"?: HelixBaseImage["srcset"];
+  "prop:srcset"?: HelixHeadlessImage["srcset"];
   /** How much of the line it will take, passed through to the picture. */
-  "prop:sizes"?: HelixBaseImage["sizes"];
+  "prop:sizes"?: HelixHeadlessImage["sizes"];
   /** How urgently to fetch it, for the one picture that is the page.
 
 The hero of a page is usually its largest contentful paint, and the fix is
@@ -4554,7 +4582,7 @@ two attributes rather than one: `loading="eager"` stops it waiting for the
 viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
-  "attr:fetch-priority"?: HelixBaseImage["fetchPriority"];
+  "attr:fetch-priority"?: HelixHeadlessImage["fetchPriority"];
   /** How urgently to fetch it, for the one picture that is the page.
 
 The hero of a page is usually its largest contentful paint, and the fix is
@@ -4562,7 +4590,7 @@ two attributes rather than one: `loading="eager"` stops it waiting for the
 viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
-  "prop:fetchPriority"?: HelixBaseImage["fetchPriority"];
+  "prop:fetchPriority"?: HelixHeadlessImage["fetchPriority"];
   /** Whether the picture is on its way, here, or never coming.
 
 Read-only to a consumer: it is a report rather than a setting.
@@ -4578,11 +4606,11 @@ different name a re-parse cannot mistake for a declaration, and it is what
 
 `loading` writes nothing, because it is where every image starts and the
 resting state of a mirror is the attribute's absence. */
-  "prop:status"?: HelixBaseImage["status"];
+  "prop:status"?: HelixHeadlessImage["status"];
   /** The picture arrived. */
-  "on:helix-load"?: (e: HelixBaseImageHelixLoadElementEvent) => void;
+  "on:helix-load"?: (e: HelixHeadlessImageHelixLoadElementEvent) => void;
   /** It is not coming. */
-  "on:helix-error"?: (e: HelixBaseImageHelixErrorElementEvent) => void;
+  "on:helix-error"?: (e: HelixHeadlessImageHelixErrorElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4590,22 +4618,22 @@ resting state of a mirror is the attribute's absence. */
   textContent?: string | number;
 };
 
-/** `HelixBaseInput` component event */
-export type HelixBaseInputElementEvent<E = Event> = TypedEvent<
-  HelixBaseInput,
+/** `HelixHeadlessInput` component event */
+export type HelixHeadlessInputElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessInput,
   E
 >;
 /** `helix-input` event type */
-export type HelixBaseInputHelixInputElementEvent =
-  HelixBaseInputElementEvent<HelixInputEvent>;
+export type HelixHeadlessInputHelixInputElementEvent =
+  HelixHeadlessInputElementEvent<HelixInputEvent>;
 
-export type HelixBaseInputProps = {
+export type HelixHeadlessInputProps = {
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
-  placeholder?: HelixBaseInput["placeholder"];
+  placeholder?: HelixHeadlessInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "read-only"?: HelixBaseInput["readOnly"];
+  "read-only"?: HelixHeadlessInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
-  readOnly?: HelixBaseInput["readOnly"];
+  readOnly?: HelixHeadlessInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation.
 
 **Not reflected**, and it was. Reflection exists so a selector can reach a
@@ -4620,29 +4648,29 @@ this is the only one of them with a value that puts itself on the host.
 Nothing reads it from the attribute either. The real `<input>` inside takes
 it as a property binding, which is what makes the keyboard and the
 validation follow. */
-  type?: HelixBaseInput["type"];
+  type?: HelixHeadlessInput["type"];
   /** Whether the field offers a button that empties it.
 
 Shown only while there is something to clear, because a control that does
 nothing is worse than no control: a reader who presses it and sees no
 change has to work out whether the field was already empty or the button
 is broken. */
-  clearable?: HelixBaseInput["clearable"];
+  clearable?: HelixHeadlessInput["clearable"];
   /** What the clear button is called, since an icon has no name of its own. */
-  "clear-label"?: HelixBaseInput["clearLabel"];
+  "clear-label"?: HelixHeadlessInput["clearLabel"];
   /** What the clear button is called, since an icon has no name of its own. */
-  clearLabel?: HelixBaseInput["clearLabel"];
+  clearLabel?: HelixHeadlessInput["clearLabel"];
   /** Whether a password field offers a toggle that shows what was typed.
 
 Ignored on every other type. A reveal on an email field would be a button
 that does nothing visible, and guarding it here rather than asking the
 consumer not to means the property can be set once on a component that
 changes type. */
-  reveal?: HelixBaseInput["reveal"];
+  reveal?: HelixHeadlessInput["reveal"];
   /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
-  "reveal-label"?: HelixBaseInput["revealLabel"];
+  "reveal-label"?: HelixHeadlessInput["revealLabel"];
   /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
-  revealLabel?: HelixBaseInput["revealLabel"];
+  revealLabel?: HelixHeadlessInput["revealLabel"];
   /** A regular expression the value has to match, as the platform reads it.
 
 The class documentation promised `pattern` and `minlength` "and the rest"
@@ -4653,19 +4681,19 @@ and the field constrained nothing while looking as though it did.
 Forwarded rather than checked here, which is the whole reason validity is
 the platform's: the browser knows what a `pattern` means, anchors it at both
 ends, and produces the message in the reader's own language. */
-  pattern?: HelixBaseInput["pattern"];
+  pattern?: HelixHeadlessInput["pattern"];
   /** Fewest characters the value may have. */
-  minlength?: HelixBaseInput["minLength"];
+  minlength?: HelixHeadlessInput["minLength"];
   /** Fewest characters the value may have. */
-  minLength?: HelixBaseInput["minLength"];
+  minLength?: HelixHeadlessInput["minLength"];
   /** Most characters the value may have. */
-  maxlength?: HelixBaseInput["maxLength"];
+  maxlength?: HelixHeadlessInput["maxLength"];
   /** Most characters the value may have. */
-  maxLength?: HelixBaseInput["maxLength"];
+  maxLength?: HelixHeadlessInput["maxLength"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseInput["defaultValue"];
+  "default-value"?: HelixHeadlessInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseInput["defaultValue"];
+  defaultValue?: HelixHeadlessInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -4677,15 +4705,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseInput["value"];
+  value?: HelixHeadlessInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseInput["hint"];
+  hint?: HelixHeadlessInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseInput["feedback"];
+  feedback?: HelixHeadlessInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseInput["label"];
+  label?: HelixHeadlessInput["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseInput["required"];
+  required?: HelixHeadlessInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4696,7 +4724,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseInput["disabled"];
+  disabled?: HelixHeadlessInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -4714,21 +4742,21 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseInput["name"];
+  name?: HelixHeadlessInput["name"];
 
   /** Fired as the text changes, and cancelable. */
-  "onhelix-input"?: (e: HelixBaseInputHelixInputElementEvent) => void;
+  "onhelix-input"?: (e: HelixHeadlessInputHelixInputElementEvent) => void;
   /** Relayed from the input once the reader has finished. */
-  onchange?: (e: HelixBaseInputElementEvent) => void;
+  onchange?: (e: HelixHeadlessInputElementEvent) => void;
 };
 
-export type HelixBaseInputSolidJsProps = {
+export type HelixHeadlessInputSolidJsProps = {
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
-  "prop:placeholder"?: HelixBaseInput["placeholder"];
+  "prop:placeholder"?: HelixHeadlessInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "bool:read-only"?: HelixBaseInput["readOnly"];
+  "bool:read-only"?: HelixHeadlessInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
-  "prop:readOnly"?: HelixBaseInput["readOnly"];
+  "prop:readOnly"?: HelixHeadlessInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation.
 
 **Not reflected**, and it was. Reflection exists so a selector can reach a
@@ -4743,29 +4771,29 @@ this is the only one of them with a value that puts itself on the host.
 Nothing reads it from the attribute either. The real `<input>` inside takes
 it as a property binding, which is what makes the keyboard and the
 validation follow. */
-  "prop:type"?: HelixBaseInput["type"];
+  "prop:type"?: HelixHeadlessInput["type"];
   /** Whether the field offers a button that empties it.
 
 Shown only while there is something to clear, because a control that does
 nothing is worse than no control: a reader who presses it and sees no
 change has to work out whether the field was already empty or the button
 is broken. */
-  "prop:clearable"?: HelixBaseInput["clearable"];
+  "prop:clearable"?: HelixHeadlessInput["clearable"];
   /** What the clear button is called, since an icon has no name of its own. */
-  "attr:clear-label"?: HelixBaseInput["clearLabel"];
+  "attr:clear-label"?: HelixHeadlessInput["clearLabel"];
   /** What the clear button is called, since an icon has no name of its own. */
-  "prop:clearLabel"?: HelixBaseInput["clearLabel"];
+  "prop:clearLabel"?: HelixHeadlessInput["clearLabel"];
   /** Whether a password field offers a toggle that shows what was typed.
 
 Ignored on every other type. A reveal on an email field would be a button
 that does nothing visible, and guarding it here rather than asking the
 consumer not to means the property can be set once on a component that
 changes type. */
-  "prop:reveal"?: HelixBaseInput["reveal"];
+  "prop:reveal"?: HelixHeadlessInput["reveal"];
   /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
-  "attr:reveal-label"?: HelixBaseInput["revealLabel"];
+  "attr:reveal-label"?: HelixHeadlessInput["revealLabel"];
   /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
-  "prop:revealLabel"?: HelixBaseInput["revealLabel"];
+  "prop:revealLabel"?: HelixHeadlessInput["revealLabel"];
   /** A regular expression the value has to match, as the platform reads it.
 
 The class documentation promised `pattern` and `minlength` "and the rest"
@@ -4776,19 +4804,19 @@ and the field constrained nothing while looking as though it did.
 Forwarded rather than checked here, which is the whole reason validity is
 the platform's: the browser knows what a `pattern` means, anchors it at both
 ends, and produces the message in the reader's own language. */
-  "prop:pattern"?: HelixBaseInput["pattern"];
+  "prop:pattern"?: HelixHeadlessInput["pattern"];
   /** Fewest characters the value may have. */
-  "attr:minlength"?: HelixBaseInput["minLength"];
+  "attr:minlength"?: HelixHeadlessInput["minLength"];
   /** Fewest characters the value may have. */
-  "prop:minLength"?: HelixBaseInput["minLength"];
+  "prop:minLength"?: HelixHeadlessInput["minLength"];
   /** Most characters the value may have. */
-  "attr:maxlength"?: HelixBaseInput["maxLength"];
+  "attr:maxlength"?: HelixHeadlessInput["maxLength"];
   /** Most characters the value may have. */
-  "prop:maxLength"?: HelixBaseInput["maxLength"];
+  "prop:maxLength"?: HelixHeadlessInput["maxLength"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseInput["defaultValue"];
+  "attr:default-value"?: HelixHeadlessInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseInput["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -4800,15 +4828,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseInput["value"];
+  "prop:value"?: HelixHeadlessInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseInput["hint"];
+  "prop:hint"?: HelixHeadlessInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseInput["feedback"];
+  "prop:feedback"?: HelixHeadlessInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseInput["label"];
+  "prop:label"?: HelixHeadlessInput["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseInput["required"];
+  "prop:required"?: HelixHeadlessInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4819,7 +4847,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseInput["disabled"];
+  "prop:disabled"?: HelixHeadlessInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -4837,11 +4865,11 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseInput["name"];
+  "prop:name"?: HelixHeadlessInput["name"];
   /** Fired as the text changes, and cancelable. */
-  "on:helix-input"?: (e: HelixBaseInputHelixInputElementEvent) => void;
+  "on:helix-input"?: (e: HelixHeadlessInputHelixInputElementEvent) => void;
   /** Relayed from the input once the reader has finished. */
-  "on:change"?: (e: HelixBaseInputElementEvent) => void;
+  "on:change"?: (e: HelixHeadlessInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4849,21 +4877,21 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseKbdProps = {};
+export type HelixHeadlessKbdProps = {};
 
-export type HelixBaseKbdSolidJsProps = {
+export type HelixHeadlessKbdSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
   textContent?: string | number;
 };
 
-export type HelixBaseLegendProps = {
+export type HelixHeadlessLegendProps = {
   /** Which way to read the table.
 
 Absent is `series`, one entry per data column. `categories` reads one entry
 per body row instead, for a donut, whose slices are the rows. */
-  entries?: HelixBaseLegend["entries"];
+  entries?: HelixHeadlessLegend["entries"];
   /** The id of the table to take the names from.
 
 Resolved through `getRootNode()`, so a legend inside another component's
@@ -4871,15 +4899,15 @@ shadow root names a table in that root rather than in the document.
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  for?: HelixBaseLegend["for"];
+  for?: HelixHeadlessLegend["for"];
 };
 
-export type HelixBaseLegendSolidJsProps = {
+export type HelixHeadlessLegendSolidJsProps = {
   /** Which way to read the table.
 
 Absent is `series`, one entry per data column. `categories` reads one entry
 per body row instead, for a donut, whose slices are the rows. */
-  "prop:entries"?: HelixBaseLegend["entries"];
+  "prop:entries"?: HelixHeadlessLegend["entries"];
   /** The id of the table to take the names from.
 
 Resolved through `getRootNode()`, so a legend inside another component's
@@ -4887,7 +4915,7 @@ shadow root names a table in that root rather than in the document.
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  "prop:for"?: HelixBaseLegend["for"];
+  "prop:for"?: HelixHeadlessLegend["for"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4895,13 +4923,13 @@ shadow root names a table in that root rather than in the document.
   textContent?: string | number;
 };
 
-export type HelixBaseLineChartProps = {
+export type HelixHeadlessLineChartProps = {
   /** Whether a wash is drawn under each line.
 
 Absent is lines alone, which is what suits more than one series: washes
 stack and the lower ones are read through the upper. One series over a
 ground it should feel like a quantity against is the case for this. */
-  area?: HelixBaseLineChart["area"];
+  area?: HelixHeadlessLineChart["area"];
   /** How the line gets from one reading to the next.
 
 **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
@@ -4922,7 +4950,7 @@ consumer wrote, and caught that the first time. The default therefore lives
 where the path is built, as `curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
-  curve?: HelixBaseLineChart["curve"];
+  curve?: HelixHeadlessLineChart["curve"];
   /** Which rules are drawn across the plot, if any.
 
 Absent draws none, which is the honest default rather than a timid one: a
@@ -4945,14 +4973,14 @@ a reader cannot debug.
 
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
-  gridlines?: HelixBaseLineChart["gridlines"];
+  gridlines?: HelixHeadlessLineChart["gridlines"];
   /** Whether zero is forced into the range.
 
 Absent measures from the data's own extent, which is what a line is for.
 Set it where the distance from nothing is the point rather than the shape,
 and accept that a series which never approaches zero becomes a flat rule
 near the top of the box. */
-  zero?: HelixBaseLineChart["zero"];
+  zero?: HelixHeadlessLineChart["zero"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -4961,21 +4989,21 @@ shadow root names a table in that root rather than in the document. A
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  for?: HelixBaseLineChart["for"];
+  for?: HelixHeadlessLineChart["for"];
   /** The drawing's name, for a pointer resting on it.
 
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
-  label?: HelixBaseLineChart["label"];
+  label?: HelixHeadlessLineChart["label"];
 };
 
-export type HelixBaseLineChartSolidJsProps = {
+export type HelixHeadlessLineChartSolidJsProps = {
   /** Whether a wash is drawn under each line.
 
 Absent is lines alone, which is what suits more than one series: washes
 stack and the lower ones are read through the upper. One series over a
 ground it should feel like a quantity against is the case for this. */
-  "prop:area"?: HelixBaseLineChart["area"];
+  "prop:area"?: HelixHeadlessLineChart["area"];
   /** How the line gets from one reading to the next.
 
 **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
@@ -4996,7 +5024,7 @@ consumer wrote, and caught that the first time. The default therefore lives
 where the path is built, as `curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
-  "prop:curve"?: HelixBaseLineChart["curve"];
+  "prop:curve"?: HelixHeadlessLineChart["curve"];
   /** Which rules are drawn across the plot, if any.
 
 Absent draws none, which is the honest default rather than a timid one: a
@@ -5019,14 +5047,14 @@ a reader cannot debug.
 
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
-  "prop:gridlines"?: HelixBaseLineChart["gridlines"];
+  "prop:gridlines"?: HelixHeadlessLineChart["gridlines"];
   /** Whether zero is forced into the range.
 
 Absent measures from the data's own extent, which is what a line is for.
 Set it where the distance from nothing is the point rather than the shape,
 and accept that a series which never approaches zero becomes a flat rule
 near the top of the box. */
-  "prop:zero"?: HelixBaseLineChart["zero"];
+  "prop:zero"?: HelixHeadlessLineChart["zero"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -5035,12 +5063,12 @@ shadow root names a table in that root rather than in the document. A
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  "prop:for"?: HelixBaseLineChart["for"];
+  "prop:for"?: HelixHeadlessLineChart["for"];
   /** The drawing's name, for a pointer resting on it.
 
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
-  "prop:label"?: HelixBaseLineChart["label"];
+  "prop:label"?: HelixHeadlessLineChart["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5048,32 +5076,32 @@ words and is already written. */
   textContent?: string | number;
 };
 
-export type HelixBaseListItemProps = {
+export type HelixHeadlessListItemProps = {
   /** Where the row goes, and nothing when it goes nowhere.
 
 Empty rather than optional, and unset by default: a list is not always a
 list of links, and an empty `href` written onto every row would be a link
 to the current page on every row a consumer never asked to be one. */
-  href?: HelixBaseListItem["href"];
+  href?: HelixHeadlessListItem["href"];
   /** Where the link opens, for the rare row that leaves the site. */
-  target?: HelixBaseListItem["target"];
+  target?: HelixHeadlessListItem["target"];
   /** What the link declares about where it goes. The consumer's decision rather
 than one derived from `target`, for the reason `Tree.Item` gives. */
-  rel?: HelixBaseListItem["rel"];
+  rel?: HelixHeadlessListItem["rel"];
 };
 
-export type HelixBaseListItemSolidJsProps = {
+export type HelixHeadlessListItemSolidJsProps = {
   /** Where the row goes, and nothing when it goes nowhere.
 
 Empty rather than optional, and unset by default: a list is not always a
 list of links, and an empty `href` written onto every row would be a link
 to the current page on every row a consumer never asked to be one. */
-  "prop:href"?: HelixBaseListItem["href"];
+  "prop:href"?: HelixHeadlessListItem["href"];
   /** Where the link opens, for the rare row that leaves the site. */
-  "prop:target"?: HelixBaseListItem["target"];
+  "prop:target"?: HelixHeadlessListItem["target"];
   /** What the link declares about where it goes. The consumer's decision rather
 than one derived from `target`, for the reason `Tree.Item` gives. */
-  "prop:rel"?: HelixBaseListItem["rel"];
+  "prop:rel"?: HelixHeadlessListItem["rel"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5081,9 +5109,9 @@ than one derived from `target`, for the reason `Tree.Item` gives. */
   textContent?: string | number;
 };
 
-export type HelixBaseListProps = {
+export type HelixHeadlessListProps = {
   /** Accessible name for the set. */
-  label?: HelixBaseList["label"];
+  label?: HelixHeadlessList["label"];
   /** What kind of list this is, which is a fact about the content.
 
 On the headless tier because it is meaning rather than decoration, the same
@@ -5104,12 +5132,12 @@ has to survive with the stylesheet turned off.
   the supporting text `List.Item` already has, so the kind changes how the
   pair is drawn and nothing about what a consumer writes. A separate
   `List.Term` element would be a second row shape for one attribute's sake. */
-  kind?: HelixBaseList["kind"];
+  kind?: HelixHeadlessList["kind"];
 };
 
-export type HelixBaseListSolidJsProps = {
+export type HelixHeadlessListSolidJsProps = {
   /** Accessible name for the set. */
-  "prop:label"?: HelixBaseList["label"];
+  "prop:label"?: HelixHeadlessList["label"];
   /** What kind of list this is, which is a fact about the content.
 
 On the headless tier because it is meaning rather than decoration, the same
@@ -5130,7 +5158,7 @@ has to survive with the stylesheet turned off.
   the supporting text `List.Item` already has, so the kind changes how the
   pair is drawn and nothing about what a consumer writes. A separate
   `List.Term` element would be a second row shape for one attribute's sake. */
-  "prop:kind"?: HelixBaseList["kind"];
+  "prop:kind"?: HelixHeadlessList["kind"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5138,30 +5166,30 @@ has to survive with the stylesheet turned off.
   textContent?: string | number;
 };
 
-/** `HelixBaseListbox` component event */
-export type HelixBaseListboxElementEvent<E = Event> = TypedEvent<
-  HelixBaseListbox,
+/** `HelixHeadlessListbox` component event */
+export type HelixHeadlessListboxElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessListbox,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseListboxHelixChangeElementEvent =
-  HelixBaseListboxElementEvent<HelixChangeEvent>;
+export type HelixHeadlessListboxHelixChangeElementEvent =
+  HelixHeadlessListboxElementEvent<HelixChangeEvent>;
 /** `helix-filter` event type */
-export type HelixBaseListboxHelixFilterElementEvent =
-  HelixBaseListboxElementEvent<HelixFilterEvent>;
+export type HelixHeadlessListboxHelixFilterElementEvent =
+  HelixHeadlessListboxElementEvent<HelixFilterEvent>;
 
-export type HelixBaseListboxProps = {
+export type HelixHeadlessListboxProps = {
   /** What the list is narrowed to, if anything.
 
 Filtering hides rather than removes, so nothing about the value changes and
 the list is still the consumer's own elements in their own order. Reading
 gives what is being filtered on; writing declares it theirs, and
 `default-filter` seeds one the list owns. */
-  filter?: HelixBaseListbox["filter"];
+  filter?: HelixHeadlessListbox["filter"];
   /** What to start narrowed to, where nothing declared it. */
-  "default-filter"?: HelixBaseListbox["defaultFilter"];
+  "default-filter"?: HelixHeadlessListbox["defaultFilter"];
   /** What to start narrowed to, where nothing declared it. */
-  defaultFilter?: HelixBaseListbox["defaultFilter"];
+  defaultFilter?: HelixHeadlessListbox["defaultFilter"];
   /** Whether the list renders a field for narrowing itself.
 
 The field lives here rather than in whatever frames the list, because the
@@ -5170,41 +5198,41 @@ this component's. A select that drew its own search box above a listbox
 would be writing the same field again, and so would a combobox, and so
 would a command palette, which is the fault the three-family split exists
 to prevent. */
-  filterable?: HelixBaseListbox["filterable"];
+  filterable?: HelixHeadlessListbox["filterable"];
   /** Placeholder for the field that narrows the list. */
-  "filter-label"?: HelixBaseListbox["filterLabel"];
+  "filter-label"?: HelixHeadlessListbox["filterLabel"];
   /** Placeholder for the field that narrows the list. */
-  filterLabel?: HelixBaseListbox["filterLabel"];
+  filterLabel?: HelixHeadlessListbox["filterLabel"];
   /** Whether more than one option can be the answer. */
-  multiple?: HelixBaseListbox["multiple"];
+  multiple?: HelixHeadlessListbox["multiple"];
   /** What is shown when a filter has hidden every option.
 
 From `MixinCollection`, which every collection in the library now shares,
 and re-declared here only to keep this list's own wording: "No matches" is
 about a filter, and the mixin's "Nothing to show" is about a list that was
 never given anything. */
-  "empty-text"?: HelixBaseListbox["emptyText"];
+  "empty-text"?: HelixHeadlessListbox["emptyText"];
   /** What is shown when a filter has hidden every option.
 
 From `MixinCollection`, which every collection in the library now shares,
 and re-declared here only to keep this list's own wording: "No matches" is
 about a filter, and the mixin's "Nothing to show" is about a list that was
 never given anything. */
-  emptyText?: HelixBaseListbox["emptyText"];
+  emptyText?: HelixHeadlessListbox["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  loading?: HelixBaseListbox["loading"];
+  loading?: HelixHeadlessListbox["loading"];
   /** What is said while they are on their way. */
-  "loading-text"?: HelixBaseListbox["loadingText"];
+  "loading-text"?: HelixHeadlessListbox["loadingText"];
   /** What is said while they are on their way. */
-  loadingText?: HelixBaseListbox["loadingText"];
+  loadingText?: HelixHeadlessListbox["loadingText"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseListbox["defaultValue"];
+  "default-value"?: HelixHeadlessListbox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseListbox["defaultValue"];
+  defaultValue?: HelixHeadlessListbox["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -5216,15 +5244,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseListbox["value"];
+  value?: HelixHeadlessListbox["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseListbox["hint"];
+  hint?: HelixHeadlessListbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseListbox["feedback"];
+  feedback?: HelixHeadlessListbox["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseListbox["label"];
+  label?: HelixHeadlessListbox["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseListbox["required"];
+  required?: HelixHeadlessListbox["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -5235,7 +5263,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseListbox["disabled"];
+  disabled?: HelixHeadlessListbox["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -5253,26 +5281,26 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseListbox["name"];
+  name?: HelixHeadlessListbox["name"];
 
   /** Fired when the answer changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseListboxHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessListboxHelixChangeElementEvent) => void;
   /** Fired before the list narrows, and cancelable. */
-  "onhelix-filter"?: (e: HelixBaseListboxHelixFilterElementEvent) => void;
+  "onhelix-filter"?: (e: HelixHeadlessListboxHelixFilterElementEvent) => void;
 };
 
-export type HelixBaseListboxSolidJsProps = {
+export type HelixHeadlessListboxSolidJsProps = {
   /** What the list is narrowed to, if anything.
 
 Filtering hides rather than removes, so nothing about the value changes and
 the list is still the consumer's own elements in their own order. Reading
 gives what is being filtered on; writing declares it theirs, and
 `default-filter` seeds one the list owns. */
-  "prop:filter"?: HelixBaseListbox["filter"];
+  "prop:filter"?: HelixHeadlessListbox["filter"];
   /** What to start narrowed to, where nothing declared it. */
-  "attr:default-filter"?: HelixBaseListbox["defaultFilter"];
+  "attr:default-filter"?: HelixHeadlessListbox["defaultFilter"];
   /** What to start narrowed to, where nothing declared it. */
-  "prop:defaultFilter"?: HelixBaseListbox["defaultFilter"];
+  "prop:defaultFilter"?: HelixHeadlessListbox["defaultFilter"];
   /** Whether the list renders a field for narrowing itself.
 
 The field lives here rather than in whatever frames the list, because the
@@ -5281,41 +5309,41 @@ this component's. A select that drew its own search box above a listbox
 would be writing the same field again, and so would a combobox, and so
 would a command palette, which is the fault the three-family split exists
 to prevent. */
-  "prop:filterable"?: HelixBaseListbox["filterable"];
+  "prop:filterable"?: HelixHeadlessListbox["filterable"];
   /** Placeholder for the field that narrows the list. */
-  "attr:filter-label"?: HelixBaseListbox["filterLabel"];
+  "attr:filter-label"?: HelixHeadlessListbox["filterLabel"];
   /** Placeholder for the field that narrows the list. */
-  "prop:filterLabel"?: HelixBaseListbox["filterLabel"];
+  "prop:filterLabel"?: HelixHeadlessListbox["filterLabel"];
   /** Whether more than one option can be the answer. */
-  "prop:multiple"?: HelixBaseListbox["multiple"];
+  "prop:multiple"?: HelixHeadlessListbox["multiple"];
   /** What is shown when a filter has hidden every option.
 
 From `MixinCollection`, which every collection in the library now shares,
 and re-declared here only to keep this list's own wording: "No matches" is
 about a filter, and the mixin's "Nothing to show" is about a list that was
 never given anything. */
-  "attr:empty-text"?: HelixBaseListbox["emptyText"];
+  "attr:empty-text"?: HelixHeadlessListbox["emptyText"];
   /** What is shown when a filter has hidden every option.
 
 From `MixinCollection`, which every collection in the library now shares,
 and re-declared here only to keep this list's own wording: "No matches" is
 about a filter, and the mixin's "Nothing to show" is about a list that was
 never given anything. */
-  "prop:emptyText"?: HelixBaseListbox["emptyText"];
+  "prop:emptyText"?: HelixHeadlessListbox["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  "prop:loading"?: HelixBaseListbox["loading"];
+  "prop:loading"?: HelixHeadlessListbox["loading"];
   /** What is said while they are on their way. */
-  "attr:loading-text"?: HelixBaseListbox["loadingText"];
+  "attr:loading-text"?: HelixHeadlessListbox["loadingText"];
   /** What is said while they are on their way. */
-  "prop:loadingText"?: HelixBaseListbox["loadingText"];
+  "prop:loadingText"?: HelixHeadlessListbox["loadingText"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseListbox["defaultValue"];
+  "attr:default-value"?: HelixHeadlessListbox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseListbox["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessListbox["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -5327,15 +5355,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseListbox["value"];
+  "prop:value"?: HelixHeadlessListbox["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseListbox["hint"];
+  "prop:hint"?: HelixHeadlessListbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseListbox["feedback"];
+  "prop:feedback"?: HelixHeadlessListbox["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseListbox["label"];
+  "prop:label"?: HelixHeadlessListbox["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseListbox["required"];
+  "prop:required"?: HelixHeadlessListbox["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -5346,7 +5374,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseListbox["disabled"];
+  "prop:disabled"?: HelixHeadlessListbox["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -5364,11 +5392,11 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseListbox["name"];
+  "prop:name"?: HelixHeadlessListbox["name"];
   /** Fired when the answer changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseListboxHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessListboxHelixChangeElementEvent) => void;
   /** Fired before the list narrows, and cancelable. */
-  "on:helix-filter"?: (e: HelixBaseListboxHelixFilterElementEvent) => void;
+  "on:helix-filter"?: (e: HelixHeadlessListboxHelixFilterElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5376,14 +5404,14 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseLoaderProps = {
+export type HelixHeadlessLoaderProps = {
   /** Accessible name, announced while the work is outstanding. */
-  label?: HelixBaseLoader["label"];
+  label?: HelixHeadlessLoader["label"];
 };
 
-export type HelixBaseLoaderSolidJsProps = {
+export type HelixHeadlessLoaderSolidJsProps = {
   /** Accessible name, announced while the work is outstanding. */
-  "prop:label"?: HelixBaseLoader["label"];
+  "prop:label"?: HelixHeadlessLoader["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5391,21 +5419,21 @@ export type HelixBaseLoaderSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseMegamenu` component event */
-export type HelixBaseMegamenuElementEvent<E = Event> = TypedEvent<
-  HelixBaseMegamenu,
+/** `HelixHeadlessMegamenu` component event */
+export type HelixHeadlessMegamenuElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessMegamenu,
   E
 >;
 /** `helix-open` event type */
-export type HelixBaseMegamenuHelixOpenElementEvent =
-  HelixBaseMegamenuElementEvent<HelixOpenEvent>;
+export type HelixHeadlessMegamenuHelixOpenElementEvent =
+  HelixHeadlessMegamenuElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseMegamenuHelixCloseElementEvent =
-  HelixBaseMegamenuElementEvent<HelixCloseEvent>;
+export type HelixHeadlessMegamenuHelixCloseElementEvent =
+  HelixHeadlessMegamenuElementEvent<HelixCloseEvent>;
 
-export type HelixBaseMegamenuProps = {
+export type HelixHeadlessMegamenuProps = {
   /** The section's name, which names the default trigger and the panel. */
-  label?: HelixBaseMegamenu["label"];
+  label?: HelixHeadlessMegamenu["label"];
   /** Whether the panel is a card under the trigger or a band across the page.
 
 The resting one is the card, hanging off the trigger and as wide as it
@@ -5419,21 +5447,21 @@ tier knows about it at all: a band spans the viewport, so there is nothing
 to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
-  variant?: HelixBaseMegamenu["variant"];
+  variant?: HelixHeadlessMegamenu["variant"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
 the trigger, and it is the default because that is what a navigation bar
 does. `click` is for a trigger that does something else as well, or a panel
 heavy enough that opening it on the way past is rude. */
-  "open-on"?: HelixBaseMegamenu["openOn"];
+  "open-on"?: HelixHeadlessMegamenu["openOn"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
 the trigger, and it is the default because that is what a navigation bar
 does. `click` is for a trigger that does something else as well, or a panel
 heavy enough that opening it on the way past is rude. */
-  openOn?: HelixBaseMegamenu["openOn"];
+  openOn?: HelixHeadlessMegamenu["openOn"];
   /** The width, in pixels, under which a card becomes a band. Zero never does.
 
 A card is a panel hung off one word, and there is no room to hang anything
@@ -5449,7 +5477,7 @@ so the controller has to be told not to measure, and that decision is here
 whatever the stylesheet says. Writing the width in both places would be one
 number in two languages, drifting the first time either moved. This sets
 `data-narrow` on the host and the stylesheet arranges itself off that. */
-  "full-below"?: HelixBaseMegamenu["fullBelow"];
+  "full-below"?: HelixHeadlessMegamenu["fullBelow"];
   /** The width, in pixels, under which a card becomes a band. Zero never does.
 
 A card is a panel hung off one word, and there is no room to hang anything
@@ -5465,7 +5493,7 @@ so the controller has to be told not to measure, and that decision is here
 whatever the stylesheet says. Writing the width in both places would be one
 number in two languages, drifting the first time either moved. This sets
 `data-narrow` on the host and the stylesheet arranges itself off that. */
-  fullBelow?: HelixBaseMegamenu["fullBelow"];
+  fullBelow?: HelixHeadlessMegamenu["fullBelow"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -5488,21 +5516,21 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseMegamenu["open"];
+  open?: HelixHeadlessMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseMegamenu["defaultOpen"];
+  "default-open"?: HelixHeadlessMegamenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseMegamenu["defaultOpen"];
+  defaultOpen?: HelixHeadlessMegamenu["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixBaseMegamenuHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixBaseMegamenuHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseMegamenuSolidJsProps = {
+export type HelixHeadlessMegamenuSolidJsProps = {
   /** The section's name, which names the default trigger and the panel. */
-  "prop:label"?: HelixBaseMegamenu["label"];
+  "prop:label"?: HelixHeadlessMegamenu["label"];
   /** Whether the panel is a card under the trigger or a band across the page.
 
 The resting one is the card, hanging off the trigger and as wide as it
@@ -5516,21 +5544,21 @@ tier knows about it at all: a band spans the viewport, so there is nothing
 to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
-  "prop:variant"?: HelixBaseMegamenu["variant"];
+  "prop:variant"?: HelixHeadlessMegamenu["variant"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
 the trigger, and it is the default because that is what a navigation bar
 does. `click` is for a trigger that does something else as well, or a panel
 heavy enough that opening it on the way past is rude. */
-  "attr:open-on"?: HelixBaseMegamenu["openOn"];
+  "attr:open-on"?: HelixHeadlessMegamenu["openOn"];
   /** Whether hovering the trigger opens the panel, or only a press does.
 
 A press always works. This says whether a mouse also opens it by resting on
 the trigger, and it is the default because that is what a navigation bar
 does. `click` is for a trigger that does something else as well, or a panel
 heavy enough that opening it on the way past is rude. */
-  "prop:openOn"?: HelixBaseMegamenu["openOn"];
+  "prop:openOn"?: HelixHeadlessMegamenu["openOn"];
   /** The width, in pixels, under which a card becomes a band. Zero never does.
 
 A card is a panel hung off one word, and there is no room to hang anything
@@ -5546,7 +5574,7 @@ so the controller has to be told not to measure, and that decision is here
 whatever the stylesheet says. Writing the width in both places would be one
 number in two languages, drifting the first time either moved. This sets
 `data-narrow` on the host and the stylesheet arranges itself off that. */
-  "attr:full-below"?: HelixBaseMegamenu["fullBelow"];
+  "attr:full-below"?: HelixHeadlessMegamenu["fullBelow"];
   /** The width, in pixels, under which a card becomes a band. Zero never does.
 
 A card is a panel hung off one word, and there is no room to hang anything
@@ -5562,7 +5590,7 @@ so the controller has to be told not to measure, and that decision is here
 whatever the stylesheet says. Writing the width in both places would be one
 number in two languages, drifting the first time either moved. This sets
 `data-narrow` on the host and the stylesheet arranges itself off that. */
-  "prop:fullBelow"?: HelixBaseMegamenu["fullBelow"];
+  "prop:fullBelow"?: HelixHeadlessMegamenu["fullBelow"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -5585,15 +5613,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseMegamenu["open"];
+  "prop:open"?: HelixHeadlessMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseMegamenu["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessMegamenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseMegamenu["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessMegamenu["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixBaseMegamenuHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixBaseMegamenuHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5601,18 +5629,18 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-/** `HelixBaseMenuItem` component event */
-export type HelixBaseMenuItemElementEvent<E = Event> = TypedEvent<
-  HelixBaseMenuItem,
+/** `HelixHeadlessMenuItem` component event */
+export type HelixHeadlessMenuItemElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessMenuItem,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseMenuItemHelixSelectElementEvent =
-  HelixBaseMenuItemElementEvent<HelixSelectEvent>;
+export type HelixHeadlessMenuItemHelixSelectElementEvent =
+  HelixHeadlessMenuItemElementEvent<HelixSelectEvent>;
 
-export type HelixBaseMenuItemProps = {
+export type HelixHeadlessMenuItemProps = {
   /** What this row stands for, carried in the event when it is chosen. */
-  value?: HelixBaseMenuItem["value"];
+  value?: HelixHeadlessMenuItem["value"];
   /** Whether the row is one of a set of choices.
 
 Separate from `checked`, and it has to be. A row that is off is still a
@@ -5622,11 +5650,11 @@ as a checkbox tells a reader its siblings are commands, which is the one
 thing they are not.
 
 `checked` implies it, so a row that is on never has to say both. */
-  checkable?: HelixBaseMenuItem["checkable"];
+  checkable?: HelixHeadlessMenuItem["checkable"];
   /** Whether the row is ticked. */
-  checked?: HelixBaseMenuItem["checked"];
+  checked?: HelixHeadlessMenuItem["checked"];
   /** Whether the row can be chosen. */
-  disabled?: HelixBaseMenuItem["disabled"];
+  disabled?: HelixHeadlessMenuItem["disabled"];
   /** Where the row goes, which makes it a real link.
 
 **The row itself becomes an `<a>`, and the role goes with it.** A
@@ -5645,23 +5673,23 @@ point at the option's host, measured: assigning
 back `null`. So `role="option"` is pinned to the host, and an anchor under
 it hits the naming failure above. A menu has no such constraint because
 focus really moves to the row. */
-  href?: HelixBaseMenuItem["href"];
+  href?: HelixHeadlessMenuItem["href"];
   /** Where the link opens, for the rows that should leave the page. */
-  target?: HelixBaseMenuItem["target"];
+  target?: HelixHeadlessMenuItem["target"];
   /** The relationship, which `target="_blank"` should always set. */
-  rel?: HelixBaseMenuItem["rel"];
+  rel?: HelixHeadlessMenuItem["rel"];
   /** Whether the link saves the file rather than opening it.
 
 Only meaningful beside an `href`, and only for a file served from this
 origin: the attribute is ignored cross-origin, which is the browser's rule
 about who may name a file on somebody's disk rather than a gap here. */
-  download?: HelixBaseMenuItem["download"];
+  download?: HelixHeadlessMenuItem["download"];
   /** Whether this row is on the page currently showing.
 
 Set by the menu, and a property rather than an attribute for that reason.
 Public because the menu has to reach it, and not something a consumer
 writes: which page is open is the menu's business. */
-  onPage?: HelixBaseMenuItem["onPage"];
+  onPage?: HelixHeadlessMenuItem["onPage"];
   /** Whether this row's submenu is the page showing.
 
 Separate from `onPage`, and it has to be. A row that opened a page is not
@@ -5669,15 +5697,15 @@ itself on that page, so both are false for it, and rendering nothing on
 that basis takes its `slot[name="submenu"]` with it: the rows inside have
 nowhere to be assigned and are never laid out. The element that holds the
 page has to keep the slot even when it shows no row of its own. */
-  showingSubmenu?: HelixBaseMenuItem["showingSubmenu"];
+  showingSubmenu?: HelixHeadlessMenuItem["showingSubmenu"];
 
   /** Fired when the row is chosen. */
-  "onhelix-select"?: (e: HelixBaseMenuItemHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessMenuItemHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseMenuItemSolidJsProps = {
+export type HelixHeadlessMenuItemSolidJsProps = {
   /** What this row stands for, carried in the event when it is chosen. */
-  "prop:value"?: HelixBaseMenuItem["value"];
+  "prop:value"?: HelixHeadlessMenuItem["value"];
   /** Whether the row is one of a set of choices.
 
 Separate from `checked`, and it has to be. A row that is off is still a
@@ -5687,11 +5715,11 @@ as a checkbox tells a reader its siblings are commands, which is the one
 thing they are not.
 
 `checked` implies it, so a row that is on never has to say both. */
-  "prop:checkable"?: HelixBaseMenuItem["checkable"];
+  "prop:checkable"?: HelixHeadlessMenuItem["checkable"];
   /** Whether the row is ticked. */
-  "prop:checked"?: HelixBaseMenuItem["checked"];
+  "prop:checked"?: HelixHeadlessMenuItem["checked"];
   /** Whether the row can be chosen. */
-  "prop:disabled"?: HelixBaseMenuItem["disabled"];
+  "prop:disabled"?: HelixHeadlessMenuItem["disabled"];
   /** Where the row goes, which makes it a real link.
 
 **The row itself becomes an `<a>`, and the role goes with it.** A
@@ -5710,23 +5738,23 @@ point at the option's host, measured: assigning
 back `null`. So `role="option"` is pinned to the host, and an anchor under
 it hits the naming failure above. A menu has no such constraint because
 focus really moves to the row. */
-  "prop:href"?: HelixBaseMenuItem["href"];
+  "prop:href"?: HelixHeadlessMenuItem["href"];
   /** Where the link opens, for the rows that should leave the page. */
-  "prop:target"?: HelixBaseMenuItem["target"];
+  "prop:target"?: HelixHeadlessMenuItem["target"];
   /** The relationship, which `target="_blank"` should always set. */
-  "prop:rel"?: HelixBaseMenuItem["rel"];
+  "prop:rel"?: HelixHeadlessMenuItem["rel"];
   /** Whether the link saves the file rather than opening it.
 
 Only meaningful beside an `href`, and only for a file served from this
 origin: the attribute is ignored cross-origin, which is the browser's rule
 about who may name a file on somebody's disk rather than a gap here. */
-  "prop:download"?: HelixBaseMenuItem["download"];
+  "prop:download"?: HelixHeadlessMenuItem["download"];
   /** Whether this row is on the page currently showing.
 
 Set by the menu, and a property rather than an attribute for that reason.
 Public because the menu has to reach it, and not something a consumer
 writes: which page is open is the menu's business. */
-  "prop:onPage"?: HelixBaseMenuItem["onPage"];
+  "prop:onPage"?: HelixHeadlessMenuItem["onPage"];
   /** Whether this row's submenu is the page showing.
 
 Separate from `onPage`, and it has to be. A row that opened a page is not
@@ -5734,9 +5762,9 @@ itself on that page, so both are false for it, and rendering nothing on
 that basis takes its `slot[name="submenu"]` with it: the rows inside have
 nowhere to be assigned and are never laid out. The element that holds the
 page has to keep the slot even when it shows no row of its own. */
-  "prop:showingSubmenu"?: HelixBaseMenuItem["showingSubmenu"];
+  "prop:showingSubmenu"?: HelixHeadlessMenuItem["showingSubmenu"];
   /** Fired when the row is chosen. */
-  "on:helix-select"?: (e: HelixBaseMenuItemHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessMenuItemHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5744,43 +5772,46 @@ page has to keep the slot even when it shows no row of its own. */
   textContent?: string | number;
 };
 
-/** `HelixBaseMenu` component event */
-export type HelixBaseMenuElementEvent<E = Event> = TypedEvent<HelixBaseMenu, E>;
+/** `HelixHeadlessMenu` component event */
+export type HelixHeadlessMenuElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessMenu,
+  E
+>;
 /** `helix-open` event type */
-export type HelixBaseMenuHelixOpenElementEvent =
-  HelixBaseMenuElementEvent<HelixOpenEvent>;
+export type HelixHeadlessMenuHelixOpenElementEvent =
+  HelixHeadlessMenuElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseMenuHelixCloseElementEvent =
-  HelixBaseMenuElementEvent<HelixCloseEvent>;
+export type HelixHeadlessMenuHelixCloseElementEvent =
+  HelixHeadlessMenuElementEvent<HelixCloseEvent>;
 /** `helix-select` event type */
-export type HelixBaseMenuHelixSelectElementEvent =
-  HelixBaseMenuElementEvent<HelixSelectEvent>;
+export type HelixHeadlessMenuHelixSelectElementEvent =
+  HelixHeadlessMenuElementEvent<HelixSelectEvent>;
 
-export type HelixBaseMenuProps = {
+export type HelixHeadlessMenuProps = {
   /** Preferred side. It moves if that side does not fit. */
-  placement?: HelixBaseMenu["placement"];
+  placement?: HelixHeadlessMenu["placement"];
   /** Space between the trigger and the surface, in pixels. */
-  offset?: HelixBaseMenu["offset"];
+  offset?: HelixHeadlessMenu["offset"];
   /** Accessible name for the surface. */
-  label?: HelixBaseMenu["label"];
+  label?: HelixHeadlessMenu["label"];
   /** What the row returning from a submenu reads. */
-  "back-label"?: HelixBaseMenu["backLabel"];
+  "back-label"?: HelixHeadlessMenu["backLabel"];
   /** What the row returning from a submenu reads. */
-  backLabel?: HelixBaseMenu["backLabel"];
+  backLabel?: HelixHeadlessMenu["backLabel"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  loading?: HelixBaseMenu["loading"];
+  loading?: HelixHeadlessMenu["loading"];
   /** What is said while they are on their way. */
-  "loading-text"?: HelixBaseMenu["loadingText"];
+  "loading-text"?: HelixHeadlessMenu["loadingText"];
   /** What is said while they are on their way. */
-  loadingText?: HelixBaseMenu["loadingText"];
+  loadingText?: HelixHeadlessMenu["loadingText"];
   /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixBaseMenu["emptyText"];
+  "empty-text"?: HelixHeadlessMenu["emptyText"];
   /** What is said where there are none, and none are coming. */
-  emptyText?: HelixBaseMenu["emptyText"];
+  emptyText?: HelixHeadlessMenu["emptyText"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -5803,45 +5834,45 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseMenu["open"];
+  open?: HelixHeadlessMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseMenu["defaultOpen"];
+  "default-open"?: HelixHeadlessMenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseMenu["defaultOpen"];
+  defaultOpen?: HelixHeadlessMenu["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixBaseMenuHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessMenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixBaseMenuHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessMenuHelixCloseElementEvent) => void;
   /** Fired when an item is chosen. */
-  "onhelix-select"?: (e: HelixBaseMenuHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseMenuSolidJsProps = {
+export type HelixHeadlessMenuSolidJsProps = {
   /** Preferred side. It moves if that side does not fit. */
-  "prop:placement"?: HelixBaseMenu["placement"];
+  "prop:placement"?: HelixHeadlessMenu["placement"];
   /** Space between the trigger and the surface, in pixels. */
-  "prop:offset"?: HelixBaseMenu["offset"];
+  "prop:offset"?: HelixHeadlessMenu["offset"];
   /** Accessible name for the surface. */
-  "prop:label"?: HelixBaseMenu["label"];
+  "prop:label"?: HelixHeadlessMenu["label"];
   /** What the row returning from a submenu reads. */
-  "attr:back-label"?: HelixBaseMenu["backLabel"];
+  "attr:back-label"?: HelixHeadlessMenu["backLabel"];
   /** What the row returning from a submenu reads. */
-  "prop:backLabel"?: HelixBaseMenu["backLabel"];
+  "prop:backLabel"?: HelixHeadlessMenu["backLabel"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  "prop:loading"?: HelixBaseMenu["loading"];
+  "prop:loading"?: HelixHeadlessMenu["loading"];
   /** What is said while they are on their way. */
-  "attr:loading-text"?: HelixBaseMenu["loadingText"];
+  "attr:loading-text"?: HelixHeadlessMenu["loadingText"];
   /** What is said while they are on their way. */
-  "prop:loadingText"?: HelixBaseMenu["loadingText"];
+  "prop:loadingText"?: HelixHeadlessMenu["loadingText"];
   /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixBaseMenu["emptyText"];
+  "attr:empty-text"?: HelixHeadlessMenu["emptyText"];
   /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixBaseMenu["emptyText"];
+  "prop:emptyText"?: HelixHeadlessMenu["emptyText"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -5864,17 +5895,17 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseMenu["open"];
+  "prop:open"?: HelixHeadlessMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseMenu["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessMenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseMenu["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessMenu["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixBaseMenuHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessMenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixBaseMenuHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessMenuHelixCloseElementEvent) => void;
   /** Fired when an item is chosen. */
-  "on:helix-select"?: (e: HelixBaseMenuHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5882,31 +5913,31 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-export type HelixBaseMeterProps = {
+export type HelixHeadlessMeterProps = {
   /** Accessible name for the reading. */
-  label?: HelixBaseMeter["label"];
+  label?: HelixHeadlessMeter["label"];
   /** Bottom of the range. */
-  min?: HelixBaseMeter["min"];
+  min?: HelixHeadlessMeter["min"];
   /** Top of the range.
 
 A hundred rather than the platform's one, which is what `Progress` already
 takes and what a consumer writing `value="72"` means. A range of zero to one
 is a fraction, and a component that reads `value="72"` as seventy-two times
 over its maximum is a trap that costs nothing to avoid. */
-  max?: HelixBaseMeter["max"];
+  max?: HelixHeadlessMeter["max"];
   /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
-  value?: HelixBaseMeter["value"];
+  value?: HelixHeadlessMeter["value"];
   /** Top of the low band. Absent leaves the range unbanded. */
-  low?: HelixBaseMeter["low"];
+  low?: HelixHeadlessMeter["low"];
   /** Bottom of the high band. Absent leaves the range unbanded. */
-  high?: HelixBaseMeter["high"];
+  high?: HelixHeadlessMeter["high"];
   /** Where in the range it is best to be.
 
 Defaults to the middle of whatever bands are declared, which is the
 platform's own default and the right one for a score. A meter where low is
 good, like disk usage, says `optimum="0"`; one where high is good, like a
 battery, says `optimum="100"`. */
-  optimum?: HelixBaseMeter["optimum"];
+  optimum?: HelixHeadlessMeter["optimum"];
   /** The band, said outright, where the three thresholds cannot say it.
 
 **The specification's model has a shape, and it is worth knowing before
@@ -5932,7 +5963,7 @@ Not reflected. Nothing selects on it: the band reaches the stylesheet as
 `data-band` on the fill, because that is the element being colored, so
 reflecting here would write an attribute onto the host for no reader. Third
 time this rule has caught something today. */
-  band?: HelixBaseMeter["band"];
+  band?: HelixHeadlessMeter["band"];
   /** Whether the reading is drawn as a bar, a ring or an arc.
 
 A gauge and a meter are the same thing measured: a value in a range, with
@@ -5949,50 +5980,50 @@ range have somewhere to be that is not each other.
 There is no needle in any of them. A needle is a picture of an instrument
 rather than a reading, it costs a rotation and a shape to draw it with, and
 it says nothing the end of the arc does not already say. */
-  shape?: HelixBaseMeter["shape"];
+  shape?: HelixHeadlessMeter["shape"];
   /** Whether the reading is shown beside the bar. */
-  "show-value"?: HelixBaseMeter["showValue"];
+  "show-value"?: HelixHeadlessMeter["showValue"];
   /** Whether the reading is shown beside the bar. */
-  showValue?: HelixBaseMeter["showValue"];
+  showValue?: HelixHeadlessMeter["showValue"];
   /** What the reading says, where a number is not the whole story.
 
 `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
 same property `Progress` carries, for the same reason: a percentage is a
 fair summary of a task and a poor one of a quantity. */
-  "value-text"?: HelixBaseMeter["valueText"];
+  "value-text"?: HelixHeadlessMeter["valueText"];
   /** What the reading says, where a number is not the whole story.
 
 `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
 same property `Progress` carries, for the same reason: a percentage is a
 fair summary of a task and a poor one of a quantity. */
-  valueText?: HelixBaseMeter["valueText"];
+  valueText?: HelixHeadlessMeter["valueText"];
 };
 
-export type HelixBaseMeterSolidJsProps = {
+export type HelixHeadlessMeterSolidJsProps = {
   /** Accessible name for the reading. */
-  "prop:label"?: HelixBaseMeter["label"];
+  "prop:label"?: HelixHeadlessMeter["label"];
   /** Bottom of the range. */
-  "prop:min"?: HelixBaseMeter["min"];
+  "prop:min"?: HelixHeadlessMeter["min"];
   /** Top of the range.
 
 A hundred rather than the platform's one, which is what `Progress` already
 takes and what a consumer writing `value="72"` means. A range of zero to one
 is a fraction, and a component that reads `value="72"` as seventy-two times
 over its maximum is a trap that costs nothing to avoid. */
-  "prop:max"?: HelixBaseMeter["max"];
+  "prop:max"?: HelixHeadlessMeter["max"];
   /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
-  "prop:value"?: HelixBaseMeter["value"];
+  "prop:value"?: HelixHeadlessMeter["value"];
   /** Top of the low band. Absent leaves the range unbanded. */
-  "prop:low"?: HelixBaseMeter["low"];
+  "prop:low"?: HelixHeadlessMeter["low"];
   /** Bottom of the high band. Absent leaves the range unbanded. */
-  "prop:high"?: HelixBaseMeter["high"];
+  "prop:high"?: HelixHeadlessMeter["high"];
   /** Where in the range it is best to be.
 
 Defaults to the middle of whatever bands are declared, which is the
 platform's own default and the right one for a score. A meter where low is
 good, like disk usage, says `optimum="0"`; one where high is good, like a
 battery, says `optimum="100"`. */
-  "prop:optimum"?: HelixBaseMeter["optimum"];
+  "prop:optimum"?: HelixHeadlessMeter["optimum"];
   /** The band, said outright, where the three thresholds cannot say it.
 
 **The specification's model has a shape, and it is worth knowing before
@@ -6018,7 +6049,7 @@ Not reflected. Nothing selects on it: the band reaches the stylesheet as
 `data-band` on the fill, because that is the element being colored, so
 reflecting here would write an attribute onto the host for no reader. Third
 time this rule has caught something today. */
-  "prop:band"?: HelixBaseMeter["band"];
+  "prop:band"?: HelixHeadlessMeter["band"];
   /** Whether the reading is drawn as a bar, a ring or an arc.
 
 A gauge and a meter are the same thing measured: a value in a range, with
@@ -6035,23 +6066,23 @@ range have somewhere to be that is not each other.
 There is no needle in any of them. A needle is a picture of an instrument
 rather than a reading, it costs a rotation and a shape to draw it with, and
 it says nothing the end of the arc does not already say. */
-  "prop:shape"?: HelixBaseMeter["shape"];
+  "prop:shape"?: HelixHeadlessMeter["shape"];
   /** Whether the reading is shown beside the bar. */
-  "bool:show-value"?: HelixBaseMeter["showValue"];
+  "bool:show-value"?: HelixHeadlessMeter["showValue"];
   /** Whether the reading is shown beside the bar. */
-  "prop:showValue"?: HelixBaseMeter["showValue"];
+  "prop:showValue"?: HelixHeadlessMeter["showValue"];
   /** What the reading says, where a number is not the whole story.
 
 `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
 same property `Progress` carries, for the same reason: a percentage is a
 fair summary of a task and a poor one of a quantity. */
-  "attr:value-text"?: HelixBaseMeter["valueText"];
+  "attr:value-text"?: HelixHeadlessMeter["valueText"];
   /** What the reading says, where a number is not the whole story.
 
 `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
 same property `Progress` carries, for the same reason: a percentage is a
 fair summary of a task and a poor one of a quantity. */
-  "prop:valueText"?: HelixBaseMeter["valueText"];
+  "prop:valueText"?: HelixHeadlessMeter["valueText"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6059,14 +6090,14 @@ fair summary of a task and a poor one of a quantity. */
   textContent?: string | number;
 };
 
-export type HelixBaseNavigationProps = {
+export type HelixHeadlessNavigationProps = {
   /** Accessible name for the landmark. */
-  label?: HelixBaseNavigation["label"];
+  label?: HelixHeadlessNavigation["label"];
 };
 
-export type HelixBaseNavigationSolidJsProps = {
+export type HelixHeadlessNavigationSolidJsProps = {
   /** Accessible name for the landmark. */
-  "prop:label"?: HelixBaseNavigation["label"];
+  "prop:label"?: HelixHeadlessNavigation["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6074,40 +6105,40 @@ export type HelixBaseNavigationSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseNumberInput` component event */
-export type HelixBaseNumberInputElementEvent<E = Event> = TypedEvent<
-  HelixBaseNumberInput,
+/** `HelixHeadlessNumberInput` component event */
+export type HelixHeadlessNumberInputElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessNumberInput,
   E
 >;
 /** `helix-input` event type */
-export type HelixBaseNumberInputHelixInputElementEvent =
-  HelixBaseNumberInputElementEvent<HelixInputEvent>;
+export type HelixHeadlessNumberInputHelixInputElementEvent =
+  HelixHeadlessNumberInputElementEvent<HelixInputEvent>;
 
-export type HelixBaseNumberInputProps = {
+export type HelixHeadlessNumberInputProps = {
   /** Smallest value the reader may reach. Absent has no floor. */
-  min?: HelixBaseNumberInput["min"];
+  min?: HelixHeadlessNumberInput["min"];
   /** Largest value the reader may reach. Absent has no ceiling. */
-  max?: HelixBaseNumberInput["max"];
+  max?: HelixHeadlessNumberInput["max"];
   /** How far one step moves. */
-  step?: HelixBaseNumberInput["step"];
+  step?: HelixHeadlessNumberInput["step"];
   /** How far `PageUp` and `PageDown` move.
 
 Ten steps, which is the convention every spinner on the platform follows,
 and a property because ten of a step of `0.01` is a hundredth and rarely
 what a reader wants from a whole key. */
-  "large-step"?: HelixBaseNumberInput["largeStep"];
+  "large-step"?: HelixHeadlessNumberInput["largeStep"];
   /** How far `PageUp` and `PageDown` move.
 
 Ten steps, which is the convention every spinner on the platform follows,
 and a property because ten of a step of `0.01` is a hundredth and rarely
 what a reader wants from a whole key. */
-  largeStep?: HelixBaseNumberInput["largeStep"];
+  largeStep?: HelixHeadlessNumberInput["largeStep"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
-  placeholder?: HelixBaseNumberInput["placeholder"];
+  placeholder?: HelixHeadlessNumberInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "read-only"?: HelixBaseNumberInput["readOnly"];
+  "read-only"?: HelixHeadlessNumberInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
-  readOnly?: HelixBaseNumberInput["readOnly"];
+  readOnly?: HelixHeadlessNumberInput["readOnly"];
   /** Whether a grip is shown that changes the value when it is dragged.
 
 The label is what is dragged, so this adds no chrome at all. Still opt-in,
@@ -6116,19 +6147,19 @@ across a word expecting to select it should get that everywhere it has not
 been asked for. Where it earns its place is a value a reader tunes rather
 than states: a duration, a weight, a count they are looking for rather than
 one they already know. */
-  scrub?: HelixBaseNumberInput["scrub"];
+  scrub?: HelixHeadlessNumberInput["scrub"];
   /** Accessible name for the control that steps down. */
-  "decrement-label"?: HelixBaseNumberInput["decrementLabel"];
+  "decrement-label"?: HelixHeadlessNumberInput["decrementLabel"];
   /** Accessible name for the control that steps down. */
-  decrementLabel?: HelixBaseNumberInput["decrementLabel"];
+  decrementLabel?: HelixHeadlessNumberInput["decrementLabel"];
   /** Accessible name for the control that steps up. */
-  "increment-label"?: HelixBaseNumberInput["incrementLabel"];
+  "increment-label"?: HelixHeadlessNumberInput["incrementLabel"];
   /** Accessible name for the control that steps up. */
-  incrementLabel?: HelixBaseNumberInput["incrementLabel"];
+  incrementLabel?: HelixHeadlessNumberInput["incrementLabel"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseNumberInput["defaultValue"];
+  "default-value"?: HelixHeadlessNumberInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseNumberInput["defaultValue"];
+  defaultValue?: HelixHeadlessNumberInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -6140,15 +6171,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseNumberInput["value"];
+  value?: HelixHeadlessNumberInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseNumberInput["hint"];
+  hint?: HelixHeadlessNumberInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseNumberInput["feedback"];
+  feedback?: HelixHeadlessNumberInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseNumberInput["label"];
+  label?: HelixHeadlessNumberInput["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseNumberInput["required"];
+  required?: HelixHeadlessNumberInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -6159,7 +6190,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseNumberInput["disabled"];
+  disabled?: HelixHeadlessNumberInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -6177,39 +6208,39 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseNumberInput["name"];
+  name?: HelixHeadlessNumberInput["name"];
 
   /** Fired as the value changes, and cancelable. */
-  "onhelix-input"?: (e: HelixBaseNumberInputHelixInputElementEvent) => void;
+  "onhelix-input"?: (e: HelixHeadlessNumberInputHelixInputElementEvent) => void;
   /** Relayed from the field once the reader has finished. */
-  onchange?: (e: HelixBaseNumberInputElementEvent) => void;
+  onchange?: (e: HelixHeadlessNumberInputElementEvent) => void;
 };
 
-export type HelixBaseNumberInputSolidJsProps = {
+export type HelixHeadlessNumberInputSolidJsProps = {
   /** Smallest value the reader may reach. Absent has no floor. */
-  "prop:min"?: HelixBaseNumberInput["min"];
+  "prop:min"?: HelixHeadlessNumberInput["min"];
   /** Largest value the reader may reach. Absent has no ceiling. */
-  "prop:max"?: HelixBaseNumberInput["max"];
+  "prop:max"?: HelixHeadlessNumberInput["max"];
   /** How far one step moves. */
-  "prop:step"?: HelixBaseNumberInput["step"];
+  "prop:step"?: HelixHeadlessNumberInput["step"];
   /** How far `PageUp` and `PageDown` move.
 
 Ten steps, which is the convention every spinner on the platform follows,
 and a property because ten of a step of `0.01` is a hundredth and rarely
 what a reader wants from a whole key. */
-  "attr:large-step"?: HelixBaseNumberInput["largeStep"];
+  "attr:large-step"?: HelixHeadlessNumberInput["largeStep"];
   /** How far `PageUp` and `PageDown` move.
 
 Ten steps, which is the convention every spinner on the platform follows,
 and a property because ten of a step of `0.01` is a hundredth and rarely
 what a reader wants from a whole key. */
-  "prop:largeStep"?: HelixBaseNumberInput["largeStep"];
+  "prop:largeStep"?: HelixHeadlessNumberInput["largeStep"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
-  "prop:placeholder"?: HelixBaseNumberInput["placeholder"];
+  "prop:placeholder"?: HelixHeadlessNumberInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "bool:read-only"?: HelixBaseNumberInput["readOnly"];
+  "bool:read-only"?: HelixHeadlessNumberInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
-  "prop:readOnly"?: HelixBaseNumberInput["readOnly"];
+  "prop:readOnly"?: HelixHeadlessNumberInput["readOnly"];
   /** Whether a grip is shown that changes the value when it is dragged.
 
 The label is what is dragged, so this adds no chrome at all. Still opt-in,
@@ -6218,19 +6249,19 @@ across a word expecting to select it should get that everywhere it has not
 been asked for. Where it earns its place is a value a reader tunes rather
 than states: a duration, a weight, a count they are looking for rather than
 one they already know. */
-  "prop:scrub"?: HelixBaseNumberInput["scrub"];
+  "prop:scrub"?: HelixHeadlessNumberInput["scrub"];
   /** Accessible name for the control that steps down. */
-  "attr:decrement-label"?: HelixBaseNumberInput["decrementLabel"];
+  "attr:decrement-label"?: HelixHeadlessNumberInput["decrementLabel"];
   /** Accessible name for the control that steps down. */
-  "prop:decrementLabel"?: HelixBaseNumberInput["decrementLabel"];
+  "prop:decrementLabel"?: HelixHeadlessNumberInput["decrementLabel"];
   /** Accessible name for the control that steps up. */
-  "attr:increment-label"?: HelixBaseNumberInput["incrementLabel"];
+  "attr:increment-label"?: HelixHeadlessNumberInput["incrementLabel"];
   /** Accessible name for the control that steps up. */
-  "prop:incrementLabel"?: HelixBaseNumberInput["incrementLabel"];
+  "prop:incrementLabel"?: HelixHeadlessNumberInput["incrementLabel"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseNumberInput["defaultValue"];
+  "attr:default-value"?: HelixHeadlessNumberInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseNumberInput["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessNumberInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -6242,15 +6273,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseNumberInput["value"];
+  "prop:value"?: HelixHeadlessNumberInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseNumberInput["hint"];
+  "prop:hint"?: HelixHeadlessNumberInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseNumberInput["feedback"];
+  "prop:feedback"?: HelixHeadlessNumberInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseNumberInput["label"];
+  "prop:label"?: HelixHeadlessNumberInput["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseNumberInput["required"];
+  "prop:required"?: HelixHeadlessNumberInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -6261,7 +6292,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseNumberInput["disabled"];
+  "prop:disabled"?: HelixHeadlessNumberInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -6279,11 +6310,13 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseNumberInput["name"];
+  "prop:name"?: HelixHeadlessNumberInput["name"];
   /** Fired as the value changes, and cancelable. */
-  "on:helix-input"?: (e: HelixBaseNumberInputHelixInputElementEvent) => void;
+  "on:helix-input"?: (
+    e: HelixHeadlessNumberInputHelixInputElementEvent,
+  ) => void;
   /** Relayed from the field once the reader has finished. */
-  "on:change"?: (e: HelixBaseNumberInputElementEvent) => void;
+  "on:change"?: (e: HelixHeadlessNumberInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6291,14 +6324,14 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseOptionGroupProps = {
+export type HelixHeadlessOptionGroupProps = {
   /** The heading over the run. */
-  label?: HelixBaseOptionGroup["label"];
+  label?: HelixHeadlessOptionGroup["label"];
 };
 
-export type HelixBaseOptionGroupSolidJsProps = {
+export type HelixHeadlessOptionGroupSolidJsProps = {
   /** The heading over the run. */
-  "prop:label"?: HelixBaseOptionGroup["label"];
+  "prop:label"?: HelixHeadlessOptionGroup["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6306,26 +6339,26 @@ export type HelixBaseOptionGroupSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseOption` component event */
-export type HelixBaseOptionElementEvent<E = Event> = TypedEvent<
-  HelixBaseOption,
+/** `HelixHeadlessOption` component event */
+export type HelixHeadlessOptionElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessOption,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseOptionHelixSelectElementEvent =
-  HelixBaseOptionElementEvent<HelixSelectEvent>;
+export type HelixHeadlessOptionHelixSelectElementEvent =
+  HelixHeadlessOptionElementEvent<HelixSelectEvent>;
 
-export type HelixBaseOptionProps = {
+export type HelixHeadlessOptionProps = {
   /** Whether this choice can be made. */
-  disabled?: HelixBaseOption["disabled"];
+  disabled?: HelixHeadlessOption["disabled"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
-  "data-active"?: HelixBaseOption["active"];
+  "data-active"?: HelixHeadlessOption["active"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
-  active?: HelixBaseOption["active"];
+  active?: HelixHeadlessOption["active"];
   /** Whether this choice is currently chosen. Written by the listbox. */
-  selected?: HelixBaseOption["selected"];
+  selected?: HelixHeadlessOption["selected"];
   /** Identifies this choice, and is what a form submits. */
-  value?: HelixBaseOption["value"];
+  value?: HelixHeadlessOption["value"];
   /** A second destination for this row, taken with the modifier held.
 
 **An attribute rather than a second row, which is the whole point.** A
@@ -6341,7 +6374,7 @@ what happens. `Command` is the only owner that reads it today, because a
 select has one destination by definition.
 
 Absent is a row with one destination, which is nearly every row. */
-  alternate?: HelixBaseOption["alternate"];
+  alternate?: HelixHeadlessOption["alternate"];
   /** What the second destination is, for a reader who cannot see the footer.
 
 A row with two destinations needs both said, or a screen reader is told
@@ -6349,7 +6382,7 @@ about one of them and the other is a key nobody mentioned. It goes to
 `aria-description` rather than into the name: the name is the row's own
 words and stays what a reader searched for, and the second destination is a
 fact about what pressing a key would do, which is what a description is. */
-  "alternate-label"?: HelixBaseOption["alternateLabel"];
+  "alternate-label"?: HelixHeadlessOption["alternateLabel"];
   /** What the second destination is, for a reader who cannot see the footer.
 
 A row with two destinations needs both said, or a screen reader is told
@@ -6357,23 +6390,23 @@ about one of them and the other is a key nobody mentioned. It goes to
 `aria-description` rather than into the name: the name is the row's own
 words and stays what a reader searched for, and the second destination is a
 fact about what pressing a key would do, which is what a description is. */
-  alternateLabel?: HelixBaseOption["alternateLabel"];
+  alternateLabel?: HelixHeadlessOption["alternateLabel"];
 
   /** Fired when this choice is made. */
-  "onhelix-select"?: (e: HelixBaseOptionHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessOptionHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseOptionSolidJsProps = {
+export type HelixHeadlessOptionSolidJsProps = {
   /** Whether this choice can be made. */
-  "prop:disabled"?: HelixBaseOption["disabled"];
+  "prop:disabled"?: HelixHeadlessOption["disabled"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
-  "bool:data-active"?: HelixBaseOption["active"];
+  "bool:data-active"?: HelixHeadlessOption["active"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
-  "prop:active"?: HelixBaseOption["active"];
+  "prop:active"?: HelixHeadlessOption["active"];
   /** Whether this choice is currently chosen. Written by the listbox. */
-  "prop:selected"?: HelixBaseOption["selected"];
+  "prop:selected"?: HelixHeadlessOption["selected"];
   /** Identifies this choice, and is what a form submits. */
-  "prop:value"?: HelixBaseOption["value"];
+  "prop:value"?: HelixHeadlessOption["value"];
   /** A second destination for this row, taken with the modifier held.
 
 **An attribute rather than a second row, which is the whole point.** A
@@ -6389,7 +6422,7 @@ what happens. `Command` is the only owner that reads it today, because a
 select has one destination by definition.
 
 Absent is a row with one destination, which is nearly every row. */
-  "prop:alternate"?: HelixBaseOption["alternate"];
+  "prop:alternate"?: HelixHeadlessOption["alternate"];
   /** What the second destination is, for a reader who cannot see the footer.
 
 A row with two destinations needs both said, or a screen reader is told
@@ -6397,7 +6430,7 @@ about one of them and the other is a key nobody mentioned. It goes to
 `aria-description` rather than into the name: the name is the row's own
 words and stays what a reader searched for, and the second destination is a
 fact about what pressing a key would do, which is what a description is. */
-  "attr:alternate-label"?: HelixBaseOption["alternateLabel"];
+  "attr:alternate-label"?: HelixHeadlessOption["alternateLabel"];
   /** What the second destination is, for a reader who cannot see the footer.
 
 A row with two destinations needs both said, or a screen reader is told
@@ -6405,9 +6438,9 @@ about one of them and the other is a key nobody mentioned. It goes to
 `aria-description` rather than into the name: the name is the row's own
 words and stays what a reader searched for, and the second destination is a
 fact about what pressing a key would do, which is what a description is. */
-  "prop:alternateLabel"?: HelixBaseOption["alternateLabel"];
+  "prop:alternateLabel"?: HelixHeadlessOption["alternateLabel"];
   /** Fired when this choice is made. */
-  "on:helix-select"?: (e: HelixBaseOptionHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessOptionHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6415,24 +6448,24 @@ fact about what pressing a key would do, which is what a description is. */
   textContent?: string | number;
 };
 
-/** `HelixBaseOutline` component event */
-export type HelixBaseOutlineElementEvent<E = Event> = TypedEvent<
-  HelixBaseOutline,
+/** `HelixHeadlessOutline` component event */
+export type HelixHeadlessOutlineElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessOutline,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseOutlineHelixChangeElementEvent =
-  HelixBaseOutlineElementEvent<HelixChangeEvent>;
+export type HelixHeadlessOutlineHelixChangeElementEvent =
+  HelixHeadlessOutlineElementEvent<HelixChangeEvent>;
 
-export type HelixBaseOutlineProps = {
+export type HelixHeadlessOutlineProps = {
   /** Accessible name for the navigation. */
-  label?: HelixBaseOutline["label"];
+  label?: HelixHeadlessOutline["label"];
   /** How far below the top of the window a heading counts as reached, in pixels.
 
 The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
-  offset?: HelixBaseOutline["offset"];
+  offset?: HelixHeadlessOutline["offset"];
   /** How a click on one of these links travels to its section.
 
 The platform's own vocabulary, because this is the platform's own option:
@@ -6452,21 +6485,21 @@ three are done by hand here, and only when there is a reason to take over.
 read at the click rather than cached, because a reader can change it while
 the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
-  behavior?: HelixBaseOutline["behavior"];
+  behavior?: HelixHeadlessOutline["behavior"];
 
   /** The section being read has changed, carrying its id as the value. */
-  "onhelix-change"?: (e: HelixBaseOutlineHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessOutlineHelixChangeElementEvent) => void;
 };
 
-export type HelixBaseOutlineSolidJsProps = {
+export type HelixHeadlessOutlineSolidJsProps = {
   /** Accessible name for the navigation. */
-  "prop:label"?: HelixBaseOutline["label"];
+  "prop:label"?: HelixHeadlessOutline["label"];
   /** How far below the top of the window a heading counts as reached, in pixels.
 
 The reading line. A page with a sticky masthead sets this to its height, or
 a little more: without it the current section changes as a heading slides
 under the chrome rather than as it reaches the top of what can be seen. */
-  "prop:offset"?: HelixBaseOutline["offset"];
+  "prop:offset"?: HelixHeadlessOutline["offset"];
   /** How a click on one of these links travels to its section.
 
 The platform's own vocabulary, because this is the platform's own option:
@@ -6486,9 +6519,9 @@ three are done by hand here, and only when there is a reason to take over.
 read at the click rather than cached, because a reader can change it while
 the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
-  "prop:behavior"?: HelixBaseOutline["behavior"];
+  "prop:behavior"?: HelixHeadlessOutline["behavior"];
   /** The section being read has changed, carrying its id as the value. */
-  "on:helix-change"?: (e: HelixBaseOutlineHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessOutlineHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6496,16 +6529,16 @@ JavaScript rather than CSS decides. */
   textContent?: string | number;
 };
 
-/** `HelixBasePagination` component event */
-export type HelixBasePaginationElementEvent<E = Event> = TypedEvent<
-  HelixBasePagination,
+/** `HelixHeadlessPagination` component event */
+export type HelixHeadlessPaginationElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessPagination,
   E
 >;
 /** `helix-navigate` event type */
-export type HelixBasePaginationHelixNavigateElementEvent =
-  HelixBasePaginationElementEvent<HelixNavigateEvent>;
+export type HelixHeadlessPaginationHelixNavigateElementEvent =
+  HelixHeadlessPaginationElementEvent<HelixNavigateEvent>;
 
-export type HelixBasePaginationProps = {
+export type HelixHeadlessPaginationProps = {
   /** How many pages there are in total.
 
 Clamped to at least one wherever it is read, so a result that has not
@@ -6515,7 +6548,7 @@ appears and pushes the layout down.
 Left unset where `total` and `page-size` are both given, since the two of
 them already say it. A fallback rather than an override: writing this wins,
 so there is never a question of which of two sources is current. */
-  pages?: HelixBasePagination["pages"];
+  pages?: HelixHeadlessPagination["pages"];
   /** How many items there are across every page.
 
 What `pages` falls back to together with `page-size`. Unset is the common
@@ -6523,19 +6556,19 @@ case, where a consumer knows the page total and not the item total.
 
 Nothing is rendered from it. `Pagination.Summary` is what reads a total out
 to a reader, and takes its own. */
-  total?: HelixBasePagination["total"];
+  total?: HelixHeadlessPagination["total"];
   /** How many items are on a page.
 
 Only arithmetic: this does not slice anything, because the component never
 sees the items. It is what turns `total` into a page count, and nothing
 else. */
-  "page-size"?: HelixBasePagination["pageSize"];
+  "page-size"?: HelixHeadlessPagination["pageSize"];
   /** How many items are on a page.
 
 Only arithmetic: this does not slice anything, because the component never
 sees the items. It is what turns `total` into a page count, and nothing
 else. */
-  pageSize?: HelixBasePagination["pageSize"];
+  pageSize?: HelixHeadlessPagination["pageSize"];
   /** Whether to offer a jump to the first and last pages.
 
 Off by default. The gaps already reach any page in a few presses and the
@@ -6548,7 +6581,7 @@ Not reflected. It adds two elements rather than changing how any of them
 look, so no rule selects on it, and the house rule is that reflection
 exists for selectors: an unread reflected attribute is one more thing
 written onto a host at upgrade that a server's output never had. */
-  ends?: HelixBasePagination["ends"];
+  ends?: HelixHeadlessPagination["ends"];
   /** The page on show, one-based.
 
 An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -6563,21 +6596,21 @@ not exist while the control in front of them said otherwise. Not a
 far-fetched value: it is a bookmarked link after the result shrank.
 
 Rounded here too, so `2.7` reads as the 2 it renders. */
-  page?: HelixBasePagination["page"];
+  page?: HelixHeadlessPagination["page"];
   /** Page to open on, where nothing declared one. */
-  "default-page"?: HelixBasePagination["defaultPage"];
+  "default-page"?: HelixHeadlessPagination["defaultPage"];
   /** Page to open on, where nothing declared one. */
-  defaultPage?: HelixBasePagination["defaultPage"];
+  defaultPage?: HelixHeadlessPagination["defaultPage"];
   /** How many pages to show either side of the current one. */
-  siblings?: HelixBasePagination["siblings"];
+  siblings?: HelixHeadlessPagination["siblings"];
   /** How many pages to show at each end, whatever the current one is. */
-  boundaries?: HelixBasePagination["boundaries"];
+  boundaries?: HelixHeadlessPagination["boundaries"];
   /** Address for a page, with `{page}` standing in for its number.
 
 Absent renders buttons. Present renders links, which is what a paged result
 with its own URL should be: a crawler follows them, a middle click opens
 one, and the back button works without the consumer wiring anything. */
-  href?: HelixBasePagination["href"];
+  href?: HelixHeadlessPagination["href"];
   /** Where the numbers are replaced by a reading of the two.
 
 A different structure rather than a different look, which is why it is
@@ -6587,9 +6620,9 @@ where the total is large enough that no window over it is useful.
 
 Not reflected, for the reason `ends` is not: it decides what renders, so
 nothing has to select on it. */
-  compact?: HelixBasePagination["compact"];
+  compact?: HelixHeadlessPagination["compact"];
   /** Accessible name for the navigation landmark. */
-  label?: HelixBasePagination["label"];
+  label?: HelixHeadlessPagination["label"];
   /** Locale for the page numbers. Absent uses the runtime's own.
 
 The same property the calendar takes, doing the same job one layer down:
@@ -6601,53 +6634,53 @@ digits into it has done half the job.
 
 Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
 different address from `?page=1234`. */
-  locale?: HelixBasePagination["locale"];
+  locale?: HelixHeadlessPagination["locale"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
-  "page-label"?: HelixBasePagination["pageLabel"];
+  "page-label"?: HelixHeadlessPagination["pageLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
-  pageLabel?: HelixBasePagination["pageLabel"];
+  pageLabel?: HelixHeadlessPagination["pageLabel"];
   /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
 
 The word went: it read "Page 7 of 24" and the landmark it sits in is
 already named "Pagination", so the noun was said twice to a screen reader
 and took a third of the width from a control whose whole reason for
 existing is that the row is narrow. The numbers are the reading. */
-  "status-label"?: HelixBasePagination["statusLabel"];
+  "status-label"?: HelixHeadlessPagination["statusLabel"];
   /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
 
 The word went: it read "Page 7 of 24" and the landmark it sits in is
 already named "Pagination", so the noun was said twice to a screen reader
 and took a third of the width from a control whose whole reason for
 existing is that the row is narrow. The numbers are the reading. */
-  statusLabel?: HelixBasePagination["statusLabel"];
+  statusLabel?: HelixHeadlessPagination["statusLabel"];
   /** Accessible name for the control that moves back. */
-  "previous-label"?: HelixBasePagination["previousLabel"];
+  "previous-label"?: HelixHeadlessPagination["previousLabel"];
   /** Accessible name for the control that moves back. */
-  previousLabel?: HelixBasePagination["previousLabel"];
+  previousLabel?: HelixHeadlessPagination["previousLabel"];
   /** Accessible name for the control that moves forward. */
-  "next-label"?: HelixBasePagination["nextLabel"];
+  "next-label"?: HelixHeadlessPagination["nextLabel"];
   /** Accessible name for the control that moves forward. */
-  nextLabel?: HelixBasePagination["nextLabel"];
+  nextLabel?: HelixHeadlessPagination["nextLabel"];
   /** Accessible name for the control that jumps to the first page. */
-  "first-label"?: HelixBasePagination["firstLabel"];
+  "first-label"?: HelixHeadlessPagination["firstLabel"];
   /** Accessible name for the control that jumps to the first page. */
-  firstLabel?: HelixBasePagination["firstLabel"];
+  firstLabel?: HelixHeadlessPagination["firstLabel"];
   /** Accessible name for the control that jumps to the last page. */
-  "last-label"?: HelixBasePagination["lastLabel"];
+  "last-label"?: HelixHeadlessPagination["lastLabel"];
   /** Accessible name for the control that jumps to the last page. */
-  lastLabel?: HelixBasePagination["lastLabel"];
+  lastLabel?: HelixHeadlessPagination["lastLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
-  "gap-label"?: HelixBasePagination["gapLabel"];
+  "gap-label"?: HelixHeadlessPagination["gapLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
-  gapLabel?: HelixBasePagination["gapLabel"];
+  gapLabel?: HelixHeadlessPagination["gapLabel"];
 
   /** Fired before the page changes, and cancelable. The only way to refuse one. */
   "onhelix-navigate"?: (
-    e: HelixBasePaginationHelixNavigateElementEvent,
+    e: HelixHeadlessPaginationHelixNavigateElementEvent,
   ) => void;
 };
 
-export type HelixBasePaginationSolidJsProps = {
+export type HelixHeadlessPaginationSolidJsProps = {
   /** How many pages there are in total.
 
 Clamped to at least one wherever it is read, so a result that has not
@@ -6657,7 +6690,7 @@ appears and pushes the layout down.
 Left unset where `total` and `page-size` are both given, since the two of
 them already say it. A fallback rather than an override: writing this wins,
 so there is never a question of which of two sources is current. */
-  "prop:pages"?: HelixBasePagination["pages"];
+  "prop:pages"?: HelixHeadlessPagination["pages"];
   /** How many items there are across every page.
 
 What `pages` falls back to together with `page-size`. Unset is the common
@@ -6665,19 +6698,19 @@ case, where a consumer knows the page total and not the item total.
 
 Nothing is rendered from it. `Pagination.Summary` is what reads a total out
 to a reader, and takes its own. */
-  "prop:total"?: HelixBasePagination["total"];
+  "prop:total"?: HelixHeadlessPagination["total"];
   /** How many items are on a page.
 
 Only arithmetic: this does not slice anything, because the component never
 sees the items. It is what turns `total` into a page count, and nothing
 else. */
-  "attr:page-size"?: HelixBasePagination["pageSize"];
+  "attr:page-size"?: HelixHeadlessPagination["pageSize"];
   /** How many items are on a page.
 
 Only arithmetic: this does not slice anything, because the component never
 sees the items. It is what turns `total` into a page count, and nothing
 else. */
-  "prop:pageSize"?: HelixBasePagination["pageSize"];
+  "prop:pageSize"?: HelixHeadlessPagination["pageSize"];
   /** Whether to offer a jump to the first and last pages.
 
 Off by default. The gaps already reach any page in a few presses and the
@@ -6690,7 +6723,7 @@ Not reflected. It adds two elements rather than changing how any of them
 look, so no rule selects on it, and the house rule is that reflection
 exists for selectors: an unread reflected attribute is one more thing
 written onto a host at upgrade that a server's output never had. */
-  "prop:ends"?: HelixBasePagination["ends"];
+  "prop:ends"?: HelixHeadlessPagination["ends"];
   /** The page on show, one-based.
 
 An accessor pair, the same shape as the calendar's `month`. Reading gives
@@ -6705,21 +6738,21 @@ not exist while the control in front of them said otherwise. Not a
 far-fetched value: it is a bookmarked link after the result shrank.
 
 Rounded here too, so `2.7` reads as the 2 it renders. */
-  "prop:page"?: HelixBasePagination["page"];
+  "prop:page"?: HelixHeadlessPagination["page"];
   /** Page to open on, where nothing declared one. */
-  "attr:default-page"?: HelixBasePagination["defaultPage"];
+  "attr:default-page"?: HelixHeadlessPagination["defaultPage"];
   /** Page to open on, where nothing declared one. */
-  "prop:defaultPage"?: HelixBasePagination["defaultPage"];
+  "prop:defaultPage"?: HelixHeadlessPagination["defaultPage"];
   /** How many pages to show either side of the current one. */
-  "prop:siblings"?: HelixBasePagination["siblings"];
+  "prop:siblings"?: HelixHeadlessPagination["siblings"];
   /** How many pages to show at each end, whatever the current one is. */
-  "prop:boundaries"?: HelixBasePagination["boundaries"];
+  "prop:boundaries"?: HelixHeadlessPagination["boundaries"];
   /** Address for a page, with `{page}` standing in for its number.
 
 Absent renders buttons. Present renders links, which is what a paged result
 with its own URL should be: a crawler follows them, a middle click opens
 one, and the back button works without the consumer wiring anything. */
-  "prop:href"?: HelixBasePagination["href"];
+  "prop:href"?: HelixHeadlessPagination["href"];
   /** Where the numbers are replaced by a reading of the two.
 
 A different structure rather than a different look, which is why it is
@@ -6729,9 +6762,9 @@ where the total is large enough that no window over it is useful.
 
 Not reflected, for the reason `ends` is not: it decides what renders, so
 nothing has to select on it. */
-  "prop:compact"?: HelixBasePagination["compact"];
+  "prop:compact"?: HelixHeadlessPagination["compact"];
   /** Accessible name for the navigation landmark. */
-  "prop:label"?: HelixBasePagination["label"];
+  "prop:label"?: HelixHeadlessPagination["label"];
   /** Locale for the page numbers. Absent uses the runtime's own.
 
 The same property the calendar takes, doing the same job one layer down:
@@ -6743,48 +6776,48 @@ digits into it has done half the job.
 
 Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
 different address from `?page=1234`. */
-  "prop:locale"?: HelixBasePagination["locale"];
+  "prop:locale"?: HelixHeadlessPagination["locale"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
-  "attr:page-label"?: HelixBasePagination["pageLabel"];
+  "attr:page-label"?: HelixHeadlessPagination["pageLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
-  "prop:pageLabel"?: HelixBasePagination["pageLabel"];
+  "prop:pageLabel"?: HelixHeadlessPagination["pageLabel"];
   /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
 
 The word went: it read "Page 7 of 24" and the landmark it sits in is
 already named "Pagination", so the noun was said twice to a screen reader
 and took a third of the width from a control whose whole reason for
 existing is that the row is narrow. The numbers are the reading. */
-  "attr:status-label"?: HelixBasePagination["statusLabel"];
+  "attr:status-label"?: HelixHeadlessPagination["statusLabel"];
   /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
 
 The word went: it read "Page 7 of 24" and the landmark it sits in is
 already named "Pagination", so the noun was said twice to a screen reader
 and took a third of the width from a control whose whole reason for
 existing is that the row is narrow. The numbers are the reading. */
-  "prop:statusLabel"?: HelixBasePagination["statusLabel"];
+  "prop:statusLabel"?: HelixHeadlessPagination["statusLabel"];
   /** Accessible name for the control that moves back. */
-  "attr:previous-label"?: HelixBasePagination["previousLabel"];
+  "attr:previous-label"?: HelixHeadlessPagination["previousLabel"];
   /** Accessible name for the control that moves back. */
-  "prop:previousLabel"?: HelixBasePagination["previousLabel"];
+  "prop:previousLabel"?: HelixHeadlessPagination["previousLabel"];
   /** Accessible name for the control that moves forward. */
-  "attr:next-label"?: HelixBasePagination["nextLabel"];
+  "attr:next-label"?: HelixHeadlessPagination["nextLabel"];
   /** Accessible name for the control that moves forward. */
-  "prop:nextLabel"?: HelixBasePagination["nextLabel"];
+  "prop:nextLabel"?: HelixHeadlessPagination["nextLabel"];
   /** Accessible name for the control that jumps to the first page. */
-  "attr:first-label"?: HelixBasePagination["firstLabel"];
+  "attr:first-label"?: HelixHeadlessPagination["firstLabel"];
   /** Accessible name for the control that jumps to the first page. */
-  "prop:firstLabel"?: HelixBasePagination["firstLabel"];
+  "prop:firstLabel"?: HelixHeadlessPagination["firstLabel"];
   /** Accessible name for the control that jumps to the last page. */
-  "attr:last-label"?: HelixBasePagination["lastLabel"];
+  "attr:last-label"?: HelixHeadlessPagination["lastLabel"];
   /** Accessible name for the control that jumps to the last page. */
-  "prop:lastLabel"?: HelixBasePagination["lastLabel"];
+  "prop:lastLabel"?: HelixHeadlessPagination["lastLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
-  "attr:gap-label"?: HelixBasePagination["gapLabel"];
+  "attr:gap-label"?: HelixHeadlessPagination["gapLabel"];
   /** Accessible name for a gap, with `{page}` filled in as where it goes. */
-  "prop:gapLabel"?: HelixBasePagination["gapLabel"];
+  "prop:gapLabel"?: HelixHeadlessPagination["gapLabel"];
   /** Fired before the page changes, and cancelable. The only way to refuse one. */
   "on:helix-navigate"?: (
-    e: HelixBasePaginationHelixNavigateElementEvent,
+    e: HelixHeadlessPaginationHelixNavigateElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -6793,67 +6826,67 @@ existing is that the row is narrow. The numbers are the reading. */
   textContent?: string | number;
 };
 
-/** `HelixBasePaginationSize` component event */
-export type HelixBasePaginationSizeElementEvent<E = Event> = TypedEvent<
-  HelixBasePaginationSize,
+/** `HelixHeadlessPaginationSize` component event */
+export type HelixHeadlessPaginationSizeElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessPaginationSize,
   E
 >;
 /** `helix-change` event type */
-export type HelixBasePaginationSizeHelixChangeElementEvent =
-  HelixBasePaginationSizeElementEvent<HelixChangeEvent>;
+export type HelixHeadlessPaginationSizeHelixChangeElementEvent =
+  HelixHeadlessPaginationSizeElementEvent<HelixChangeEvent>;
 
-export type HelixBasePaginationSizeProps = {
+export type HelixHeadlessPaginationSizeProps = {
   /** The sizes offered, comma separated.
 
 A string rather than an array, so the whole control is expressible in
 markup and survives a server render. Anything that is not a positive number
 is dropped rather than rendered as an option that cannot mean anything. */
-  sizes?: HelixBasePaginationSize["sizes"];
+  sizes?: HelixHeadlessPaginationSize["sizes"];
   /** The size in force.
 
 Reading gives the real one; writing declares it the consumer's, and
 `default-value` seeds one this element owns. Same accessor pair as
 `Pagination.page` and the calendar's `month`. */
-  value?: HelixBasePaginationSize["value"];
+  value?: HelixHeadlessPaginationSize["value"];
   /** Size to start on, where nothing declared one. */
-  "default-value"?: HelixBasePaginationSize["defaultValue"];
+  "default-value"?: HelixHeadlessPaginationSize["defaultValue"];
   /** Size to start on, where nothing declared one. */
-  defaultValue?: HelixBasePaginationSize["defaultValue"];
+  defaultValue?: HelixHeadlessPaginationSize["defaultValue"];
   /** The words beside the control. */
-  label?: HelixBasePaginationSize["label"];
+  label?: HelixHeadlessPaginationSize["label"];
   /** Locale for the numbers. Absent uses the runtime's own. */
-  locale?: HelixBasePaginationSize["locale"];
+  locale?: HelixHeadlessPaginationSize["locale"];
 
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
   "onhelix-change"?: (
-    e: HelixBasePaginationSizeHelixChangeElementEvent,
+    e: HelixHeadlessPaginationSizeHelixChangeElementEvent,
   ) => void;
 };
 
-export type HelixBasePaginationSizeSolidJsProps = {
+export type HelixHeadlessPaginationSizeSolidJsProps = {
   /** The sizes offered, comma separated.
 
 A string rather than an array, so the whole control is expressible in
 markup and survives a server render. Anything that is not a positive number
 is dropped rather than rendered as an option that cannot mean anything. */
-  "prop:sizes"?: HelixBasePaginationSize["sizes"];
+  "prop:sizes"?: HelixHeadlessPaginationSize["sizes"];
   /** The size in force.
 
 Reading gives the real one; writing declares it the consumer's, and
 `default-value` seeds one this element owns. Same accessor pair as
 `Pagination.page` and the calendar's `month`. */
-  "prop:value"?: HelixBasePaginationSize["value"];
+  "prop:value"?: HelixHeadlessPaginationSize["value"];
   /** Size to start on, where nothing declared one. */
-  "attr:default-value"?: HelixBasePaginationSize["defaultValue"];
+  "attr:default-value"?: HelixHeadlessPaginationSize["defaultValue"];
   /** Size to start on, where nothing declared one. */
-  "prop:defaultValue"?: HelixBasePaginationSize["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessPaginationSize["defaultValue"];
   /** The words beside the control. */
-  "prop:label"?: HelixBasePaginationSize["label"];
+  "prop:label"?: HelixHeadlessPaginationSize["label"];
   /** Locale for the numbers. Absent uses the runtime's own. */
-  "prop:locale"?: HelixBasePaginationSize["locale"];
+  "prop:locale"?: HelixHeadlessPaginationSize["locale"];
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
   "on:helix-change"?: (
-    e: HelixBasePaginationSizeHelixChangeElementEvent,
+    e: HelixHeadlessPaginationSizeHelixChangeElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -6862,15 +6895,15 @@ Reading gives the real one; writing declares it the consumer's, and
   textContent?: string | number;
 };
 
-export type HelixBasePaginationSummaryProps = {
+export type HelixHeadlessPaginationSummaryProps = {
   /** The page on show, one-based. */
-  page?: HelixBasePaginationSummary["page"];
+  page?: HelixHeadlessPaginationSummary["page"];
   /** How many items are on a page. */
-  "page-size"?: HelixBasePaginationSummary["pageSize"];
+  "page-size"?: HelixHeadlessPaginationSummary["pageSize"];
   /** How many items are on a page. */
-  pageSize?: HelixBasePaginationSummary["pageSize"];
+  pageSize?: HelixHeadlessPaginationSummary["pageSize"];
   /** How many items there are across every page. */
-  total?: HelixBasePaginationSummary["total"];
+  total?: HelixHeadlessPaginationSummary["total"];
   /** The reading, with `{from}`, `{to}` and `{total}` filled in.
 
 A template rather than a prefix and a suffix, because word order is not
@@ -6884,20 +6917,20 @@ words beside the control. This is neither. It is the whole visible content
 of the element, so calling it `label` put one word on three jobs inside one
 family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
 which each label something; this labels nothing, it *is* the thing. */
-  format?: HelixBasePaginationSummary["format"];
+  format?: HelixHeadlessPaginationSummary["format"];
   /** Locale for the numbers. Absent uses the runtime's own. */
-  locale?: HelixBasePaginationSummary["locale"];
+  locale?: HelixHeadlessPaginationSummary["locale"];
 };
 
-export type HelixBasePaginationSummarySolidJsProps = {
+export type HelixHeadlessPaginationSummarySolidJsProps = {
   /** The page on show, one-based. */
-  "prop:page"?: HelixBasePaginationSummary["page"];
+  "prop:page"?: HelixHeadlessPaginationSummary["page"];
   /** How many items are on a page. */
-  "attr:page-size"?: HelixBasePaginationSummary["pageSize"];
+  "attr:page-size"?: HelixHeadlessPaginationSummary["pageSize"];
   /** How many items are on a page. */
-  "prop:pageSize"?: HelixBasePaginationSummary["pageSize"];
+  "prop:pageSize"?: HelixHeadlessPaginationSummary["pageSize"];
   /** How many items there are across every page. */
-  "prop:total"?: HelixBasePaginationSummary["total"];
+  "prop:total"?: HelixHeadlessPaginationSummary["total"];
   /** The reading, with `{from}`, `{to}` and `{total}` filled in.
 
 A template rather than a prefix and a suffix, because word order is not
@@ -6911,9 +6944,9 @@ words beside the control. This is neither. It is the whole visible content
 of the element, so calling it `label` put one word on three jobs inside one
 family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
 which each label something; this labels nothing, it *is* the thing. */
-  "prop:format"?: HelixBasePaginationSummary["format"];
+  "prop:format"?: HelixHeadlessPaginationSummary["format"];
   /** Locale for the numbers. Absent uses the runtime's own. */
-  "prop:locale"?: HelixBasePaginationSummary["locale"];
+  "prop:locale"?: HelixHeadlessPaginationSummary["locale"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6921,21 +6954,21 @@ which each label something; this labels nothing, it *is* the thing. */
   textContent?: string | number;
 };
 
-/** `HelixBasePinInput` component event */
-export type HelixBasePinInputElementEvent<E = Event> = TypedEvent<
-  HelixBasePinInput,
+/** `HelixHeadlessPinInput` component event */
+export type HelixHeadlessPinInputElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessPinInput,
   E
 >;
 /** `helix-input` event type */
-export type HelixBasePinInputHelixInputElementEvent =
-  HelixBasePinInputElementEvent<HelixInputEvent>;
+export type HelixHeadlessPinInputHelixInputElementEvent =
+  HelixHeadlessPinInputElementEvent<HelixInputEvent>;
 /** `helix-complete` event type */
-export type HelixBasePinInputHelixCompleteElementEvent =
-  HelixBasePinInputElementEvent<HelixCompleteEvent>;
+export type HelixHeadlessPinInputHelixCompleteElementEvent =
+  HelixHeadlessPinInputElementEvent<HelixCompleteEvent>;
 
-export type HelixBasePinInputProps = {
+export type HelixHeadlessPinInputProps = {
   /** How many characters the code has. */
-  length?: HelixBasePinInput["length"];
+  length?: HelixHeadlessPinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
 `numeric` and `alphanumeric` also refuse anything else on the way in,
@@ -6957,9 +6990,9 @@ onto every `<helix-pin-input>` ever rendered, an attribute no consumer's
 markup had. That is the fault `Input`'s own `type` had and the reason the
 area rules carry the sentence "reflect only what CSS selects on". The real
 inputs take it as a binding, which is what makes the keyboard follow. */
-  type?: HelixBasePinInput["type"];
+  type?: HelixHeadlessPinInput["type"];
   /** Whether the characters are hidden, the way a password is. */
-  mask?: HelixBasePinInput["mask"];
+  mask?: HelixHeadlessPinInput["mask"];
   /** What an empty box shows, usually a single dot.
 
 The platform's own placeholder, on each cell, rather than a character
@@ -6971,19 +7004,19 @@ have to know that.
 Empty by default, because a row of boxes already reads as a row of boxes
 and a dot in each is a choice about how much the field should announce
 itself before anybody has touched it. */
-  placeholder?: HelixBasePinInput["placeholder"];
+  placeholder?: HelixHeadlessPinInput["placeholder"];
   /** Whether the boxes refuse input while still submitting their value. */
-  "read-only"?: HelixBasePinInput["readOnly"];
+  "read-only"?: HelixHeadlessPinInput["readOnly"];
   /** Whether the boxes refuse input while still submitting their value. */
-  readOnly?: HelixBasePinInput["readOnly"];
+  readOnly?: HelixHeadlessPinInput["readOnly"];
   /** Accessible name for one box, with `{index}` and `{length}` filled in. */
-  "cell-label"?: HelixBasePinInput["cellLabel"];
+  "cell-label"?: HelixHeadlessPinInput["cellLabel"];
   /** Accessible name for one box, with `{index}` and `{length}` filled in. */
-  cellLabel?: HelixBasePinInput["cellLabel"];
+  cellLabel?: HelixHeadlessPinInput["cellLabel"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBasePinInput["defaultValue"];
+  "default-value"?: HelixHeadlessPinInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBasePinInput["defaultValue"];
+  defaultValue?: HelixHeadlessPinInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -6995,15 +7028,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBasePinInput["value"];
+  value?: HelixHeadlessPinInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBasePinInput["hint"];
+  hint?: HelixHeadlessPinInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBasePinInput["feedback"];
+  feedback?: HelixHeadlessPinInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBasePinInput["label"];
+  label?: HelixHeadlessPinInput["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBasePinInput["required"];
+  required?: HelixHeadlessPinInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7014,7 +7047,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBasePinInput["disabled"];
+  disabled?: HelixHeadlessPinInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7032,17 +7065,19 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBasePinInput["name"];
+  name?: HelixHeadlessPinInput["name"];
 
   /** Fired as the code changes, and cancelable. */
-  "onhelix-input"?: (e: HelixBasePinInputHelixInputElementEvent) => void;
+  "onhelix-input"?: (e: HelixHeadlessPinInputHelixInputElementEvent) => void;
   /** Fired when the last box is filled. */
-  "onhelix-complete"?: (e: HelixBasePinInputHelixCompleteElementEvent) => void;
+  "onhelix-complete"?: (
+    e: HelixHeadlessPinInputHelixCompleteElementEvent,
+  ) => void;
 };
 
-export type HelixBasePinInputSolidJsProps = {
+export type HelixHeadlessPinInputSolidJsProps = {
   /** How many characters the code has. */
-  "prop:length"?: HelixBasePinInput["length"];
+  "prop:length"?: HelixHeadlessPinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
 `numeric` and `alphanumeric` also refuse anything else on the way in,
@@ -7064,9 +7099,9 @@ onto every `<helix-pin-input>` ever rendered, an attribute no consumer's
 markup had. That is the fault `Input`'s own `type` had and the reason the
 area rules carry the sentence "reflect only what CSS selects on". The real
 inputs take it as a binding, which is what makes the keyboard follow. */
-  "prop:type"?: HelixBasePinInput["type"];
+  "prop:type"?: HelixHeadlessPinInput["type"];
   /** Whether the characters are hidden, the way a password is. */
-  "prop:mask"?: HelixBasePinInput["mask"];
+  "prop:mask"?: HelixHeadlessPinInput["mask"];
   /** What an empty box shows, usually a single dot.
 
 The platform's own placeholder, on each cell, rather than a character
@@ -7078,19 +7113,19 @@ have to know that.
 Empty by default, because a row of boxes already reads as a row of boxes
 and a dot in each is a choice about how much the field should announce
 itself before anybody has touched it. */
-  "prop:placeholder"?: HelixBasePinInput["placeholder"];
+  "prop:placeholder"?: HelixHeadlessPinInput["placeholder"];
   /** Whether the boxes refuse input while still submitting their value. */
-  "bool:read-only"?: HelixBasePinInput["readOnly"];
+  "bool:read-only"?: HelixHeadlessPinInput["readOnly"];
   /** Whether the boxes refuse input while still submitting their value. */
-  "prop:readOnly"?: HelixBasePinInput["readOnly"];
+  "prop:readOnly"?: HelixHeadlessPinInput["readOnly"];
   /** Accessible name for one box, with `{index}` and `{length}` filled in. */
-  "attr:cell-label"?: HelixBasePinInput["cellLabel"];
+  "attr:cell-label"?: HelixHeadlessPinInput["cellLabel"];
   /** Accessible name for one box, with `{index}` and `{length}` filled in. */
-  "prop:cellLabel"?: HelixBasePinInput["cellLabel"];
+  "prop:cellLabel"?: HelixHeadlessPinInput["cellLabel"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBasePinInput["defaultValue"];
+  "attr:default-value"?: HelixHeadlessPinInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBasePinInput["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessPinInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -7102,15 +7137,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBasePinInput["value"];
+  "prop:value"?: HelixHeadlessPinInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBasePinInput["hint"];
+  "prop:hint"?: HelixHeadlessPinInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBasePinInput["feedback"];
+  "prop:feedback"?: HelixHeadlessPinInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBasePinInput["label"];
+  "prop:label"?: HelixHeadlessPinInput["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBasePinInput["required"];
+  "prop:required"?: HelixHeadlessPinInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7121,7 +7156,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBasePinInput["disabled"];
+  "prop:disabled"?: HelixHeadlessPinInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7139,11 +7174,13 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBasePinInput["name"];
+  "prop:name"?: HelixHeadlessPinInput["name"];
   /** Fired as the code changes, and cancelable. */
-  "on:helix-input"?: (e: HelixBasePinInputHelixInputElementEvent) => void;
+  "on:helix-input"?: (e: HelixHeadlessPinInputHelixInputElementEvent) => void;
   /** Fired when the last box is filled. */
-  "on:helix-complete"?: (e: HelixBasePinInputHelixCompleteElementEvent) => void;
+  "on:helix-complete"?: (
+    e: HelixHeadlessPinInputHelixCompleteElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7151,25 +7188,25 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBasePopover` component event */
-export type HelixBasePopoverElementEvent<E = Event> = TypedEvent<
-  HelixBasePopover,
+/** `HelixHeadlessPopover` component event */
+export type HelixHeadlessPopoverElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessPopover,
   E
 >;
 /** `helix-open` event type */
-export type HelixBasePopoverHelixOpenElementEvent =
-  HelixBasePopoverElementEvent<HelixOpenEvent>;
+export type HelixHeadlessPopoverHelixOpenElementEvent =
+  HelixHeadlessPopoverElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBasePopoverHelixCloseElementEvent =
-  HelixBasePopoverElementEvent<HelixCloseEvent>;
+export type HelixHeadlessPopoverHelixCloseElementEvent =
+  HelixHeadlessPopoverElementEvent<HelixCloseEvent>;
 
-export type HelixBasePopoverProps = {
+export type HelixHeadlessPopoverProps = {
   /** Accessible name for the panel. */
-  label?: HelixBasePopover["label"];
+  label?: HelixHeadlessPopover["label"];
   /** Space between the trigger and the panel, in pixels. */
-  offset?: HelixBasePopover["offset"];
+  offset?: HelixHeadlessPopover["offset"];
   /** Preferred side. It moves if that side does not fit. */
-  placement?: HelixBasePopover["placement"];
+  placement?: HelixHeadlessPopover["placement"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -7192,25 +7229,25 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBasePopover["open"];
+  open?: HelixHeadlessPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBasePopover["defaultOpen"];
+  "default-open"?: HelixHeadlessPopover["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBasePopover["defaultOpen"];
+  defaultOpen?: HelixHeadlessPopover["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixBasePopoverHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessPopoverHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixBasePopoverHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessPopoverHelixCloseElementEvent) => void;
 };
 
-export type HelixBasePopoverSolidJsProps = {
+export type HelixHeadlessPopoverSolidJsProps = {
   /** Accessible name for the panel. */
-  "prop:label"?: HelixBasePopover["label"];
+  "prop:label"?: HelixHeadlessPopover["label"];
   /** Space between the trigger and the panel, in pixels. */
-  "prop:offset"?: HelixBasePopover["offset"];
+  "prop:offset"?: HelixHeadlessPopover["offset"];
   /** Preferred side. It moves if that side does not fit. */
-  "prop:placement"?: HelixBasePopover["placement"];
+  "prop:placement"?: HelixHeadlessPopover["placement"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -7233,15 +7270,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBasePopover["open"];
+  "prop:open"?: HelixHeadlessPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBasePopover["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessPopover["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBasePopover["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessPopover["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixBasePopoverHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessPopoverHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixBasePopoverHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessPopoverHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7249,9 +7286,9 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-export type HelixBaseProgressProps = {
+export type HelixHeadlessProgressProps = {
   /** Accessible name for what is in progress. */
-  label?: HelixBaseProgress["label"];
+  label?: HelixHeadlessProgress["label"];
   /** Whether the work has a knowable end.
 
 On the headless tier rather than as a treatment, because it is
@@ -7263,12 +7300,12 @@ nothing. `value` and `max` are ignored while it is set.
 Not `Loader`, which is the other thing this could be. A loader says the
 page is busy; a bar says a named piece of work is running, and keeps its
 place in the layout when the answer arrives and it becomes determinate. */
-  indeterminate?: HelixBaseProgress["indeterminate"];
+  indeterminate?: HelixHeadlessProgress["indeterminate"];
   /** The total the work is measured against. */
-  max?: HelixBaseProgress["max"];
+  max?: HelixHeadlessProgress["max"];
   /** Whether the value is drawn as a bar or as a ring.
 
-**On this tier because it changes the markup**, which is the base tier's to
+**On this tier because it changes the markup**, which is the headless tier's to
 own. A bar is two boxes and a ring is an SVG with two circles in it, and no
 stylesheet turns one into the other: the styled tier tried, with a conic
 gradient and a mask, and the thing it could not do was the round end the
@@ -7277,7 +7314,7 @@ cap. `Skeleton.shape` is the same word for the same kind of decision.
 
 The value, the ARIA and the form participation are untouched by it. What
 changes is only which shape carries the fraction. */
-  shape?: HelixBaseProgress["shape"];
+  shape?: HelixHeadlessProgress["shape"];
   /** Whether the reading is shown beside the bar.
 
 The same name and shape `Slider` uses, because it is the same question:
@@ -7288,7 +7325,7 @@ says what is happening and a second number is noise.
 Nothing under `indeterminate`, where there is no reading to show: a percent
 that does not move is worse than none, and `valueText` is the property for
 saying "uploading" while the bar runs. */
-  "show-value"?: HelixBaseProgress["showValue"];
+  "show-value"?: HelixHeadlessProgress["showValue"];
   /** Whether the reading is shown beside the bar.
 
 The same name and shape `Slider` uses, because it is the same question:
@@ -7299,31 +7336,31 @@ says what is happening and a second number is noise.
 Nothing under `indeterminate`, where there is no reading to show: a percent
 that does not move is worse than none, and `valueText` is the property for
 saying "uploading" while the bar runs. */
-  showValue?: HelixBaseProgress["showValue"];
+  showValue?: HelixHeadlessProgress["showValue"];
   /** What has been done so far, in the same units as `max`.
 
 Clamped between zero and `max` for both the fill and the announcement, so
 the two can never disagree about what is on screen. */
-  value?: HelixBaseProgress["value"];
+  value?: HelixHeadlessProgress["value"];
   /** A reading for the value, where the number alone does not say enough.
 
 "3 of 8 files" rather than "37". Announced instead of the percentage, and
 never instead of the value itself: `aria-valuenow` still carries the
 number, because assistive technology that ignores the text still has to
 report progress. */
-  "value-text"?: HelixBaseProgress["valueText"];
+  "value-text"?: HelixHeadlessProgress["valueText"];
   /** A reading for the value, where the number alone does not say enough.
 
 "3 of 8 files" rather than "37". Announced instead of the percentage, and
 never instead of the value itself: `aria-valuenow` still carries the
 number, because assistive technology that ignores the text still has to
 report progress. */
-  valueText?: HelixBaseProgress["valueText"];
+  valueText?: HelixHeadlessProgress["valueText"];
 };
 
-export type HelixBaseProgressSolidJsProps = {
+export type HelixHeadlessProgressSolidJsProps = {
   /** Accessible name for what is in progress. */
-  "prop:label"?: HelixBaseProgress["label"];
+  "prop:label"?: HelixHeadlessProgress["label"];
   /** Whether the work has a knowable end.
 
 On the headless tier rather than as a treatment, because it is
@@ -7335,12 +7372,12 @@ nothing. `value` and `max` are ignored while it is set.
 Not `Loader`, which is the other thing this could be. A loader says the
 page is busy; a bar says a named piece of work is running, and keeps its
 place in the layout when the answer arrives and it becomes determinate. */
-  "prop:indeterminate"?: HelixBaseProgress["indeterminate"];
+  "prop:indeterminate"?: HelixHeadlessProgress["indeterminate"];
   /** The total the work is measured against. */
-  "prop:max"?: HelixBaseProgress["max"];
+  "prop:max"?: HelixHeadlessProgress["max"];
   /** Whether the value is drawn as a bar or as a ring.
 
-**On this tier because it changes the markup**, which is the base tier's to
+**On this tier because it changes the markup**, which is the headless tier's to
 own. A bar is two boxes and a ring is an SVG with two circles in it, and no
 stylesheet turns one into the other: the styled tier tried, with a conic
 gradient and a mask, and the thing it could not do was the round end the
@@ -7349,7 +7386,7 @@ cap. `Skeleton.shape` is the same word for the same kind of decision.
 
 The value, the ARIA and the form participation are untouched by it. What
 changes is only which shape carries the fraction. */
-  "prop:shape"?: HelixBaseProgress["shape"];
+  "prop:shape"?: HelixHeadlessProgress["shape"];
   /** Whether the reading is shown beside the bar.
 
 The same name and shape `Slider` uses, because it is the same question:
@@ -7360,7 +7397,7 @@ says what is happening and a second number is noise.
 Nothing under `indeterminate`, where there is no reading to show: a percent
 that does not move is worse than none, and `valueText` is the property for
 saying "uploading" while the bar runs. */
-  "bool:show-value"?: HelixBaseProgress["showValue"];
+  "bool:show-value"?: HelixHeadlessProgress["showValue"];
   /** Whether the reading is shown beside the bar.
 
 The same name and shape `Slider` uses, because it is the same question:
@@ -7371,26 +7408,26 @@ says what is happening and a second number is noise.
 Nothing under `indeterminate`, where there is no reading to show: a percent
 that does not move is worse than none, and `valueText` is the property for
 saying "uploading" while the bar runs. */
-  "prop:showValue"?: HelixBaseProgress["showValue"];
+  "prop:showValue"?: HelixHeadlessProgress["showValue"];
   /** What has been done so far, in the same units as `max`.
 
 Clamped between zero and `max` for both the fill and the announcement, so
 the two can never disagree about what is on screen. */
-  "prop:value"?: HelixBaseProgress["value"];
+  "prop:value"?: HelixHeadlessProgress["value"];
   /** A reading for the value, where the number alone does not say enough.
 
 "3 of 8 files" rather than "37". Announced instead of the percentage, and
 never instead of the value itself: `aria-valuenow` still carries the
 number, because assistive technology that ignores the text still has to
 report progress. */
-  "attr:value-text"?: HelixBaseProgress["valueText"];
+  "attr:value-text"?: HelixHeadlessProgress["valueText"];
   /** A reading for the value, where the number alone does not say enough.
 
 "3 of 8 files" rather than "37". Announced instead of the percentage, and
 never instead of the value itself: `aria-valuenow` still carries the
 number, because assistive technology that ignores the text still has to
 report progress. */
-  "prop:valueText"?: HelixBaseProgress["valueText"];
+  "prop:valueText"?: HelixHeadlessProgress["valueText"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7398,14 +7435,14 @@ report progress. */
   textContent?: string | number;
 };
 
-export type HelixBaseQrCodeProps = {
+export type HelixHeadlessQrCodeProps = {
   /** What the code encodes, which is usually a URL. */
-  value?: HelixBaseQrCode["value"];
+  value?: HelixHeadlessQrCode["value"];
   /** What the image is called.
 
 Falling back to the value is deliberate: a code almost always holds a URL,
 and a URL is a better name than "QR code" for a reader who cannot see it. */
-  label?: HelixBaseQrCode["label"];
+  label?: HelixHeadlessQrCode["label"];
   /** How the modules are drawn.
 
 `square` is the default and the only one that joins runs of adjacent
@@ -7417,7 +7454,7 @@ middle. That cost is paid only by a code that asks for them.
 A scanner reads contrast between cells, not their shape, so all three
 scan. `dots` sits a little under half a module so neighbours do not touch,
 which is what makes it read as dots rather than as a softened square code. */
-  shape?: HelixBaseQrCode["shape"];
+  shape?: HelixHeadlessQrCode["shape"];
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
@@ -7425,17 +7462,17 @@ costs about fifteen percent redundancy. `H` where a mark covers the center,
 chosen automatically when the slot is filled: it is the level that makes
 covering safe, and a consumer who fills the slot has said what they want
 without having to know that. */
-  correction?: HelixBaseQrCode["correction"];
+  correction?: HelixHeadlessQrCode["correction"];
 };
 
-export type HelixBaseQrCodeSolidJsProps = {
+export type HelixHeadlessQrCodeSolidJsProps = {
   /** What the code encodes, which is usually a URL. */
-  "prop:value"?: HelixBaseQrCode["value"];
+  "prop:value"?: HelixHeadlessQrCode["value"];
   /** What the image is called.
 
 Falling back to the value is deliberate: a code almost always holds a URL,
 and a URL is a better name than "QR code" for a reader who cannot see it. */
-  "prop:label"?: HelixBaseQrCode["label"];
+  "prop:label"?: HelixHeadlessQrCode["label"];
   /** How the modules are drawn.
 
 `square` is the default and the only one that joins runs of adjacent
@@ -7447,7 +7484,7 @@ middle. That cost is paid only by a code that asks for them.
 A scanner reads contrast between cells, not their shape, so all three
 scan. `dots` sits a little under half a module so neighbours do not touch,
 which is what makes it read as dots rather than as a softened square code. */
-  "prop:shape"?: HelixBaseQrCode["shape"];
+  "prop:shape"?: HelixHeadlessQrCode["shape"];
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
@@ -7455,7 +7492,7 @@ costs about fifteen percent redundancy. `H` where a mark covers the center,
 chosen automatically when the slot is filled: it is the level that makes
 covering safe, and a consumer who fills the slot has said what they want
 without having to know that. */
-  "prop:correction"?: HelixBaseQrCode["correction"];
+  "prop:correction"?: HelixHeadlessQrCode["correction"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7463,14 +7500,14 @@ without having to know that. */
   textContent?: string | number;
 };
 
-export type HelixBaseQuoteProps = {
+export type HelixHeadlessQuoteProps = {
   /** URL identifying where the quotation came from. */
-  cite?: HelixBaseQuote["cite"];
+  cite?: HelixHeadlessQuote["cite"];
 };
 
-export type HelixBaseQuoteSolidJsProps = {
+export type HelixHeadlessQuoteSolidJsProps = {
   /** URL identifying where the quotation came from. */
-  "prop:cite"?: HelixBaseQuote["cite"];
+  "prop:cite"?: HelixHeadlessQuote["cite"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7478,16 +7515,16 @@ export type HelixBaseQuoteSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseRadioGroup` component event */
-export type HelixBaseRadioGroupElementEvent<E = Event> = TypedEvent<
-  HelixBaseRadioGroup,
+/** `HelixHeadlessRadioGroup` component event */
+export type HelixHeadlessRadioGroupElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessRadioGroup,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseRadioGroupHelixChangeElementEvent =
-  HelixBaseRadioGroupElementEvent<HelixChangeEvent>;
+export type HelixHeadlessRadioGroupHelixChangeElementEvent =
+  HelixHeadlessRadioGroupElementEvent<HelixChangeEvent>;
 
-export type HelixBaseRadioGroupProps = {
+export type HelixHeadlessRadioGroupProps = {
   /** Which way the choices run. A column reads one line per answer.
 
 **Optional rather than defaulted, which is not a style preference.** A
@@ -7496,11 +7533,11 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the column, which the stylesheet reads as the base rule, so
 only `horizontal` has to be named. */
-  orientation?: HelixBaseRadioGroup["orientation"];
+  orientation?: HelixHeadlessRadioGroup["orientation"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseRadioGroup["defaultValue"];
+  "default-value"?: HelixHeadlessRadioGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseRadioGroup["defaultValue"];
+  defaultValue?: HelixHeadlessRadioGroup["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -7512,15 +7549,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseRadioGroup["value"];
+  value?: HelixHeadlessRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseRadioGroup["hint"];
+  hint?: HelixHeadlessRadioGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseRadioGroup["feedback"];
+  feedback?: HelixHeadlessRadioGroup["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseRadioGroup["label"];
+  label?: HelixHeadlessRadioGroup["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseRadioGroup["required"];
+  required?: HelixHeadlessRadioGroup["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7531,7 +7568,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseRadioGroup["disabled"];
+  disabled?: HelixHeadlessRadioGroup["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7549,13 +7586,15 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseRadioGroup["name"];
+  name?: HelixHeadlessRadioGroup["name"];
 
   /** Fired when the answer changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseRadioGroupHelixChangeElementEvent) => void;
+  "onhelix-change"?: (
+    e: HelixHeadlessRadioGroupHelixChangeElementEvent,
+  ) => void;
 };
 
-export type HelixBaseRadioGroupSolidJsProps = {
+export type HelixHeadlessRadioGroupSolidJsProps = {
   /** Which way the choices run. A column reads one line per answer.
 
 **Optional rather than defaulted, which is not a style preference.** A
@@ -7564,11 +7603,11 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the column, which the stylesheet reads as the base rule, so
 only `horizontal` has to be named. */
-  "prop:orientation"?: HelixBaseRadioGroup["orientation"];
+  "prop:orientation"?: HelixHeadlessRadioGroup["orientation"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseRadioGroup["defaultValue"];
+  "attr:default-value"?: HelixHeadlessRadioGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseRadioGroup["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessRadioGroup["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -7580,15 +7619,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseRadioGroup["value"];
+  "prop:value"?: HelixHeadlessRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseRadioGroup["hint"];
+  "prop:hint"?: HelixHeadlessRadioGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseRadioGroup["feedback"];
+  "prop:feedback"?: HelixHeadlessRadioGroup["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseRadioGroup["label"];
+  "prop:label"?: HelixHeadlessRadioGroup["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseRadioGroup["required"];
+  "prop:required"?: HelixHeadlessRadioGroup["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7599,7 +7638,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseRadioGroup["disabled"];
+  "prop:disabled"?: HelixHeadlessRadioGroup["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7617,9 +7656,11 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseRadioGroup["name"];
+  "prop:name"?: HelixHeadlessRadioGroup["name"];
   /** Fired when the answer changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseRadioGroupHelixChangeElementEvent) => void;
+  "on:helix-change"?: (
+    e: HelixHeadlessRadioGroupHelixChangeElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7627,36 +7668,36 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseRadio` component event */
-export type HelixBaseRadioElementEvent<E = Event> = TypedEvent<
-  HelixBaseRadio,
+/** `HelixHeadlessRadio` component event */
+export type HelixHeadlessRadioElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessRadio,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseRadioHelixSelectElementEvent =
-  HelixBaseRadioElementEvent<HelixSelectEvent>;
+export type HelixHeadlessRadioHelixSelectElementEvent =
+  HelixHeadlessRadioElementEvent<HelixSelectEvent>;
 
-export type HelixBaseRadioProps = {
+export type HelixHeadlessRadioProps = {
   /** Whether this choice can be made. */
-  disabled?: HelixBaseRadio["disabled"];
+  disabled?: HelixHeadlessRadio["disabled"];
   /** Whether this is the current choice. Written by the group. */
-  selected?: HelixBaseRadio["selected"];
+  selected?: HelixHeadlessRadio["selected"];
   /** Identifies this choice to the group, and is what the form submits. */
-  value?: HelixBaseRadio["value"];
+  value?: HelixHeadlessRadio["value"];
 
   /** Fired when this choice is made. */
-  "onhelix-select"?: (e: HelixBaseRadioHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessRadioHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseRadioSolidJsProps = {
+export type HelixHeadlessRadioSolidJsProps = {
   /** Whether this choice can be made. */
-  "prop:disabled"?: HelixBaseRadio["disabled"];
+  "prop:disabled"?: HelixHeadlessRadio["disabled"];
   /** Whether this is the current choice. Written by the group. */
-  "prop:selected"?: HelixBaseRadio["selected"];
+  "prop:selected"?: HelixHeadlessRadio["selected"];
   /** Identifies this choice to the group, and is what the form submits. */
-  "prop:value"?: HelixBaseRadio["value"];
+  "prop:value"?: HelixHeadlessRadio["value"];
   /** Fired when this choice is made. */
-  "on:helix-select"?: (e: HelixBaseRadioHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessRadioHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7664,47 +7705,47 @@ export type HelixBaseRadioSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseRating` component event */
-export type HelixBaseRatingElementEvent<E = Event> = TypedEvent<
-  HelixBaseRating,
+/** `HelixHeadlessRating` component event */
+export type HelixHeadlessRatingElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessRating,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseRatingHelixChangeElementEvent =
-  HelixBaseRatingElementEvent<HelixChangeEvent>;
+export type HelixHeadlessRatingHelixChangeElementEvent =
+  HelixHeadlessRatingElementEvent<HelixChangeEvent>;
 
-export type HelixBaseRatingProps = {
+export type HelixHeadlessRatingProps = {
   /** How many marks there are. */
-  max?: HelixBaseRating["max"];
+  max?: HelixHeadlessRating["max"];
   /** The smallest part of a mark that can be chosen.
 
 `0.5` is the half star, and it is the reason the value is a number rather
 than an index: with halves, five marks are ten answers. */
-  step?: HelixBaseRating["step"];
+  step?: HelixHeadlessRating["step"];
   /** Whether this shows a score rather than asks for one.
 
 A readout is not a control that has been switched off. It takes no focus,
 answers no keys, and reads as one thing: see the note on the class. */
-  readonly?: HelixBaseRating["readOnly"];
+  readonly?: HelixHeadlessRating["readOnly"];
   /** Whether this shows a score rather than asks for one.
 
 A readout is not a control that has been switched off. It takes no focus,
 answers no keys, and reads as one thing: see the note on the class. */
-  readOnly?: HelixBaseRating["readOnly"];
+  readOnly?: HelixHeadlessRating["readOnly"];
   /** How the score is read out, where "3.5 out of 5" is not what it should say.
 
 A rating out of five is one of the few places a screen reader gets a worse
 answer from the value than from a sentence: "3.5" alone is a number without
 a subject. This names the readout, where a control is named by its `label`
 and each of its options by the score that option is. */
-  "value-text"?: HelixBaseRating["valueText"];
+  "value-text"?: HelixHeadlessRating["valueText"];
   /** How the score is read out, where "3.5 out of 5" is not what it should say.
 
 A rating out of five is one of the few places a screen reader gets a worse
 answer from the value than from a sentence: "3.5" alone is a number without
 a subject. This names the readout, where a control is named by its `label`
 and each of its options by the score that option is. */
-  valueText?: HelixBaseRating["valueText"];
+  valueText?: HelixHeadlessRating["valueText"];
   /** Whether the score is written out beside the marks.
 
 Marks say roughly, and a number says exactly. Four and a bit stars is not a
@@ -7715,7 +7756,7 @@ same attribute.
 It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
-  "show-value"?: HelixBaseRating["showValue"];
+  "show-value"?: HelixHeadlessRating["showValue"];
   /** Whether the score is written out beside the marks.
 
 Marks say roughly, and a number says exactly. Four and a bit stars is not a
@@ -7726,11 +7767,11 @@ same attribute.
 It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
-  showValue?: HelixBaseRating["showValue"];
+  showValue?: HelixHeadlessRating["showValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseRating["defaultValue"];
+  "default-value"?: HelixHeadlessRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseRating["defaultValue"];
+  defaultValue?: HelixHeadlessRating["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -7742,15 +7783,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseRating["value"];
+  value?: HelixHeadlessRating["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseRating["hint"];
+  hint?: HelixHeadlessRating["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseRating["feedback"];
+  feedback?: HelixHeadlessRating["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseRating["label"];
+  label?: HelixHeadlessRating["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseRating["required"];
+  required?: HelixHeadlessRating["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7761,7 +7802,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseRating["disabled"];
+  disabled?: HelixHeadlessRating["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7779,44 +7820,44 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseRating["name"];
+  name?: HelixHeadlessRating["name"];
 
   /** Fired before the score changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseRatingHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessRatingHelixChangeElementEvent) => void;
 };
 
-export type HelixBaseRatingSolidJsProps = {
+export type HelixHeadlessRatingSolidJsProps = {
   /** How many marks there are. */
-  "prop:max"?: HelixBaseRating["max"];
+  "prop:max"?: HelixHeadlessRating["max"];
   /** The smallest part of a mark that can be chosen.
 
 `0.5` is the half star, and it is the reason the value is a number rather
 than an index: with halves, five marks are ten answers. */
-  "prop:step"?: HelixBaseRating["step"];
+  "prop:step"?: HelixHeadlessRating["step"];
   /** Whether this shows a score rather than asks for one.
 
 A readout is not a control that has been switched off. It takes no focus,
 answers no keys, and reads as one thing: see the note on the class. */
-  "bool:readonly"?: HelixBaseRating["readOnly"];
+  "bool:readonly"?: HelixHeadlessRating["readOnly"];
   /** Whether this shows a score rather than asks for one.
 
 A readout is not a control that has been switched off. It takes no focus,
 answers no keys, and reads as one thing: see the note on the class. */
-  "prop:readOnly"?: HelixBaseRating["readOnly"];
+  "prop:readOnly"?: HelixHeadlessRating["readOnly"];
   /** How the score is read out, where "3.5 out of 5" is not what it should say.
 
 A rating out of five is one of the few places a screen reader gets a worse
 answer from the value than from a sentence: "3.5" alone is a number without
 a subject. This names the readout, where a control is named by its `label`
 and each of its options by the score that option is. */
-  "attr:value-text"?: HelixBaseRating["valueText"];
+  "attr:value-text"?: HelixHeadlessRating["valueText"];
   /** How the score is read out, where "3.5 out of 5" is not what it should say.
 
 A rating out of five is one of the few places a screen reader gets a worse
 answer from the value than from a sentence: "3.5" alone is a number without
 a subject. This names the readout, where a control is named by its `label`
 and each of its options by the score that option is. */
-  "prop:valueText"?: HelixBaseRating["valueText"];
+  "prop:valueText"?: HelixHeadlessRating["valueText"];
   /** Whether the score is written out beside the marks.
 
 Marks say roughly, and a number says exactly. Four and a bit stars is not a
@@ -7827,7 +7868,7 @@ same attribute.
 It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
-  "bool:show-value"?: HelixBaseRating["showValue"];
+  "bool:show-value"?: HelixHeadlessRating["showValue"];
   /** Whether the score is written out beside the marks.
 
 Marks say roughly, and a number says exactly. Four and a bit stars is not a
@@ -7838,11 +7879,11 @@ same attribute.
 It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
-  "prop:showValue"?: HelixBaseRating["showValue"];
+  "prop:showValue"?: HelixHeadlessRating["showValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseRating["defaultValue"];
+  "attr:default-value"?: HelixHeadlessRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseRating["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessRating["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -7854,15 +7895,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseRating["value"];
+  "prop:value"?: HelixHeadlessRating["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseRating["hint"];
+  "prop:hint"?: HelixHeadlessRating["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseRating["feedback"];
+  "prop:feedback"?: HelixHeadlessRating["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseRating["label"];
+  "prop:label"?: HelixHeadlessRating["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseRating["required"];
+  "prop:required"?: HelixHeadlessRating["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7873,7 +7914,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseRating["disabled"];
+  "prop:disabled"?: HelixHeadlessRating["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7891,9 +7932,9 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseRating["name"];
+  "prop:name"?: HelixHeadlessRating["name"];
   /** Fired before the score changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseRatingHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessRatingHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7901,18 +7942,18 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseScrollAreaProps = {
+export type HelixHeadlessScrollAreaProps = {
   /** Names the region, for a reader arriving at it out of context.
 
 Without one there is no region: see the note on the class. */
-  label?: HelixBaseScrollArea["label"];
+  label?: HelixHeadlessScrollArea["label"];
 };
 
-export type HelixBaseScrollAreaSolidJsProps = {
+export type HelixHeadlessScrollAreaSolidJsProps = {
   /** Names the region, for a reader arriving at it out of context.
 
 Without one there is no region: see the note on the class. */
-  "prop:label"?: HelixBaseScrollArea["label"];
+  "prop:label"?: HelixHeadlessScrollArea["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7920,22 +7961,22 @@ Without one there is no region: see the note on the class. */
   textContent?: string | number;
 };
 
-/** `HelixBaseSelect` component event */
-export type HelixBaseSelectElementEvent<E = Event> = TypedEvent<
-  HelixBaseSelect,
+/** `HelixHeadlessSelect` component event */
+export type HelixHeadlessSelectElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessSelect,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseSelectHelixChangeElementEvent =
-  HelixBaseSelectElementEvent<HelixChangeEvent>;
+export type HelixHeadlessSelectHelixChangeElementEvent =
+  HelixHeadlessSelectElementEvent<HelixChangeEvent>;
 /** `helix-open` event type */
-export type HelixBaseSelectHelixOpenElementEvent =
-  HelixBaseSelectElementEvent<HelixOpenEvent>;
+export type HelixHeadlessSelectHelixOpenElementEvent =
+  HelixHeadlessSelectElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseSelectHelixCloseElementEvent =
-  HelixBaseSelectElementEvent<HelixCloseEvent>;
+export type HelixHeadlessSelectHelixCloseElementEvent =
+  HelixHeadlessSelectElementEvent<HelixCloseEvent>;
 
-export type HelixBaseSelectProps = {
+export type HelixHeadlessSelectProps = {
   /** Whether the list can be narrowed by typing.
 
 Passed to the listbox rather than acted on here, because the listbox owns
@@ -7943,25 +7984,25 @@ the filtering, the empty state and the keyboard. This property existed and
 was never read: it reflected, it type-checked, and nothing anywhere
 rendered a field. API that does nothing is worse than API that is missing,
 because a consumer sets it and believes it. */
-  filterable?: HelixBaseSelect["filterable"];
+  filterable?: HelixHeadlessSelect["filterable"];
   /** Whether the options are still on their way.
 
 Passed straight to the list, which is where the rows are and so where the
 message belongs. Two components saying "Loading" about one request is a
 consumer wiring the same flag twice. */
-  loading?: HelixBaseSelect["loading"];
+  loading?: HelixHeadlessSelect["loading"];
   /** What the list says while they are on their way. */
-  "loading-text"?: HelixBaseSelect["loadingText"];
+  "loading-text"?: HelixHeadlessSelect["loadingText"];
   /** What the list says while they are on their way. */
-  loadingText?: HelixBaseSelect["loadingText"];
+  loadingText?: HelixHeadlessSelect["loadingText"];
   /** What it says where there are none. */
-  "empty-text"?: HelixBaseSelect["emptyText"];
+  "empty-text"?: HelixHeadlessSelect["emptyText"];
   /** What it says where there are none. */
-  emptyText?: HelixBaseSelect["emptyText"];
+  emptyText?: HelixHeadlessSelect["emptyText"];
   /** Whether more than one option can be the answer. */
-  multiple?: HelixBaseSelect["multiple"];
+  multiple?: HelixHeadlessSelect["multiple"];
   /** Shown on the trigger while nothing is chosen. */
-  placeholder?: HelixBaseSelect["placeholder"];
+  placeholder?: HelixHeadlessSelect["placeholder"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -7984,15 +8025,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseSelect["open"];
+  open?: HelixHeadlessSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseSelect["defaultOpen"];
+  "default-open"?: HelixHeadlessSelect["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseSelect["defaultOpen"];
+  defaultOpen?: HelixHeadlessSelect["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseSelect["defaultValue"];
+  "default-value"?: HelixHeadlessSelect["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseSelect["defaultValue"];
+  defaultValue?: HelixHeadlessSelect["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -8004,15 +8045,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseSelect["value"];
+  value?: HelixHeadlessSelect["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseSelect["hint"];
+  hint?: HelixHeadlessSelect["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseSelect["feedback"];
+  feedback?: HelixHeadlessSelect["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseSelect["label"];
+  label?: HelixHeadlessSelect["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseSelect["required"];
+  required?: HelixHeadlessSelect["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -8023,7 +8064,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseSelect["disabled"];
+  disabled?: HelixHeadlessSelect["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -8041,17 +8082,17 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseSelect["name"];
+  name?: HelixHeadlessSelect["name"];
 
   /** Relayed from the listbox when the answer changes. */
-  "onhelix-change"?: (e: HelixBaseSelectHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessSelectHelixChangeElementEvent) => void;
   /** Fired when the list opens. */
-  "onhelix-open"?: (e: HelixBaseSelectHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessSelectHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixBaseSelectHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessSelectHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseSelectSolidJsProps = {
+export type HelixHeadlessSelectSolidJsProps = {
   /** Whether the list can be narrowed by typing.
 
 Passed to the listbox rather than acted on here, because the listbox owns
@@ -8059,25 +8100,25 @@ the filtering, the empty state and the keyboard. This property existed and
 was never read: it reflected, it type-checked, and nothing anywhere
 rendered a field. API that does nothing is worse than API that is missing,
 because a consumer sets it and believes it. */
-  "prop:filterable"?: HelixBaseSelect["filterable"];
+  "prop:filterable"?: HelixHeadlessSelect["filterable"];
   /** Whether the options are still on their way.
 
 Passed straight to the list, which is where the rows are and so where the
 message belongs. Two components saying "Loading" about one request is a
 consumer wiring the same flag twice. */
-  "prop:loading"?: HelixBaseSelect["loading"];
+  "prop:loading"?: HelixHeadlessSelect["loading"];
   /** What the list says while they are on their way. */
-  "attr:loading-text"?: HelixBaseSelect["loadingText"];
+  "attr:loading-text"?: HelixHeadlessSelect["loadingText"];
   /** What the list says while they are on their way. */
-  "prop:loadingText"?: HelixBaseSelect["loadingText"];
+  "prop:loadingText"?: HelixHeadlessSelect["loadingText"];
   /** What it says where there are none. */
-  "attr:empty-text"?: HelixBaseSelect["emptyText"];
+  "attr:empty-text"?: HelixHeadlessSelect["emptyText"];
   /** What it says where there are none. */
-  "prop:emptyText"?: HelixBaseSelect["emptyText"];
+  "prop:emptyText"?: HelixHeadlessSelect["emptyText"];
   /** Whether more than one option can be the answer. */
-  "prop:multiple"?: HelixBaseSelect["multiple"];
+  "prop:multiple"?: HelixHeadlessSelect["multiple"];
   /** Shown on the trigger while nothing is chosen. */
-  "prop:placeholder"?: HelixBaseSelect["placeholder"];
+  "prop:placeholder"?: HelixHeadlessSelect["placeholder"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -8100,15 +8141,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseSelect["open"];
+  "prop:open"?: HelixHeadlessSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseSelect["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessSelect["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseSelect["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessSelect["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseSelect["defaultValue"];
+  "attr:default-value"?: HelixHeadlessSelect["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseSelect["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessSelect["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -8120,15 +8161,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseSelect["value"];
+  "prop:value"?: HelixHeadlessSelect["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseSelect["hint"];
+  "prop:hint"?: HelixHeadlessSelect["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseSelect["feedback"];
+  "prop:feedback"?: HelixHeadlessSelect["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseSelect["label"];
+  "prop:label"?: HelixHeadlessSelect["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseSelect["required"];
+  "prop:required"?: HelixHeadlessSelect["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -8139,7 +8180,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseSelect["disabled"];
+  "prop:disabled"?: HelixHeadlessSelect["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -8157,13 +8198,13 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseSelect["name"];
+  "prop:name"?: HelixHeadlessSelect["name"];
   /** Relayed from the listbox when the answer changes. */
-  "on:helix-change"?: (e: HelixBaseSelectHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessSelectHelixChangeElementEvent) => void;
   /** Fired when the list opens. */
-  "on:helix-open"?: (e: HelixBaseSelectHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessSelectHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixBaseSelectHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessSelectHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8171,39 +8212,39 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseSkeletonProps = {};
+export type HelixHeadlessSkeletonProps = {};
 
-export type HelixBaseSkeletonSolidJsProps = {
+export type HelixHeadlessSkeletonSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
   textContent?: string | number;
 };
 
-/** `HelixBaseSlider` component event */
-export type HelixBaseSliderElementEvent<E = Event> = TypedEvent<
-  HelixBaseSlider,
+/** `HelixHeadlessSlider` component event */
+export type HelixHeadlessSliderElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessSlider,
   E
 >;
 /** `helix-input` event type */
-export type HelixBaseSliderHelixInputElementEvent =
-  HelixBaseSliderElementEvent<HelixInputEvent>;
+export type HelixHeadlessSliderHelixInputElementEvent =
+  HelixHeadlessSliderElementEvent<HelixInputEvent>;
 
-export type HelixBaseSliderProps = {
+export type HelixHeadlessSliderProps = {
   /** Whether there are two thumbs and the value is a pair.
 
 The pair is one string, `"10,50"`, which is what a form submits and what
 `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
 the two, since a range has no single number. */
-  range?: HelixBaseSlider["range"];
+  range?: HelixHeadlessSlider["range"];
   /** The largest value the reader can choose. */
-  max?: HelixBaseSlider["max"];
+  max?: HelixHeadlessSlider["max"];
   /** The smallest value the reader can choose. */
-  min?: HelixBaseSlider["min"];
+  min?: HelixHeadlessSlider["min"];
   /** Whether the chosen value is shown beside the track. */
-  "show-value"?: HelixBaseSlider["showValue"];
+  "show-value"?: HelixHeadlessSlider["showValue"];
   /** Whether the chosen value is shown beside the track. */
-  showValue?: HelixBaseSlider["showValue"];
+  showValue?: HelixHeadlessSlider["showValue"];
   /** How many marks to draw along the track, evenly spaced, ends included.
 
 `0` or `1` draws none: one mark on a track says nothing about a range.
@@ -8217,13 +8258,13 @@ are places the thumb cannot go. A mark the thumb can never sit on is the
 one thing a mark must not be, so the spacing gives way rather than the
 step, and marks may come out unevenly spaced when the two disagree. That
 is the honest picture of the range being offered. */
-  markers?: HelixBaseSlider["markers"];
+  markers?: HelixHeadlessSlider["markers"];
   /** Whether each mark says which value it stands at. */
-  "marker-labels"?: HelixBaseSlider["markerLabels"];
+  "marker-labels"?: HelixHeadlessSlider["markerLabels"];
   /** Whether each mark says which value it stands at. */
-  markerLabels?: HelixBaseSlider["markerLabels"];
+  markerLabels?: HelixHeadlessSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
-  step?: HelixBaseSlider["step"];
+  step?: HelixHeadlessSlider["step"];
   /** Which way the track runs, `vertical` standing it on end.
 
 For a level rather than a quantity: a fader, a channel, anything a reader
@@ -8234,11 +8275,11 @@ horizontal, which is what almost every slider in a form wants.
 takes the width of the row it is in. `--slider-length` is that number and
 defaults to nine rem, so one dropped into a layout is a usable height
 rather than a thumb sitting on nothing. */
-  orientation?: HelixBaseSlider["orientation"];
+  orientation?: HelixHeadlessSlider["orientation"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseSlider["defaultValue"];
+  "default-value"?: HelixHeadlessSlider["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseSlider["defaultValue"];
+  defaultValue?: HelixHeadlessSlider["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -8250,15 +8291,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseSlider["value"];
+  value?: HelixHeadlessSlider["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseSlider["hint"];
+  hint?: HelixHeadlessSlider["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseSlider["feedback"];
+  feedback?: HelixHeadlessSlider["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseSlider["label"];
+  label?: HelixHeadlessSlider["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseSlider["required"];
+  required?: HelixHeadlessSlider["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -8269,7 +8310,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseSlider["disabled"];
+  disabled?: HelixHeadlessSlider["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -8287,29 +8328,29 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseSlider["name"];
+  name?: HelixHeadlessSlider["name"];
 
   /** Fired as the value changes, and cancelable. */
-  "onhelix-input"?: (e: HelixBaseSliderHelixInputElementEvent) => void;
+  "onhelix-input"?: (e: HelixHeadlessSliderHelixInputElementEvent) => void;
   /** Relayed once the reader has let go. */
-  onchange?: (e: HelixBaseSliderElementEvent) => void;
+  onchange?: (e: HelixHeadlessSliderElementEvent) => void;
 };
 
-export type HelixBaseSliderSolidJsProps = {
+export type HelixHeadlessSliderSolidJsProps = {
   /** Whether there are two thumbs and the value is a pair.
 
 The pair is one string, `"10,50"`, which is what a form submits and what
 `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
 the two, since a range has no single number. */
-  "prop:range"?: HelixBaseSlider["range"];
+  "prop:range"?: HelixHeadlessSlider["range"];
   /** The largest value the reader can choose. */
-  "prop:max"?: HelixBaseSlider["max"];
+  "prop:max"?: HelixHeadlessSlider["max"];
   /** The smallest value the reader can choose. */
-  "prop:min"?: HelixBaseSlider["min"];
+  "prop:min"?: HelixHeadlessSlider["min"];
   /** Whether the chosen value is shown beside the track. */
-  "bool:show-value"?: HelixBaseSlider["showValue"];
+  "bool:show-value"?: HelixHeadlessSlider["showValue"];
   /** Whether the chosen value is shown beside the track. */
-  "prop:showValue"?: HelixBaseSlider["showValue"];
+  "prop:showValue"?: HelixHeadlessSlider["showValue"];
   /** How many marks to draw along the track, evenly spaced, ends included.
 
 `0` or `1` draws none: one mark on a track says nothing about a range.
@@ -8323,13 +8364,13 @@ are places the thumb cannot go. A mark the thumb can never sit on is the
 one thing a mark must not be, so the spacing gives way rather than the
 step, and marks may come out unevenly spaced when the two disagree. That
 is the honest picture of the range being offered. */
-  "prop:markers"?: HelixBaseSlider["markers"];
+  "prop:markers"?: HelixHeadlessSlider["markers"];
   /** Whether each mark says which value it stands at. */
-  "bool:marker-labels"?: HelixBaseSlider["markerLabels"];
+  "bool:marker-labels"?: HelixHeadlessSlider["markerLabels"];
   /** Whether each mark says which value it stands at. */
-  "prop:markerLabels"?: HelixBaseSlider["markerLabels"];
+  "prop:markerLabels"?: HelixHeadlessSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
-  "prop:step"?: HelixBaseSlider["step"];
+  "prop:step"?: HelixHeadlessSlider["step"];
   /** Which way the track runs, `vertical` standing it on end.
 
 For a level rather than a quantity: a fader, a channel, anything a reader
@@ -8340,11 +8381,11 @@ horizontal, which is what almost every slider in a form wants.
 takes the width of the row it is in. `--slider-length` is that number and
 defaults to nine rem, so one dropped into a layout is a usable height
 rather than a thumb sitting on nothing. */
-  "prop:orientation"?: HelixBaseSlider["orientation"];
+  "prop:orientation"?: HelixHeadlessSlider["orientation"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseSlider["defaultValue"];
+  "attr:default-value"?: HelixHeadlessSlider["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseSlider["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessSlider["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -8356,15 +8397,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseSlider["value"];
+  "prop:value"?: HelixHeadlessSlider["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseSlider["hint"];
+  "prop:hint"?: HelixHeadlessSlider["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseSlider["feedback"];
+  "prop:feedback"?: HelixHeadlessSlider["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseSlider["label"];
+  "prop:label"?: HelixHeadlessSlider["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseSlider["required"];
+  "prop:required"?: HelixHeadlessSlider["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -8375,7 +8416,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseSlider["disabled"];
+  "prop:disabled"?: HelixHeadlessSlider["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -8393,11 +8434,11 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseSlider["name"];
+  "prop:name"?: HelixHeadlessSlider["name"];
   /** Fired as the value changes, and cancelable. */
-  "on:helix-input"?: (e: HelixBaseSliderHelixInputElementEvent) => void;
+  "on:helix-input"?: (e: HelixHeadlessSliderHelixInputElementEvent) => void;
   /** Relayed once the reader has let go. */
-  "on:change"?: (e: HelixBaseSliderElementEvent) => void;
+  "on:change"?: (e: HelixHeadlessSliderElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8405,7 +8446,7 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseSparklineProps = {
+export type HelixHeadlessSparklineProps = {
   /** What the readings are drawn as.
 
 Absent is a line, `area` is a line with the region beneath it washed, and
@@ -8433,7 +8474,7 @@ anywhere the fill would be noise, several of them in one box for instance.
 
 This tier rather than the one above: a plot type is geometry and geometry
 is markup, the same reason `curve` lives here. */
-  plot?: HelixBaseSparkline["plot"];
+  plot?: HelixHeadlessSparkline["plot"];
   /** How the line gets from one reading to the next.
 
 **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
@@ -8457,7 +8498,7 @@ assert against. So the resting state is still the attribute's absence, and
 
 `step` claims the opposite of both, that a reading holds until the next.
 Bars ignore it, having no between to interpolate. */
-  curve?: HelixBaseSparkline["curve"];
+  curve?: HelixHeadlessSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
@@ -8466,24 +8507,24 @@ attribute is not.
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  for?: HelixBaseSparkline["for"];
+  for?: HelixHeadlessSparkline["for"];
   /** What the line says, in a sentence.
 
 "Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
 the accessible representation of a sparkline, and a list of the fourteen
 numbers is not. Absent, the drawing is hidden from a screen reader rather
 than announced without a name. */
-  label?: HelixBaseSparkline["label"];
+  label?: HelixHeadlessSparkline["label"];
   /** The numbers, separated by whitespace or by commas.
 
 Both separators, so `values="1240 1318"` and an array assigned to the
 property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
 and a string is what survives React's hydration where an array property
 does not. */
-  values?: HelixBaseSparkline["values"];
+  values?: HelixHeadlessSparkline["values"];
 };
 
-export type HelixBaseSparklineSolidJsProps = {
+export type HelixHeadlessSparklineSolidJsProps = {
   /** What the readings are drawn as.
 
 Absent is a line, `area` is a line with the region beneath it washed, and
@@ -8511,7 +8552,7 @@ anywhere the fill would be noise, several of them in one box for instance.
 
 This tier rather than the one above: a plot type is geometry and geometry
 is markup, the same reason `curve` lives here. */
-  "prop:plot"?: HelixBaseSparkline["plot"];
+  "prop:plot"?: HelixHeadlessSparkline["plot"];
   /** How the line gets from one reading to the next.
 
 **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
@@ -8535,7 +8576,7 @@ assert against. So the resting state is still the attribute's absence, and
 
 `step` claims the opposite of both, that a reading holds until the next.
 Bars ignore it, having no between to interpolate. */
-  "prop:curve"?: HelixBaseSparkline["curve"];
+  "prop:curve"?: HelixHeadlessSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
@@ -8544,21 +8585,21 @@ attribute is not.
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  "prop:for"?: HelixBaseSparkline["for"];
+  "prop:for"?: HelixHeadlessSparkline["for"];
   /** What the line says, in a sentence.
 
 "Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
 the accessible representation of a sparkline, and a list of the fourteen
 numbers is not. Absent, the drawing is hidden from a screen reader rather
 than announced without a name. */
-  "prop:label"?: HelixBaseSparkline["label"];
+  "prop:label"?: HelixHeadlessSparkline["label"];
   /** The numbers, separated by whitespace or by commas.
 
 Both separators, so `values="1240 1318"` and an array assigned to the
 property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
 and a string is what survives React's hydration where an array property
 does not. */
-  "prop:values"?: HelixBaseSparkline["values"];
+  "prop:values"?: HelixHeadlessSparkline["values"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8566,33 +8607,35 @@ does not. */
   textContent?: string | number;
 };
 
-/** `HelixBaseSpeedDialItem` component event */
-export type HelixBaseSpeedDialItemElementEvent<E = Event> = TypedEvent<
-  HelixBaseSpeedDialItem,
+/** `HelixHeadlessSpeedDialItem` component event */
+export type HelixHeadlessSpeedDialItemElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessSpeedDialItem,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseSpeedDialItemHelixSelectElementEvent =
-  HelixBaseSpeedDialItemElementEvent<HelixSelectEvent>;
+export type HelixHeadlessSpeedDialItemHelixSelectElementEvent =
+  HelixHeadlessSpeedDialItemElementEvent<HelixSelectEvent>;
 
-export type HelixBaseSpeedDialItemProps = {
+export type HelixHeadlessSpeedDialItemProps = {
   /** What this action stands for, carried in the event when it is chosen. */
-  value?: HelixBaseSpeedDialItem["value"];
+  value?: HelixHeadlessSpeedDialItem["value"];
   /** Whether the action can be chosen. */
-  disabled?: HelixBaseSpeedDialItem["disabled"];
+  disabled?: HelixHeadlessSpeedDialItem["disabled"];
 
   /** Fired when the action is chosen. */
-  "onhelix-select"?: (e: HelixBaseSpeedDialItemHelixSelectElementEvent) => void;
+  "onhelix-select"?: (
+    e: HelixHeadlessSpeedDialItemHelixSelectElementEvent,
+  ) => void;
 };
 
-export type HelixBaseSpeedDialItemSolidJsProps = {
+export type HelixHeadlessSpeedDialItemSolidJsProps = {
   /** What this action stands for, carried in the event when it is chosen. */
-  "prop:value"?: HelixBaseSpeedDialItem["value"];
+  "prop:value"?: HelixHeadlessSpeedDialItem["value"];
   /** Whether the action can be chosen. */
-  "prop:disabled"?: HelixBaseSpeedDialItem["disabled"];
+  "prop:disabled"?: HelixHeadlessSpeedDialItem["disabled"];
   /** Fired when the action is chosen. */
   "on:helix-select"?: (
-    e: HelixBaseSpeedDialItemHelixSelectElementEvent,
+    e: HelixHeadlessSpeedDialItemHelixSelectElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -8601,28 +8644,28 @@ export type HelixBaseSpeedDialItemSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseSpeedDial` component event */
-export type HelixBaseSpeedDialElementEvent<E = Event> = TypedEvent<
-  HelixBaseSpeedDial,
+/** `HelixHeadlessSpeedDial` component event */
+export type HelixHeadlessSpeedDialElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessSpeedDial,
   E
 >;
 /** `helix-open` event type */
-export type HelixBaseSpeedDialHelixOpenElementEvent =
-  HelixBaseSpeedDialElementEvent<HelixOpenEvent>;
+export type HelixHeadlessSpeedDialHelixOpenElementEvent =
+  HelixHeadlessSpeedDialElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseSpeedDialHelixCloseElementEvent =
-  HelixBaseSpeedDialElementEvent<HelixCloseEvent>;
+export type HelixHeadlessSpeedDialHelixCloseElementEvent =
+  HelixHeadlessSpeedDialElementEvent<HelixCloseEvent>;
 
-export type HelixBaseSpeedDialProps = {
+export type HelixHeadlessSpeedDialProps = {
   /** Names the trigger and the set of actions it opens. */
-  label?: HelixBaseSpeedDial["label"];
+  label?: HelixHeadlessSpeedDial["label"];
   /** Which way the actions fan out. They move if that side does not fit.
 
 Up by default, because the control this hangs off is usually docked to the
 bottom of the window and there is nothing below it to fan into. */
-  placement?: HelixBaseSpeedDial["placement"];
+  placement?: HelixHeadlessSpeedDial["placement"];
   /** Space between the trigger and the actions, in pixels. */
-  offset?: HelixBaseSpeedDial["offset"];
+  offset?: HelixHeadlessSpeedDial["offset"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -8645,28 +8688,28 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseSpeedDial["open"];
+  open?: HelixHeadlessSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseSpeedDial["defaultOpen"];
+  "default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseSpeedDial["defaultOpen"];
+  defaultOpen?: HelixHeadlessSpeedDial["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixBaseSpeedDialHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixBaseSpeedDialHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseSpeedDialSolidJsProps = {
+export type HelixHeadlessSpeedDialSolidJsProps = {
   /** Names the trigger and the set of actions it opens. */
-  "prop:label"?: HelixBaseSpeedDial["label"];
+  "prop:label"?: HelixHeadlessSpeedDial["label"];
   /** Which way the actions fan out. They move if that side does not fit.
 
 Up by default, because the control this hangs off is usually docked to the
 bottom of the window and there is nothing below it to fan into. */
-  "prop:placement"?: HelixBaseSpeedDial["placement"];
+  "prop:placement"?: HelixHeadlessSpeedDial["placement"];
   /** Space between the trigger and the actions, in pixels. */
-  "prop:offset"?: HelixBaseSpeedDial["offset"];
+  "prop:offset"?: HelixHeadlessSpeedDial["offset"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -8689,15 +8732,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseSpeedDial["open"];
+  "prop:open"?: HelixHeadlessSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseSpeedDial["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseSpeedDial["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessSpeedDial["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixBaseSpeedDialHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixBaseSpeedDialHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8705,16 +8748,16 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-/** `HelixBaseSplitter` component event */
-export type HelixBaseSplitterElementEvent<E = Event> = TypedEvent<
-  HelixBaseSplitter,
+/** `HelixHeadlessSplitter` component event */
+export type HelixHeadlessSplitterElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessSplitter,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseSplitterHelixChangeElementEvent =
-  HelixBaseSplitterElementEvent<HelixChangeEvent>;
+export type HelixHeadlessSplitterHelixChangeElementEvent =
+  HelixHeadlessSplitterElementEvent<HelixChangeEvent>;
 
-export type HelixBaseSplitterProps = {
+export type HelixHeadlessSplitterProps = {
   /** Which way the panes are laid out.
 
 `horizontal` is side by side with an upright divider between them, and
@@ -8725,17 +8768,17 @@ right and the sentence beside it said the reverse.
 
 Unset is horizontal and stays unset, so a reflected default cannot appear on
 a host whose server output never had it. */
-  orientation?: HelixBaseSplitter["orientation"];
+  orientation?: HelixHeadlessSplitter["orientation"];
   /** Where the divider sits, as a percentage of the whole.
 
 Reading gives where it is; writing declares it the consumer's, and
 `default-position` seeds one this element owns. The same accessor pair
 `Pagination.page` and the calendar's `month` carry. */
-  position?: HelixBaseSplitter["position"];
+  position?: HelixHeadlessSplitter["position"];
   /** Where the divider starts, where nothing declared it. */
-  "default-position"?: HelixBaseSplitter["defaultPosition"];
+  "default-position"?: HelixHeadlessSplitter["defaultPosition"];
   /** Where the divider starts, where nothing declared it. */
-  defaultPosition?: HelixBaseSplitter["defaultPosition"];
+  defaultPosition?: HelixHeadlessSplitter["defaultPosition"];
   /** Which pane is shut, if either.
 
 The same accessor pair as `position`, and deliberately a second state
@@ -8747,43 +8790,43 @@ needs no memory of its own.
 
 It overrides `min` and `max`, which is the point of it. Those keep a sliver
 of a pane during a drag; this is the thing that says the sliver can go. */
-  collapsed?: HelixBaseSplitter["collapsed"];
+  collapsed?: HelixHeadlessSplitter["collapsed"];
   /** Which pane starts shut, where nothing declared it. */
-  "default-collapsed"?: HelixBaseSplitter["defaultCollapsed"];
+  "default-collapsed"?: HelixHeadlessSplitter["defaultCollapsed"];
   /** Which pane starts shut, where nothing declared it. */
-  defaultCollapsed?: HelixBaseSplitter["defaultCollapsed"];
+  defaultCollapsed?: HelixHeadlessSplitter["defaultCollapsed"];
   /** How much of a shut pane is still shown, as a percentage.
 
 Zero by default, which is a pane fully gone. A tab strip or a title bar
 that should survive its own collapse says how much of itself to keep, and
 only whoever put it there knows that, which is the same reason `min` is a
 consumer's to set. */
-  "collapsed-size"?: HelixBaseSplitter["collapsedSize"];
+  "collapsed-size"?: HelixHeadlessSplitter["collapsedSize"];
   /** How much of a shut pane is still shown, as a percentage.
 
 Zero by default, which is a pane fully gone. A tab strip or a title bar
 that should survive its own collapse says how much of itself to keep, and
 only whoever put it there knows that, which is the same reason `min` is a
 consumer's to set. */
-  collapsedSize?: HelixBaseSplitter["collapsedSize"];
+  collapsedSize?: HelixHeadlessSplitter["collapsedSize"];
   /** Nearest the divider may come to the start, as a percentage. */
-  min?: HelixBaseSplitter["min"];
+  min?: HelixHeadlessSplitter["min"];
   /** Nearest it may come to the end. */
-  max?: HelixBaseSplitter["max"];
+  max?: HelixHeadlessSplitter["max"];
   /** How far one arrow press moves it, as a percentage. */
-  step?: HelixBaseSplitter["step"];
+  step?: HelixHeadlessSplitter["step"];
   /** Accessible name for the divider. */
-  label?: HelixBaseSplitter["label"];
+  label?: HelixHeadlessSplitter["label"];
   /** Accessible name for the handle where two dividers cross. */
-  "corner-label"?: HelixBaseSplitter["cornerLabel"];
+  "corner-label"?: HelixHeadlessSplitter["cornerLabel"];
   /** Accessible name for the handle where two dividers cross. */
-  cornerLabel?: HelixBaseSplitter["cornerLabel"];
+  cornerLabel?: HelixHeadlessSplitter["cornerLabel"];
 
   /** Fired when the divider settles, named `position` or `collapsed`. */
-  "onhelix-change"?: (e: HelixBaseSplitterHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessSplitterHelixChangeElementEvent) => void;
 };
 
-export type HelixBaseSplitterSolidJsProps = {
+export type HelixHeadlessSplitterSolidJsProps = {
   /** Which way the panes are laid out.
 
 `horizontal` is side by side with an upright divider between them, and
@@ -8794,17 +8837,17 @@ right and the sentence beside it said the reverse.
 
 Unset is horizontal and stays unset, so a reflected default cannot appear on
 a host whose server output never had it. */
-  "prop:orientation"?: HelixBaseSplitter["orientation"];
+  "prop:orientation"?: HelixHeadlessSplitter["orientation"];
   /** Where the divider sits, as a percentage of the whole.
 
 Reading gives where it is; writing declares it the consumer's, and
 `default-position` seeds one this element owns. The same accessor pair
 `Pagination.page` and the calendar's `month` carry. */
-  "prop:position"?: HelixBaseSplitter["position"];
+  "prop:position"?: HelixHeadlessSplitter["position"];
   /** Where the divider starts, where nothing declared it. */
-  "attr:default-position"?: HelixBaseSplitter["defaultPosition"];
+  "attr:default-position"?: HelixHeadlessSplitter["defaultPosition"];
   /** Where the divider starts, where nothing declared it. */
-  "prop:defaultPosition"?: HelixBaseSplitter["defaultPosition"];
+  "prop:defaultPosition"?: HelixHeadlessSplitter["defaultPosition"];
   /** Which pane is shut, if either.
 
 The same accessor pair as `position`, and deliberately a second state
@@ -8816,39 +8859,39 @@ needs no memory of its own.
 
 It overrides `min` and `max`, which is the point of it. Those keep a sliver
 of a pane during a drag; this is the thing that says the sliver can go. */
-  "prop:collapsed"?: HelixBaseSplitter["collapsed"];
+  "prop:collapsed"?: HelixHeadlessSplitter["collapsed"];
   /** Which pane starts shut, where nothing declared it. */
-  "attr:default-collapsed"?: HelixBaseSplitter["defaultCollapsed"];
+  "attr:default-collapsed"?: HelixHeadlessSplitter["defaultCollapsed"];
   /** Which pane starts shut, where nothing declared it. */
-  "prop:defaultCollapsed"?: HelixBaseSplitter["defaultCollapsed"];
+  "prop:defaultCollapsed"?: HelixHeadlessSplitter["defaultCollapsed"];
   /** How much of a shut pane is still shown, as a percentage.
 
 Zero by default, which is a pane fully gone. A tab strip or a title bar
 that should survive its own collapse says how much of itself to keep, and
 only whoever put it there knows that, which is the same reason `min` is a
 consumer's to set. */
-  "attr:collapsed-size"?: HelixBaseSplitter["collapsedSize"];
+  "attr:collapsed-size"?: HelixHeadlessSplitter["collapsedSize"];
   /** How much of a shut pane is still shown, as a percentage.
 
 Zero by default, which is a pane fully gone. A tab strip or a title bar
 that should survive its own collapse says how much of itself to keep, and
 only whoever put it there knows that, which is the same reason `min` is a
 consumer's to set. */
-  "prop:collapsedSize"?: HelixBaseSplitter["collapsedSize"];
+  "prop:collapsedSize"?: HelixHeadlessSplitter["collapsedSize"];
   /** Nearest the divider may come to the start, as a percentage. */
-  "prop:min"?: HelixBaseSplitter["min"];
+  "prop:min"?: HelixHeadlessSplitter["min"];
   /** Nearest it may come to the end. */
-  "prop:max"?: HelixBaseSplitter["max"];
+  "prop:max"?: HelixHeadlessSplitter["max"];
   /** How far one arrow press moves it, as a percentage. */
-  "prop:step"?: HelixBaseSplitter["step"];
+  "prop:step"?: HelixHeadlessSplitter["step"];
   /** Accessible name for the divider. */
-  "prop:label"?: HelixBaseSplitter["label"];
+  "prop:label"?: HelixHeadlessSplitter["label"];
   /** Accessible name for the handle where two dividers cross. */
-  "attr:corner-label"?: HelixBaseSplitter["cornerLabel"];
+  "attr:corner-label"?: HelixHeadlessSplitter["cornerLabel"];
   /** Accessible name for the handle where two dividers cross. */
-  "prop:cornerLabel"?: HelixBaseSplitter["cornerLabel"];
+  "prop:cornerLabel"?: HelixHeadlessSplitter["cornerLabel"];
   /** Fired when the divider settles, named `position` or `collapsed`. */
-  "on:helix-change"?: (e: HelixBaseSplitterHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessSplitterHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8856,14 +8899,14 @@ consumer's to set. */
   textContent?: string | number;
 };
 
-export type HelixBaseStatGroupProps = {
+export type HelixHeadlessStatGroupProps = {
   /** Accessible name for the set. */
-  label?: HelixBaseStatGroup["label"];
+  label?: HelixHeadlessStatGroup["label"];
 };
 
-export type HelixBaseStatGroupSolidJsProps = {
+export type HelixHeadlessStatGroupSolidJsProps = {
   /** Accessible name for the set. */
-  "prop:label"?: HelixBaseStatGroup["label"];
+  "prop:label"?: HelixHeadlessStatGroup["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8871,7 +8914,7 @@ export type HelixBaseStatGroupSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseStatProps = {
+export type HelixHeadlessStatProps = {
   /** Which way the label and the value are arranged.
 
 Absent is a column, the label over the number, which is how a figure is read
@@ -8893,10 +8936,10 @@ consumer rendered: React compares what it rendered against what is there and
 reports a hydration mismatch. The absent attribute is the column, which the
 stylesheet reads as the base case. The existing server spec caught this,
 being the one that asserts the host carries nothing nobody wrote. */
-  direction?: HelixBaseStat["direction"];
+  direction?: HelixHeadlessStat["direction"];
 };
 
-export type HelixBaseStatSolidJsProps = {
+export type HelixHeadlessStatSolidJsProps = {
   /** Which way the label and the value are arranged.
 
 Absent is a column, the label over the number, which is how a figure is read
@@ -8918,7 +8961,7 @@ consumer rendered: React compares what it rendered against what is there and
 reports a hydration mismatch. The absent attribute is the column, which the
 stylesheet reads as the base case. The existing server spec caught this,
 being the one that asserts the host carries nothing nobody wrote. */
-  "prop:direction"?: HelixBaseStat["direction"];
+  "prop:direction"?: HelixHeadlessStat["direction"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8926,21 +8969,21 @@ being the one that asserts the host carries nothing nobody wrote. */
   textContent?: string | number;
 };
 
-/** `HelixBaseSteps` component event */
-export type HelixBaseStepsElementEvent<E = Event> = TypedEvent<
-  HelixBaseSteps,
+/** `HelixHeadlessSteps` component event */
+export type HelixHeadlessStepsElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessSteps,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseStepsHelixChangeElementEvent =
-  HelixBaseStepsElementEvent<HelixChangeEvent>;
+export type HelixHeadlessStepsHelixChangeElementEvent =
+  HelixHeadlessStepsElementEvent<HelixChangeEvent>;
 
-export type HelixBaseStepsProps = {
+export type HelixHeadlessStepsProps = {
   /** Accessible name for the sequence.
 
 A list of stages is a landmark a reader arrives at out of order, so it
 needs a name of its own rather than borrowing the heading above it. */
-  label?: HelixBaseSteps["label"];
+  label?: HelixHeadlessSteps["label"];
   /** Which way the steps run.
 
 Absent is a row, which is what a form header wants, with each name under
@@ -8952,7 +8995,7 @@ Each axis has one arrangement rather than a second property offering both
 in both. Of those four combinations three are ones nobody should pick, and
 a property whose job is mostly to be left alone is a property that mostly
 catches people out. */
-  orientation?: HelixBaseSteps["orientation"];
+  orientation?: HelixHeadlessSteps["orientation"];
   /** What each step is marked with.
 
 Absent is the state itself: a check where a stage is done, a target where
@@ -8963,7 +9006,7 @@ nothing about whether it is finished.
 `numeric` is the older convention and is still the right one where the
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
-  variant?: HelixBaseSteps["variant"];
+  variant?: HelixHeadlessSteps["variant"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -8977,22 +9020,22 @@ An accessor pair, the same shape as the other three. Reading gives the
 real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
-  active?: HelixBaseSteps["active"];
+  active?: HelixHeadlessSteps["active"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "default-active"?: HelixBaseSteps["defaultActive"];
+  "default-active"?: HelixHeadlessSteps["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  defaultActive?: HelixBaseSteps["defaultActive"];
+  defaultActive?: HelixHeadlessSteps["defaultActive"];
 
   /** Fired when the active step changes. */
-  "onhelix-change"?: (e: HelixBaseStepsHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessStepsHelixChangeElementEvent) => void;
 };
 
-export type HelixBaseStepsSolidJsProps = {
+export type HelixHeadlessStepsSolidJsProps = {
   /** Accessible name for the sequence.
 
 A list of stages is a landmark a reader arrives at out of order, so it
 needs a name of its own rather than borrowing the heading above it. */
-  "prop:label"?: HelixBaseSteps["label"];
+  "prop:label"?: HelixHeadlessSteps["label"];
   /** Which way the steps run.
 
 Absent is a row, which is what a form header wants, with each name under
@@ -9004,7 +9047,7 @@ Each axis has one arrangement rather than a second property offering both
 in both. Of those four combinations three are ones nobody should pick, and
 a property whose job is mostly to be left alone is a property that mostly
 catches people out. */
-  "prop:orientation"?: HelixBaseSteps["orientation"];
+  "prop:orientation"?: HelixHeadlessSteps["orientation"];
   /** What each step is marked with.
 
 Absent is the state itself: a check where a stage is done, a target where
@@ -9015,7 +9058,7 @@ nothing about whether it is finished.
 `numeric` is the older convention and is still the right one where the
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
-  "prop:variant"?: HelixBaseSteps["variant"];
+  "prop:variant"?: HelixHeadlessSteps["variant"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -9029,13 +9072,13 @@ An accessor pair, the same shape as the other three. Reading gives the
 real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
-  "prop:active"?: HelixBaseSteps["active"];
+  "prop:active"?: HelixHeadlessSteps["active"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "attr:default-active"?: HelixBaseSteps["defaultActive"];
+  "attr:default-active"?: HelixHeadlessSteps["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "prop:defaultActive"?: HelixBaseSteps["defaultActive"];
+  "prop:defaultActive"?: HelixHeadlessSteps["defaultActive"];
   /** Fired when the active step changes. */
-  "on:helix-change"?: (e: HelixBaseStepsHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessStepsHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9043,37 +9086,40 @@ how markup says where to start. */
   textContent?: string | number;
 };
 
-/** `HelixBaseStep` component event */
-export type HelixBaseStepElementEvent<E = Event> = TypedEvent<HelixBaseStep, E>;
+/** `HelixHeadlessStep` component event */
+export type HelixHeadlessStepElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessStep,
+  E
+>;
 /** `helix-select` event type */
-export type HelixBaseStepHelixSelectElementEvent =
-  HelixBaseStepElementEvent<HelixSelectEvent>;
+export type HelixHeadlessStepHelixSelectElementEvent =
+  HelixHeadlessStepElementEvent<HelixSelectEvent>;
 
-export type HelixBaseStepProps = {
+export type HelixHeadlessStepProps = {
   /** Whether the reader has finished this stage. */
-  complete?: HelixBaseStep["complete"];
+  complete?: HelixHeadlessStep["complete"];
   /** Whether this is the stage the reader is in. */
-  current?: HelixBaseStep["current"];
+  current?: HelixHeadlessStep["current"];
   /** Whether the reader may go to this stage. */
-  disabled?: HelixBaseStep["disabled"];
+  disabled?: HelixHeadlessStep["disabled"];
   /** What this stage is called when it announces itself. */
-  value?: HelixBaseStep["value"];
+  value?: HelixHeadlessStep["value"];
 
   /** Fired when the step is pressed. */
-  "onhelix-select"?: (e: HelixBaseStepHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessStepHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseStepSolidJsProps = {
+export type HelixHeadlessStepSolidJsProps = {
   /** Whether the reader has finished this stage. */
-  "prop:complete"?: HelixBaseStep["complete"];
+  "prop:complete"?: HelixHeadlessStep["complete"];
   /** Whether this is the stage the reader is in. */
-  "prop:current"?: HelixBaseStep["current"];
+  "prop:current"?: HelixHeadlessStep["current"];
   /** Whether the reader may go to this stage. */
-  "prop:disabled"?: HelixBaseStep["disabled"];
+  "prop:disabled"?: HelixHeadlessStep["disabled"];
   /** What this stage is called when it announces itself. */
-  "prop:value"?: HelixBaseStep["value"];
+  "prop:value"?: HelixHeadlessStep["value"];
   /** Fired when the step is pressed. */
-  "on:helix-select"?: (e: HelixBaseStepHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessStepHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9081,18 +9127,18 @@ export type HelixBaseStepSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseSwitch` component event */
-export type HelixBaseSwitchElementEvent<E = Event> = TypedEvent<
-  HelixBaseSwitch,
+/** `HelixHeadlessSwitch` component event */
+export type HelixHeadlessSwitchElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessSwitch,
   E
 >;
 /** `helix-toggle` event type */
-export type HelixBaseSwitchHelixToggleElementEvent =
-  HelixBaseSwitchElementEvent<HelixToggleEvent>;
+export type HelixHeadlessSwitchHelixToggleElementEvent =
+  HelixHeadlessSwitchElementEvent<HelixToggleEvent>;
 
-export type HelixBaseSwitchProps = {
+export type HelixHeadlessSwitchProps = {
   /** Value submitted when the switch is on. */
-  value?: HelixBaseSwitch["value"];
+  value?: HelixHeadlessSwitch["value"];
   /** Whether the control is checked.
 
 One property rather than two. Reading gives the real state whichever
@@ -9103,19 +9149,19 @@ same shape all four of these mixins have, for the reason given on
 
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `data-checked` carries the resolved state for stylesheets. */
-  checked?: HelixBaseSwitch["checked"];
+  checked?: HelixHeadlessSwitch["checked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
-  "default-checked"?: HelixBaseSwitch["defaultChecked"];
+  "default-checked"?: HelixHeadlessSwitch["defaultChecked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
-  defaultChecked?: HelixBaseSwitch["defaultChecked"];
+  defaultChecked?: HelixHeadlessSwitch["defaultChecked"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseSwitch["hint"];
+  hint?: HelixHeadlessSwitch["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseSwitch["feedback"];
+  feedback?: HelixHeadlessSwitch["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseSwitch["label"];
+  label?: HelixHeadlessSwitch["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseSwitch["required"];
+  required?: HelixHeadlessSwitch["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -9126,7 +9172,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseSwitch["disabled"];
+  disabled?: HelixHeadlessSwitch["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -9144,17 +9190,17 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseSwitch["name"];
+  name?: HelixHeadlessSwitch["name"];
 
   /** Fired before the state changes, and cancelable. */
-  "onhelix-toggle"?: (e: HelixBaseSwitchHelixToggleElementEvent) => void;
+  "onhelix-toggle"?: (e: HelixHeadlessSwitchHelixToggleElementEvent) => void;
   /** Relayed from the input once the state has changed. */
-  onchange?: (e: HelixBaseSwitchElementEvent) => void;
+  onchange?: (e: HelixHeadlessSwitchElementEvent) => void;
 };
 
-export type HelixBaseSwitchSolidJsProps = {
+export type HelixHeadlessSwitchSolidJsProps = {
   /** Value submitted when the switch is on. */
-  "prop:value"?: HelixBaseSwitch["value"];
+  "prop:value"?: HelixHeadlessSwitch["value"];
   /** Whether the control is checked.
 
 One property rather than two. Reading gives the real state whichever
@@ -9165,19 +9211,19 @@ same shape all four of these mixins have, for the reason given on
 
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `data-checked` carries the resolved state for stylesheets. */
-  "prop:checked"?: HelixBaseSwitch["checked"];
+  "prop:checked"?: HelixHeadlessSwitch["checked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
-  "bool:default-checked"?: HelixBaseSwitch["defaultChecked"];
+  "bool:default-checked"?: HelixHeadlessSwitch["defaultChecked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
-  "prop:defaultChecked"?: HelixBaseSwitch["defaultChecked"];
+  "prop:defaultChecked"?: HelixHeadlessSwitch["defaultChecked"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseSwitch["hint"];
+  "prop:hint"?: HelixHeadlessSwitch["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseSwitch["feedback"];
+  "prop:feedback"?: HelixHeadlessSwitch["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseSwitch["label"];
+  "prop:label"?: HelixHeadlessSwitch["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseSwitch["required"];
+  "prop:required"?: HelixHeadlessSwitch["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -9188,7 +9234,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseSwitch["disabled"];
+  "prop:disabled"?: HelixHeadlessSwitch["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -9206,11 +9252,11 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseSwitch["name"];
+  "prop:name"?: HelixHeadlessSwitch["name"];
   /** Fired before the state changes, and cancelable. */
-  "on:helix-toggle"?: (e: HelixBaseSwitchHelixToggleElementEvent) => void;
+  "on:helix-toggle"?: (e: HelixHeadlessSwitchHelixToggleElementEvent) => void;
   /** Relayed from the input once the state has changed. */
-  "on:change"?: (e: HelixBaseSwitchElementEvent) => void;
+  "on:change"?: (e: HelixHeadlessSwitchElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9218,14 +9264,14 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseTableCellProps = {
+export type HelixHeadlessTableCellProps = {
   /** Whether the cell heads its column. */
-  header?: HelixBaseTableCell["header"];
+  header?: HelixHeadlessTableCell["header"];
 };
 
-export type HelixBaseTableCellSolidJsProps = {
+export type HelixHeadlessTableCellSolidJsProps = {
   /** Whether the cell heads its column. */
-  "prop:header"?: HelixBaseTableCell["header"];
+  "prop:header"?: HelixHeadlessTableCell["header"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9233,7 +9279,7 @@ export type HelixBaseTableCellSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseTableColumnProps = {
+export type HelixHeadlessTableColumnProps = {
   /** The track this column takes, as CSS.
 
 A single track value, so anything valid in `grid-template-columns` works:
@@ -9241,10 +9287,10 @@ A single track value, so anything valid in `grid-template-columns` works:
 left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
 `1fr` track keeps an automatic minimum and refuses to shrink under a long
 cell, so one unbreakable value pushes the table past its container. */
-  width?: HelixBaseTableColumn["width"];
+  width?: HelixHeadlessTableColumn["width"];
 };
 
-export type HelixBaseTableColumnSolidJsProps = {
+export type HelixHeadlessTableColumnSolidJsProps = {
   /** The track this column takes, as CSS.
 
 A single track value, so anything valid in `grid-template-columns` works:
@@ -9252,7 +9298,7 @@ A single track value, so anything valid in `grid-template-columns` works:
 left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
 `1fr` track keeps an automatic minimum and refuses to shrink under a long
 cell, so one unbreakable value pushes the table past its container. */
-  "prop:width"?: HelixBaseTableColumn["width"];
+  "prop:width"?: HelixHeadlessTableColumn["width"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9260,7 +9306,7 @@ cell, so one unbreakable value pushes the table past its container. */
   textContent?: string | number;
 };
 
-export type HelixBaseTableProps = {
+export type HelixHeadlessTableProps = {
   /** Column track list, as CSS. Deprecated: declare columns instead.
 
 Kept for a table that has no `helix-table-column` children, and ignored the
@@ -9270,26 +9316,26 @@ fact held in two places, and nothing checked that they agreed. Worse, the
 value is CSS, so handing it headings by mistake produced an invalid track
 list, which a grid ignores in silence: the table collapsed to one column
 and said nothing. Columns carry both halves now. */
-  columns?: HelixBaseTable["columns"];
+  columns?: HelixHeadlessTable["columns"];
   /** Accessible name for the table. */
-  label?: HelixBaseTable["label"];
+  label?: HelixHeadlessTable["label"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  loading?: HelixBaseTable["loading"];
+  loading?: HelixHeadlessTable["loading"];
   /** What is said while they are on their way. */
-  "loading-text"?: HelixBaseTable["loadingText"];
+  "loading-text"?: HelixHeadlessTable["loadingText"];
   /** What is said while they are on their way. */
-  loadingText?: HelixBaseTable["loadingText"];
+  loadingText?: HelixHeadlessTable["loadingText"];
   /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixBaseTable["emptyText"];
+  "empty-text"?: HelixHeadlessTable["emptyText"];
   /** What is said where there are none, and none are coming. */
-  emptyText?: HelixBaseTable["emptyText"];
+  emptyText?: HelixHeadlessTable["emptyText"];
 };
 
-export type HelixBaseTableSolidJsProps = {
+export type HelixHeadlessTableSolidJsProps = {
   /** Column track list, as CSS. Deprecated: declare columns instead.
 
 Kept for a table that has no `helix-table-column` children, and ignored the
@@ -9299,23 +9345,23 @@ fact held in two places, and nothing checked that they agreed. Worse, the
 value is CSS, so handing it headings by mistake produced an invalid track
 list, which a grid ignores in silence: the table collapsed to one column
 and said nothing. Columns carry both halves now. */
-  "prop:columns"?: HelixBaseTable["columns"];
+  "prop:columns"?: HelixHeadlessTable["columns"];
   /** Accessible name for the table. */
-  "prop:label"?: HelixBaseTable["label"];
+  "prop:label"?: HelixHeadlessTable["label"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  "prop:loading"?: HelixBaseTable["loading"];
+  "prop:loading"?: HelixHeadlessTable["loading"];
   /** What is said while they are on their way. */
-  "attr:loading-text"?: HelixBaseTable["loadingText"];
+  "attr:loading-text"?: HelixHeadlessTable["loadingText"];
   /** What is said while they are on their way. */
-  "prop:loadingText"?: HelixBaseTable["loadingText"];
+  "prop:loadingText"?: HelixHeadlessTable["loadingText"];
   /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixBaseTable["emptyText"];
+  "attr:empty-text"?: HelixHeadlessTable["emptyText"];
   /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixBaseTable["emptyText"];
+  "prop:emptyText"?: HelixHeadlessTable["emptyText"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9323,20 +9369,20 @@ say that without the component knowing what a row looks like. */
   textContent?: string | number;
 };
 
-export type HelixBaseTableRowProps = {};
+export type HelixHeadlessTableRowProps = {};
 
-export type HelixBaseTableRowSolidJsProps = {
+export type HelixHeadlessTableRowSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
   textContent?: string | number;
 };
 
-export type HelixBaseTabsPanelProps = {
+export type HelixHeadlessTabsPanelProps = {
   /** Pairs the panel with the tab of the same value. */
-  value?: HelixBaseTabsPanel["value"];
+  value?: HelixHeadlessTabsPanel["value"];
   /** Whether this panel is the visible one. */
-  selected?: HelixBaseTabsPanel["selected"];
+  selected?: HelixHeadlessTabsPanel["selected"];
   /** The name of the panel, which is the text of the tab that opens it.
 
 Set by the root, which is the only thing that sees both. No attribute,
@@ -9350,14 +9396,14 @@ name at all. An element reference cannot reach there either, a sibling
 shadow tree being neither the same tree nor an ancestor of it. A name is
 the one form that crosses, and `aria-label` on a `tabpanel` is how the
 pattern names one anyway. */
-  label?: HelixBaseTabsPanel["label"];
+  label?: HelixHeadlessTabsPanel["label"];
 };
 
-export type HelixBaseTabsPanelSolidJsProps = {
+export type HelixHeadlessTabsPanelSolidJsProps = {
   /** Pairs the panel with the tab of the same value. */
-  "prop:value"?: HelixBaseTabsPanel["value"];
+  "prop:value"?: HelixHeadlessTabsPanel["value"];
   /** Whether this panel is the visible one. */
-  "prop:selected"?: HelixBaseTabsPanel["selected"];
+  "prop:selected"?: HelixHeadlessTabsPanel["selected"];
   /** The name of the panel, which is the text of the tab that opens it.
 
 Set by the root, which is the only thing that sees both. No attribute,
@@ -9371,7 +9417,7 @@ name at all. An element reference cannot reach there either, a sibling
 shadow tree being neither the same tree nor an ancestor of it. A name is
 the one form that crosses, and `aria-label` on a `tabpanel` is how the
 pattern names one anyway. */
-  "prop:label"?: HelixBaseTabsPanel["label"];
+  "prop:label"?: HelixHeadlessTabsPanel["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9379,16 +9425,19 @@ pattern names one anyway. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTabs` component event */
-export type HelixBaseTabsElementEvent<E = Event> = TypedEvent<HelixBaseTabs, E>;
+/** `HelixHeadlessTabs` component event */
+export type HelixHeadlessTabsElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTabs,
+  E
+>;
 /** `helix-change` event type */
-export type HelixBaseTabsHelixChangeElementEvent =
-  HelixBaseTabsElementEvent<HelixChangeEvent>;
+export type HelixHeadlessTabsHelixChangeElementEvent =
+  HelixHeadlessTabsElementEvent<HelixChangeEvent>;
 /** `helix-select` event type */
-export type HelixBaseTabsHelixSelectElementEvent =
-  HelixBaseTabsElementEvent<HelixSelectEvent>;
+export type HelixHeadlessTabsHelixSelectElementEvent =
+  HelixHeadlessTabsElementEvent<HelixSelectEvent>;
 
-export type HelixBaseTabsProps = {
+export type HelixHeadlessTabsProps = {
   /** How the row reads.
 
 Unset is a raised pill on the selected tab with nothing behind the row,
@@ -9412,15 +9461,15 @@ meets first.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
-  variant?: HelixBaseTabs["variant"];
+  variant?: HelixHeadlessTabs["variant"];
   /** Accessible name for the tab list. */
-  label?: HelixBaseTabs["label"];
+  label?: HelixHeadlessTabs["label"];
   /** Whether arrowing to a tab also selects it.
 
 Automatic is the default because showing a panel is usually cheap. Set this
 where it is not, so a reader arrowing past four tabs does not load four
 panels on the way. */
-  manual?: HelixBaseTabs["manual"];
+  manual?: HelixHeadlessTabs["manual"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -9434,19 +9483,19 @@ An accessor pair, the same shape as the other three. Reading gives the
 real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
-  active?: HelixBaseTabs["active"];
+  active?: HelixHeadlessTabs["active"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "default-active"?: HelixBaseTabs["defaultActive"];
+  "default-active"?: HelixHeadlessTabs["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  defaultActive?: HelixBaseTabs["defaultActive"];
+  defaultActive?: HelixHeadlessTabs["defaultActive"];
 
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
-  "onhelix-change"?: (e: HelixBaseTabsHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessTabsHelixChangeElementEvent) => void;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
-  "onhelix-select"?: (e: HelixBaseTabsHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessTabsHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseTabsSolidJsProps = {
+export type HelixHeadlessTabsSolidJsProps = {
   /** How the row reads.
 
 Unset is a raised pill on the selected tab with nothing behind the row,
@@ -9470,15 +9519,15 @@ meets first.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
-  "prop:variant"?: HelixBaseTabs["variant"];
+  "prop:variant"?: HelixHeadlessTabs["variant"];
   /** Accessible name for the tab list. */
-  "prop:label"?: HelixBaseTabs["label"];
+  "prop:label"?: HelixHeadlessTabs["label"];
   /** Whether arrowing to a tab also selects it.
 
 Automatic is the default because showing a panel is usually cheap. Set this
 where it is not, so a reader arrowing past four tabs does not load four
 panels on the way. */
-  "prop:manual"?: HelixBaseTabs["manual"];
+  "prop:manual"?: HelixHeadlessTabs["manual"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -9492,15 +9541,15 @@ An accessor pair, the same shape as the other three. Reading gives the
 real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
-  "prop:active"?: HelixBaseTabs["active"];
+  "prop:active"?: HelixHeadlessTabs["active"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "attr:default-active"?: HelixBaseTabs["defaultActive"];
+  "attr:default-active"?: HelixHeadlessTabs["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "prop:defaultActive"?: HelixBaseTabs["defaultActive"];
+  "prop:defaultActive"?: HelixHeadlessTabs["defaultActive"];
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
-  "on:helix-change"?: (e: HelixBaseTabsHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessTabsHelixChangeElementEvent) => void;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
-  "on:helix-select"?: (e: HelixBaseTabsHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessTabsHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9508,36 +9557,36 @@ how markup says where to start. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTabsTab` component event */
-export type HelixBaseTabsTabElementEvent<E = Event> = TypedEvent<
-  HelixBaseTabsTab,
+/** `HelixHeadlessTabsTab` component event */
+export type HelixHeadlessTabsTabElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTabsTab,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseTabsTabHelixSelectElementEvent =
-  HelixBaseTabsTabElementEvent<HelixSelectEvent>;
+export type HelixHeadlessTabsTabHelixSelectElementEvent =
+  HelixHeadlessTabsTabElementEvent<HelixSelectEvent>;
 
-export type HelixBaseTabsTabProps = {
+export type HelixHeadlessTabsTabProps = {
   /** Identifies the tab, and pairs it with the panel of the same value. */
-  value?: HelixBaseTabsTab["value"];
+  value?: HelixHeadlessTabsTab["value"];
   /** Whether this tab is the current one. */
-  selected?: HelixBaseTabsTab["selected"];
+  selected?: HelixHeadlessTabsTab["selected"];
   /** Whether the tab can be chosen. */
-  disabled?: HelixBaseTabsTab["disabled"];
+  disabled?: HelixHeadlessTabsTab["disabled"];
 
   /** Fired when the tab is chosen. */
-  "onhelix-select"?: (e: HelixBaseTabsTabHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessTabsTabHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseTabsTabSolidJsProps = {
+export type HelixHeadlessTabsTabSolidJsProps = {
   /** Identifies the tab, and pairs it with the panel of the same value. */
-  "prop:value"?: HelixBaseTabsTab["value"];
+  "prop:value"?: HelixHeadlessTabsTab["value"];
   /** Whether this tab is the current one. */
-  "prop:selected"?: HelixBaseTabsTab["selected"];
+  "prop:selected"?: HelixHeadlessTabsTab["selected"];
   /** Whether the tab can be chosen. */
-  "prop:disabled"?: HelixBaseTabsTab["disabled"];
+  "prop:disabled"?: HelixHeadlessTabsTab["disabled"];
   /** Fired when the tab is chosen. */
-  "on:helix-select"?: (e: HelixBaseTabsTabHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessTabsTabHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9545,53 +9594,56 @@ export type HelixBaseTabsTabSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseTag` component event */
-export type HelixBaseTagElementEvent<E = Event> = TypedEvent<HelixBaseTag, E>;
+/** `HelixHeadlessTag` component event */
+export type HelixHeadlessTagElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTag,
+  E
+>;
 /** `helix-dismiss` event type */
-export type HelixBaseTagHelixDismissElementEvent =
-  HelixBaseTagElementEvent<HelixDismissEvent>;
+export type HelixHeadlessTagHelixDismissElementEvent =
+  HelixHeadlessTagElementEvent<HelixDismissEvent>;
 
-export type HelixBaseTagProps = {
+export type HelixHeadlessTagProps = {
   /** Whether it offers a control to take it away. */
-  dismissible?: HelixBaseTag["dismissible"];
+  dismissible?: HelixHeadlessTag["dismissible"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  "dismiss-label"?: HelixBaseTag["dismissLabel"];
+  "dismiss-label"?: HelixHeadlessTag["dismissLabel"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  dismissLabel?: HelixBaseTag["dismissLabel"];
+  dismissLabel?: HelixHeadlessTag["dismissLabel"];
 
   /** Fired when the reader asks to remove the tag. */
-  "onhelix-dismiss"?: (e: HelixBaseTagHelixDismissElementEvent) => void;
+  "onhelix-dismiss"?: (e: HelixHeadlessTagHelixDismissElementEvent) => void;
 };
 
-export type HelixBaseTagSolidJsProps = {
+export type HelixHeadlessTagSolidJsProps = {
   /** Whether it offers a control to take it away. */
-  "prop:dismissible"?: HelixBaseTag["dismissible"];
+  "prop:dismissible"?: HelixHeadlessTag["dismissible"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  "attr:dismiss-label"?: HelixBaseTag["dismissLabel"];
+  "attr:dismiss-label"?: HelixHeadlessTag["dismissLabel"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  "prop:dismissLabel"?: HelixBaseTag["dismissLabel"];
+  "prop:dismissLabel"?: HelixHeadlessTag["dismissLabel"];
   /** Fired when the reader asks to remove the tag. */
-  "on:helix-dismiss"?: (e: HelixBaseTagHelixDismissElementEvent) => void;
+  "on:helix-dismiss"?: (e: HelixHeadlessTagHelixDismissElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9599,50 +9651,50 @@ would catch. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTextarea` component event */
-export type HelixBaseTextareaElementEvent<E = Event> = TypedEvent<
-  HelixBaseTextarea,
+/** `HelixHeadlessTextarea` component event */
+export type HelixHeadlessTextareaElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTextarea,
   E
 >;
 /** `helix-input` event type */
-export type HelixBaseTextareaHelixInputElementEvent =
-  HelixBaseTextareaElementEvent<HelixInputEvent>;
+export type HelixHeadlessTextareaHelixInputElementEvent =
+  HelixHeadlessTextareaElementEvent<HelixInputEvent>;
 
-export type HelixBaseTextareaProps = {
+export type HelixHeadlessTextareaProps = {
   /** Whether the box follows its own content rather than scrolling. */
-  "auto-grow"?: HelixBaseTextarea["autoGrow"];
+  "auto-grow"?: HelixHeadlessTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
-  autoGrow?: HelixBaseTextarea["autoGrow"];
+  autoGrow?: HelixHeadlessTextarea["autoGrow"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
-  placeholder?: HelixBaseTextarea["placeholder"];
+  placeholder?: HelixHeadlessTextarea["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "read-only"?: HelixBaseTextarea["readOnly"];
+  "read-only"?: HelixHeadlessTextarea["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
-  readOnly?: HelixBaseTextarea["readOnly"];
+  readOnly?: HelixHeadlessTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
-  rows?: HelixBaseTextarea["rows"];
+  rows?: HelixHeadlessTextarea["rows"];
   /** Fewest characters the value may have.
 
 Forwarded to the real `<textarea>` rather than checked here, which is what
 makes the message the browser's and therefore the reader's own language.
 No `pattern`: the platform does not give a textarea one, and inventing it
 would be this library guessing where the point is to stop guessing. */
-  minlength?: HelixBaseTextarea["minLength"];
+  minlength?: HelixHeadlessTextarea["minLength"];
   /** Fewest characters the value may have.
 
 Forwarded to the real `<textarea>` rather than checked here, which is what
 makes the message the browser's and therefore the reader's own language.
 No `pattern`: the platform does not give a textarea one, and inventing it
 would be this library guessing where the point is to stop guessing. */
-  minLength?: HelixBaseTextarea["minLength"];
+  minLength?: HelixHeadlessTextarea["minLength"];
   /** Most characters the value may have. */
-  maxlength?: HelixBaseTextarea["maxLength"];
+  maxlength?: HelixHeadlessTextarea["maxLength"];
   /** Most characters the value may have. */
-  maxLength?: HelixBaseTextarea["maxLength"];
+  maxLength?: HelixHeadlessTextarea["maxLength"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseTextarea["defaultValue"];
+  "default-value"?: HelixHeadlessTextarea["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseTextarea["defaultValue"];
+  defaultValue?: HelixHeadlessTextarea["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -9654,15 +9706,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseTextarea["value"];
+  value?: HelixHeadlessTextarea["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseTextarea["hint"];
+  hint?: HelixHeadlessTextarea["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseTextarea["feedback"];
+  feedback?: HelixHeadlessTextarea["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseTextarea["label"];
+  label?: HelixHeadlessTextarea["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseTextarea["required"];
+  required?: HelixHeadlessTextarea["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -9673,7 +9725,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseTextarea["disabled"];
+  disabled?: HelixHeadlessTextarea["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -9691,49 +9743,49 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseTextarea["name"];
+  name?: HelixHeadlessTextarea["name"];
 
   /** Fired as the text changes, and cancelable. */
-  "onhelix-input"?: (e: HelixBaseTextareaHelixInputElementEvent) => void;
+  "onhelix-input"?: (e: HelixHeadlessTextareaHelixInputElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
-  onchange?: (e: HelixBaseTextareaElementEvent) => void;
+  onchange?: (e: HelixHeadlessTextareaElementEvent) => void;
 };
 
-export type HelixBaseTextareaSolidJsProps = {
+export type HelixHeadlessTextareaSolidJsProps = {
   /** Whether the box follows its own content rather than scrolling. */
-  "bool:auto-grow"?: HelixBaseTextarea["autoGrow"];
+  "bool:auto-grow"?: HelixHeadlessTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
-  "prop:autoGrow"?: HelixBaseTextarea["autoGrow"];
+  "prop:autoGrow"?: HelixHeadlessTextarea["autoGrow"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
-  "prop:placeholder"?: HelixBaseTextarea["placeholder"];
+  "prop:placeholder"?: HelixHeadlessTextarea["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "bool:read-only"?: HelixBaseTextarea["readOnly"];
+  "bool:read-only"?: HelixHeadlessTextarea["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
-  "prop:readOnly"?: HelixBaseTextarea["readOnly"];
+  "prop:readOnly"?: HelixHeadlessTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
-  "prop:rows"?: HelixBaseTextarea["rows"];
+  "prop:rows"?: HelixHeadlessTextarea["rows"];
   /** Fewest characters the value may have.
 
 Forwarded to the real `<textarea>` rather than checked here, which is what
 makes the message the browser's and therefore the reader's own language.
 No `pattern`: the platform does not give a textarea one, and inventing it
 would be this library guessing where the point is to stop guessing. */
-  "attr:minlength"?: HelixBaseTextarea["minLength"];
+  "attr:minlength"?: HelixHeadlessTextarea["minLength"];
   /** Fewest characters the value may have.
 
 Forwarded to the real `<textarea>` rather than checked here, which is what
 makes the message the browser's and therefore the reader's own language.
 No `pattern`: the platform does not give a textarea one, and inventing it
 would be this library guessing where the point is to stop guessing. */
-  "prop:minLength"?: HelixBaseTextarea["minLength"];
+  "prop:minLength"?: HelixHeadlessTextarea["minLength"];
   /** Most characters the value may have. */
-  "attr:maxlength"?: HelixBaseTextarea["maxLength"];
+  "attr:maxlength"?: HelixHeadlessTextarea["maxLength"];
   /** Most characters the value may have. */
-  "prop:maxLength"?: HelixBaseTextarea["maxLength"];
+  "prop:maxLength"?: HelixHeadlessTextarea["maxLength"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseTextarea["defaultValue"];
+  "attr:default-value"?: HelixHeadlessTextarea["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseTextarea["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessTextarea["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -9745,15 +9797,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseTextarea["value"];
+  "prop:value"?: HelixHeadlessTextarea["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseTextarea["hint"];
+  "prop:hint"?: HelixHeadlessTextarea["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseTextarea["feedback"];
+  "prop:feedback"?: HelixHeadlessTextarea["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseTextarea["label"];
+  "prop:label"?: HelixHeadlessTextarea["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseTextarea["required"];
+  "prop:required"?: HelixHeadlessTextarea["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -9764,7 +9816,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseTextarea["disabled"];
+  "prop:disabled"?: HelixHeadlessTextarea["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -9782,11 +9834,11 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseTextarea["name"];
+  "prop:name"?: HelixHeadlessTextarea["name"];
   /** Fired as the text changes, and cancelable. */
-  "on:helix-input"?: (e: HelixBaseTextareaHelixInputElementEvent) => void;
+  "on:helix-input"?: (e: HelixHeadlessTextareaHelixInputElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
-  "on:change"?: (e: HelixBaseTextareaElementEvent) => void;
+  "on:change"?: (e: HelixHeadlessTextareaElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9794,22 +9846,22 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTimeInput` component event */
-export type HelixBaseTimeInputElementEvent<E = Event> = TypedEvent<
-  HelixBaseTimeInput,
+/** `HelixHeadlessTimeInput` component event */
+export type HelixHeadlessTimeInputElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTimeInput,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseTimeInputHelixChangeElementEvent =
-  HelixBaseTimeInputElementEvent<HelixChangeEvent>;
+export type HelixHeadlessTimeInputHelixChangeElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixChangeEvent>;
 /** `helix-open` event type */
-export type HelixBaseTimeInputHelixOpenElementEvent =
-  HelixBaseTimeInputElementEvent<HelixOpenEvent>;
+export type HelixHeadlessTimeInputHelixOpenElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseTimeInputHelixCloseElementEvent =
-  HelixBaseTimeInputElementEvent<HelixCloseEvent>;
+export type HelixHeadlessTimeInputHelixCloseElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixCloseEvent>;
 
-export type HelixBaseTimeInputProps = {
+export type HelixHeadlessTimeInputProps = {
   /** Whether the panel is one list of times or a column each.
 
 `list` offers whole times, which is what a product with slots or opening
@@ -9823,54 +9875,54 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  variant?: HelixBaseTimeInput["variant"];
+  variant?: HelixHeadlessTimeInput["variant"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
 number, and both are carried as one comma-separated value, which is what a
 form submits. `helix-time-picker` carries the longer note on the interaction and on
 why a wheel cannot do either. */
-  mode?: HelixBaseTimeInput["mode"];
+  mode?: HelixHeadlessTimeInput["mode"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default, for the reason Date Input gives: how
 many fit depends on the width of the field and the length of what is in it,
 and this element knows neither. */
-  "max-tags"?: HelixBaseTimeInput["maxTags"];
+  "max-tags"?: HelixHeadlessTimeInput["maxTags"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default, for the reason Date Input gives: how
 many fit depends on the width of the field and the length of what is in it,
 and this element knows neither. */
-  maxTags?: HelixBaseTimeInput["maxTags"];
+  maxTags?: HelixHeadlessTimeInput["maxTags"];
   /** How far apart the offered times are, in minutes. */
-  step?: HelixBaseTimeInput["step"];
+  step?: HelixHeadlessTimeInput["step"];
   /** Earliest time that can be chosen, as `HH:mm`. */
-  min?: HelixBaseTimeInput["min"];
+  min?: HelixHeadlessTimeInput["min"];
   /** Latest time that can be chosen, as `HH:mm`. */
-  max?: HelixBaseTimeInput["max"];
+  max?: HelixHeadlessTimeInput["max"];
   /** Whether the field writes the time out, or holds the value as it is.
 
 `local` is the reader's own convention from `Intl`, which is what a time is
 for reading; `iso` is `HH:mm`, which is what it is for typing. The field
 swaps to the value while the caret is in it either way, so the rendering is
 never something this element would refuse to read back. */
-  "time-style"?: HelixBaseTimeInput["timeStyle"];
+  "time-style"?: HelixHeadlessTimeInput["timeStyle"];
   /** Whether the field writes the time out, or holds the value as it is.
 
 `local` is the reader's own convention from `Intl`, which is what a time is
 for reading; `iso` is `HH:mm`, which is what it is for typing. The field
 swaps to the value while the caret is in it either way, so the rendering is
 never something this element would refuse to read back. */
-  timeStyle?: HelixBaseTimeInput["timeStyle"];
+  timeStyle?: HelixHeadlessTimeInput["timeStyle"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
-  locale?: HelixBaseTimeInput["locale"];
+  locale?: HelixHeadlessTimeInput["locale"];
   /** What the field says before a time is in it. */
-  placeholder?: HelixBaseTimeInput["placeholder"];
+  placeholder?: HelixHeadlessTimeInput["placeholder"];
   /** Accessible name for the control that opens the list. */
-  "trigger-label"?: HelixBaseTimeInput["triggerLabel"];
+  "trigger-label"?: HelixHeadlessTimeInput["triggerLabel"];
   /** Accessible name for the control that opens the list. */
-  triggerLabel?: HelixBaseTimeInput["triggerLabel"];
+  triggerLabel?: HelixHeadlessTimeInput["triggerLabel"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -9893,15 +9945,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseTimeInput["open"];
+  open?: HelixHeadlessTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseTimeInput["defaultOpen"];
+  "default-open"?: HelixHeadlessTimeInput["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseTimeInput["defaultOpen"];
+  defaultOpen?: HelixHeadlessTimeInput["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseTimeInput["defaultValue"];
+  "default-value"?: HelixHeadlessTimeInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseTimeInput["defaultValue"];
+  defaultValue?: HelixHeadlessTimeInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -9913,15 +9965,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseTimeInput["value"];
+  value?: HelixHeadlessTimeInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseTimeInput["hint"];
+  hint?: HelixHeadlessTimeInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseTimeInput["feedback"];
+  feedback?: HelixHeadlessTimeInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseTimeInput["label"];
+  label?: HelixHeadlessTimeInput["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseTimeInput["required"];
+  required?: HelixHeadlessTimeInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -9932,7 +9984,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseTimeInput["disabled"];
+  disabled?: HelixHeadlessTimeInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -9950,17 +10002,17 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseTimeInput["name"];
+  name?: HelixHeadlessTimeInput["name"];
 
   /** Fired when the time changes. */
-  "onhelix-change"?: (e: HelixBaseTimeInputHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessTimeInputHelixChangeElementEvent) => void;
   /** Fired when the list opens. */
-  "onhelix-open"?: (e: HelixBaseTimeInputHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixBaseTimeInputHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseTimeInputSolidJsProps = {
+export type HelixHeadlessTimeInputSolidJsProps = {
   /** Whether the panel is one list of times or a column each.
 
 `list` offers whole times, which is what a product with slots or opening
@@ -9974,54 +10026,54 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  "prop:variant"?: HelixBaseTimeInput["variant"];
+  "prop:variant"?: HelixHeadlessTimeInput["variant"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
 number, and both are carried as one comma-separated value, which is what a
 form submits. `helix-time-picker` carries the longer note on the interaction and on
 why a wheel cannot do either. */
-  "prop:mode"?: HelixBaseTimeInput["mode"];
+  "prop:mode"?: HelixHeadlessTimeInput["mode"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default, for the reason Date Input gives: how
 many fit depends on the width of the field and the length of what is in it,
 and this element knows neither. */
-  "attr:max-tags"?: HelixBaseTimeInput["maxTags"];
+  "attr:max-tags"?: HelixHeadlessTimeInput["maxTags"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default, for the reason Date Input gives: how
 many fit depends on the width of the field and the length of what is in it,
 and this element knows neither. */
-  "prop:maxTags"?: HelixBaseTimeInput["maxTags"];
+  "prop:maxTags"?: HelixHeadlessTimeInput["maxTags"];
   /** How far apart the offered times are, in minutes. */
-  "prop:step"?: HelixBaseTimeInput["step"];
+  "prop:step"?: HelixHeadlessTimeInput["step"];
   /** Earliest time that can be chosen, as `HH:mm`. */
-  "prop:min"?: HelixBaseTimeInput["min"];
+  "prop:min"?: HelixHeadlessTimeInput["min"];
   /** Latest time that can be chosen, as `HH:mm`. */
-  "prop:max"?: HelixBaseTimeInput["max"];
+  "prop:max"?: HelixHeadlessTimeInput["max"];
   /** Whether the field writes the time out, or holds the value as it is.
 
 `local` is the reader's own convention from `Intl`, which is what a time is
 for reading; `iso` is `HH:mm`, which is what it is for typing. The field
 swaps to the value while the caret is in it either way, so the rendering is
 never something this element would refuse to read back. */
-  "attr:time-style"?: HelixBaseTimeInput["timeStyle"];
+  "attr:time-style"?: HelixHeadlessTimeInput["timeStyle"];
   /** Whether the field writes the time out, or holds the value as it is.
 
 `local` is the reader's own convention from `Intl`, which is what a time is
 for reading; `iso` is `HH:mm`, which is what it is for typing. The field
 swaps to the value while the caret is in it either way, so the rendering is
 never something this element would refuse to read back. */
-  "prop:timeStyle"?: HelixBaseTimeInput["timeStyle"];
+  "prop:timeStyle"?: HelixHeadlessTimeInput["timeStyle"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
-  "prop:locale"?: HelixBaseTimeInput["locale"];
+  "prop:locale"?: HelixHeadlessTimeInput["locale"];
   /** What the field says before a time is in it. */
-  "prop:placeholder"?: HelixBaseTimeInput["placeholder"];
+  "prop:placeholder"?: HelixHeadlessTimeInput["placeholder"];
   /** Accessible name for the control that opens the list. */
-  "attr:trigger-label"?: HelixBaseTimeInput["triggerLabel"];
+  "attr:trigger-label"?: HelixHeadlessTimeInput["triggerLabel"];
   /** Accessible name for the control that opens the list. */
-  "prop:triggerLabel"?: HelixBaseTimeInput["triggerLabel"];
+  "prop:triggerLabel"?: HelixHeadlessTimeInput["triggerLabel"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -10044,15 +10096,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseTimeInput["open"];
+  "prop:open"?: HelixHeadlessTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseTimeInput["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessTimeInput["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseTimeInput["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessTimeInput["defaultOpen"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseTimeInput["defaultValue"];
+  "attr:default-value"?: HelixHeadlessTimeInput["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseTimeInput["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessTimeInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -10064,15 +10116,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseTimeInput["value"];
+  "prop:value"?: HelixHeadlessTimeInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseTimeInput["hint"];
+  "prop:hint"?: HelixHeadlessTimeInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseTimeInput["feedback"];
+  "prop:feedback"?: HelixHeadlessTimeInput["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseTimeInput["label"];
+  "prop:label"?: HelixHeadlessTimeInput["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseTimeInput["required"];
+  "prop:required"?: HelixHeadlessTimeInput["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -10083,7 +10135,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseTimeInput["disabled"];
+  "prop:disabled"?: HelixHeadlessTimeInput["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -10101,13 +10153,15 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseTimeInput["name"];
+  "prop:name"?: HelixHeadlessTimeInput["name"];
   /** Fired when the time changes. */
-  "on:helix-change"?: (e: HelixBaseTimeInputHelixChangeElementEvent) => void;
+  "on:helix-change"?: (
+    e: HelixHeadlessTimeInputHelixChangeElementEvent,
+  ) => void;
   /** Fired when the list opens. */
-  "on:helix-open"?: (e: HelixBaseTimeInputHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixBaseTimeInputHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10115,16 +10169,16 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTimePicker` component event */
-export type HelixBaseTimePickerElementEvent<E = Event> = TypedEvent<
-  HelixBaseTimePicker,
+/** `HelixHeadlessTimePicker` component event */
+export type HelixHeadlessTimePickerElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTimePicker,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseTimePickerHelixChangeElementEvent =
-  HelixBaseTimePickerElementEvent<HelixChangeEvent>;
+export type HelixHeadlessTimePickerHelixChangeElementEvent =
+  HelixHeadlessTimePickerElementEvent<HelixChangeEvent>;
 
-export type HelixBaseTimePickerProps = {
+export type HelixHeadlessTimePickerProps = {
   /** Whether the current selection fails validation.
 
 A flag rather than a message, which is the split Date Picker already drew and
@@ -10133,17 +10187,17 @@ the field that wraps one owns the label, the hint and the feedback, and a
 second message inside the panel would be the same error said twice. What is
 left for the picker is the one thing the field cannot draw from outside, the
 mark on the answer itself. */
-  invalid?: HelixBaseTimePicker["invalid"];
+  invalid?: HelixHeadlessTimePicker["invalid"];
   /** How far apart the offered times are, in minutes.
 
 Fifteen, which is four rows an hour and ninety-six in a day: enough that a
 reader scrolls rather than hunts, and few enough that the list is a list.
 Anything under five is a thousand rows and wants a field instead. */
-  step?: HelixBaseTimePicker["step"];
+  step?: HelixHeadlessTimePicker["step"];
   /** Earliest time offered, as `HH:mm`. */
-  min?: HelixBaseTimePicker["min"];
+  min?: HelixHeadlessTimePicker["min"];
   /** Latest time offered, as `HH:mm`. */
-  max?: HelixBaseTimePicker["max"];
+  max?: HelixHeadlessTimePicker["max"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -10154,7 +10208,7 @@ already gone is not two bounds.
 A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
-  "disable-times"?: HelixBaseTimePicker["disableTimes"];
+  "disable-times"?: HelixHeadlessTimePicker["disableTimes"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -10165,11 +10219,11 @@ already gone is not two bounds.
 A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
-  disableTimes?: HelixBaseTimePicker["disableTimes"];
+  disableTimes?: HelixHeadlessTimePicker["disableTimes"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
-  locale?: HelixBaseTimePicker["locale"];
+  locale?: HelixHeadlessTimePicker["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
-  label?: HelixBaseTimePicker["label"];
+  label?: HelixHeadlessTimePicker["label"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end with everything between
@@ -10187,7 +10241,7 @@ wheels is two sets of wheels, which is two controls; a multiple is a set,
 and a wheel has exactly one value by construction. Rather than draw
 something that cannot say what it holds, `wheels` renders as a list
 whenever a mode is set. */
-  mode?: HelixBaseTimePicker["mode"];
+  mode?: HelixHeadlessTimePicker["mode"];
   /** Whether the times are one list or a column each.
 
 `list` is the default and offers whole times, which is what a product with
@@ -10212,11 +10266,11 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  variant?: HelixBaseTimePicker["variant"];
+  variant?: HelixHeadlessTimePicker["variant"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseTimePicker["defaultValue"];
+  "default-value"?: HelixHeadlessTimePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseTimePicker["defaultValue"];
+  defaultValue?: HelixHeadlessTimePicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -10228,7 +10282,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseTimePicker["value"];
+  value?: HelixHeadlessTimePicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -10239,7 +10293,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseTimePicker["disabled"];
+  disabled?: HelixHeadlessTimePicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -10257,13 +10311,15 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseTimePicker["name"];
+  name?: HelixHeadlessTimePicker["name"];
 
   /** Fired when the time changes. */
-  "onhelix-change"?: (e: HelixBaseTimePickerHelixChangeElementEvent) => void;
+  "onhelix-change"?: (
+    e: HelixHeadlessTimePickerHelixChangeElementEvent,
+  ) => void;
 };
 
-export type HelixBaseTimePickerSolidJsProps = {
+export type HelixHeadlessTimePickerSolidJsProps = {
   /** Whether the current selection fails validation.
 
 A flag rather than a message, which is the split Date Picker already drew and
@@ -10272,17 +10328,17 @@ the field that wraps one owns the label, the hint and the feedback, and a
 second message inside the panel would be the same error said twice. What is
 left for the picker is the one thing the field cannot draw from outside, the
 mark on the answer itself. */
-  "prop:invalid"?: HelixBaseTimePicker["invalid"];
+  "prop:invalid"?: HelixHeadlessTimePicker["invalid"];
   /** How far apart the offered times are, in minutes.
 
 Fifteen, which is four rows an hour and ninety-six in a day: enough that a
 reader scrolls rather than hunts, and few enough that the list is a list.
 Anything under five is a thousand rows and wants a field instead. */
-  "prop:step"?: HelixBaseTimePicker["step"];
+  "prop:step"?: HelixHeadlessTimePicker["step"];
   /** Earliest time offered, as `HH:mm`. */
-  "prop:min"?: HelixBaseTimePicker["min"];
+  "prop:min"?: HelixHeadlessTimePicker["min"];
   /** Latest time offered, as `HH:mm`. */
-  "prop:max"?: HelixBaseTimePicker["max"];
+  "prop:max"?: HelixHeadlessTimePicker["max"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -10293,7 +10349,7 @@ already gone is not two bounds.
 A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
-  "attr:disable-times"?: HelixBaseTimePicker["disableTimes"];
+  "attr:disable-times"?: HelixHeadlessTimePicker["disableTimes"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -10304,11 +10360,11 @@ already gone is not two bounds.
 A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
-  "prop:disableTimes"?: HelixBaseTimePicker["disableTimes"];
+  "prop:disableTimes"?: HelixHeadlessTimePicker["disableTimes"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
-  "prop:locale"?: HelixBaseTimePicker["locale"];
+  "prop:locale"?: HelixHeadlessTimePicker["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
-  "prop:label"?: HelixBaseTimePicker["label"];
+  "prop:label"?: HelixHeadlessTimePicker["label"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end with everything between
@@ -10326,7 +10382,7 @@ wheels is two sets of wheels, which is two controls; a multiple is a set,
 and a wheel has exactly one value by construction. Rather than draw
 something that cannot say what it holds, `wheels` renders as a list
 whenever a mode is set. */
-  "prop:mode"?: HelixBaseTimePicker["mode"];
+  "prop:mode"?: HelixHeadlessTimePicker["mode"];
   /** Whether the times are one list or a column each.
 
 `list` is the default and offers whole times, which is what a product with
@@ -10351,11 +10407,11 @@ moment the element upgrades, including the ones a consumer rendered and did
 not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
-  "prop:variant"?: HelixBaseTimePicker["variant"];
+  "prop:variant"?: HelixHeadlessTimePicker["variant"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseTimePicker["defaultValue"];
+  "attr:default-value"?: HelixHeadlessTimePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseTimePicker["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessTimePicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -10367,7 +10423,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseTimePicker["value"];
+  "prop:value"?: HelixHeadlessTimePicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -10378,7 +10434,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseTimePicker["disabled"];
+  "prop:disabled"?: HelixHeadlessTimePicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -10396,9 +10452,11 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseTimePicker["name"];
+  "prop:name"?: HelixHeadlessTimePicker["name"];
   /** Fired when the time changes. */
-  "on:helix-change"?: (e: HelixBaseTimePickerHelixChangeElementEvent) => void;
+  "on:helix-change"?: (
+    e: HelixHeadlessTimePickerHelixChangeElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10406,26 +10464,26 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-export type HelixBaseTimelineItemProps = {
+export type HelixHeadlessTimelineItemProps = {
   /** When it happened, machine-readable.
 
 Whatever `<time>` accepts, which is a date, a time, both, a duration or a
 week. Unset, the label is written as it was given and nothing claims to
 know what instant it names. */
-  datetime?: HelixBaseTimelineItem["datetime"];
+  datetime?: HelixHeadlessTimelineItem["datetime"];
   /** What kind of event it was, which decides the mark's color and nothing else. */
-  tone?: HelixBaseTimelineItem["tone"];
+  tone?: HelixHeadlessTimelineItem["tone"];
 };
 
-export type HelixBaseTimelineItemSolidJsProps = {
+export type HelixHeadlessTimelineItemSolidJsProps = {
   /** When it happened, machine-readable.
 
 Whatever `<time>` accepts, which is a date, a time, both, a duration or a
 week. Unset, the label is written as it was given and nothing claims to
 know what instant it names. */
-  "prop:datetime"?: HelixBaseTimelineItem["datetime"];
+  "prop:datetime"?: HelixHeadlessTimelineItem["datetime"];
   /** What kind of event it was, which decides the mark's color and nothing else. */
-  "prop:tone"?: HelixBaseTimelineItem["tone"];
+  "prop:tone"?: HelixHeadlessTimelineItem["tone"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10433,14 +10491,14 @@ know what instant it names. */
   textContent?: string | number;
 };
 
-export type HelixBaseTimelineProps = {
+export type HelixHeadlessTimelineProps = {
   /** Names the record, for a reader arriving at it out of context. */
-  label?: HelixBaseTimeline["label"];
+  label?: HelixHeadlessTimeline["label"];
 };
 
-export type HelixBaseTimelineSolidJsProps = {
+export type HelixHeadlessTimelineSolidJsProps = {
   /** Names the record, for a reader arriving at it out of context. */
-  "prop:label"?: HelixBaseTimeline["label"];
+  "prop:label"?: HelixHeadlessTimeline["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10448,26 +10506,26 @@ export type HelixBaseTimelineSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseToastItem` component event */
-export type HelixBaseToastItemElementEvent<E = Event> = TypedEvent<
-  HelixBaseToastItem,
+/** `HelixHeadlessToastItem` component event */
+export type HelixHeadlessToastItemElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessToastItem,
   E
 >;
 /** `helix-dismiss` event type */
-export type HelixBaseToastItemHelixDismissElementEvent =
-  HelixBaseToastItemElementEvent<HelixDismissEvent>;
+export type HelixHeadlessToastItemHelixDismissElementEvent =
+  HelixHeadlessToastItemElementEvent<HelixDismissEvent>;
 
-export type HelixBaseToastItemProps = {
+export type HelixHeadlessToastItemProps = {
   /** How long it stays, in milliseconds. Absent means until it is dismissed.
 
 Read once when the item is first rendered. Changing it afterwards does not
 restart a message the reader is already partway through. */
-  duration?: HelixBaseToastItem["duration"];
+  duration?: HelixHeadlessToastItem["duration"];
   /** What kind of message it is, which picks the mark and its name.
 
 `severity` was a sixth spelling of `tone`, and a subset of it: a toast
 reports a status and never a brand role. */
-  tone?: HelixBaseToastItem["tone"];
+  tone?: HelixHeadlessToastItem["tone"];
   /** Whether the message is still showing.
 
 The same decide-once contract every other stateful thing here carries, and
@@ -10486,39 +10544,41 @@ markup can choose a starting state without claiming ownership, and there is
 only one starting state that makes sense: a message that has been rendered
 is showing. An attribute whose only legal value is the default is an
 attribute nobody can use. */
-  open?: HelixBaseToastItem["open"];
+  open?: HelixHeadlessToastItem["open"];
   /** Whether it offers a control to take it away. */
-  dismissible?: HelixBaseToastItem["dismissible"];
+  dismissible?: HelixHeadlessToastItem["dismissible"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  "dismiss-label"?: HelixBaseToastItem["dismissLabel"];
+  "dismiss-label"?: HelixHeadlessToastItem["dismissLabel"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  dismissLabel?: HelixBaseToastItem["dismissLabel"];
+  dismissLabel?: HelixHeadlessToastItem["dismissLabel"];
 
   /** Fired when it asks to go, whether by the control or by its timer. */
-  "onhelix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
+  "onhelix-dismiss"?: (
+    e: HelixHeadlessToastItemHelixDismissElementEvent,
+  ) => void;
 };
 
-export type HelixBaseToastItemSolidJsProps = {
+export type HelixHeadlessToastItemSolidJsProps = {
   /** How long it stays, in milliseconds. Absent means until it is dismissed.
 
 Read once when the item is first rendered. Changing it afterwards does not
 restart a message the reader is already partway through. */
-  "prop:duration"?: HelixBaseToastItem["duration"];
+  "prop:duration"?: HelixHeadlessToastItem["duration"];
   /** What kind of message it is, which picks the mark and its name.
 
 `severity` was a sixth spelling of `tone`, and a subset of it: a toast
 reports a status and never a brand role. */
-  "prop:tone"?: HelixBaseToastItem["tone"];
+  "prop:tone"?: HelixHeadlessToastItem["tone"];
   /** Whether the message is still showing.
 
 The same decide-once contract every other stateful thing here carries, and
@@ -10537,25 +10597,27 @@ markup can choose a starting state without claiming ownership, and there is
 only one starting state that makes sense: a message that has been rendered
 is showing. An attribute whose only legal value is the default is an
 attribute nobody can use. */
-  "prop:open"?: HelixBaseToastItem["open"];
+  "prop:open"?: HelixHeadlessToastItem["open"];
   /** Whether it offers a control to take it away. */
-  "prop:dismissible"?: HelixBaseToastItem["dismissible"];
+  "prop:dismissible"?: HelixHeadlessToastItem["dismissible"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  "attr:dismiss-label"?: HelixBaseToastItem["dismissLabel"];
+  "attr:dismiss-label"?: HelixHeadlessToastItem["dismissLabel"];
   /** Accessible name for that control.
 
 `attribute` is spelled out because Lit lowercases a property name to
 derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
-  "prop:dismissLabel"?: HelixBaseToastItem["dismissLabel"];
+  "prop:dismissLabel"?: HelixHeadlessToastItem["dismissLabel"];
   /** Fired when it asks to go, whether by the control or by its timer. */
-  "on:helix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
+  "on:helix-dismiss"?: (
+    e: HelixHeadlessToastItemHelixDismissElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10563,9 +10625,9 @@ would catch. */
   textContent?: string | number;
 };
 
-export type HelixBaseToastProps = {
+export type HelixHeadlessToastProps = {
   /** Accessible name for the region, such as "Notifications". */
-  label?: HelixBaseToast["label"];
+  label?: HelixHeadlessToast["label"];
   /** Which corner or edge the stack sits at.
 
 Named here rather than on each message, because where a page puts its
@@ -10581,12 +10643,12 @@ describe only the departures, which is what `orientation` has always done.
 
 The SSR spec could never have caught it: it passed a placement explicitly,
 so the attribute it asserted was one the consumer had written. */
-  placement?: HelixBaseToast["placement"];
+  placement?: HelixHeadlessToast["placement"];
 };
 
-export type HelixBaseToastSolidJsProps = {
+export type HelixHeadlessToastSolidJsProps = {
   /** Accessible name for the region, such as "Notifications". */
-  "prop:label"?: HelixBaseToast["label"];
+  "prop:label"?: HelixHeadlessToast["label"];
   /** Which corner or edge the stack sits at.
 
 Named here rather than on each message, because where a page puts its
@@ -10602,7 +10664,7 @@ describe only the departures, which is what `orientation` has always done.
 
 The SSR spec could never have caught it: it passed a placement explicitly,
 so the attribute it asserted was one the consumer had written. */
-  "prop:placement"?: HelixBaseToast["placement"];
+  "prop:placement"?: HelixHeadlessToast["placement"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10610,19 +10672,19 @@ so the attribute it asserted was one the consumer had written. */
   textContent?: string | number;
 };
 
-/** `HelixBaseToggleGroup` component event */
-export type HelixBaseToggleGroupElementEvent<E = Event> = TypedEvent<
-  HelixBaseToggleGroup,
+/** `HelixHeadlessToggleGroup` component event */
+export type HelixHeadlessToggleGroupElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessToggleGroup,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseToggleGroupHelixChangeElementEvent =
-  HelixBaseToggleGroupElementEvent<HelixChangeEvent>;
+export type HelixHeadlessToggleGroupHelixChangeElementEvent =
+  HelixHeadlessToggleGroupElementEvent<HelixChangeEvent>;
 /** `helix-select` event type */
-export type HelixBaseToggleGroupHelixSelectElementEvent =
-  HelixBaseToggleGroupElementEvent<HelixSelectEvent>;
+export type HelixHeadlessToggleGroupHelixSelectElementEvent =
+  HelixHeadlessToggleGroupElementEvent<HelixSelectEvent>;
 
-export type HelixBaseToggleGroupProps = {
+export type HelixHeadlessToggleGroupProps = {
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
@@ -10637,7 +10699,7 @@ accessible name: the set would then be named for nobody using a screen
 reader while looking correct to everybody else. Worse, setting both draws
 it twice. One property moves the label the consumer already has to give,
 and cannot be used to remove it. */
-  "label-placement"?: HelixBaseToggleGroup["labelPlacement"];
+  "label-placement"?: HelixHeadlessToggleGroup["labelPlacement"];
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
@@ -10652,11 +10714,11 @@ accessible name: the set would then be named for nobody using a screen
 reader while looking correct to everybody else. Worse, setting both draws
 it twice. One property moves the label the consumer already has to give,
 and cannot be used to remove it. */
-  labelPlacement?: HelixBaseToggleGroup["labelPlacement"];
+  labelPlacement?: HelixHeadlessToggleGroup["labelPlacement"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseToggleGroup["defaultValue"];
+  "default-value"?: HelixHeadlessToggleGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseToggleGroup["defaultValue"];
+  defaultValue?: HelixHeadlessToggleGroup["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -10668,15 +10730,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseToggleGroup["value"];
+  value?: HelixHeadlessToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixBaseToggleGroup["hint"];
+  hint?: HelixHeadlessToggleGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  feedback?: HelixBaseToggleGroup["feedback"];
+  feedback?: HelixHeadlessToggleGroup["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  label?: HelixBaseToggleGroup["label"];
+  label?: HelixHeadlessToggleGroup["label"];
   /** Whether the form refuses to submit without it. */
-  required?: HelixBaseToggleGroup["required"];
+  required?: HelixHeadlessToggleGroup["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -10687,7 +10749,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseToggleGroup["disabled"];
+  disabled?: HelixHeadlessToggleGroup["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -10705,15 +10767,19 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseToggleGroup["name"];
+  name?: HelixHeadlessToggleGroup["name"];
 
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
-  "onhelix-change"?: (e: HelixBaseToggleGroupHelixChangeElementEvent) => void;
+  "onhelix-change"?: (
+    e: HelixHeadlessToggleGroupHelixChangeElementEvent,
+  ) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
-  "onhelix-select"?: (e: HelixBaseToggleGroupHelixSelectElementEvent) => void;
+  "onhelix-select"?: (
+    e: HelixHeadlessToggleGroupHelixSelectElementEvent,
+  ) => void;
 };
 
-export type HelixBaseToggleGroupSolidJsProps = {
+export type HelixHeadlessToggleGroupSolidJsProps = {
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
@@ -10728,7 +10794,7 @@ accessible name: the set would then be named for nobody using a screen
 reader while looking correct to everybody else. Worse, setting both draws
 it twice. One property moves the label the consumer already has to give,
 and cannot be used to remove it. */
-  "attr:label-placement"?: HelixBaseToggleGroup["labelPlacement"];
+  "attr:label-placement"?: HelixHeadlessToggleGroup["labelPlacement"];
   /** Where the group's label sits, `start` putting it on the track's line.
 
 Absent is above, which is what a field looks like and what almost every
@@ -10743,11 +10809,11 @@ accessible name: the set would then be named for nobody using a screen
 reader while looking correct to everybody else. Worse, setting both draws
 it twice. One property moves the label the consumer already has to give,
 and cannot be used to remove it. */
-  "prop:labelPlacement"?: HelixBaseToggleGroup["labelPlacement"];
+  "prop:labelPlacement"?: HelixHeadlessToggleGroup["labelPlacement"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseToggleGroup["defaultValue"];
+  "attr:default-value"?: HelixHeadlessToggleGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseToggleGroup["defaultValue"];
+  "prop:defaultValue"?: HelixHeadlessToggleGroup["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -10759,15 +10825,15 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseToggleGroup["value"];
+  "prop:value"?: HelixHeadlessToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixBaseToggleGroup["hint"];
+  "prop:hint"?: HelixHeadlessToggleGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
-  "prop:feedback"?: HelixBaseToggleGroup["feedback"];
+  "prop:feedback"?: HelixHeadlessToggleGroup["feedback"];
   /** The accessible name, and the fallback for the `label` slot. */
-  "prop:label"?: HelixBaseToggleGroup["label"];
+  "prop:label"?: HelixHeadlessToggleGroup["label"];
   /** Whether the form refuses to submit without it. */
-  "prop:required"?: HelixBaseToggleGroup["required"];
+  "prop:required"?: HelixHeadlessToggleGroup["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -10778,7 +10844,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseToggleGroup["disabled"];
+  "prop:disabled"?: HelixHeadlessToggleGroup["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -10796,11 +10862,15 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseToggleGroup["name"];
+  "prop:name"?: HelixHeadlessToggleGroup["name"];
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
-  "on:helix-change"?: (e: HelixBaseToggleGroupHelixChangeElementEvent) => void;
+  "on:helix-change"?: (
+    e: HelixHeadlessToggleGroupHelixChangeElementEvent,
+  ) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
-  "on:helix-select"?: (e: HelixBaseToggleGroupHelixSelectElementEvent) => void;
+  "on:helix-select"?: (
+    e: HelixHeadlessToggleGroupHelixSelectElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10808,22 +10878,22 @@ reflected none of them. */
   textContent?: string | number;
 };
 
-/** `HelixBaseToggle` component event */
-export type HelixBaseToggleElementEvent<E = Event> = TypedEvent<
-  HelixBaseToggle,
+/** `HelixHeadlessToggle` component event */
+export type HelixHeadlessToggleElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessToggle,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseToggleHelixSelectElementEvent =
-  HelixBaseToggleElementEvent<HelixSelectEvent>;
+export type HelixHeadlessToggleHelixSelectElementEvent =
+  HelixHeadlessToggleElementEvent<HelixSelectEvent>;
 
-export type HelixBaseToggleProps = {
+export type HelixHeadlessToggleProps = {
   /** Identifies the item to the group. */
-  value?: HelixBaseToggle["value"];
+  value?: HelixHeadlessToggle["value"];
   /** Whether this item is the current one. */
-  selected?: HelixBaseToggle["selected"];
+  selected?: HelixHeadlessToggle["selected"];
   /** Whether the item can be chosen. */
-  disabled?: HelixBaseToggle["disabled"];
+  disabled?: HelixHeadlessToggle["disabled"];
   /** Whether this item holds the group's tab stop while nothing is chosen.
 
 The stop normally rides on the selection, and an unanswered group has no
@@ -10831,19 +10901,19 @@ selection, so it had no stop and the keyboard could not reach it. Written
 by the group, with no attribute: it is coordination between elements, and
 `tabindex` on a host the consumer rendered is the change a React consumer's
 hydration reports and does not patch up. */
-  focusable?: HelixBaseToggle["focusable"];
+  focusable?: HelixHeadlessToggle["focusable"];
 
   /** Fired when the item is chosen. */
-  "onhelix-select"?: (e: HelixBaseToggleHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessToggleHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseToggleSolidJsProps = {
+export type HelixHeadlessToggleSolidJsProps = {
   /** Identifies the item to the group. */
-  "prop:value"?: HelixBaseToggle["value"];
+  "prop:value"?: HelixHeadlessToggle["value"];
   /** Whether this item is the current one. */
-  "prop:selected"?: HelixBaseToggle["selected"];
+  "prop:selected"?: HelixHeadlessToggle["selected"];
   /** Whether the item can be chosen. */
-  "prop:disabled"?: HelixBaseToggle["disabled"];
+  "prop:disabled"?: HelixHeadlessToggle["disabled"];
   /** Whether this item holds the group's tab stop while nothing is chosen.
 
 The stop normally rides on the selection, and an unanswered group has no
@@ -10851,9 +10921,9 @@ selection, so it had no stop and the keyboard could not reach it. Written
 by the group, with no attribute: it is coordination between elements, and
 `tabindex` on a host the consumer rendered is the change a React consumer's
 hydration reports and does not patch up. */
-  "prop:focusable"?: HelixBaseToggle["focusable"];
+  "prop:focusable"?: HelixHeadlessToggle["focusable"];
   /** Fired when the item is chosen. */
-  "on:helix-select"?: (e: HelixBaseToggleHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessToggleHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10861,18 +10931,18 @@ hydration reports and does not patch up. */
   textContent?: string | number;
 };
 
-export type HelixBaseToolbarProps = {
+export type HelixHeadlessToolbarProps = {
   /** Accessible name for the toolbar. */
-  label?: HelixBaseToolbar["label"];
+  label?: HelixHeadlessToolbar["label"];
   /** Which way the arrow keys move. */
-  orientation?: HelixBaseToolbar["orientation"];
+  orientation?: HelixHeadlessToolbar["orientation"];
 };
 
-export type HelixBaseToolbarSolidJsProps = {
+export type HelixHeadlessToolbarSolidJsProps = {
   /** Accessible name for the toolbar. */
-  "prop:label"?: HelixBaseToolbar["label"];
+  "prop:label"?: HelixHeadlessToolbar["label"];
   /** Which way the arrow keys move. */
-  "prop:orientation"?: HelixBaseToolbar["orientation"];
+  "prop:orientation"?: HelixHeadlessToolbar["orientation"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10880,25 +10950,25 @@ export type HelixBaseToolbarSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixBaseTooltip` component event */
-export type HelixBaseTooltipElementEvent<E = Event> = TypedEvent<
-  HelixBaseTooltip,
+/** `HelixHeadlessTooltip` component event */
+export type HelixHeadlessTooltipElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTooltip,
   E
 >;
 /** `helix-open` event type */
-export type HelixBaseTooltipHelixOpenElementEvent =
-  HelixBaseTooltipElementEvent<HelixOpenEvent>;
+export type HelixHeadlessTooltipHelixOpenElementEvent =
+  HelixHeadlessTooltipElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseTooltipHelixCloseElementEvent =
-  HelixBaseTooltipElementEvent<HelixCloseEvent>;
+export type HelixHeadlessTooltipHelixCloseElementEvent =
+  HelixHeadlessTooltipElementEvent<HelixCloseEvent>;
 
-export type HelixBaseTooltipProps = {
+export type HelixHeadlessTooltipProps = {
   /** The text shown in the bubble.
 
 The common case, and the fallback for the `content` slot: slot something
 there and it replaces this. Both cannot show at once, which is the point
 of using fallback content rather than rendering whichever is present. */
-  content?: HelixBaseTooltip["content"];
+  content?: HelixHeadlessTooltip["content"];
   /** The id of the element this describes, in this tooltip's own tree.
 
 Set it and the tooltip stops wrapping: it renders no trigger, listens on
@@ -10916,9 +10986,9 @@ and `placement`, which are not properties on the class at that moment, come
 through as attributes. Both paths reach the same place through Lit, so
 nothing is broken by it; a `[for]` selector would find nothing, which is
 why this does not reflect and nothing styles on it. */
-  for?: HelixBaseTooltip["for"];
+  for?: HelixHeadlessTooltip["for"];
   /** Preferred side. It moves if that side does not fit. */
-  placement?: HelixBaseTooltip["placement"];
+  placement?: HelixHeadlessTooltip["placement"];
   /** Space between the trigger and the point of the bubble, in pixels.
 
 **Measured from the point, which is what the arrow being back changed.**
@@ -10928,7 +10998,7 @@ two pixels off the trigger, which reads as touching. The controller is
 given this plus however far the arrow actually protrudes, so eight means
 eight from whatever is nearest, arrow or edge, and a consumer who changes
 it changes the visible gap rather than a number the arrow then eats into. */
-  offset?: HelixBaseTooltip["offset"];
+  offset?: HelixHeadlessTooltip["offset"];
   /** The id of a box to keep the bubble inside, instead of the viewport.
 
 Resolved the way `for` is, so an id in the same tree, which is what lets a
@@ -10940,19 +11010,19 @@ in a 320px card, three pixels past the card itself.
 Clamping is on the cross axis only, which is what makes this safe to point
 at a box the bubble genuinely does not fit inside. See `within` on
 `FloatingController` for what happens if it is applied to the rest. */
-  within?: HelixBaseTooltip["within"];
+  within?: HelixHeadlessTooltip["within"];
   /** Whether the tooltip never shows. */
-  disabled?: HelixBaseTooltip["disabled"];
+  disabled?: HelixHeadlessTooltip["disabled"];
   /** How long the pointer must rest before the bubble appears, in milliseconds.
 
 Without one, sweeping across a row of controls flashes a tooltip for each
 of them, which is noise rather than help. Focus opens with no delay: a
 keyboard reader arriving on a control has already committed to it. */
-  delay?: HelixBaseTooltip["delay"];
+  delay?: HelixHeadlessTooltip["delay"];
   /** How long the bubble stays after the pointer leaves, in milliseconds. */
-  "delay-out"?: HelixBaseTooltip["delayOut"];
+  "delay-out"?: HelixHeadlessTooltip["delayOut"];
   /** How long the bubble stays after the pointer leaves, in milliseconds. */
-  delayOut?: HelixBaseTooltip["delayOut"];
+  delayOut?: HelixHeadlessTooltip["delayOut"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -10975,25 +11045,25 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseTooltip["open"];
+  open?: HelixHeadlessTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseTooltip["defaultOpen"];
+  "default-open"?: HelixHeadlessTooltip["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseTooltip["defaultOpen"];
+  defaultOpen?: HelixHeadlessTooltip["defaultOpen"];
 
   /** Fired before the bubble shows, and cancelable. */
-  "onhelix-open"?: (e: HelixBaseTooltipHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessTooltipHelixOpenElementEvent) => void;
   /** Fired before it hides, and cancelable. */
-  "onhelix-close"?: (e: HelixBaseTooltipHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessTooltipHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseTooltipSolidJsProps = {
+export type HelixHeadlessTooltipSolidJsProps = {
   /** The text shown in the bubble.
 
 The common case, and the fallback for the `content` slot: slot something
 there and it replaces this. Both cannot show at once, which is the point
 of using fallback content rather than rendering whichever is present. */
-  "prop:content"?: HelixBaseTooltip["content"];
+  "prop:content"?: HelixHeadlessTooltip["content"];
   /** The id of the element this describes, in this tooltip's own tree.
 
 Set it and the tooltip stops wrapping: it renders no trigger, listens on
@@ -11011,9 +11081,9 @@ and `placement`, which are not properties on the class at that moment, come
 through as attributes. Both paths reach the same place through Lit, so
 nothing is broken by it; a `[for]` selector would find nothing, which is
 why this does not reflect and nothing styles on it. */
-  "prop:for"?: HelixBaseTooltip["for"];
+  "prop:for"?: HelixHeadlessTooltip["for"];
   /** Preferred side. It moves if that side does not fit. */
-  "prop:placement"?: HelixBaseTooltip["placement"];
+  "prop:placement"?: HelixHeadlessTooltip["placement"];
   /** Space between the trigger and the point of the bubble, in pixels.
 
 **Measured from the point, which is what the arrow being back changed.**
@@ -11023,7 +11093,7 @@ two pixels off the trigger, which reads as touching. The controller is
 given this plus however far the arrow actually protrudes, so eight means
 eight from whatever is nearest, arrow or edge, and a consumer who changes
 it changes the visible gap rather than a number the arrow then eats into. */
-  "prop:offset"?: HelixBaseTooltip["offset"];
+  "prop:offset"?: HelixHeadlessTooltip["offset"];
   /** The id of a box to keep the bubble inside, instead of the viewport.
 
 Resolved the way `for` is, so an id in the same tree, which is what lets a
@@ -11035,19 +11105,19 @@ in a 320px card, three pixels past the card itself.
 Clamping is on the cross axis only, which is what makes this safe to point
 at a box the bubble genuinely does not fit inside. See `within` on
 `FloatingController` for what happens if it is applied to the rest. */
-  "prop:within"?: HelixBaseTooltip["within"];
+  "prop:within"?: HelixHeadlessTooltip["within"];
   /** Whether the tooltip never shows. */
-  "prop:disabled"?: HelixBaseTooltip["disabled"];
+  "prop:disabled"?: HelixHeadlessTooltip["disabled"];
   /** How long the pointer must rest before the bubble appears, in milliseconds.
 
 Without one, sweeping across a row of controls flashes a tooltip for each
 of them, which is noise rather than help. Focus opens with no delay: a
 keyboard reader arriving on a control has already committed to it. */
-  "prop:delay"?: HelixBaseTooltip["delay"];
+  "prop:delay"?: HelixHeadlessTooltip["delay"];
   /** How long the bubble stays after the pointer leaves, in milliseconds. */
-  "attr:delay-out"?: HelixBaseTooltip["delayOut"];
+  "attr:delay-out"?: HelixHeadlessTooltip["delayOut"];
   /** How long the bubble stays after the pointer leaves, in milliseconds. */
-  "prop:delayOut"?: HelixBaseTooltip["delayOut"];
+  "prop:delayOut"?: HelixHeadlessTooltip["delayOut"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -11070,15 +11140,15 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseTooltip["open"];
+  "prop:open"?: HelixHeadlessTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseTooltip["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessTooltip["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseTooltip["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessTooltip["defaultOpen"];
   /** Fired before the bubble shows, and cancelable. */
-  "on:helix-open"?: (e: HelixBaseTooltipHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessTooltipHelixOpenElementEvent) => void;
   /** Fired before it hides, and cancelable. */
-  "on:helix-close"?: (e: HelixBaseTooltipHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessTooltipHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11086,21 +11156,24 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTour` component event */
-export type HelixBaseTourElementEvent<E = Event> = TypedEvent<HelixBaseTour, E>;
+/** `HelixHeadlessTour` component event */
+export type HelixHeadlessTourElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTour,
+  E
+>;
 /** `helix-change` event type */
-export type HelixBaseTourHelixChangeElementEvent =
-  HelixBaseTourElementEvent<HelixChangeEvent>;
+export type HelixHeadlessTourHelixChangeElementEvent =
+  HelixHeadlessTourElementEvent<HelixChangeEvent>;
 /** `helix-complete` event type */
-export type HelixBaseTourHelixCompleteElementEvent =
-  HelixBaseTourElementEvent<HelixCompleteEvent>;
+export type HelixHeadlessTourHelixCompleteElementEvent =
+  HelixHeadlessTourElementEvent<HelixCompleteEvent>;
 /** `helix-close` event type */
-export type HelixBaseTourHelixCloseElementEvent =
-  HelixBaseTourElementEvent<HelixCloseEvent>;
+export type HelixHeadlessTourHelixCloseElementEvent =
+  HelixHeadlessTourElementEvent<HelixCloseEvent>;
 
-export type HelixBaseTourProps = {
+export type HelixHeadlessTourProps = {
   /** Whether the tour is running. */
-  open?: HelixBaseTour["open"];
+  open?: HelixHeadlessTour["open"];
   /** Which stop the reader is on.
 
 **It said `@controlled` for two days and honoured none of it.** The tag is
@@ -11113,45 +11186,45 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
 `default-index` for markup that only seeds, a held state that is
 `undefined` until somebody sets one, and a mode decided once at the first
 update so a later assignment cannot take the tour over. */
-  index?: HelixBaseTour["index"];
+  index?: HelixHeadlessTour["index"];
   /** Stop to start on, where nothing declared one. */
-  "default-index"?: HelixBaseTour["defaultIndex"];
+  "default-index"?: HelixHeadlessTour["defaultIndex"];
   /** Stop to start on, where nothing declared one. */
-  defaultIndex?: HelixBaseTour["defaultIndex"];
+  defaultIndex?: HelixHeadlessTour["defaultIndex"];
   /** Accessible name for the run, such as "Getting started". */
-  label?: HelixBaseTour["label"];
+  label?: HelixHeadlessTour["label"];
   /** Space left around the target when it is lit, in pixels. */
-  "spotlight-padding"?: HelixBaseTour["spotlightPadding"];
+  "spotlight-padding"?: HelixHeadlessTour["spotlightPadding"];
   /** Space left around the target when it is lit, in pixels. */
-  spotlightPadding?: HelixBaseTour["spotlightPadding"];
+  spotlightPadding?: HelixHeadlessTour["spotlightPadding"];
   /** Label for the control that goes back, handed to every stop. */
-  "back-label"?: HelixBaseTour["backLabel"];
+  "back-label"?: HelixHeadlessTour["backLabel"];
   /** Label for the control that goes back, handed to every stop. */
-  backLabel?: HelixBaseTour["backLabel"];
+  backLabel?: HelixHeadlessTour["backLabel"];
   /** Label for the control that goes on. */
-  "next-label"?: HelixBaseTour["nextLabel"];
+  "next-label"?: HelixHeadlessTour["nextLabel"];
   /** Label for the control that goes on. */
-  nextLabel?: HelixBaseTour["nextLabel"];
+  nextLabel?: HelixHeadlessTour["nextLabel"];
   /** Label for the control that goes on from the last stop. */
-  "done-label"?: HelixBaseTour["doneLabel"];
+  "done-label"?: HelixHeadlessTour["doneLabel"];
   /** Label for the control that goes on from the last stop. */
-  doneLabel?: HelixBaseTour["doneLabel"];
+  doneLabel?: HelixHeadlessTour["doneLabel"];
   /** Label for the control that leaves the tour. */
-  "skip-label"?: HelixBaseTour["skipLabel"];
+  "skip-label"?: HelixHeadlessTour["skipLabel"];
   /** Label for the control that leaves the tour. */
-  skipLabel?: HelixBaseTour["skipLabel"];
+  skipLabel?: HelixHeadlessTour["skipLabel"];
 
   /** Fired when the current stop moves, carrying the new index. */
-  "onhelix-change"?: (e: HelixBaseTourHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessTourHelixChangeElementEvent) => void;
   /** Fired when the last stop is finished. */
-  "onhelix-complete"?: (e: HelixBaseTourHelixCompleteElementEvent) => void;
+  "onhelix-complete"?: (e: HelixHeadlessTourHelixCompleteElementEvent) => void;
   /** Fired when the reader leaves early. */
-  "onhelix-close"?: (e: HelixBaseTourHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessTourHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseTourSolidJsProps = {
+export type HelixHeadlessTourSolidJsProps = {
   /** Whether the tour is running. */
-  "prop:open"?: HelixBaseTour["open"];
+  "prop:open"?: HelixHeadlessTour["open"];
   /** Which stop the reader is on.
 
 **It said `@controlled` for two days and honoured none of it.** The tag is
@@ -11164,39 +11237,39 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
 `default-index` for markup that only seeds, a held state that is
 `undefined` until somebody sets one, and a mode decided once at the first
 update so a later assignment cannot take the tour over. */
-  "prop:index"?: HelixBaseTour["index"];
+  "prop:index"?: HelixHeadlessTour["index"];
   /** Stop to start on, where nothing declared one. */
-  "attr:default-index"?: HelixBaseTour["defaultIndex"];
+  "attr:default-index"?: HelixHeadlessTour["defaultIndex"];
   /** Stop to start on, where nothing declared one. */
-  "prop:defaultIndex"?: HelixBaseTour["defaultIndex"];
+  "prop:defaultIndex"?: HelixHeadlessTour["defaultIndex"];
   /** Accessible name for the run, such as "Getting started". */
-  "prop:label"?: HelixBaseTour["label"];
+  "prop:label"?: HelixHeadlessTour["label"];
   /** Space left around the target when it is lit, in pixels. */
-  "attr:spotlight-padding"?: HelixBaseTour["spotlightPadding"];
+  "attr:spotlight-padding"?: HelixHeadlessTour["spotlightPadding"];
   /** Space left around the target when it is lit, in pixels. */
-  "prop:spotlightPadding"?: HelixBaseTour["spotlightPadding"];
+  "prop:spotlightPadding"?: HelixHeadlessTour["spotlightPadding"];
   /** Label for the control that goes back, handed to every stop. */
-  "attr:back-label"?: HelixBaseTour["backLabel"];
+  "attr:back-label"?: HelixHeadlessTour["backLabel"];
   /** Label for the control that goes back, handed to every stop. */
-  "prop:backLabel"?: HelixBaseTour["backLabel"];
+  "prop:backLabel"?: HelixHeadlessTour["backLabel"];
   /** Label for the control that goes on. */
-  "attr:next-label"?: HelixBaseTour["nextLabel"];
+  "attr:next-label"?: HelixHeadlessTour["nextLabel"];
   /** Label for the control that goes on. */
-  "prop:nextLabel"?: HelixBaseTour["nextLabel"];
+  "prop:nextLabel"?: HelixHeadlessTour["nextLabel"];
   /** Label for the control that goes on from the last stop. */
-  "attr:done-label"?: HelixBaseTour["doneLabel"];
+  "attr:done-label"?: HelixHeadlessTour["doneLabel"];
   /** Label for the control that goes on from the last stop. */
-  "prop:doneLabel"?: HelixBaseTour["doneLabel"];
+  "prop:doneLabel"?: HelixHeadlessTour["doneLabel"];
   /** Label for the control that leaves the tour. */
-  "attr:skip-label"?: HelixBaseTour["skipLabel"];
+  "attr:skip-label"?: HelixHeadlessTour["skipLabel"];
   /** Label for the control that leaves the tour. */
-  "prop:skipLabel"?: HelixBaseTour["skipLabel"];
+  "prop:skipLabel"?: HelixHeadlessTour["skipLabel"];
   /** Fired when the current stop moves, carrying the new index. */
-  "on:helix-change"?: (e: HelixBaseTourHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessTourHelixChangeElementEvent) => void;
   /** Fired when the last stop is finished. */
-  "on:helix-complete"?: (e: HelixBaseTourHelixCompleteElementEvent) => void;
+  "on:helix-complete"?: (e: HelixHeadlessTourHelixCompleteElementEvent) => void;
   /** Fired when the reader leaves early. */
-  "on:helix-close"?: (e: HelixBaseTourHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessTourHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11204,20 +11277,20 @@ update so a later assignment cannot take the tour over. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTourStop` component event */
-export type HelixBaseTourStopElementEvent<E = Event> = TypedEvent<
-  HelixBaseTourStop,
+/** `HelixHeadlessTourStop` component event */
+export type HelixHeadlessTourStopElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTourStop,
   E
 >;
 /** `helix-tour-ask` event type */
-export type HelixBaseTourStopHelixTourAskElementEvent =
-  HelixBaseTourStopElementEvent<HelixTourAskEvent>;
+export type HelixHeadlessTourStopHelixTourAskElementEvent =
+  HelixHeadlessTourStopElementEvent<HelixTourAskEvent>;
 
-export type HelixBaseTourStopProps = {
+export type HelixHeadlessTourStopProps = {
   /** The id of the element this stop is about. */
-  for?: HelixBaseTourStop["for"];
+  for?: HelixHeadlessTourStop["for"];
   /** Which side of the target the panel prefers. */
-  placement?: HelixBaseTourStop["placement"];
+  placement?: HelixHeadlessTourStop["placement"];
   /** Whether this is the stop the reader is on.
 
 Written by the root rather than by a consumer, which is the one place this
@@ -11225,37 +11298,39 @@ family writes onto markup it does not own. It is acceptable here for a
 reason that did not hold for the trail or the avatar group: a tour starts
 closed, so there is no server state to get wrong. The server renders a
 closed tour, a closed tour shows nothing, and nothing can disagree. */
-  current?: HelixBaseTourStop["current"];
+  current?: HelixHeadlessTourStop["current"];
   /** Whether this is the last stop, so the control says Done. */
-  last?: HelixBaseTourStop["last"];
+  last?: HelixHeadlessTourStop["last"];
   /** Whether this is the first stop, so there is nowhere back to. */
-  first?: HelixBaseTourStop["first"];
+  first?: HelixHeadlessTourStop["first"];
   /** Label for the control that goes back. */
-  "back-label"?: HelixBaseTourStop["backLabel"];
+  "back-label"?: HelixHeadlessTourStop["backLabel"];
   /** Label for the control that goes back. */
-  backLabel?: HelixBaseTourStop["backLabel"];
+  backLabel?: HelixHeadlessTourStop["backLabel"];
   /** Label for the control that goes on. */
-  "next-label"?: HelixBaseTourStop["nextLabel"];
+  "next-label"?: HelixHeadlessTourStop["nextLabel"];
   /** Label for the control that goes on. */
-  nextLabel?: HelixBaseTourStop["nextLabel"];
+  nextLabel?: HelixHeadlessTourStop["nextLabel"];
   /** Label for the control that goes on from the last stop. */
-  "done-label"?: HelixBaseTourStop["doneLabel"];
+  "done-label"?: HelixHeadlessTourStop["doneLabel"];
   /** Label for the control that goes on from the last stop. */
-  doneLabel?: HelixBaseTourStop["doneLabel"];
+  doneLabel?: HelixHeadlessTourStop["doneLabel"];
   /** Label for the control that leaves the tour. */
-  "skip-label"?: HelixBaseTourStop["skipLabel"];
+  "skip-label"?: HelixHeadlessTourStop["skipLabel"];
   /** Label for the control that leaves the tour. */
-  skipLabel?: HelixBaseTourStop["skipLabel"];
+  skipLabel?: HelixHeadlessTourStop["skipLabel"];
 
   /** A stop asking the tour to move, from its own controls. */
-  "onhelix-tour-ask"?: (e: HelixBaseTourStopHelixTourAskElementEvent) => void;
+  "onhelix-tour-ask"?: (
+    e: HelixHeadlessTourStopHelixTourAskElementEvent,
+  ) => void;
 };
 
-export type HelixBaseTourStopSolidJsProps = {
+export type HelixHeadlessTourStopSolidJsProps = {
   /** The id of the element this stop is about. */
-  "prop:for"?: HelixBaseTourStop["for"];
+  "prop:for"?: HelixHeadlessTourStop["for"];
   /** Which side of the target the panel prefers. */
-  "prop:placement"?: HelixBaseTourStop["placement"];
+  "prop:placement"?: HelixHeadlessTourStop["placement"];
   /** Whether this is the stop the reader is on.
 
 Written by the root rather than by a consumer, which is the one place this
@@ -11263,29 +11338,31 @@ family writes onto markup it does not own. It is acceptable here for a
 reason that did not hold for the trail or the avatar group: a tour starts
 closed, so there is no server state to get wrong. The server renders a
 closed tour, a closed tour shows nothing, and nothing can disagree. */
-  "prop:current"?: HelixBaseTourStop["current"];
+  "prop:current"?: HelixHeadlessTourStop["current"];
   /** Whether this is the last stop, so the control says Done. */
-  "prop:last"?: HelixBaseTourStop["last"];
+  "prop:last"?: HelixHeadlessTourStop["last"];
   /** Whether this is the first stop, so there is nowhere back to. */
-  "prop:first"?: HelixBaseTourStop["first"];
+  "prop:first"?: HelixHeadlessTourStop["first"];
   /** Label for the control that goes back. */
-  "attr:back-label"?: HelixBaseTourStop["backLabel"];
+  "attr:back-label"?: HelixHeadlessTourStop["backLabel"];
   /** Label for the control that goes back. */
-  "prop:backLabel"?: HelixBaseTourStop["backLabel"];
+  "prop:backLabel"?: HelixHeadlessTourStop["backLabel"];
   /** Label for the control that goes on. */
-  "attr:next-label"?: HelixBaseTourStop["nextLabel"];
+  "attr:next-label"?: HelixHeadlessTourStop["nextLabel"];
   /** Label for the control that goes on. */
-  "prop:nextLabel"?: HelixBaseTourStop["nextLabel"];
+  "prop:nextLabel"?: HelixHeadlessTourStop["nextLabel"];
   /** Label for the control that goes on from the last stop. */
-  "attr:done-label"?: HelixBaseTourStop["doneLabel"];
+  "attr:done-label"?: HelixHeadlessTourStop["doneLabel"];
   /** Label for the control that goes on from the last stop. */
-  "prop:doneLabel"?: HelixBaseTourStop["doneLabel"];
+  "prop:doneLabel"?: HelixHeadlessTourStop["doneLabel"];
   /** Label for the control that leaves the tour. */
-  "attr:skip-label"?: HelixBaseTourStop["skipLabel"];
+  "attr:skip-label"?: HelixHeadlessTourStop["skipLabel"];
   /** Label for the control that leaves the tour. */
-  "prop:skipLabel"?: HelixBaseTourStop["skipLabel"];
+  "prop:skipLabel"?: HelixHeadlessTourStop["skipLabel"];
   /** A stop asking the tour to move, from its own controls. */
-  "on:helix-tour-ask"?: (e: HelixBaseTourStopHelixTourAskElementEvent) => void;
+  "on:helix-tour-ask"?: (
+    e: HelixHeadlessTourStopHelixTourAskElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11293,39 +11370,39 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTreeItem` component event */
-export type HelixBaseTreeItemElementEvent<E = Event> = TypedEvent<
-  HelixBaseTreeItem,
+/** `HelixHeadlessTreeItem` component event */
+export type HelixHeadlessTreeItemElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTreeItem,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseTreeItemHelixSelectElementEvent =
-  HelixBaseTreeItemElementEvent<HelixSelectEvent>;
+export type HelixHeadlessTreeItemHelixSelectElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixSelectEvent>;
 /** `helix-open` event type */
-export type HelixBaseTreeItemHelixOpenElementEvent =
-  HelixBaseTreeItemElementEvent<HelixOpenEvent>;
+export type HelixHeadlessTreeItemHelixOpenElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixOpenEvent>;
 /** `helix-close` event type */
-export type HelixBaseTreeItemHelixCloseElementEvent =
-  HelixBaseTreeItemElementEvent<HelixCloseEvent>;
+export type HelixHeadlessTreeItemHelixCloseElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixCloseEvent>;
 
-export type HelixBaseTreeItemProps = {
+export type HelixHeadlessTreeItemProps = {
   /** Identifies the item to the consumer, carried in `helix-select`. */
-  value?: HelixBaseTreeItem["value"];
+  value?: HelixHeadlessTreeItem["value"];
   /** Where this node goes, which makes its row a real link.
 
 Unset by default, and unreflected: a tree of choosable nodes is not a tree
 of links, and an empty `href` written onto every row would be a link to the
 current page on every item a consumer never asked to be one. */
-  href?: HelixBaseTreeItem["href"];
+  href?: HelixHeadlessTreeItem["href"];
   /** Where the link opens, for the rare row that leaves the site. */
-  target?: HelixBaseTreeItem["target"];
+  target?: HelixHeadlessTreeItem["target"];
   /** What the link declares about where it goes.
 
 Set by the consumer rather than derived from `target`: `noreferrer` is a
 decision about their own analytics and a component should not make it for
 them. `noopener` is not needed as a default either, since every browser
 this library supports implies it for `target="_blank"` already. */
-  rel?: HelixBaseTreeItem["rel"];
+  rel?: HelixHeadlessTreeItem["rel"];
   /** Whether this item is the current one.
 
 Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -11338,14 +11415,14 @@ answer `level` gives one paragraph down: the indent it drives is written
 onto the row rather than onto the host, because the row is not part of the
 tree React hydrates. Mirroring to `data-selected` on the host instead was
 the same fault with a different name, and React said so. */
-  selected?: HelixBaseTreeItem["selected"];
+  selected?: HelixHeadlessTreeItem["selected"];
   /** Depth from the root, set by the tree so indentation needs no CSS nesting.
 
 Not reflected. The tree assigns this after it upgrades, so an attribute
 here would be a change to markup the consumer rendered and hydration would
 report it. The indent it drives is written onto the row instead, inside the
 shadow root, which is not part of the tree React hydrates. */
-  level?: HelixBaseTreeItem["level"];
+  level?: HelixHeadlessTreeItem["level"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -11368,40 +11445,40 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  open?: HelixBaseTreeItem["open"];
+  open?: HelixHeadlessTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "default-open"?: HelixBaseTreeItem["defaultOpen"];
+  "default-open"?: HelixHeadlessTreeItem["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  defaultOpen?: HelixBaseTreeItem["defaultOpen"];
+  defaultOpen?: HelixHeadlessTreeItem["defaultOpen"];
   /** Whether this item holds the tree's single tab stop. */
-  focusable?: HelixBaseTreeItem["focusable"];
+  focusable?: HelixHeadlessTreeItem["focusable"];
 
   /** Fired when the item is chosen. */
-  "onhelix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
-  "onhelix-open"?: (e: HelixBaseTreeItemHelixOpenElementEvent) => void;
+  "onhelix-open"?: (e: HelixHeadlessTreeItemHelixOpenElementEvent) => void;
   /** Fired before a branch closes, and cancelable. */
-  "onhelix-close"?: (e: HelixBaseTreeItemHelixCloseElementEvent) => void;
+  "onhelix-close"?: (e: HelixHeadlessTreeItemHelixCloseElementEvent) => void;
 };
 
-export type HelixBaseTreeItemSolidJsProps = {
+export type HelixHeadlessTreeItemSolidJsProps = {
   /** Identifies the item to the consumer, carried in `helix-select`. */
-  "prop:value"?: HelixBaseTreeItem["value"];
+  "prop:value"?: HelixHeadlessTreeItem["value"];
   /** Where this node goes, which makes its row a real link.
 
 Unset by default, and unreflected: a tree of choosable nodes is not a tree
 of links, and an empty `href` written onto every row would be a link to the
 current page on every item a consumer never asked to be one. */
-  "prop:href"?: HelixBaseTreeItem["href"];
+  "prop:href"?: HelixHeadlessTreeItem["href"];
   /** Where the link opens, for the rare row that leaves the site. */
-  "prop:target"?: HelixBaseTreeItem["target"];
+  "prop:target"?: HelixHeadlessTreeItem["target"];
   /** What the link declares about where it goes.
 
 Set by the consumer rather than derived from `target`: `noreferrer` is a
 decision about their own analytics and a component should not make it for
 them. `noopener` is not needed as a default either, since every browser
 this library supports implies it for `target="_blank"` already. */
-  "prop:rel"?: HelixBaseTreeItem["rel"];
+  "prop:rel"?: HelixHeadlessTreeItem["rel"];
   /** Whether this item is the current one.
 
 Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -11414,14 +11491,14 @@ answer `level` gives one paragraph down: the indent it drives is written
 onto the row rather than onto the host, because the row is not part of the
 tree React hydrates. Mirroring to `data-selected` on the host instead was
 the same fault with a different name, and React said so. */
-  "prop:selected"?: HelixBaseTreeItem["selected"];
+  "prop:selected"?: HelixHeadlessTreeItem["selected"];
   /** Depth from the root, set by the tree so indentation needs no CSS nesting.
 
 Not reflected. The tree assigns this after it upgrades, so an attribute
 here would be a change to markup the consumer rendered and hydration would
 report it. The indent it drives is written onto the row instead, inside the
 shadow root, which is not part of the tree React hydrates. */
-  "prop:level"?: HelixBaseTreeItem["level"];
+  "prop:level"?: HelixHeadlessTreeItem["level"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -11444,19 +11521,19 @@ that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
 state for stylesheets, which is what it has always been for. */
-  "prop:open"?: HelixBaseTreeItem["open"];
+  "prop:open"?: HelixHeadlessTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "bool:default-open"?: HelixBaseTreeItem["defaultOpen"];
+  "bool:default-open"?: HelixHeadlessTreeItem["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
-  "prop:defaultOpen"?: HelixBaseTreeItem["defaultOpen"];
+  "prop:defaultOpen"?: HelixHeadlessTreeItem["defaultOpen"];
   /** Whether this item holds the tree's single tab stop. */
-  "prop:focusable"?: HelixBaseTreeItem["focusable"];
+  "prop:focusable"?: HelixHeadlessTreeItem["focusable"];
   /** Fired when the item is chosen. */
-  "on:helix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
-  "on:helix-open"?: (e: HelixBaseTreeItemHelixOpenElementEvent) => void;
+  "on:helix-open"?: (e: HelixHeadlessTreeItemHelixOpenElementEvent) => void;
   /** Fired before a branch closes, and cancelable. */
-  "on:helix-close"?: (e: HelixBaseTreeItemHelixCloseElementEvent) => void;
+  "on:helix-close"?: (e: HelixHeadlessTreeItemHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11464,32 +11541,35 @@ state for stylesheets, which is what it has always been for. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTree` component event */
-export type HelixBaseTreeElementEvent<E = Event> = TypedEvent<HelixBaseTree, E>;
+/** `HelixHeadlessTree` component event */
+export type HelixHeadlessTreeElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTree,
+  E
+>;
 /** `helix-change` event type */
-export type HelixBaseTreeHelixChangeElementEvent =
-  HelixBaseTreeElementEvent<HelixChangeEvent>;
+export type HelixHeadlessTreeHelixChangeElementEvent =
+  HelixHeadlessTreeElementEvent<HelixChangeEvent>;
 /** `helix-select` event type */
-export type HelixBaseTreeHelixSelectElementEvent =
-  HelixBaseTreeElementEvent<HelixSelectEvent>;
+export type HelixHeadlessTreeHelixSelectElementEvent =
+  HelixHeadlessTreeElementEvent<HelixSelectEvent>;
 
-export type HelixBaseTreeProps = {
+export type HelixHeadlessTreeProps = {
   /** Accessible name for the tree. */
-  label?: HelixBaseTree["label"];
+  label?: HelixHeadlessTree["label"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  loading?: HelixBaseTree["loading"];
+  loading?: HelixHeadlessTree["loading"];
   /** What is said while they are on their way. */
-  "loading-text"?: HelixBaseTree["loadingText"];
+  "loading-text"?: HelixHeadlessTree["loadingText"];
   /** What is said while they are on their way. */
-  loadingText?: HelixBaseTree["loadingText"];
+  loadingText?: HelixHeadlessTree["loadingText"];
   /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixBaseTree["emptyText"];
+  "empty-text"?: HelixHeadlessTree["emptyText"];
   /** What is said where there are none, and none are coming. */
-  emptyText?: HelixBaseTree["emptyText"];
+  emptyText?: HelixHeadlessTree["emptyText"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -11503,35 +11583,35 @@ An accessor pair, the same shape as the other three. Reading gives the
 real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
-  active?: HelixBaseTree["active"];
+  active?: HelixHeadlessTree["active"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "default-active"?: HelixBaseTree["defaultActive"];
+  "default-active"?: HelixHeadlessTree["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  defaultActive?: HelixBaseTree["defaultActive"];
+  defaultActive?: HelixHeadlessTree["defaultActive"];
 
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
-  "onhelix-change"?: (e: HelixBaseTreeHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixHeadlessTreeHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
-  "onhelix-select"?: (e: HelixBaseTreeHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixHeadlessTreeHelixSelectElementEvent) => void;
 };
 
-export type HelixBaseTreeSolidJsProps = {
+export type HelixHeadlessTreeSolidJsProps = {
   /** Accessible name for the tree. */
-  "prop:label"?: HelixBaseTree["label"];
+  "prop:label"?: HelixHeadlessTree["label"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
 are dimmed rather than removed while a new set arrives, and only CSS can
 say that without the component knowing what a row looks like. */
-  "prop:loading"?: HelixBaseTree["loading"];
+  "prop:loading"?: HelixHeadlessTree["loading"];
   /** What is said while they are on their way. */
-  "attr:loading-text"?: HelixBaseTree["loadingText"];
+  "attr:loading-text"?: HelixHeadlessTree["loadingText"];
   /** What is said while they are on their way. */
-  "prop:loadingText"?: HelixBaseTree["loadingText"];
+  "prop:loadingText"?: HelixHeadlessTree["loadingText"];
   /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixBaseTree["emptyText"];
+  "attr:empty-text"?: HelixHeadlessTree["emptyText"];
   /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixBaseTree["emptyText"];
+  "prop:emptyText"?: HelixHeadlessTree["emptyText"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -11545,15 +11625,15 @@ An accessor pair, the same shape as the other three. Reading gives the
 real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
-  "prop:active"?: HelixBaseTree["active"];
+  "prop:active"?: HelixHeadlessTree["active"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "attr:default-active"?: HelixBaseTree["defaultActive"];
+  "attr:default-active"?: HelixHeadlessTree["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "prop:defaultActive"?: HelixBaseTree["defaultActive"];
+  "prop:defaultActive"?: HelixHeadlessTree["defaultActive"];
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
-  "on:helix-change"?: (e: HelixBaseTreeHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixHeadlessTreeHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
-  "on:helix-select"?: (e: HelixBaseTreeHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixHeadlessTreeHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11561,7 +11641,7 @@ how markup says where to start. */
   textContent?: string | number;
 };
 
-export type HelixBaseTrendProps = {
+export type HelixHeadlessTrendProps = {
   /** Which way the measurement moved.
 
 Absent is neutral, so a trend with nothing to report draws a bar rather
@@ -11570,17 +11650,17 @@ than picking a direction. Optional rather than defaulted for the reason
 attribute onto the host the moment the element upgrades, and the host is
 markup the consumer rendered, which React compares against what it rendered
 and reports as a hydration mismatch. */
-  direction?: HelixBaseTrend["direction"];
+  direction?: HelixHeadlessTrend["direction"];
   /** Which direction is the improvement, for this metric.
 
 Absent states the movement without judging it, which is the honest default:
 revenue up is good news and latency up is bad news, and only the consumer
 knows which one this is. Set it once per metric and it holds while the
 direction changes underneath. */
-  good?: HelixBaseTrend["good"];
+  good?: HelixHeadlessTrend["good"];
 };
 
-export type HelixBaseTrendSolidJsProps = {
+export type HelixHeadlessTrendSolidJsProps = {
   /** Which way the measurement moved.
 
 Absent is neutral, so a trend with nothing to report draws a bar rather
@@ -11589,14 +11669,14 @@ than picking a direction. Optional rather than defaulted for the reason
 attribute onto the host the moment the element upgrades, and the host is
 markup the consumer rendered, which React compares against what it rendered
 and reports as a hydration mismatch. */
-  "prop:direction"?: HelixBaseTrend["direction"];
+  "prop:direction"?: HelixHeadlessTrend["direction"];
   /** Which direction is the improvement, for this metric.
 
 Absent states the movement without judging it, which is the honest default:
 revenue up is good news and latency up is bad news, and only the consumer
 knows which one this is. Set it once per metric and it holds while the
 direction changes underneath. */
-  "prop:good"?: HelixBaseTrend["good"];
+  "prop:good"?: HelixHeadlessTrend["good"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11604,20 +11684,20 @@ direction changes underneath. */
   textContent?: string | number;
 };
 
-/** `HelixBaseVideoPlaylistItem` component event */
-export type HelixBaseVideoPlaylistItemElementEvent<E = Event> = TypedEvent<
-  HelixBaseVideoPlaylistItem,
+/** `HelixHeadlessVideoPlaylistItem` component event */
+export type HelixHeadlessVideoPlaylistItemElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessVideoPlaylistItem,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseVideoPlaylistItemHelixSelectElementEvent =
-  HelixBaseVideoPlaylistItemElementEvent<HelixSelectEvent>;
+export type HelixHeadlessVideoPlaylistItemHelixSelectElementEvent =
+  HelixHeadlessVideoPlaylistItemElementEvent<HelixSelectEvent>;
 
-export type HelixBaseVideoPlaylistItemProps = {
+export type HelixHeadlessVideoPlaylistItemProps = {
   /** What identifies the entry, and what `active` is compared against. */
-  value?: HelixBaseVideoPlaylistItem["value"];
+  value?: HelixHeadlessVideoPlaylistItem["value"];
   /** The file this entry plays. */
-  src?: HelixBaseVideoPlaylistItem["src"];
+  src?: HelixHeadlessVideoPlaylistItem["src"];
   /** What covers the picture before this entry plays, and the row's thumbnail.
 
 One property doing both, because they are the same picture: the frame that
@@ -11625,27 +11705,27 @@ stands for the clip stands for it in the list too. It is the `media` slot's
 fallback rather than something drawn beside it, which is this library's rule
 for a content property, so a consumer with something better to show slots it
 and the two can never both appear. */
-  poster?: HelixBaseVideoPlaylistItem["poster"];
+  poster?: HelixHeadlessVideoPlaylistItem["poster"];
   /** Whether the entry can be chosen. */
-  disabled?: HelixBaseVideoPlaylistItem["disabled"];
+  disabled?: HelixHeadlessVideoPlaylistItem["disabled"];
   /** Whether the player is on this entry.
 
 Written by the playlist rather than by the entry, the way an option's
 selection is: an entry that made itself current would be a second answer to
 which one is playing. */
-  current?: HelixBaseVideoPlaylistItem["current"];
+  current?: HelixHeadlessVideoPlaylistItem["current"];
 
   /** Fired when the entry is chosen. */
   "onhelix-select"?: (
-    e: HelixBaseVideoPlaylistItemHelixSelectElementEvent,
+    e: HelixHeadlessVideoPlaylistItemHelixSelectElementEvent,
   ) => void;
 };
 
-export type HelixBaseVideoPlaylistItemSolidJsProps = {
+export type HelixHeadlessVideoPlaylistItemSolidJsProps = {
   /** What identifies the entry, and what `active` is compared against. */
-  "prop:value"?: HelixBaseVideoPlaylistItem["value"];
+  "prop:value"?: HelixHeadlessVideoPlaylistItem["value"];
   /** The file this entry plays. */
-  "prop:src"?: HelixBaseVideoPlaylistItem["src"];
+  "prop:src"?: HelixHeadlessVideoPlaylistItem["src"];
   /** What covers the picture before this entry plays, and the row's thumbnail.
 
 One property doing both, because they are the same picture: the frame that
@@ -11653,18 +11733,18 @@ stands for the clip stands for it in the list too. It is the `media` slot's
 fallback rather than something drawn beside it, which is this library's rule
 for a content property, so a consumer with something better to show slots it
 and the two can never both appear. */
-  "prop:poster"?: HelixBaseVideoPlaylistItem["poster"];
+  "prop:poster"?: HelixHeadlessVideoPlaylistItem["poster"];
   /** Whether the entry can be chosen. */
-  "prop:disabled"?: HelixBaseVideoPlaylistItem["disabled"];
+  "prop:disabled"?: HelixHeadlessVideoPlaylistItem["disabled"];
   /** Whether the player is on this entry.
 
 Written by the playlist rather than by the entry, the way an option's
 selection is: an entry that made itself current would be a second answer to
 which one is playing. */
-  "prop:current"?: HelixBaseVideoPlaylistItem["current"];
+  "prop:current"?: HelixHeadlessVideoPlaylistItem["current"];
   /** Fired when the entry is chosen. */
   "on:helix-select"?: (
-    e: HelixBaseVideoPlaylistItemHelixSelectElementEvent,
+    e: HelixHeadlessVideoPlaylistItemHelixSelectElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -11673,47 +11753,47 @@ which one is playing. */
   textContent?: string | number;
 };
 
-/** `HelixBaseVideoPlaylistMenu` component event */
-export type HelixBaseVideoPlaylistMenuElementEvent<E = Event> = TypedEvent<
-  HelixBaseVideoPlaylistMenu,
+/** `HelixHeadlessVideoPlaylistMenu` component event */
+export type HelixHeadlessVideoPlaylistMenuElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessVideoPlaylistMenu,
   E
 >;
 /** `helix-select` event type */
-export type HelixBaseVideoPlaylistMenuHelixSelectElementEvent =
-  HelixBaseVideoPlaylistMenuElementEvent<HelixSelectEvent>;
+export type HelixHeadlessVideoPlaylistMenuHelixSelectElementEvent =
+  HelixHeadlessVideoPlaylistMenuElementEvent<HelixSelectEvent>;
 
-export type HelixBaseVideoPlaylistMenuProps = {
+export type HelixHeadlessVideoPlaylistMenuProps = {
   /** The menu's accessible name, and its trigger's.
 
 "Episodes" suits a series and is wrong for a set of camera angles, and the
 component cannot know which one it is in. */
-  label?: HelixBaseVideoPlaylistMenu["label"];
+  label?: HelixHeadlessVideoPlaylistMenu["label"];
   /** Where the menu opens relative to its trigger.
 
 `top-end` because a control bar sits at the foot of the picture, and a menu
 opening downward from there opens off the player. */
-  placement?: HelixBaseVideoPlaylistMenu["placement"];
+  placement?: HelixHeadlessVideoPlaylistMenu["placement"];
 
   /** Fired with the chosen entry's value. The playlist listens for it. */
   "onhelix-select"?: (
-    e: HelixBaseVideoPlaylistMenuHelixSelectElementEvent,
+    e: HelixHeadlessVideoPlaylistMenuHelixSelectElementEvent,
   ) => void;
 };
 
-export type HelixBaseVideoPlaylistMenuSolidJsProps = {
+export type HelixHeadlessVideoPlaylistMenuSolidJsProps = {
   /** The menu's accessible name, and its trigger's.
 
 "Episodes" suits a series and is wrong for a set of camera angles, and the
 component cannot know which one it is in. */
-  "prop:label"?: HelixBaseVideoPlaylistMenu["label"];
+  "prop:label"?: HelixHeadlessVideoPlaylistMenu["label"];
   /** Where the menu opens relative to its trigger.
 
 `top-end` because a control bar sits at the foot of the picture, and a menu
 opening downward from there opens off the player. */
-  "prop:placement"?: HelixBaseVideoPlaylistMenu["placement"];
+  "prop:placement"?: HelixHeadlessVideoPlaylistMenu["placement"];
   /** Fired with the chosen entry's value. The playlist listens for it. */
   "on:helix-select"?: (
-    e: HelixBaseVideoPlaylistMenuHelixSelectElementEvent,
+    e: HelixHeadlessVideoPlaylistMenuHelixSelectElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -11722,18 +11802,18 @@ opening downward from there opens off the player. */
   textContent?: string | number;
 };
 
-/** `HelixBaseVideoPlaylist` component event */
-export type HelixBaseVideoPlaylistElementEvent<E = Event> = TypedEvent<
-  HelixBaseVideoPlaylist,
+/** `HelixHeadlessVideoPlaylist` component event */
+export type HelixHeadlessVideoPlaylistElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessVideoPlaylist,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseVideoPlaylistHelixChangeElementEvent =
-  HelixBaseVideoPlaylistElementEvent<HelixChangeEvent>;
+export type HelixHeadlessVideoPlaylistHelixChangeElementEvent =
+  HelixHeadlessVideoPlaylistElementEvent<HelixChangeEvent>;
 
-export type HelixBaseVideoPlaylistProps = {
+export type HelixHeadlessVideoPlaylistProps = {
   /** Accessible name for the list, which usually has no visible heading. */
-  label?: HelixBaseVideoPlaylist["label"];
+  label?: HelixHeadlessVideoPlaylist["label"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -11747,19 +11827,21 @@ An accessor pair, the same shape as the other three. Reading gives the
 real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
-  active?: HelixBaseVideoPlaylist["active"];
+  active?: HelixHeadlessVideoPlaylist["active"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "default-active"?: HelixBaseVideoPlaylist["defaultActive"];
+  "default-active"?: HelixHeadlessVideoPlaylist["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  defaultActive?: HelixBaseVideoPlaylist["defaultActive"];
+  defaultActive?: HelixHeadlessVideoPlaylist["defaultActive"];
 
   /** Fired before the current entry changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseVideoPlaylistHelixChangeElementEvent) => void;
+  "onhelix-change"?: (
+    e: HelixHeadlessVideoPlaylistHelixChangeElementEvent,
+  ) => void;
 };
 
-export type HelixBaseVideoPlaylistSolidJsProps = {
+export type HelixHeadlessVideoPlaylistSolidJsProps = {
   /** Accessible name for the list, which usually has no visible heading. */
-  "prop:label"?: HelixBaseVideoPlaylist["label"];
+  "prop:label"?: HelixHeadlessVideoPlaylist["label"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -11773,14 +11855,14 @@ An accessor pair, the same shape as the other three. Reading gives the
 real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
-  "prop:active"?: HelixBaseVideoPlaylist["active"];
+  "prop:active"?: HelixHeadlessVideoPlaylist["active"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "attr:default-active"?: HelixBaseVideoPlaylist["defaultActive"];
+  "attr:default-active"?: HelixHeadlessVideoPlaylist["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
-  "prop:defaultActive"?: HelixBaseVideoPlaylist["defaultActive"];
+  "prop:defaultActive"?: HelixHeadlessVideoPlaylist["defaultActive"];
   /** Fired before the current entry changes, and cancelable. */
   "on:helix-change"?: (
-    e: HelixBaseVideoPlaylistHelixChangeElementEvent,
+    e: HelixHeadlessVideoPlaylistHelixChangeElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -11789,40 +11871,40 @@ how markup says where to start. */
   textContent?: string | number;
 };
 
-/** `HelixBaseVideo` component event */
-export type HelixBaseVideoElementEvent<E = Event> = TypedEvent<
-  HelixBaseVideo,
+/** `HelixHeadlessVideo` component event */
+export type HelixHeadlessVideoElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessVideo,
   E
 >;
 /** `helix-next` event type */
-export type HelixBaseVideoHelixNextElementEvent =
-  HelixBaseVideoElementEvent<HelixNextEvent>;
+export type HelixHeadlessVideoHelixNextElementEvent =
+  HelixHeadlessVideoElementEvent<HelixNextEvent>;
 /** `helix-previous` event type */
-export type HelixBaseVideoHelixPreviousElementEvent =
-  HelixBaseVideoElementEvent<HelixPreviousEvent>;
+export type HelixHeadlessVideoHelixPreviousElementEvent =
+  HelixHeadlessVideoElementEvent<HelixPreviousEvent>;
 
-export type HelixBaseVideoProps = {
+export type HelixHeadlessVideoProps = {
   /** Where the video is, for the common case of one file. */
-  src?: HelixBaseVideo["src"];
+  src?: HelixHeadlessVideo["src"];
   /** A still shown before it plays, which the platform draws itself. */
-  poster?: HelixBaseVideo["poster"];
+  poster?: HelixHeadlessVideo["poster"];
   /** Accessible name, since a video is not described by its filename. */
-  label?: HelixBaseVideo["label"];
+  label?: HelixHeadlessVideo["label"];
   /** Whether it starts again at the end. */
-  loop?: HelixBaseVideo["loop"];
+  loop?: HelixHeadlessVideo["loop"];
   /** Whether it starts silent, which is what an autoplaying video must do. */
-  muted?: HelixBaseVideo["muted"];
+  muted?: HelixHeadlessVideo["muted"];
   /** Whether it plays where it sits rather than taking over the screen. */
-  "plays-inline"?: HelixBaseVideo["playsInline"];
+  "plays-inline"?: HelixHeadlessVideo["playsInline"];
   /** Whether it plays where it sits rather than taking over the screen. */
-  playsInline?: HelixBaseVideo["playsInline"];
+  playsInline?: HelixHeadlessVideo["playsInline"];
   /** Whether the browser draws the controls instead of this element.
 
 A fallback rather than a default. Two bars over one video is worse than
 either alone, so this one is not drawn at all when it is set. */
-  controls?: HelixBaseVideo["controls"];
+  controls?: HelixHeadlessVideo["controls"];
   /** How much to fetch before anything is asked for. */
-  preload?: HelixBaseVideo["preload"];
+  preload?: HelixHeadlessVideo["preload"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
 A list rather than a property apiece. A bar is a row with a budget, and a
@@ -11843,7 +11925,7 @@ decline it deliberately. It is also the one control whose success is not
 ours to promise: the attribute is ignored cross-origin, so a file served
 from somewhere else opens rather than saves, which is the browser's rule
 and not something a player can work around. */
-  "extra-controls"?: HelixBaseVideo["extraControls"];
+  "extra-controls"?: HelixHeadlessVideo["extraControls"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
 A list rather than a property apiece. A bar is a row with a budget, and a
@@ -11864,7 +11946,7 @@ decline it deliberately. It is also the one control whose success is not
 ours to promise: the attribute is ignored cross-origin, so a file served
 from somewhere else opens rather than saves, which is the browser's rule
 and not something a player can work around. */
-  extraControls?: HelixBaseVideo["extraControls"];
+  extraControls?: HelixHeadlessVideo["extraControls"];
   /** Controls that go behind one button instead of onto the bar, named the same
 way.
 
@@ -11880,7 +11962,7 @@ menu as the layout shifts is a control the reader has to find twice.
 So the consumer says where the fold is, which they can, having already
 named the controls in order. A name in both lists is drawn once, on the
 bar: two of the same control is worse than either placement. */
-  "overflow-controls"?: HelixBaseVideo["overflowControls"];
+  "overflow-controls"?: HelixHeadlessVideo["overflowControls"];
   /** Controls that go behind one button instead of onto the bar, named the same
 way.
 
@@ -11896,7 +11978,7 @@ menu as the layout shifts is a control the reader has to find twice.
 So the consumer says where the fold is, which they can, having already
 named the controls in order. A name in both lists is drawn once, on the
 bar: two of the same control is worse than either placement. */
-  overflowControls?: HelixBaseVideo["overflowControls"];
+  overflowControls?: HelixHeadlessVideo["overflowControls"];
   /** The big mark over the picture before anything has played, or `none`.
 
 **On unless it is turned off, because a stopped video has nothing else.**
@@ -11917,7 +11999,7 @@ would be the opposite of helpful.
 A value rather than a boolean, so the resting state is the attribute's
 absence: a boolean defaulting to on would have to be spelled as its own
 negation. */
-  "start-control"?: HelixBaseVideo["startControl"];
+  "start-control"?: HelixHeadlessVideo["startControl"];
   /** The big mark over the picture before anything has played, or `none`.
 
 **On unless it is turned off, because a stopped video has nothing else.**
@@ -11938,9 +12020,9 @@ would be the opposite of helpful.
 A value rather than a boolean, so the resting state is the attribute's
 absence: a boolean defaulting to on would have to be spelled as its own
 negation. */
-  startControl?: HelixBaseVideo["startControl"];
+  startControl?: HelixHeadlessVideo["startControl"];
   /** The speeds offered, slowest first, as multipliers of normal. */
-  speeds?: HelixBaseVideo["speeds"];
+  speeds?: HelixHeadlessVideo["speeds"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
 
 It used to leave the moment the pointer did, which is not how a player
@@ -11950,7 +12032,7 @@ a large number keeps it up for as long as anyone is likely to look.
 
 The wait is only ever about *idling*. A video that is paused keeps its bar
 regardless, because a reader who stopped it is deciding what to do next. */
-  "idle-delay"?: HelixBaseVideo["idleDelay"];
+  "idle-delay"?: HelixHeadlessVideo["idleDelay"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
 
 It used to leave the moment the pointer did, which is not how a player
@@ -11960,58 +12042,58 @@ a large number keeps it up for as long as anyone is likely to look.
 
 The wait is only ever about *idling*. A video that is paused keeps its bar
 regardless, because a reader who stopped it is deciding what to do next. */
-  idleDelay?: HelixBaseVideo["idleDelay"];
+  idleDelay?: HelixHeadlessVideo["idleDelay"];
   /** What the play control is called while it would start the video. */
-  "play-label"?: HelixBaseVideo["playLabel"];
+  "play-label"?: HelixHeadlessVideo["playLabel"];
   /** What the play control is called while it would start the video. */
-  playLabel?: HelixBaseVideo["playLabel"];
+  playLabel?: HelixHeadlessVideo["playLabel"];
   /** And while it would stop it. */
-  "pause-label"?: HelixBaseVideo["pauseLabel"];
+  "pause-label"?: HelixHeadlessVideo["pauseLabel"];
   /** And while it would stop it. */
-  pauseLabel?: HelixBaseVideo["pauseLabel"];
+  pauseLabel?: HelixHeadlessVideo["pauseLabel"];
   /** What a reader is told while the picture is waiting for more of itself. */
-  "loading-label"?: HelixBaseVideo["loadingLabel"];
+  "loading-label"?: HelixHeadlessVideo["loadingLabel"];
   /** What a reader is told while the picture is waiting for more of itself. */
-  loadingLabel?: HelixBaseVideo["loadingLabel"];
+  loadingLabel?: HelixHeadlessVideo["loadingLabel"];
   /** And what they are told when it will not play at all. */
-  "error-label"?: HelixBaseVideo["errorLabel"];
+  "error-label"?: HelixHeadlessVideo["errorLabel"];
   /** And what they are told when it will not play at all. */
-  errorLabel?: HelixBaseVideo["errorLabel"];
+  errorLabel?: HelixHeadlessVideo["errorLabel"];
 
   /** Fired when the reader asks for the next item. */
-  "onhelix-next"?: (e: HelixBaseVideoHelixNextElementEvent) => void;
+  "onhelix-next"?: (e: HelixHeadlessVideoHelixNextElementEvent) => void;
   /** Fired when they ask for the previous one. */
-  "onhelix-previous"?: (e: HelixBaseVideoHelixPreviousElementEvent) => void;
+  "onhelix-previous"?: (e: HelixHeadlessVideoHelixPreviousElementEvent) => void;
   /** Relayed, because it does not cross a shadow boundary. */
-  onplay?: (e: HelixBaseVideoElementEvent) => void;
+  onplay?: (e: HelixHeadlessVideoElementEvent) => void;
   /** Relayed for the same reason. */
-  onpause?: (e: HelixBaseVideoElementEvent) => void;
+  onpause?: (e: HelixHeadlessVideoElementEvent) => void;
   /** Relayed for the same reason. */
-  onended?: (e: HelixBaseVideoElementEvent) => void;
+  onended?: (e: HelixHeadlessVideoElementEvent) => void;
 };
 
-export type HelixBaseVideoSolidJsProps = {
+export type HelixHeadlessVideoSolidJsProps = {
   /** Where the video is, for the common case of one file. */
-  "prop:src"?: HelixBaseVideo["src"];
+  "prop:src"?: HelixHeadlessVideo["src"];
   /** A still shown before it plays, which the platform draws itself. */
-  "prop:poster"?: HelixBaseVideo["poster"];
+  "prop:poster"?: HelixHeadlessVideo["poster"];
   /** Accessible name, since a video is not described by its filename. */
-  "prop:label"?: HelixBaseVideo["label"];
+  "prop:label"?: HelixHeadlessVideo["label"];
   /** Whether it starts again at the end. */
-  "prop:loop"?: HelixBaseVideo["loop"];
+  "prop:loop"?: HelixHeadlessVideo["loop"];
   /** Whether it starts silent, which is what an autoplaying video must do. */
-  "prop:muted"?: HelixBaseVideo["muted"];
+  "prop:muted"?: HelixHeadlessVideo["muted"];
   /** Whether it plays where it sits rather than taking over the screen. */
-  "bool:plays-inline"?: HelixBaseVideo["playsInline"];
+  "bool:plays-inline"?: HelixHeadlessVideo["playsInline"];
   /** Whether it plays where it sits rather than taking over the screen. */
-  "prop:playsInline"?: HelixBaseVideo["playsInline"];
+  "prop:playsInline"?: HelixHeadlessVideo["playsInline"];
   /** Whether the browser draws the controls instead of this element.
 
 A fallback rather than a default. Two bars over one video is worse than
 either alone, so this one is not drawn at all when it is set. */
-  "prop:controls"?: HelixBaseVideo["controls"];
+  "prop:controls"?: HelixHeadlessVideo["controls"];
   /** How much to fetch before anything is asked for. */
-  "prop:preload"?: HelixBaseVideo["preload"];
+  "prop:preload"?: HelixHeadlessVideo["preload"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
 A list rather than a property apiece. A bar is a row with a budget, and a
@@ -12032,7 +12114,7 @@ decline it deliberately. It is also the one control whose success is not
 ours to promise: the attribute is ignored cross-origin, so a file served
 from somewhere else opens rather than saves, which is the browser's rule
 and not something a player can work around. */
-  "attr:extra-controls"?: HelixBaseVideo["extraControls"];
+  "attr:extra-controls"?: HelixHeadlessVideo["extraControls"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
 A list rather than a property apiece. A bar is a row with a budget, and a
@@ -12053,7 +12135,7 @@ decline it deliberately. It is also the one control whose success is not
 ours to promise: the attribute is ignored cross-origin, so a file served
 from somewhere else opens rather than saves, which is the browser's rule
 and not something a player can work around. */
-  "prop:extraControls"?: HelixBaseVideo["extraControls"];
+  "prop:extraControls"?: HelixHeadlessVideo["extraControls"];
   /** Controls that go behind one button instead of onto the bar, named the same
 way.
 
@@ -12069,7 +12151,7 @@ menu as the layout shifts is a control the reader has to find twice.
 So the consumer says where the fold is, which they can, having already
 named the controls in order. A name in both lists is drawn once, on the
 bar: two of the same control is worse than either placement. */
-  "attr:overflow-controls"?: HelixBaseVideo["overflowControls"];
+  "attr:overflow-controls"?: HelixHeadlessVideo["overflowControls"];
   /** Controls that go behind one button instead of onto the bar, named the same
 way.
 
@@ -12085,7 +12167,7 @@ menu as the layout shifts is a control the reader has to find twice.
 So the consumer says where the fold is, which they can, having already
 named the controls in order. A name in both lists is drawn once, on the
 bar: two of the same control is worse than either placement. */
-  "prop:overflowControls"?: HelixBaseVideo["overflowControls"];
+  "prop:overflowControls"?: HelixHeadlessVideo["overflowControls"];
   /** The big mark over the picture before anything has played, or `none`.
 
 **On unless it is turned off, because a stopped video has nothing else.**
@@ -12106,7 +12188,7 @@ would be the opposite of helpful.
 A value rather than a boolean, so the resting state is the attribute's
 absence: a boolean defaulting to on would have to be spelled as its own
 negation. */
-  "attr:start-control"?: HelixBaseVideo["startControl"];
+  "attr:start-control"?: HelixHeadlessVideo["startControl"];
   /** The big mark over the picture before anything has played, or `none`.
 
 **On unless it is turned off, because a stopped video has nothing else.**
@@ -12127,9 +12209,9 @@ would be the opposite of helpful.
 A value rather than a boolean, so the resting state is the attribute's
 absence: a boolean defaulting to on would have to be spelled as its own
 negation. */
-  "prop:startControl"?: HelixBaseVideo["startControl"];
+  "prop:startControl"?: HelixHeadlessVideo["startControl"];
   /** The speeds offered, slowest first, as multipliers of normal. */
-  "prop:speeds"?: HelixBaseVideo["speeds"];
+  "prop:speeds"?: HelixHeadlessVideo["speeds"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
 
 It used to leave the moment the pointer did, which is not how a player
@@ -12139,7 +12221,7 @@ a large number keeps it up for as long as anyone is likely to look.
 
 The wait is only ever about *idling*. A video that is paused keeps its bar
 regardless, because a reader who stopped it is deciding what to do next. */
-  "attr:idle-delay"?: HelixBaseVideo["idleDelay"];
+  "attr:idle-delay"?: HelixHeadlessVideo["idleDelay"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
 
 It used to leave the moment the pointer did, which is not how a player
@@ -12149,33 +12231,35 @@ a large number keeps it up for as long as anyone is likely to look.
 
 The wait is only ever about *idling*. A video that is paused keeps its bar
 regardless, because a reader who stopped it is deciding what to do next. */
-  "prop:idleDelay"?: HelixBaseVideo["idleDelay"];
+  "prop:idleDelay"?: HelixHeadlessVideo["idleDelay"];
   /** What the play control is called while it would start the video. */
-  "attr:play-label"?: HelixBaseVideo["playLabel"];
+  "attr:play-label"?: HelixHeadlessVideo["playLabel"];
   /** What the play control is called while it would start the video. */
-  "prop:playLabel"?: HelixBaseVideo["playLabel"];
+  "prop:playLabel"?: HelixHeadlessVideo["playLabel"];
   /** And while it would stop it. */
-  "attr:pause-label"?: HelixBaseVideo["pauseLabel"];
+  "attr:pause-label"?: HelixHeadlessVideo["pauseLabel"];
   /** And while it would stop it. */
-  "prop:pauseLabel"?: HelixBaseVideo["pauseLabel"];
+  "prop:pauseLabel"?: HelixHeadlessVideo["pauseLabel"];
   /** What a reader is told while the picture is waiting for more of itself. */
-  "attr:loading-label"?: HelixBaseVideo["loadingLabel"];
+  "attr:loading-label"?: HelixHeadlessVideo["loadingLabel"];
   /** What a reader is told while the picture is waiting for more of itself. */
-  "prop:loadingLabel"?: HelixBaseVideo["loadingLabel"];
+  "prop:loadingLabel"?: HelixHeadlessVideo["loadingLabel"];
   /** And what they are told when it will not play at all. */
-  "attr:error-label"?: HelixBaseVideo["errorLabel"];
+  "attr:error-label"?: HelixHeadlessVideo["errorLabel"];
   /** And what they are told when it will not play at all. */
-  "prop:errorLabel"?: HelixBaseVideo["errorLabel"];
+  "prop:errorLabel"?: HelixHeadlessVideo["errorLabel"];
   /** Fired when the reader asks for the next item. */
-  "on:helix-next"?: (e: HelixBaseVideoHelixNextElementEvent) => void;
+  "on:helix-next"?: (e: HelixHeadlessVideoHelixNextElementEvent) => void;
   /** Fired when they ask for the previous one. */
-  "on:helix-previous"?: (e: HelixBaseVideoHelixPreviousElementEvent) => void;
+  "on:helix-previous"?: (
+    e: HelixHeadlessVideoHelixPreviousElementEvent,
+  ) => void;
   /** Relayed, because it does not cross a shadow boundary. */
-  "on:play"?: (e: HelixBaseVideoElementEvent) => void;
+  "on:play"?: (e: HelixHeadlessVideoElementEvent) => void;
   /** Relayed for the same reason. */
-  "on:pause"?: (e: HelixBaseVideoElementEvent) => void;
+  "on:pause"?: (e: HelixHeadlessVideoElementEvent) => void;
   /** Relayed for the same reason. */
-  "on:ended"?: (e: HelixBaseVideoElementEvent) => void;
+  "on:ended"?: (e: HelixHeadlessVideoElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -12183,22 +12267,22 @@ regardless, because a reader who stopped it is deciding what to do next. */
   textContent?: string | number;
 };
 
-export type HelixBaseVirtualListProps = {
+export type HelixHeadlessVirtualListProps = {
   /** How tall one row is, in pixels, used to map scroll offset to an index. */
-  estimate?: HelixBaseVirtualList["estimate"];
+  estimate?: HelixHeadlessVirtualList["estimate"];
   /** Id of the element holding the rows, as JSON in a script. */
-  for?: HelixBaseVirtualList["for"];
+  for?: HelixHeadlessVirtualList["for"];
   /** What the list is called, since the rendered rows are only a window on it. */
-  label?: HelixBaseVirtualList["label"];
+  label?: HelixHeadlessVirtualList["label"];
 };
 
-export type HelixBaseVirtualListSolidJsProps = {
+export type HelixHeadlessVirtualListSolidJsProps = {
   /** How tall one row is, in pixels, used to map scroll offset to an index. */
-  "prop:estimate"?: HelixBaseVirtualList["estimate"];
+  "prop:estimate"?: HelixHeadlessVirtualList["estimate"];
   /** Id of the element holding the rows, as JSON in a script. */
-  "prop:for"?: HelixBaseVirtualList["for"];
+  "prop:for"?: HelixHeadlessVirtualList["for"];
   /** What the list is called, since the rendered rows are only a window on it. */
-  "prop:label"?: HelixBaseVirtualList["label"];
+  "prop:label"?: HelixHeadlessVirtualList["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -12294,9 +12378,11 @@ export type CustomElements = {
    * - `content`: The revealed region.
    * - `content-inner`: The clipping box inside the animated region.
    */
-  "helix-base-accordion-item": Partial<
-    HelixBaseAccordionItemProps & BaseProps<HelixBaseAccordionItem> & BaseEvents
-  > & HelixBaseAccordionItemControlled;
+  "helix-headless-accordion-item": Partial<
+    HelixHeadlessAccordionItemProps &
+      BaseProps<HelixHeadlessAccordionItem> &
+      BaseEvents
+  >;
 
   /**
    * Holds the mode and nothing else. The item that was clicked is what
@@ -12311,7 +12397,7 @@ export type CustomElements = {
    * Membership resolves on demand, so there is no registry to keep in step: an
    * item added a second after render coordinates on its first click.
    *
-   * Items are matched with `instanceof HelixBaseAccordionItem`, never by tag
+   * Items are matched with `instanceof HelixHeadlessAccordionItem`, never by tag
    * name. Matching `helix-accordion-item` would tie this tier to the styled one.
    *
    * Every listener is attached on connect, so none of it runs on the server,
@@ -12337,8 +12423,8 @@ export type CustomElements = {
    *
    * - `(default)`: The accordion's items.
    */
-  "helix-base-accordion": Partial<
-    HelixBaseAccordionProps & BaseProps<HelixBaseAccordion> & BaseEvents
+  "helix-headless-accordion": Partial<
+    HelixHeadlessAccordionProps & BaseProps<HelixHeadlessAccordion> & BaseEvents
   >;
 
   /**
@@ -12423,8 +12509,10 @@ export type CustomElements = {
    * - `dismiss`: The control that asks to close.
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    */
-  "helix-base-announcement": Partial<
-    HelixBaseAnnouncementProps & BaseProps<HelixBaseAnnouncement> & BaseEvents
+  "helix-headless-announcement": Partial<
+    HelixHeadlessAnnouncementProps &
+      BaseProps<HelixHeadlessAnnouncement> &
+      BaseEvents
   >;
 
   /**
@@ -12489,8 +12577,8 @@ export type CustomElements = {
    * - `content`: The middle region.
    * - `end`: The trailing region.
    */
-  "helix-base-app-header": Partial<
-    HelixBaseAppHeaderProps & BaseProps<HelixBaseAppHeader> & BaseEvents
+  "helix-headless-app-header": Partial<
+    HelixHeadlessAppHeaderProps & BaseProps<HelixHeadlessAppHeader> & BaseEvents
   >;
 
   /**
@@ -12561,8 +12649,10 @@ export type CustomElements = {
    *
    * - `overflow`: The count of avatars past `max`.
    */
-  "helix-base-avatar-group": Partial<
-    HelixBaseAvatarGroupProps & BaseProps<HelixBaseAvatarGroup> & BaseEvents
+  "helix-headless-avatar-group": Partial<
+    HelixHeadlessAvatarGroupProps &
+      BaseProps<HelixHeadlessAvatarGroup> &
+      BaseEvents
   >;
 
   /**
@@ -12604,8 +12694,8 @@ export type CustomElements = {
    * - `image`: The image, when one is loading or loaded.
    * - `initials`: The initials shown when there is no usable image.
    */
-  "helix-base-avatar": Partial<
-    HelixBaseAvatarProps & BaseProps<HelixBaseAvatar> & BaseEvents
+  "helix-headless-avatar": Partial<
+    HelixHeadlessAvatarProps & BaseProps<HelixHeadlessAvatar> & BaseEvents
   >;
 
   /**
@@ -12644,8 +12734,8 @@ export type CustomElements = {
    *
    * - `indicator`: The count, or the dot when there is no value.
    */
-  "helix-base-badge": Partial<
-    HelixBaseBadgeProps & BaseProps<HelixBaseBadge> & BaseEvents
+  "helix-headless-badge": Partial<
+    HelixHeadlessBadgeProps & BaseProps<HelixHeadlessBadge> & BaseEvents
   >;
 
   /**
@@ -12815,8 +12905,8 @@ export type CustomElements = {
    * - `tooltip-name`: A column's name inside the tooltip.
    * - `tooltip-value`: A column's value inside the tooltip.
    */
-  "helix-base-bar-chart": Partial<
-    HelixBaseBarChartProps & BaseProps<HelixBaseBarChart> & BaseEvents
+  "helix-headless-bar-chart": Partial<
+    HelixHeadlessBarChartProps & BaseProps<HelixHeadlessBarChart> & BaseEvents
   >;
 
   /**
@@ -12848,8 +12938,10 @@ export type CustomElements = {
    * - `blockquote`: The quotation.
    * - `attribution`: The footer carrying the source.
    */
-  "helix-base-blockquote": Partial<
-    HelixBaseBlockquoteProps & BaseProps<HelixBaseBlockquote> & BaseEvents
+  "helix-headless-blockquote": Partial<
+    HelixHeadlessBlockquoteProps &
+      BaseProps<HelixHeadlessBlockquote> &
+      BaseEvents
   >;
 
   /**
@@ -12910,8 +13002,10 @@ export type CustomElements = {
    * - `separator`: The separator preceding the item.
    * - `separator-mark`: The glyph between this crumb and the next, where none is slotted.
    */
-  "helix-base-breadcrumb": Partial<
-    HelixBaseBreadcrumbProps & BaseProps<HelixBaseBreadcrumb> & BaseEvents
+  "helix-headless-breadcrumb": Partial<
+    HelixHeadlessBreadcrumbProps &
+      BaseProps<HelixHeadlessBreadcrumb> &
+      BaseEvents
   >;
 
   /**
@@ -12978,8 +13072,10 @@ export type CustomElements = {
    *
    * - `list`: The ordered list.
    */
-  "helix-base-breadcrumbs": Partial<
-    HelixBaseBreadcrumbsProps & BaseProps<HelixBaseBreadcrumbs> & BaseEvents
+  "helix-headless-breadcrumbs": Partial<
+    HelixHeadlessBreadcrumbsProps &
+      BaseProps<HelixHeadlessBreadcrumbs> &
+      BaseEvents
   >;
 
   /**
@@ -13010,8 +13106,10 @@ export type CustomElements = {
    *
    * - `(default)`: The buttons in the group.
    */
-  "helix-base-button-group": Partial<
-    HelixBaseButtonGroupProps & BaseProps<HelixBaseButtonGroup> & BaseEvents
+  "helix-headless-button-group": Partial<
+    HelixHeadlessButtonGroupProps &
+      BaseProps<HelixHeadlessButtonGroup> &
+      BaseEvents
   >;
 
   /**
@@ -13153,8 +13251,8 @@ export type CustomElements = {
    *
    * - `button`: The inner control.
    */
-  "helix-base-button": Partial<
-    HelixBaseButtonProps & BaseProps<HelixBaseButton> & BaseEvents
+  "helix-headless-button": Partial<
+    HelixHeadlessButtonProps & BaseProps<HelixHeadlessButton> & BaseEvents
   >;
 
   /**
@@ -13202,8 +13300,8 @@ export type CustomElements = {
    * - `icon`: The icon region.
    * - `icon-mark`: The tone glyph, where none is slotted.
    */
-  "helix-base-callout": Partial<
-    HelixBaseCalloutProps & BaseProps<HelixBaseCallout> & BaseEvents
+  "helix-headless-callout": Partial<
+    HelixHeadlessCalloutProps & BaseProps<HelixHeadlessCallout> & BaseEvents
   >;
 
   /**
@@ -13246,8 +13344,8 @@ export type CustomElements = {
    * - `(default)`: The card's main content.
    * - `footer`: Actions that conclude the card.
    */
-  "helix-base-card": Partial<
-    HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
+  "helix-headless-card": Partial<
+    HelixHeadlessCardProps & BaseProps<HelixHeadlessCard> & BaseEvents
   >;
 
   /**
@@ -13356,9 +13454,9 @@ export type CustomElements = {
    * - `rotation-mark`: The glyph on the play and pause control.
    * - `track`: The scroller the slides sit in.
    */
-  "helix-base-carousel": Partial<
-    HelixBaseCarouselProps & BaseProps<HelixBaseCarousel> & BaseEvents
-  > & HelixBaseCarouselControlled;
+  "helix-headless-carousel": Partial<
+    HelixHeadlessCarouselProps & BaseProps<HelixHeadlessCarousel> & BaseEvents
+  > & HelixHeadlessCarouselControlled;
 
   /**
    * The host is the group, so `role="group"` sits on it through internals and
@@ -13481,8 +13579,10 @@ export type CustomElements = {
    * - `hint`: Help under the set.
    * - `feedback`: What is wrong with it.
    */
-  "helix-base-checkbox-group": Partial<
-    HelixBaseCheckboxGroupProps & BaseProps<HelixBaseCheckboxGroup> & BaseEvents
+  "helix-headless-checkbox-group": Partial<
+    HelixHeadlessCheckboxGroupProps &
+      BaseProps<HelixHeadlessCheckboxGroup> &
+      BaseEvents
   >;
 
   /**
@@ -13642,9 +13742,9 @@ export type CustomElements = {
    * - `label`: The label beside it.
    * - `mark`: The tick, or the dash when the box is indeterminate.
    */
-  "helix-base-checkbox": Partial<
-    HelixBaseCheckboxProps & BaseProps<HelixBaseCheckbox> & BaseEvents
-  > & HelixBaseCheckboxControlled;
+  "helix-headless-checkbox": Partial<
+    HelixHeadlessCheckboxProps & BaseProps<HelixHeadlessCheckbox> & BaseEvents
+  > & HelixHeadlessCheckboxControlled;
 
   /**
    * **`<pre><code>` and nothing cleverer.** The pair is what the platform means
@@ -13696,8 +13796,8 @@ export type CustomElements = {
    * - `copy`: The copy button.
    * - `label`: The file name or language, where one is given.
    */
-  "helix-base-code-block": Partial<
-    HelixBaseCodeBlockProps & BaseProps<HelixBaseCodeBlock> & BaseEvents
+  "helix-headless-code-block": Partial<
+    HelixHeadlessCodeBlockProps & BaseProps<HelixHeadlessCodeBlock> & BaseEvents
   >;
 
   /**
@@ -13725,8 +13825,8 @@ export type CustomElements = {
    *
    * - `code`: The `<code>` element.
    */
-  "helix-base-code": Partial<
-    HelixBaseCodeProps & BaseProps<HelixBaseCode> & BaseEvents
+  "helix-headless-code": Partial<
+    HelixHeadlessCodeProps & BaseProps<HelixHeadlessCode> & BaseEvents
   >;
 
   /**
@@ -13956,9 +14056,11 @@ export type CustomElements = {
    * - `surface`: The floating panel.
    * - `picker`: The color picker inside it.
    */
-  "helix-base-color-input": Partial<
-    HelixBaseColorInputProps & BaseProps<HelixBaseColorInput> & BaseEvents
-  > & HelixBaseColorInputControlled;
+  "helix-headless-color-input": Partial<
+    HelixHeadlessColorInputProps &
+      BaseProps<HelixHeadlessColorInput> &
+      BaseEvents
+  >;
 
   /**
    * **The picker itself, with no field around it.** Color Input is this element in
@@ -14167,9 +14269,11 @@ export type CustomElements = {
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
    */
-  "helix-base-color-picker": Partial<
-    HelixBaseColorPickerProps & BaseProps<HelixBaseColorPicker> & BaseEvents
-  > & HelixBaseColorPickerControlled;
+  "helix-headless-color-picker": Partial<
+    HelixHeadlessColorPickerProps &
+      BaseProps<HelixHeadlessColorPicker> &
+      BaseEvents
+  >;
 
   /**
    * **The list is `helix-listbox`, and the filtering is its own.** It already
@@ -14452,9 +14556,9 @@ export type CustomElements = {
    * - `items`: The scrolling box of options, forwarded from the listbox.
    * - `empty`: What shows where the filter has hidden everything, forwarded from the listbox.
    */
-  "helix-base-combobox": Partial<
-    HelixBaseComboboxProps & BaseProps<HelixBaseCombobox> & BaseEvents
-  > & HelixBaseComboboxControlled;
+  "helix-headless-combobox": Partial<
+    HelixHeadlessComboboxProps & BaseProps<HelixHeadlessCombobox> & BaseEvents
+  > & HelixHeadlessComboboxControlled;
 
   /**
    * **The list is `helix-listbox`, filtering and all.** Listbox already owns
@@ -14557,9 +14661,9 @@ export type CustomElements = {
    * - `search-field`: The field itself.
    * - `footer`: The row under the list.
    */
-  "helix-base-command": Partial<
-    HelixBaseCommandProps & BaseProps<HelixBaseCommand> & BaseEvents
-  > & HelixBaseCommandControlled;
+  "helix-headless-command": Partial<
+    HelixHeadlessCommandProps & BaseProps<HelixHeadlessCommand> & BaseEvents
+  > & HelixHeadlessCommandControlled;
 
   /**
    * **The confirmation is the component.** Writing to the clipboard is three
@@ -14720,8 +14824,10 @@ export type CustomElements = {
    * - `mark`: The clipboard glyph, and the confirmation that replaces it.
    * - `tooltip`: The bubble, forwarded from the tooltip inside.
    */
-  "helix-base-copy-button": Partial<
-    HelixBaseCopyButtonProps & BaseProps<HelixBaseCopyButton> & BaseEvents
+  "helix-headless-copy-button": Partial<
+    HelixHeadlessCopyButtonProps &
+      BaseProps<HelixHeadlessCopyButton> &
+      BaseEvents
   >;
 
   /**
@@ -14967,9 +15073,9 @@ export type CustomElements = {
    * - `surface`: The floating panel.
    * - `picker`: The date picker inside it.
    */
-  "helix-base-date-input": Partial<
-    HelixBaseDateInputProps & BaseProps<HelixBaseDateInput> & BaseEvents
-  > & HelixBaseDateInputControlled;
+  "helix-headless-date-input": Partial<
+    HelixHeadlessDateInputProps & BaseProps<HelixHeadlessDateInput> & BaseEvents
+  > & HelixHeadlessDateInputControlled;
 
   /**
    * A grid of days, per the APG date grid: the whole grid is one tab stop, arrows
@@ -15170,9 +15276,11 @@ export type CustomElements = {
    * - `week`: One row of days.
    * - `weekday`: A column header naming a day of the week.
    */
-  "helix-base-date-picker": Partial<
-    HelixBaseDatePickerProps & BaseProps<HelixBaseDatePicker> & BaseEvents
-  > & HelixBaseDatePickerControlled;
+  "helix-headless-date-picker": Partial<
+    HelixHeadlessDatePickerProps &
+      BaseProps<HelixHeadlessDatePicker> &
+      BaseEvents
+  >;
 
   /**
    * A real `<dialog>` opened with `showModal()`, not a div with a role and a
@@ -15290,9 +15398,9 @@ export type CustomElements = {
    *
    * - `dialog`: The native dialog element.
    */
-  "helix-base-dialog": Partial<
-    HelixBaseDialogProps & BaseProps<HelixBaseDialog> & BaseEvents
-  > & HelixBaseDialogControlled;
+  "helix-headless-dialog": Partial<
+    HelixHeadlessDialogProps & BaseProps<HelixHeadlessDialog> & BaseEvents
+  > & HelixHeadlessDialogControlled;
 
   /**
    * The separator role lives on the rule inside the shadow root rather than on
@@ -15336,8 +15444,8 @@ export type CustomElements = {
    * - `line`: The rule itself, or each half of it where something is set in.
    * - `content`: What is set into it.
    */
-  "helix-base-divider": Partial<
-    HelixBaseDividerProps & BaseProps<HelixBaseDivider> & BaseEvents
+  "helix-headless-divider": Partial<
+    HelixHeadlessDividerProps & BaseProps<HelixHeadlessDivider> & BaseEvents
   >;
 
   /**
@@ -15475,8 +15583,10 @@ export type CustomElements = {
    * - `segment`: One slice.
    * - `track`: The ring the slices are drawn on.
    */
-  "helix-base-donut-chart": Partial<
-    HelixBaseDonutChartProps & BaseProps<HelixBaseDonutChart> & BaseEvents
+  "helix-headless-donut-chart": Partial<
+    HelixHeadlessDonutChartProps &
+      BaseProps<HelixHeadlessDonutChart> &
+      BaseEvents
   >;
 
   /**
@@ -15589,9 +15699,9 @@ export type CustomElements = {
    * - `header`: The header region.
    * - `content`: The scrolling content region.
    */
-  "helix-base-drawer": Partial<
-    HelixBaseDrawerProps & BaseProps<HelixBaseDrawer> & BaseEvents
-  > & HelixBaseDrawerControlled;
+  "helix-headless-drawer": Partial<
+    HelixHeadlessDrawerProps & BaseProps<HelixHeadlessDrawer> & BaseEvents
+  > & HelixHeadlessDrawerControlled;
 
   /**
    * A row that opens a page *contains* that page: its rows are this row's own
@@ -15657,8 +15767,10 @@ export type CustomElements = {
    * - `item`: The row itself.
    * - `label`: The words.
    */
-  "helix-base-drilldown-item": Partial<
-    HelixBaseDrilldownItemProps & BaseProps<HelixBaseDrilldownItem> & BaseEvents
+  "helix-headless-drilldown-item": Partial<
+    HelixHeadlessDrilldownItemProps &
+      BaseProps<HelixHeadlessDrilldownItem> &
+      BaseEvents
   >;
 
   /**
@@ -15730,8 +15842,8 @@ export type CustomElements = {
    * - `page`: The region the rows are in.
    * - `title`: The name of the page showing.
    */
-  "helix-base-drilldown": Partial<
-    HelixBaseDrilldownProps & BaseProps<HelixBaseDrilldown> & BaseEvents
+  "helix-headless-drilldown": Partial<
+    HelixHeadlessDrilldownProps & BaseProps<HelixHeadlessDrilldown> & BaseEvents
   >;
 
   /**
@@ -15767,8 +15879,8 @@ export type CustomElements = {
    * - `(default)`: Why, and what to do about it.
    * - `actions`: The way out.
    */
-  "helix-base-empty": Partial<
-    HelixBaseEmptyProps & BaseProps<HelixBaseEmpty> & BaseEvents
+  "helix-headless-empty": Partial<
+    HelixHeadlessEmptyProps & BaseProps<HelixHeadlessEmpty> & BaseEvents
   >;
 
   /**
@@ -15935,8 +16047,8 @@ export type CustomElements = {
    * - `kind`: What kind of file it is.
    * - `remove`: The control that takes it back out.
    */
-  "helix-base-file-input": Partial<
-    HelixBaseFileInputProps & BaseProps<HelixBaseFileInput> & BaseEvents
+  "helix-headless-file-input": Partial<
+    HelixHeadlessFileInputProps & BaseProps<HelixHeadlessFileInput> & BaseEvents
   >;
 
   /**
@@ -15948,8 +16060,8 @@ export type CustomElements = {
    * and having a component that says so is what makes it reviewable.
    *
    * **Registered, so it can be rendered and not only subclassed.** The styled
-   * icon button extended `HelixBaseButton` directly, which left no
-   * `helix-base-icon-button` for anything to use: a headless consumer wanting an
+   * icon button extended `HelixHeadlessButton` directly, which left no
+   * `helix-headless-icon-button` for anything to use: a headless consumer wanting an
    * icon button had a button and a naming convention. Anything in this tier that
    * needs one, such as an announcement's dismiss control, can now render it
    * without reaching into the styled tier for a tag that would never upgrade.
@@ -16076,8 +16188,10 @@ export type CustomElements = {
    *
    * - `button`: The inner button or anchor.
    */
-  "helix-base-icon-button": Partial<
-    HelixBaseIconButtonProps & BaseProps<HelixBaseIconButton> & BaseEvents
+  "helix-headless-icon-button": Partial<
+    HelixHeadlessIconButtonProps &
+      BaseProps<HelixHeadlessIconButton> &
+      BaseEvents
   >;
 
   /**
@@ -16117,14 +16231,14 @@ export type CustomElements = {
    *
    * - `svg`: The rendered SVG.
    */
-  "helix-base-icon": Partial<
-    HelixBaseIconProps & BaseProps<HelixBaseIcon> & BaseEvents
+  "helix-headless-icon": Partial<
+    HelixHeadlessIconProps & BaseProps<HelixHeadlessIcon> & BaseEvents
   >;
 
   /**
    * **An element rather than a recipe, because of the part CSS cannot do.**
    * Reserving the box is `aspect-ratio` and needs nothing from anybody; `Link` and
-   * the megamenu row are recipes in `base.css` for exactly that reason. What
+   * the megamenu row are recipes in `headless.css` for exactly that reason. What
    * cannot be written as a rule is *when the picture arrived*: a stylesheet has no
    * way to know, and no way to hear that it never will. So this owns three states
    * and the two events that move between them, and leaves the box to the
@@ -16210,8 +16324,8 @@ export type CustomElements = {
    * - `placeholder`: What stands in until it arrives.
    * - `fallback`: What stands in when it fails.
    */
-  "helix-base-image": Partial<
-    HelixBaseImageProps & BaseProps<HelixBaseImage> & BaseEvents
+  "helix-headless-image": Partial<
+    HelixHeadlessImageProps & BaseProps<HelixHeadlessImage> & BaseEvents
   >;
 
   /**
@@ -16429,9 +16543,9 @@ export type CustomElements = {
    * - `icon`: A glyph this component draws.
    * - `reveal`: The button that shows and hides a password.
    */
-  "helix-base-input": Partial<
-    HelixBaseInputProps & BaseProps<HelixBaseInput> & BaseEvents
-  > & HelixBaseInputControlled;
+  "helix-headless-input": Partial<
+    HelixHeadlessInputProps & BaseProps<HelixHeadlessInput> & BaseEvents
+  > & HelixHeadlessInputControlled;
 
   /**
    * Renders a real `<kbd>`, so the passage still means "press this" to anything
@@ -16454,8 +16568,8 @@ export type CustomElements = {
    *
    * - `kbd`: The key.
    */
-  "helix-base-kbd": Partial<
-    HelixBaseKbdProps & BaseProps<HelixBaseKbd> & BaseEvents
+  "helix-headless-kbd": Partial<
+    HelixHeadlessKbdProps & BaseProps<HelixHeadlessKbd> & BaseEvents
   >;
 
   /**
@@ -16513,8 +16627,8 @@ export type CustomElements = {
    * - `name`: One series name.
    * - `swatch`: The color a series is drawn in.
    */
-  "helix-base-legend": Partial<
-    HelixBaseLegendProps & BaseProps<HelixBaseLegend> & BaseEvents
+  "helix-headless-legend": Partial<
+    HelixHeadlessLegendProps & BaseProps<HelixHeadlessLegend> & BaseEvents
   >;
 
   /**
@@ -16654,8 +16768,8 @@ export type CustomElements = {
    * - `tooltip-name`: A column's name inside the tooltip.
    * - `tooltip-value`: A column's value inside the tooltip.
    */
-  "helix-base-line-chart": Partial<
-    HelixBaseLineChartProps & BaseProps<HelixBaseLineChart> & BaseEvents
+  "helix-headless-line-chart": Partial<
+    HelixHeadlessLineChartProps & BaseProps<HelixHeadlessLineChart> & BaseEvents
   >;
 
   /**
@@ -16711,8 +16825,8 @@ export type CustomElements = {
    *
    * - `row`: The layout, held off the host so the host can carry a marker.
    */
-  "helix-base-list-item": Partial<
-    HelixBaseListItemProps & BaseProps<HelixBaseListItem> & BaseEvents
+  "helix-headless-list-item": Partial<
+    HelixHeadlessListItemProps & BaseProps<HelixHeadlessListItem> & BaseEvents
   >;
 
   /**
@@ -16752,8 +16866,8 @@ export type CustomElements = {
    *
    * - `(default)`: The rows.
    */
-  "helix-base-list": Partial<
-    HelixBaseListProps & BaseProps<HelixBaseList> & BaseEvents
+  "helix-headless-list": Partial<
+    HelixHeadlessListProps & BaseProps<HelixHeadlessList> & BaseEvents
   >;
 
   /**
@@ -17003,9 +17117,9 @@ export type CustomElements = {
    * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
    */
-  "helix-base-listbox": Partial<
-    HelixBaseListboxProps & BaseProps<HelixBaseListbox> & BaseEvents
-  > & HelixBaseListboxControlled;
+  "helix-headless-listbox": Partial<
+    HelixHeadlessListboxProps & BaseProps<HelixHeadlessListbox> & BaseEvents
+  > & HelixHeadlessListboxControlled;
 
   /**
    * Two concentric circles rather than one arc: the track is what makes the
@@ -17049,8 +17163,8 @@ export type CustomElements = {
    * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
    */
-  "helix-base-loader": Partial<
-    HelixBaseLoaderProps & BaseProps<HelixBaseLoader> & BaseEvents
+  "helix-headless-loader": Partial<
+    HelixHeadlessLoaderProps & BaseProps<HelixHeadlessLoader> & BaseEvents
   >;
 
   /**
@@ -17204,9 +17318,9 @@ export type CustomElements = {
    * - `trigger`: The default trigger, where none was slotted.
    * - `panel`: The region that opens.
    */
-  "helix-base-megamenu": Partial<
-    HelixBaseMegamenuProps & BaseProps<HelixBaseMegamenu> & BaseEvents
-  > & HelixBaseMegamenuControlled;
+  "helix-headless-megamenu": Partial<
+    HelixHeadlessMegamenuProps & BaseProps<HelixHeadlessMegamenu> & BaseEvents
+  > & HelixHeadlessMegamenuControlled;
 
   /**
    * Three shapes, one element, because a reader moving down a menu with the
@@ -17335,8 +17449,8 @@ export type CustomElements = {
    * - `start`: The leading column, which is a slot and is always there.
    * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
-  "helix-base-menu-item": Partial<
-    HelixBaseMenuItemProps & BaseProps<HelixBaseMenuItem> & BaseEvents
+  "helix-headless-menu-item": Partial<
+    HelixHeadlessMenuItemProps & BaseProps<HelixHeadlessMenuItem> & BaseEvents
   >;
 
   /**
@@ -17436,9 +17550,9 @@ export type CustomElements = {
    * - `menu`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
    */
-  "helix-base-menu": Partial<
-    HelixBaseMenuProps & BaseProps<HelixBaseMenu> & BaseEvents
-  > & HelixBaseMenuControlled;
+  "helix-headless-menu": Partial<
+    HelixHeadlessMenuProps & BaseProps<HelixHeadlessMenu> & BaseEvents
+  > & HelixHeadlessMenuControlled;
 
   /**
    * **Not `Progress`, and the difference is the whole component.** A progress bar
@@ -17558,8 +17672,8 @@ export type CustomElements = {
    * - `tick`: A mark at `low` or at `high`.
    * - `value`: The reading, under `show-value`.
    */
-  "helix-base-meter": Partial<
-    HelixBaseMeterProps & BaseProps<HelixBaseMeter> & BaseEvents
+  "helix-headless-meter": Partial<
+    HelixHeadlessMeterProps & BaseProps<HelixHeadlessMeter> & BaseEvents
   >;
 
   /**
@@ -17598,8 +17712,10 @@ export type CustomElements = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The marker that travels to the current destination.
    */
-  "helix-base-navigation": Partial<
-    HelixBaseNavigationProps & BaseProps<HelixBaseNavigation> & BaseEvents
+  "helix-headless-navigation": Partial<
+    HelixHeadlessNavigationProps &
+      BaseProps<HelixHeadlessNavigation> &
+      BaseEvents
   >;
 
   /**
@@ -17796,9 +17912,11 @@ export type CustomElements = {
    * - `increment-mark`: The glyph on the step up control.
    * - `label`: The name over the field, which is also the scrub grip.
    */
-  "helix-base-number-input": Partial<
-    HelixBaseNumberInputProps & BaseProps<HelixBaseNumberInput> & BaseEvents
-  > & HelixBaseNumberInputControlled;
+  "helix-headless-number-input": Partial<
+    HelixHeadlessNumberInputProps &
+      BaseProps<HelixHeadlessNumberInput> &
+      BaseEvents
+  >;
 
   /**
    * A heading over a set, and nothing else: it holds no selection and no value,
@@ -17829,8 +17947,10 @@ export type CustomElements = {
    * - `label`: The heading.
    * - `items`: The run itself.
    */
-  "helix-base-option-group": Partial<
-    HelixBaseOptionGroupProps & BaseProps<HelixBaseOptionGroup> & BaseEvents
+  "helix-headless-option-group": Partial<
+    HelixHeadlessOptionGroupProps &
+      BaseProps<HelixHeadlessOptionGroup> &
+      BaseEvents
   >;
 
   /**
@@ -17916,8 +18036,8 @@ export type CustomElements = {
    * - `item`: The row.
    * - `label`: The words.
    */
-  "helix-base-option": Partial<
-    HelixBaseOptionProps & BaseProps<HelixBaseOption> & BaseEvents
+  "helix-headless-option": Partial<
+    HelixHeadlessOptionProps & BaseProps<HelixHeadlessOption> & BaseEvents
   >;
 
   /**
@@ -18011,8 +18131,8 @@ export type CustomElements = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The mark that travels to the section being read.
    */
-  "helix-base-outline": Partial<
-    HelixBaseOutlineProps & BaseProps<HelixBaseOutline> & BaseEvents
+  "helix-headless-outline": Partial<
+    HelixHeadlessOutlineProps & BaseProps<HelixHeadlessOutline> & BaseEvents
   >;
 
   /**
@@ -18194,9 +18314,11 @@ export type CustomElements = {
    * - `previous`: The control that moves back one page.
    * - `status`: The reading of where you are, in `compact`.
    */
-  "helix-base-pagination": Partial<
-    HelixBasePaginationProps & BaseProps<HelixBasePagination> & BaseEvents
-  > & HelixBasePaginationControlled;
+  "helix-headless-pagination": Partial<
+    HelixHeadlessPaginationProps &
+      BaseProps<HelixHeadlessPagination> &
+      BaseEvents
+  >;
 
   /**
    * Its own element beside `Pagination` rather than a slot inside it, for the
@@ -18269,9 +18391,9 @@ export type CustomElements = {
    * - `trigger`: The closed control, forwarded from the select.
    * - `value`: The chosen size inside the trigger, forwarded from the select.
    */
-  "helix-base-pagination-size": Partial<
-    HelixBasePaginationSizeProps &
-      BaseProps<HelixBasePaginationSize> &
+  "helix-headless-pagination-size": Partial<
+    HelixHeadlessPaginationSizeProps &
+      BaseProps<HelixHeadlessPaginationSize> &
       BaseEvents
   >;
 
@@ -18333,9 +18455,9 @@ export type CustomElements = {
    * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
    */
-  "helix-base-pagination-summary": Partial<
-    HelixBasePaginationSummaryProps &
-      BaseProps<HelixBasePaginationSummary> &
+  "helix-headless-pagination-summary": Partial<
+    HelixHeadlessPaginationSummaryProps &
+      BaseProps<HelixHeadlessPaginationSummary> &
       BaseEvents
   >;
 
@@ -18517,9 +18639,9 @@ export type CustomElements = {
    * - `field`: The row of boxes.
    * - `cell`: One box.
    */
-  "helix-base-pin-input": Partial<
-    HelixBasePinInputProps & BaseProps<HelixBasePinInput> & BaseEvents
-  > & HelixBasePinInputControlled;
+  "helix-headless-pin-input": Partial<
+    HelixHeadlessPinInputProps & BaseProps<HelixHeadlessPinInput> & BaseEvents
+  > & HelixHeadlessPinInputControlled;
 
   /**
    * The general case the specific overlays are versions of. `Menu` holds
@@ -18610,9 +18732,9 @@ export type CustomElements = {
    * - `content`: The scrolling region inside the panel.
    * - `popover`: The panel.
    */
-  "helix-base-popover": Partial<
-    HelixBasePopoverProps & BaseProps<HelixBasePopover> & BaseEvents
-  > & HelixBasePopoverControlled;
+  "helix-headless-popover": Partial<
+    HelixHeadlessPopoverProps & BaseProps<HelixHeadlessPopover> & BaseEvents
+  > & HelixHeadlessPopoverControlled;
 
   /**
    * Determinate by default, and `indeterminate` for a task whose total is not
@@ -18664,7 +18786,7 @@ export type CustomElements = {
    * - `max`: The total the work is measured against.
    * - `shape`: Whether the value is drawn as a bar or as a ring.
    *
-   * **On this tier because it changes the markup**, which is the base tier's to
+   * **On this tier because it changes the markup**, which is the headless tier's to
    * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
    * stylesheet turns one into the other: the styled tier tried, with a conic
    * gradient and a mask, and the thing it could not do was the round end the
@@ -18710,8 +18832,8 @@ export type CustomElements = {
    * - `groove`: The unfilled circle, under the ring's own sweep.
    * - `value`: The reading beside the bar, under `show-value`.
    */
-  "helix-base-progress": Partial<
-    HelixBaseProgressProps & BaseProps<HelixBaseProgress> & BaseEvents
+  "helix-headless-progress": Partial<
+    HelixHeadlessProgressProps & BaseProps<HelixHeadlessProgress> & BaseEvents
   >;
 
   /**
@@ -18780,8 +18902,8 @@ export type CustomElements = {
    * - `finders`: The three corner squares, which can take their own color.
    * - `logo`: The box holding the center mark.
    */
-  "helix-base-qr-code": Partial<
-    HelixBaseQrCodeProps & BaseProps<HelixBaseQrCode> & BaseEvents
+  "helix-headless-qr-code": Partial<
+    HelixHeadlessQrCodeProps & BaseProps<HelixHeadlessQrCode> & BaseEvents
   >;
 
   /**
@@ -18811,8 +18933,8 @@ export type CustomElements = {
    *
    * - `quote`: The quotation.
    */
-  "helix-base-quote": Partial<
-    HelixBaseQuoteProps & BaseProps<HelixBaseQuote> & BaseEvents
+  "helix-headless-quote": Partial<
+    HelixHeadlessQuoteProps & BaseProps<HelixHeadlessQuote> & BaseEvents
   >;
 
   /**
@@ -18971,9 +19093,11 @@ export type CustomElements = {
    * - `hint`: Help under the set.
    * - `feedback`: What is wrong with it.
    */
-  "helix-base-radio-group": Partial<
-    HelixBaseRadioGroupProps & BaseProps<HelixBaseRadioGroup> & BaseEvents
-  > & HelixBaseRadioGroupControlled;
+  "helix-headless-radio-group": Partial<
+    HelixHeadlessRadioGroupProps &
+      BaseProps<HelixHeadlessRadioGroup> &
+      BaseEvents
+  >;
 
   /**
    * Renders a `<button role="radio">`, not an `<input type="radio">`, and the
@@ -19028,8 +19152,8 @@ export type CustomElements = {
    * - `mark`: The dot inside it.
    * - `label`: The words beside it.
    */
-  "helix-base-radio": Partial<
-    HelixBaseRadioProps & BaseProps<HelixBaseRadio> & BaseEvents
+  "helix-headless-radio": Partial<
+    HelixHeadlessRadioProps & BaseProps<HelixHeadlessRadio> & BaseEvents
   >;
 
   /**
@@ -19227,9 +19351,9 @@ export type CustomElements = {
    * - `option`: One place a reader can press, which is one step.
    * - `value`: The score written out, under `show-value`.
    */
-  "helix-base-rating": Partial<
-    HelixBaseRatingProps & BaseProps<HelixBaseRating> & BaseEvents
-  > & HelixBaseRatingControlled;
+  "helix-headless-rating": Partial<
+    HelixHeadlessRatingProps & BaseProps<HelixHeadlessRating> & BaseEvents
+  > & HelixHeadlessRatingControlled;
 
   /**
    * **The whole component is one fact a stylesheet cannot work out for itself:
@@ -19286,8 +19410,10 @@ export type CustomElements = {
    * - `viewport`: The scrolling box.
    * - `edges`: Where the sideways edge cues are drawn.
    */
-  "helix-base-scroll-area": Partial<
-    HelixBaseScrollAreaProps & BaseProps<HelixBaseScrollArea> & BaseEvents
+  "helix-headless-scroll-area": Partial<
+    HelixHeadlessScrollAreaProps &
+      BaseProps<HelixHeadlessScrollArea> &
+      BaseEvents
   >;
 
   /**
@@ -19490,9 +19616,9 @@ export type CustomElements = {
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
    */
-  "helix-base-select": Partial<
-    HelixBaseSelectProps & BaseProps<HelixBaseSelect> & BaseEvents
-  > & HelixBaseSelectControlled;
+  "helix-headless-select": Partial<
+    HelixHeadlessSelectProps & BaseProps<HelixHeadlessSelect> & BaseEvents
+  > & HelixHeadlessSelectControlled;
 
   /**
    * Carries `aria-busy` and a polite live region, so a reader using a screen
@@ -19509,8 +19635,8 @@ export type CustomElements = {
    *
    * - `skeleton`: The placeholder surface.
    */
-  "helix-base-skeleton": Partial<
-    HelixBaseSkeletonProps & BaseProps<HelixBaseSkeleton> & BaseEvents
+  "helix-headless-skeleton": Partial<
+    HelixHeadlessSkeletonProps & BaseProps<HelixHeadlessSkeleton> & BaseEvents
   >;
 
   /**
@@ -19722,9 +19848,9 @@ export type CustomElements = {
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `output`: The current value, shown beside it.
    */
-  "helix-base-slider": Partial<
-    HelixBaseSliderProps & BaseProps<HelixBaseSlider> & BaseEvents
-  > & HelixBaseSliderControlled;
+  "helix-headless-slider": Partial<
+    HelixHeadlessSliderProps & BaseProps<HelixHeadlessSlider> & BaseEvents
+  > & HelixHeadlessSliderControlled;
 
   /**
    * The one chart here that takes its numbers from an attribute, and the reversal
@@ -19849,8 +19975,8 @@ export type CustomElements = {
    * - `wash-end`: The far stop of the area's gradient.
    * - `wash-start`: The stop of the area's gradient that meets the line.
    */
-  "helix-base-sparkline": Partial<
-    HelixBaseSparklineProps & BaseProps<HelixBaseSparkline> & BaseEvents
+  "helix-headless-sparkline": Partial<
+    HelixHeadlessSparklineProps & BaseProps<HelixHeadlessSparkline> & BaseEvents
   >;
 
   /**
@@ -19907,8 +20033,10 @@ export type CustomElements = {
    * - `icon`: The mark's box.
    * - `label`: The name beside it.
    */
-  "helix-base-speed-dial-item": Partial<
-    HelixBaseSpeedDialItemProps & BaseProps<HelixBaseSpeedDialItem> & BaseEvents
+  "helix-headless-speed-dial-item": Partial<
+    HelixHeadlessSpeedDialItemProps &
+      BaseProps<HelixHeadlessSpeedDialItem> &
+      BaseEvents
   >;
 
   /**
@@ -20003,9 +20131,9 @@ export type CustomElements = {
    * - `trigger`: The default trigger, where none was slotted.
    * - `actions`: The region the actions are drawn in.
    */
-  "helix-base-speed-dial": Partial<
-    HelixBaseSpeedDialProps & BaseProps<HelixBaseSpeedDial> & BaseEvents
-  > & HelixBaseSpeedDialControlled;
+  "helix-headless-speed-dial": Partial<
+    HelixHeadlessSpeedDialProps & BaseProps<HelixHeadlessSpeedDial> & BaseEvents
+  > & HelixHeadlessSpeedDialControlled;
 
   /**
    * **One axis, and nesting is how you get two.** The sandbox this was taken from
@@ -20173,13 +20301,13 @@ export type CustomElements = {
    * otherwise coupled and neither reads the other's state. `settled` is false
    * for each step of a drag and true once, at the end, for the reason a drag
    * announces once: only the position it ends at is a preference.
-   * - `cross(by: HelixBaseSplitter, at: number) => void`: Records that a nested splitter crosses this one at `at` percent along it.
+   * - `cross(by: HelixHeadlessSplitter, at: number) => void`: Records that a nested splitter crosses this one at `at` percent along it.
    *
    * Public because it is the whole of the channel between the two, and it runs
    * one way: the child tells the parent where it is, and the parent draws the
    * corner and drives them both. Nothing is read back, so neither has to know
    * anything about the other's state.
-   * - `uncross(by: HelixBaseSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
+   * - `uncross(by: HelixHeadlessSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
    *
    * ## CSS Custom Properties
    *
@@ -20197,9 +20325,9 @@ export type CustomElements = {
    * - `separator`: The divider itself.
    * - `corner`: The handle where two dividers cross, added on the client.
    */
-  "helix-base-splitter": Partial<
-    HelixBaseSplitterProps & BaseProps<HelixBaseSplitter> & BaseEvents
-  > & HelixBaseSplitterControlled;
+  "helix-headless-splitter": Partial<
+    HelixHeadlessSplitterProps & BaseProps<HelixHeadlessSplitter> & BaseEvents
+  > & HelixHeadlessSplitterControlled;
 
   /**
    * A group rather than a list, because the figures are read together and their
@@ -20218,8 +20346,8 @@ export type CustomElements = {
    *
    * - `(default)`: The stats.
    */
-  "helix-base-stat-group": Partial<
-    HelixBaseStatGroupProps & BaseProps<HelixBaseStatGroup> & BaseEvents
+  "helix-headless-stat-group": Partial<
+    HelixHeadlessStatGroupProps & BaseProps<HelixHeadlessStatGroup> & BaseEvents
   >;
 
   /**
@@ -20271,8 +20399,8 @@ export type CustomElements = {
    * - `label`: What the value measures.
    * - `unit`: The unit, set beside the value.
    */
-  "helix-base-stat": Partial<
-    HelixBaseStatProps & BaseProps<HelixBaseStat> & BaseEvents
+  "helix-headless-stat": Partial<
+    HelixHeadlessStatProps & BaseProps<HelixHeadlessStat> & BaseEvents
   >;
 
   /**
@@ -20372,8 +20500,8 @@ export type CustomElements = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back.
    */
-  "helix-base-steps": Partial<
-    HelixBaseStepsProps & BaseProps<HelixBaseSteps> & BaseEvents
+  "helix-headless-steps": Partial<
+    HelixHeadlessStepsProps & BaseProps<HelixHeadlessSteps> & BaseEvents
   >;
 
   /**
@@ -20468,8 +20596,8 @@ export type CustomElements = {
    * - `marker`: The shape carrying the number or the check.
    * - `trail`: The half line running on to the next.
    */
-  "helix-base-step": Partial<
-    HelixBaseStepProps & BaseProps<HelixBaseStep> & BaseEvents
+  "helix-headless-step": Partial<
+    HelixHeadlessStepProps & BaseProps<HelixHeadlessStep> & BaseEvents
   >;
 
   /**
@@ -20624,9 +20752,9 @@ export type CustomElements = {
    * - `thumb`: The part that moves.
    * - `label`: The words beside it.
    */
-  "helix-base-switch": Partial<
-    HelixBaseSwitchProps & BaseProps<HelixBaseSwitch> & BaseEvents
-  > & HelixBaseSwitchControlled;
+  "helix-headless-switch": Partial<
+    HelixHeadlessSwitchProps & BaseProps<HelixHeadlessSwitch> & BaseEvents
+  > & HelixHeadlessSwitchControlled;
 
   /**
    * Carries its own role, because a grid of divs is not a table to anything
@@ -20649,8 +20777,8 @@ export type CustomElements = {
    *
    * - `(default)`: The cell's content.
    */
-  "helix-base-table-cell": Partial<
-    HelixBaseTableCellProps & BaseProps<HelixBaseTableCell> & BaseEvents
+  "helix-headless-table-cell": Partial<
+    HelixHeadlessTableCellProps & BaseProps<HelixHeadlessTableCell> & BaseEvents
   >;
 
   /**
@@ -20698,8 +20826,10 @@ export type CustomElements = {
    *
    * - `column`: The heading cell.
    */
-  "helix-base-table-column": Partial<
-    HelixBaseTableColumnProps & BaseProps<HelixBaseTableColumn> & BaseEvents
+  "helix-headless-table-column": Partial<
+    HelixHeadlessTableColumnProps &
+      BaseProps<HelixHeadlessTableColumn> &
+      BaseEvents
   >;
 
   /**
@@ -20761,8 +20891,8 @@ export type CustomElements = {
    * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    * - `table`: The grid.
    */
-  "helix-base-table": Partial<
-    HelixBaseTableProps & BaseProps<HelixBaseTable> & BaseEvents
+  "helix-headless-table": Partial<
+    HelixHeadlessTableProps & BaseProps<HelixHeadlessTable> & BaseEvents
   >;
 
   /**
@@ -20777,8 +20907,8 @@ export type CustomElements = {
    *
    * - `(default)`: The row's cells.
    */
-  "helix-base-table-row": Partial<
-    HelixBaseTableRowProps & BaseProps<HelixBaseTableRow> & BaseEvents
+  "helix-headless-table-row": Partial<
+    HelixHeadlessTableRowProps & BaseProps<HelixHeadlessTableRow> & BaseEvents
   >;
 
   /**
@@ -20818,8 +20948,8 @@ export type CustomElements = {
    *
    * - `panel`: The panel container.
    */
-  "helix-base-tabs-panel": Partial<
-    HelixBaseTabsPanelProps & BaseProps<HelixBaseTabsPanel> & BaseEvents
+  "helix-headless-tabs-panel": Partial<
+    HelixHeadlessTabsPanelProps & BaseProps<HelixHeadlessTabsPanel> & BaseEvents
   >;
 
   /**
@@ -20914,8 +21044,8 @@ export type CustomElements = {
    * - `tabs`: The tab list.
    * - `panels`: The panel container.
    */
-  "helix-base-tabs": Partial<
-    HelixBaseTabsProps & BaseProps<HelixBaseTabs> & BaseEvents
+  "helix-headless-tabs": Partial<
+    HelixHeadlessTabsProps & BaseProps<HelixHeadlessTabs> & BaseEvents
   >;
 
   /**
@@ -20959,8 +21089,8 @@ export type CustomElements = {
    *
    * - `tab`: The tab itself.
    */
-  "helix-base-tabs-tab": Partial<
-    HelixBaseTabsTabProps & BaseProps<HelixBaseTabsTab> & BaseEvents
+  "helix-headless-tabs-tab": Partial<
+    HelixHeadlessTabsTabProps & BaseProps<HelixHeadlessTabsTab> & BaseEvents
   >;
 
   /**
@@ -21012,8 +21142,8 @@ export type CustomElements = {
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `prefix`: The category before the label.
    */
-  "helix-base-tag": Partial<
-    HelixBaseTagProps & BaseProps<HelixBaseTag> & BaseEvents
+  "helix-headless-tag": Partial<
+    HelixHeadlessTagProps & BaseProps<HelixHeadlessTag> & BaseEvents
   >;
 
   /**
@@ -21162,9 +21292,9 @@ export type CustomElements = {
    * - `field`: The box holding the control.
    * - `control`: The textarea itself.
    */
-  "helix-base-textarea": Partial<
-    HelixBaseTextareaProps & BaseProps<HelixBaseTextarea> & BaseEvents
-  > & HelixBaseTextareaControlled;
+  "helix-headless-textarea": Partial<
+    HelixHeadlessTextareaProps & BaseProps<HelixHeadlessTextarea> & BaseEvents
+  > & HelixHeadlessTextareaControlled;
 
   /**
    * **The list is `helix-time-picker`, not a second one written here.** It is worth
@@ -21385,9 +21515,9 @@ export type CustomElements = {
    * - `surface`: The floating panel.
    * - `picker`: The list inside it.
    */
-  "helix-base-time-input": Partial<
-    HelixBaseTimeInputProps & BaseProps<HelixBaseTimeInput> & BaseEvents
-  > & HelixBaseTimeInputControlled;
+  "helix-headless-time-input": Partial<
+    HelixHeadlessTimeInputProps & BaseProps<HelixHeadlessTimeInput> & BaseEvents
+  > & HelixHeadlessTimeInputControlled;
 
   /**
    * **A list rather than three wheels**, and the reason is what a list already
@@ -21612,9 +21742,11 @@ export type CustomElements = {
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it. Carries `data-between` inside a range.
    */
-  "helix-base-time-picker": Partial<
-    HelixBaseTimePickerProps & BaseProps<HelixBaseTimePicker> & BaseEvents
-  > & HelixBaseTimePickerControlled;
+  "helix-headless-time-picker": Partial<
+    HelixHeadlessTimePickerProps &
+      BaseProps<HelixHeadlessTimePicker> &
+      BaseEvents
+  >;
 
   /**
    * **The time is a `<time>`, and only when there is a time to put in it.** Given
@@ -21662,8 +21794,10 @@ export type CustomElements = {
    * - `rail`: The column holding the mark and the line.
    * - `time`: When it happened.
    */
-  "helix-base-timeline-item": Partial<
-    HelixBaseTimelineItemProps & BaseProps<HelixBaseTimelineItem> & BaseEvents
+  "helix-headless-timeline-item": Partial<
+    HelixHeadlessTimelineItemProps &
+      BaseProps<HelixHeadlessTimelineItem> &
+      BaseEvents
   >;
 
   /**
@@ -21704,8 +21838,8 @@ export type CustomElements = {
    *
    * - `(default)`: The entries.
    */
-  "helix-base-timeline": Partial<
-    HelixBaseTimelineProps & BaseProps<HelixBaseTimeline> & BaseEvents
+  "helix-headless-timeline": Partial<
+    HelixHeadlessTimelineProps & BaseProps<HelixHeadlessTimeline> & BaseEvents
   >;
 
   /**
@@ -21835,9 +21969,9 @@ export type CustomElements = {
    * - `item`: The message's own surface.
    * - `timer`: The bar showing how long is left, where a duration was given.
    */
-  "helix-base-toast-item": Partial<
-    HelixBaseToastItemProps & BaseProps<HelixBaseToastItem> & BaseEvents
-  > & HelixBaseToastItemControlled;
+  "helix-headless-toast-item": Partial<
+    HelixHeadlessToastItemProps & BaseProps<HelixHeadlessToastItem> & BaseEvents
+  > & HelixHeadlessToastItemControlled;
 
   /**
    * **The region is why this is one family rather than two.** A live region has
@@ -21898,8 +22032,8 @@ export type CustomElements = {
    *
    * - `region`: The stack the messages are in.
    */
-  "helix-base-toast": Partial<
-    HelixBaseToastProps & BaseProps<HelixBaseToast> & BaseEvents
+  "helix-headless-toast": Partial<
+    HelixHeadlessToastProps & BaseProps<HelixHeadlessToast> & BaseEvents
   >;
 
   /**
@@ -22071,9 +22205,11 @@ export type CustomElements = {
    * - `divider`: The rule after an inline label, separating it from the items.
    * - `indicator`: The moving marker behind the selected item.
    */
-  "helix-base-toggle-group": Partial<
-    HelixBaseToggleGroupProps & BaseProps<HelixBaseToggleGroup> & BaseEvents
-  > & HelixBaseToggleGroupControlled;
+  "helix-headless-toggle-group": Partial<
+    HelixHeadlessToggleGroupProps &
+      BaseProps<HelixHeadlessToggleGroup> &
+      BaseEvents
+  >;
 
   /**
    * Renders a `<button role="radio">`. This is a form control and nothing else.
@@ -22126,8 +22262,8 @@ export type CustomElements = {
    *
    * - `item`: The radio button.
    */
-  "helix-base-toggle": Partial<
-    HelixBaseToggleProps & BaseProps<HelixBaseToggle> & BaseEvents
+  "helix-headless-toggle": Partial<
+    HelixHeadlessToggleProps & BaseProps<HelixHeadlessToggle> & BaseEvents
   >;
 
   /**
@@ -22160,8 +22296,8 @@ export type CustomElements = {
    *
    * - `toolbar`: The toolbar container.
    */
-  "helix-base-toolbar": Partial<
-    HelixBaseToolbarProps & BaseProps<HelixBaseToolbar> & BaseEvents
+  "helix-headless-toolbar": Partial<
+    HelixHeadlessToolbarProps & BaseProps<HelixHeadlessToolbar> & BaseEvents
   >;
 
   /**
@@ -22345,9 +22481,9 @@ export type CustomElements = {
    * - `arrow`: The point, resting against the trigger.
    * - `tooltip`: The bubble.
    */
-  "helix-base-tooltip": Partial<
-    HelixBaseTooltipProps & BaseProps<HelixBaseTooltip> & BaseEvents
-  > & HelixBaseTooltipControlled;
+  "helix-headless-tooltip": Partial<
+    HelixHeadlessTooltipProps & BaseProps<HelixHeadlessTooltip> & BaseEvents
+  > & HelixHeadlessTooltipControlled;
 
   /**
    * The root owns the order and nothing else. Which stop is current, what Next
@@ -22446,9 +22582,9 @@ export type CustomElements = {
    *
    * - `spotlight`: The box over the current target, which paints the scrim.
    */
-  "helix-base-tour": Partial<
-    HelixBaseTourProps & BaseProps<HelixBaseTour> & BaseEvents
-  > & HelixBaseTourControlled;
+  "helix-headless-tour": Partial<
+    HelixHeadlessTourProps & BaseProps<HelixHeadlessTour> & BaseEvents
+  > & HelixHeadlessTourControlled;
 
   /**
    * A stop names a target with `for` and holds whatever the consumer puts in it.
@@ -22527,8 +22663,8 @@ export type CustomElements = {
    * - `next`: The control that goes on, and finishes on the last stop.
    * - `skip`: The control that leaves the tour.
    */
-  "helix-base-tour-stop": Partial<
-    HelixBaseTourStopProps & BaseProps<HelixBaseTourStop> & BaseEvents
+  "helix-headless-tour-stop": Partial<
+    HelixHeadlessTourStopProps & BaseProps<HelixHeadlessTourStop> & BaseEvents
   >;
 
   /**
@@ -22693,9 +22829,9 @@ export type CustomElements = {
    * - `label`: The label text.
    * - `group`: The container for nested items.
    */
-  "helix-base-tree-item": Partial<
-    HelixBaseTreeItemProps & BaseProps<HelixBaseTreeItem> & BaseEvents
-  > & HelixBaseTreeItemControlled;
+  "helix-headless-tree-item": Partial<
+    HelixHeadlessTreeItemProps & BaseProps<HelixHeadlessTreeItem> & BaseEvents
+  > & HelixHeadlessTreeItemControlled;
 
   /**
    * Focus is a single tab stop, moved with the arrow keys, which is what the tree
@@ -22763,8 +22899,8 @@ export type CustomElements = {
    *
    * - `tree`: The tree container.
    */
-  "helix-base-tree": Partial<
-    HelixBaseTreeProps & BaseProps<HelixBaseTree> & BaseEvents
+  "helix-headless-tree": Partial<
+    HelixHeadlessTreeProps & BaseProps<HelixHeadlessTree> & BaseEvents
   >;
 
   /**
@@ -22822,8 +22958,8 @@ export type CustomElements = {
    * - `direction`: The direction as a word, for readers who are not looking.
    * - `icon`: The arrow.
    */
-  "helix-base-trend": Partial<
-    HelixBaseTrendProps & BaseProps<HelixBaseTrend> & BaseEvents
+  "helix-headless-trend": Partial<
+    HelixHeadlessTrendProps & BaseProps<HelixHeadlessTrend> & BaseEvents
   >;
 
   /**
@@ -22898,9 +23034,9 @@ export type CustomElements = {
    * - `thumbnail`: The image `poster` falls back to.
    * - `label`: The name and whatever follows it.
    */
-  "helix-base-video-playlist-item": Partial<
-    HelixBaseVideoPlaylistItemProps &
-      BaseProps<HelixBaseVideoPlaylistItem> &
+  "helix-headless-video-playlist-item": Partial<
+    HelixHeadlessVideoPlaylistItemProps &
+      BaseProps<HelixHeadlessVideoPlaylistItem> &
       BaseEvents
   >;
 
@@ -22972,9 +23108,9 @@ export type CustomElements = {
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
    */
-  "helix-base-video-playlist-menu": Partial<
-    HelixBaseVideoPlaylistMenuProps &
-      BaseProps<HelixBaseVideoPlaylistMenu> &
+  "helix-headless-video-playlist-menu": Partial<
+    HelixHeadlessVideoPlaylistMenuProps &
+      BaseProps<HelixHeadlessVideoPlaylistMenu> &
       BaseEvents
   >;
 
@@ -23053,8 +23189,10 @@ export type CustomElements = {
    * - `player`: The region holding the player.
    * - `items`: The list of entries.
    */
-  "helix-base-video-playlist": Partial<
-    HelixBaseVideoPlaylistProps & BaseProps<HelixBaseVideoPlaylist> & BaseEvents
+  "helix-headless-video-playlist": Partial<
+    HelixHeadlessVideoPlaylistProps &
+      BaseProps<HelixHeadlessVideoPlaylist> &
+      BaseEvents
   >;
 
   /**
@@ -23276,8 +23414,8 @@ export type CustomElements = {
    * - `more`: The button that opens it.
    * - `fullscreen`: The whole screen, and back.
    */
-  "helix-base-video": Partial<
-    HelixBaseVideoProps & BaseProps<HelixBaseVideo> & BaseEvents
+  "helix-headless-video": Partial<
+    HelixHeadlessVideoProps & BaseProps<HelixHeadlessVideo> & BaseEvents
   >;
 
   /**
@@ -23320,7 +23458,7 @@ export type CustomElements = {
    * before it is a list at all:
    *
    * ```css
-   * helix-base-virtual-list::part(viewport) {
+   * helix-headless-virtual-list::part(viewport) {
    *   block-size: 12rem;
    *   overflow-y: auto;
    * }
@@ -23354,8 +23492,10 @@ export type CustomElements = {
    * - `before`: The space standing in for rows above the window.
    * - `viewport`: The scrolling box. Needs a block size and an overflow on this tier.
    */
-  "helix-base-virtual-list": Partial<
-    HelixBaseVirtualListProps & BaseProps<HelixBaseVirtualList> & BaseEvents
+  "helix-headless-virtual-list": Partial<
+    HelixHeadlessVirtualListProps &
+      BaseProps<HelixHeadlessVirtualList> &
+      BaseEvents
   >;
 };
 
@@ -23447,12 +23587,12 @@ export type CustomElementsSolidJs = {
    * - `content`: The revealed region.
    * - `content-inner`: The clipping box inside the animated region.
    */
-  "helix-base-accordion-item": Partial<
-    HelixBaseAccordionItemProps &
-      HelixBaseAccordionItemSolidJsProps &
-      BaseProps<HelixBaseAccordionItem> &
+  "helix-headless-accordion-item": Partial<
+    HelixHeadlessAccordionItemProps &
+      HelixHeadlessAccordionItemSolidJsProps &
+      BaseProps<HelixHeadlessAccordionItem> &
       BaseEvents
-  > & HelixBaseAccordionItemControlledSolidJs;
+  >;
 
   /**
    * Holds the mode and nothing else. The item that was clicked is what
@@ -23467,7 +23607,7 @@ export type CustomElementsSolidJs = {
    * Membership resolves on demand, so there is no registry to keep in step: an
    * item added a second after render coordinates on its first click.
    *
-   * Items are matched with `instanceof HelixBaseAccordionItem`, never by tag
+   * Items are matched with `instanceof HelixHeadlessAccordionItem`, never by tag
    * name. Matching `helix-accordion-item` would tie this tier to the styled one.
    *
    * Every listener is attached on connect, so none of it runs on the server,
@@ -23493,10 +23633,10 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The accordion's items.
    */
-  "helix-base-accordion": Partial<
-    HelixBaseAccordionProps &
-      HelixBaseAccordionSolidJsProps &
-      BaseProps<HelixBaseAccordion> &
+  "helix-headless-accordion": Partial<
+    HelixHeadlessAccordionProps &
+      HelixHeadlessAccordionSolidJsProps &
+      BaseProps<HelixHeadlessAccordion> &
       BaseEvents
   >;
 
@@ -23582,10 +23722,10 @@ export type CustomElementsSolidJs = {
    * - `dismiss`: The control that asks to close.
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    */
-  "helix-base-announcement": Partial<
-    HelixBaseAnnouncementProps &
-      HelixBaseAnnouncementSolidJsProps &
-      BaseProps<HelixBaseAnnouncement> &
+  "helix-headless-announcement": Partial<
+    HelixHeadlessAnnouncementProps &
+      HelixHeadlessAnnouncementSolidJsProps &
+      BaseProps<HelixHeadlessAnnouncement> &
       BaseEvents
   >;
 
@@ -23651,10 +23791,10 @@ export type CustomElementsSolidJs = {
    * - `content`: The middle region.
    * - `end`: The trailing region.
    */
-  "helix-base-app-header": Partial<
-    HelixBaseAppHeaderProps &
-      HelixBaseAppHeaderSolidJsProps &
-      BaseProps<HelixBaseAppHeader> &
+  "helix-headless-app-header": Partial<
+    HelixHeadlessAppHeaderProps &
+      HelixHeadlessAppHeaderSolidJsProps &
+      BaseProps<HelixHeadlessAppHeader> &
       BaseEvents
   >;
 
@@ -23726,10 +23866,10 @@ export type CustomElementsSolidJs = {
    *
    * - `overflow`: The count of avatars past `max`.
    */
-  "helix-base-avatar-group": Partial<
-    HelixBaseAvatarGroupProps &
-      HelixBaseAvatarGroupSolidJsProps &
-      BaseProps<HelixBaseAvatarGroup> &
+  "helix-headless-avatar-group": Partial<
+    HelixHeadlessAvatarGroupProps &
+      HelixHeadlessAvatarGroupSolidJsProps &
+      BaseProps<HelixHeadlessAvatarGroup> &
       BaseEvents
   >;
 
@@ -23772,10 +23912,10 @@ export type CustomElementsSolidJs = {
    * - `image`: The image, when one is loading or loaded.
    * - `initials`: The initials shown when there is no usable image.
    */
-  "helix-base-avatar": Partial<
-    HelixBaseAvatarProps &
-      HelixBaseAvatarSolidJsProps &
-      BaseProps<HelixBaseAvatar> &
+  "helix-headless-avatar": Partial<
+    HelixHeadlessAvatarProps &
+      HelixHeadlessAvatarSolidJsProps &
+      BaseProps<HelixHeadlessAvatar> &
       BaseEvents
   >;
 
@@ -23815,10 +23955,10 @@ export type CustomElementsSolidJs = {
    *
    * - `indicator`: The count, or the dot when there is no value.
    */
-  "helix-base-badge": Partial<
-    HelixBaseBadgeProps &
-      HelixBaseBadgeSolidJsProps &
-      BaseProps<HelixBaseBadge> &
+  "helix-headless-badge": Partial<
+    HelixHeadlessBadgeProps &
+      HelixHeadlessBadgeSolidJsProps &
+      BaseProps<HelixHeadlessBadge> &
       BaseEvents
   >;
 
@@ -23989,10 +24129,10 @@ export type CustomElementsSolidJs = {
    * - `tooltip-name`: A column's name inside the tooltip.
    * - `tooltip-value`: A column's value inside the tooltip.
    */
-  "helix-base-bar-chart": Partial<
-    HelixBaseBarChartProps &
-      HelixBaseBarChartSolidJsProps &
-      BaseProps<HelixBaseBarChart> &
+  "helix-headless-bar-chart": Partial<
+    HelixHeadlessBarChartProps &
+      HelixHeadlessBarChartSolidJsProps &
+      BaseProps<HelixHeadlessBarChart> &
       BaseEvents
   >;
 
@@ -24025,10 +24165,10 @@ export type CustomElementsSolidJs = {
    * - `blockquote`: The quotation.
    * - `attribution`: The footer carrying the source.
    */
-  "helix-base-blockquote": Partial<
-    HelixBaseBlockquoteProps &
-      HelixBaseBlockquoteSolidJsProps &
-      BaseProps<HelixBaseBlockquote> &
+  "helix-headless-blockquote": Partial<
+    HelixHeadlessBlockquoteProps &
+      HelixHeadlessBlockquoteSolidJsProps &
+      BaseProps<HelixHeadlessBlockquote> &
       BaseEvents
   >;
 
@@ -24090,10 +24230,10 @@ export type CustomElementsSolidJs = {
    * - `separator`: The separator preceding the item.
    * - `separator-mark`: The glyph between this crumb and the next, where none is slotted.
    */
-  "helix-base-breadcrumb": Partial<
-    HelixBaseBreadcrumbProps &
-      HelixBaseBreadcrumbSolidJsProps &
-      BaseProps<HelixBaseBreadcrumb> &
+  "helix-headless-breadcrumb": Partial<
+    HelixHeadlessBreadcrumbProps &
+      HelixHeadlessBreadcrumbSolidJsProps &
+      BaseProps<HelixHeadlessBreadcrumb> &
       BaseEvents
   >;
 
@@ -24161,10 +24301,10 @@ export type CustomElementsSolidJs = {
    *
    * - `list`: The ordered list.
    */
-  "helix-base-breadcrumbs": Partial<
-    HelixBaseBreadcrumbsProps &
-      HelixBaseBreadcrumbsSolidJsProps &
-      BaseProps<HelixBaseBreadcrumbs> &
+  "helix-headless-breadcrumbs": Partial<
+    HelixHeadlessBreadcrumbsProps &
+      HelixHeadlessBreadcrumbsSolidJsProps &
+      BaseProps<HelixHeadlessBreadcrumbs> &
       BaseEvents
   >;
 
@@ -24196,10 +24336,10 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The buttons in the group.
    */
-  "helix-base-button-group": Partial<
-    HelixBaseButtonGroupProps &
-      HelixBaseButtonGroupSolidJsProps &
-      BaseProps<HelixBaseButtonGroup> &
+  "helix-headless-button-group": Partial<
+    HelixHeadlessButtonGroupProps &
+      HelixHeadlessButtonGroupSolidJsProps &
+      BaseProps<HelixHeadlessButtonGroup> &
       BaseEvents
   >;
 
@@ -24342,10 +24482,10 @@ export type CustomElementsSolidJs = {
    *
    * - `button`: The inner control.
    */
-  "helix-base-button": Partial<
-    HelixBaseButtonProps &
-      HelixBaseButtonSolidJsProps &
-      BaseProps<HelixBaseButton> &
+  "helix-headless-button": Partial<
+    HelixHeadlessButtonProps &
+      HelixHeadlessButtonSolidJsProps &
+      BaseProps<HelixHeadlessButton> &
       BaseEvents
   >;
 
@@ -24394,10 +24534,10 @@ export type CustomElementsSolidJs = {
    * - `icon`: The icon region.
    * - `icon-mark`: The tone glyph, where none is slotted.
    */
-  "helix-base-callout": Partial<
-    HelixBaseCalloutProps &
-      HelixBaseCalloutSolidJsProps &
-      BaseProps<HelixBaseCallout> &
+  "helix-headless-callout": Partial<
+    HelixHeadlessCalloutProps &
+      HelixHeadlessCalloutSolidJsProps &
+      BaseProps<HelixHeadlessCallout> &
       BaseEvents
   >;
 
@@ -24441,10 +24581,10 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The card's main content.
    * - `footer`: Actions that conclude the card.
    */
-  "helix-base-card": Partial<
-    HelixBaseCardProps &
-      HelixBaseCardSolidJsProps &
-      BaseProps<HelixBaseCard> &
+  "helix-headless-card": Partial<
+    HelixHeadlessCardProps &
+      HelixHeadlessCardSolidJsProps &
+      BaseProps<HelixHeadlessCard> &
       BaseEvents
   >;
 
@@ -24554,12 +24694,12 @@ export type CustomElementsSolidJs = {
    * - `rotation-mark`: The glyph on the play and pause control.
    * - `track`: The scroller the slides sit in.
    */
-  "helix-base-carousel": Partial<
-    HelixBaseCarouselProps &
-      HelixBaseCarouselSolidJsProps &
-      BaseProps<HelixBaseCarousel> &
+  "helix-headless-carousel": Partial<
+    HelixHeadlessCarouselProps &
+      HelixHeadlessCarouselSolidJsProps &
+      BaseProps<HelixHeadlessCarousel> &
       BaseEvents
-  > & HelixBaseCarouselControlledSolidJs;
+  > & HelixHeadlessCarouselControlledSolidJs;
 
   /**
    * The host is the group, so `role="group"` sits on it through internals and
@@ -24682,10 +24822,10 @@ export type CustomElementsSolidJs = {
    * - `hint`: Help under the set.
    * - `feedback`: What is wrong with it.
    */
-  "helix-base-checkbox-group": Partial<
-    HelixBaseCheckboxGroupProps &
-      HelixBaseCheckboxGroupSolidJsProps &
-      BaseProps<HelixBaseCheckboxGroup> &
+  "helix-headless-checkbox-group": Partial<
+    HelixHeadlessCheckboxGroupProps &
+      HelixHeadlessCheckboxGroupSolidJsProps &
+      BaseProps<HelixHeadlessCheckboxGroup> &
       BaseEvents
   >;
 
@@ -24846,12 +24986,12 @@ export type CustomElementsSolidJs = {
    * - `label`: The label beside it.
    * - `mark`: The tick, or the dash when the box is indeterminate.
    */
-  "helix-base-checkbox": Partial<
-    HelixBaseCheckboxProps &
-      HelixBaseCheckboxSolidJsProps &
-      BaseProps<HelixBaseCheckbox> &
+  "helix-headless-checkbox": Partial<
+    HelixHeadlessCheckboxProps &
+      HelixHeadlessCheckboxSolidJsProps &
+      BaseProps<HelixHeadlessCheckbox> &
       BaseEvents
-  > & HelixBaseCheckboxControlledSolidJs;
+  > & HelixHeadlessCheckboxControlledSolidJs;
 
   /**
    * **`<pre><code>` and nothing cleverer.** The pair is what the platform means
@@ -24903,10 +25043,10 @@ export type CustomElementsSolidJs = {
    * - `copy`: The copy button.
    * - `label`: The file name or language, where one is given.
    */
-  "helix-base-code-block": Partial<
-    HelixBaseCodeBlockProps &
-      HelixBaseCodeBlockSolidJsProps &
-      BaseProps<HelixBaseCodeBlock> &
+  "helix-headless-code-block": Partial<
+    HelixHeadlessCodeBlockProps &
+      HelixHeadlessCodeBlockSolidJsProps &
+      BaseProps<HelixHeadlessCodeBlock> &
       BaseEvents
   >;
 
@@ -24935,10 +25075,10 @@ export type CustomElementsSolidJs = {
    *
    * - `code`: The `<code>` element.
    */
-  "helix-base-code": Partial<
-    HelixBaseCodeProps &
-      HelixBaseCodeSolidJsProps &
-      BaseProps<HelixBaseCode> &
+  "helix-headless-code": Partial<
+    HelixHeadlessCodeProps &
+      HelixHeadlessCodeSolidJsProps &
+      BaseProps<HelixHeadlessCode> &
       BaseEvents
   >;
 
@@ -25169,12 +25309,12 @@ export type CustomElementsSolidJs = {
    * - `surface`: The floating panel.
    * - `picker`: The color picker inside it.
    */
-  "helix-base-color-input": Partial<
-    HelixBaseColorInputProps &
-      HelixBaseColorInputSolidJsProps &
-      BaseProps<HelixBaseColorInput> &
+  "helix-headless-color-input": Partial<
+    HelixHeadlessColorInputProps &
+      HelixHeadlessColorInputSolidJsProps &
+      BaseProps<HelixHeadlessColorInput> &
       BaseEvents
-  > & HelixBaseColorInputControlledSolidJs;
+  >;
 
   /**
    * **The picker itself, with no field around it.** Color Input is this element in
@@ -25383,12 +25523,12 @@ export type CustomElementsSolidJs = {
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
    */
-  "helix-base-color-picker": Partial<
-    HelixBaseColorPickerProps &
-      HelixBaseColorPickerSolidJsProps &
-      BaseProps<HelixBaseColorPicker> &
+  "helix-headless-color-picker": Partial<
+    HelixHeadlessColorPickerProps &
+      HelixHeadlessColorPickerSolidJsProps &
+      BaseProps<HelixHeadlessColorPicker> &
       BaseEvents
-  > & HelixBaseColorPickerControlledSolidJs;
+  >;
 
   /**
    * **The list is `helix-listbox`, and the filtering is its own.** It already
@@ -25671,12 +25811,12 @@ export type CustomElementsSolidJs = {
    * - `items`: The scrolling box of options, forwarded from the listbox.
    * - `empty`: What shows where the filter has hidden everything, forwarded from the listbox.
    */
-  "helix-base-combobox": Partial<
-    HelixBaseComboboxProps &
-      HelixBaseComboboxSolidJsProps &
-      BaseProps<HelixBaseCombobox> &
+  "helix-headless-combobox": Partial<
+    HelixHeadlessComboboxProps &
+      HelixHeadlessComboboxSolidJsProps &
+      BaseProps<HelixHeadlessCombobox> &
       BaseEvents
-  > & HelixBaseComboboxControlledSolidJs;
+  > & HelixHeadlessComboboxControlledSolidJs;
 
   /**
    * **The list is `helix-listbox`, filtering and all.** Listbox already owns
@@ -25779,12 +25919,12 @@ export type CustomElementsSolidJs = {
    * - `search-field`: The field itself.
    * - `footer`: The row under the list.
    */
-  "helix-base-command": Partial<
-    HelixBaseCommandProps &
-      HelixBaseCommandSolidJsProps &
-      BaseProps<HelixBaseCommand> &
+  "helix-headless-command": Partial<
+    HelixHeadlessCommandProps &
+      HelixHeadlessCommandSolidJsProps &
+      BaseProps<HelixHeadlessCommand> &
       BaseEvents
-  > & HelixBaseCommandControlledSolidJs;
+  > & HelixHeadlessCommandControlledSolidJs;
 
   /**
    * **The confirmation is the component.** Writing to the clipboard is three
@@ -25945,10 +26085,10 @@ export type CustomElementsSolidJs = {
    * - `mark`: The clipboard glyph, and the confirmation that replaces it.
    * - `tooltip`: The bubble, forwarded from the tooltip inside.
    */
-  "helix-base-copy-button": Partial<
-    HelixBaseCopyButtonProps &
-      HelixBaseCopyButtonSolidJsProps &
-      BaseProps<HelixBaseCopyButton> &
+  "helix-headless-copy-button": Partial<
+    HelixHeadlessCopyButtonProps &
+      HelixHeadlessCopyButtonSolidJsProps &
+      BaseProps<HelixHeadlessCopyButton> &
       BaseEvents
   >;
 
@@ -26195,12 +26335,12 @@ export type CustomElementsSolidJs = {
    * - `surface`: The floating panel.
    * - `picker`: The date picker inside it.
    */
-  "helix-base-date-input": Partial<
-    HelixBaseDateInputProps &
-      HelixBaseDateInputSolidJsProps &
-      BaseProps<HelixBaseDateInput> &
+  "helix-headless-date-input": Partial<
+    HelixHeadlessDateInputProps &
+      HelixHeadlessDateInputSolidJsProps &
+      BaseProps<HelixHeadlessDateInput> &
       BaseEvents
-  > & HelixBaseDateInputControlledSolidJs;
+  > & HelixHeadlessDateInputControlledSolidJs;
 
   /**
    * A grid of days, per the APG date grid: the whole grid is one tab stop, arrows
@@ -26401,12 +26541,12 @@ export type CustomElementsSolidJs = {
    * - `week`: One row of days.
    * - `weekday`: A column header naming a day of the week.
    */
-  "helix-base-date-picker": Partial<
-    HelixBaseDatePickerProps &
-      HelixBaseDatePickerSolidJsProps &
-      BaseProps<HelixBaseDatePicker> &
+  "helix-headless-date-picker": Partial<
+    HelixHeadlessDatePickerProps &
+      HelixHeadlessDatePickerSolidJsProps &
+      BaseProps<HelixHeadlessDatePicker> &
       BaseEvents
-  > & HelixBaseDatePickerControlledSolidJs;
+  >;
 
   /**
    * A real `<dialog>` opened with `showModal()`, not a div with a role and a
@@ -26524,12 +26664,12 @@ export type CustomElementsSolidJs = {
    *
    * - `dialog`: The native dialog element.
    */
-  "helix-base-dialog": Partial<
-    HelixBaseDialogProps &
-      HelixBaseDialogSolidJsProps &
-      BaseProps<HelixBaseDialog> &
+  "helix-headless-dialog": Partial<
+    HelixHeadlessDialogProps &
+      HelixHeadlessDialogSolidJsProps &
+      BaseProps<HelixHeadlessDialog> &
       BaseEvents
-  > & HelixBaseDialogControlledSolidJs;
+  > & HelixHeadlessDialogControlledSolidJs;
 
   /**
    * The separator role lives on the rule inside the shadow root rather than on
@@ -26573,10 +26713,10 @@ export type CustomElementsSolidJs = {
    * - `line`: The rule itself, or each half of it where something is set in.
    * - `content`: What is set into it.
    */
-  "helix-base-divider": Partial<
-    HelixBaseDividerProps &
-      HelixBaseDividerSolidJsProps &
-      BaseProps<HelixBaseDivider> &
+  "helix-headless-divider": Partial<
+    HelixHeadlessDividerProps &
+      HelixHeadlessDividerSolidJsProps &
+      BaseProps<HelixHeadlessDivider> &
       BaseEvents
   >;
 
@@ -26715,10 +26855,10 @@ export type CustomElementsSolidJs = {
    * - `segment`: One slice.
    * - `track`: The ring the slices are drawn on.
    */
-  "helix-base-donut-chart": Partial<
-    HelixBaseDonutChartProps &
-      HelixBaseDonutChartSolidJsProps &
-      BaseProps<HelixBaseDonutChart> &
+  "helix-headless-donut-chart": Partial<
+    HelixHeadlessDonutChartProps &
+      HelixHeadlessDonutChartSolidJsProps &
+      BaseProps<HelixHeadlessDonutChart> &
       BaseEvents
   >;
 
@@ -26832,12 +26972,12 @@ export type CustomElementsSolidJs = {
    * - `header`: The header region.
    * - `content`: The scrolling content region.
    */
-  "helix-base-drawer": Partial<
-    HelixBaseDrawerProps &
-      HelixBaseDrawerSolidJsProps &
-      BaseProps<HelixBaseDrawer> &
+  "helix-headless-drawer": Partial<
+    HelixHeadlessDrawerProps &
+      HelixHeadlessDrawerSolidJsProps &
+      BaseProps<HelixHeadlessDrawer> &
       BaseEvents
-  > & HelixBaseDrawerControlledSolidJs;
+  > & HelixHeadlessDrawerControlledSolidJs;
 
   /**
    * A row that opens a page *contains* that page: its rows are this row's own
@@ -26903,10 +27043,10 @@ export type CustomElementsSolidJs = {
    * - `item`: The row itself.
    * - `label`: The words.
    */
-  "helix-base-drilldown-item": Partial<
-    HelixBaseDrilldownItemProps &
-      HelixBaseDrilldownItemSolidJsProps &
-      BaseProps<HelixBaseDrilldownItem> &
+  "helix-headless-drilldown-item": Partial<
+    HelixHeadlessDrilldownItemProps &
+      HelixHeadlessDrilldownItemSolidJsProps &
+      BaseProps<HelixHeadlessDrilldownItem> &
       BaseEvents
   >;
 
@@ -26979,10 +27119,10 @@ export type CustomElementsSolidJs = {
    * - `page`: The region the rows are in.
    * - `title`: The name of the page showing.
    */
-  "helix-base-drilldown": Partial<
-    HelixBaseDrilldownProps &
-      HelixBaseDrilldownSolidJsProps &
-      BaseProps<HelixBaseDrilldown> &
+  "helix-headless-drilldown": Partial<
+    HelixHeadlessDrilldownProps &
+      HelixHeadlessDrilldownSolidJsProps &
+      BaseProps<HelixHeadlessDrilldown> &
       BaseEvents
   >;
 
@@ -27019,10 +27159,10 @@ export type CustomElementsSolidJs = {
    * - `(default)`: Why, and what to do about it.
    * - `actions`: The way out.
    */
-  "helix-base-empty": Partial<
-    HelixBaseEmptyProps &
-      HelixBaseEmptySolidJsProps &
-      BaseProps<HelixBaseEmpty> &
+  "helix-headless-empty": Partial<
+    HelixHeadlessEmptyProps &
+      HelixHeadlessEmptySolidJsProps &
+      BaseProps<HelixHeadlessEmpty> &
       BaseEvents
   >;
 
@@ -27190,10 +27330,10 @@ export type CustomElementsSolidJs = {
    * - `kind`: What kind of file it is.
    * - `remove`: The control that takes it back out.
    */
-  "helix-base-file-input": Partial<
-    HelixBaseFileInputProps &
-      HelixBaseFileInputSolidJsProps &
-      BaseProps<HelixBaseFileInput> &
+  "helix-headless-file-input": Partial<
+    HelixHeadlessFileInputProps &
+      HelixHeadlessFileInputSolidJsProps &
+      BaseProps<HelixHeadlessFileInput> &
       BaseEvents
   >;
 
@@ -27206,8 +27346,8 @@ export type CustomElementsSolidJs = {
    * and having a component that says so is what makes it reviewable.
    *
    * **Registered, so it can be rendered and not only subclassed.** The styled
-   * icon button extended `HelixBaseButton` directly, which left no
-   * `helix-base-icon-button` for anything to use: a headless consumer wanting an
+   * icon button extended `HelixHeadlessButton` directly, which left no
+   * `helix-headless-icon-button` for anything to use: a headless consumer wanting an
    * icon button had a button and a naming convention. Anything in this tier that
    * needs one, such as an announcement's dismiss control, can now render it
    * without reaching into the styled tier for a tag that would never upgrade.
@@ -27334,10 +27474,10 @@ export type CustomElementsSolidJs = {
    *
    * - `button`: The inner button or anchor.
    */
-  "helix-base-icon-button": Partial<
-    HelixBaseIconButtonProps &
-      HelixBaseIconButtonSolidJsProps &
-      BaseProps<HelixBaseIconButton> &
+  "helix-headless-icon-button": Partial<
+    HelixHeadlessIconButtonProps &
+      HelixHeadlessIconButtonSolidJsProps &
+      BaseProps<HelixHeadlessIconButton> &
       BaseEvents
   >;
 
@@ -27378,17 +27518,17 @@ export type CustomElementsSolidJs = {
    *
    * - `svg`: The rendered SVG.
    */
-  "helix-base-icon": Partial<
-    HelixBaseIconProps &
-      HelixBaseIconSolidJsProps &
-      BaseProps<HelixBaseIcon> &
+  "helix-headless-icon": Partial<
+    HelixHeadlessIconProps &
+      HelixHeadlessIconSolidJsProps &
+      BaseProps<HelixHeadlessIcon> &
       BaseEvents
   >;
 
   /**
    * **An element rather than a recipe, because of the part CSS cannot do.**
    * Reserving the box is `aspect-ratio` and needs nothing from anybody; `Link` and
-   * the megamenu row are recipes in `base.css` for exactly that reason. What
+   * the megamenu row are recipes in `headless.css` for exactly that reason. What
    * cannot be written as a rule is *when the picture arrived*: a stylesheet has no
    * way to know, and no way to hear that it never will. So this owns three states
    * and the two events that move between them, and leaves the box to the
@@ -27474,10 +27614,10 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: What stands in until it arrives.
    * - `fallback`: What stands in when it fails.
    */
-  "helix-base-image": Partial<
-    HelixBaseImageProps &
-      HelixBaseImageSolidJsProps &
-      BaseProps<HelixBaseImage> &
+  "helix-headless-image": Partial<
+    HelixHeadlessImageProps &
+      HelixHeadlessImageSolidJsProps &
+      BaseProps<HelixHeadlessImage> &
       BaseEvents
   >;
 
@@ -27696,12 +27836,12 @@ export type CustomElementsSolidJs = {
    * - `icon`: A glyph this component draws.
    * - `reveal`: The button that shows and hides a password.
    */
-  "helix-base-input": Partial<
-    HelixBaseInputProps &
-      HelixBaseInputSolidJsProps &
-      BaseProps<HelixBaseInput> &
+  "helix-headless-input": Partial<
+    HelixHeadlessInputProps &
+      HelixHeadlessInputSolidJsProps &
+      BaseProps<HelixHeadlessInput> &
       BaseEvents
-  > & HelixBaseInputControlledSolidJs;
+  > & HelixHeadlessInputControlledSolidJs;
 
   /**
    * Renders a real `<kbd>`, so the passage still means "press this" to anything
@@ -27724,10 +27864,10 @@ export type CustomElementsSolidJs = {
    *
    * - `kbd`: The key.
    */
-  "helix-base-kbd": Partial<
-    HelixBaseKbdProps &
-      HelixBaseKbdSolidJsProps &
-      BaseProps<HelixBaseKbd> &
+  "helix-headless-kbd": Partial<
+    HelixHeadlessKbdProps &
+      HelixHeadlessKbdSolidJsProps &
+      BaseProps<HelixHeadlessKbd> &
       BaseEvents
   >;
 
@@ -27786,10 +27926,10 @@ export type CustomElementsSolidJs = {
    * - `name`: One series name.
    * - `swatch`: The color a series is drawn in.
    */
-  "helix-base-legend": Partial<
-    HelixBaseLegendProps &
-      HelixBaseLegendSolidJsProps &
-      BaseProps<HelixBaseLegend> &
+  "helix-headless-legend": Partial<
+    HelixHeadlessLegendProps &
+      HelixHeadlessLegendSolidJsProps &
+      BaseProps<HelixHeadlessLegend> &
       BaseEvents
   >;
 
@@ -27930,10 +28070,10 @@ export type CustomElementsSolidJs = {
    * - `tooltip-name`: A column's name inside the tooltip.
    * - `tooltip-value`: A column's value inside the tooltip.
    */
-  "helix-base-line-chart": Partial<
-    HelixBaseLineChartProps &
-      HelixBaseLineChartSolidJsProps &
-      BaseProps<HelixBaseLineChart> &
+  "helix-headless-line-chart": Partial<
+    HelixHeadlessLineChartProps &
+      HelixHeadlessLineChartSolidJsProps &
+      BaseProps<HelixHeadlessLineChart> &
       BaseEvents
   >;
 
@@ -27990,10 +28130,10 @@ export type CustomElementsSolidJs = {
    *
    * - `row`: The layout, held off the host so the host can carry a marker.
    */
-  "helix-base-list-item": Partial<
-    HelixBaseListItemProps &
-      HelixBaseListItemSolidJsProps &
-      BaseProps<HelixBaseListItem> &
+  "helix-headless-list-item": Partial<
+    HelixHeadlessListItemProps &
+      HelixHeadlessListItemSolidJsProps &
+      BaseProps<HelixHeadlessListItem> &
       BaseEvents
   >;
 
@@ -28034,10 +28174,10 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The rows.
    */
-  "helix-base-list": Partial<
-    HelixBaseListProps &
-      HelixBaseListSolidJsProps &
-      BaseProps<HelixBaseList> &
+  "helix-headless-list": Partial<
+    HelixHeadlessListProps &
+      HelixHeadlessListSolidJsProps &
+      BaseProps<HelixHeadlessList> &
       BaseEvents
   >;
 
@@ -28288,12 +28428,12 @@ export type CustomElementsSolidJs = {
    * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
    */
-  "helix-base-listbox": Partial<
-    HelixBaseListboxProps &
-      HelixBaseListboxSolidJsProps &
-      BaseProps<HelixBaseListbox> &
+  "helix-headless-listbox": Partial<
+    HelixHeadlessListboxProps &
+      HelixHeadlessListboxSolidJsProps &
+      BaseProps<HelixHeadlessListbox> &
       BaseEvents
-  > & HelixBaseListboxControlledSolidJs;
+  > & HelixHeadlessListboxControlledSolidJs;
 
   /**
    * Two concentric circles rather than one arc: the track is what makes the
@@ -28337,10 +28477,10 @@ export type CustomElementsSolidJs = {
    * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
    */
-  "helix-base-loader": Partial<
-    HelixBaseLoaderProps &
-      HelixBaseLoaderSolidJsProps &
-      BaseProps<HelixBaseLoader> &
+  "helix-headless-loader": Partial<
+    HelixHeadlessLoaderProps &
+      HelixHeadlessLoaderSolidJsProps &
+      BaseProps<HelixHeadlessLoader> &
       BaseEvents
   >;
 
@@ -28495,12 +28635,12 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The default trigger, where none was slotted.
    * - `panel`: The region that opens.
    */
-  "helix-base-megamenu": Partial<
-    HelixBaseMegamenuProps &
-      HelixBaseMegamenuSolidJsProps &
-      BaseProps<HelixBaseMegamenu> &
+  "helix-headless-megamenu": Partial<
+    HelixHeadlessMegamenuProps &
+      HelixHeadlessMegamenuSolidJsProps &
+      BaseProps<HelixHeadlessMegamenu> &
       BaseEvents
-  > & HelixBaseMegamenuControlledSolidJs;
+  > & HelixHeadlessMegamenuControlledSolidJs;
 
   /**
    * Three shapes, one element, because a reader moving down a menu with the
@@ -28629,10 +28769,10 @@ export type CustomElementsSolidJs = {
    * - `start`: The leading column, which is a slot and is always there.
    * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
-  "helix-base-menu-item": Partial<
-    HelixBaseMenuItemProps &
-      HelixBaseMenuItemSolidJsProps &
-      BaseProps<HelixBaseMenuItem> &
+  "helix-headless-menu-item": Partial<
+    HelixHeadlessMenuItemProps &
+      HelixHeadlessMenuItemSolidJsProps &
+      BaseProps<HelixHeadlessMenuItem> &
       BaseEvents
   >;
 
@@ -28733,12 +28873,12 @@ export type CustomElementsSolidJs = {
    * - `menu`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
    */
-  "helix-base-menu": Partial<
-    HelixBaseMenuProps &
-      HelixBaseMenuSolidJsProps &
-      BaseProps<HelixBaseMenu> &
+  "helix-headless-menu": Partial<
+    HelixHeadlessMenuProps &
+      HelixHeadlessMenuSolidJsProps &
+      BaseProps<HelixHeadlessMenu> &
       BaseEvents
-  > & HelixBaseMenuControlledSolidJs;
+  > & HelixHeadlessMenuControlledSolidJs;
 
   /**
    * **Not `Progress`, and the difference is the whole component.** A progress bar
@@ -28858,10 +28998,10 @@ export type CustomElementsSolidJs = {
    * - `tick`: A mark at `low` or at `high`.
    * - `value`: The reading, under `show-value`.
    */
-  "helix-base-meter": Partial<
-    HelixBaseMeterProps &
-      HelixBaseMeterSolidJsProps &
-      BaseProps<HelixBaseMeter> &
+  "helix-headless-meter": Partial<
+    HelixHeadlessMeterProps &
+      HelixHeadlessMeterSolidJsProps &
+      BaseProps<HelixHeadlessMeter> &
       BaseEvents
   >;
 
@@ -28901,10 +29041,10 @@ export type CustomElementsSolidJs = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The marker that travels to the current destination.
    */
-  "helix-base-navigation": Partial<
-    HelixBaseNavigationProps &
-      HelixBaseNavigationSolidJsProps &
-      BaseProps<HelixBaseNavigation> &
+  "helix-headless-navigation": Partial<
+    HelixHeadlessNavigationProps &
+      HelixHeadlessNavigationSolidJsProps &
+      BaseProps<HelixHeadlessNavigation> &
       BaseEvents
   >;
 
@@ -29102,12 +29242,12 @@ export type CustomElementsSolidJs = {
    * - `increment-mark`: The glyph on the step up control.
    * - `label`: The name over the field, which is also the scrub grip.
    */
-  "helix-base-number-input": Partial<
-    HelixBaseNumberInputProps &
-      HelixBaseNumberInputSolidJsProps &
-      BaseProps<HelixBaseNumberInput> &
+  "helix-headless-number-input": Partial<
+    HelixHeadlessNumberInputProps &
+      HelixHeadlessNumberInputSolidJsProps &
+      BaseProps<HelixHeadlessNumberInput> &
       BaseEvents
-  > & HelixBaseNumberInputControlledSolidJs;
+  >;
 
   /**
    * A heading over a set, and nothing else: it holds no selection and no value,
@@ -29138,10 +29278,10 @@ export type CustomElementsSolidJs = {
    * - `label`: The heading.
    * - `items`: The run itself.
    */
-  "helix-base-option-group": Partial<
-    HelixBaseOptionGroupProps &
-      HelixBaseOptionGroupSolidJsProps &
-      BaseProps<HelixBaseOptionGroup> &
+  "helix-headless-option-group": Partial<
+    HelixHeadlessOptionGroupProps &
+      HelixHeadlessOptionGroupSolidJsProps &
+      BaseProps<HelixHeadlessOptionGroup> &
       BaseEvents
   >;
 
@@ -29228,10 +29368,10 @@ export type CustomElementsSolidJs = {
    * - `item`: The row.
    * - `label`: The words.
    */
-  "helix-base-option": Partial<
-    HelixBaseOptionProps &
-      HelixBaseOptionSolidJsProps &
-      BaseProps<HelixBaseOption> &
+  "helix-headless-option": Partial<
+    HelixHeadlessOptionProps &
+      HelixHeadlessOptionSolidJsProps &
+      BaseProps<HelixHeadlessOption> &
       BaseEvents
   >;
 
@@ -29326,10 +29466,10 @@ export type CustomElementsSolidJs = {
    * - `nav`: The navigation landmark.
    * - `indicator`: The mark that travels to the section being read.
    */
-  "helix-base-outline": Partial<
-    HelixBaseOutlineProps &
-      HelixBaseOutlineSolidJsProps &
-      BaseProps<HelixBaseOutline> &
+  "helix-headless-outline": Partial<
+    HelixHeadlessOutlineProps &
+      HelixHeadlessOutlineSolidJsProps &
+      BaseProps<HelixHeadlessOutline> &
       BaseEvents
   >;
 
@@ -29512,12 +29652,12 @@ export type CustomElementsSolidJs = {
    * - `previous`: The control that moves back one page.
    * - `status`: The reading of where you are, in `compact`.
    */
-  "helix-base-pagination": Partial<
-    HelixBasePaginationProps &
-      HelixBasePaginationSolidJsProps &
-      BaseProps<HelixBasePagination> &
+  "helix-headless-pagination": Partial<
+    HelixHeadlessPaginationProps &
+      HelixHeadlessPaginationSolidJsProps &
+      BaseProps<HelixHeadlessPagination> &
       BaseEvents
-  > & HelixBasePaginationControlledSolidJs;
+  >;
 
   /**
    * Its own element beside `Pagination` rather than a slot inside it, for the
@@ -29590,10 +29730,10 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The closed control, forwarded from the select.
    * - `value`: The chosen size inside the trigger, forwarded from the select.
    */
-  "helix-base-pagination-size": Partial<
-    HelixBasePaginationSizeProps &
-      HelixBasePaginationSizeSolidJsProps &
-      BaseProps<HelixBasePaginationSize> &
+  "helix-headless-pagination-size": Partial<
+    HelixHeadlessPaginationSizeProps &
+      HelixHeadlessPaginationSizeSolidJsProps &
+      BaseProps<HelixHeadlessPaginationSize> &
       BaseEvents
   >;
 
@@ -29655,10 +29795,10 @@ export type CustomElementsSolidJs = {
    * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
    */
-  "helix-base-pagination-summary": Partial<
-    HelixBasePaginationSummaryProps &
-      HelixBasePaginationSummarySolidJsProps &
-      BaseProps<HelixBasePaginationSummary> &
+  "helix-headless-pagination-summary": Partial<
+    HelixHeadlessPaginationSummaryProps &
+      HelixHeadlessPaginationSummarySolidJsProps &
+      BaseProps<HelixHeadlessPaginationSummary> &
       BaseEvents
   >;
 
@@ -29840,12 +29980,12 @@ export type CustomElementsSolidJs = {
    * - `field`: The row of boxes.
    * - `cell`: One box.
    */
-  "helix-base-pin-input": Partial<
-    HelixBasePinInputProps &
-      HelixBasePinInputSolidJsProps &
-      BaseProps<HelixBasePinInput> &
+  "helix-headless-pin-input": Partial<
+    HelixHeadlessPinInputProps &
+      HelixHeadlessPinInputSolidJsProps &
+      BaseProps<HelixHeadlessPinInput> &
       BaseEvents
-  > & HelixBasePinInputControlledSolidJs;
+  > & HelixHeadlessPinInputControlledSolidJs;
 
   /**
    * The general case the specific overlays are versions of. `Menu` holds
@@ -29936,12 +30076,12 @@ export type CustomElementsSolidJs = {
    * - `content`: The scrolling region inside the panel.
    * - `popover`: The panel.
    */
-  "helix-base-popover": Partial<
-    HelixBasePopoverProps &
-      HelixBasePopoverSolidJsProps &
-      BaseProps<HelixBasePopover> &
+  "helix-headless-popover": Partial<
+    HelixHeadlessPopoverProps &
+      HelixHeadlessPopoverSolidJsProps &
+      BaseProps<HelixHeadlessPopover> &
       BaseEvents
-  > & HelixBasePopoverControlledSolidJs;
+  > & HelixHeadlessPopoverControlledSolidJs;
 
   /**
    * Determinate by default, and `indeterminate` for a task whose total is not
@@ -29993,7 +30133,7 @@ export type CustomElementsSolidJs = {
    * - `max`: The total the work is measured against.
    * - `shape`: Whether the value is drawn as a bar or as a ring.
    *
-   * **On this tier because it changes the markup**, which is the base tier's to
+   * **On this tier because it changes the markup**, which is the headless tier's to
    * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
    * stylesheet turns one into the other: the styled tier tried, with a conic
    * gradient and a mask, and the thing it could not do was the round end the
@@ -30039,10 +30179,10 @@ export type CustomElementsSolidJs = {
    * - `groove`: The unfilled circle, under the ring's own sweep.
    * - `value`: The reading beside the bar, under `show-value`.
    */
-  "helix-base-progress": Partial<
-    HelixBaseProgressProps &
-      HelixBaseProgressSolidJsProps &
-      BaseProps<HelixBaseProgress> &
+  "helix-headless-progress": Partial<
+    HelixHeadlessProgressProps &
+      HelixHeadlessProgressSolidJsProps &
+      BaseProps<HelixHeadlessProgress> &
       BaseEvents
   >;
 
@@ -30112,10 +30252,10 @@ export type CustomElementsSolidJs = {
    * - `finders`: The three corner squares, which can take their own color.
    * - `logo`: The box holding the center mark.
    */
-  "helix-base-qr-code": Partial<
-    HelixBaseQrCodeProps &
-      HelixBaseQrCodeSolidJsProps &
-      BaseProps<HelixBaseQrCode> &
+  "helix-headless-qr-code": Partial<
+    HelixHeadlessQrCodeProps &
+      HelixHeadlessQrCodeSolidJsProps &
+      BaseProps<HelixHeadlessQrCode> &
       BaseEvents
   >;
 
@@ -30146,10 +30286,10 @@ export type CustomElementsSolidJs = {
    *
    * - `quote`: The quotation.
    */
-  "helix-base-quote": Partial<
-    HelixBaseQuoteProps &
-      HelixBaseQuoteSolidJsProps &
-      BaseProps<HelixBaseQuote> &
+  "helix-headless-quote": Partial<
+    HelixHeadlessQuoteProps &
+      HelixHeadlessQuoteSolidJsProps &
+      BaseProps<HelixHeadlessQuote> &
       BaseEvents
   >;
 
@@ -30309,12 +30449,12 @@ export type CustomElementsSolidJs = {
    * - `hint`: Help under the set.
    * - `feedback`: What is wrong with it.
    */
-  "helix-base-radio-group": Partial<
-    HelixBaseRadioGroupProps &
-      HelixBaseRadioGroupSolidJsProps &
-      BaseProps<HelixBaseRadioGroup> &
+  "helix-headless-radio-group": Partial<
+    HelixHeadlessRadioGroupProps &
+      HelixHeadlessRadioGroupSolidJsProps &
+      BaseProps<HelixHeadlessRadioGroup> &
       BaseEvents
-  > & HelixBaseRadioGroupControlledSolidJs;
+  >;
 
   /**
    * Renders a `<button role="radio">`, not an `<input type="radio">`, and the
@@ -30369,10 +30509,10 @@ export type CustomElementsSolidJs = {
    * - `mark`: The dot inside it.
    * - `label`: The words beside it.
    */
-  "helix-base-radio": Partial<
-    HelixBaseRadioProps &
-      HelixBaseRadioSolidJsProps &
-      BaseProps<HelixBaseRadio> &
+  "helix-headless-radio": Partial<
+    HelixHeadlessRadioProps &
+      HelixHeadlessRadioSolidJsProps &
+      BaseProps<HelixHeadlessRadio> &
       BaseEvents
   >;
 
@@ -30571,12 +30711,12 @@ export type CustomElementsSolidJs = {
    * - `option`: One place a reader can press, which is one step.
    * - `value`: The score written out, under `show-value`.
    */
-  "helix-base-rating": Partial<
-    HelixBaseRatingProps &
-      HelixBaseRatingSolidJsProps &
-      BaseProps<HelixBaseRating> &
+  "helix-headless-rating": Partial<
+    HelixHeadlessRatingProps &
+      HelixHeadlessRatingSolidJsProps &
+      BaseProps<HelixHeadlessRating> &
       BaseEvents
-  > & HelixBaseRatingControlledSolidJs;
+  > & HelixHeadlessRatingControlledSolidJs;
 
   /**
    * **The whole component is one fact a stylesheet cannot work out for itself:
@@ -30633,10 +30773,10 @@ export type CustomElementsSolidJs = {
    * - `viewport`: The scrolling box.
    * - `edges`: Where the sideways edge cues are drawn.
    */
-  "helix-base-scroll-area": Partial<
-    HelixBaseScrollAreaProps &
-      HelixBaseScrollAreaSolidJsProps &
-      BaseProps<HelixBaseScrollArea> &
+  "helix-headless-scroll-area": Partial<
+    HelixHeadlessScrollAreaProps &
+      HelixHeadlessScrollAreaSolidJsProps &
+      BaseProps<HelixHeadlessScrollArea> &
       BaseEvents
   >;
 
@@ -30840,12 +30980,12 @@ export type CustomElementsSolidJs = {
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
    */
-  "helix-base-select": Partial<
-    HelixBaseSelectProps &
-      HelixBaseSelectSolidJsProps &
-      BaseProps<HelixBaseSelect> &
+  "helix-headless-select": Partial<
+    HelixHeadlessSelectProps &
+      HelixHeadlessSelectSolidJsProps &
+      BaseProps<HelixHeadlessSelect> &
       BaseEvents
-  > & HelixBaseSelectControlledSolidJs;
+  > & HelixHeadlessSelectControlledSolidJs;
 
   /**
    * Carries `aria-busy` and a polite live region, so a reader using a screen
@@ -30862,10 +31002,10 @@ export type CustomElementsSolidJs = {
    *
    * - `skeleton`: The placeholder surface.
    */
-  "helix-base-skeleton": Partial<
-    HelixBaseSkeletonProps &
-      HelixBaseSkeletonSolidJsProps &
-      BaseProps<HelixBaseSkeleton> &
+  "helix-headless-skeleton": Partial<
+    HelixHeadlessSkeletonProps &
+      HelixHeadlessSkeletonSolidJsProps &
+      BaseProps<HelixHeadlessSkeleton> &
       BaseEvents
   >;
 
@@ -31078,12 +31218,12 @@ export type CustomElementsSolidJs = {
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `output`: The current value, shown beside it.
    */
-  "helix-base-slider": Partial<
-    HelixBaseSliderProps &
-      HelixBaseSliderSolidJsProps &
-      BaseProps<HelixBaseSlider> &
+  "helix-headless-slider": Partial<
+    HelixHeadlessSliderProps &
+      HelixHeadlessSliderSolidJsProps &
+      BaseProps<HelixHeadlessSlider> &
       BaseEvents
-  > & HelixBaseSliderControlledSolidJs;
+  > & HelixHeadlessSliderControlledSolidJs;
 
   /**
    * The one chart here that takes its numbers from an attribute, and the reversal
@@ -31208,10 +31348,10 @@ export type CustomElementsSolidJs = {
    * - `wash-end`: The far stop of the area's gradient.
    * - `wash-start`: The stop of the area's gradient that meets the line.
    */
-  "helix-base-sparkline": Partial<
-    HelixBaseSparklineProps &
-      HelixBaseSparklineSolidJsProps &
-      BaseProps<HelixBaseSparkline> &
+  "helix-headless-sparkline": Partial<
+    HelixHeadlessSparklineProps &
+      HelixHeadlessSparklineSolidJsProps &
+      BaseProps<HelixHeadlessSparkline> &
       BaseEvents
   >;
 
@@ -31269,10 +31409,10 @@ export type CustomElementsSolidJs = {
    * - `icon`: The mark's box.
    * - `label`: The name beside it.
    */
-  "helix-base-speed-dial-item": Partial<
-    HelixBaseSpeedDialItemProps &
-      HelixBaseSpeedDialItemSolidJsProps &
-      BaseProps<HelixBaseSpeedDialItem> &
+  "helix-headless-speed-dial-item": Partial<
+    HelixHeadlessSpeedDialItemProps &
+      HelixHeadlessSpeedDialItemSolidJsProps &
+      BaseProps<HelixHeadlessSpeedDialItem> &
       BaseEvents
   >;
 
@@ -31368,12 +31508,12 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The default trigger, where none was slotted.
    * - `actions`: The region the actions are drawn in.
    */
-  "helix-base-speed-dial": Partial<
-    HelixBaseSpeedDialProps &
-      HelixBaseSpeedDialSolidJsProps &
-      BaseProps<HelixBaseSpeedDial> &
+  "helix-headless-speed-dial": Partial<
+    HelixHeadlessSpeedDialProps &
+      HelixHeadlessSpeedDialSolidJsProps &
+      BaseProps<HelixHeadlessSpeedDial> &
       BaseEvents
-  > & HelixBaseSpeedDialControlledSolidJs;
+  > & HelixHeadlessSpeedDialControlledSolidJs;
 
   /**
    * **One axis, and nesting is how you get two.** The sandbox this was taken from
@@ -31541,13 +31681,13 @@ export type CustomElementsSolidJs = {
    * otherwise coupled and neither reads the other's state. `settled` is false
    * for each step of a drag and true once, at the end, for the reason a drag
    * announces once: only the position it ends at is a preference.
-   * - `cross(by: HelixBaseSplitter, at: number) => void`: Records that a nested splitter crosses this one at `at` percent along it.
+   * - `cross(by: HelixHeadlessSplitter, at: number) => void`: Records that a nested splitter crosses this one at `at` percent along it.
    *
    * Public because it is the whole of the channel between the two, and it runs
    * one way: the child tells the parent where it is, and the parent draws the
    * corner and drives them both. Nothing is read back, so neither has to know
    * anything about the other's state.
-   * - `uncross(by: HelixBaseSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
+   * - `uncross(by: HelixHeadlessSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
    *
    * ## CSS Custom Properties
    *
@@ -31565,12 +31705,12 @@ export type CustomElementsSolidJs = {
    * - `separator`: The divider itself.
    * - `corner`: The handle where two dividers cross, added on the client.
    */
-  "helix-base-splitter": Partial<
-    HelixBaseSplitterProps &
-      HelixBaseSplitterSolidJsProps &
-      BaseProps<HelixBaseSplitter> &
+  "helix-headless-splitter": Partial<
+    HelixHeadlessSplitterProps &
+      HelixHeadlessSplitterSolidJsProps &
+      BaseProps<HelixHeadlessSplitter> &
       BaseEvents
-  > & HelixBaseSplitterControlledSolidJs;
+  > & HelixHeadlessSplitterControlledSolidJs;
 
   /**
    * A group rather than a list, because the figures are read together and their
@@ -31589,10 +31729,10 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The stats.
    */
-  "helix-base-stat-group": Partial<
-    HelixBaseStatGroupProps &
-      HelixBaseStatGroupSolidJsProps &
-      BaseProps<HelixBaseStatGroup> &
+  "helix-headless-stat-group": Partial<
+    HelixHeadlessStatGroupProps &
+      HelixHeadlessStatGroupSolidJsProps &
+      BaseProps<HelixHeadlessStatGroup> &
       BaseEvents
   >;
 
@@ -31645,10 +31785,10 @@ export type CustomElementsSolidJs = {
    * - `label`: What the value measures.
    * - `unit`: The unit, set beside the value.
    */
-  "helix-base-stat": Partial<
-    HelixBaseStatProps &
-      HelixBaseStatSolidJsProps &
-      BaseProps<HelixBaseStat> &
+  "helix-headless-stat": Partial<
+    HelixHeadlessStatProps &
+      HelixHeadlessStatSolidJsProps &
+      BaseProps<HelixHeadlessStat> &
       BaseEvents
   >;
 
@@ -31749,10 +31889,10 @@ export type CustomElementsSolidJs = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back.
    */
-  "helix-base-steps": Partial<
-    HelixBaseStepsProps &
-      HelixBaseStepsSolidJsProps &
-      BaseProps<HelixBaseSteps> &
+  "helix-headless-steps": Partial<
+    HelixHeadlessStepsProps &
+      HelixHeadlessStepsSolidJsProps &
+      BaseProps<HelixHeadlessSteps> &
       BaseEvents
   >;
 
@@ -31848,10 +31988,10 @@ export type CustomElementsSolidJs = {
    * - `marker`: The shape carrying the number or the check.
    * - `trail`: The half line running on to the next.
    */
-  "helix-base-step": Partial<
-    HelixBaseStepProps &
-      HelixBaseStepSolidJsProps &
-      BaseProps<HelixBaseStep> &
+  "helix-headless-step": Partial<
+    HelixHeadlessStepProps &
+      HelixHeadlessStepSolidJsProps &
+      BaseProps<HelixHeadlessStep> &
       BaseEvents
   >;
 
@@ -32007,12 +32147,12 @@ export type CustomElementsSolidJs = {
    * - `thumb`: The part that moves.
    * - `label`: The words beside it.
    */
-  "helix-base-switch": Partial<
-    HelixBaseSwitchProps &
-      HelixBaseSwitchSolidJsProps &
-      BaseProps<HelixBaseSwitch> &
+  "helix-headless-switch": Partial<
+    HelixHeadlessSwitchProps &
+      HelixHeadlessSwitchSolidJsProps &
+      BaseProps<HelixHeadlessSwitch> &
       BaseEvents
-  > & HelixBaseSwitchControlledSolidJs;
+  > & HelixHeadlessSwitchControlledSolidJs;
 
   /**
    * Carries its own role, because a grid of divs is not a table to anything
@@ -32035,10 +32175,10 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The cell's content.
    */
-  "helix-base-table-cell": Partial<
-    HelixBaseTableCellProps &
-      HelixBaseTableCellSolidJsProps &
-      BaseProps<HelixBaseTableCell> &
+  "helix-headless-table-cell": Partial<
+    HelixHeadlessTableCellProps &
+      HelixHeadlessTableCellSolidJsProps &
+      BaseProps<HelixHeadlessTableCell> &
       BaseEvents
   >;
 
@@ -32087,10 +32227,10 @@ export type CustomElementsSolidJs = {
    *
    * - `column`: The heading cell.
    */
-  "helix-base-table-column": Partial<
-    HelixBaseTableColumnProps &
-      HelixBaseTableColumnSolidJsProps &
-      BaseProps<HelixBaseTableColumn> &
+  "helix-headless-table-column": Partial<
+    HelixHeadlessTableColumnProps &
+      HelixHeadlessTableColumnSolidJsProps &
+      BaseProps<HelixHeadlessTableColumn> &
       BaseEvents
   >;
 
@@ -32153,10 +32293,10 @@ export type CustomElementsSolidJs = {
    * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    * - `table`: The grid.
    */
-  "helix-base-table": Partial<
-    HelixBaseTableProps &
-      HelixBaseTableSolidJsProps &
-      BaseProps<HelixBaseTable> &
+  "helix-headless-table": Partial<
+    HelixHeadlessTableProps &
+      HelixHeadlessTableSolidJsProps &
+      BaseProps<HelixHeadlessTable> &
       BaseEvents
   >;
 
@@ -32172,10 +32312,10 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The row's cells.
    */
-  "helix-base-table-row": Partial<
-    HelixBaseTableRowProps &
-      HelixBaseTableRowSolidJsProps &
-      BaseProps<HelixBaseTableRow> &
+  "helix-headless-table-row": Partial<
+    HelixHeadlessTableRowProps &
+      HelixHeadlessTableRowSolidJsProps &
+      BaseProps<HelixHeadlessTableRow> &
       BaseEvents
   >;
 
@@ -32216,10 +32356,10 @@ export type CustomElementsSolidJs = {
    *
    * - `panel`: The panel container.
    */
-  "helix-base-tabs-panel": Partial<
-    HelixBaseTabsPanelProps &
-      HelixBaseTabsPanelSolidJsProps &
-      BaseProps<HelixBaseTabsPanel> &
+  "helix-headless-tabs-panel": Partial<
+    HelixHeadlessTabsPanelProps &
+      HelixHeadlessTabsPanelSolidJsProps &
+      BaseProps<HelixHeadlessTabsPanel> &
       BaseEvents
   >;
 
@@ -32315,10 +32455,10 @@ export type CustomElementsSolidJs = {
    * - `tabs`: The tab list.
    * - `panels`: The panel container.
    */
-  "helix-base-tabs": Partial<
-    HelixBaseTabsProps &
-      HelixBaseTabsSolidJsProps &
-      BaseProps<HelixBaseTabs> &
+  "helix-headless-tabs": Partial<
+    HelixHeadlessTabsProps &
+      HelixHeadlessTabsSolidJsProps &
+      BaseProps<HelixHeadlessTabs> &
       BaseEvents
   >;
 
@@ -32363,10 +32503,10 @@ export type CustomElementsSolidJs = {
    *
    * - `tab`: The tab itself.
    */
-  "helix-base-tabs-tab": Partial<
-    HelixBaseTabsTabProps &
-      HelixBaseTabsTabSolidJsProps &
-      BaseProps<HelixBaseTabsTab> &
+  "helix-headless-tabs-tab": Partial<
+    HelixHeadlessTabsTabProps &
+      HelixHeadlessTabsTabSolidJsProps &
+      BaseProps<HelixHeadlessTabsTab> &
       BaseEvents
   >;
 
@@ -32419,10 +32559,10 @@ export type CustomElementsSolidJs = {
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `prefix`: The category before the label.
    */
-  "helix-base-tag": Partial<
-    HelixBaseTagProps &
-      HelixBaseTagSolidJsProps &
-      BaseProps<HelixBaseTag> &
+  "helix-headless-tag": Partial<
+    HelixHeadlessTagProps &
+      HelixHeadlessTagSolidJsProps &
+      BaseProps<HelixHeadlessTag> &
       BaseEvents
   >;
 
@@ -32572,12 +32712,12 @@ export type CustomElementsSolidJs = {
    * - `field`: The box holding the control.
    * - `control`: The textarea itself.
    */
-  "helix-base-textarea": Partial<
-    HelixBaseTextareaProps &
-      HelixBaseTextareaSolidJsProps &
-      BaseProps<HelixBaseTextarea> &
+  "helix-headless-textarea": Partial<
+    HelixHeadlessTextareaProps &
+      HelixHeadlessTextareaSolidJsProps &
+      BaseProps<HelixHeadlessTextarea> &
       BaseEvents
-  > & HelixBaseTextareaControlledSolidJs;
+  > & HelixHeadlessTextareaControlledSolidJs;
 
   /**
    * **The list is `helix-time-picker`, not a second one written here.** It is worth
@@ -32798,12 +32938,12 @@ export type CustomElementsSolidJs = {
    * - `surface`: The floating panel.
    * - `picker`: The list inside it.
    */
-  "helix-base-time-input": Partial<
-    HelixBaseTimeInputProps &
-      HelixBaseTimeInputSolidJsProps &
-      BaseProps<HelixBaseTimeInput> &
+  "helix-headless-time-input": Partial<
+    HelixHeadlessTimeInputProps &
+      HelixHeadlessTimeInputSolidJsProps &
+      BaseProps<HelixHeadlessTimeInput> &
       BaseEvents
-  > & HelixBaseTimeInputControlledSolidJs;
+  > & HelixHeadlessTimeInputControlledSolidJs;
 
   /**
    * **A list rather than three wheels**, and the reason is what a list already
@@ -33028,12 +33168,12 @@ export type CustomElementsSolidJs = {
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it. Carries `data-between` inside a range.
    */
-  "helix-base-time-picker": Partial<
-    HelixBaseTimePickerProps &
-      HelixBaseTimePickerSolidJsProps &
-      BaseProps<HelixBaseTimePicker> &
+  "helix-headless-time-picker": Partial<
+    HelixHeadlessTimePickerProps &
+      HelixHeadlessTimePickerSolidJsProps &
+      BaseProps<HelixHeadlessTimePicker> &
       BaseEvents
-  > & HelixBaseTimePickerControlledSolidJs;
+  >;
 
   /**
    * **The time is a `<time>`, and only when there is a time to put in it.** Given
@@ -33081,10 +33221,10 @@ export type CustomElementsSolidJs = {
    * - `rail`: The column holding the mark and the line.
    * - `time`: When it happened.
    */
-  "helix-base-timeline-item": Partial<
-    HelixBaseTimelineItemProps &
-      HelixBaseTimelineItemSolidJsProps &
-      BaseProps<HelixBaseTimelineItem> &
+  "helix-headless-timeline-item": Partial<
+    HelixHeadlessTimelineItemProps &
+      HelixHeadlessTimelineItemSolidJsProps &
+      BaseProps<HelixHeadlessTimelineItem> &
       BaseEvents
   >;
 
@@ -33126,10 +33266,10 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The entries.
    */
-  "helix-base-timeline": Partial<
-    HelixBaseTimelineProps &
-      HelixBaseTimelineSolidJsProps &
-      BaseProps<HelixBaseTimeline> &
+  "helix-headless-timeline": Partial<
+    HelixHeadlessTimelineProps &
+      HelixHeadlessTimelineSolidJsProps &
+      BaseProps<HelixHeadlessTimeline> &
       BaseEvents
   >;
 
@@ -33260,12 +33400,12 @@ export type CustomElementsSolidJs = {
    * - `item`: The message's own surface.
    * - `timer`: The bar showing how long is left, where a duration was given.
    */
-  "helix-base-toast-item": Partial<
-    HelixBaseToastItemProps &
-      HelixBaseToastItemSolidJsProps &
-      BaseProps<HelixBaseToastItem> &
+  "helix-headless-toast-item": Partial<
+    HelixHeadlessToastItemProps &
+      HelixHeadlessToastItemSolidJsProps &
+      BaseProps<HelixHeadlessToastItem> &
       BaseEvents
-  > & HelixBaseToastItemControlledSolidJs;
+  > & HelixHeadlessToastItemControlledSolidJs;
 
   /**
    * **The region is why this is one family rather than two.** A live region has
@@ -33326,10 +33466,10 @@ export type CustomElementsSolidJs = {
    *
    * - `region`: The stack the messages are in.
    */
-  "helix-base-toast": Partial<
-    HelixBaseToastProps &
-      HelixBaseToastSolidJsProps &
-      BaseProps<HelixBaseToast> &
+  "helix-headless-toast": Partial<
+    HelixHeadlessToastProps &
+      HelixHeadlessToastSolidJsProps &
+      BaseProps<HelixHeadlessToast> &
       BaseEvents
   >;
 
@@ -33502,12 +33642,12 @@ export type CustomElementsSolidJs = {
    * - `divider`: The rule after an inline label, separating it from the items.
    * - `indicator`: The moving marker behind the selected item.
    */
-  "helix-base-toggle-group": Partial<
-    HelixBaseToggleGroupProps &
-      HelixBaseToggleGroupSolidJsProps &
-      BaseProps<HelixBaseToggleGroup> &
+  "helix-headless-toggle-group": Partial<
+    HelixHeadlessToggleGroupProps &
+      HelixHeadlessToggleGroupSolidJsProps &
+      BaseProps<HelixHeadlessToggleGroup> &
       BaseEvents
-  > & HelixBaseToggleGroupControlledSolidJs;
+  >;
 
   /**
    * Renders a `<button role="radio">`. This is a form control and nothing else.
@@ -33560,10 +33700,10 @@ export type CustomElementsSolidJs = {
    *
    * - `item`: The radio button.
    */
-  "helix-base-toggle": Partial<
-    HelixBaseToggleProps &
-      HelixBaseToggleSolidJsProps &
-      BaseProps<HelixBaseToggle> &
+  "helix-headless-toggle": Partial<
+    HelixHeadlessToggleProps &
+      HelixHeadlessToggleSolidJsProps &
+      BaseProps<HelixHeadlessToggle> &
       BaseEvents
   >;
 
@@ -33597,10 +33737,10 @@ export type CustomElementsSolidJs = {
    *
    * - `toolbar`: The toolbar container.
    */
-  "helix-base-toolbar": Partial<
-    HelixBaseToolbarProps &
-      HelixBaseToolbarSolidJsProps &
-      BaseProps<HelixBaseToolbar> &
+  "helix-headless-toolbar": Partial<
+    HelixHeadlessToolbarProps &
+      HelixHeadlessToolbarSolidJsProps &
+      BaseProps<HelixHeadlessToolbar> &
       BaseEvents
   >;
 
@@ -33785,12 +33925,12 @@ export type CustomElementsSolidJs = {
    * - `arrow`: The point, resting against the trigger.
    * - `tooltip`: The bubble.
    */
-  "helix-base-tooltip": Partial<
-    HelixBaseTooltipProps &
-      HelixBaseTooltipSolidJsProps &
-      BaseProps<HelixBaseTooltip> &
+  "helix-headless-tooltip": Partial<
+    HelixHeadlessTooltipProps &
+      HelixHeadlessTooltipSolidJsProps &
+      BaseProps<HelixHeadlessTooltip> &
       BaseEvents
-  > & HelixBaseTooltipControlledSolidJs;
+  > & HelixHeadlessTooltipControlledSolidJs;
 
   /**
    * The root owns the order and nothing else. Which stop is current, what Next
@@ -33889,12 +34029,12 @@ export type CustomElementsSolidJs = {
    *
    * - `spotlight`: The box over the current target, which paints the scrim.
    */
-  "helix-base-tour": Partial<
-    HelixBaseTourProps &
-      HelixBaseTourSolidJsProps &
-      BaseProps<HelixBaseTour> &
+  "helix-headless-tour": Partial<
+    HelixHeadlessTourProps &
+      HelixHeadlessTourSolidJsProps &
+      BaseProps<HelixHeadlessTour> &
       BaseEvents
-  > & HelixBaseTourControlledSolidJs;
+  > & HelixHeadlessTourControlledSolidJs;
 
   /**
    * A stop names a target with `for` and holds whatever the consumer puts in it.
@@ -33973,10 +34113,10 @@ export type CustomElementsSolidJs = {
    * - `next`: The control that goes on, and finishes on the last stop.
    * - `skip`: The control that leaves the tour.
    */
-  "helix-base-tour-stop": Partial<
-    HelixBaseTourStopProps &
-      HelixBaseTourStopSolidJsProps &
-      BaseProps<HelixBaseTourStop> &
+  "helix-headless-tour-stop": Partial<
+    HelixHeadlessTourStopProps &
+      HelixHeadlessTourStopSolidJsProps &
+      BaseProps<HelixHeadlessTourStop> &
       BaseEvents
   >;
 
@@ -34142,12 +34282,12 @@ export type CustomElementsSolidJs = {
    * - `label`: The label text.
    * - `group`: The container for nested items.
    */
-  "helix-base-tree-item": Partial<
-    HelixBaseTreeItemProps &
-      HelixBaseTreeItemSolidJsProps &
-      BaseProps<HelixBaseTreeItem> &
+  "helix-headless-tree-item": Partial<
+    HelixHeadlessTreeItemProps &
+      HelixHeadlessTreeItemSolidJsProps &
+      BaseProps<HelixHeadlessTreeItem> &
       BaseEvents
-  > & HelixBaseTreeItemControlledSolidJs;
+  > & HelixHeadlessTreeItemControlledSolidJs;
 
   /**
    * Focus is a single tab stop, moved with the arrow keys, which is what the tree
@@ -34215,10 +34355,10 @@ export type CustomElementsSolidJs = {
    *
    * - `tree`: The tree container.
    */
-  "helix-base-tree": Partial<
-    HelixBaseTreeProps &
-      HelixBaseTreeSolidJsProps &
-      BaseProps<HelixBaseTree> &
+  "helix-headless-tree": Partial<
+    HelixHeadlessTreeProps &
+      HelixHeadlessTreeSolidJsProps &
+      BaseProps<HelixHeadlessTree> &
       BaseEvents
   >;
 
@@ -34277,10 +34417,10 @@ export type CustomElementsSolidJs = {
    * - `direction`: The direction as a word, for readers who are not looking.
    * - `icon`: The arrow.
    */
-  "helix-base-trend": Partial<
-    HelixBaseTrendProps &
-      HelixBaseTrendSolidJsProps &
-      BaseProps<HelixBaseTrend> &
+  "helix-headless-trend": Partial<
+    HelixHeadlessTrendProps &
+      HelixHeadlessTrendSolidJsProps &
+      BaseProps<HelixHeadlessTrend> &
       BaseEvents
   >;
 
@@ -34356,10 +34496,10 @@ export type CustomElementsSolidJs = {
    * - `thumbnail`: The image `poster` falls back to.
    * - `label`: The name and whatever follows it.
    */
-  "helix-base-video-playlist-item": Partial<
-    HelixBaseVideoPlaylistItemProps &
-      HelixBaseVideoPlaylistItemSolidJsProps &
-      BaseProps<HelixBaseVideoPlaylistItem> &
+  "helix-headless-video-playlist-item": Partial<
+    HelixHeadlessVideoPlaylistItemProps &
+      HelixHeadlessVideoPlaylistItemSolidJsProps &
+      BaseProps<HelixHeadlessVideoPlaylistItem> &
       BaseEvents
   >;
 
@@ -34431,10 +34571,10 @@ export type CustomElementsSolidJs = {
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
    */
-  "helix-base-video-playlist-menu": Partial<
-    HelixBaseVideoPlaylistMenuProps &
-      HelixBaseVideoPlaylistMenuSolidJsProps &
-      BaseProps<HelixBaseVideoPlaylistMenu> &
+  "helix-headless-video-playlist-menu": Partial<
+    HelixHeadlessVideoPlaylistMenuProps &
+      HelixHeadlessVideoPlaylistMenuSolidJsProps &
+      BaseProps<HelixHeadlessVideoPlaylistMenu> &
       BaseEvents
   >;
 
@@ -34513,10 +34653,10 @@ export type CustomElementsSolidJs = {
    * - `player`: The region holding the player.
    * - `items`: The list of entries.
    */
-  "helix-base-video-playlist": Partial<
-    HelixBaseVideoPlaylistProps &
-      HelixBaseVideoPlaylistSolidJsProps &
-      BaseProps<HelixBaseVideoPlaylist> &
+  "helix-headless-video-playlist": Partial<
+    HelixHeadlessVideoPlaylistProps &
+      HelixHeadlessVideoPlaylistSolidJsProps &
+      BaseProps<HelixHeadlessVideoPlaylist> &
       BaseEvents
   >;
 
@@ -34739,10 +34879,10 @@ export type CustomElementsSolidJs = {
    * - `more`: The button that opens it.
    * - `fullscreen`: The whole screen, and back.
    */
-  "helix-base-video": Partial<
-    HelixBaseVideoProps &
-      HelixBaseVideoSolidJsProps &
-      BaseProps<HelixBaseVideo> &
+  "helix-headless-video": Partial<
+    HelixHeadlessVideoProps &
+      HelixHeadlessVideoSolidJsProps &
+      BaseProps<HelixHeadlessVideo> &
       BaseEvents
   >;
 
@@ -34786,7 +34926,7 @@ export type CustomElementsSolidJs = {
    * before it is a list at all:
    *
    * ```css
-   * helix-base-virtual-list::part(viewport) {
+   * helix-headless-virtual-list::part(viewport) {
    *   block-size: 12rem;
    *   overflow-y: auto;
    * }
@@ -34820,10 +34960,10 @@ export type CustomElementsSolidJs = {
    * - `before`: The space standing in for rows above the window.
    * - `viewport`: The scrolling box. Needs a block size and an overflow on this tier.
    */
-  "helix-base-virtual-list": Partial<
-    HelixBaseVirtualListProps &
-      HelixBaseVirtualListSolidJsProps &
-      BaseProps<HelixBaseVirtualList> &
+  "helix-headless-virtual-list": Partial<
+    HelixHeadlessVirtualListProps &
+      HelixHeadlessVirtualListSolidJsProps &
+      BaseProps<HelixHeadlessVirtualList> &
       BaseEvents
   >;
 };
@@ -34977,1353 +35117,1002 @@ declare global {
    would otherwise make both arms optional again. */
 
 /**
- * helix-base-accordion-item: a controlled `open` announces and waits, so the handler comes with it.
+ * helix-headless-carousel: a controlled `index` announces and waits, so the handler comes with it.
  */
-type HelixBaseAccordionItemControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseAccordionItem["open"];
-        "onhelix-open": (event: HelixBaseAccordionItemHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseAccordionItemHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseAccordionItem["open"];
-        ref: import('react').Ref<HelixBaseAccordionItem>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-base-accordion-item, in Solid's dialect: `on:` and the event name. */
-type HelixBaseAccordionItemControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseAccordionItem["open"];
-        "on:helix-open": (event: HelixBaseAccordionItemHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseAccordionItemHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixBaseAccordionItem["open"];
-        ref: BaseProps<HelixBaseAccordionItem>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-base-carousel: a controlled `index` announces and waits, so the handler comes with it.
- */
-type HelixBaseCarouselControlled =
+type HelixHeadlessCarouselControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-select`. */
-        index: HelixBaseCarousel["index"];
-        "onhelix-select": (event: HelixBaseCarouselHelixSelectElementEvent) => void;
+        index: HelixHeadlessCarousel["index"];
+        "onhelix-select": (event: HelixHeadlessCarouselHelixSelectElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        index: HelixBaseCarousel["index"];
-        ref: import('react').Ref<HelixBaseCarousel>;
+        index: HelixHeadlessCarousel["index"];
+        ref: import('react').Ref<HelixHeadlessCarousel>;
       }
     | { index?: undefined }
   );
 
-/** helix-base-carousel, in Solid's dialect: `on:` and the event name. */
-type HelixBaseCarouselControlledSolidJs =
+/** helix-headless-carousel, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessCarouselControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-select`. */
-        index: HelixBaseCarousel["index"];
-        "on:helix-select": (event: HelixBaseCarouselHelixSelectElementEvent) => void;
+        index: HelixHeadlessCarousel["index"];
+        "on:helix-select": (event: HelixHeadlessCarouselHelixSelectElementEvent) => void;
       }
     | {
-        index: HelixBaseCarousel["index"];
-        ref: BaseProps<HelixBaseCarousel>["ref"];
+        index: HelixHeadlessCarousel["index"];
+        ref: BaseProps<HelixHeadlessCarousel>["ref"];
       }
     | { index?: undefined }
   );
 
 /**
- * helix-base-checkbox: a controlled `checked` announces and waits, so the handler comes with it.
+ * helix-headless-checkbox: a controlled `checked` announces and waits, so the handler comes with it.
  */
-type HelixBaseCheckboxControlled =
+type HelixHeadlessCheckboxControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-toggle`. */
-        checked: HelixBaseCheckbox["checked"];
-        "onhelix-toggle": (event: HelixBaseCheckboxHelixToggleElementEvent) => void;
+        checked: HelixHeadlessCheckbox["checked"];
+        "onhelix-toggle": (event: HelixHeadlessCheckboxHelixToggleElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        checked: HelixBaseCheckbox["checked"];
-        ref: import('react').Ref<HelixBaseCheckbox>;
+        checked: HelixHeadlessCheckbox["checked"];
+        ref: import('react').Ref<HelixHeadlessCheckbox>;
       }
     | { checked?: undefined }
   );
 
-/** helix-base-checkbox, in Solid's dialect: `on:` and the event name. */
-type HelixBaseCheckboxControlledSolidJs =
+/** helix-headless-checkbox, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessCheckboxControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-toggle`. */
-        checked: HelixBaseCheckbox["checked"];
-        "on:helix-toggle": (event: HelixBaseCheckboxHelixToggleElementEvent) => void;
+        checked: HelixHeadlessCheckbox["checked"];
+        "on:helix-toggle": (event: HelixHeadlessCheckboxHelixToggleElementEvent) => void;
       }
     | {
-        checked: HelixBaseCheckbox["checked"];
-        ref: BaseProps<HelixBaseCheckbox>["ref"];
+        checked: HelixHeadlessCheckbox["checked"];
+        ref: BaseProps<HelixHeadlessCheckbox>["ref"];
       }
     | { checked?: undefined }
   );
 
 /**
- * helix-base-color-input: a controlled `open` or `value` announces and waits, so the handler comes with it.
+ * helix-headless-combobox: a controlled `open` or `value` announces and waits, so the handler comes with it.
  */
-type HelixBaseColorInputControlled =
+type HelixHeadlessComboboxControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseColorInput["open"];
-        "onhelix-open": (event: HelixBaseColorInputHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseColorInputHelixCloseElementEvent) => void;
+        open: HelixHeadlessCombobox["open"];
+        "onhelix-open": (event: HelixHeadlessComboboxHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessComboboxHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseColorInput["open"];
-        ref: import('react').Ref<HelixBaseColorInput>;
+        open: HelixHeadlessCombobox["open"];
+        ref: import('react').Ref<HelixHeadlessCombobox>;
       }
     | { open?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseColorInput["value"];
-        "onhelix-change": (event: HelixBaseColorInputHelixChangeElementEvent) => void;
+        value: HelixHeadlessCombobox["value"];
+        "onhelix-change": (event: HelixHeadlessComboboxHelixChangeElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseColorInput["value"];
-        ref: import('react').Ref<HelixBaseColorInput>;
+        value: HelixHeadlessCombobox["value"];
+        ref: import('react').Ref<HelixHeadlessCombobox>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-color-input, in Solid's dialect: `on:` and the event name. */
-type HelixBaseColorInputControlledSolidJs =
+/** helix-headless-combobox, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessComboboxControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseColorInput["open"];
-        "on:helix-open": (event: HelixBaseColorInputHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseColorInputHelixCloseElementEvent) => void;
+        open: HelixHeadlessCombobox["open"];
+        "on:helix-open": (event: HelixHeadlessComboboxHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessComboboxHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseColorInput["open"];
-        ref: BaseProps<HelixBaseColorInput>["ref"];
+        open: HelixHeadlessCombobox["open"];
+        ref: BaseProps<HelixHeadlessCombobox>["ref"];
       }
     | { open?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseColorInput["value"];
-        "on:helix-change": (event: HelixBaseColorInputHelixChangeElementEvent) => void;
+        value: HelixHeadlessCombobox["value"];
+        "on:helix-change": (event: HelixHeadlessComboboxHelixChangeElementEvent) => void;
       }
     | {
-        value: HelixBaseColorInput["value"];
-        ref: BaseProps<HelixBaseColorInput>["ref"];
+        value: HelixHeadlessCombobox["value"];
+        ref: BaseProps<HelixHeadlessCombobox>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-color-picker: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-headless-command: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBaseColorPickerControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseColorPicker["value"];
-        "onhelix-change": (event: HelixBaseColorPickerHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseColorPicker["value"];
-        ref: import('react').Ref<HelixBaseColorPicker>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-base-color-picker, in Solid's dialect: `on:` and the event name. */
-type HelixBaseColorPickerControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseColorPicker["value"];
-        "on:helix-change": (event: HelixBaseColorPickerHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixBaseColorPicker["value"];
-        ref: BaseProps<HelixBaseColorPicker>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-base-combobox: a controlled `open` or `value` announces and waits, so the handler comes with it.
- */
-type HelixBaseComboboxControlled =
+type HelixHeadlessCommandControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseCombobox["open"];
-        "onhelix-open": (event: HelixBaseComboboxHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseComboboxHelixCloseElementEvent) => void;
+        open: HelixHeadlessCommand["open"];
+        "onhelix-open": (event: HelixHeadlessCommandHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessCommandHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseCombobox["open"];
-        ref: import('react').Ref<HelixBaseCombobox>;
+        open: HelixHeadlessCommand["open"];
+        ref: import('react').Ref<HelixHeadlessCommand>;
+      }
+    | { open?: undefined }
+  );
+
+/** helix-headless-command, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessCommandControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixHeadlessCommand["open"];
+        "on:helix-open": (event: HelixHeadlessCommandHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessCommandHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixHeadlessCommand["open"];
+        ref: BaseProps<HelixHeadlessCommand>["ref"];
+      }
+    | { open?: undefined }
+  );
+
+/**
+ * helix-headless-date-input: a controlled `open` or `value` announces and waits, so the handler comes with it.
+ */
+type HelixHeadlessDateInputControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixHeadlessDateInput["open"];
+        "onhelix-open": (event: HelixHeadlessDateInputHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessDateInputHelixCloseElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        open: HelixHeadlessDateInput["open"];
+        ref: import('react').Ref<HelixHeadlessDateInput>;
       }
     | { open?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseCombobox["value"];
-        "onhelix-change": (event: HelixBaseComboboxHelixChangeElementEvent) => void;
+        value: HelixHeadlessDateInput["value"];
+        "onhelix-change": (event: HelixHeadlessDateInputHelixChangeElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseCombobox["value"];
-        ref: import('react').Ref<HelixBaseCombobox>;
+        value: HelixHeadlessDateInput["value"];
+        ref: import('react').Ref<HelixHeadlessDateInput>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-combobox, in Solid's dialect: `on:` and the event name. */
-type HelixBaseComboboxControlledSolidJs =
+/** helix-headless-date-input, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessDateInputControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseCombobox["open"];
-        "on:helix-open": (event: HelixBaseComboboxHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseComboboxHelixCloseElementEvent) => void;
+        open: HelixHeadlessDateInput["open"];
+        "on:helix-open": (event: HelixHeadlessDateInputHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessDateInputHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseCombobox["open"];
-        ref: BaseProps<HelixBaseCombobox>["ref"];
+        open: HelixHeadlessDateInput["open"];
+        ref: BaseProps<HelixHeadlessDateInput>["ref"];
       }
     | { open?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseCombobox["value"];
-        "on:helix-change": (event: HelixBaseComboboxHelixChangeElementEvent) => void;
+        value: HelixHeadlessDateInput["value"];
+        "on:helix-change": (event: HelixHeadlessDateInputHelixChangeElementEvent) => void;
       }
     | {
-        value: HelixBaseCombobox["value"];
-        ref: BaseProps<HelixBaseCombobox>["ref"];
+        value: HelixHeadlessDateInput["value"];
+        ref: BaseProps<HelixHeadlessDateInput>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-command: a controlled `open` announces and waits, so the handler comes with it.
+ * helix-headless-dialog: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBaseCommandControlled =
+type HelixHeadlessDialogControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseCommand["open"];
-        "onhelix-open": (event: HelixBaseCommandHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseCommandHelixCloseElementEvent) => void;
+        open: HelixHeadlessDialog["open"];
+        "onhelix-open": (event: HelixHeadlessDialogHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessDialogHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseCommand["open"];
-        ref: import('react').Ref<HelixBaseCommand>;
+        open: HelixHeadlessDialog["open"];
+        ref: import('react').Ref<HelixHeadlessDialog>;
       }
     | { open?: undefined }
   );
 
-/** helix-base-command, in Solid's dialect: `on:` and the event name. */
-type HelixBaseCommandControlledSolidJs =
+/** helix-headless-dialog, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessDialogControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseCommand["open"];
-        "on:helix-open": (event: HelixBaseCommandHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseCommandHelixCloseElementEvent) => void;
+        open: HelixHeadlessDialog["open"];
+        "on:helix-open": (event: HelixHeadlessDialogHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessDialogHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseCommand["open"];
-        ref: BaseProps<HelixBaseCommand>["ref"];
+        open: HelixHeadlessDialog["open"];
+        ref: BaseProps<HelixHeadlessDialog>["ref"];
       }
     | { open?: undefined }
   );
 
 /**
- * helix-base-date-input: a controlled `open` or `value` announces and waits, so the handler comes with it.
+ * helix-headless-drawer: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBaseDateInputControlled =
+type HelixHeadlessDrawerControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseDateInput["open"];
-        "onhelix-open": (event: HelixBaseDateInputHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseDateInputHelixCloseElementEvent) => void;
+        open: HelixHeadlessDrawer["open"];
+        "onhelix-open": (event: HelixHeadlessDrawerHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessDrawerHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseDateInput["open"];
-        ref: import('react').Ref<HelixBaseDateInput>;
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseDateInput["value"];
-        "onhelix-change": (event: HelixBaseDateInputHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseDateInput["value"];
-        ref: import('react').Ref<HelixBaseDateInput>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-base-date-input, in Solid's dialect: `on:` and the event name. */
-type HelixBaseDateInputControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseDateInput["open"];
-        "on:helix-open": (event: HelixBaseDateInputHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseDateInputHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixBaseDateInput["open"];
-        ref: BaseProps<HelixBaseDateInput>["ref"];
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseDateInput["value"];
-        "on:helix-change": (event: HelixBaseDateInputHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixBaseDateInput["value"];
-        ref: BaseProps<HelixBaseDateInput>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-base-date-picker: a controlled `month` or `value` announces and waits, so the handler comes with it.
- */
-type HelixBaseDatePickerControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-navigate`. */
-        month: HelixBaseDatePicker["month"];
-        "onhelix-navigate": (event: HelixBaseDatePickerHelixNavigateElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        month: HelixBaseDatePicker["month"];
-        ref: import('react').Ref<HelixBaseDatePicker>;
-      }
-    | { month?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseDatePicker["value"];
-        "onhelix-change": (event: HelixBaseDatePickerHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseDatePicker["value"];
-        ref: import('react').Ref<HelixBaseDatePicker>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-base-date-picker, in Solid's dialect: `on:` and the event name. */
-type HelixBaseDatePickerControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-navigate`. */
-        month: HelixBaseDatePicker["month"];
-        "on:helix-navigate": (event: HelixBaseDatePickerHelixNavigateElementEvent) => void;
-      }
-    | {
-        month: HelixBaseDatePicker["month"];
-        ref: BaseProps<HelixBaseDatePicker>["ref"];
-      }
-    | { month?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseDatePicker["value"];
-        "on:helix-change": (event: HelixBaseDatePickerHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixBaseDatePicker["value"];
-        ref: BaseProps<HelixBaseDatePicker>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-base-dialog: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixBaseDialogControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseDialog["open"];
-        "onhelix-open": (event: HelixBaseDialogHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseDialogHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseDialog["open"];
-        ref: import('react').Ref<HelixBaseDialog>;
+        open: HelixHeadlessDrawer["open"];
+        ref: import('react').Ref<HelixHeadlessDrawer>;
       }
     | { open?: undefined }
   );
 
-/** helix-base-dialog, in Solid's dialect: `on:` and the event name. */
-type HelixBaseDialogControlledSolidJs =
+/** helix-headless-drawer, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessDrawerControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseDialog["open"];
-        "on:helix-open": (event: HelixBaseDialogHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseDialogHelixCloseElementEvent) => void;
+        open: HelixHeadlessDrawer["open"];
+        "on:helix-open": (event: HelixHeadlessDrawerHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessDrawerHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseDialog["open"];
-        ref: BaseProps<HelixBaseDialog>["ref"];
+        open: HelixHeadlessDrawer["open"];
+        ref: BaseProps<HelixHeadlessDrawer>["ref"];
       }
     | { open?: undefined }
   );
 
 /**
- * helix-base-drawer: a controlled `open` announces and waits, so the handler comes with it.
+ * helix-headless-input: a controlled `value` announces and waits, so the handler comes with it.
  */
-type HelixBaseDrawerControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseDrawer["open"];
-        "onhelix-open": (event: HelixBaseDrawerHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseDrawerHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseDrawer["open"];
-        ref: import('react').Ref<HelixBaseDrawer>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-base-drawer, in Solid's dialect: `on:` and the event name. */
-type HelixBaseDrawerControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseDrawer["open"];
-        "on:helix-open": (event: HelixBaseDrawerHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseDrawerHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixBaseDrawer["open"];
-        ref: BaseProps<HelixBaseDrawer>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-base-input: a controlled `value` announces and waits, so the handler comes with it.
- */
-type HelixBaseInputControlled =
+type HelixHeadlessInputControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBaseInput["value"];
-        "onhelix-input": (event: HelixBaseInputHelixInputElementEvent) => void;
+        value: HelixHeadlessInput["value"];
+        "onhelix-input": (event: HelixHeadlessInputHelixInputElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseInput["value"];
-        ref: import('react').Ref<HelixBaseInput>;
+        value: HelixHeadlessInput["value"];
+        ref: import('react').Ref<HelixHeadlessInput>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-input, in Solid's dialect: `on:` and the event name. */
-type HelixBaseInputControlledSolidJs =
+/** helix-headless-input, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessInputControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBaseInput["value"];
-        "on:helix-input": (event: HelixBaseInputHelixInputElementEvent) => void;
+        value: HelixHeadlessInput["value"];
+        "on:helix-input": (event: HelixHeadlessInputHelixInputElementEvent) => void;
       }
     | {
-        value: HelixBaseInput["value"];
-        ref: BaseProps<HelixBaseInput>["ref"];
+        value: HelixHeadlessInput["value"];
+        ref: BaseProps<HelixHeadlessInput>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-listbox: a controlled `filter` or `value` announces and waits, so the handler comes with it.
+ * helix-headless-listbox: a controlled `filter` or `value` announces and waits, so the handler comes with it.
  */
-type HelixBaseListboxControlled =
+type HelixHeadlessListboxControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-filter`. */
-        filter: HelixBaseListbox["filter"];
-        "onhelix-filter": (event: HelixBaseListboxHelixFilterElementEvent) => void;
+        filter: HelixHeadlessListbox["filter"];
+        "onhelix-filter": (event: HelixHeadlessListboxHelixFilterElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        filter: HelixBaseListbox["filter"];
-        ref: import('react').Ref<HelixBaseListbox>;
+        filter: HelixHeadlessListbox["filter"];
+        ref: import('react').Ref<HelixHeadlessListbox>;
       }
     | { filter?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseListbox["value"];
-        "onhelix-change": (event: HelixBaseListboxHelixChangeElementEvent) => void;
+        value: HelixHeadlessListbox["value"];
+        "onhelix-change": (event: HelixHeadlessListboxHelixChangeElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseListbox["value"];
-        ref: import('react').Ref<HelixBaseListbox>;
+        value: HelixHeadlessListbox["value"];
+        ref: import('react').Ref<HelixHeadlessListbox>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-listbox, in Solid's dialect: `on:` and the event name. */
-type HelixBaseListboxControlledSolidJs =
+/** helix-headless-listbox, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessListboxControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-filter`. */
-        filter: HelixBaseListbox["filter"];
-        "on:helix-filter": (event: HelixBaseListboxHelixFilterElementEvent) => void;
+        filter: HelixHeadlessListbox["filter"];
+        "on:helix-filter": (event: HelixHeadlessListboxHelixFilterElementEvent) => void;
       }
     | {
-        filter: HelixBaseListbox["filter"];
-        ref: BaseProps<HelixBaseListbox>["ref"];
+        filter: HelixHeadlessListbox["filter"];
+        ref: BaseProps<HelixHeadlessListbox>["ref"];
       }
     | { filter?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseListbox["value"];
-        "on:helix-change": (event: HelixBaseListboxHelixChangeElementEvent) => void;
+        value: HelixHeadlessListbox["value"];
+        "on:helix-change": (event: HelixHeadlessListboxHelixChangeElementEvent) => void;
       }
     | {
-        value: HelixBaseListbox["value"];
-        ref: BaseProps<HelixBaseListbox>["ref"];
+        value: HelixHeadlessListbox["value"];
+        ref: BaseProps<HelixHeadlessListbox>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-megamenu: a controlled `open` announces and waits, so the handler comes with it.
+ * helix-headless-megamenu: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBaseMegamenuControlled =
+type HelixHeadlessMegamenuControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseMegamenu["open"];
-        "onhelix-open": (event: HelixBaseMegamenuHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseMegamenuHelixCloseElementEvent) => void;
+        open: HelixHeadlessMegamenu["open"];
+        "onhelix-open": (event: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseMegamenu["open"];
-        ref: import('react').Ref<HelixBaseMegamenu>;
+        open: HelixHeadlessMegamenu["open"];
+        ref: import('react').Ref<HelixHeadlessMegamenu>;
       }
     | { open?: undefined }
   );
 
-/** helix-base-megamenu, in Solid's dialect: `on:` and the event name. */
-type HelixBaseMegamenuControlledSolidJs =
+/** helix-headless-megamenu, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessMegamenuControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseMegamenu["open"];
-        "on:helix-open": (event: HelixBaseMegamenuHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseMegamenuHelixCloseElementEvent) => void;
+        open: HelixHeadlessMegamenu["open"];
+        "on:helix-open": (event: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseMegamenu["open"];
-        ref: BaseProps<HelixBaseMegamenu>["ref"];
+        open: HelixHeadlessMegamenu["open"];
+        ref: BaseProps<HelixHeadlessMegamenu>["ref"];
       }
     | { open?: undefined }
   );
 
 /**
- * helix-base-menu: a controlled `open` announces and waits, so the handler comes with it.
+ * helix-headless-menu: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBaseMenuControlled =
+type HelixHeadlessMenuControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseMenu["open"];
-        "onhelix-open": (event: HelixBaseMenuHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseMenuHelixCloseElementEvent) => void;
+        open: HelixHeadlessMenu["open"];
+        "onhelix-open": (event: HelixHeadlessMenuHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessMenuHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseMenu["open"];
-        ref: import('react').Ref<HelixBaseMenu>;
+        open: HelixHeadlessMenu["open"];
+        ref: import('react').Ref<HelixHeadlessMenu>;
       }
     | { open?: undefined }
   );
 
-/** helix-base-menu, in Solid's dialect: `on:` and the event name. */
-type HelixBaseMenuControlledSolidJs =
+/** helix-headless-menu, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessMenuControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseMenu["open"];
-        "on:helix-open": (event: HelixBaseMenuHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseMenuHelixCloseElementEvent) => void;
+        open: HelixHeadlessMenu["open"];
+        "on:helix-open": (event: HelixHeadlessMenuHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessMenuHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseMenu["open"];
-        ref: BaseProps<HelixBaseMenu>["ref"];
+        open: HelixHeadlessMenu["open"];
+        ref: BaseProps<HelixHeadlessMenu>["ref"];
       }
     | { open?: undefined }
   );
 
 /**
- * helix-base-number-input: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-headless-pin-input: a controlled `value` announces and waits, so the handler comes with it.
  */
-type HelixBaseNumberInputControlled =
+type HelixHeadlessPinInputControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBaseNumberInput["value"];
-        "onhelix-input": (event: HelixBaseNumberInputHelixInputElementEvent) => void;
+        value: HelixHeadlessPinInput["value"];
+        "onhelix-input": (event: HelixHeadlessPinInputHelixInputElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseNumberInput["value"];
-        ref: import('react').Ref<HelixBaseNumberInput>;
+        value: HelixHeadlessPinInput["value"];
+        ref: import('react').Ref<HelixHeadlessPinInput>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-number-input, in Solid's dialect: `on:` and the event name. */
-type HelixBaseNumberInputControlledSolidJs =
+/** helix-headless-pin-input, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessPinInputControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBaseNumberInput["value"];
-        "on:helix-input": (event: HelixBaseNumberInputHelixInputElementEvent) => void;
+        value: HelixHeadlessPinInput["value"];
+        "on:helix-input": (event: HelixHeadlessPinInputHelixInputElementEvent) => void;
       }
     | {
-        value: HelixBaseNumberInput["value"];
-        ref: BaseProps<HelixBaseNumberInput>["ref"];
+        value: HelixHeadlessPinInput["value"];
+        ref: BaseProps<HelixHeadlessPinInput>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-pagination: a controlled `page` announces and waits, so the handler comes with it.
+ * helix-headless-popover: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBasePaginationControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-navigate`. */
-        page: HelixBasePagination["page"];
-        "onhelix-navigate": (event: HelixBasePaginationHelixNavigateElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        page: HelixBasePagination["page"];
-        ref: import('react').Ref<HelixBasePagination>;
-      }
-    | { page?: undefined }
-  );
-
-/** helix-base-pagination, in Solid's dialect: `on:` and the event name. */
-type HelixBasePaginationControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-navigate`. */
-        page: HelixBasePagination["page"];
-        "on:helix-navigate": (event: HelixBasePaginationHelixNavigateElementEvent) => void;
-      }
-    | {
-        page: HelixBasePagination["page"];
-        ref: BaseProps<HelixBasePagination>["ref"];
-      }
-    | { page?: undefined }
-  );
-
-/**
- * helix-base-pin-input: a controlled `value` announces and waits, so the handler comes with it.
- */
-type HelixBasePinInputControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBasePinInput["value"];
-        "onhelix-input": (event: HelixBasePinInputHelixInputElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBasePinInput["value"];
-        ref: import('react').Ref<HelixBasePinInput>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-base-pin-input, in Solid's dialect: `on:` and the event name. */
-type HelixBasePinInputControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBasePinInput["value"];
-        "on:helix-input": (event: HelixBasePinInputHelixInputElementEvent) => void;
-      }
-    | {
-        value: HelixBasePinInput["value"];
-        ref: BaseProps<HelixBasePinInput>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-base-popover: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixBasePopoverControlled =
+type HelixHeadlessPopoverControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBasePopover["open"];
-        "onhelix-open": (event: HelixBasePopoverHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBasePopoverHelixCloseElementEvent) => void;
+        open: HelixHeadlessPopover["open"];
+        "onhelix-open": (event: HelixHeadlessPopoverHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessPopoverHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBasePopover["open"];
-        ref: import('react').Ref<HelixBasePopover>;
+        open: HelixHeadlessPopover["open"];
+        ref: import('react').Ref<HelixHeadlessPopover>;
       }
     | { open?: undefined }
   );
 
-/** helix-base-popover, in Solid's dialect: `on:` and the event name. */
-type HelixBasePopoverControlledSolidJs =
+/** helix-headless-popover, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessPopoverControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBasePopover["open"];
-        "on:helix-open": (event: HelixBasePopoverHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBasePopoverHelixCloseElementEvent) => void;
+        open: HelixHeadlessPopover["open"];
+        "on:helix-open": (event: HelixHeadlessPopoverHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessPopoverHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBasePopover["open"];
-        ref: BaseProps<HelixBasePopover>["ref"];
+        open: HelixHeadlessPopover["open"];
+        ref: BaseProps<HelixHeadlessPopover>["ref"];
       }
     | { open?: undefined }
   );
 
 /**
- * helix-base-radio-group: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-headless-rating: a controlled `value` announces and waits, so the handler comes with it.
  */
-type HelixBaseRadioGroupControlled =
+type HelixHeadlessRatingControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseRadioGroup["value"];
-        "onhelix-change": (event: HelixBaseRadioGroupHelixChangeElementEvent) => void;
+        value: HelixHeadlessRating["value"];
+        "onhelix-change": (event: HelixHeadlessRatingHelixChangeElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseRadioGroup["value"];
-        ref: import('react').Ref<HelixBaseRadioGroup>;
+        value: HelixHeadlessRating["value"];
+        ref: import('react').Ref<HelixHeadlessRating>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-radio-group, in Solid's dialect: `on:` and the event name. */
-type HelixBaseRadioGroupControlledSolidJs =
+/** helix-headless-rating, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessRatingControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseRadioGroup["value"];
-        "on:helix-change": (event: HelixBaseRadioGroupHelixChangeElementEvent) => void;
+        value: HelixHeadlessRating["value"];
+        "on:helix-change": (event: HelixHeadlessRatingHelixChangeElementEvent) => void;
       }
     | {
-        value: HelixBaseRadioGroup["value"];
-        ref: BaseProps<HelixBaseRadioGroup>["ref"];
+        value: HelixHeadlessRating["value"];
+        ref: BaseProps<HelixHeadlessRating>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-rating: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-headless-select: a controlled `open` or `value` announces and waits, so the handler comes with it.
  */
-type HelixBaseRatingControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseRating["value"];
-        "onhelix-change": (event: HelixBaseRatingHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseRating["value"];
-        ref: import('react').Ref<HelixBaseRating>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-base-rating, in Solid's dialect: `on:` and the event name. */
-type HelixBaseRatingControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseRating["value"];
-        "on:helix-change": (event: HelixBaseRatingHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixBaseRating["value"];
-        ref: BaseProps<HelixBaseRating>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-base-select: a controlled `open` or `value` announces and waits, so the handler comes with it.
- */
-type HelixBaseSelectControlled =
+type HelixHeadlessSelectControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseSelect["open"];
-        "onhelix-open": (event: HelixBaseSelectHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseSelectHelixCloseElementEvent) => void;
+        open: HelixHeadlessSelect["open"];
+        "onhelix-open": (event: HelixHeadlessSelectHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessSelectHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseSelect["open"];
-        ref: import('react').Ref<HelixBaseSelect>;
+        open: HelixHeadlessSelect["open"];
+        ref: import('react').Ref<HelixHeadlessSelect>;
       }
     | { open?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseSelect["value"];
-        "onhelix-change": (event: HelixBaseSelectHelixChangeElementEvent) => void;
+        value: HelixHeadlessSelect["value"];
+        "onhelix-change": (event: HelixHeadlessSelectHelixChangeElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseSelect["value"];
-        ref: import('react').Ref<HelixBaseSelect>;
+        value: HelixHeadlessSelect["value"];
+        ref: import('react').Ref<HelixHeadlessSelect>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-select, in Solid's dialect: `on:` and the event name. */
-type HelixBaseSelectControlledSolidJs =
+/** helix-headless-select, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessSelectControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseSelect["open"];
-        "on:helix-open": (event: HelixBaseSelectHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseSelectHelixCloseElementEvent) => void;
+        open: HelixHeadlessSelect["open"];
+        "on:helix-open": (event: HelixHeadlessSelectHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessSelectHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseSelect["open"];
-        ref: BaseProps<HelixBaseSelect>["ref"];
+        open: HelixHeadlessSelect["open"];
+        ref: BaseProps<HelixHeadlessSelect>["ref"];
       }
     | { open?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseSelect["value"];
-        "on:helix-change": (event: HelixBaseSelectHelixChangeElementEvent) => void;
+        value: HelixHeadlessSelect["value"];
+        "on:helix-change": (event: HelixHeadlessSelectHelixChangeElementEvent) => void;
       }
     | {
-        value: HelixBaseSelect["value"];
-        ref: BaseProps<HelixBaseSelect>["ref"];
+        value: HelixHeadlessSelect["value"];
+        ref: BaseProps<HelixHeadlessSelect>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-slider: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-headless-slider: a controlled `value` announces and waits, so the handler comes with it.
  */
-type HelixBaseSliderControlled =
+type HelixHeadlessSliderControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBaseSlider["value"];
-        "onhelix-input": (event: HelixBaseSliderHelixInputElementEvent) => void;
+        value: HelixHeadlessSlider["value"];
+        "onhelix-input": (event: HelixHeadlessSliderHelixInputElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseSlider["value"];
-        ref: import('react').Ref<HelixBaseSlider>;
+        value: HelixHeadlessSlider["value"];
+        ref: import('react').Ref<HelixHeadlessSlider>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-slider, in Solid's dialect: `on:` and the event name. */
-type HelixBaseSliderControlledSolidJs =
+/** helix-headless-slider, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessSliderControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBaseSlider["value"];
-        "on:helix-input": (event: HelixBaseSliderHelixInputElementEvent) => void;
+        value: HelixHeadlessSlider["value"];
+        "on:helix-input": (event: HelixHeadlessSliderHelixInputElementEvent) => void;
       }
     | {
-        value: HelixBaseSlider["value"];
-        ref: BaseProps<HelixBaseSlider>["ref"];
+        value: HelixHeadlessSlider["value"];
+        ref: BaseProps<HelixHeadlessSlider>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-speed-dial: a controlled `open` announces and waits, so the handler comes with it.
+ * helix-headless-speed-dial: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBaseSpeedDialControlled =
+type HelixHeadlessSpeedDialControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseSpeedDial["open"];
-        "onhelix-open": (event: HelixBaseSpeedDialHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseSpeedDialHelixCloseElementEvent) => void;
+        open: HelixHeadlessSpeedDial["open"];
+        "onhelix-open": (event: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseSpeedDial["open"];
-        ref: import('react').Ref<HelixBaseSpeedDial>;
+        open: HelixHeadlessSpeedDial["open"];
+        ref: import('react').Ref<HelixHeadlessSpeedDial>;
       }
     | { open?: undefined }
   );
 
-/** helix-base-speed-dial, in Solid's dialect: `on:` and the event name. */
-type HelixBaseSpeedDialControlledSolidJs =
+/** helix-headless-speed-dial, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessSpeedDialControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseSpeedDial["open"];
-        "on:helix-open": (event: HelixBaseSpeedDialHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseSpeedDialHelixCloseElementEvent) => void;
+        open: HelixHeadlessSpeedDial["open"];
+        "on:helix-open": (event: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseSpeedDial["open"];
-        ref: BaseProps<HelixBaseSpeedDial>["ref"];
+        open: HelixHeadlessSpeedDial["open"];
+        ref: BaseProps<HelixHeadlessSpeedDial>["ref"];
       }
     | { open?: undefined }
   );
 
 /**
- * helix-base-splitter: a controlled `position` or `collapsed` announces and waits, so the handler comes with it.
+ * helix-headless-splitter: a controlled `position` or `collapsed` announces and waits, so the handler comes with it.
  */
-type HelixBaseSplitterControlled =
+type HelixHeadlessSplitterControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        position: HelixBaseSplitter["position"];
-        "onhelix-change": (event: HelixBaseSplitterHelixChangeElementEvent) => void;
+        position: HelixHeadlessSplitter["position"];
+        "onhelix-change": (event: HelixHeadlessSplitterHelixChangeElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        position: HelixBaseSplitter["position"];
-        ref: import('react').Ref<HelixBaseSplitter>;
+        position: HelixHeadlessSplitter["position"];
+        ref: import('react').Ref<HelixHeadlessSplitter>;
       }
     | { position?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        collapsed: HelixBaseSplitter["collapsed"];
-        "onhelix-change": (event: HelixBaseSplitterHelixChangeElementEvent) => void;
+        collapsed: HelixHeadlessSplitter["collapsed"];
+        "onhelix-change": (event: HelixHeadlessSplitterHelixChangeElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        collapsed: HelixBaseSplitter["collapsed"];
-        ref: import('react').Ref<HelixBaseSplitter>;
+        collapsed: HelixHeadlessSplitter["collapsed"];
+        ref: import('react').Ref<HelixHeadlessSplitter>;
       }
     | { collapsed?: undefined }
   );
 
-/** helix-base-splitter, in Solid's dialect: `on:` and the event name. */
-type HelixBaseSplitterControlledSolidJs =
+/** helix-headless-splitter, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessSplitterControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        position: HelixBaseSplitter["position"];
-        "on:helix-change": (event: HelixBaseSplitterHelixChangeElementEvent) => void;
+        position: HelixHeadlessSplitter["position"];
+        "on:helix-change": (event: HelixHeadlessSplitterHelixChangeElementEvent) => void;
       }
     | {
-        position: HelixBaseSplitter["position"];
-        ref: BaseProps<HelixBaseSplitter>["ref"];
+        position: HelixHeadlessSplitter["position"];
+        ref: BaseProps<HelixHeadlessSplitter>["ref"];
       }
     | { position?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        collapsed: HelixBaseSplitter["collapsed"];
-        "on:helix-change": (event: HelixBaseSplitterHelixChangeElementEvent) => void;
+        collapsed: HelixHeadlessSplitter["collapsed"];
+        "on:helix-change": (event: HelixHeadlessSplitterHelixChangeElementEvent) => void;
       }
     | {
-        collapsed: HelixBaseSplitter["collapsed"];
-        ref: BaseProps<HelixBaseSplitter>["ref"];
+        collapsed: HelixHeadlessSplitter["collapsed"];
+        ref: BaseProps<HelixHeadlessSplitter>["ref"];
       }
     | { collapsed?: undefined }
   );
 
 /**
- * helix-base-switch: a controlled `checked` announces and waits, so the handler comes with it.
+ * helix-headless-switch: a controlled `checked` announces and waits, so the handler comes with it.
  */
-type HelixBaseSwitchControlled =
+type HelixHeadlessSwitchControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-toggle`. */
-        checked: HelixBaseSwitch["checked"];
-        "onhelix-toggle": (event: HelixBaseSwitchHelixToggleElementEvent) => void;
+        checked: HelixHeadlessSwitch["checked"];
+        "onhelix-toggle": (event: HelixHeadlessSwitchHelixToggleElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        checked: HelixBaseSwitch["checked"];
-        ref: import('react').Ref<HelixBaseSwitch>;
+        checked: HelixHeadlessSwitch["checked"];
+        ref: import('react').Ref<HelixHeadlessSwitch>;
       }
     | { checked?: undefined }
   );
 
-/** helix-base-switch, in Solid's dialect: `on:` and the event name. */
-type HelixBaseSwitchControlledSolidJs =
+/** helix-headless-switch, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessSwitchControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-toggle`. */
-        checked: HelixBaseSwitch["checked"];
-        "on:helix-toggle": (event: HelixBaseSwitchHelixToggleElementEvent) => void;
+        checked: HelixHeadlessSwitch["checked"];
+        "on:helix-toggle": (event: HelixHeadlessSwitchHelixToggleElementEvent) => void;
       }
     | {
-        checked: HelixBaseSwitch["checked"];
-        ref: BaseProps<HelixBaseSwitch>["ref"];
+        checked: HelixHeadlessSwitch["checked"];
+        ref: BaseProps<HelixHeadlessSwitch>["ref"];
       }
     | { checked?: undefined }
   );
 
 /**
- * helix-base-textarea: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-headless-textarea: a controlled `value` announces and waits, so the handler comes with it.
  */
-type HelixBaseTextareaControlled =
+type HelixHeadlessTextareaControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBaseTextarea["value"];
-        "onhelix-input": (event: HelixBaseTextareaHelixInputElementEvent) => void;
+        value: HelixHeadlessTextarea["value"];
+        "onhelix-input": (event: HelixHeadlessTextareaHelixInputElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseTextarea["value"];
-        ref: import('react').Ref<HelixBaseTextarea>;
+        value: HelixHeadlessTextarea["value"];
+        ref: import('react').Ref<HelixHeadlessTextarea>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-textarea, in Solid's dialect: `on:` and the event name. */
-type HelixBaseTextareaControlledSolidJs =
+/** helix-headless-textarea, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessTextareaControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixBaseTextarea["value"];
-        "on:helix-input": (event: HelixBaseTextareaHelixInputElementEvent) => void;
+        value: HelixHeadlessTextarea["value"];
+        "on:helix-input": (event: HelixHeadlessTextareaHelixInputElementEvent) => void;
       }
     | {
-        value: HelixBaseTextarea["value"];
-        ref: BaseProps<HelixBaseTextarea>["ref"];
+        value: HelixHeadlessTextarea["value"];
+        ref: BaseProps<HelixHeadlessTextarea>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-time-input: a controlled `open` or `value` announces and waits, so the handler comes with it.
+ * helix-headless-time-input: a controlled `open` or `value` announces and waits, so the handler comes with it.
  */
-type HelixBaseTimeInputControlled =
+type HelixHeadlessTimeInputControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseTimeInput["open"];
-        "onhelix-open": (event: HelixBaseTimeInputHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseTimeInputHelixCloseElementEvent) => void;
+        open: HelixHeadlessTimeInput["open"];
+        "onhelix-open": (event: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseTimeInput["open"];
-        ref: import('react').Ref<HelixBaseTimeInput>;
+        open: HelixHeadlessTimeInput["open"];
+        ref: import('react').Ref<HelixHeadlessTimeInput>;
       }
     | { open?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseTimeInput["value"];
-        "onhelix-change": (event: HelixBaseTimeInputHelixChangeElementEvent) => void;
+        value: HelixHeadlessTimeInput["value"];
+        "onhelix-change": (event: HelixHeadlessTimeInputHelixChangeElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseTimeInput["value"];
-        ref: import('react').Ref<HelixBaseTimeInput>;
+        value: HelixHeadlessTimeInput["value"];
+        ref: import('react').Ref<HelixHeadlessTimeInput>;
       }
     | { value?: undefined }
   );
 
-/** helix-base-time-input, in Solid's dialect: `on:` and the event name. */
-type HelixBaseTimeInputControlledSolidJs =
+/** helix-headless-time-input, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessTimeInputControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseTimeInput["open"];
-        "on:helix-open": (event: HelixBaseTimeInputHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseTimeInputHelixCloseElementEvent) => void;
+        open: HelixHeadlessTimeInput["open"];
+        "on:helix-open": (event: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseTimeInput["open"];
-        ref: BaseProps<HelixBaseTimeInput>["ref"];
+        open: HelixHeadlessTimeInput["open"];
+        ref: BaseProps<HelixHeadlessTimeInput>["ref"];
       }
     | { open?: undefined }
   ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseTimeInput["value"];
-        "on:helix-change": (event: HelixBaseTimeInputHelixChangeElementEvent) => void;
+        value: HelixHeadlessTimeInput["value"];
+        "on:helix-change": (event: HelixHeadlessTimeInputHelixChangeElementEvent) => void;
       }
     | {
-        value: HelixBaseTimeInput["value"];
-        ref: BaseProps<HelixBaseTimeInput>["ref"];
+        value: HelixHeadlessTimeInput["value"];
+        ref: BaseProps<HelixHeadlessTimeInput>["ref"];
       }
     | { value?: undefined }
   );
 
 /**
- * helix-base-time-picker: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-headless-toast-item: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBaseTimePickerControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseTimePicker["value"];
-        "onhelix-change": (event: HelixBaseTimePickerHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseTimePicker["value"];
-        ref: import('react').Ref<HelixBaseTimePicker>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-base-time-picker, in Solid's dialect: `on:` and the event name. */
-type HelixBaseTimePickerControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseTimePicker["value"];
-        "on:helix-change": (event: HelixBaseTimePickerHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixBaseTimePicker["value"];
-        ref: BaseProps<HelixBaseTimePicker>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-base-toast-item: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixBaseToastItemControlled =
+type HelixHeadlessToastItemControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-dismiss`. */
-        open: HelixBaseToastItem["open"];
-        "onhelix-dismiss": (event: HelixBaseToastItemHelixDismissElementEvent) => void;
+        open: HelixHeadlessToastItem["open"];
+        "onhelix-dismiss": (event: HelixHeadlessToastItemHelixDismissElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseToastItem["open"];
-        ref: import('react').Ref<HelixBaseToastItem>;
+        open: HelixHeadlessToastItem["open"];
+        ref: import('react').Ref<HelixHeadlessToastItem>;
       }
     | { open?: undefined }
   );
 
-/** helix-base-toast-item, in Solid's dialect: `on:` and the event name. */
-type HelixBaseToastItemControlledSolidJs =
+/** helix-headless-toast-item, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessToastItemControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-dismiss`. */
-        open: HelixBaseToastItem["open"];
-        "on:helix-dismiss": (event: HelixBaseToastItemHelixDismissElementEvent) => void;
+        open: HelixHeadlessToastItem["open"];
+        "on:helix-dismiss": (event: HelixHeadlessToastItemHelixDismissElementEvent) => void;
       }
     | {
-        open: HelixBaseToastItem["open"];
-        ref: BaseProps<HelixBaseToastItem>["ref"];
+        open: HelixHeadlessToastItem["open"];
+        ref: BaseProps<HelixHeadlessToastItem>["ref"];
       }
     | { open?: undefined }
   );
 
 /**
- * helix-base-toggle-group: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-headless-tooltip: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBaseToggleGroupControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseToggleGroup["value"];
-        "onhelix-change": (event: HelixBaseToggleGroupHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixBaseToggleGroup["value"];
-        ref: import('react').Ref<HelixBaseToggleGroup>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-base-toggle-group, in Solid's dialect: `on:` and the event name. */
-type HelixBaseToggleGroupControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixBaseToggleGroup["value"];
-        "on:helix-change": (event: HelixBaseToggleGroupHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixBaseToggleGroup["value"];
-        ref: BaseProps<HelixBaseToggleGroup>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-base-tooltip: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixBaseTooltipControlled =
+type HelixHeadlessTooltipControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseTooltip["open"];
-        "onhelix-open": (event: HelixBaseTooltipHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseTooltipHelixCloseElementEvent) => void;
+        open: HelixHeadlessTooltip["open"];
+        "onhelix-open": (event: HelixHeadlessTooltipHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessTooltipHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseTooltip["open"];
-        ref: import('react').Ref<HelixBaseTooltip>;
+        open: HelixHeadlessTooltip["open"];
+        ref: import('react').Ref<HelixHeadlessTooltip>;
       }
     | { open?: undefined }
   );
 
-/** helix-base-tooltip, in Solid's dialect: `on:` and the event name. */
-type HelixBaseTooltipControlledSolidJs =
+/** helix-headless-tooltip, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessTooltipControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseTooltip["open"];
-        "on:helix-open": (event: HelixBaseTooltipHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseTooltipHelixCloseElementEvent) => void;
+        open: HelixHeadlessTooltip["open"];
+        "on:helix-open": (event: HelixHeadlessTooltipHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessTooltipHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseTooltip["open"];
-        ref: BaseProps<HelixBaseTooltip>["ref"];
+        open: HelixHeadlessTooltip["open"];
+        ref: BaseProps<HelixHeadlessTooltip>["ref"];
       }
     | { open?: undefined }
   );
 
 /**
- * helix-base-tour: a controlled `index` announces and waits, so the handler comes with it.
+ * helix-headless-tour: a controlled `index` announces and waits, so the handler comes with it.
  */
-type HelixBaseTourControlled =
+type HelixHeadlessTourControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        index: HelixBaseTour["index"];
-        "onhelix-change": (event: HelixBaseTourHelixChangeElementEvent) => void;
+        index: HelixHeadlessTour["index"];
+        "onhelix-change": (event: HelixHeadlessTourHelixChangeElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        index: HelixBaseTour["index"];
-        ref: import('react').Ref<HelixBaseTour>;
+        index: HelixHeadlessTour["index"];
+        ref: import('react').Ref<HelixHeadlessTour>;
       }
     | { index?: undefined }
   );
 
-/** helix-base-tour, in Solid's dialect: `on:` and the event name. */
-type HelixBaseTourControlledSolidJs =
+/** helix-headless-tour, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessTourControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
-        index: HelixBaseTour["index"];
-        "on:helix-change": (event: HelixBaseTourHelixChangeElementEvent) => void;
+        index: HelixHeadlessTour["index"];
+        "on:helix-change": (event: HelixHeadlessTourHelixChangeElementEvent) => void;
       }
     | {
-        index: HelixBaseTour["index"];
-        ref: BaseProps<HelixBaseTour>["ref"];
+        index: HelixHeadlessTour["index"];
+        ref: BaseProps<HelixHeadlessTour>["ref"];
       }
     | { index?: undefined }
   );
 
 /**
- * helix-base-tree-item: a controlled `open` announces and waits, so the handler comes with it.
+ * helix-headless-tree-item: a controlled `open` announces and waits, so the handler comes with it.
  */
-type HelixBaseTreeItemControlled =
+type HelixHeadlessTreeItemControlled =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseTreeItem["open"];
-        "onhelix-open": (event: HelixBaseTreeItemHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixBaseTreeItemHelixCloseElementEvent) => void;
+        open: HelixHeadlessTreeItem["open"];
+        "onhelix-open": (event: HelixHeadlessTreeItemHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixHeadlessTreeItemHelixCloseElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixBaseTreeItem["open"];
-        ref: import('react').Ref<HelixBaseTreeItem>;
+        open: HelixHeadlessTreeItem["open"];
+        ref: import('react').Ref<HelixHeadlessTreeItem>;
       }
     | { open?: undefined }
   );
 
-/** helix-base-tree-item, in Solid's dialect: `on:` and the event name. */
-type HelixBaseTreeItemControlledSolidJs =
+/** helix-headless-tree-item, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessTreeItemControlledSolidJs =
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixBaseTreeItem["open"];
-        "on:helix-open": (event: HelixBaseTreeItemHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixBaseTreeItemHelixCloseElementEvent) => void;
+        open: HelixHeadlessTreeItem["open"];
+        "on:helix-open": (event: HelixHeadlessTreeItemHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixHeadlessTreeItemHelixCloseElementEvent) => void;
       }
     | {
-        open: HelixBaseTreeItem["open"];
-        ref: BaseProps<HelixBaseTreeItem>["ref"];
+        open: HelixHeadlessTreeItem["open"];
+        ref: BaseProps<HelixHeadlessTreeItem>["ref"];
       }
     | { open?: undefined }
   );

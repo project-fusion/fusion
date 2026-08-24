@@ -51,8 +51,8 @@ import { property } from 'lit/decorators.js'
  * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
  */
-@customElement('helix-base-popover')
-export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
+@customElement('helix-headless-popover')
+export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   /** Accessible name for the panel. */
   @property()
   label = 'Popover'
@@ -229,6 +229,6 @@ export class HelixBasePopover extends MixinControllerOpen(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-popover': HelixBasePopover
+    'helix-headless-popover': HelixHeadlessPopover
   }
 }

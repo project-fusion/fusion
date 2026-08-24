@@ -13,7 +13,7 @@ type Input = HTMLElement & {
 }
 
 const input = async (extra = ''): Promise<Input> =>
-  (await mount(`<helix-base-input label="Name" ${extra}></helix-base-input>`)) as Input
+  (await mount(`<helix-headless-input label="Name" ${extra}></helix-headless-input>`)) as Input
 
 /** The real input inside, which is where a caret lives. */
 const _control = (host: Input): HTMLInputElement =>
@@ -71,7 +71,7 @@ describe('a control that is controlled and unattended says so', () => {
       host.requestValue('Hopper')
     })
     expect(said).toHaveLength(1)
-    expect(said[0]).toContain('<helix-base-input> is controlled')
+    expect(said[0]).toContain('<helix-headless-input> is controlled')
     expect(said[0]).toContain('`value` was declared')
     expect(said[0]).toContain('default-value')
   })

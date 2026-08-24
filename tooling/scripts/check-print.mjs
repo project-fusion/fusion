@@ -25,7 +25,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const SOURCE = 'helix/web/src'
+const SOURCE = 'helix/styled/src'
 
 const families = readdirSync(SOURCE, { withFileTypes: true })
   .filter((one) => one.isDirectory())

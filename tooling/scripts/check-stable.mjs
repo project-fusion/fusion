@@ -62,8 +62,8 @@ const declares = (dir, status) => {
 const problems = []
 let stable = 0
 
-for (const family of families('helix/web/src')) {
-  const web = join('helix/web/src', family)
+for (const family of families('helix/styled/src')) {
+  const web = join('helix/styled/src', family)
   const headless = join('helix/headless/src', family)
   if (!declares(web, 'stable') && !declares(headless, 'stable')) {
     continue

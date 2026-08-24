@@ -17,7 +17,7 @@ type Item = HTMLElement & {
 
 const region = async (items = ''): Promise<HTMLElement> =>
   (await mount(
-    `<helix-base-toast label="Notifications">${items}</helix-base-toast>`,
+    `<helix-headless-toast label="Notifications">${items}</helix-headless-toast>`,
   )) as HTMLElement
 
 describe('toast region', () => {
@@ -49,8 +49,10 @@ describe('toast region', () => {
 
 describe('toast item', () => {
   const item = async (attrs = ''): Promise<Item> => {
-    const host = await region(`<helix-base-toast-item ${attrs}>Saved</helix-base-toast-item>`)
-    const found = host.querySelector('helix-base-toast-item') as Item
+    const host = await region(
+      `<helix-headless-toast-item ${attrs}>Saved</helix-headless-toast-item>`,
+    )
+    const found = host.querySelector('helix-headless-toast-item') as Item
     await found.updateComplete
     return found
   }

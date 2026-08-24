@@ -64,8 +64,8 @@ const FOLDS_UP_TO = 12
  *
  * @csspart overflow - The count of avatars past `max`.
  */
-@customElement('helix-base-avatar-group')
-export class HelixBaseAvatarGroup extends HelixElement {
+@customElement('helix-headless-avatar-group')
+export class HelixHeadlessAvatarGroup extends HelixElement {
   /** Accessible name for the set, such as "Reviewers". */
   @property()
   label = ''
@@ -137,6 +137,6 @@ export class HelixBaseAvatarGroup extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-avatar-group': HelixBaseAvatarGroup
+    'helix-headless-avatar-group': HelixHeadlessAvatarGroup
   }
 }

@@ -193,8 +193,8 @@ const SKIP_SECONDS = 10
  * @cssproperty --video-level - The current volume, 0 to 1.
  * @cssproperty --video-progress - How far playback has reached, as a fraction of the duration.
  */
-@customElement('helix-base-video')
-export class HelixBaseVideo extends HelixElement {
+@customElement('helix-headless-video')
+export class HelixHeadlessVideo extends HelixElement {
   /** Where the video is, for the common case of one file. */
   @property()
   src = ''
@@ -1620,6 +1620,6 @@ export class HelixBaseVideo extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-video': HelixBaseVideo
+    'helix-headless-video': HelixHeadlessVideo
   }
 }

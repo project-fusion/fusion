@@ -1,0 +1,33 @@
+<!-- @summary The same drawer on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-headless-button
+  command="--show"
+  commandfor="panel"
+>
+  Open drawer
+</helix-headless-button>
+
+<helix-headless-drawer
+  id="panel"
+  label="Drawer Title"
+  placement="end"
+>
+  <span slot="header">Drawer Title</span>
+  <div class="stack">
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+      tempor incididunt ut labore.
+    </p>
+    <helix-headless-button
+      command="--close"
+      commandfor="panel"
+    >
+      Close
+    </helix-headless-button>
+  </div>
+</helix-headless-drawer>

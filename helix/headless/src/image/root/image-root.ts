@@ -8,7 +8,7 @@ import { property, state } from 'lit/decorators.js'
  * @description
  * **An element rather than a recipe, because of the part CSS cannot do.**
  * Reserving the box is `aspect-ratio` and needs nothing from anybody; `Link` and
- * the megamenu row are recipes in `base.css` for exactly that reason. What
+ * the megamenu row are recipes in `headless.css` for exactly that reason. What
  * cannot be written as a rule is *when the picture arrived*: a stylesheet has no
  * way to know, and no way to hear that it never will. So this owns three states
  * and the two events that move between them, and leaves the box to the
@@ -49,8 +49,8 @@ import { property, state } from 'lit/decorators.js'
  * @csspart placeholder - What stands in until it arrives.
  * @csspart fallback - What stands in when it fails.
  */
-@customElement('helix-base-image')
-export class HelixBaseImage extends HelixElement {
+@customElement('helix-headless-image')
+export class HelixHeadlessImage extends HelixElement {
   /** Where the picture is. */
   @property()
   src = ''
@@ -229,6 +229,6 @@ export class HelixBaseImage extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-image': HelixBaseImage
+    'helix-headless-image': HelixHeadlessImage
   }
 }

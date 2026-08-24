@@ -19,13 +19,13 @@ type Tooltip = HTMLElement & {
 
 const tooltip = async (attrs = 'content="Regenerates the manifests"'): Promise<Tooltip> =>
   (await mount(
-    `<helix-base-tooltip ${attrs}><button>Analyze</button></helix-base-tooltip>`,
+    `<helix-headless-tooltip ${attrs}><button>Analyze</button></helix-headless-tooltip>`,
   )) as Tooltip
 
 /** A tooltip whose bubble is filled from the light DOM instead of `content`. */
 const slotted = async (attrs = '', inner = '<b>Rich</b>'): Promise<Tooltip> =>
   (await mount(
-    `<helix-base-tooltip ${attrs}><button>Analyze</button><span slot="content">${inner}</span></helix-base-tooltip>`,
+    `<helix-headless-tooltip ${attrs}><button>Analyze</button><span slot="content">${inner}</span></helix-headless-tooltip>`,
   )) as Tooltip
 
 /**
@@ -151,7 +151,7 @@ describe('tooltip', () => {
   test('an element with no text of its own is still something to say', async () => {
     // The reason emptiness cannot be a text test. An icon is exactly what a
     // consumer reaches for the slot to say.
-    const tip = await slotted('', '<helix-base-icon name="info"></helix-base-icon>')
+    const tip = await slotted('', '<helix-headless-icon name="info"></helix-headless-icon>')
     tip.show()
     await tip.updateComplete
     expect(tip.open).toBe(true)
@@ -174,9 +174,9 @@ describe('tooltip for', () => {
     triggerAttrs = 'id="target" aria-describedby="tip"',
   ) => {
     const host = await mount(
-      `<div><button ${triggerAttrs}>Save</button><helix-base-tooltip ${tipAttrs}></helix-base-tooltip></div>`,
+      `<div><button ${triggerAttrs}>Save</button><helix-headless-tooltip ${tipAttrs}></helix-headless-tooltip></div>`,
     )
-    const tip = host.querySelector('helix-base-tooltip') as Tooltip
+    const tip = host.querySelector('helix-headless-tooltip') as Tooltip
     await tip.updateComplete
     return { button: host.querySelector('button') as HTMLElement, tip }
   }
@@ -202,9 +202,9 @@ describe('tooltip for', () => {
   test('slotted content is named by its text, flattened', async () => {
     const host = await mount(
       `<div><button id="target" aria-describedby="tip">Save</button>` +
-        `<helix-base-tooltip id="tip" for="target"><span slot="content">Save <b>now</b></span></helix-base-tooltip></div>`,
+        `<helix-headless-tooltip id="tip" for="target"><span slot="content">Save <b>now</b></span></helix-headless-tooltip></div>`,
     )
-    const tip = host.querySelector('helix-base-tooltip') as Tooltip
+    const tip = host.querySelector('helix-headless-tooltip') as Tooltip
     await tip.updateComplete
     expect(tip.internals?.ariaLabel).toBe('Save now')
   })
@@ -261,7 +261,7 @@ describe('tooltip for', () => {
        Holds are cleared with it: left set, the pointer stays recorded as being
        over the trigger and the next release anywhere brings the bubble back. */
     const host = (await mount(
-      '<helix-base-tooltip content="Preferences"><button type="button">gear</button></helix-base-tooltip>',
+      '<helix-headless-tooltip content="Preferences"><button type="button">gear</button></helix-headless-tooltip>',
     )) as HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
     await host.updateComplete
 

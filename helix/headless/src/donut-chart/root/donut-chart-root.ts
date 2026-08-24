@@ -113,8 +113,8 @@ const THICKNESS: Record<string, number> = {
  *
  * @cssproperty --donut-chart-stroke - How thick the ring is drawn, derived from `hole`.
  */
-@customElement('helix-base-donut-chart')
-export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
+@customElement('helix-headless-donut-chart')
+export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
   /* The slices, in table order, with anything negative dropped. */
   /**
    * The pointer is not mapped across this one.
@@ -129,7 +129,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
    * Set here rather than in a constructor, and that is not a style choice. The
    * analyzer reads `this.pointer.axis = 'none'` in a constructor body as a
    * declaration of a public field called `axis`, and failed the build with
-   * `HelixBaseDonutChart.tracks has no description` for a member that does not
+   * `HelixHeadlessDonutChart.tracks has no description` for a member that does not
    * exist on this class at all.
    */
   override connectedCallback(): void {
@@ -364,6 +364,6 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-donut-chart': HelixBaseDonutChart
+    'helix-headless-donut-chart': HelixHeadlessDonutChart
   }
 }

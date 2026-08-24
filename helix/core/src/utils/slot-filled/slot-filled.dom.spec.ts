@@ -70,5 +70,5 @@ describe('what counts as filled', () => {
    assertion here would be measuring happy-dom, and one written to pass under it
    would assert the opposite of what ships.
    `helix/core` has no browser lane: `build-specs.mjs` bundles families out of
-   `helix/headless` and `helix/web`. Covering this properly means a component
+   `helix/headless` and `helix/styled`. Covering this properly means a component
    spec in one of those, which is where the behavior is consumed anyway. */

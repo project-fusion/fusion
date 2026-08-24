@@ -20,7 +20,9 @@ beforeAll(async () => {
  */
 describe('a group of options', () => {
   test('is a group, named by its label, so a reader is told which run this is', async () => {
-    const host = await mount('<helix-base-option-group label="Recent"></helix-base-option-group>')
+    const host = await mount(
+      '<helix-headless-option-group label="Recent"></helix-headless-option-group>',
+    )
     expect(role(host)).toBe('group')
     expect(label(host)).toBe('Recent')
   })
@@ -28,7 +30,9 @@ describe('a group of options', () => {
   /* The heading is drawn and is `aria-hidden`, because the name is already on
      the host: read out again it would announce the run twice. */
   test('draws its heading without announcing it a second time', async () => {
-    const host = await mount('<helix-base-option-group label="Recent"></helix-base-option-group>')
+    const host = await mount(
+      '<helix-headless-option-group label="Recent"></helix-headless-option-group>',
+    )
     const label = part(host, 'label') as HTMLElement
     expect(label.textContent?.trim()).toBe('Recent')
     expect(label.getAttribute('aria-hidden')).toBe('true')
@@ -39,7 +43,7 @@ describe('a group of options', () => {
      more than text. */
   test('takes a slotted label over the string', async () => {
     const host = await mount(
-      '<helix-base-option-group label="Plain"><b slot="label">Rich</b></helix-base-option-group>',
+      '<helix-headless-option-group label="Plain"><b slot="label">Rich</b></helix-headless-option-group>',
     )
     const slotted = host.querySelector('[slot="label"]')
     expect(slotted?.textContent).toBe('Rich')
@@ -50,12 +54,12 @@ describe('a group of options', () => {
      one structural promise this element makes to whatever renders into it. */
   test('holds its options in the run it draws', async () => {
     const host = await mount(
-      `<helix-base-option-group label="Recent">
-        <helix-base-option value="a">A</helix-base-option>
-        <helix-base-option value="b">B</helix-base-option>
-      </helix-base-option-group>`,
+      `<helix-headless-option-group label="Recent">
+        <helix-headless-option value="a">A</helix-headless-option>
+        <helix-headless-option value="b">B</helix-headless-option>
+      </helix-headless-option-group>`,
     )
     expect(part(host, 'items')).not.toBeNull()
-    expect(host.querySelectorAll('helix-base-option').length).toBe(2)
+    expect(host.querySelectorAll('helix-headless-option').length).toBe(2)
   })
 })

@@ -9,7 +9,7 @@
  * nothing contradicts, which is the shape a value drifts in.
  *
  * **It had drifted, and the split is what exposed it.** When `charts` came out
- * of `content` on 23 Aug 2026 only `helix/web` moved. `bar-chart`, `donut-chart`,
+ * of `content` on 23 Aug 2026 only `helix/styled` moved. `bar-chart`, `donut-chart`,
  * `line-chart`, `sparkline`, `trend` and `legend` went on saying `content` in
  * `helix/headless` for a day, and nothing failed, because `content` was still a
  * legal word. A vocabulary check cannot catch a stale value that is spelled
@@ -32,7 +32,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const TIERS = { headless: 'helix/headless/src', styled: 'helix/web/src' }
+const TIERS = { headless: 'helix/headless/src', styled: 'helix/styled/src' }
 const CATEGORY = /@category ([a-z-]+)/
 
 /** The category on a family's root element, or null where there is no root. */

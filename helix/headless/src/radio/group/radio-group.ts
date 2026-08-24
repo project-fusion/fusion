@@ -10,7 +10,7 @@ import {
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixBaseRadio } from '../root/radio-root.js'
+import { HelixHeadlessRadio } from '../root/radio-root.js'
 
 /**
  * @summary A set of choices where exactly one is the answer.
@@ -51,8 +51,8 @@ import { HelixBaseRadio } from '../root/radio-root.js'
  * @csspart hint - Help under the set.
  * @csspart feedback - What is wrong with it.
  */
-@customElement('helix-base-radio-group')
-export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
+@customElement('helix-headless-radio-group')
+export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
   /**
    * Which way the choices run. A column reads one line per answer.
    *
@@ -84,9 +84,9 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
   })
 
   /** The radios, in light-DOM order. Client only: the server has no tree. */
-  get items(): HelixBaseRadio[] {
+  get items(): HelixHeadlessRadio[] {
     return [...this.children].filter(
-      (child): child is HelixBaseRadio => child instanceof HelixBaseRadio,
+      (child): child is HelixHeadlessRadio => child instanceof HelixHeadlessRadio,
     )
   }
 
@@ -188,6 +188,6 @@ export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFo
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-radio-group': HelixBaseRadioGroup
+    'helix-headless-radio-group': HelixHeadlessRadioGroup
   }
 }

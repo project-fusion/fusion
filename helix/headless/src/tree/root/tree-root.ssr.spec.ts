@@ -3,12 +3,12 @@ import { hostAttributes, partTag, ssr, withoutStyles } from '@helix-io/testing/s
 import { html } from 'lit'
 import '../index.js'
 
-const tree = html`<helix-base-tree label="Repository">
-  <helix-base-tree-item default-open value="helix">
+const tree = html`<helix-headless-tree label="Repository">
+  <helix-headless-tree-item default-open value="helix">
     helix
-    <helix-base-tree-item slot="children" value="web">web</helix-base-tree-item>
-  </helix-base-tree-item>
-</helix-base-tree>`
+    <helix-headless-tree-item slot="children" value="web">web</helix-headless-tree-item>
+  </helix-headless-tree-item>
+</helix-headless-tree>`
 
 describe('tree server output', () => {
   test('the tree role and its name are served', () => {
@@ -24,6 +24,6 @@ describe('tree server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(tree), 'helix-base-tree')).toEqual(['label'])
+    expect(hostAttributes(ssr(tree), 'helix-headless-tree')).toEqual(['label'])
   })
 })

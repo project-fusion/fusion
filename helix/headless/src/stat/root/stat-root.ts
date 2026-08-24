@@ -30,8 +30,8 @@ import { property } from 'lit/decorators.js'
  * @slot label - What the value measures.
  * @slot unit - The unit, set beside the value.
  */
-@customElement('helix-base-stat')
-export class HelixBaseStat extends HelixElement {
+@customElement('helix-headless-stat')
+export class HelixHeadlessStat extends HelixElement {
   /**
    * Which way the label and the value are arranged.
    *
@@ -67,6 +67,6 @@ export class HelixBaseStat extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-stat': HelixBaseStat
+    'helix-headless-stat': HelixHeadlessStat
   }
 }

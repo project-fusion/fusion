@@ -39,8 +39,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @csspart svg - The rendered SVG.
  */
-@customElement('helix-base-icon')
-export class HelixBaseIcon extends HelixElement {
+@customElement('helix-headless-icon')
+export class HelixHeadlessIcon extends HelixElement {
   /** Name of the icon in the Helix set. */
   @property()
   name = ''
@@ -78,6 +78,6 @@ export class HelixBaseIcon extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-icon': HelixBaseIcon
+    'helix-headless-icon': HelixHeadlessIcon
   }
 }

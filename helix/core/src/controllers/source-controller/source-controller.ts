@@ -66,7 +66,7 @@ export class SourceController implements ReactiveController {
     return found.tagName === 'TABLE' ||
       role === 'table' ||
       role === 'grid' ||
-      /^helix-(base-)?table$/i.test(found.tagName)
+      /^helix-(headless-)?table$/i.test(found.tagName)
       ? found
       : null
   }

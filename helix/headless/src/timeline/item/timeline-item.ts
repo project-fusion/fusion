@@ -43,8 +43,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart rail - The column holding the mark and the line.
  * @csspart time - When it happened.
  */
-@customElement('helix-base-timeline-item')
-export class HelixBaseTimelineItem extends HelixElement {
+@customElement('helix-headless-timeline-item')
+export class HelixHeadlessTimelineItem extends HelixElement {
   /**
    * When it happened, machine-readable.
    *
@@ -112,6 +112,6 @@ export class HelixBaseTimelineItem extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-timeline-item': HelixBaseTimelineItem
+    'helix-headless-timeline-item': HelixHeadlessTimelineItem
   }
 }

@@ -15,11 +15,11 @@ direction never reverses.
 | `@helix-io/styles` | Tokens and the base layer. Pure CSS | nothing |
 | `@helix-io/core` | Element base class, mixins, decorators | Lit |
 | `@helix-io/headless` | Structure, accessibility, state, form participation | `core` |
-| `@helix-io/web` | Presentation: tokens, parts, and the visual axes | `headless`, `styles` |
+| `@helix-io/styled` | Presentation: tokens, parts, and the visual axes | `headless`, `styles` |
 
 `@helix-io/theme` and `@helix-io/icons` ship beside the stack rather than in it:
 neither is a tier, and neither is needed to render a component. **There is no
-React package.** The framework typings are generated into `@helix-io/web`, and
+React package.** The framework typings are generated into `@helix-io/styled`, and
 the bridge that repairs React's hydration of custom events is in
 `@helix-io/core`. See [React](./react).
 
@@ -34,7 +34,7 @@ downward, the four are one package in four files.
 
 ## What belongs where
 
-The base tier owns what a component **is and does**: markup structure, ARIA
+The headless tier owns what a component **is and does**: markup structure, ARIA
 wiring, slots, events, internal state, form participation. It ships no CSS, no
 token references, and none of the visual axes.
 
@@ -44,7 +44,7 @@ here.
 ```ts
 // headless/src/accordion/item/accordion-item.ts
 // no CSS, no tokens
-export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
+export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement) {
   protected override render() {
     return html`
       <div part="container">
@@ -57,11 +57,11 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
 }
 
 // web/src/accordion/root/accordion-root.ts
-// extends the base, adds presentation only
+// extends the headless one, adds presentation only
 import { styles } from './accordion-root.css.js'
 
 @customElement('helix-accordion')
-export class HelixAccordion extends HelixBaseAccordion {
+export class HelixAccordion extends HelixHeadlessAccordion {
   @property({ reflect: true })
   separation?: 'outlined' | 'plain'
 

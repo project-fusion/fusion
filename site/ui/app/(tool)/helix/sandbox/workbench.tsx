@@ -17,7 +17,7 @@ import type {
   HelixToggleGroup,
   HelixTree,
   HelixTreeItem,
-} from '@helix-io/web'
+} from '@helix-io/styled'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Family } from '../../../../content/catalog/catalog'
 import { useApiTier } from '../../../../hooks/use-api-tier/use-api-tier'
@@ -385,14 +385,14 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      effects run in order on one flush, so the writing effect below saw
      `read.current === true` beside a `familySlug` still null, wrote an empty
      query and emptied the address of the link it had just arrived on. Measured,
-     not reasoned about: `?e=accordion.default&l=centered&d=rtl&tier=base`
+     not reasoned about: `?e=accordion.default&l=centered&d=rtl&tier=headless`
      became `/helix/sandbox` within a frame. A `setState` batches with the other
      setters, so this turns true on the same render that carries the values, and
      the effect that reads it cannot run early. */
   const [read, setRead] = useState(false)
-  const [forcedTier, setForcedTier] = useState<'base' | 'styled' | null>(null)
+  const [forcedTier, setForcedTier] = useState<'headless' | 'styled' | null>(null)
   const preferredTier = useApiTier()
-  const wanted = (forcedTier ?? preferredTier) === 'base' ? 'headless' : 'styled'
+  const wanted = (forcedTier ?? preferredTier) === 'headless' ? 'headless' : 'styled'
   const inTier = useMemo(() => {
     const kept = families.map((entry) => ({
       ...entry,
@@ -401,7 +401,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     /* A floor, not a feature. `resolve` has to come back with an example for
        the panes to have anything to show, so a tier nothing has written an
        example for yet would leave the workbench with nothing to open. Three
-       families carry base examples today and #135 is about the rest. */
+       families carry headless examples today and #135 is about the rest. */
     return kept.some((entry) => entry.examples.length > 0) ? kept : families
   }, [families, wanted])
 
@@ -554,7 +554,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
          nothing else. An explicit `t=styled` survives, because a link that
          deliberately pins the common tier still means it for a reader whose
          preference is base. */
-      tier: forcedTier ?? (preferredTier === 'base' ? 'base' : null),
+      tier: forcedTier ?? (preferredTier === 'headless' ? 'headless' : null),
     })
     /* The fragment is only ours to write once the editor has been seeded.
        Before that it is still the one the page arrived with, and this effect

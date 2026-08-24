@@ -13,7 +13,7 @@
  * families shared once instead of into every bundle, which is the right instinct
  * and is not worth what it costs here: a family's entry now imports *both*
  * tiers, because its behavior is specified in `helix/headless` and its
- * appearance in `helix/web`, and the styled class extends the base one. An
+ * appearance in `helix/styled`, and the styled class extends the headless one. An
  * `extends` clause is evaluated the moment its module runs, so when the two land
  * in different chunks neither can go first, and every entry dies on
  * `ReferenceError: Cannot access 'A' before initialization` before a single test
@@ -38,8 +38,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
  * Both tiers, merged by family.
  *
  * The specs moved when the tiers stopped sharing tags: a family's functional
- * tests are `helix/headless`'s and its stylesheet tests are `helix/web`'s, so
- * twenty files left one directory for the other. Reading only `helix/web`,
+ * tests are `helix/headless`'s and its stylesheet tests are `helix/styled`'s, so
+ * twenty files left one directory for the other. Reading only `helix/styled`,
  * which is what this did, would have dropped every one of them from the browser
  * runner while still printing a family count and a size, which is the shape of
  * a coverage loss nobody sees.
@@ -48,7 +48,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
  * Select should run what Select is tested by, and which tier a file sits in is
  * a fact about this repository rather than about the component.
  */
-const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/web/src')]
+const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/styled/src')]
 const harness = join(root, 'helix/testing/src/browser.ts')
 const entries = join(root, '.local/spec-entries')
 const out = join(root, 'site/ui/public/specs')

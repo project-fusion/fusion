@@ -74,8 +74,8 @@ const readValues = (input: string): number[] =>
  * @cssproperty --chart-terminus-x - Where the last point sits horizontally, as a percentage.
  * @cssproperty --chart-terminus-y - Where the last point sits vertically, as a percentage.
  */
-@customElement('helix-base-sparkline')
-export class HelixBaseSparkline extends HelixElement {
+@customElement('helix-headless-sparkline')
+export class HelixHeadlessSparkline extends HelixElement {
   /**
    * What the readings are drawn as.
    *
@@ -350,6 +350,6 @@ export class HelixBaseSparkline extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-sparkline': HelixBaseSparkline
+    'helix-headless-sparkline': HelixHeadlessSparkline
   }
 }

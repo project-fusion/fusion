@@ -8,7 +8,7 @@ describe('slider server output', () => {
     // A range whose min and max arrive on hydration jumps: the browser clamps
     // the value against the defaults of 0 and 100 first.
     const control = partTag(
-      ssr(html`<helix-base-slider max="200" min="50" value="120"></helix-base-slider>`),
+      ssr(html`<helix-headless-slider max="200" min="50" value="120"></helix-headless-slider>`),
       'control',
     )
     expect(control).toMatch(/<input/)
@@ -17,14 +17,14 @@ describe('slider server output', () => {
   })
 
   test('markers are rendered on the server, since they are layout', () => {
-    expect(hasPart(ssr(html`<helix-base-slider markers="5"></helix-base-slider>`), 'markers')).toBe(
-      true,
-    )
+    expect(
+      hasPart(ssr(html`<helix-headless-slider markers="5"></helix-headless-slider>`), 'markers'),
+    ).toBe(true)
   })
 
   test('one marker is none, so the row is not drawn for it', () => {
-    expect(hasPart(ssr(html`<helix-base-slider markers="1"></helix-base-slider>`), 'markers')).toBe(
-      false,
-    )
+    expect(
+      hasPart(ssr(html`<helix-headless-slider markers="1"></helix-headless-slider>`), 'markers'),
+    ).toBe(false)
   })
 })

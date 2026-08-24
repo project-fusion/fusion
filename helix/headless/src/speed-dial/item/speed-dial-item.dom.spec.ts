@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 const action = async (attributes = 'value="save"'): Promise<HTMLElement> =>
   (await mount(
-    `<helix-base-speed-dial-item ${attributes}><svg slot="icon"></svg>Save</helix-base-speed-dial-item>`,
+    `<helix-headless-speed-dial-item ${attributes}><svg slot="icon"></svg>Save</helix-headless-speed-dial-item>`,
   )) as HTMLElement
 
 /**

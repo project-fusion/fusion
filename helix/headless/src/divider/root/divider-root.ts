@@ -27,8 +27,8 @@ import { property } from 'lit/decorators.js'
  * @csspart line - The rule itself, or each half of it where something is set in.
  * @csspart content - What is set into it.
  */
-@customElement('helix-base-divider')
-export class HelixBaseDivider extends HelixElement {
+@customElement('helix-headless-divider')
+export class HelixHeadlessDivider extends HelixElement {
   /** Which way the rule runs. */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
@@ -108,6 +108,6 @@ export class HelixBaseDivider extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-divider': HelixBaseDivider
+    'helix-headless-divider': HelixHeadlessDivider
   }
 }

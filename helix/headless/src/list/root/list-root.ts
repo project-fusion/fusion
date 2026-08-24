@@ -18,8 +18,8 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The rows.
  */
-@customElement('helix-base-list')
-export class HelixBaseList extends HelixElement {
+@customElement('helix-headless-list')
+export class HelixHeadlessList extends HelixElement {
   /** Accessible name for the set. */
   @property()
   label = ''
@@ -68,6 +68,6 @@ export class HelixBaseList extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-list': HelixBaseList
+    'helix-headless-list': HelixHeadlessList
   }
 }

@@ -27,7 +27,7 @@ import { useEffect, useState } from 'react'
  *
  * An effect runs after hydration, so React commits against the markup the
  * server actually sent and the elements upgrade into a tree nobody is checking
- * any more. The window where a tag is unknown is what `@helix-io/web/elements.css`
+ * any more. The window where a tag is unknown is what `@helix-io/styled/elements.css`
  * already covers, hiding `:not(:defined)` by visibility so the page does not
  * reflow when the definitions land.
  */
@@ -36,7 +36,7 @@ export function HelixElements(): null {
 
   useEffect(() => {
     let live = true
-    void Promise.all([import('@helix-io/web'), import('@helix-io/sandbox/specs')]).then(() => {
+    void Promise.all([import('@helix-io/styled'), import('@helix-io/sandbox/specs')]).then(() => {
       if (live) {
         setRegistered(true)
       }

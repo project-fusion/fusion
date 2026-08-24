@@ -7,7 +7,9 @@ beforeAll(async () => {
 })
 
 const row = async (attributes = ''): Promise<HTMLElement> =>
-  (await mount(`<helix-base-menu-item ${attributes}>Open</helix-base-menu-item>`)) as HTMLElement
+  (await mount(
+    `<helix-headless-menu-item ${attributes}>Open</helix-headless-menu-item>`,
+  )) as HTMLElement
 
 /**
  * One menu row, and the contract that is the row's rather than the menu's.

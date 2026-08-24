@@ -49,8 +49,8 @@ import { property } from 'lit/decorators.js'
  *
  * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Absent while indeterminate.
  */
-@customElement('helix-base-progress')
-export class HelixBaseProgress extends HelixElement {
+@customElement('helix-headless-progress')
+export class HelixHeadlessProgress extends HelixElement {
   /** Accessible name for what is in progress. */
   @property()
   label = 'Progress'
@@ -78,7 +78,7 @@ export class HelixBaseProgress extends HelixElement {
   /**
    * Whether the value is drawn as a bar or as a ring.
    *
-   * **On this tier because it changes the markup**, which is the base tier's to
+   * **On this tier because it changes the markup**, which is the headless tier's to
    * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
    * stylesheet turns one into the other: the styled tier tried, with a conic
    * gradient and a mask, and the thing it could not do was the round end the
@@ -212,6 +212,6 @@ export class HelixBaseProgress extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-progress': HelixBaseProgress
+    'helix-headless-progress': HelixHeadlessProgress
   }
 }

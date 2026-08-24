@@ -21,7 +21,7 @@
  * to override a string. Only fallbacks containing elements are asked about.
  *
  * **A call is not a property.** `CopyButton` drew both its marks as
- * `${HelixBaseCopyButton.icon(copy)}`, a static helper returning a template,
+ * `${HelixHeadlessCopyButton.icon(copy)}`, a static helper returning a template,
  * and the first version of this let it through on the shape of the expression:
  * two pieces of markup a tier might want to redraw, exempted for looking like a
  * reference. Parentheses are the test.
@@ -43,7 +43,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const TIERS = ['helix/headless/src', 'helix/web/src']
+const TIERS = ['helix/headless/src', 'helix/styled/src']
 
 /** Every `.ts` under a tier, specs and generated stylesheets excluded. */
 const sources = (root) => {
@@ -122,7 +122,7 @@ for (const tier of TIERS) {
          markup a tier would want to draw differently.
          **A call is not a property**, which is the distinction that took a
          second pass. `CopyButton` drew both its marks as
-         `${HelixBaseCopyButton.icon(copy)}`, a static helper returning a
+         `${HelixHeadlessCopyButton.icon(copy)}`, a static helper returning a
          template, and that read as a bare reference and was let through: two
          pieces of markup a tier might well want to redraw, permitted by the
          shape of the expression rather than by anything about them. No

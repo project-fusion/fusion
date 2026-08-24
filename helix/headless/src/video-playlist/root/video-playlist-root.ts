@@ -1,7 +1,7 @@
 import { customElement, HelixElement, MixinControllerActive } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { HelixBaseVideoPlaylistItem } from '../item/video-playlist-item.js'
+import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
 
 /**
  * @summary A set of clips and the one player they take turns in.
@@ -44,16 +44,16 @@ import type { HelixBaseVideoPlaylistItem } from '../item/video-playlist-item.js'
  *
  * @event {HelixChangeEvent} helix-change - Fired before the current entry changes, and cancelable.
  */
-@customElement('helix-base-video-playlist')
-export class HelixBaseVideoPlaylist extends MixinControllerActive(HelixElement) {
+@customElement('helix-headless-video-playlist')
+export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixElement) {
   /** Accessible name for the list, which usually has no visible heading. */
   @property()
   label = 'Playlist'
 
   /** The entries, in the order the consumer wrote them. */
-  private get items(): HelixBaseVideoPlaylistItem[] {
-    return [...this.querySelectorAll<HelixBaseVideoPlaylistItem>('[value]')].filter((one) =>
-      one.matches('helix-video-playlist-item, helix-base-video-playlist-item'),
+  private get items(): HelixHeadlessVideoPlaylistItem[] {
+    return [...this.querySelectorAll<HelixHeadlessVideoPlaylistItem>('[value]')].filter((one) =>
+      one.matches('helix-video-playlist-item, helix-headless-video-playlist-item'),
     )
   }
 
@@ -61,7 +61,7 @@ export class HelixBaseVideoPlaylist extends MixinControllerActive(HelixElement) 
    * The player, whichever tag the consumer slotted.
    *
    * Asked of the slot rather than matched by tag name: the headless tier's
-   * player is `helix-base-video` and the styled tier's is `helix-video`, and a
+   * player is `helix-headless-video` and the styled tier's is `helix-video`, and a
    * consumer bringing a third under either name should still be driven. What is
    * needed of it is `src`, which is the whole of the contract.
    */
@@ -219,6 +219,6 @@ export class HelixBaseVideoPlaylist extends MixinControllerActive(HelixElement) 
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-video-playlist': HelixBaseVideoPlaylist
+    'helix-headless-video-playlist': HelixHeadlessVideoPlaylist
   }
 }

@@ -28,7 +28,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const ROOTS = ['helix/headless/src', 'helix/web/src']
+const ROOTS = ['helix/headless/src', 'helix/styled/src']
 const OBSERVER = /new\s+(?:Intersection|Mutation|Resize|Performance)Observer\b/
 
 const sources = (root) => {

@@ -34,8 +34,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart column - The heading cell.
  */
-@customElement('helix-base-table-column')
-export class HelixBaseTableColumn extends HelixElement {
+@customElement('helix-headless-table-column')
+export class HelixHeadlessTableColumn extends HelixElement {
   /**
    * The track this column takes, as CSS.
    *
@@ -72,6 +72,6 @@ export class HelixBaseTableColumn extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-table-column': HelixBaseTableColumn
+    'helix-headless-table-column': HelixHeadlessTableColumn
   }
 }

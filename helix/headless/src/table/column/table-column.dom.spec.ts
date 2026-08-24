@@ -10,7 +10,7 @@ type Column = HTMLElement & { isTableColumn: boolean; track: string; width: stri
 
 const column = async (attributes = ''): Promise<Column> =>
   (await mount(
-    `<helix-base-table-column ${attributes}>Appearance</helix-base-table-column>`,
+    `<helix-headless-table-column ${attributes}>Appearance</helix-headless-table-column>`,
   )) as Column
 
 /**

@@ -3,7 +3,7 @@ import { caretDown } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { HelixBaseAccordion } from '../root/accordion-root.js'
+import { HelixHeadlessAccordion } from '../root/accordion-root.js'
 
 /** Shadow-DOM id linking the trigger's aria-controls to the content region. */
 const CONTENT_ID = 'content'
@@ -47,8 +47,8 @@ const TRIGGER_ID = 'trigger'
  * @event {HelixCloseEvent} helix-close - Fired before the section closes, and cancelable.
  * @event {HelixOpenEvent} helix-open - Fired when the item opens or closes.
  */
-@customElement('helix-base-accordion-item')
-export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
+@customElement('helix-headless-accordion-item')
+export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement) {
   /**
    * Where the open indicator sits, or whether there is one.
    *
@@ -81,8 +81,8 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
    * that item's light DOM and finds the same accordion, so the check below is
    * what keeps it independent.
    */
-  private get accordion(): HelixBaseAccordion | null {
-    return closestInstance(this, HelixBaseAccordion)
+  private get accordion(): HelixHeadlessAccordion | null {
+    return closestInstance(this, HelixHeadlessAccordion)
   }
 
   /**
@@ -91,7 +91,7 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
    * Direct children only. An accordion nested inside an item's content is a
    * separate set, and opening a section in it must not close anything outside.
    */
-  private get peers(): HelixBaseAccordionItem[] {
+  private get peers(): HelixHeadlessAccordionItem[] {
     const accordion = this.accordion
     if (!accordion || accordion.items.indexOf(this) === -1) {
       return []
@@ -210,6 +210,6 @@ export class HelixBaseAccordionItem extends MixinControllerOpen(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-accordion-item': HelixBaseAccordionItem
+    'helix-headless-accordion-item': HelixHeadlessAccordionItem
   }
 }

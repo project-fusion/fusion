@@ -3,14 +3,14 @@ import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@helix-io/
 import { html } from 'lit'
 import '../index.js'
 
-const banded = html`<helix-base-meter
+const banded = html`<helix-headless-meter
   high="80"
   label="Disk"
   low="50"
   optimum="0"
   show-value
   value="94"
-></helix-base-meter>`
+></helix-headless-meter>`
 
 describe('meter server output', () => {
   test('the reading is drawn on the server, from numbers it already has', () => {
@@ -27,7 +27,7 @@ describe('meter server output', () => {
 
   test('an unbanded meter ships neither', () => {
     // A gauge with nothing said about it is a reading, not good news.
-    const plain = html`<helix-base-meter label="Disk" value="20"></helix-base-meter>`
+    const plain = html`<helix-headless-meter label="Disk" value="20"></helix-headless-meter>`
     expect(partTag(ssr(plain), 'indicator')).not.toContain('data-band')
     expect(hasPart(ssr(plain), 'tick')).toBe(false)
   })
@@ -37,7 +37,7 @@ describe('meter server output', () => {
   })
 
   test('the role is on internals, so the host stays as written', () => {
-    expect(hostAttributes(ssr(banded), 'helix-base-meter')).toEqual([
+    expect(hostAttributes(ssr(banded), 'helix-headless-meter')).toEqual([
       'high',
       'label',
       'low',

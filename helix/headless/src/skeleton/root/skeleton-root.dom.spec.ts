@@ -8,7 +8,9 @@ beforeAll(async () => {
 
 describe('skeleton', () => {
   test('says the region is filling rather than saying nothing', async () => {
-    const skeleton = (await mount('<helix-base-skeleton></helix-base-skeleton>')) as HTMLElement & {
+    const skeleton = (await mount(
+      '<helix-headless-skeleton></helix-headless-skeleton>',
+    )) as HTMLElement & {
       internals?: ElementInternals
     }
     expect(skeleton.internals?.ariaBusy).toBe('true')
@@ -19,9 +21,11 @@ describe('skeleton', () => {
   test("the shape is the styled tier's, not the headless tier's", async () => {
     // An appearance property on the headless tier is the one thing that tier
     // exists for not having.
-    const { HelixBaseSkeleton } = await import('@helix-io/headless')
-    expect('shape' in HelixBaseSkeleton.prototype).toBe(false)
-    const skeleton = await mount('<helix-base-skeleton shape="circle"></helix-base-skeleton>')
+    const { HelixHeadlessSkeleton } = await import('@helix-io/headless')
+    expect('shape' in HelixHeadlessSkeleton.prototype).toBe(false)
+    const skeleton = await mount(
+      '<helix-headless-skeleton shape="circle"></helix-headless-skeleton>',
+    )
     expect(part(skeleton, 'skeleton')).not.toBeNull()
   })
 })

@@ -79,4 +79,4 @@ export const LANDING: PageCopy = {
 }
 
 /** The one line the hero asks a reader to run rather than to read. */
-export const INSTALL = 'bun add @helix-io/web'
+export const INSTALL = 'bun add @helix-io/styled'

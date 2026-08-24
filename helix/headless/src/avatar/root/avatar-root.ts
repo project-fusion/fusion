@@ -49,8 +49,8 @@ export const initialsOf = (name: string): string => {
  * @event {Event} load - Relayed from the image once it has loaded.
  * @event {Event} error - Relayed from the image when it fails.
  */
-@customElement('helix-base-avatar')
-export class HelixBaseAvatar extends HelixElement {
+@customElement('helix-headless-avatar')
+export class HelixHeadlessAvatar extends HelixElement {
   /** Image to show. Falls back to the slot, or to initials, if it fails. */
   @property()
   src = ''
@@ -128,6 +128,6 @@ export class HelixBaseAvatar extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-avatar': HelixBaseAvatar
+    'helix-headless-avatar': HelixHeadlessAvatar
   }
 }

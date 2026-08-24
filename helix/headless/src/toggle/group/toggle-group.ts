@@ -10,7 +10,7 @@ import {
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixBaseToggle } from '../root/toggle-root.js'
+import { HelixHeadlessToggle } from '../root/toggle-root.js'
 
 /**
  * @summary A row of options with the selection marked by a moving indicator.
@@ -59,8 +59,8 @@ import { HelixBaseToggle } from '../root/toggle-root.js'
  * @event {HelixChangeEvent} helix-change - Fired before the answer moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here.
  */
-@customElement('helix-base-toggle-group')
-export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
+@customElement('helix-headless-toggle-group')
+export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
   /**
    * Marks the chosen item, which used to happen inside the placing method.
    *
@@ -123,9 +123,9 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
     items: () => this.items,
   })
 
-  private get items(): HelixBaseToggle[] {
+  private get items(): HelixHeadlessToggle[] {
     return [...this.children].filter(
-      (child): child is HelixBaseToggle => child instanceof HelixBaseToggle,
+      (child): child is HelixHeadlessToggle => child instanceof HelixHeadlessToggle,
     )
   }
 
@@ -304,6 +304,6 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-toggle-group': HelixBaseToggleGroup
+    'helix-headless-toggle-group': HelixHeadlessToggleGroup
   }
 }

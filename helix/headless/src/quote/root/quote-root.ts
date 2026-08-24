@@ -24,8 +24,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart quote - The quotation.
  */
-@customElement('helix-base-quote')
-export class HelixBaseQuote extends HelixElement {
+@customElement('helix-headless-quote')
+export class HelixHeadlessQuote extends HelixElement {
   /** URL identifying where the quotation came from. */
   @property()
   cite = ''
@@ -37,6 +37,6 @@ export class HelixBaseQuote extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-quote': HelixBaseQuote
+    'helix-headless-quote': HelixHeadlessQuote
   }
 }

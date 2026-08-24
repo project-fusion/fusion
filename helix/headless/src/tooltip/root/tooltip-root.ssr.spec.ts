@@ -3,9 +3,9 @@ import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@helix-io/
 import { html } from 'lit'
 import '../index.js'
 
-const tooltip = html`<helix-base-tooltip content="Regenerates the manifests">
+const tooltip = html`<helix-headless-tooltip content="Regenerates the manifests">
   <button>Analyze</button>
-</helix-base-tooltip>`
+</helix-headless-tooltip>`
 
 describe('tooltip server output', () => {
   test('the trigger is in the served markup', () => {
@@ -25,6 +25,6 @@ describe('tooltip server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(tooltip), 'helix-base-tooltip')).toEqual(['content'])
+    expect(hostAttributes(ssr(tooltip), 'helix-headless-tooltip')).toEqual(['content'])
   })
 })

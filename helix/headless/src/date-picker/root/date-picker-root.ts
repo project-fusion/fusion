@@ -156,8 +156,8 @@ const addMonths = (date: Date, months: number): Date => {
  *
  * @cssproperty --date-picker-column-count - How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.
  */
-@customElement('helix-base-date-picker')
-export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) {
+@customElement('helix-headless-date-picker')
+export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormElement) {
   /** How many dates can be held at once. */
   @property({ reflect: true })
   mode?: 'range' | 'multiple'
@@ -723,6 +723,6 @@ export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) 
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-date-picker': HelixBaseDatePicker
+    'helix-headless-date-picker': HelixHeadlessDatePicker
   }
 }

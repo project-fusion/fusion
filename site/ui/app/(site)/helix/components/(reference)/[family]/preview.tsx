@@ -4,7 +4,7 @@
    split exists so a page showing a sandbox without an editable pane does not
    pay for one. This page has an editable pane, so it pays. */
 import '@helix-io/sandbox/editor'
-import type { HelixChangeEvent, HelixSandbox, HelixSandboxPreview } from '@helix-io/web'
+import type { HelixChangeEvent, HelixSandbox, HelixSandboxPreview } from '@helix-io/styled'
 import { useEffect, useRef, useState } from 'react'
 import docs from '../docs.module.css'
 

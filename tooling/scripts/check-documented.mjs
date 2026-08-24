@@ -42,7 +42,7 @@
  *   `vue.d.ts`. Nothing has ever dispatched it: the event is `helix-change`. It
  *   slipped the rule above because it carries none of this library's prefixes,
  *   so the verb is what catches it instead.
- * - **A subpath, resolved rather than assumed.** `@helix-io/web/custom-elements.json`
+ * - **A subpath, resolved rather than assumed.** `@helix-io/styled/custom-elements.json`
  *   was recommended by two pages and refused by `require.resolve`: the export map
  *   answered it through a wildcard pattern that rewrites a subpath into a
  *   directory under `dist` with an index in it, so the path asked for a file that

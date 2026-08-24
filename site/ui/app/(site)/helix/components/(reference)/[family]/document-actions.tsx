@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixMenu } from '@helix-io/web'
+import type { HelixMenu } from '@helix-io/styled'
 import { useEffect, useRef, useState } from 'react'
 import { absolute } from '@/utils/site/site'
 

@@ -6,12 +6,12 @@
  * `instanceof`, never by tag name. Matching `helix-accordion-item` would tie
  * this tier to the styled one." Nine headless families resolve their
  * relationships that way; two did it by tag, and both named `helix-*` tags that
- * only `@helix-io/web` registers, which is a headless package depending on a
+ * only `@helix-io/styled` registers, which is a headless package depending on a
  * styled one by string.
  *
- * The consequence is silent rather than loud. Subclassing a base element under
+ * The consequence is silent rather than loud. Subclassing a headless element under
  * a different tag is exactly what the headless tier exists to allow, and it is
- * what `helix/web` itself does. Under a third tag the lookup returned `null`,
+ * what `helix/styled` itself does. Under a third tag the lookup returned `null`,
  * so an accordion's `mode` was ignored and every section behaved as `multiple`
  * with no error anywhere.
  *

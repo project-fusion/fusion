@@ -42,8 +42,8 @@ import { property } from 'lit/decorators.js'
  * @slot supporting - Secondary text under the label.
  * @slot end - Trailing content.
  */
-@customElement('helix-base-list-item')
-export class HelixBaseListItem extends HelixElement {
+@customElement('helix-headless-list-item')
+export class HelixHeadlessListItem extends HelixElement {
   /**
    * Where the row goes, and nothing when it goes nowhere.
    *
@@ -106,6 +106,6 @@ export class HelixBaseListItem extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-list-item': HelixBaseListItem
+    'helix-headless-list-item': HelixHeadlessListItem
   }
 }

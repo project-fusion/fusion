@@ -1,7 +1,7 @@
 import { customElement, HelixElement, MixinCollection } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { HelixBaseTableColumn } from '../column/table-column.js'
+import type { HelixHeadlessTableColumn } from '../column/table-column.js'
 
 /**
  * @summary Tabular data laid out on a grid.
@@ -37,8 +37,8 @@ import type { HelixBaseTableColumn } from '../column/table-column.js'
  *
  * @cssproperty --table-template - The column track list, built from the columns the consumer declared.
  */
-@customElement('helix-base-table')
-export class HelixBaseTable extends MixinCollection(HelixElement) {
+@customElement('helix-headless-table')
+export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   /**
    * Column track list, as CSS. Deprecated: declare columns instead.
    *
@@ -58,7 +58,7 @@ export class HelixBaseTable extends MixinCollection(HelixElement) {
   label = ''
 
   /** The columns declared as children, in the order they are written. */
-  get tableColumns(): HelixBaseTableColumn[] {
+  get tableColumns(): HelixHeadlessTableColumn[] {
     /* `?? []` is the server. Lit's element shim carries attributes and not a
        tree, so `children` is undefined there, and this getter is reached from
        `template`, which is read during `render`: spreading it threw and the
@@ -66,7 +66,7 @@ export class HelixBaseTable extends MixinCollection(HelixElement) {
        had, in code written after it was fixed there, which is the argument for
        the SSR specs existing at all. */
     return [...(this.children ?? [])].filter(
-      (child): child is HelixBaseTableColumn =>
+      (child): child is HelixHeadlessTableColumn =>
         'isTableColumn' in child && child.isTableColumn === true,
     )
   }
@@ -156,6 +156,6 @@ export class HelixBaseTable extends MixinCollection(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-table': HelixBaseTable
+    'helix-headless-table': HelixHeadlessTable
   }
 }

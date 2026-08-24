@@ -27,8 +27,8 @@ import { html, type TemplateResult } from 'lit'
  *
  * @csspart code - The `<code>` element.
  */
-@customElement('helix-base-code')
-export class HelixBaseCode extends HelixElement {
+@customElement('helix-headless-code')
+export class HelixHeadlessCode extends HelixElement {
   protected override render(): TemplateResult {
     return html`<code part="code"><slot></slot></code>`
   }
@@ -36,6 +36,6 @@ export class HelixBaseCode extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-code': HelixBaseCode
+    'helix-headless-code': HelixHeadlessCode
   }
 }

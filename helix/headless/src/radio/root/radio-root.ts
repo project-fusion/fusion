@@ -41,8 +41,8 @@ import { property } from 'lit/decorators.js'
  * @csspart mark - The dot inside it.
  * @csspart label - The words beside it.
  */
-@customElement('helix-base-radio')
-export class HelixBaseRadio extends HelixElement {
+@customElement('helix-headless-radio')
+export class HelixHeadlessRadio extends HelixElement {
   /** Whether this choice can be made. */
   @property({ reflect: true, type: Boolean })
   disabled = false
@@ -90,6 +90,6 @@ export class HelixBaseRadio extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-radio': HelixBaseRadio
+    'helix-headless-radio': HelixHeadlessRadio
   }
 }

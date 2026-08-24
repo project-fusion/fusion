@@ -71,8 +71,8 @@ import { property, state } from 'lit/decorators.js'
  * @cssproperty --rating-step - The width of one step, as a fraction of a mark.
  * @cssproperty --rating-steps - How many steps one mark is divided into.
  */
-@customElement('helix-base-rating')
-export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormElement)) {
+@customElement('helix-headless-rating')
+export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFormElement)) {
   /*
    * Discrete, which is the default and is said here only because it was wrong.
    *
@@ -454,6 +454,6 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-rating': HelixBaseRating
+    'helix-headless-rating': HelixHeadlessRating
   }
 }

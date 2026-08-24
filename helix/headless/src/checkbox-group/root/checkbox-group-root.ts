@@ -9,7 +9,7 @@ import {
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
+import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
 
 /**
  * @summary Groups related checkboxes, and reports them as one set.
@@ -51,8 +51,8 @@ import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
  *
  * @event {HelixChangeEvent} helix-change - Fired when any box changes, with the whole set.
  */
-@customElement('helix-base-checkbox-group')
-export class HelixBaseCheckboxGroup extends MixinField(HelixFormElement) {
+@customElement('helix-headless-checkbox-group')
+export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   /* `name` is inherited. It arrives with `HelixFormElement` reflected and with
      the converter that makes an empty one absent rather than `name=""`, which
      the copy declared here had neither of. What it means differs slightly and
@@ -72,9 +72,9 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixFormElement) {
   })
 
   /** The boxes, in light-DOM order. Client only: the server has no tree. */
-  get boxes(): HelixBaseCheckbox[] {
+  get boxes(): HelixHeadlessCheckbox[] {
     return [...this.children].filter(
-      (child): child is HelixBaseCheckbox => child instanceof HelixBaseCheckbox,
+      (child): child is HelixHeadlessCheckbox => child instanceof HelixHeadlessCheckbox,
     )
   }
 
@@ -266,6 +266,6 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixFormElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-checkbox-group': HelixBaseCheckboxGroup
+    'helix-headless-checkbox-group': HelixHeadlessCheckboxGroup
   }
 }

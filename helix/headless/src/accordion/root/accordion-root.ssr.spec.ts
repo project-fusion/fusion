@@ -29,15 +29,15 @@ import '../index.js'
    assertion nobody maintains. */
 describe('accordion server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
-    expect(withoutStyles(ssr(html`<helix-base-accordion></helix-base-accordion>`))).toContain(
-      'helix-base-accordion',
-    )
+    expect(
+      withoutStyles(ssr(html`<helix-headless-accordion></helix-headless-accordion>`)),
+    ).toContain('helix-headless-accordion')
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-base-accordion></helix-base-accordion>`),
-      'helix-base-accordion',
+      ssr(html`<helix-headless-accordion></helix-headless-accordion>`),
+      'helix-headless-accordion',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

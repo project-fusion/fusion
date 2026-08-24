@@ -11,7 +11,7 @@ describe('code', () => {
      reader and is nothing to anyone else, which is the failure this exists to
      avoid, so it is the one thing worth asserting. */
   test('renders a real code element', async () => {
-    const el = await mount('<helix-base-code>data-density</helix-base-code>')
+    const el = await mount('<helix-headless-code>data-density</helix-headless-code>')
     const code = el.shadowRoot?.querySelector('[part="code"]')
     expect(code?.tagName).toBe('CODE')
   })

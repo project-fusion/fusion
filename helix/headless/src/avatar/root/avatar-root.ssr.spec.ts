@@ -7,7 +7,7 @@ describe('avatar server output', () => {
   test('initials are computed on the server, not after hydration', () => {
     // A pure function of the name, so both sides agree without measuring.
     const markup = withoutStyles(
-      ssr(html`<helix-base-avatar name="Ross Sheppard"></helix-base-avatar>`),
+      ssr(html`<helix-headless-avatar name="Ross Sheppard"></helix-headless-avatar>`),
     )
     expect(markup).toContain('RS')
   })
@@ -16,14 +16,16 @@ describe('avatar server output', () => {
     // The name and the role go through `ElementInternals`, which writes no
     // attribute at all. A DOM spec asserts they are announced; what matters
     // here is that the served host is exactly what was typed.
-    const markup = ssr(html`<helix-base-avatar name="Ross Sheppard"></helix-base-avatar>`)
-    expect(hostAttributes(markup, 'helix-base-avatar')).toEqual(['name'])
+    const markup = ssr(html`<helix-headless-avatar name="Ross Sheppard"></helix-headless-avatar>`)
+    expect(hostAttributes(markup, 'helix-headless-avatar')).toEqual(['name'])
   })
 
   test('an image renders as an image, with the fallback held back', () => {
     // The server cannot know whether an image will load, so it renders the
     // optimistic case and the client corrects on error.
-    const markup = ssr(html`<helix-base-avatar name="Ross" src="/me.avif"></helix-base-avatar>`)
+    const markup = ssr(
+      html`<helix-headless-avatar name="Ross" src="/me.avif"></helix-headless-avatar>`,
+    )
     expect(partTag(markup, 'image')).toContain('src="/me.avif"')
     expect(partTag(markup, 'initials')).toBe('')
   })

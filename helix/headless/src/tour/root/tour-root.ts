@@ -9,7 +9,7 @@ import {
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
-import type { HelixBaseTourStop } from '../stop/tour-stop.js'
+import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
 
 /**
  * @summary A guided run through an interface, one stop at a time.
@@ -68,8 +68,8 @@ import type { HelixBaseTourStop } from '../stop/tour-stop.js'
  * finished.
  * @event {HelixCloseEvent} helix-close - Fired when the reader leaves early.
  */
-@customElement('helix-base-tour')
-export class HelixBaseTour extends HelixElement {
+@customElement('helix-headless-tour')
+export class HelixHeadlessTour extends HelixElement {
   /** Whether the tour is running. */
   @property({ reflect: true, type: Boolean })
   open = false
@@ -147,9 +147,9 @@ export class HelixBaseTour extends HelixElement {
   private spot: { height: number; left: number; top: number; width: number } | undefined
 
   /** The stops, in the order they were written. */
-  get stops(): HelixBaseTourStop[] {
+  get stops(): HelixHeadlessTourStop[] {
     return (this.assigned ?? []).filter(
-      (one): one is HelixBaseTourStop => (one as HelixBaseTourStop).current !== undefined,
+      (one): one is HelixHeadlessTourStop => (one as HelixHeadlessTourStop).current !== undefined,
     )
   }
 
@@ -363,6 +363,6 @@ export class HelixBaseTour extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-tour': HelixBaseTour
+    'helix-headless-tour': HelixHeadlessTour
   }
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixInput } from '@helix-io/web'
+import type { HelixInput } from '@helix-io/styled'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'

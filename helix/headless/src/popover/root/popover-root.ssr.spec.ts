@@ -8,10 +8,10 @@ describe('popover server output', () => {
     /* Present and hidden rather than absent, so opening after hydration is an
        attribute coming off rather than a subtree arriving. */
     const markup = withoutStyles(
-      ssr(html`<helix-base-popover label="Details">
+      ssr(html`<helix-headless-popover label="Details">
         <button slot="trigger">Details</button>
         Body
-      </helix-base-popover>`),
+      </helix-headless-popover>`),
     )
     expect(markup).toContain('name="trigger"')
     expect(hasPart(markup, 'popover')).toBe(true)
@@ -22,16 +22,16 @@ describe('popover server output', () => {
     /* `manual`, not `auto`. An `auto` popover light-dismisses itself and closes
        its siblings, which is close to what is wanted and would take dismissal
        away from the host that has to coordinate it. */
-    expect(partTag(ssr(html`<helix-base-popover>Body</helix-base-popover>`), 'popover')).toContain(
-      'popover="manual"',
-    )
+    expect(
+      partTag(ssr(html`<helix-headless-popover>Body</helix-headless-popover>`), 'popover'),
+    ).toContain('popover="manual"')
   })
 
   test('open reaches the served markup as the hook the styles select on', () => {
     expect(
       hostAttributes(
-        ssr(html`<helix-base-popover open>x</helix-base-popover>`),
-        'helix-base-popover',
+        ssr(html`<helix-headless-popover open>x</helix-headless-popover>`),
+        'helix-headless-popover',
       ),
     ).toEqual(['data-open', 'open'])
   })
@@ -42,7 +42,9 @@ describe('popover server output', () => {
        and the attribute they would care about most is the one that changes on
        every open. */
     const markup = withoutStyles(
-      ssr(html`<helix-base-popover><button slot="trigger">Go</button>Body</helix-base-popover>`),
+      ssr(
+        html`<helix-headless-popover><button slot="trigger">Go</button>Body</helix-headless-popover>`,
+      ),
     )
     expect(markup).not.toContain('aria-expanded')
   })

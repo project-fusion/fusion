@@ -1,6 +1,6 @@
 ---
 name: adding-helix-components
-description: Adds a component to the Helix design system, across the headless and styled tiers, with tokens, specs, manifest metadata, and generated React wrappers. Use when creating a new Helix component or part, adding a part to an existing component family, or when the user mentions Helix components, helix/headless, helix/web, or a component name like Button, Tabs, or Dialog.
+description: Adds a component to the Helix design system, across the headless and styled tiers, with tokens, specs, manifest metadata, and generated React wrappers. Use when creating a new Helix component or part, adding a part to an existing component family, or when the user mentions Helix components, helix/headless, helix/styled, or a component name like Button, Tabs, or Dialog.
 ---
 
 # Adding a Helix component
@@ -40,7 +40,7 @@ procedure.
 
 `helix/headless/src/<family>/<part>/<family>-<part>.ts`
 
-- Class `HelixBase<Family><Part>`, tag `helix-base-<family>-<part>`.
+- Class `HelixHeadless<Family><Part>`, tag `helix-headless-<family>-<part>`.
 - Structure, ARIA, slots, events. **No CSS, no tokens.**
 - Every structural element gets `part="…"`.
 - Class JSDoc carries the full contract: `@summary`, `@description`, `@since`,
@@ -59,7 +59,7 @@ undefined there.
 
 ## 3. Styled tier
 
-`helix/web/src/<family>/<part>/<family>-<part>.ts` plus a sibling `.css`.
+`helix/styled/src/<family>/<part>/<family>-<part>.ts` plus a sibling `.css`.
 
 - Class `Helix<Family><Part>` extending the base, tag `helix-<family>-<part>`.
 - Presentation only, and the properties are the visual axes: `emphasis`,
@@ -106,7 +106,7 @@ bun run check && bun run verify
 ```
 
 `build` runs `styles` and `analyze`, and `analyze` is what regenerates the
-framework typings: `jsx.d.ts`, `vue.d.ts` and `svelte.d.ts`, in `helix/web`,
+framework typings: `jsx.d.ts`, `vue.d.ts` and `svelte.d.ts`, in `helix/styled`,
 emitted by cem plugins. **There are no React wrappers and there is no
 `helix/react`.** Inspect the generated typings and confirm the properties and the
 typed event callbacks appear as expected.

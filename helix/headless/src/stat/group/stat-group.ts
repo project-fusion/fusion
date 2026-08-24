@@ -17,8 +17,8 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The stats.
  */
-@customElement('helix-base-stat-group')
-export class HelixBaseStatGroup extends HelixElement {
+@customElement('helix-headless-stat-group')
+export class HelixHeadlessStatGroup extends HelixElement {
   /** Accessible name for the set. */
   @property()
   label = ''
@@ -35,6 +35,6 @@ export class HelixBaseStatGroup extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-stat-group': HelixBaseStatGroup
+    'helix-headless-stat-group': HelixHeadlessStatGroup
   }
 }

@@ -10,15 +10,18 @@ describe('toast server output', () => {
        with its first message is one that is frequently not announced. Serving
        the empty region is what makes the first toast of a session work. */
     expect(
-      hasPart(ssr(html`<helix-base-toast label="Notifications"></helix-base-toast>`), 'region'),
+      hasPart(
+        ssr(html`<helix-headless-toast label="Notifications"></helix-headless-toast>`),
+        'region',
+      ),
     ).toBe(true)
   })
 
   test('messages already there are served with it', () => {
     const markup = withoutStyles(
       ssr(
-        html`<helix-base-toast
-          ><helix-base-toast-item tone="success">Saved</helix-base-toast-item></helix-base-toast
+        html`<helix-headless-toast
+          ><helix-headless-toast-item tone="success">Saved</helix-headless-toast-item></helix-headless-toast
         >`,
       ),
     )
@@ -29,9 +32,9 @@ describe('toast server output', () => {
     expect(
       hostAttributes(
         ssr(
-          html`<helix-base-toast label="Notifications" placement="top-center"></helix-base-toast>`,
+          html`<helix-headless-toast label="Notifications" placement="top-center"></helix-headless-toast>`,
         ),
-        'helix-base-toast',
+        'helix-headless-toast',
       ),
     ).toEqual(['label', 'placement'])
   })
@@ -44,14 +47,17 @@ describe('toast server output', () => {
      says nothing about the host that was not. */
   test('and nothing at all where the consumer wrote nothing', () => {
     expect(
-      hostAttributes(ssr(html`<helix-base-toast></helix-base-toast>`), 'helix-base-toast'),
+      hostAttributes(
+        ssr(html`<helix-headless-toast></helix-headless-toast>`),
+        'helix-headless-toast',
+      ),
     ).toEqual([])
   })
 
   test('a message serves its dismiss control, so it works before hydration', () => {
     expect(
       hasPart(
-        ssr(html`<helix-base-toast-item dismissible>Saved</helix-base-toast-item>`),
+        ssr(html`<helix-headless-toast-item dismissible>Saved</helix-headless-toast-item>`),
         'dismiss',
       ),
     ).toBe(true)

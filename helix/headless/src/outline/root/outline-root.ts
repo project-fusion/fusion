@@ -52,8 +52,8 @@ import { property, state } from 'lit/decorators.js'
  * @csspart nav - The navigation landmark.
  * @csspart indicator - The mark that travels to the section being read.
  */
-@customElement('helix-base-outline')
-export class HelixBaseOutline extends HelixElement {
+@customElement('helix-headless-outline')
+export class HelixHeadlessOutline extends HelixElement {
   /* The mark. Vertical, which the controller needs no telling about: it writes
      all four values and the stylesheet uses the two it cares about. */
   private readonly indicator = new IndicatorController(this, {
@@ -534,6 +534,6 @@ export class HelixBaseOutline extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-outline': HelixBaseOutline
+    'helix-headless-outline': HelixHeadlessOutline
   }
 }

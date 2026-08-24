@@ -60,8 +60,8 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @csspart direction - The direction as a word, for readers who are not looking.
  * @csspart icon - The arrow.
  */
-@customElement('helix-base-trend')
-export class HelixBaseTrend extends HelixElement {
+@customElement('helix-headless-trend')
+export class HelixHeadlessTrend extends HelixElement {
   /**
    * Which way the measurement moved.
    *
@@ -124,6 +124,6 @@ export class HelixBaseTrend extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-trend': HelixBaseTrend
+    'helix-headless-trend': HelixHeadlessTrend
   }
 }

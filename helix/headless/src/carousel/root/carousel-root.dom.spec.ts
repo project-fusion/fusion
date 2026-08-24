@@ -14,11 +14,11 @@ type Carousel = HTMLElement & {
 }
 
 const carousel = async (attrs = ''): Promise<Carousel> =>
-  (await mount(`<helix-base-carousel label="Verticals" ${attrs}>
+  (await mount(`<helix-headless-carousel label="Verticals" ${attrs}>
     <div>Design</div>
     <div>Mind</div>
     <div>Energy</div>
-  </helix-base-carousel>`)) as Carousel
+  </helix-headless-carousel>`)) as Carousel
 
 describe('carousel', () => {
   test('announces itself as a carousel, not as a bare group', async () => {
@@ -44,7 +44,7 @@ describe('carousel', () => {
 
   test('a slide that names itself keeps its own name', async () => {
     const cal = (await mount(
-      '<helix-base-carousel label="x"><div aria-label="Fusion Design">D</div></helix-base-carousel>',
+      '<helix-headless-carousel label="x"><div aria-label="Fusion Design">D</div></helix-headless-carousel>',
     )) as Carousel
     expect(cal.children[0]?.getAttribute('aria-label')).toBe('Fusion Design')
   })
@@ -116,7 +116,7 @@ describe('carousel naming', () => {
        what you do when a wrapper already names the thing, got the broken half
        of that rather than the honest one. */
     const host = (await mount(
-      '<helix-base-carousel label=""></helix-base-carousel>',
+      '<helix-headless-carousel label=""></helix-headless-carousel>',
     )) as Updatable & {
       internals: ElementInternals
     }
@@ -133,9 +133,9 @@ describe('carousel selection can be refused', () => {
     HTMLElement & { goTo(index: number): void; index: number; updateComplete: Promise<boolean> }
   > => {
     const host = (await mount(
-      `<helix-base-carousel label="Highlights">
+      `<helix-headless-carousel label="Highlights">
         <div>One</div><div>Two</div><div>Three</div>
-      </helix-base-carousel>`,
+      </helix-headless-carousel>`,
     )) as HTMLElement & {
       goTo(index: number): void
       index: number
@@ -187,9 +187,9 @@ describe('carousel, controlled and uncontrolled', () => {
     HTMLElement & { goTo(index: number): void; index: number; updateComplete: Promise<boolean> }
   > => {
     const host = (await mount(
-      `<helix-base-carousel label="Highlights" ${attrs}>
+      `<helix-headless-carousel label="Highlights" ${attrs}>
         <div>One</div><div>Two</div><div>Three</div>
-      </helix-base-carousel>`,
+      </helix-headless-carousel>`,
     )) as HTMLElement & {
       goTo(index: number): void
       index: number
@@ -246,9 +246,9 @@ describe('carousel settling', () => {
   const scrolling = async (
     attrs = '',
   ): Promise<{ host: Carousel & { goTo(index: number): void }; track: HTMLElement }> => {
-    const host = (await mount(`<helix-base-carousel label="Shots" ${attrs}>
+    const host = (await mount(`<helix-headless-carousel label="Shots" ${attrs}>
       <div>One</div><div>Two</div><div>Three</div><div>Four</div>
-    </helix-base-carousel>`)) as Carousel & { goTo(index: number): void }
+    </helix-headless-carousel>`)) as Carousel & { goTo(index: number): void }
     await host.updateComplete
     const track = part(host, 'track') as HTMLElement
     /* Offsets past the track's own bleed, so a stated position is one the
@@ -397,9 +397,9 @@ describe('carousel across several slides at once', () => {
      here is that one number, and every failure it replaced came from counting
      slides instead. */
   const four = async (): Promise<HTMLElement> =>
-    mount(`<helix-base-carousel label="Reel" per-view="4">
+    mount(`<helix-headless-carousel label="Reel" per-view="4">
       <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
-    </helix-base-carousel>`)
+    </helix-headless-carousel>`)
 
   test('the indicators count positions, not slides', async () => {
     const host = await four()
@@ -416,9 +416,9 @@ describe('carousel across several slides at once', () => {
   })
 
   test('one across is unchanged, so a plain carousel counts its slides', async () => {
-    const host = await mount(`<helix-base-carousel label="Reel">
+    const host = await mount(`<helix-headless-carousel label="Reel">
       <div>1</div><div>2</div><div>3</div>
-    </helix-base-carousel>`)
+    </helix-headless-carousel>`)
     expect(part(host, 'indicators')?.querySelectorAll('[part="indicator"]')).toHaveLength(3)
   })
 })

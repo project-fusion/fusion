@@ -26,8 +26,8 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The buttons in the group.
  */
-@customElement('helix-base-button-group')
-export class HelixBaseButtonGroup extends HelixElement {
+@customElement('helix-headless-button-group')
+export class HelixHeadlessButtonGroup extends HelixElement {
   /**
    * Accessible name for the group.
    *
@@ -49,6 +49,6 @@ export class HelixBaseButtonGroup extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-button-group': HelixBaseButtonGroup
+    'helix-headless-button-group': HelixHeadlessButtonGroup
   }
 }

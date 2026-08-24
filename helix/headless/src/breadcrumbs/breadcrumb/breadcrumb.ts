@@ -51,8 +51,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart separator - The separator preceding the item.
  * @csspart separator-mark - The glyph between this crumb and the next, where none is slotted.
  */
-@customElement('helix-base-breadcrumb')
-export class HelixBaseBreadcrumb extends HelixElement {
+@customElement('helix-headless-breadcrumb')
+export class HelixHeadlessBreadcrumb extends HelixElement {
   /** Whether this item is the page the reader is on. */
   @property({ reflect: true, type: Boolean })
   current = false
@@ -129,6 +129,6 @@ export class HelixBaseBreadcrumb extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-breadcrumb': HelixBaseBreadcrumb
+    'helix-headless-breadcrumb': HelixHeadlessBreadcrumb
   }
 }

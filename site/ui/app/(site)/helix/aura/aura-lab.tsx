@@ -101,7 +101,7 @@ const RESTING: Record<Knob, number> = {
 /**
  * The bench, now driving `helix-aura` rather than a second copy of it.
  *
- * The shader moved into `helix/web`, so this page is a consumer like any other
+ * The shader moved into `helix/styled`, so this page is a consumer like any other
  * and the knobs are the component's own properties. That is the point of moving
  * it: tuning happens against the published surface, and anything awkward here
  * is awkward for everyone.

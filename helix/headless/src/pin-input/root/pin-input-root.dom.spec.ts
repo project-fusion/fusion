@@ -10,7 +10,7 @@ type Pin = HTMLElement & { clear(): void; updateComplete: Promise<unknown>; valu
 
 const pin = async (attrs = ''): Promise<Pin> => {
   const host = (await mount(
-    `<helix-base-pin-input label="Code" ${attrs}></helix-base-pin-input>`,
+    `<helix-headless-pin-input label="Code" ${attrs}></helix-headless-pin-input>`,
   )) as Pin
   await host.updateComplete
   return host

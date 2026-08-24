@@ -29,15 +29,15 @@ import '../index.js'
    assertion nobody maintains. */
 describe('tabs panel server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
-    expect(withoutStyles(ssr(html`<helix-base-tabs-panel></helix-base-tabs-panel>`))).toContain(
-      'helix-base-tabs-panel',
-    )
+    expect(
+      withoutStyles(ssr(html`<helix-headless-tabs-panel></helix-headless-tabs-panel>`)),
+    ).toContain('helix-headless-tabs-panel')
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-base-tabs-panel></helix-base-tabs-panel>`),
-      'helix-base-tabs-panel',
+      ssr(html`<helix-headless-tabs-panel></helix-headless-tabs-panel>`),
+      'helix-headless-tabs-panel',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

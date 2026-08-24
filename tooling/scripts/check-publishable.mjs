@@ -44,7 +44,7 @@
  *
  * **One version per domain.** Lockstep is the versioning policy, and the
  * property it exists to hold is that `@helix-io/headless@x` works with
- * `@helix-io/web@x`. A manifest carrying a different string from its neighbours
+ * `@helix-io/styled@x`. A manifest carrying a different string from its neighbours
  * is that promise already broken, and the release stamps whatever it finds.
  *
  * Run with `bun run check:publishable` (also part of `bun run verify`).
@@ -172,7 +172,7 @@ for (const [name, { directory, manifest }] of manifests()) {
 
 /* One visibility for everything, because a release is all of it or none. A
    domain half public and half restricted installs for nobody: a consumer who
-   can reach `@helix-io/web` gets a 404 on the `@helix-io/core` it depends on,
+   can reach `@helix-io/styled` gets a 404 on the `@helix-io/core` it depends on,
    and the failure names the dependency rather than the setting that caused it.
    npm also decides visibility at first publish, so a package that goes out
    wrong is not corrected by editing this field afterwards. */
@@ -195,7 +195,7 @@ for (const domain of Object.keys(DOMAINS)) {
   if (distinct.size > 1) {
     problems.push(
       `${domain}: versions disagree across the domain (${[...distinct].sort().join(', ')}). ` +
-        'Lockstep is what makes `@helix-io/headless@x` work with `@helix-io/web@x`, and the ' +
+        'Lockstep is what makes `@helix-io/headless@x` work with `@helix-io/styled@x`, and the ' +
         'release stamps whatever it finds: ' +
         inDomain.map((entry) => `${entry.directory} is ${entry.version}`).join(', '),
     )

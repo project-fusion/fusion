@@ -6,11 +6,11 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-const markup = `<helix-base-button-group label="Text alignment">
-  <helix-base-button>Left</helix-base-button>
-  <helix-base-button>Center</helix-base-button>
-  <helix-base-button>Right</helix-base-button>
-</helix-base-button-group>`
+const markup = `<helix-headless-button-group label="Text alignment">
+  <helix-headless-button>Left</helix-headless-button>
+  <helix-headless-button>Center</helix-headless-button>
+  <helix-headless-button>Right</helix-headless-button>
+</helix-headless-button-group>`
 
 describe('button group', () => {
   test('is a named group, set on internals rather than on the host', async () => {
@@ -24,7 +24,7 @@ describe('button group', () => {
 
   test('an author `aria-label` overrides the property', async () => {
     const group = (await mount(
-      '<helix-base-button-group aria-label="Alignment" label="Text alignment"></helix-base-button-group>',
+      '<helix-headless-button-group aria-label="Alignment" label="Text alignment"></helix-headless-button-group>',
     )) as HTMLElement
     expect(group.getAttribute('aria-label')).toBe('Alignment')
   })
@@ -38,7 +38,7 @@ describe('button group', () => {
     // A group is not a toolbar. The APG toolbar pattern asks for one tab stop
     // with arrow keys inside it, and nothing here touches tabindex.
     const group = await mount(markup)
-    for (const button of [...group.querySelectorAll('helix-base-button')]) {
+    for (const button of [...group.querySelectorAll('helix-headless-button')]) {
       expect(button.hasAttribute('tabindex')).toBe(false)
     }
   })

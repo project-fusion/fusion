@@ -98,7 +98,7 @@ for (const file of files) {
  * Two smaller reasons, both real. A named import is checked when the package
  * compiles, where a `name` string is checked only when this script runs. And
  * `helix-icon` is not registered on the headless tier at all, which registers
- * `helix-base-icon`, so a headless consumer got an inert element and no mark.
+ * `helix-headless-icon`, so a headless consumer got an inert element and no mark.
  *
  * **Nothing does this today**, which is exactly when to write the rule down: it
  * was nine components a week ago, the last two were converted deliberately, and
@@ -106,7 +106,7 @@ for (const file of files) {
  * stripped first, because several files explain this decision by naming the tag
  * they no longer use.
  */
-const RENDERED = /<helix-(?:base-)?icon\b/
+const RENDERED = /<helix-(?:headless-)?icon\b/
 for (const file of files) {
   /* The library's own components, and nothing else. `<helix-icon>` is a public
      element and an app writing one is using it as intended: `site/ui` does, in

@@ -72,8 +72,8 @@ const HEIGHT = 100
  * @csspart tooltip-name - A column's name inside the tooltip.
  * @csspart tooltip-value - A column's value inside the tooltip.
  */
-@customElement('helix-base-line-chart')
-export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
+@customElement('helix-headless-line-chart')
+export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   /**
    * Whether a wash is drawn under each line.
    *
@@ -393,6 +393,6 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-line-chart': HelixBaseLineChart
+    'helix-headless-line-chart': HelixHeadlessLineChart
   }
 }

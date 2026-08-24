@@ -15,7 +15,7 @@ import { registerDom } from '@helix-io/testing/dom'
  * Rendered rather than inspected as a `TemplateResult`, because what is being
  * asserted is the element that comes out: the attributes are what make a glyph
  * inherit its color, stay out of the accessibility tree, and take the size the
- * sheet in `helix/web` gives it.
+ * sheet in `helix/styled` gives it.
  */
 let drawIcon: typeof import('./draw-icon.js').drawIcon
 let render: typeof import('lit').render
@@ -60,7 +60,7 @@ describe('a glyph a component draws itself', () => {
   })
 
   /* `data-glyph` rather than a class, because the sizing lives in
-     `helix/web/src/icon/glyph.css` and a component's own `--icon-size`
+     `helix/styled/src/icon/glyph.css` and a component's own `--icon-size`
      declarations have to keep working untouched: the variable was read by
      `helix-icon`, and now it is read by the rule that sheet carries. Without it
      every one of those declarations goes quietly dead and every mark in six

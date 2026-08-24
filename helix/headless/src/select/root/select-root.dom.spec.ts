@@ -21,10 +21,10 @@ const settle = async (host: Updatable): Promise<void> => {
 }
 
 const select = async (extra = ''): Promise<Updatable> => {
-  document.body.innerHTML = `<helix-base-select label="L" name="c" ${extra}>
-    <helix-base-option value="one">Alpha</helix-base-option>
-    <helix-base-option value="two">Beta</helix-base-option>
-  </helix-base-select>`
+  document.body.innerHTML = `<helix-headless-select label="L" name="c" ${extra}>
+    <helix-headless-option value="one">Alpha</helix-headless-option>
+    <helix-headless-option value="two">Beta</helix-headless-option>
+  </helix-headless-select>`
   const host = document.body.firstElementChild as Updatable
   await settle(host)
   return host
@@ -163,10 +163,10 @@ if (hasLayout()) {
          `:popover-open` is the only thing that distinguishes the two. A panel
          that is merely visible passes every other spec in this file. */
       const host = (await mount(
-        `<helix-base-select label="Fruit" open>
-          <helix-base-option value="apple">Apple</helix-base-option>
-          <helix-base-option value="pear">Pear</helix-base-option>
-        </helix-base-select>`,
+        `<helix-headless-select label="Fruit" open>
+          <helix-headless-option value="apple">Apple</helix-headless-option>
+          <helix-headless-option value="pear">Pear</helix-headless-option>
+        </helix-headless-select>`,
       )) as HTMLElement & { updateComplete: Promise<boolean> }
       await host.updateComplete
       const surface = part(host, 'surface') as HTMLElement
@@ -175,9 +175,9 @@ if (hasLayout()) {
 
     test('a closed panel is not in it, and paints nothing', async () => {
       const host = (await mount(
-        `<helix-base-select label="Fruit">
-          <helix-base-option value="apple">Apple</helix-base-option>
-        </helix-base-select>`,
+        `<helix-headless-select label="Fruit">
+          <helix-headless-option value="apple">Apple</helix-headless-option>
+        </helix-headless-select>`,
       )) as HTMLElement & { updateComplete: Promise<boolean> }
       await host.updateComplete
       const surface = part(host, 'surface') as HTMLElement
@@ -197,10 +197,10 @@ if (hasLayout()) {
        not be operated with a mouse at all. */
     const opened = async (attrs = ''): Promise<Updatable & { value: string }> => {
       const host = (await mount(
-        `<helix-base-select label="Fruit" name="fruit" ${attrs}>
-          <helix-base-option value="apple">Apple</helix-base-option>
-          <helix-base-option value="pear">Pear</helix-base-option>
-        </helix-base-select>`,
+        `<helix-headless-select label="Fruit" name="fruit" ${attrs}>
+          <helix-headless-option value="apple">Apple</helix-headless-option>
+          <helix-headless-option value="pear">Pear</helix-headless-option>
+        </helix-headless-select>`,
       )) as Updatable & { value: string }
       await host.updateComplete
       ;(part(host as HTMLElement, 'trigger') as HTMLElement).click()
@@ -209,7 +209,7 @@ if (hasLayout()) {
     }
 
     const press = async (host: HTMLElement, value: string): Promise<void> => {
-      const option = host.querySelector(`helix-base-option[value="${value}"]`) as HTMLElement
+      const option = host.querySelector(`helix-headless-option[value="${value}"]`) as HTMLElement
       await (option as unknown as { updateComplete: Promise<boolean> }).updateComplete
       const row = option.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null
       if (!row) {

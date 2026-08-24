@@ -31,7 +31,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const TIERS = ['helix/headless/src', 'helix/sandbox/src', 'helix/web/src']
+const TIERS = ['helix/headless/src', 'helix/sandbox/src', 'helix/styled/src']
 
 const walk = (dir, found = []) => {
   for (const entry of readdirSync(dir)) {

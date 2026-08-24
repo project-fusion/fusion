@@ -55,7 +55,7 @@ export const seriesIndex = (depth: number): number => (depth % PALETTE) + 1
  * The numbered twenty-four are the seam between the tiers: `chart/series.css`
  * points each at a semantic token, which is a decision and so belongs to the
  * styled tier, and a consumer on `headless` sets the same names to whatever
- * they like. The base examples set them to a ramp of grays.
+ * they like. The headless examples set them to a ramp of grays.
  *
  * @cssproperty --chart-series - The color of the mark this is set on. Written by the component, read by the sheet that paints.
  * @cssproperty --chart-series-1 - The color of series 1. The styled tier points it at a palette token.

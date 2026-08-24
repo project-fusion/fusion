@@ -13,7 +13,7 @@
  *
  * **What it can see, said plainly, because it is a third of the problem.** Only
  * a rule that sets an ink *and* a ground together is legible: measured across
- * `helix/web`, 12 rules do that, while 165 set only an ink and 112 only a
+ * `helix/styled`, 12 rules do that, while 165 set only an ink and 112 only a
  * ground. The rest inherit their ground from a host, a part above them or the
  * page, and no scan of the text can know which without laying the page out.
  *
@@ -37,7 +37,7 @@ import { ORACLE, pairs } from './theme-facts.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-const SOURCE = join(ROOT, 'helix/web/src')
+const SOURCE = join(ROOT, 'helix/styled/src')
 
 /**
  * Pairs a component paints on purpose that the model deliberately omits, with

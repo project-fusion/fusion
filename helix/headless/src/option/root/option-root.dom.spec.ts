@@ -9,7 +9,7 @@ beforeAll(async () => {
 describe('option', () => {
   test('is an option, which is what an owning listbox needs it to be', async () => {
     const host = (await mount(
-      '<helix-base-option value="a">Alpha</helix-base-option>',
+      '<helix-headless-option value="a">Alpha</helix-headless-option>',
     )) as HTMLElement & {
       internals: ElementInternals
     }
@@ -20,7 +20,7 @@ describe('option', () => {
     /* An option that selected itself would be a second answer to which one is
        chosen, and the two would disagree the first time a listener refused. */
     const host = (await mount(
-      '<helix-base-option value="a">Alpha</helix-base-option>',
+      '<helix-headless-option value="a">Alpha</helix-headless-option>',
     )) as HTMLElement & {
       select: () => void
       selected: boolean
@@ -36,7 +36,7 @@ describe('option', () => {
 
   test('a disabled option announces nothing at all', async () => {
     const host = (await mount(
-      '<helix-base-option disabled value="a">Alpha</helix-base-option>',
+      '<helix-headless-option disabled value="a">Alpha</helix-headless-option>',
     )) as HTMLElement & { select: () => void }
     let announced = false
     host.addEventListener('helix-select', () => {
@@ -50,7 +50,7 @@ describe('option', () => {
     // Which is what a listbox matches a filter against. Asking for both a
     // property and the content is asking for two things to disagree.
     const host = (await mount(
-      '<helix-base-option value="a"> Alpha </helix-base-option>',
+      '<helix-headless-option value="a"> Alpha </helix-headless-option>',
     )) as HTMLElement & {
       text: string
     }

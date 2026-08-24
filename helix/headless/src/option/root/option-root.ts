@@ -41,8 +41,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart label - The words.
  */
-@customElement('helix-base-option')
-export class HelixBaseOption extends HelixElement {
+@customElement('helix-headless-option')
+export class HelixHeadlessOption extends HelixElement {
   /** Whether this choice can be made. */
   @property({ reflect: true, type: Boolean })
   disabled = false
@@ -137,6 +137,6 @@ export class HelixBaseOption extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-option': HelixBaseOption
+    'helix-headless-option': HelixHeadlessOption
   }
 }

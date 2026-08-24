@@ -46,8 +46,8 @@ import { property } from 'lit/decorators.js'
  * @aliases Result count, Range
  * @documentation https://helix.fusion.dev/components/pagination
  */
-@customElement('helix-base-pagination-summary')
-export class HelixBasePaginationSummary extends HelixElement {
+@customElement('helix-headless-pagination-summary')
+export class HelixHeadlessPaginationSummary extends HelixElement {
   /** The page on show, one-based. */
   @property({ type: Number })
   page = 1
@@ -121,6 +121,6 @@ export class HelixBasePaginationSummary extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-pagination-summary': HelixBasePaginationSummary
+    'helix-headless-pagination-summary': HelixHeadlessPaginationSummary
   }
 }

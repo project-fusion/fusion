@@ -30,14 +30,14 @@ import '../index.js'
 describe('drilldown item server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
     expect(
-      withoutStyles(ssr(html`<helix-base-drilldown-item></helix-base-drilldown-item>`)),
-    ).toContain('helix-base-drilldown-item')
+      withoutStyles(ssr(html`<helix-headless-drilldown-item></helix-headless-drilldown-item>`)),
+    ).toContain('helix-headless-drilldown-item')
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-base-drilldown-item></helix-base-drilldown-item>`),
-      'helix-base-drilldown-item',
+      ssr(html`<helix-headless-drilldown-item></helix-headless-drilldown-item>`),
+      'helix-headless-drilldown-item',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

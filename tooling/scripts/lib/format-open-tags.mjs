@@ -2,7 +2,7 @@
 /**
  * One attribute per line in an open tag, shared by everything that writes one.
  *
- * Extracted when `build-base-examples.mjs` arrived, because two writers of the
+ * Extracted when `build-headless-examples.mjs` arrived, because two writers of the
  * same files have to agree: the generator wrote its markup one way, the
  * formatter rewrote it the other, and `bun run check` cleaned nine files that
  * the very next `--check` then reported as drifted. That is the same rule the

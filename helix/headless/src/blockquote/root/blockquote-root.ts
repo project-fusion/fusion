@@ -26,8 +26,8 @@ import { property } from 'lit/decorators.js'
  * @csspart blockquote - The quotation.
  * @csspart attribution - The footer carrying the source.
  */
-@customElement('helix-base-blockquote')
-export class HelixBaseBlockquote extends HelixElement {
+@customElement('helix-headless-blockquote')
+export class HelixHeadlessBlockquote extends HelixElement {
   /** URL identifying where the passage came from. */
   @property()
   cite = ''
@@ -75,6 +75,6 @@ export class HelixBaseBlockquote extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-blockquote': HelixBaseBlockquote
+    'helix-headless-blockquote': HelixHeadlessBlockquote
   }
 }

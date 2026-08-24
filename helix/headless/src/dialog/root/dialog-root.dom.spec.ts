@@ -21,10 +21,10 @@ type Dialog = HTMLElement & {
 
 const dialog = async (extra = ''): Promise<Dialog> =>
   (await mount(
-    `<helix-base-dialog label="Delete project" ${extra}>
+    `<helix-headless-dialog label="Delete project" ${extra}>
       <h2 slot="header">Delete project</h2>
       This cannot be undone.
-    </helix-base-dialog>`,
+    </helix-headless-dialog>`,
   )) as Dialog
 
 describe('dialog', () => {
@@ -94,8 +94,8 @@ describe('dialog', () => {
 describe('dialog invokers', () => {
   const wired = async (): Promise<{ dialog: Dialog; trigger: HTMLElement }> => {
     const trigger = (await mount(
-      `<helix-base-button command="--show" commandfor="confirm">Delete</helix-base-button>
-       <helix-base-dialog id="confirm" label="Delete project">Body</helix-base-dialog>`,
+      `<helix-headless-button command="--show" commandfor="confirm">Delete</helix-headless-button>
+       <helix-headless-dialog id="confirm" label="Delete project">Body</helix-headless-dialog>`,
     )) as HTMLElement & { updateComplete: Promise<boolean> }
     const dialog = trigger.nextElementSibling as Dialog
     await trigger.updateComplete
@@ -195,12 +195,12 @@ if (hasLayout()) {
 describe('dialog framing', () => {
   const framed = async (extra = ''): Promise<Dialog> =>
     (await mount(
-      `<helix-base-dialog label="Discard changes" ${extra}>
+      `<helix-headless-dialog label="Discard changes" ${extra}>
         <span slot="icon">!</span>
         <h2 slot="header">Discard changes?</h2>
         Nine edits have not been saved.
         <span slot="footer">actions</span>
-      </helix-base-dialog>`,
+      </helix-headless-dialog>`,
     )) as Dialog
 
   test('the mark sits above the title, in its own slot', async () => {

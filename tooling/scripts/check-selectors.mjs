@@ -21,7 +21,7 @@
  *
  * Parts are resolved through `extends`, because a styled component usually
  * renders none of its own: `helix-icon-button` styles `[part="button"]` and the
- * markup for it lives in `HelixBaseButton`, in another tier and another family.
+ * markup for it lives in `HelixHeadlessButton`, in another tier and another family.
  * Checking a component against only its own file reports every one of those as
  * dead.
  *
@@ -73,7 +73,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
-const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/web/src', 'helix/sandbox/src']
+const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/styled/src', 'helix/sandbox/src']
 
 /** Every `.ts` under a tier, skipping specs and generated stylesheets. */
 const sources = (dir) => {

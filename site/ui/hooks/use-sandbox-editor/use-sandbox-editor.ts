@@ -6,7 +6,7 @@ import { useEffect } from 'react'
  * Registers the sandbox editor, after React has hydrated.
  *
  * **The editor is not in the site's own registrar and cannot be.**
- * `HelixElements` imports `@helix-io/web` and `@helix-io/sandbox`, and the
+ * `HelixElements` imports `@helix-io/styled` and `@helix-io/sandbox`, and the
  * sandbox barrel exports the JSX helpers and the spec runner and not this: the
  * editor carries CodeMirror, so registering it from the root layout would put
  * it on every page of the site to serve two. So the two routes that render one
@@ -32,7 +32,7 @@ import { useEffect } from 'react'
  * is why it survived: the page renders, the editor works, and the only sign is
  * a console message naming an attribute no author wrote.
  *
- * The window where the tag is unknown is what `@helix-io/web/elements.css`
+ * The window where the tag is unknown is what `@helix-io/styled/elements.css`
  * already covers, hiding `:not(:defined)` by visibility so nothing reflows when
  * the definition lands.
  */

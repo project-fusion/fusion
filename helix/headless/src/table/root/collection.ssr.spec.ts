@@ -13,17 +13,20 @@ describe('a collection on the server', () => {
        Shipping "Nothing to show" over markup that is about to have rows in it
        is the one thing an empty state must never do, and it would be shipped
        into the first paint where a reader would see it. */
-    expect(hasPart(ssr(html`<helix-base-tree label="Files"></helix-base-tree>`), 'empty')).toBe(
-      false,
-    )
     expect(
-      hasPart(ssr(html`<helix-base-table label="Invoices"></helix-base-table>`), 'empty'),
+      hasPart(ssr(html`<helix-headless-tree label="Files"></helix-headless-tree>`), 'empty'),
     ).toBe(false)
-    expect(hasPart(ssr(html`<helix-base-menu label="Actions"></helix-base-menu>`), 'empty')).toBe(
-      false,
-    )
     expect(
-      hasPart(ssr(html`<helix-base-drilldown label="Pages"></helix-base-drilldown>`), 'empty'),
+      hasPart(ssr(html`<helix-headless-table label="Invoices"></helix-headless-table>`), 'empty'),
+    ).toBe(false)
+    expect(
+      hasPart(ssr(html`<helix-headless-menu label="Actions"></helix-headless-menu>`), 'empty'),
+    ).toBe(false)
+    expect(
+      hasPart(
+        ssr(html`<helix-headless-drilldown label="Pages"></helix-headless-drilldown>`),
+        'empty',
+      ),
     ).toBe(false)
   })
 
@@ -33,10 +36,16 @@ describe('a collection on the server', () => {
        slow connection sees "Loading" in the first paint rather than a blank
        box that fills in when a script arrives. */
     expect(
-      hasPart(ssr(html`<helix-base-tree label="Files" loading></helix-base-tree>`), 'loading'),
+      hasPart(
+        ssr(html`<helix-headless-tree label="Files" loading></helix-headless-tree>`),
+        'loading',
+      ),
     ).toBe(true)
     expect(
-      hasPart(ssr(html`<helix-base-table label="Invoices" loading></helix-base-table>`), 'loading'),
+      hasPart(
+        ssr(html`<helix-headless-table label="Invoices" loading></helix-headless-table>`),
+        'loading',
+      ),
     ).toBe(true)
   })
 })

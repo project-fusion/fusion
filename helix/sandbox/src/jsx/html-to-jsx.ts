@@ -24,7 +24,7 @@
 /** A tag that never has children, so JSX has to close it itself. */
 const VOID = new Set([
   'area',
-  'base',
+  'headless',
   'br',
   'col',
   'embed',

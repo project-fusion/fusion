@@ -15,13 +15,13 @@ import { join } from 'node:path'
  *
  * The examples live beside the styled components and most of them use styled
  * tags, so this read the styled manifest alone and would have reported
- * `<helix-base-checkbox>` as an element that does not exist. It does exist: it
- * is registered by `helix/headless`, which is the tier the base examples are
+ * `<helix-headless-checkbox>` as an element that does not exist. It does exist: it
+ * is registered by `helix/headless`, which is the tier the headless examples are
  * there to show is real and consumable. Reading one manifest meant a base
  * example could not be validated at all, so a typo in one would have rendered
  * an inert unknown element and passed. */
-const MANIFESTS = ['helix/web/custom-elements.json', 'helix/headless/custom-elements.json']
-const ROOT = 'helix/web/src'
+const MANIFESTS = ['helix/styled/custom-elements.json', 'helix/headless/custom-elements.json']
+const ROOT = 'helix/styled/src'
 
 /**
  * Attributes any element may carry, so no component declares them.

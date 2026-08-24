@@ -7,7 +7,7 @@ beforeAll(async () => {
 })
 
 const spark = async (attributes: string): Promise<HTMLElement> =>
-  mount(`<helix-base-sparkline ${attributes}></helix-base-sparkline>`)
+  mount(`<helix-headless-sparkline ${attributes}></helix-headless-sparkline>`)
 
 const path = (host: HTMLElement): string | null => part(host, 'line')?.getAttribute('d') ?? null
 
@@ -208,8 +208,8 @@ describe('sparkline from a table', () => {
         <tr><th scope="row">Mon</th><td>10</td></tr>
         <tr><th scope="row">Tue</th><td>30</td></tr>
         <tr><th scope="row">Wed</th><td>20</td></tr>
-      </tbody></table><helix-base-sparkline ${attributes}></helix-base-sparkline></div>`)
-    const host = document.querySelector('helix-base-sparkline') as HTMLElement & {
+      </tbody></table><helix-headless-sparkline ${attributes}></helix-headless-sparkline></div>`)
+    const host = document.querySelector('helix-headless-sparkline') as HTMLElement & {
       updateComplete: Promise<unknown>
     }
     await host.updateComplete

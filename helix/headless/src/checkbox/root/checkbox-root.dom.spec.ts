@@ -14,7 +14,7 @@ type Checkbox = HTMLElement & {
 }
 
 const checkbox = async (attrs = ''): Promise<Checkbox> =>
-  (await mount(`<helix-base-checkbox ${attrs}>Terms</helix-base-checkbox>`)) as Checkbox
+  (await mount(`<helix-headless-checkbox ${attrs}>Terms</helix-headless-checkbox>`)) as Checkbox
 
 const control = (box: Checkbox): HTMLInputElement => part(box, 'control') as HTMLInputElement
 
@@ -105,7 +105,7 @@ describe('checkbox descriptions', () => {
        and the `<label>` around both is what forwards the press, so the label
        cannot be the standalone `<label for>` an input renders: nesting one in
        the other is invalid markup and the inner one would swallow the press. */
-    const host = await mount('<helix-base-checkbox label="Accept"></helix-base-checkbox>')
+    const host = await mount('<helix-headless-checkbox label="Accept"></helix-headless-checkbox>')
     const field = part(host, 'field') as HTMLElement
     const label = part(host, 'label') as HTMLElement
     expect(field.tagName).toBe('LABEL')
@@ -116,7 +116,7 @@ describe('checkbox descriptions', () => {
   test('a hint sits outside that label, so pressing it does not toggle', async () => {
     // Help text is not the control's name and must not be its hit target.
     const host = await mount(
-      '<helix-base-checkbox label="Accept" hint="Help"></helix-base-checkbox>',
+      '<helix-headless-checkbox label="Accept" hint="Help"></helix-headless-checkbox>',
     )
     const field = part(host, 'field') as HTMLElement
     const hint = part(host, 'hint') as HTMLElement
@@ -129,7 +129,9 @@ describe('checkbox descriptions', () => {
 
 describe('checkbox label fallback', () => {
   test('slotted words win over the property', async () => {
-    const host = await mount('<helix-base-checkbox label="Ignored">Slotted</helix-base-checkbox>')
+    const host = await mount(
+      '<helix-headless-checkbox label="Ignored">Slotted</helix-headless-checkbox>',
+    )
     const slot = (part(host, 'label') as HTMLElement).querySelector('slot') as HTMLSlotElement
     expect(slot.assignedNodes()[0]?.textContent).toBe('Slotted')
   })
@@ -139,7 +141,7 @@ describe('checkbox label fallback', () => {
        expectation is. A whitespace-only text node is assigned to the default
        slot and defeats its fallback, so a newline between the tags costs the
        label with nothing to say it did. */
-    const host = await mount('<helix-base-checkbox label="Accept"></helix-base-checkbox>')
+    const host = await mount('<helix-headless-checkbox label="Accept"></helix-headless-checkbox>')
     const slot = (part(host, 'label') as HTMLElement).querySelector('slot') as HTMLSlotElement
     expect(slot.assignedNodes().length).toBe(0)
     expect(slot.textContent?.trim()).toBe('Accept')
@@ -161,7 +163,7 @@ describe('checkbox validation message', () => {
 
   const required = async (): Promise<Updatable> => {
     document.body.innerHTML =
-      '<form><helix-base-checkbox label="Accept" hint="Hint" name="terms" required></helix-base-checkbox></form>'
+      '<form><helix-headless-checkbox label="Accept" hint="Hint" name="terms" required></helix-headless-checkbox></form>'
     const host = (document.body.firstElementChild as HTMLElement).firstElementChild as Updatable
     await host.updateComplete
     return host

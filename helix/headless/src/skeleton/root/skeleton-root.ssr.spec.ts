@@ -5,11 +5,13 @@ import '../index.js'
 
 describe('skeleton server output', () => {
   test('the placeholder is in the served markup', () => {
-    expect(hasPart(ssr(html`<helix-base-skeleton></helix-base-skeleton>`), 'skeleton')).toBe(true)
+    expect(
+      hasPart(ssr(html`<helix-headless-skeleton></helix-headless-skeleton>`), 'skeleton'),
+    ).toBe(true)
   })
 
   test('the host carries only what the consumer wrote', () => {
-    const markup = ssr(html`<helix-base-skeleton shape="text"></helix-base-skeleton>`)
-    expect(hostAttributes(markup, 'helix-base-skeleton')).toEqual(['shape'])
+    const markup = ssr(html`<helix-headless-skeleton shape="text"></helix-headless-skeleton>`)
+    expect(hostAttributes(markup, 'helix-headless-skeleton')).toEqual(['shape'])
   })
 })

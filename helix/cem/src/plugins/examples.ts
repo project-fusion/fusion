@@ -29,7 +29,7 @@ const oneLine = (value: string): string => value.replace(/\s+/g, ' ').trim()
  * Attaches a family's examples to its root declaration.
  *
  * The examples were already on disk and already read, by the docs site, which
- * walked `helix/web/src/<family>/.examples` itself. That worked and put the
+ * walked `helix/styled/src/<family>/.examples` itself. That worked and put the
  * knowledge in the wrong place: the site is a consumer of this library, and it
  * was reaching past the published interface into the library's source tree to
  * find out what a component ships. Anything else wanting the same list, another

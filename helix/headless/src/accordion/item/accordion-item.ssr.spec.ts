@@ -4,22 +4,22 @@ import { html } from 'lit'
 import '../index.js'
 
 const item = (open: string) =>
-  ssr(html`<helix-base-accordion>
-    <helix-base-accordion-item ${open === 'open' ? html`default-open` : html``}>
+  ssr(html`<helix-headless-accordion>
+    <helix-headless-accordion-item ${open === 'open' ? html`default-open` : html``}>
       <span slot="summary">One</span>
       Body
-    </helix-base-accordion-item>
-  </helix-base-accordion>`)
+    </helix-headless-accordion-item>
+  </helix-headless-accordion>`)
 
 describe('accordion server output', () => {
   test('renders its real state on the server, not after hydration', () => {
     const closed = ssr(
-      html`<helix-base-accordion-item><span slot="summary">S</span>Body</helix-base-accordion-item>`,
+      html`<helix-headless-accordion-item><span slot="summary">S</span>Body</helix-headless-accordion-item>`,
     )
     expect(partTag(closed, 'trigger')).toContain('aria-expanded="false"')
 
     const open = ssr(
-      html`<helix-base-accordion-item default-open><span slot="summary">S</span>Body</helix-base-accordion-item>`,
+      html`<helix-headless-accordion-item default-open><span slot="summary">S</span>Body</helix-headless-accordion-item>`,
     )
     expect(partTag(open, 'trigger')).toContain('aria-expanded="true"')
   })
@@ -28,7 +28,7 @@ describe('accordion server output', () => {
     // Present for a crawler, and hidden rather than removed so it can animate.
     const closed = withoutStyles(
       ssr(
-        html`<helix-base-accordion-item><span slot="summary">S</span>Body</helix-base-accordion-item>`,
+        html`<helix-headless-accordion-item><span slot="summary">S</span>Body</helix-headless-accordion-item>`,
       ),
     )
     expect(closed).toContain('Body')
@@ -46,13 +46,13 @@ describe('accordion server output', () => {
        inlined stylesheet names both attributes and `toContain` would pass on a
        selector. */
     const closed = ssr(
-      html`<helix-base-accordion-item><span slot="summary">S</span>Body</helix-base-accordion-item>`,
+      html`<helix-headless-accordion-item><span slot="summary">S</span>Body</helix-headless-accordion-item>`,
     )
     expect(partTag(closed, 'content')).toContain('hidden')
     expect(partTag(closed, 'content')).toContain('inert')
 
     const open = ssr(
-      html`<helix-base-accordion-item default-open><span slot="summary">S</span>Body</helix-base-accordion-item>`,
+      html`<helix-headless-accordion-item default-open><span slot="summary">S</span>Body</helix-headless-accordion-item>`,
     )
     expect(partTag(open, 'content')).not.toContain('hidden')
     expect(partTag(open, 'content')).not.toContain('inert')
@@ -61,7 +61,7 @@ describe('accordion server output', () => {
   test('the region is named by its trigger, inside one shadow root', () => {
     // IDREFs do not cross a shadow boundary, so both ids have to live together.
     const markup = ssr(
-      html`<helix-base-accordion-item><span slot="summary">S</span>x</helix-base-accordion-item>`,
+      html`<helix-headless-accordion-item><span slot="summary">S</span>x</helix-headless-accordion-item>`,
     )
     expect(partTag(markup, 'trigger')).toContain('aria-controls="content"')
     expect(partTag(markup, 'content')).toContain('aria-labelledby="trigger"')

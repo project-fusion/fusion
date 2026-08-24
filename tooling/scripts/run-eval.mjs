@@ -45,7 +45,7 @@ const corpus = JSON.parse(readFileSync(join(ROOT, 'tooling', 'eval', 'questions.
  */
 const reference = () => {
   const manifest = JSON.parse(
-    readFileSync(join(ROOT, 'helix', 'web', 'custom-elements.json'), 'utf8'),
+    readFileSync(join(ROOT, 'helix', 'styled', 'custom-elements.json'), 'utf8'),
   )
   const tokens = new Set(
     JSON.parse(readFileSync(join(ROOT, 'helix', 'styles', 'tokens.json'), 'utf8')).tokens.map(

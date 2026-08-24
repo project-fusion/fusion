@@ -1,1 +1,1 @@
-export { HelixBaseCommand } from './root/command-root.js'
+export { HelixHeadlessCommand } from './root/command-root.js'

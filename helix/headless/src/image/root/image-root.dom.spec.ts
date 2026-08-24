@@ -13,7 +13,9 @@ const image = async (attrs = ''): Promise<Picture> => {
      attribute keeps the first, so a spec about an empty alt was reading the
      helper's own. */
   const alt = attrs.includes('alt=') ? '' : 'alt="A pier"'
-  const host = (await mount(`<helix-base-image ${alt} ${attrs}></helix-base-image>`)) as Picture
+  const host = (await mount(
+    `<helix-headless-image ${alt} ${attrs}></helix-headless-image>`,
+  )) as Picture
   await host.updateComplete
   return host
 }
@@ -151,7 +153,7 @@ if (hasLayout()) {
        first and its own layout spec says the same. */
     const shown = async (attrs: string): Promise<Picture> => {
       const host = (await mount(
-        `<helix-base-image alt="A pier" style="inline-size:120px;--image-aspect:1/1" ${attrs}></helix-base-image>`,
+        `<helix-headless-image alt="A pier" style="inline-size:120px;--image-aspect:1/1" ${attrs}></helix-headless-image>`,
       )) as Picture
       await host.updateComplete
       return host
@@ -176,7 +178,7 @@ if (hasLayout()) {
          was a centering flex box, which gave it its content height of zero. The
          stand-in was a plain rectangle and the skeleton was never visible. */
       const host = (await mount(
-        `<helix-base-image alt="Waiting" style="inline-size:120px;--image-aspect:1/1"><i slot="placeholder"></i></helix-base-image>`,
+        `<helix-headless-image alt="Waiting" style="inline-size:120px;--image-aspect:1/1"><i slot="placeholder"></i></helix-headless-image>`,
       )) as Picture
       await host.updateComplete
       const stand = boxOf(host, 'placeholder')

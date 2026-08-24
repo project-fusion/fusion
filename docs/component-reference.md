@@ -1,6 +1,6 @@
 # Component reference
 
-*Generated from `helix/web/custom-elements.json` by `bun run reference`. Do
+*Generated from `helix/styled/custom-elements.json` by `bun run reference`. Do
 not edit: `bun run check:reference` fails when this file and the manifest
 disagree, and the manifest is regenerated from the source on every build.*
 
@@ -16,7 +16,7 @@ these lives on the component itself and is rendered in full at
 
 Groups collapsible sections, one open at a time by default.
 
-Extends `HelixBaseAccordion`.
+Extends `HelixHeadlessAccordion`.
 
 Items share one rule between neighbours rather than each drawing its own, so
 the seam between two items is one pixel and not two. Those seams are what
@@ -27,8 +27,8 @@ the default: an accordion is a list, where a card is a surface.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `items` | - | `HelixBaseAccordionItem[]` | - | `HelixBaseAccordion` | Direct items, in light-DOM order. Client only: the server has no tree. |
-| `mode` | `mode` | `'single' \| 'single-collapsible' \| undefined` | - | `HelixBaseAccordion` | How many sections may be open at once. |
+| `items` | - | `HelixHeadlessAccordionItem[]` | - | `HelixHeadlessAccordion` | Direct items, in light-DOM order. Client only: the server has no tree. |
+| `mode` | `mode` | `'single' \| 'single-collapsible' \| undefined` | - | `HelixHeadlessAccordion` | How many sections may be open at once. |
 | `separation` | `separation` | `'outlined' \| 'plain' \| undefined` | - | - | How the stack separates itself from the page. |
 
 #### Slots
@@ -48,7 +48,7 @@ the default: an accordion is a list, where a card is a surface.
 
 One collapsible section of an accordion.
 
-Extends `HelixBaseAccordionItem`.
+Extends `HelixHeadlessAccordionItem`.
 
 The open and close transition animates `grid-template-rows` from `0fr` to
 `1fr`, which is the only technique that reaches the content's intrinsic
@@ -61,7 +61,7 @@ Usable on its own as a disclosure, with no accordion around it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `chevronPlacement` | `chevron-placement` | `'auto' \| 'start' \| 'end' \| 'none' \| undefined` | - | `HelixBaseAccordionItem` | Where the open indicator sits, or whether there is one. |
+| `chevronPlacement` | `chevron-placement` | `'auto' \| 'start' \| 'end' \| 'none' \| undefined` | - | `HelixHeadlessAccordionItem` | Where the open indicator sits, or whether there is one. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 
@@ -69,7 +69,7 @@ Usable on its own as a disclosure, with no accordion around it.
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focusTrigger()` | `HelixBaseAccordionItem` | Moves focus to this item's trigger. |
+| `focusTrigger()` | `HelixHeadlessAccordionItem` | Moves focus to this item's trigger. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
 | `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
 
@@ -109,7 +109,7 @@ Usable on its own as a disclosure, with no accordion around it.
 
 A page-level message above the masthead, which can be dismissed.
 
-Extends `HelixBaseAnnouncement`.
+Extends `HelixHeadlessAnnouncement`.
 
 Full width and flat, with the severity carried by a tinted fill and a
 hairline beneath rather than by a border on four sides: an announcement is a
@@ -121,7 +121,7 @@ band across the top of the page, not a box that happens to be wide.
 | --- | --- | --- | --- | --- | --- |
 | `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
-| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'surface' \| 'warning' \| undefined` | - | `HelixBaseAnnouncement` | Which color the band wears. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'surface' \| 'warning' \| undefined` | - | `HelixHeadlessAnnouncement` | Which color the band wears. |
 
 #### Methods
 
@@ -164,7 +164,7 @@ band across the top of the page, not a box that happens to be wide.
 
 Page-level banner holding brand, navigation, and actions.
 
-Extends `HelixBaseAppHeader`.
+Extends `HelixHeadlessAppHeader`.
 
 Flat, opaque, and in the flow. Both of the interesting things a banner can do
 are opt-in: `sticky` because following the reader is a decision about the
@@ -181,7 +181,7 @@ no shadow: the rule is the whole of it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `contentAlign` | `content-align` | `'start' \| undefined` | - | `HelixBaseAppHeader` | Where the middle region sits in the bar. |
+| `contentAlign` | `content-align` | `'start' \| undefined` | - | `HelixHeadlessAppHeader` | Where the middle region sits in the bar. |
 | `material` | `material` | `'glass' \| 'transparent' \| undefined` | - | - | What the banner is made of, which is how much of what is behind it shows through. |
 | `sticky` | `sticky` | `boolean` | `false` | - | Whether the banner sticks to the top of the viewport. |
 
@@ -301,7 +301,7 @@ takes no pointer events.
 
 Represents a person or entity with an image or their initials.
 
-Extends `HelixBaseAvatar`.
+Extends `HelixHeadlessAvatar`.
 
 Initials scale with the avatar rather than being sized per size, because the
 font size is set in `em` against the avatar's own dimension. One rule covers
@@ -312,10 +312,10 @@ every size, including one a consumer sets themselves through
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `name` | `name` | `string` | `''` | `HelixBaseAvatar` | Name of the person or entity. Used for the label and the initials. |
+| `name` | `name` | `string` | `''` | `HelixHeadlessAvatar` | Name of the person or entity. Used for the label and the initials. |
 | `shape` | `shape` | `'circle' \| 'square' \| undefined` | - | - | Whether the avatar is a circle or a rounded square. |
 | `size` | `size` | `'sm' \| 'md' \| 'lg' \| undefined` | - | - | Edge length of the avatar. |
-| `src` | `src` | `string` | `''` | `HelixBaseAvatar` | Image to show. Falls back to the slot, or to initials, if it fails. |
+| `src` | `src` | `string` | `''` | `HelixHeadlessAvatar` | Image to show. Falls back to the slot, or to initials, if it fails. |
 
 #### Events
 
@@ -348,7 +348,7 @@ every size, including one a consumer sets themselves through
 
 Overlapping avatars, with a count for the ones not shown.
 
-Extends `HelixBaseAvatarGroup`.
+Extends `HelixHeadlessAvatarGroup`.
 
 They overlap by a step of space, which is enough to read as a stack without
 the faces occluding each other. Each carries a ring in the page's own
@@ -366,10 +366,10 @@ its markup is the worse trade of the two.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `avatars` | - | `HTMLElement[]` | - | `HelixBaseAvatarGroup` | The avatars, in light-DOM order. Empty on the server, which has no tree. |
-| `label` | `label` | `string` | `''` | `HelixBaseAvatarGroup` | Accessible name for the set, such as "Reviewers". |
-| `max` | `max` | `number` | `0` | `HelixBaseAvatarGroup` | How many avatars are shown before the rest become a count. |
-| `overflow` | - | `number` | - | `HelixBaseAvatarGroup` | How many avatars are past the limit, and so not shown. |
+| `avatars` | - | `HTMLElement[]` | - | `HelixHeadlessAvatarGroup` | The avatars, in light-DOM order. Empty on the server, which has no tree. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessAvatarGroup` | Accessible name for the set, such as "Reviewers". |
+| `max` | `max` | `number` | `0` | `HelixHeadlessAvatarGroup` | How many avatars are shown before the rest become a count. |
+| `overflow` | - | `number` | - | `HelixHeadlessAvatarGroup` | How many avatars are past the limit, and so not shown. |
 
 #### Slots
 
@@ -396,7 +396,7 @@ its markup is the worse trade of the two.
 
 Attaches a count or a presence mark to another element.
 
-Extends `HelixBaseBadge`.
+Extends `HelixHeadlessBadge`.
 
 The indicator carries a ring in the page's own background color, so it stays
 legible where it overlaps the thing it is pinned to. Without it a dark badge
@@ -406,10 +406,10 @@ on a dark icon reads as a bite taken out of the icon.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `''` | `HelixBaseBadge` | Accessible name. Required for a dot, which has no text to read. |
-| `max` | `max` | `number \| undefined` | - | `HelixBaseBadge` | Cap for a numeric value. Past it the indicator reads `{max}+`. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessBadge` | Accessible name. Required for a dot, which has no text to read. |
+| `max` | `max` | `number \| undefined` | - | `HelixHeadlessBadge` | Cap for a numeric value. Past it the indicator reads `{max}+`. |
 | `tone` | `tone` | `'danger' \| 'neutral' \| undefined` | - | - | What the mark means. |
-| `value` | `value` | `string` | `''` | `HelixBaseBadge` | The count or short text to show. Absent shows a dot, zero shows nothing. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessBadge` | The count or short text to show. Absent shows a dot, zero shows nothing. |
 
 #### Slots
 
@@ -437,7 +437,7 @@ on a dark icon reads as a bite taken out of the icon.
 
 Categories as columns, read from a table.
 
-Extends `HelixBaseBarChart`.
+Extends `HelixHeadlessBarChart`.
 
 The columns take the series palette in order, so a chart of one is series one
 and a chart of four is the first four. Rounded at the far end only, because a
@@ -448,20 +448,20 @@ it is measured against.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `direction` | `direction` | `'horizontal' \| undefined` | - | `HelixBaseBarChart` | Whether the categories run down the side rather than along the bottom. |
+| `direction` | `direction` | `'horizontal' \| undefined` | - | `HelixHeadlessBarChart` | Whether the categories run down the side rather than along the bottom. |
 | `emphasis` | `emphasis` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much ink the columns claim. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `glass` | `glass` | `string \| undefined` | - | - | Which series are glass rather than solid, by name. |
-| `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixBaseBarChart` | Which rules are drawn across the plot, if any. |
+| `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixHeadlessBarChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
-| `lines` | `lines` | `string \| undefined` | - | `HelixBaseBarChart` | Which series are drawn as a line instead of as columns, by name. |
+| `lines` | `lines` | `string \| undefined` | - | `HelixHeadlessBarChart` | Which series are drawn as a line instead of as columns, by name. |
 | `material` | `material` | `'glass' \| undefined` | - | - | What the columns are made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `outlined` | `outlined` | `string \| undefined` | - | - | Which series are drawn as an outline rather than a fill, by name. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
 | `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
-| `secondary` | `secondary` | `string \| undefined` | - | `HelixBaseBarChart` | Which series are measured against a scale of their own, by name. |
+| `secondary` | `secondary` | `string \| undefined` | - | `HelixHeadlessBarChart` | Which series are measured against a scale of their own, by name. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 | `subtle` | `subtle` | `string \| undefined` | - | - | Which series are drawn as a wash of their color, by name. Matched as `outlined` is. |
 | `wash` | `wash` | `'gradient' \| undefined` | - | - | How a column's fill is distributed across it. |
@@ -514,7 +514,7 @@ it is measured against.
 
 A passage set off from the prose around it.
 
-Extends `HelixBaseBlockquote`.
+Extends `HelixHeadlessBlockquote`.
 
 Set larger than body text on the display face, because a pulled quotation is
 a change of voice and the type is what says so. No quotation marks are drawn:
@@ -525,7 +525,7 @@ top of that are the same thing said twice.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `cite` | `cite` | `string` | `''` | `HelixBaseBlockquote` | URL identifying where the passage came from. |
+| `cite` | `cite` | `string` | `''` | `HelixHeadlessBlockquote` | URL identifying where the passage came from. |
 
 #### Slots
 
@@ -553,7 +553,7 @@ top of that are the same thing said twice.
 
 Shows the path to the current page.
 
-Extends `HelixBaseBreadcrumbs`.
+Extends `HelixHeadlessBreadcrumbs`.
 
 A single wrapping line by default. The trail wraps rather than scrolling,
 because a truncated path tells the reader less than a two-line one.
@@ -580,7 +580,7 @@ because a truncated path tells the reader less than a two-line one.
 
 One step in a breadcrumb trail.
 
-Extends `HelixBaseBreadcrumb`.
+Extends `HelixHeadlessBreadcrumb`.
 
 The separator is hidden on the first item with `:host(:first-child)`, so no
 item needs to know its own index and the parent needs no coordination.
@@ -595,10 +595,10 @@ and leaves box and background to `::slotted`.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `current` | `current` | `boolean` | `false` | `HelixBaseBreadcrumb` | Whether this item is the page the reader is on. |
-| `href` | `href` | `string` | `''` | `HelixBaseBreadcrumb` | Where the crumb goes, and nothing where it is the current page. |
-| `rel` | `rel` | `string` | `''` | `HelixBaseBreadcrumb` | What the link declares about where it goes. The consumer's decision. |
-| `target` | `target` | `string` | `''` | `HelixBaseBreadcrumb` | Where the link opens, for the rare crumb that leaves the site. |
+| `current` | `current` | `boolean` | `false` | `HelixHeadlessBreadcrumb` | Whether this item is the page the reader is on. |
+| `href` | `href` | `string` | `''` | `HelixHeadlessBreadcrumb` | Where the crumb goes, and nothing where it is the current page. |
+| `rel` | `rel` | `string` | `''` | `HelixHeadlessBreadcrumb` | What the link declares about where it goes. The consumer's decision. |
+| `target` | `target` | `string` | `''` | `HelixHeadlessBreadcrumb` | Where the link opens, for the rare crumb that leaves the site. |
 
 #### Slots
 
@@ -631,7 +631,7 @@ and leaves box and background to `::slotted`.
 
 Triggers an action, submits a form, or navigates.
 
-Extends `HelixBaseButton`.
+Extends `HelixHeadlessButton`.
 
 Four appearances, all drawn on one control so a link styled as a button and a
 real button are indistinguishable to a reader. There are no sizes: a control
@@ -645,19 +645,19 @@ ring is declared here rather than inherited, because the base layer's
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
-| `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
+| `command` | `command` | `string` | `''` | `HelixHeadlessButton` | What to send when the button is activated, and what to send it to. |
+| `commandFor` | `commandfor` | `string` | `''` | `HelixHeadlessButton` | The id of the element the command is sent to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
-| `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
+| `focusable` | - | `boolean` | `true` | `HelixHeadlessButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `label` | `label` | `string` | `''` | `HelixBaseButton` | Accessible name, for a button whose content is not text. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessButton` | Accessible name, for a button whose content is not text. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | `MixinControlSurface` | What it means. |
-| `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
+| `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixHeadlessButton` | What activating the button does to its form. |
 | `width` | `width` | `'auto' \| 'full' \| 'standard' \| undefined` | - | - | How much of the space available to it the button takes. |
 
 #### Methods
@@ -698,7 +698,7 @@ ring is declared here rather than inherited, because the base layer's
 
 Groups related buttons into one control.
 
-Extends `HelixBaseButtonGroup`.
+Extends `HelixHeadlessButtonGroup`.
 
 The buttons are joined into a single shape: the outer corners keep their
 radius, the inner ones lose it, and adjacent borders collapse into one line.
@@ -713,7 +713,7 @@ therefore serves a consumer's own anchor styled as a button.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | - | - | - | - | Whether the buttons are one bar or a spaced row. |
-| `label` | `label` | `string` | `''` | `HelixBaseButtonGroup` | Accessible name for the group. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessButtonGroup` | Accessible name for the group. |
 | `variant` | `variant` | `'joined' \| 'spaced' \| undefined` | - | - | Whether the buttons are one bar or a spaced row. |
 
 #### Slots
@@ -734,7 +734,7 @@ therefore serves a consumer's own anchor styled as a button.
 
 Sets a passage apart as information, a warning, or an error.
 
-Extends `HelixBaseCallout`.
+Extends `HelixHeadlessCallout`.
 
 Tinted from the severity's status color with `color-mix`, and marked with a
 bar on the inline start so the severity survives being read in grayscale or
@@ -747,7 +747,7 @@ headless tier; this tier only decides what that meaning looks like.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `tone` | `tone` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseCallout` | What kind of attention the passage needs. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixHeadlessCallout` | What kind of attention the passage needs. |
 
 #### Slots
 
@@ -778,7 +778,7 @@ headless tier; this tier only decides what that meaning looks like.
 
 Groups related content and actions into a single surface.
 
-Extends `HelixBaseCard`.
+Extends `HelixHeadlessCard`.
 
 Regions are slots: `media`, `header`, the default slot for content, and
 `footer`. An omitted region takes no space, so a card with only content needs
@@ -800,7 +800,7 @@ element you slotted, not a wrapper around it.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `material` | `material` | `'glass' \| undefined` | - | - | What the card is made of. |
-| `mediaPlacement` | `media-placement` | `'end' \| undefined` | - | `HelixBaseCard` | Puts the media after the content instead of before it. |
+| `mediaPlacement` | `media-placement` | `'end' \| undefined` | - | `HelixHeadlessCard` | Puts the media after the content instead of before it. |
 | `orientation` | `orientation` | `'vertical' \| 'horizontal' \| undefined` | - | - | Whether media sits above the content stack or beside it. |
 | `separation` | `separation` | `'elevated' \| 'filled' \| 'outlined' \| 'plain' \| undefined` | - | - | How the card separates itself from the page. |
 
@@ -834,7 +834,7 @@ element you slotted, not a wrapper around it.
 
 Shows one slide of several, with controls to move between them.
 
-Extends `HelixBaseCarousel`.
+Extends `HelixHeadlessCarousel`.
 
 The track scroll-snaps, so a drag and a trackpad swipe move it with the
 browser's own momentum and the controls only have to scroll.
@@ -848,26 +848,26 @@ which is what a run of cards wants rather than a run of full-width panels.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `autoplay` | `autoplay` | `boolean` | `false` | `HelixBaseCarousel` | Whether the carousel advances on its own. |
+| `autoplay` | `autoplay` | `boolean` | `false` | `HelixHeadlessCarousel` | Whether the carousel advances on its own. |
 | `controlsAlign` | `controls-align` | `'center' \| 'end' \| 'start' \| undefined` | - | - | Where along that side the arrows sit. See `indicatorAlign`. |
 | `controlsPlacement` | `controls-placement` | `'block-end' \| 'block-start' \| 'inline-end' \| 'inline-start' \| 'overlay' \| undefined` | - | - | Which side of the slides the arrows sit on. |
-| `defaultIndex` | `default-index` | `number` | `0` | `HelixBaseCarousel` | Slide to start on, where nothing declared one. |
-| `index` | `index` | `number` | - | `HelixBaseCarousel` | The slide in view, counted from zero. |
+| `defaultIndex` | `default-index` | `number` | `0` | `HelixHeadlessCarousel` | Slide to start on, where nothing declared one. |
+| `index` | `index` | `number` | - | `HelixHeadlessCarousel` | The slide in view, counted from zero. |
 | `indicatorAlign` | `indicator-align` | `'center' \| 'end' \| 'start' \| undefined` | - | - | Where along that side the dots sit. |
 | `indicatorPlacement` | `indicator-placement` | `'block-end' \| 'block-start' \| 'inline-end' \| 'inline-start' \| undefined` | - | - | Which side of the slides the dots sit on. |
-| `interval` | `interval` | `number` | `5000` | `HelixBaseCarousel` | How long each slide is held, in milliseconds. |
-| `label` | `label` | `string` | `'Carousel'` | `HelixBaseCarousel` | Accessible name for the carousel. |
-| `loop` | `loop` | `boolean` | `false` | `HelixBaseCarousel` | Whether moving past either end wraps to the other. |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseCarousel` | Which way the track runs. |
-| `perView` | `per-view` | `number \| undefined` | - | `HelixBaseCarousel` | How many slides are shown across the track at once. Absent shows one. |
-| `positions` | - | `number` | - | `HelixBaseCarousel` | How many distinct views the track holds, which is what the indicators count. |
-| `slides` | - | `HTMLElement[]` | - | `HelixBaseCarousel` | The slides, in light-DOM order. Empty on the server, which has no tree. |
+| `interval` | `interval` | `number` | `5000` | `HelixHeadlessCarousel` | How long each slide is held, in milliseconds. |
+| `label` | `label` | `string` | `'Carousel'` | `HelixHeadlessCarousel` | Accessible name for the carousel. |
+| `loop` | `loop` | `boolean` | `false` | `HelixHeadlessCarousel` | Whether moving past either end wraps to the other. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessCarousel` | Which way the track runs. |
+| `perView` | `per-view` | `number \| undefined` | - | `HelixHeadlessCarousel` | How many slides are shown across the track at once. Absent shows one. |
+| `positions` | - | `number` | - | `HelixHeadlessCarousel` | How many distinct views the track holds, which is what the indicators count. |
+| `slides` | - | `HTMLElement[]` | - | `HelixHeadlessCarousel` | The slides, in light-DOM order. Empty on the server, which has no tree. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `goTo()` | `HelixBaseCarousel` | Moves to a slide, wrapping only where `loop` says to. |
+| `goTo()` | `HelixHeadlessCarousel` | Moves to a slide, wrapping only where `loop` says to. |
 
 #### Events
 
@@ -910,7 +910,7 @@ which is what a run of cards wants rather than a run of full-width panels.
 
 A box that is ticked, or not, or neither.
 
-Extends `HelixBaseCheckbox`.
+Extends `HelixHeadlessCheckbox`.
 
 The box is the native input, restyled rather than replaced, so the tick and
 the indeterminate dash are the browser's own and the control stays a control
@@ -930,13 +930,13 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseCheckbox` | Whether the box shows as neither checked nor unchecked. |
+| `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixHeadlessCheckbox` | Whether the box shows as neither checked nor unchecked. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseCheckbox` | Focus is delegated to the input, so the host is never the focus target. |
-| `value` | `value` | `string` | `'on'` | `HelixBaseCheckbox` | Value submitted when the box is checked. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessCheckbox` | Focus is delegated to the input, so the host is never the focus target. |
+| `value` | `value` | `string` | `'on'` | `HelixHeadlessCheckbox` | Value submitted when the box is checked. |
 | `variant` | `variant` | `'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 
 #### Methods
@@ -944,7 +944,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | Method | From | Description |
 | --- | --- | --- |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `HelixBaseCheckbox` | Returns the box to the state its markup declared. |
+| `formResetCallback()` | `HelixHeadlessCheckbox` | Returns the box to the state its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerChecked` | Restores the control when the browser brings a form back. |
 | `requestChecked()` | `MixinControllerChecked` | Requests a checked change, and reports whether it was applied. |
 | `resetChecked()` | `MixinControllerChecked` | Drops the uncontrolled state, so the control reads `defaultChecked` again. |
@@ -992,7 +992,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 Groups related checkboxes, and reports them as one set.
 
-Extends `HelixBaseCheckboxGroup`.
+Extends `HelixHeadlessCheckboxGroup`.
 
 A column by default, which is what a list of choices wants: the eye scans one
 line per answer rather than hunting along a row.
@@ -1001,7 +1001,7 @@ line per answer rather than hunting along a row.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `boxes` | - | `HelixBaseCheckbox[]` | - | `HelixBaseCheckboxGroup` | The boxes, in light-DOM order. Client only: the server has no tree. |
+| `boxes` | - | `HelixHeadlessCheckbox[]` | - | `HelixHeadlessCheckboxGroup` | The boxes, in light-DOM order. Client only: the server has no tree. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -1012,7 +1012,7 @@ line per answer rather than hunting along a row.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `orientation` | `orientation` | `'horizontal' \| undefined` | - | - | Which way the boxes run. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `value` | `value` | `string` | `''` | `HelixBaseCheckboxGroup` | The checked values, comma separated. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessCheckboxGroup` | The checked values, comma separated. |
 
 #### Methods
 
@@ -1055,7 +1055,7 @@ line per answer rather than hunting along a row.
 
 A fragment of code inside a line of prose.
 
-Extends `HelixBaseCode`.
+Extends `HelixHeadlessCode`.
 
 A step down the scale, because a monospace face reads larger than the prose
 around it at the same nominal size. `--code-size` overrides it.
@@ -1085,7 +1085,7 @@ around it at the same nominal size. `--code-size` overrides it.
 
 A block of code, with somewhere to put its name and a way to take it.
 
-Extends `HelixBaseCodeBlock`.
+Extends `HelixHeadlessCodeBlock`.
 
 The header sits above the code rather than floating on it. Overlaid, which is
 the usual build, the copy button covers the first line, which is the one line
@@ -1095,8 +1095,8 @@ of a snippet a reader is most likely to be reading.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `''` | `HelixBaseCodeBlock` | What to call this block, usually a file name or a language. |
-| `noCopy` | `no-copy` | `boolean` | `false` | `HelixBaseCodeBlock` | Whether to leave the copy button off. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessCodeBlock` | What to call this block, usually a file name or a language. |
+| `noCopy` | `no-copy` | `boolean` | `false` | `HelixHeadlessCodeBlock` | Whether to leave the copy button off. |
 
 #### Slots
 
@@ -1127,7 +1127,7 @@ of a snippet a reader is most likely to be reading.
 
 A color, typed in any syntax or picked from a panel.
 
-Extends `HelixBaseColorInput`.
+Extends `HelixHeadlessColorInput`.
 
 The frame is the field rather than the input, so the trigger sits inside the
 same box as the text and the focus ring is drawn once around the whole
@@ -1149,32 +1149,32 @@ pads its own lower rows.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColorInput` | Whether the color carries an alpha channel. |
+| `alpha` | `alpha` | `boolean` | `false` | `HelixHeadlessColorInput` | Whether the color carries an alpha channel. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `format` | `format` | `ColorFormat \| undefined` | - | `HelixBaseColorInput` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
+| `format` | `format` | `ColorFormat \| undefined` | - | `HelixHeadlessColorInput` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `noFormat` | `no-format` | `boolean` | `false` | `HelixBaseColorInput` | Whether the reader may change the format from the panel. |
+| `noFormat` | `no-format` | `boolean` | `false` | `HelixHeadlessColorInput` | Whether the reader may change the format from the panel. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `'#000000'` | `HelixBaseColorInput` | What the field says before a color is in it. |
+| `placeholder` | `placeholder` | `string` | `'#000000'` | `HelixHeadlessColorInput` | What the field says before a color is in it. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `swatches` | `swatches` | `string` | `''` | `HelixBaseColorInput` | Colors offered under the picker, as a comma-separated list. |
-| `triggerLabel` | `trigger-label` | `string` | `'Choose a color'` | `HelixBaseColorInput` | Accessible name for the control that opens the panel. |
+| `swatches` | `swatches` | `string` | `''` | `HelixHeadlessColorInput` | Colors offered under the picker, as a comma-separated list. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a color'` | `HelixHeadlessColorInput` | Accessible name for the control that opens the panel. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-| `variant` | `variant` | `'swatch' \| undefined` | - | `HelixBaseColorInput` | Whether the field is a text box with a swatch on it, or only the swatch. |
+| `variant` | `variant` | `'swatch' \| undefined` | - | `HelixHeadlessColorInput` | Whether the field is a text box with a swatch on it, or only the swatch. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseColorInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `focus()` | `HelixHeadlessColorInput` | Puts the caret in the field, the way a label pointing at one would. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
@@ -1230,7 +1230,7 @@ pads its own lower rows.
 
 Picks a color, from a square and two ramps.
 
-Extends `HelixBaseColorPicker`.
+Extends `HelixHeadlessColorPicker`.
 
 **The square is painted in three layers, not composited from elements**: the
 hue underneath, white sliding in from the left to take the saturation out,
@@ -1258,27 +1258,27 @@ brought its own card would be a card inside a card there.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the color carries an alpha channel. |
-| `color` | - | `Color` | - | `HelixBaseColorPicker` | Where the picker stands: what was moved, or what the value says, or the start. |
+| `alpha` | `alpha` | `boolean` | `false` | `HelixHeadlessColorPicker` | Whether the color carries an alpha channel. |
+| `color` | - | `Color` | - | `HelixHeadlessColorPicker` | Where the picker stands: what was moved, or what the value says, or the start. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `format` | `format` | `ColorFormat \| undefined` | - | `HelixBaseColorPicker` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
-| `invalid` | `invalid` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the current selection fails validation. |
+| `format` | `format` | `ColorFormat \| undefined` | - | `HelixHeadlessColorPicker` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
+| `invalid` | `invalid` | `boolean` | `false` | `HelixHeadlessColorPicker` | Whether the current selection fails validation. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `noEyedropper` | `no-eyedropper` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the eyedropper is offered where the browser has one. |
-| `noFormat` | `no-format` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the reader may change the format. |
-| `noValue` | `no-value` | `boolean` | `false` | `HelixBaseColorPicker` | Whether to leave the value out, for a picker whose value is stated elsewhere. |
-| `swatches` | `swatches` | `string` | `''` | `HelixBaseColorPicker` | Colors offered under the picker, as a comma-separated list. |
+| `noEyedropper` | `no-eyedropper` | `boolean` | `false` | `HelixHeadlessColorPicker` | Whether the eyedropper is offered where the browser has one. |
+| `noFormat` | `no-format` | `boolean` | `false` | `HelixHeadlessColorPicker` | Whether the reader may change the format. |
+| `noValue` | `no-value` | `boolean` | `false` | `HelixHeadlessColorPicker` | Whether to leave the value out, for a picker whose value is stated elsewhere. |
+| `swatches` | `swatches` | `string` | `''` | `HelixHeadlessColorPicker` | Colors offered under the picker, as a comma-separated list. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseColorPicker` | Puts the keyboard on the square, which is the control a reader wants. |
+| `focus()` | `HelixHeadlessColorPicker` | Puts the keyboard on the square, which is the control a reader wants. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
@@ -1334,7 +1334,7 @@ brought its own card would be a card inside a card there.
 
 A field that filters a list as it is typed into.
 
-Extends `HelixBaseCombobox`.
+Extends `HelixHeadlessCombobox`.
 
 The frame is the field rather than the input, so the caret, the marks and the
 focus ring are drawn once around the whole control, which is the arrangement
@@ -1344,29 +1344,29 @@ Input, Color Input and Date Input all take.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `creatable` | `creatable` | `boolean` | `false` | `HelixBaseCombobox` | Whether the reader may answer with something the list does not hold. |
-| `createLabel` | `create-label` | `string` | `'Add'` | `HelixBaseCombobox` | What the create row says, before the words it would add. |
+| `creatable` | `creatable` | `boolean` | `false` | `HelixHeadlessCombobox` | Whether the reader may answer with something the list does not hold. |
+| `createLabel` | `create-label` | `string` | `'Add'` | `HelixHeadlessCombobox` | What the create row says, before the words it would add. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixBaseCombobox` | Words shown where the filter has hidden everything. |
+| `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixHeadlessCombobox` | Words shown where the filter has hidden everything. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `listLabel` | `list-label` | `string` | `'Options'` | `HelixBaseCombobox` | Accessible name for the list, which has no visible one of its own. |
-| `loading` | `loading` | `boolean` | `false` | `HelixBaseCombobox` | Whether the options are still on their way. |
-| `loadingText` | `loading-text` | `string` | `'Loading'` | `HelixBaseCombobox` | What the list says while they are on their way. |
-| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseCombobox` | How many tags to draw before the rest become a count. `multiple` only. |
-| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseCombobox` | Whether more than one option can be chosen. |
+| `listLabel` | `list-label` | `string` | `'Options'` | `HelixHeadlessCombobox` | Accessible name for the list, which has no visible one of its own. |
+| `loading` | `loading` | `boolean` | `false` | `HelixHeadlessCombobox` | Whether the options are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `HelixHeadlessCombobox` | What the list says while they are on their way. |
+| `maxTags` | `max-tags` | `number` | `0` | `HelixHeadlessCombobox` | How many tags to draw before the rest become a count. `multiple` only. |
+| `multiple` | `multiple` | `boolean` | `false` | `HelixHeadlessCombobox` | Whether more than one option can be chosen. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseCombobox` | Text shown while nothing has been chosen. |
-| `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseCombobox` | What a tag's remove control is called, since the mark has no name. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessCombobox` | Text shown while nothing has been chosen. |
+| `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixHeadlessCombobox` | What a tag's remove control is called, since the mark has no name. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `suggest` | `suggest` | `boolean` | `false` | `HelixBaseCombobox` | Whether the field finishes the word as it is typed. |
+| `suggest` | `suggest` | `boolean` | `false` | `HelixHeadlessCombobox` | Whether the field finishes the word as it is typed. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
@@ -1431,7 +1431,7 @@ Input, Color Input and Date Input all take.
 
 A list of commands, opened from anywhere and filtered by typing.
 
-Extends `HelixBaseCommand`.
+Extends `HelixHeadlessCommand`.
 
 The palette is a dialog holding a filterable listbox, so what this tier adds
 is where that dialog sits and how the list reads inside it. It opens against
@@ -1444,11 +1444,11 @@ otherwise walk up and down the screen under the words being typed.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `emptyText` | `empty-text` | `string` | `'No commands'` | `HelixBaseCommand` | Words shown where the filter has matched nothing. |
-| `hotkey` | `hotkey` | `string` | `'mod+k'` | `HelixBaseCommand` | The key that opens it, as `mod+k` or `shift+p` or plain `k`. |
-| `label` | `label` | `string` | `'Commands'` | `HelixBaseCommand` | Accessible name for the overlay, which has no visible heading. |
+| `emptyText` | `empty-text` | `string` | `'No commands'` | `HelixHeadlessCommand` | Words shown where the filter has matched nothing. |
+| `hotkey` | `hotkey` | `string` | `'mod+k'` | `HelixHeadlessCommand` | The key that opens it, as `mod+k` or `shift+p` or plain `k`. |
+| `label` | `label` | `string` | `'Commands'` | `HelixHeadlessCommand` | Accessible name for the overlay, which has no visible heading. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `'Search commands'` | `HelixBaseCommand` | Shown in the field before anything is typed. |
+| `placeholder` | `placeholder` | `string` | `'Search commands'` | `HelixHeadlessCommand` | Shown in the field before anything is typed. |
 
 #### Methods
 
@@ -1498,7 +1498,7 @@ otherwise walk up and down the screen under the words being typed.
 
 A button that puts a string on the clipboard and says it did.
 
-Extends `HelixBaseCopyButton`.
+Extends `HelixHeadlessCopyButton`.
 
 Takes the icon button's square box, then stacks its two faces in one grid
 cell so the press never changes the button's size. See the stylesheet: a
@@ -1509,21 +1509,21 @@ it for reassurance reads as a second, accidental press.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
-| `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
-| `copiedLabel` | `copied-label` | `string` | `'Copied'` | `HelixBaseCopyButton` | What it is called, and says, after one. |
+| `command` | `command` | `string` | `''` | `HelixHeadlessButton` | What to send when the button is activated, and what to send it to. |
+| `commandFor` | `commandfor` | `string` | `''` | `HelixHeadlessButton` | The id of the element the command is sent to. |
+| `copiedLabel` | `copied-label` | `string` | `'Copied'` | `HelixHeadlessCopyButton` | What it is called, and says, after one. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
-| `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
+| `focusable` | - | `boolean` | `true` | `HelixHeadlessButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `label` | `label` | `string` | `'Copy'` | `HelixBaseButton` | What it is called, and says, before a press. |
+| `label` | `label` | `string` | `'Copy'` | `HelixHeadlessButton` | What it is called, and says, before a press. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | `MixinControlSurface` | What it means. |
-| `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
-| `value` | `value` | `string` | `''` | `HelixBaseCopyButton` | What goes on the clipboard. |
+| `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixHeadlessButton` | What activating the button does to its form. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessCopyButton` | What goes on the clipboard. |
 
 #### Methods
 
@@ -1560,7 +1560,7 @@ it for reassurance reads as a second, accidental press.
 
 A date, typed or picked from a calendar.
 
-Extends `HelixBaseDateInput`.
+Extends `HelixHeadlessDateInput`.
 
 The frame is the field rather than the input, so the trigger sits inside the
 same box as the text and the focus ring is drawn once around the whole
@@ -1579,37 +1579,37 @@ whatever holds it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `dateStyle` | `date-style` | `'full' \| 'iso' \| 'long' \| 'medium' \| 'short'` | `'long'` | `HelixBaseDateInput` | How a date is written in the field: `short` through `full`, or ISO. |
+| `dateStyle` | `date-style` | `'full' \| 'iso' \| 'long' \| 'medium' \| 'short'` | `'long'` | `HelixHeadlessDateInput` | How a date is written in the field: `short` through `full`, or ISO. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseDateInput` | Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. |
-| `disableDays` | `disable-days` | `string` | `''` | `HelixBaseDateInput` | Days of the week that cannot be chosen, `0` for Sunday through `6`. |
+| `disableDates` | `disable-dates` | `string` | `''` | `HelixHeadlessDateInput` | Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. |
+| `disableDays` | `disable-days` | `string` | `''` | `HelixHeadlessDateInput` | Days of the week that cannot be chosen, `0` for Sunday through `6`. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixBaseDateInput` | First column of the week in the calendar, `0` for Sunday through `6`. |
+| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixHeadlessDateInput` | First column of the week in the calendar, `0` for Sunday through `6`. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseDateInput` | Language tag the calendar names its months and days in. |
-| `max` | `max` | `string` | `''` | `HelixBaseDateInput` | Latest date that can be chosen, as `YYYY-MM-DD`. |
-| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseDateInput` | How many dates are shown as tags before the rest are counted, in `multiple`. |
-| `min` | `min` | `string` | `''` | `HelixBaseDateInput` | Earliest date that can be chosen, as `YYYY-MM-DD`. |
-| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseDateInput` | How many dates can be held at once. |
-| `months` | `months` | `number` | `1` | `HelixBaseDateInput` | How many months the calendar shows, side by side. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessDateInput` | Language tag the calendar names its months and days in. |
+| `max` | `max` | `string` | `''` | `HelixHeadlessDateInput` | Latest date that can be chosen, as `YYYY-MM-DD`. |
+| `maxTags` | `max-tags` | `number` | `0` | `HelixHeadlessDateInput` | How many dates are shown as tags before the rest are counted, in `multiple`. |
+| `min` | `min` | `string` | `''` | `HelixHeadlessDateInput` | Earliest date that can be chosen, as `YYYY-MM-DD`. |
+| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixHeadlessDateInput` | How many dates can be held at once. |
+| `months` | `months` | `number` | `1` | `HelixHeadlessDateInput` | How many months the calendar shows, side by side. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `'YYYY-MM-DD'` | `HelixBaseDateInput` | What the field says before a date is in it. |
+| `placeholder` | `placeholder` | `string` | `'YYYY-MM-DD'` | `HelixHeadlessDateInput` | What the field says before a date is in it. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `triggerLabel` | `trigger-label` | `string` | `'Choose a date'` | `HelixBaseDateInput` | Accessible name for the control that opens the calendar. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a date'` | `HelixHeadlessDateInput` | Accessible name for the control that opens the calendar. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseDateInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `focus()` | `HelixHeadlessDateInput` | Puts the caret in the field, the way a label pointing at one would. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
@@ -1661,7 +1661,7 @@ whatever holds it.
 
 Shows a month, and takes a date from it.
 
-Extends `HelixBaseDatePicker`.
+Extends `HelixHeadlessDatePicker`.
 
 Six week rows always, so the grid keeps one height and a month change does
 not move whatever sits beneath it.
@@ -1678,26 +1678,26 @@ grid reads as a continuous run of dates.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `defaultMonth` | `default-month` | `string` | `''` | `HelixBaseDatePicker` | Month to open on, where nothing declared one. |
+| `defaultMonth` | `default-month` | `string` | `''` | `HelixHeadlessDatePicker` | Month to open on, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseDatePicker` | Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. |
-| `disableDays` | `disable-days` | `string` | `''` | `HelixBaseDatePicker` | Days of the week that cannot be chosen, comma separated, `0` to `6`. |
-| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixBaseDatePicker` | First column of the week, `0` for Sunday through `6` for Saturday. |
+| `disableDates` | `disable-dates` | `string` | `''` | `HelixHeadlessDatePicker` | Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. |
+| `disableDays` | `disable-days` | `string` | `''` | `HelixHeadlessDatePicker` | Days of the week that cannot be chosen, comma separated, `0` to `6`. |
+| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixHeadlessDatePicker` | First column of the week, `0` for Sunday through `6` for Saturday. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `invalid` | `invalid` | `boolean` | `false` | `HelixBaseDatePicker` | Whether the current selection fails validation. |
-| `label` | `label` | `string` | `'Date Picker'` | `HelixBaseDatePicker` | Accessible name for the grid. |
+| `invalid` | `invalid` | `boolean` | `false` | `HelixHeadlessDatePicker` | Whether the current selection fails validation. |
+| `label` | `label` | `string` | `'Date Picker'` | `HelixHeadlessDatePicker` | Accessible name for the grid. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseDatePicker` | Locale for month and day names. Absent uses the runtime's own. |
-| `max` | `max` | `string` | `''` | `HelixBaseDatePicker` | Latest selectable date, as `YYYY-MM-DD`. |
-| `min` | `min` | `string` | `''` | `HelixBaseDatePicker` | Earliest selectable date, as `YYYY-MM-DD`. |
-| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseDatePicker` | How many dates can be held at once. |
-| `month` | `month` | `string` | - | `HelixBaseDatePicker` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
-| `months` | `months` | `number` | `1` | `HelixBaseDatePicker` | How many months to show, side by side. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessDatePicker` | Locale for month and day names. Absent uses the runtime's own. |
+| `max` | `max` | `string` | `''` | `HelixHeadlessDatePicker` | Latest selectable date, as `YYYY-MM-DD`. |
+| `min` | `min` | `string` | `''` | `HelixHeadlessDatePicker` | Earliest selectable date, as `YYYY-MM-DD`. |
+| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixHeadlessDatePicker` | How many dates can be held at once. |
+| `month` | `month` | `string` | - | `HelixHeadlessDatePicker` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
+| `months` | `months` | `number` | `1` | `HelixHeadlessDatePicker` | How many months to show, side by side. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `nextLabel` | `next-label` | `string` | `'Next month'` | `HelixBaseDatePicker` | Accessible name for the control that pages forward. |
-| `previousLabel` | `previous-label` | `string` | `'Previous month'` | `HelixBaseDatePicker` | Accessible name for the control that pages back. |
+| `nextLabel` | `next-label` | `string` | `'Next month'` | `HelixHeadlessDatePicker` | Accessible name for the control that pages forward. |
+| `previousLabel` | `previous-label` | `string` | `'Previous month'` | `HelixHeadlessDatePicker` | Accessible name for the control that pages back. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
@@ -1752,7 +1752,7 @@ grid reads as a continuous run of dates.
 
 A modal window, on the platform's own dialog.
 
-Extends `HelixBaseDialog`.
+Extends `HelixHeadlessDialog`.
 
 The panel is `surface-overlay` with a shadow, because that is what it is: a
 thing over the page rather than on it. The scrim is drawn on `::backdrop`,
@@ -1765,18 +1765,18 @@ dialog rather than being a div somebody positioned.
 | --- | --- | --- | --- | --- | --- |
 | `align` | `align` | `'center' \| 'start' \| undefined` | - | - | Whether the panel's contents run from the start or center on it. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `label` | `label` | `string` | `''` | `HelixBaseDialog` | Accessible name for the dialog. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessDialog` | Accessible name for the dialog. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `persistent` | `persistent` | `boolean` | `false` | `HelixBaseDialog` | Whether Escape can close it. |
+| `persistent` | `persistent` | `boolean` | `false` | `HelixHeadlessDialog` | Whether Escape can close it. |
 | `size` | `size` | `'sm' \| 'md' \| 'lg' \| 'full' \| undefined` | - | - | How wide the panel is allowed to be. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `close()` | `HelixBaseDialog` | Asks to close, which a consumer may refuse. |
+| `close()` | `HelixHeadlessDialog` | Asks to close, which a consumer may refuse. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
-| `show()` | `HelixBaseDialog` | Moves focus into the dialog and makes the rest of the page inert. |
+| `show()` | `HelixHeadlessDialog` | Moves focus into the dialog and makes the rest of the page inert. |
 | `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
 
 #### Events
@@ -1820,7 +1820,7 @@ dialog rather than being a div somebody positioned.
 
 Separates content into groups with a rule.
 
-Extends `HelixBaseDivider`.
+Extends `HelixHeadlessDivider`.
 
 A one-pixel rule in the border color, running the full inline size by
 default. A vertical divider stretches to its flex parent instead of setting
@@ -1831,8 +1831,8 @@ tall that is.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `announced` | `announced` | `boolean` | `false` | `HelixBaseDivider` | Whether the rule is announced as a separator. |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseDivider` | Which way the rule runs. |
+| `announced` | `announced` | `boolean` | `false` | `HelixHeadlessDivider` | Whether the rule is announced as a separator. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessDivider` | Which way the rule runs. |
 
 #### Slots
 
@@ -1864,7 +1864,7 @@ tall that is.
 
 Parts of a whole as a ring, read from a table.
 
-Extends `HelixBaseDonutChart`.
+Extends `HelixHeadlessDonutChart`.
 
 The slices take the series palette in order, so a legend beside it maps the
 same twenty-four.
@@ -1890,7 +1890,7 @@ larger than the default.
 | --- | --- | --- | --- | --- | --- |
 | `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the slices claim. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
-| `hole` | `hole` | `'large' \| 'none' \| 'small' \| undefined` | - | `HelixBaseDonutChart` | How much is left open in the middle. |
+| `hole` | `hole` | `'large' \| 'none' \| 'small' \| undefined` | - | `HelixHeadlessDonutChart` | How much is left open in the middle. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `material` | `material` | `'glass' \| undefined` | - | - | What the ring is made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
@@ -1898,7 +1898,7 @@ larger than the default.
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
 | `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
-| `sweep` | `sweep` | `'half' \| undefined` | - | `HelixBaseDonutChart` | How much of the circle the whole occupies. |
+| `sweep` | `sweep` | `'half' \| undefined` | - | `HelixHeadlessDonutChart` | How much of the circle the whole occupies. |
 
 #### Slots
 
@@ -1936,7 +1936,7 @@ larger than the default.
 
 A panel that slides in from an edge.
 
-Extends `HelixBaseDrawer`.
+Extends `HelixHeadlessDrawer`.
 
 The panel translates and the scrim fades, both on transform and opacity only,
 which is the one place motion is allowed to carry the work: the surface at
@@ -1947,11 +1947,11 @@ rest is flat and the movement is what says something happened.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `label` | `label` | `string` | `''` | `HelixBaseDrawer` | Accessible name for the panel. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessDrawer` | Accessible name for the panel. |
 | `material` | `material` | `'glass' \| undefined` | - | - | Whether the panel is glass rather than opaque. |
-| `modal` | `modal` | `boolean` | `true` | `HelixBaseDrawer` | Whether the drawer blocks the page behind it. |
+| `modal` | `modal` | `boolean` | `true` | `HelixHeadlessDrawer` | Whether the drawer blocks the page behind it. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placement` | `placement` | `'start' \| 'end' \| 'top' \| 'bottom' \| undefined` | - | `HelixBaseDrawer` | Which edge the drawer comes from. |
+| `placement` | `placement` | `'start' \| 'end' \| 'top' \| 'bottom' \| undefined` | - | `HelixHeadlessDrawer` | Which edge the drawer comes from. |
 
 #### Methods
 
@@ -2003,7 +2003,7 @@ rest is flat and the movement is what says something happened.
 
 A stack of pages, one showing at a time, with a way back.
 
-Extends `HelixBaseDrilldown`.
+Extends `HelixHeadlessDrilldown`.
 
 **The pages slide, and the direction is the point.** Both moves replace one
 page with another, so with no motion a reader cannot tell whether they went
@@ -2019,9 +2019,9 @@ from: the page arriving was not in the DOM a frame ago. Under
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseDrilldown` | What the control returning from a page reads. |
+| `backLabel` | `back-label` | `string` | `'Back'` | `HelixHeadlessDrilldown` | What the control returning from a page reads. |
 | `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
-| `label` | `label` | `string` | `'Navigation'` | `HelixBaseDrilldown` | Accessible name for the region. |
+| `label` | `label` | `string` | `'Navigation'` | `HelixHeadlessDrilldown` | Accessible name for the region. |
 | `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
 | `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
 
@@ -2029,7 +2029,7 @@ from: the page arriving was not in the DOM a frame ago. Under
 
 | Method | From | Description |
 | --- | --- | --- |
-| `back()` | `HelixBaseDrilldown` | Returns one page, and reports whether there was one to return to. |
+| `back()` | `HelixHeadlessDrilldown` | Returns one page, and reports whether there was one to return to. |
 
 #### Events
 
@@ -2064,7 +2064,7 @@ from: the page arriving was not in the DOM a frame ago. Under
 
 One row of a drill-down, which may hold a page of its own.
 
-Extends `HelixBaseDrilldownItem`.
+Extends `HelixHeadlessDrilldownItem`.
 
 A row is a full-width band rather than an inset pill, for the reason the
 select's options are: it reaches both edges of the panel, so a highlight
@@ -2074,18 +2074,18 @@ lines up with the edge the eye is already following down the list.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether the row can be reached at all. |
-| `focusable` | - | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether this row holds the region's tab stop. Written by the stack. |
-| `onPage` | - | `boolean` | `true` | `HelixBaseDrilldownItem` | Whether the page showing is the one this row is on. Written by the stack. |
-| `showingPage` | - | `boolean` | `false` | `HelixBaseDrilldownItem` | Whether this row's own page is the one showing. Written by the stack. |
-| `value` | `value` | `string` | `''` | `HelixBaseDrilldownItem` | Identifies the row to whatever is listening. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessDrilldownItem` | Whether the row can be reached at all. |
+| `focusable` | - | `boolean` | `false` | `HelixHeadlessDrilldownItem` | Whether this row holds the region's tab stop. Written by the stack. |
+| `onPage` | - | `boolean` | `true` | `HelixHeadlessDrilldownItem` | Whether the page showing is the one this row is on. Written by the stack. |
+| `showingPage` | - | `boolean` | `false` | `HelixHeadlessDrilldownItem` | Whether this row's own page is the one showing. Written by the stack. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessDrilldownItem` | Identifies the row to whatever is listening. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focusItem()` | `HelixBaseDrilldownItem` | Moves focus onto the row itself. |
-| `select()` | `HelixBaseDrilldownItem` | Announces that this row was chosen. |
+| `focusItem()` | `HelixHeadlessDrilldownItem` | Moves focus onto the row itself. |
+| `select()` | `HelixHeadlessDrilldownItem` | Announces that this row was chosen. |
 
 #### Events
 
@@ -2121,7 +2121,7 @@ lines up with the edge the eye is already following down the list.
 
 Says that a region has nothing in it, and what to do about it.
 
-Extends `HelixBaseEmpty`.
+Extends `HelixHeadlessEmpty`.
 
 Centered and given room, because an empty view is the only thing on screen
 and crowding it against the top edge makes the region look broken rather than
@@ -2131,7 +2131,7 @@ empty.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `noAnnounce` | `no-announce` | `boolean` | `false` | `HelixBaseEmpty` | Whether the state is announced when it appears. |
+| `noAnnounce` | `no-announce` | `boolean` | `false` | `HelixHeadlessEmpty` | Whether the state is announced when it appears. |
 
 #### Slots
 
@@ -2154,7 +2154,7 @@ empty.
 
 A control for choosing files, by pointer or by dropping them on it.
 
-Extends `HelixBaseFileInput`.
+Extends `HelixHeadlessFileInput`.
 
 The field is a box rather than a line, because nothing is typed into it: its
 height is not a line of text, and what a reader aims at is the whole area. The
@@ -2174,32 +2174,32 @@ invisible.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `accept` | `accept` | `string` | `''` | `HelixBaseFileInput` | Which files the picker offers, as a native `accept` list. |
-| `capture` | `capture` | `'environment' \| 'user' \| undefined` | - | `HelixBaseFileInput` | Which camera or microphone a mobile picker should offer, if any. |
+| `accept` | `accept` | `string` | `''` | `HelixHeadlessFileInput` | Which files the picker offers, as a native `accept` list. |
+| `capture` | `capture` | `'environment' \| 'user' \| undefined` | - | `HelixHeadlessFileInput` | Which camera or microphone a mobile picker should offer, if any. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `files` | - | `File[]` | - | `HelixBaseFileInput` | The files chosen, which is the element's own and never assigned. |
+| `files` | - | `File[]` | - | `HelixHeadlessFileInput` | The files chosen, which is the element's own and never assigned. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseFileInput` | Language tag the sizes are written in. Absent uses the runtime's own. |
-| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseFileInput` | Whether more than one file can be chosen. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessFileInput` | Language tag the sizes are written in. Absent uses the runtime's own. |
+| `multiple` | `multiple` | `boolean` | `false` | `HelixHeadlessFileInput` | Whether more than one file can be chosen. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseFileInput` | What the control removing one file is called, per file. |
+| `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixHeadlessFileInput` | What the control removing one file is called, per file. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `triggerLabel` | `trigger-label` | `string` | `'Choose files'` | `HelixBaseFileInput` | What the trigger reads, where nothing is slotted into it. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose files'` | `HelixHeadlessFileInput` | What the trigger reads, where nothing is slotted into it. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `clear()` | `HelixBaseFileInput` | Takes every file back out. |
-| `focus()` | `HelixBaseFileInput` | Puts focus on the input, the way a label pointing at one would. |
+| `clear()` | `HelixHeadlessFileInput` | Takes every file back out. |
+| `focus()` | `HelixHeadlessFileInput` | Puts focus on the input, the way a label pointing at one would. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `HelixBaseFileInput` | Empties it, which is what a form reset means for a file input. |
-| `removeAt()` | `HelixBaseFileInput` | Drops one file, by index. |
+| `formResetCallback()` | `HelixHeadlessFileInput` | Empties it, which is what a form reset means for a file input. |
+| `removeAt()` | `HelixHeadlessFileInput` | Drops one file, by index. |
 
 #### Events
 
@@ -2314,7 +2314,7 @@ Presentation only, so there is no headless tier.
 
 Renders a named icon from the Helix set.
 
-Extends `HelixBaseIcon`.
+Extends `HelixHeadlessIcon`.
 
 Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
 color of the text it sits in and a container can resize it without reaching
@@ -2325,8 +2325,8 @@ proportion as the button's own size changes.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `''` | `HelixBaseIcon` | Accessible name, for an icon that is not decorative. |
-| `name` | `name` | `string` | `''` | `HelixBaseIcon` | Name of the icon in the Helix set. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessIcon` | Accessible name, for an icon that is not decorative. |
+| `name` | `name` | `string` | `''` | `HelixHeadlessIcon` | Name of the icon in the Helix set. |
 
 #### Parts
 
@@ -2346,7 +2346,7 @@ proportion as the button's own size changes.
 
 A square button whose content is an icon.
 
-Extends `HelixBaseIconButton`.
+Extends `HelixHeadlessIconButton`.
 
 Top-level rather than `Button.Icon`, because a namespace means composition:
 `Card.Header` is part of a card, and an icon-only button is not part of a
@@ -2361,21 +2361,21 @@ common way a toolbar becomes unusable without sight.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
-| `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
+| `command` | `command` | `string` | `''` | `HelixHeadlessButton` | What to send when the button is activated, and what to send it to. |
+| `commandFor` | `commandfor` | `string` | `''` | `HelixHeadlessButton` | The id of the element the command is sent to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
-| `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
+| `focusable` | - | `boolean` | `true` | `HelixHeadlessButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `label` | `label` | `string` | `''` | `HelixBaseButton` | Accessible name, for a button whose content is not text. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessButton` | Accessible name, for a button whose content is not text. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `raised` | `raised` | `boolean` | `false` | - | Whether it is raised off the page it sits on. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `shape` | `shape` | `'circle' \| undefined` | - | - | The outline it is cut to, which is an axis of its own and not a value on one. |
 | `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | `MixinControlSurface` | What it means. |
-| `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
+| `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixHeadlessButton` | What activating the button does to its form. |
 
 #### Methods
 
@@ -2411,7 +2411,7 @@ common way a toolbar becomes unusable without sight.
 
 A picture that says whether it arrived.
 
-Extends `HelixBaseImage`.
+Extends `HelixHeadlessImage`.
 
 Presentation only: the box the picture is given, how it fills it, and the
 fade when it lands. What the three states are and when they change is the
@@ -2421,14 +2421,14 @@ base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `alt` | `alt` | `string` | `''` | `HelixBaseImage` | What it shows, for a reader who cannot see it. |
-| `fetchPriority` | `fetch-priority` | `'auto' \| 'high' \| 'low'` | `'auto'` | `HelixBaseImage` | How urgently to fetch it, for the one picture that is the page. |
-| `loading` | `loading` | `'eager' \| 'lazy' \| undefined` | - | `HelixBaseImage` | Whether to wait until it is nearly on screen. |
+| `alt` | `alt` | `string` | `''` | `HelixHeadlessImage` | What it shows, for a reader who cannot see it. |
+| `fetchPriority` | `fetch-priority` | `'auto' \| 'high' \| 'low'` | `'auto'` | `HelixHeadlessImage` | How urgently to fetch it, for the one picture that is the page. |
+| `loading` | `loading` | `'eager' \| 'lazy' \| undefined` | - | `HelixHeadlessImage` | Whether to wait until it is nearly on screen. |
 | `rounded` | `rounded` | `boolean` | `false` | - | Whether the corners are cut. |
-| `sizes` | `sizes` | `string` | `''` | `HelixBaseImage` | How much of the line it will take, passed through to the picture. |
-| `src` | `src` | `string` | `''` | `HelixBaseImage` | Where the picture is. |
-| `srcset` | `srcset` | `string` | `''` | `HelixBaseImage` | The candidate widths, passed through to the picture. |
-| `status` | - | `'error' \| 'loaded' \| 'loading'` | `'loading'` | `HelixBaseImage` | Whether the picture is on its way, here, or never coming. |
+| `sizes` | `sizes` | `string` | `''` | `HelixHeadlessImage` | How much of the line it will take, passed through to the picture. |
+| `src` | `src` | `string` | `''` | `HelixHeadlessImage` | Where the picture is. |
+| `srcset` | `srcset` | `string` | `''` | `HelixHeadlessImage` | The candidate widths, passed through to the picture. |
+| `status` | - | `'error' \| 'loaded' \| 'loading'` | `'loading'` | `HelixHeadlessImage` | Whether the picture is on its way, here, or never coming. |
 
 #### Events
 
@@ -2468,7 +2468,7 @@ base class.
 
 A single line of text a reader types into.
 
-Extends `HelixBaseInput`.
+Extends `HelixHeadlessInput`.
 
 The frame is the field rather than the input, so anything slotted at either
 end sits inside the same box as the text and the focus ring is drawn once,
@@ -2486,8 +2486,8 @@ whatever holds it, not a `size` here. Invalid styling waits for
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `clearable` | `clearable` | `boolean` | `false` | `HelixBaseInput` | Whether the field offers a button that empties it. |
-| `clearLabel` | `clear-label` | `string` | `'Clear'` | `HelixBaseInput` | What the clear button is called, since an icon has no name of its own. |
+| `clearable` | `clearable` | `boolean` | `false` | `HelixHeadlessInput` | Whether the field offers a button that empties it. |
+| `clearLabel` | `clear-label` | `string` | `'Clear'` | `HelixHeadlessInput` | What the clear button is called, since an icon has no name of its own. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
@@ -2496,29 +2496,29 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `maxLength` | `maxlength` | `number \| undefined` | - | `HelixBaseInput` | Most characters the value may have. |
-| `minLength` | `minlength` | `number \| undefined` | - | `HelixBaseInput` | Fewest characters the value may have. |
+| `maxLength` | `maxlength` | `number \| undefined` | - | `HelixHeadlessInput` | Most characters the value may have. |
+| `minLength` | `minlength` | `number \| undefined` | - | `HelixHeadlessInput` | Fewest characters the value may have. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `pattern` | `pattern` | `string` | `''` | `HelixBaseInput` | A regular expression the value has to match, as the platform reads it. |
-| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInput` | Whether the field refuses input while still submitting its value. |
+| `pattern` | `pattern` | `string` | `''` | `HelixHeadlessInput` | A regular expression the value has to match, as the platform reads it. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `reveal` | `reveal` | `boolean` | `false` | `HelixBaseInput` | Whether a password field offers a toggle that shows what was typed. |
-| `revealLabel` | `reveal-label` | `string` | `'Show password'` | `HelixBaseInput` | What the reveal toggle is called. The state is `aria-pressed`, not this. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseInput` | Focus is delegated to the input, so the host is never the focus target. |
-| `type` | `type` | `InputType` | `'text'` | `HelixBaseInput` | What the field accepts, which decides the keyboard and the validation. |
+| `reveal` | `reveal` | `boolean` | `false` | `HelixHeadlessInput` | Whether a password field offers a toggle that shows what was typed. |
+| `revealLabel` | `reveal-label` | `string` | `'Show password'` | `HelixHeadlessInput` | What the reveal toggle is called. The state is `aria-pressed`, not this. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessInput` | Focus is delegated to the input, so the host is never the focus target. |
+| `type` | `type` | `InputType` | `'text'` | `HelixHeadlessInput` | What the field accepts, which decides the keyboard and the validation. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `focus()` | `HelixHeadlessInput` | Puts the caret in the field, the way a label pointing at one would. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-| `select()` | `HelixBaseInput` | Selects everything in the field. |
+| `select()` | `HelixHeadlessInput` | Selects everything in the field. |
 
 #### Events
 
@@ -2557,7 +2557,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 
 A keyboard key or chord, set inline with text.
 
-Extends `HelixBaseKbd`.
+Extends `HelixHeadlessKbd`.
 
 Drawn as a physical key: a hairline, a sunken fill, and one inset shadow
 along the bottom edge that reads as depth without becoming a picture of a
@@ -2591,7 +2591,7 @@ than holding one size and looking wrong in a heading.
 
 The names a chart draws, each beside the color it is drawn in.
 
-Extends `HelixBaseLegend`.
+Extends `HelixHeadlessLegend`.
 
 A row that wraps, because a legend sits under a chart as wide as the chart
 and there is no arrangement of eight names that fits every width. Set
@@ -2607,8 +2607,8 @@ custom property set inline would be the headless tier naming a color.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `emphasis` | `emphasis` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much ink the swatches claim. |
-| `entries` | `entries` | `'categories' \| 'series' \| undefined` | - | `HelixBaseLegend` | Which way to read the table. |
-| `for` | `for` | `string` | `''` | `HelixBaseLegend` | The id of the table to take the names from. |
+| `entries` | `entries` | `'categories' \| 'series' \| undefined` | - | `HelixHeadlessLegend` | Which way to read the table. |
+| `for` | `for` | `string` | `''` | `HelixHeadlessLegend` | The id of the table to take the names from. |
 | `glass` | `glass` | `string \| undefined` | - | - | Which entries are glass rather than solid, by name. Matched as `outlined` is. |
 | `material` | `material` | `'glass' \| undefined` | - | - | What the swatches are made of. |
 | `outlined` | `outlined` | `string \| undefined` | - | - | Which entries are drawn as an outline rather than a fill, by name. |
@@ -2639,7 +2639,7 @@ custom property set inline would be the headless tier naming a color.
 
 A series over time as a line, read from a table.
 
-Extends `HelixBaseLineChart`.
+Extends `HelixHeadlessLineChart`.
 
 The lines take the series palette in order, so a chart of one is series one
 and a chart of four is the first four, and a legend beside it maps the same
@@ -2657,11 +2657,11 @@ answers for a shape.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `area` | `area` | `boolean` | `false` | `HelixBaseLineChart` | Whether a wash is drawn under each line. |
-| `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseLineChart` | How the line gets from one reading to the next. |
+| `area` | `area` | `boolean` | `false` | `HelixHeadlessLineChart` | Whether a wash is drawn under each line. |
+| `curve` | `curve` | `Curve \| undefined` | - | `HelixHeadlessLineChart` | How the line gets from one reading to the next. |
 | `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the lines claim. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
-| `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixBaseLineChart` | Which rules are drawn across the plot, if any. |
+| `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixHeadlessLineChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `material` | `material` | `'glass' \| undefined` | - | - | What the lines are made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
@@ -2669,7 +2669,7 @@ answers for a shape.
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
 | `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
-| `zero` | `zero` | `boolean` | `false` | `HelixBaseLineChart` | Whether zero is forced into the range. |
+| `zero` | `zero` | `boolean` | `false` | `HelixHeadlessLineChart` | Whether zero is forced into the range. |
 
 #### Parts
 
@@ -2710,7 +2710,7 @@ answers for a shape.
 
 A set of rows, read as a set.
 
-Extends `HelixBaseList`.
+Extends `HelixHeadlessList`.
 
 Rules between rows rather than around each one, so a list reads as one object
 with divisions instead of as a stack of cards. `divided` is off by default,
@@ -2722,8 +2722,8 @@ decoration doing what emptiness already does.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `divided` | `divided` | `boolean` | `false` | - | Whether a rule sits between rows. |
-| `kind` | `kind` | `'default' \| 'description' \| 'ordered' \| 'unordered' \| undefined` | - | `HelixBaseList` | What kind of list this is, which is a fact about the content. |
-| `label` | `label` | `string` | `''` | `HelixBaseList` | Accessible name for the set. |
+| `kind` | `kind` | `'default' \| 'description' \| 'ordered' \| 'unordered' \| undefined` | - | `HelixHeadlessList` | What kind of list this is, which is a fact about the content. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessList` | Accessible name for the set. |
 
 #### Slots
 
@@ -2742,7 +2742,7 @@ decoration doing what emptiness already does.
 
 One row of a list.
 
-Extends `HelixBaseListItem`.
+Extends `HelixHeadlessListItem`.
 
 A grid rather than a flex row, so the supporting text lines up under the
 label rather than under the leading icon. The leading and trailing regions
@@ -2752,9 +2752,9 @@ hold their own width and the middle takes the rest.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `href` | `href` | `string` | `''` | `HelixBaseListItem` | Where the row goes, and nothing when it goes nowhere. |
-| `rel` | `rel` | `string` | `''` | `HelixBaseListItem` | What the link declares about where it goes. The consumer's decision rather than one derived from `target`, for the reason `Tree.Item` gives. |
-| `target` | `target` | `string` | `''` | `HelixBaseListItem` | Where the link opens, for the rare row that leaves the site. |
+| `href` | `href` | `string` | `''` | `HelixHeadlessListItem` | Where the row goes, and nothing when it goes nowhere. |
+| `rel` | `rel` | `string` | `''` | `HelixHeadlessListItem` | What the link declares about where it goes. The consumer's decision rather than one derived from `target`, for the reason `Tree.Item` gives. |
+| `target` | `target` | `string` | `''` | `HelixHeadlessListItem` | Where the link opens, for the rare row that leaves the site. |
 
 #### Slots
 
@@ -2784,7 +2784,7 @@ hold their own width and the middle takes the rest.
 
 A list of options, one or several of which are the answer.
 
-Extends `HelixBaseListbox`.
+Extends `HelixHeadlessListbox`.
 
 A framed, scrolling list with the field's three parts around it. The frame is
 the list rather than the host, so a filter that empties it leaves a box with
@@ -2798,14 +2798,14 @@ list moves under the reader rather than the reader moving to find it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `defaultFilter` | `default-filter` | `string` | `''` | `HelixBaseListbox` | What to start narrowed to, where nothing declared it. |
+| `defaultFilter` | `default-filter` | `string` | `''` | `HelixHeadlessListbox` | What to start narrowed to, where nothing declared it. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `filter` | `filter` | `string` | - | `HelixBaseListbox` | What the list is narrowed to, if anything. |
-| `filterable` | `filterable` | `boolean` | `false` | `HelixBaseListbox` | Whether the list renders a field for narrowing itself. |
-| `filterLabel` | `filter-label` | `string` | `'Filter'` | `HelixBaseListbox` | Placeholder for the field that narrows the list. |
+| `filter` | `filter` | `string` | - | `HelixHeadlessListbox` | What the list is narrowed to, if anything. |
+| `filterable` | `filterable` | `boolean` | `false` | `HelixHeadlessListbox` | Whether the list renders a field for narrowing itself. |
+| `filterLabel` | `filter-label` | `string` | `'Filter'` | `HelixHeadlessListbox` | Placeholder for the field that narrows the list. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
@@ -2813,13 +2813,13 @@ list moves under the reader rather than the reader moving to find it.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
 | `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
-| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseListbox` | Whether more than one option can be the answer. |
+| `multiple` | `multiple` | `boolean` | `false` | `HelixHeadlessListbox` | Whether more than one option can be the answer. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `options` | - | `HelixBaseOption[]` | - | `HelixBaseListbox` | Every option, in the order a reader meets them. |
+| `options` | - | `HelixHeadlessOption[]` | - | `HelixHeadlessListbox` | Every option, in the order a reader meets them. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseListbox` | Focusing the host focuses the list inside it. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessListbox` | Focusing the host focuses the list inside it. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-| `values` | - | `string[]` | - | `HelixBaseListbox` | The chosen values, which is a list whether or not `multiple` is set. |
+| `values` | - | `string[]` | - | `HelixHeadlessListbox` | The chosen values, which is a list whether or not `multiple` is set. |
 
 #### Methods
 
@@ -2828,10 +2828,10 @@ list moves under the reader rather than the reader moving to find it.
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
-| `navigate()` | `HelixBaseListbox` | Runs the list's own key handling for a caller whose focus is elsewhere. |
-| `requestFilter()` | `HelixBaseListbox` | Requests a narrowing, and reports whether the request stood. |
+| `navigate()` | `HelixHeadlessListbox` | Runs the list's own key handling for a caller whose focus is elsewhere. |
+| `requestFilter()` | `HelixHeadlessListbox` | Requests a narrowing, and reports whether the request stood. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-| `reveal()` | `HelixBaseListbox` | Brings the chosen option to rest in the middle of the list. |
+| `reveal()` | `HelixHeadlessListbox` | Brings the chosen option to rest in the middle of the list. |
 
 #### Events
 
@@ -2874,7 +2874,7 @@ list moves under the reader rather than the reader moving to find it.
 
 Says that something indeterminate is in progress.
 
-Extends `HelixBaseLoader`.
+Extends `HelixHeadlessLoader`.
 
 Sized in `em`, so it matches whatever text it sits beside without being told.
 The color is `currentColor` for the same reason: a loader inside a primary
@@ -2885,7 +2885,7 @@ to say so.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `'Loading'` | `HelixBaseLoader` | Accessible name, announced while the work is outstanding. |
+| `label` | `label` | `string` | `'Loading'` | `HelixHeadlessLoader` | Accessible name, announced while the work is outstanding. |
 | `size` | `size` | `'sm' \| 'md' \| 'lg' \| undefined` | - | - | Diameter relative to the surrounding text. |
 | `variant` | `variant` | `'pulse' \| undefined` | - | - | How the waiting is drawn. |
 
@@ -2918,7 +2918,7 @@ to say so.
 
 A section of a navigation that opens a panel of destinations.
 
-Extends `HelixBaseMegamenu`.
+Extends `HelixHeadlessMegamenu`.
 
 Presentation only: the trigger, and the panel it opens as a grid of columns.
 Everything about what opens it and what closes it is the base class.
@@ -2928,11 +2928,11 @@ Everything about what opens it and what closes it is the base class.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `fullBelow` | `full-below` | `number` | `640` | `HelixBaseMegamenu` | The width, in pixels, under which a card becomes a band. Zero never does. |
-| `label` | `label` | `string` | `''` | `HelixBaseMegamenu` | The section's name, which names the default trigger and the panel. |
+| `fullBelow` | `full-below` | `number` | `640` | `HelixHeadlessMegamenu` | The width, in pixels, under which a card becomes a band. Zero never does. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessMegamenu` | The section's name, which names the default trigger and the panel. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `openOn` | `open-on` | `'click' \| 'hover'` | `'hover'` | `HelixBaseMegamenu` | Whether hovering the trigger opens the panel, or only a press does. |
-| `variant` | `variant` | `'full' \| undefined` | - | `HelixBaseMegamenu` | Whether the panel is a card under the trigger or a band across the page. |
+| `openOn` | `open-on` | `'click' \| 'hover'` | `'hover'` | `HelixHeadlessMegamenu` | Whether hovering the trigger opens the panel, or only a press does. |
+| `variant` | `variant` | `'full' \| undefined` | - | `HelixHeadlessMegamenu` | Whether the panel is a card under the trigger or a band across the page. |
 
 #### Methods
 
@@ -2981,7 +2981,7 @@ Everything about what opens it and what closes it is the base class.
 
 A menu of commands, opened from a trigger.
 
-Extends `HelixBaseMenu`.
+Extends `HelixHeadlessMenu`.
 
 The surface is in the top layer, so it needs no `z-index` and cannot be
 clipped by whatever it sits inside.
@@ -2993,23 +2993,23 @@ one panel and reads the same on a phone as on a desk.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseMenu` | What the row returning from a submenu reads. |
+| `backLabel` | `back-label` | `string` | `'Back'` | `HelixHeadlessMenu` | What the row returning from a submenu reads. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
-| `label` | `label` | `string` | `'Menu'` | `HelixBaseMenu` | Accessible name for the surface. |
+| `label` | `label` | `string` | `'Menu'` | `HelixHeadlessMenu` | Accessible name for the surface. |
 | `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
 | `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
-| `offset` | `offset` | `number` | `4` | `HelixBaseMenu` | Space between the trigger and the surface, in pixels. |
+| `offset` | `offset` | `number` | `4` | `HelixHeadlessMenu` | Space between the trigger and the surface, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixBaseMenu` | Preferred side. It moves if that side does not fit. |
+| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixHeadlessMenu` | Preferred side. It moves if that side does not fit. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `hide()` | `HelixBaseMenu` | Closes the menu, and forgets which page was showing. |
+| `hide()` | `HelixHeadlessMenu` | Closes the menu, and forgets which page was showing. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
-| `show()` | `HelixBaseMenu` | Opens the menu. |
+| `show()` | `HelixHeadlessMenu` | Opens the menu. |
 | `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
 
 #### Events
@@ -3052,7 +3052,7 @@ one panel and reads the same on a phone as on a desk.
 
 One row in a menu: a command, a choice, or a way into a submenu.
 
-Extends `HelixBaseMenuItem`.
+Extends `HelixHeadlessMenuItem`.
 
 The tick and the arrow hold their space whether or not they are showing, so
 the labels in a menu start at one place and the rows read as a column rather
@@ -3062,26 +3062,26 @@ than as a ragged list.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `checkable` | `checkable` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the row is one of a set of choices. |
-| `checked` | `checked` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the row is ticked. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the row can be chosen. |
-| `download` | `download` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the link saves the file rather than opening it. |
-| `hasSubmenu` | - | `boolean` | - | `HelixBaseMenuItem` | Whether anything was slotted into `submenu`. |
-| `href` | `href` | `string` | `''` | `HelixBaseMenuItem` | Where the row goes, which makes it a real link. |
-| `onPage` | - | `boolean` | `true` | `HelixBaseMenuItem` | Whether this row is on the page currently showing. |
-| `rel` | `rel` | `string` | `''` | `HelixBaseMenuItem` | The relationship, which `target="_blank"` should always set. |
-| `selected` | - | `boolean` | - | `HelixBaseMenuItem` | Whether this is the row the set is on, which in a menu is where focus is. |
-| `showingSubmenu` | - | `boolean` | `false` | `HelixBaseMenuItem` | Whether this row's submenu is the page showing. |
-| `target` | `target` | `string` | `''` | `HelixBaseMenuItem` | Where the link opens, for the rows that should leave the page. |
-| `value` | `value` | `string` | `''` | `HelixBaseMenuItem` | What this row stands for, carried in the event when it is chosen. |
+| `checkable` | `checkable` | `boolean` | `false` | `HelixHeadlessMenuItem` | Whether the row is one of a set of choices. |
+| `checked` | `checked` | `boolean` | `false` | `HelixHeadlessMenuItem` | Whether the row is ticked. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessMenuItem` | Whether the row can be chosen. |
+| `download` | `download` | `boolean` | `false` | `HelixHeadlessMenuItem` | Whether the link saves the file rather than opening it. |
+| `hasSubmenu` | - | `boolean` | - | `HelixHeadlessMenuItem` | Whether anything was slotted into `submenu`. |
+| `href` | `href` | `string` | `''` | `HelixHeadlessMenuItem` | Where the row goes, which makes it a real link. |
+| `onPage` | - | `boolean` | `true` | `HelixHeadlessMenuItem` | Whether this row is on the page currently showing. |
+| `rel` | `rel` | `string` | `''` | `HelixHeadlessMenuItem` | The relationship, which `target="_blank"` should always set. |
+| `selected` | - | `boolean` | - | `HelixHeadlessMenuItem` | Whether this is the row the set is on, which in a menu is where focus is. |
+| `showingSubmenu` | - | `boolean` | `false` | `HelixHeadlessMenuItem` | Whether this row's submenu is the page showing. |
+| `target` | `target` | `string` | `''` | `HelixHeadlessMenuItem` | Where the link opens, for the rows that should leave the page. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessMenuItem` | What this row stands for, carried in the event when it is chosen. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseMenuItem` | Moves focus onto the row itself. |
-| `focusItem()` | `HelixBaseMenuItem` | `NavigableItem`, so the arrow keys can be the shared controller's business. |
-| `select()` | `HelixBaseMenuItem` | Chooses the row, which is the same act as pressing it. |
+| `focus()` | `HelixHeadlessMenuItem` | Moves focus onto the row itself. |
+| `focusItem()` | `HelixHeadlessMenuItem` | `NavigableItem`, so the arrow keys can be the shared controller's business. |
+| `select()` | `HelixHeadlessMenuItem` | Chooses the row, which is the same act as pressing it. |
 
 #### Events
 
@@ -3118,7 +3118,7 @@ than as a ragged list.
 
 A measurement in a known range, and whether it is where you want it.
 
-Extends `HelixBaseMeter`.
+Extends `HelixHeadlessMeter`.
 
 The bar `Progress` draws, at twice the height and on the house corner rather
 than its pill.
@@ -3153,18 +3153,18 @@ reading are what say how far past.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `band` | `band` | `MeterBand \| undefined` | - | `HelixBaseMeter` | The band, said outright, where the three thresholds cannot say it. |
+| `band` | `band` | `MeterBand \| undefined` | - | `HelixHeadlessMeter` | The band, said outright, where the three thresholds cannot say it. |
 | `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the reading claims. |
-| `high` | `high` | `number \| undefined` | - | `HelixBaseMeter` | Bottom of the high band. Absent leaves the range unbanded. |
-| `label` | `label` | `string` | `'Meter'` | `HelixBaseMeter` | Accessible name for the reading. |
-| `low` | `low` | `number \| undefined` | - | `HelixBaseMeter` | Top of the low band. Absent leaves the range unbanded. |
-| `max` | `max` | `number` | `100` | `HelixBaseMeter` | Top of the range. |
-| `min` | `min` | `number` | `0` | `HelixBaseMeter` | Bottom of the range. |
-| `optimum` | `optimum` | `number \| undefined` | - | `HelixBaseMeter` | Where in the range it is best to be. |
-| `shape` | `shape` | `'arc' \| 'ring' \| undefined` | - | `HelixBaseMeter` | Whether the reading is drawn as a bar, a ring or an arc. |
-| `showValue` | `show-value` | `boolean` | `false` | `HelixBaseMeter` | Whether the reading is shown beside the bar. |
-| `value` | `value` | `number` | `0` | `HelixBaseMeter` | Where the reading sits between `min` and `max`. Outside them, it clamps. |
-| `valueText` | `value-text` | `string` | `''` | `HelixBaseMeter` | What the reading says, where a number is not the whole story. |
+| `high` | `high` | `number \| undefined` | - | `HelixHeadlessMeter` | Bottom of the high band. Absent leaves the range unbanded. |
+| `label` | `label` | `string` | `'Meter'` | `HelixHeadlessMeter` | Accessible name for the reading. |
+| `low` | `low` | `number \| undefined` | - | `HelixHeadlessMeter` | Top of the low band. Absent leaves the range unbanded. |
+| `max` | `max` | `number` | `100` | `HelixHeadlessMeter` | Top of the range. |
+| `min` | `min` | `number` | `0` | `HelixHeadlessMeter` | Bottom of the range. |
+| `optimum` | `optimum` | `number \| undefined` | - | `HelixHeadlessMeter` | Where in the range it is best to be. |
+| `shape` | `shape` | `'arc' \| 'ring' \| undefined` | - | `HelixHeadlessMeter` | Whether the reading is drawn as a bar, a ring or an arc. |
+| `showValue` | `show-value` | `boolean` | `false` | `HelixHeadlessMeter` | Whether the reading is shown beside the bar. |
+| `value` | `value` | `number` | `0` | `HelixHeadlessMeter` | Where the reading sits between `min` and `max`. Outside them, it clamps. |
+| `valueText` | `value-text` | `string` | `''` | `HelixHeadlessMeter` | What the reading says, where a number is not the whole story. |
 
 #### Parts
 
@@ -3197,7 +3197,7 @@ reading are what say how far past.
 
 A set of destinations, with a marker on the current one.
 
-Extends `HelixBaseNavigation`.
+Extends `HelixHeadlessNavigation`.
 
 One marker that travels, rather than a background that appears on whichever
 destination is current. A fill that swaps is two things changing at once and
@@ -3208,7 +3208,7 @@ says where the current page was as well as where it is.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `'Main'` | `HelixBaseNavigation` | Accessible name for the landmark. |
+| `label` | `label` | `string` | `'Main'` | `HelixHeadlessNavigation` | Accessible name for the landmark. |
 
 #### Slots
 
@@ -3236,7 +3236,7 @@ says where the current page was as well as where it is.
 
 A number a reader types or steps to.
 
-Extends `HelixBaseNumberInput`.
+Extends `HelixHeadlessNumberInput`.
 
 The frame an `Input` wears, because in a form this stands in a row with them.
 The difference is inside it: a button at each end of the box rather than
@@ -3255,40 +3255,40 @@ three times as long to cross.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `decrementLabel` | `decrement-label` | `string` | `'Decrease'` | `HelixBaseNumberInput` | Accessible name for the control that steps down. |
+| `decrementLabel` | `decrement-label` | `string` | `'Decrease'` | `HelixHeadlessNumberInput` | Accessible name for the control that steps down. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `incrementLabel` | `increment-label` | `string` | `'Increase'` | `HelixBaseNumberInput` | Accessible name for the control that steps up. |
+| `incrementLabel` | `increment-label` | `string` | `'Increase'` | `HelixHeadlessNumberInput` | Accessible name for the control that steps up. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `largeStep` | `large-step` | `number \| undefined` | - | `HelixBaseNumberInput` | How far `PageUp` and `PageDown` move. |
-| `max` | `max` | `number \| undefined` | - | `HelixBaseNumberInput` | Largest value the reader may reach. Absent has no ceiling. |
-| `min` | `min` | `number \| undefined` | - | `HelixBaseNumberInput` | Smallest value the reader may reach. Absent has no floor. |
+| `largeStep` | `large-step` | `number \| undefined` | - | `HelixHeadlessNumberInput` | How far `PageUp` and `PageDown` move. |
+| `max` | `max` | `number \| undefined` | - | `HelixHeadlessNumberInput` | Largest value the reader may reach. Absent has no ceiling. |
+| `min` | `min` | `number \| undefined` | - | `HelixHeadlessNumberInput` | Smallest value the reader may reach. Absent has no floor. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseNumberInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseNumberInput` | Whether the field refuses input while still submitting its value. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessNumberInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessNumberInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `scrub` | `scrub` | `boolean` | `false` | `HelixBaseNumberInput` | Whether a grip is shown that changes the value when it is dragged. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseNumberInput` | Focus is delegated to the field, so the host is never the focus target. |
-| `step` | `step` | `number` | `1` | `HelixBaseNumberInput` | How far one step moves. |
+| `scrub` | `scrub` | `boolean` | `false` | `HelixHeadlessNumberInput` | Whether a grip is shown that changes the value when it is dragged. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessNumberInput` | Focus is delegated to the field, so the host is never the focus target. |
+| `step` | `step` | `number` | `1` | `HelixHeadlessNumberInput` | How far one step moves. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseNumberInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `focus()` | `HelixHeadlessNumberInput` | Puts the caret in the field, the way a label pointing at one would. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-| `select()` | `HelixBaseNumberInput` | Selects the number, so typing replaces it. |
-| `stepDown()` | `HelixBaseNumberInput` | Steps the value down, by `largeStep` when `large` is set. |
-| `stepUp()` | `HelixBaseNumberInput` | One step up, or `PageUp`'s larger one. |
+| `select()` | `HelixHeadlessNumberInput` | Selects the number, so typing replaces it. |
+| `stepDown()` | `HelixHeadlessNumberInput` | Steps the value down, by `largeStep` when `large` is set. |
+| `stepUp()` | `HelixHeadlessNumberInput` | One step up, or `PageUp`'s larger one. |
 
 #### Events
 
@@ -3322,7 +3322,7 @@ three times as long to cross.
 
 One choice in a listbox.
 
-Extends `HelixBaseOption`.
+Extends `HelixHeadlessOption`.
 
 Two states that look different on purpose: chosen, which is a fact about the
 value, and active, which is where the keyboard is. A list that draws them the
@@ -3333,19 +3333,19 @@ picked from what they are looking at.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `active` | `data-active` | `boolean` | `false` | `HelixBaseOption` | Whether this is the option the keyboard is on. Written by the listbox. |
-| `alternate` | `alternate` | `string` | `''` | `HelixBaseOption` | A second destination for this row, taken with the modifier held. |
-| `alternateLabel` | `alternate-label` | `string` | `''` | `HelixBaseOption` | What the second destination is, for a reader who cannot see the footer. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseOption` | Whether this choice can be made. |
-| `selected` | `selected` | `boolean` | `false` | `HelixBaseOption` | Whether this choice is currently chosen. Written by the listbox. |
-| `text` | - | `string` | - | `HelixBaseOption` | The words, for a listbox that has to match text against them. |
-| `value` | `value` | `string` | `''` | `HelixBaseOption` | Identifies this choice, and is what a form submits. |
+| `active` | `data-active` | `boolean` | `false` | `HelixHeadlessOption` | Whether this is the option the keyboard is on. Written by the listbox. |
+| `alternate` | `alternate` | `string` | `''` | `HelixHeadlessOption` | A second destination for this row, taken with the modifier held. |
+| `alternateLabel` | `alternate-label` | `string` | `''` | `HelixHeadlessOption` | What the second destination is, for a reader who cannot see the footer. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessOption` | Whether this choice can be made. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessOption` | Whether this choice is currently chosen. Written by the listbox. |
+| `text` | - | `string` | - | `HelixHeadlessOption` | The words, for a listbox that has to match text against them. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessOption` | Identifies this choice, and is what a form submits. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `select()` | `HelixBaseOption` | Makes this choice and announces it. |
+| `select()` | `HelixHeadlessOption` | Makes this choice and announces it. |
 
 #### Events
 
@@ -3381,7 +3381,7 @@ picked from what they are looking at.
 
 A named run of options inside a listbox.
 
-Extends `HelixBaseOptionGroup`.
+Extends `HelixHeadlessOptionGroup`.
 
 The heading is set small and quiet, because it is a divider that happens to
 have words on it: a run of options is read as a list and the heading is what
@@ -3391,7 +3391,7 @@ tells you which list, not something to read on its own.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `''` | `HelixBaseOptionGroup` | The heading over the run. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessOptionGroup` | The heading over the run. |
 
 #### Slots
 
@@ -3413,7 +3413,7 @@ tells you which list, not something to read on its own.
 
 Links to the headings on this page, marking the one being read.
 
-Extends `HelixBaseOutline`.
+Extends `HelixHeadlessOutline`.
 
 A rule down the leading edge with the current section lit along it, which is
 the shape a table of contents has taken since printed marginalia: the line
@@ -3427,10 +3427,10 @@ document is not always where the headings are.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `behavior` | `behavior` | `ScrollBehavior` | `'auto'` | `HelixBaseOutline` | How a click on one of these links travels to its section. |
-| `current` | - | `string` | - | `HelixBaseOutline` | The id of the section being read, or empty before anything is measured. |
-| `label` | `label` | `string` | `'On this page'` | `HelixBaseOutline` | Accessible name for the navigation. |
-| `offset` | `offset` | `number` | `0` | `HelixBaseOutline` | How far below the top of the window a heading counts as reached, in pixels. |
+| `behavior` | `behavior` | `ScrollBehavior` | `'auto'` | `HelixHeadlessOutline` | How a click on one of these links travels to its section. |
+| `current` | - | `string` | - | `HelixHeadlessOutline` | The id of the section being read, or empty before anything is measured. |
+| `label` | `label` | `string` | `'On this page'` | `HelixHeadlessOutline` | Accessible name for the navigation. |
+| `offset` | `offset` | `number` | `0` | `HelixHeadlessOutline` | How far below the top of the window a heading counts as reached, in pixels. |
 
 #### Events
 
@@ -3464,7 +3464,7 @@ document is not always where the headings are.
 
 Moves between pages of a longer result.
 
-Extends `HelixBasePagination`.
+Extends `HelixHeadlessPagination`.
 
 One box for every control in the row, arrows and numbers alike, so the run has
 a single rhythm and the steps sit at the numbers' height rather than between
@@ -3494,25 +3494,25 @@ is a way through rather than a destination, so it does not compete.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `boundaries` | `boundaries` | `number` | `1` | `HelixBasePagination` | How many pages to show at each end, whatever the current one is. |
-| `compact` | `compact` | `boolean` | `false` | `HelixBasePagination` | Where the numbers are replaced by a reading of the two. |
-| `defaultPage` | `default-page` | `number` | `1` | `HelixBasePagination` | Page to open on, where nothing declared one. |
-| `ends` | `ends` | `boolean` | `false` | `HelixBasePagination` | Whether to offer a jump to the first and last pages. |
-| `firstLabel` | `first-label` | `string` | `'First page'` | `HelixBasePagination` | Accessible name for the control that jumps to the first page. |
-| `gapLabel` | `gap-label` | `string` | `'Skip to page {page}'` | `HelixBasePagination` | Accessible name for a gap, with `{page}` filled in as where it goes. |
-| `href` | `href` | `string` | `''` | `HelixBasePagination` | Address for a page, with `{page}` standing in for its number. |
-| `label` | `label` | `string` | `'Pagination'` | `HelixBasePagination` | Accessible name for the navigation landmark. |
-| `lastLabel` | `last-label` | `string` | `'Last page'` | `HelixBasePagination` | Accessible name for the control that jumps to the last page. |
-| `locale` | `locale` | `string` | `''` | `HelixBasePagination` | Locale for the page numbers. Absent uses the runtime's own. |
-| `nextLabel` | `next-label` | `string` | `'Next page'` | `HelixBasePagination` | Accessible name for the control that moves forward. |
-| `page` | `page` | `number` | - | `HelixBasePagination` | The page on show, one-based. |
-| `pageLabel` | `page-label` | `string` | `'Page {page}'` | `HelixBasePagination` | Accessible name for one page, with `{page}` and `{pages}` filled in. |
-| `pages` | `pages` | `number` | `0` | `HelixBasePagination` | How many pages there are in total. |
-| `pageSize` | `page-size` | `number` | `0` | `HelixBasePagination` | How many items are on a page. |
-| `previousLabel` | `previous-label` | `string` | `'Previous page'` | `HelixBasePagination` | Accessible name for the control that moves back. |
-| `siblings` | `siblings` | `number` | `1` | `HelixBasePagination` | How many pages to show either side of the current one. |
-| `statusLabel` | `status-label` | `string` | `'{page} of {pages}'` | `HelixBasePagination` | The reading shown in `compact`, with `{page}` and `{pages}` filled in. |
-| `total` | `total` | `number` | `0` | `HelixBasePagination` | How many items there are across every page. |
+| `boundaries` | `boundaries` | `number` | `1` | `HelixHeadlessPagination` | How many pages to show at each end, whatever the current one is. |
+| `compact` | `compact` | `boolean` | `false` | `HelixHeadlessPagination` | Where the numbers are replaced by a reading of the two. |
+| `defaultPage` | `default-page` | `number` | `1` | `HelixHeadlessPagination` | Page to open on, where nothing declared one. |
+| `ends` | `ends` | `boolean` | `false` | `HelixHeadlessPagination` | Whether to offer a jump to the first and last pages. |
+| `firstLabel` | `first-label` | `string` | `'First page'` | `HelixHeadlessPagination` | Accessible name for the control that jumps to the first page. |
+| `gapLabel` | `gap-label` | `string` | `'Skip to page {page}'` | `HelixHeadlessPagination` | Accessible name for a gap, with `{page}` filled in as where it goes. |
+| `href` | `href` | `string` | `''` | `HelixHeadlessPagination` | Address for a page, with `{page}` standing in for its number. |
+| `label` | `label` | `string` | `'Pagination'` | `HelixHeadlessPagination` | Accessible name for the navigation landmark. |
+| `lastLabel` | `last-label` | `string` | `'Last page'` | `HelixHeadlessPagination` | Accessible name for the control that jumps to the last page. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessPagination` | Locale for the page numbers. Absent uses the runtime's own. |
+| `nextLabel` | `next-label` | `string` | `'Next page'` | `HelixHeadlessPagination` | Accessible name for the control that moves forward. |
+| `page` | `page` | `number` | - | `HelixHeadlessPagination` | The page on show, one-based. |
+| `pageLabel` | `page-label` | `string` | `'Page {page}'` | `HelixHeadlessPagination` | Accessible name for one page, with `{page}` and `{pages}` filled in. |
+| `pages` | `pages` | `number` | `0` | `HelixHeadlessPagination` | How many pages there are in total. |
+| `pageSize` | `page-size` | `number` | `0` | `HelixHeadlessPagination` | How many items are on a page. |
+| `previousLabel` | `previous-label` | `string` | `'Previous page'` | `HelixHeadlessPagination` | Accessible name for the control that moves back. |
+| `siblings` | `siblings` | `number` | `1` | `HelixHeadlessPagination` | How many pages to show either side of the current one. |
+| `statusLabel` | `status-label` | `string` | `'{page} of {pages}'` | `HelixHeadlessPagination` | The reading shown in `compact`, with `{page}` and `{pages}` filled in. |
+| `total` | `total` | `number` | `0` | `HelixHeadlessPagination` | How many items there are across every page. |
 
 #### Events
 
@@ -3549,7 +3549,7 @@ is a way through rather than a destination, so it does not compete.
 
 Chooses how many items a page holds.
 
-Extends `HelixBasePaginationSize`.
+Extends `HelixHeadlessPaginationSize`.
 
 A `Select`, laid out on one row. Every other field stacks its label because it
 stands in a column of fields; this one stands in a footer beside a run of page
@@ -3562,11 +3562,11 @@ reach through both boundaries and a consumer styles it as the select it is.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `defaultValue` | `default-value` | `number` | `0` | `HelixBasePaginationSize` | Size to start on, where nothing declared one. |
-| `label` | `label` | `string` | `'Per page'` | `HelixBasePaginationSize` | The words beside the control. |
-| `locale` | `locale` | `string` | `''` | `HelixBasePaginationSize` | Locale for the numbers. Absent uses the runtime's own. |
-| `sizes` | `sizes` | `string` | `'10,25,50,100'` | `HelixBasePaginationSize` | The sizes offered, comma separated. |
-| `value` | `value` | `number` | - | `HelixBasePaginationSize` | The size in force. |
+| `defaultValue` | `default-value` | `number` | `0` | `HelixHeadlessPaginationSize` | Size to start on, where nothing declared one. |
+| `label` | `label` | `string` | `'Per page'` | `HelixHeadlessPaginationSize` | The words beside the control. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessPaginationSize` | Locale for the numbers. Absent uses the runtime's own. |
+| `sizes` | `sizes` | `string` | `'10,25,50,100'` | `HelixHeadlessPaginationSize` | The sizes offered, comma separated. |
+| `value` | `value` | `number` | - | `HelixHeadlessPaginationSize` | The size in force. |
 
 #### Events
 
@@ -3587,7 +3587,7 @@ reach through both boundaries and a consumer styles it as the select it is.
 
 Reads out which items of how many are on show.
 
-Extends `HelixBasePaginationSummary`.
+Extends `HelixHeadlessPaginationSummary`.
 
 Prose beside the controls rather than one of them: no box and no hover, in the
 subtler of the two muted steps, because it is a fact about the result and not
@@ -3597,11 +3597,11 @@ a way to move through it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `format` | `format` | `string` | `'{from}-{to} of {total}'` | `HelixBasePaginationSummary` | The reading, with `{from}`, `{to}` and `{total}` filled in. |
-| `locale` | `locale` | `string` | `''` | `HelixBasePaginationSummary` | Locale for the numbers. Absent uses the runtime's own. |
-| `page` | `page` | `number` | `1` | `HelixBasePaginationSummary` | The page on show, one-based. |
-| `pageSize` | `page-size` | `number` | `0` | `HelixBasePaginationSummary` | How many items are on a page. |
-| `total` | `total` | `number` | `0` | `HelixBasePaginationSummary` | How many items there are across every page. |
+| `format` | `format` | `string` | `'{from}-{to} of {total}'` | `HelixHeadlessPaginationSummary` | The reading, with `{from}`, `{to}` and `{total}` filled in. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessPaginationSummary` | Locale for the numbers. Absent uses the runtime's own. |
+| `page` | `page` | `number` | `1` | `HelixHeadlessPaginationSummary` | The page on show, one-based. |
+| `pageSize` | `page-size` | `number` | `0` | `HelixHeadlessPaginationSummary` | How many items are on a page. |
+| `total` | `total` | `number` | `0` | `HelixHeadlessPaginationSummary` | How many items there are across every page. |
 
 ## Pin Input
 
@@ -3609,7 +3609,7 @@ a way to move through it.
 
 A short code, one character to a box.
 
-Extends `HelixBasePinInput`.
+Extends `HelixHeadlessPinInput`.
 
 Square boxes at the control height with real space between them, which is the
 whole picture: a code is read as separate characters, and boxes shoulder to
@@ -3627,7 +3627,7 @@ breathe as a code is typed into it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `cellLabel` | `cell-label` | `string` | `'Character {index} of {length}'` | `HelixBasePinInput` | Accessible name for one box, with `{index}` and `{length}` filled in. |
+| `cellLabel` | `cell-label` | `string` | `'Character {index} of {length}'` | `HelixHeadlessPinInput` | Accessible name for one box, with `{index}` and `{length}` filled in. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
@@ -3636,22 +3636,22 @@ breathe as a code is typed into it.
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `length` | `length` | `number` | `6` | `HelixBasePinInput` | How many characters the code has. |
-| `mask` | `mask` | `boolean` | `false` | `HelixBasePinInput` | Whether the characters are hidden, the way a password is. |
+| `length` | `length` | `number` | `6` | `HelixHeadlessPinInput` | How many characters the code has. |
+| `mask` | `mask` | `boolean` | `false` | `HelixHeadlessPinInput` | Whether the characters are hidden, the way a password is. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `placeholder` | `placeholder` | `string` | `''` | `HelixBasePinInput` | What an empty box shows, usually a single dot. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixBasePinInput` | Whether the boxes refuse input while still submitting their value. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessPinInput` | What an empty box shows, usually a single dot. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessPinInput` | Whether the boxes refuse input while still submitting their value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBasePinInput` | Focus is delegated, so the host is never the focus target. |
-| `type` | `type` | `PinType` | `'numeric'` | `HelixBasePinInput` | What a box accepts, which decides the keyboard a phone offers. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessPinInput` | Focus is delegated, so the host is never the focus target. |
+| `type` | `type` | `PinType` | `'numeric'` | `HelixHeadlessPinInput` | What a box accepts, which decides the keyboard a phone offers. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `clear()` | `HelixBasePinInput` | Empties every box and returns to the first. |
-| `focus()` | `HelixBasePinInput` | Puts the caret in the first empty box, which is where a reader resumes. |
+| `clear()` | `HelixHeadlessPinInput` | Empties every box and returns to the first. |
+| `focus()` | `HelixHeadlessPinInput` | Puts the caret in the first empty box, which is where a reader resumes. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
@@ -3683,7 +3683,7 @@ breathe as a code is typed into it.
 
 A panel that opens against a trigger and holds anything.
 
-Extends `HelixBasePopover`.
+Extends `HelixHeadlessPopover`.
 
 A surface with an inset and a shadow, and nothing about what goes in it. The
 inset is the panel's rather than the consumer's, which is the same call
@@ -3700,19 +3700,19 @@ time.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `label` | `label` | `string` | `'Popover'` | `HelixBasePopover` | Accessible name for the panel. |
-| `offset` | `offset` | `number` | `4` | `HelixBasePopover` | Space between the trigger and the panel, in pixels. |
+| `label` | `label` | `string` | `'Popover'` | `HelixHeadlessPopover` | Accessible name for the panel. |
+| `offset` | `offset` | `number` | `4` | `HelixHeadlessPopover` | Space between the trigger and the panel, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixBasePopover` | Preferred side. It moves if that side does not fit. |
+| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixHeadlessPopover` | Preferred side. It moves if that side does not fit. |
 | `separation` | `separation` | `'plain' \| undefined` | - | - | How the panel separates itself from what it floats over. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `hide()` | `HelixBasePopover` | Closes the panel and puts focus back on the trigger. |
+| `hide()` | `HelixHeadlessPopover` | Closes the panel and puts focus back on the trigger. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
-| `show()` | `HelixBasePopover` | Opens the panel. |
+| `show()` | `HelixHeadlessPopover` | Opens the panel. |
 | `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
 
 #### Events
@@ -3753,7 +3753,7 @@ time.
 
 Shows how far along a task is, when that is known.
 
-Extends `HelixBaseProgress`.
+Extends `HelixHeadlessProgress`.
 
 A track and the part of it that is done. The height comes from a token rather
 than from a size property, for the reason the rest of the library gives about
@@ -3770,14 +3770,14 @@ thing advancing.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the bar claims. |
-| `fraction` | - | `number` | - | `HelixBaseProgress` | What is done, as a fraction of the whole, between 0 and 1. |
-| `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseProgress` | Whether the work has a knowable end. |
-| `label` | `label` | `string` | `'Progress'` | `HelixBaseProgress` | Accessible name for what is in progress. |
-| `max` | `max` | `number` | `100` | `HelixBaseProgress` | The total the work is measured against. |
-| `shape` | `shape` | `'ring' \| undefined` | - | `HelixBaseProgress` | Whether the value is drawn as a bar or as a ring. |
-| `showValue` | `show-value` | `boolean` | `false` | `HelixBaseProgress` | Whether the reading is shown beside the bar. |
-| `value` | `value` | `number` | `0` | `HelixBaseProgress` | What has been done so far, in the same units as `max`. |
-| `valueText` | `value-text` | `string` | `''` | `HelixBaseProgress` | A reading for the value, where the number alone does not say enough. |
+| `fraction` | - | `number` | - | `HelixHeadlessProgress` | What is done, as a fraction of the whole, between 0 and 1. |
+| `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixHeadlessProgress` | Whether the work has a knowable end. |
+| `label` | `label` | `string` | `'Progress'` | `HelixHeadlessProgress` | Accessible name for what is in progress. |
+| `max` | `max` | `number` | `100` | `HelixHeadlessProgress` | The total the work is measured against. |
+| `shape` | `shape` | `'ring' \| undefined` | - | `HelixHeadlessProgress` | Whether the value is drawn as a bar or as a ring. |
+| `showValue` | `show-value` | `boolean` | `false` | `HelixHeadlessProgress` | Whether the reading is shown beside the bar. |
+| `value` | `value` | `number` | `0` | `HelixHeadlessProgress` | What has been done so far, in the same units as `max`. |
+| `valueText` | `value-text` | `string` | `''` | `HelixHeadlessProgress` | A reading for the value, where the number alone does not say enough. |
 
 #### Parts
 
@@ -3805,9 +3805,9 @@ thing advancing.
 
 Encodes a short piece of text as a scannable square.
 
-Extends `HelixBaseQrCode`.
+Extends `HelixHeadlessQrCode`.
 
-The picture is the base tier's. What this adds is a size that can be set
+The picture is the headless tier's. What this adds is a size that can be set
 once, the colours a scanner needs, and the box that holds a center mark.
 
 **The ink is `currentColor` and the ground is a real fill.** A code has to be
@@ -3820,10 +3820,10 @@ So the ground is stated and the ink is the foreground it is chosen for.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `correction` | `correction` | `QrCorrection \| undefined` | - | `HelixBaseQrCode` | How much of the code can be lost and still read. |
-| `label` | `label` | `string` | `''` | `HelixBaseQrCode` | What the image is called. |
-| `shape` | `shape` | `QrStyle` | `'square'` | `HelixBaseQrCode` | How the modules are drawn. |
-| `value` | `value` | `string` | `''` | `HelixBaseQrCode` | What the code encodes, which is usually a URL. |
+| `correction` | `correction` | `QrCorrection \| undefined` | - | `HelixHeadlessQrCode` | How much of the code can be lost and still read. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessQrCode` | What the image is called. |
+| `shape` | `shape` | `QrStyle` | `'square'` | `HelixHeadlessQrCode` | How the modules are drawn. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessQrCode` | What the code encodes, which is usually a URL. |
 
 #### Slots
 
@@ -3857,7 +3857,7 @@ So the ground is stated and the ink is the foreground it is chosen for.
 
 A short quotation, set inline with the text around it.
 
-Extends `HelixBaseQuote`.
+Extends `HelixHeadlessQuote`.
 
 Takes the surrounding type rather than a size of its own, because a quotation
 inside a paragraph is that paragraph's text with marks around it.
@@ -3866,7 +3866,7 @@ inside a paragraph is that paragraph's text with marks around it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `cite` | `cite` | `string` | `''` | `HelixBaseQuote` | URL identifying where the quotation came from. |
+| `cite` | `cite` | `string` | `''` | `HelixHeadlessQuote` | URL identifying where the quotation came from. |
 
 #### Slots
 
@@ -3892,7 +3892,7 @@ inside a paragraph is that paragraph's text with marks around it.
 
 One choice in a radio group.
 
-Extends `HelixBaseRadio`.
+Extends `HelixHeadlessRadio`.
 
 A circle with a dot in it, drawn here rather than by the browser for the
 reason the checkbox's box is: this is a `<button role="radio">`, so there was
@@ -3907,18 +3907,18 @@ and being chosen is an answer rather than a state.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseRadio` | Whether this choice can be made. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessRadio` | Whether this choice can be made. |
 | `hideControl` | `hide-control` | `boolean` | `false` | - | Takes the circle away, leaving the card as the whole control. |
-| `selected` | `selected` | `boolean` | `false` | `HelixBaseRadio` | Whether this is the current choice. Written by the group. |
-| `value` | `value` | `string` | `''` | `HelixBaseRadio` | Identifies this choice to the group, and is what the form submits. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessRadio` | Whether this is the current choice. Written by the group. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessRadio` | Identifies this choice to the group, and is what the form submits. |
 | `variant` | `variant` | `'chip' \| 'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focusItem()` | `HelixBaseRadio` | Moves focus to this choice, for the group's arrow keys. |
-| `select()` | `HelixBaseRadio` | Makes this choice and announces it. |
+| `focusItem()` | `HelixHeadlessRadio` | Moves focus to this choice, for the group's arrow keys. |
+| `select()` | `HelixHeadlessRadio` | Makes this choice and announces it. |
 
 #### Events
 
@@ -3959,7 +3959,7 @@ and being chosen is an answer rather than a state.
 
 A set of choices where exactly one is the answer.
 
-Extends `HelixBaseRadioGroup`.
+Extends `HelixHeadlessRadioGroup`.
 
 The field's three parts, laid out the way every other field lays them out: a
 question over the set, and one line under it that is help until something is
@@ -3976,11 +3976,11 @@ group keeps its question above the row rather than beside the first choice.
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `items` | - | `HelixBaseRadio[]` | - | `HelixBaseRadioGroup` | The radios, in light-DOM order. Client only: the server has no tree. |
+| `items` | - | `HelixHeadlessRadio[]` | - | `HelixHeadlessRadioGroup` | The radios, in light-DOM order. Client only: the server has no tree. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseRadioGroup` | Which way the choices run. A column reads one line per answer. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessRadioGroup` | Which way the choices run. A column reads one line per answer. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
@@ -4028,7 +4028,7 @@ group keeps its question above the row rather than beside the first choice.
 
 A score out of a few marks, given or shown.
 
-Extends `HelixBaseRating`.
+Extends `HelixHeadlessRating`.
 
 Presentation only: the marks, and the clip that fills them partway.
 Everything about what the score is and how it is chosen is the base class.
@@ -4045,15 +4045,15 @@ Everything about what the score is and how it is chosen is the base class.
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `max` | `max` | `number` | `5` | `HelixBaseRating` | How many marks there are. |
+| `max` | `max` | `number` | `5` | `HelixHeadlessRating` | How many marks there are. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `readOnly` | `readonly` | `boolean` | `false` | `HelixBaseRating` | Whether this shows a score rather than asks for one. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessRating` | Whether this shows a score rather than asks for one. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `score` | - | `number` | - | `HelixBaseRating` | The score, as a number, clamped to what the marks can show. |
-| `showValue` | `show-value` | `boolean` | `false` | `HelixBaseRating` | Whether the score is written out beside the marks. |
-| `step` | `step` | `number` | `1` | `HelixBaseRating` | The smallest part of a mark that can be chosen. |
+| `score` | - | `number` | - | `HelixHeadlessRating` | The score, as a number, clamped to what the marks can show. |
+| `showValue` | `show-value` | `boolean` | `false` | `HelixHeadlessRating` | Whether the score is written out beside the marks. |
+| `step` | `step` | `number` | `1` | `HelixHeadlessRating` | The smallest part of a mark that can be chosen. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-| `valueText` | `value-text` | `string` | `''` | `HelixBaseRating` | How the score is read out, where "3.5 out of 5" is not what it should say. |
+| `valueText` | `value-text` | `string` | `''` | `HelixHeadlessRating` | How the score is read out, where "3.5 out of 5" is not what it should say. |
 | `variant` | `variant` | `'dots' \| 'marks' \| undefined` | - | - | Which mark the row is drawn with. |
 
 #### Methods
@@ -4455,7 +4455,7 @@ Both slots are bare, so an unfilled one generates no box and costs no gap.
 
 A scrolling box that says there is more.
 
-Extends `HelixBaseScrollArea`.
+Extends `HelixHeadlessScrollArea`.
 
 Presentation only: the fades on the edges the base class names, and a
 scrollbar that belongs to the system rather than to the platform. Which edges
@@ -4465,8 +4465,8 @@ have content past them is measured by the base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `''` | `HelixBaseScrollArea` | Names the region, for a reader arriving at it out of context. |
-| `scroller` | - | `HTMLElement \| null` | - | `HelixBaseScrollArea` | The box that actually scrolls, for anything that needs to move it. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessScrollArea` | Names the region, for a reader arriving at it out of context. |
+| `scroller` | - | `HTMLElement \| null` | - | `HelixHeadlessScrollArea` | The box that actually scrolls, for anything that needs to move it. |
 
 #### Slots
 
@@ -4501,7 +4501,7 @@ have content past them is measured by the base class.
 
 A closed list that opens to be chosen from.
 
-Extends `HelixBaseSelect`.
+Extends `HelixHeadlessSelect`.
 
 The trigger wears the same frame as an `Input`, because in a form it stands
 in a row with them and a control that looks like a button among fields reads
@@ -4518,20 +4518,20 @@ from the field it came out of.
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixBaseSelect` | What it says where there are none. |
+| `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixHeadlessSelect` | What it says where there are none. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `filterable` | `filterable` | `boolean` | `false` | `HelixBaseSelect` | Whether the list can be narrowed by typing. |
+| `filterable` | `filterable` | `boolean` | `false` | `HelixHeadlessSelect` | Whether the list can be narrowed by typing. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `loading` | `loading` | `boolean` | `false` | `HelixBaseSelect` | Whether the options are still on their way. |
-| `loadingText` | `loading-text` | `string` | `'Loading'` | `HelixBaseSelect` | What the list says while they are on their way. |
-| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseSelect` | Whether more than one option can be the answer. |
+| `loading` | `loading` | `boolean` | `false` | `HelixHeadlessSelect` | Whether the options are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `HelixHeadlessSelect` | What the list says while they are on their way. |
+| `multiple` | `multiple` | `boolean` | `false` | `HelixHeadlessSelect` | Whether more than one option can be the answer. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `'Choose'` | `HelixBaseSelect` | Shown on the trigger while nothing is chosen. |
+| `placeholder` | `placeholder` | `string` | `'Choose'` | `HelixHeadlessSelect` | Shown on the trigger while nothing is chosen. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
@@ -4595,7 +4595,7 @@ from the field it came out of.
 
 Stands in for content that has not arrived.
 
-Extends `HelixBaseSkeleton`.
+Extends `HelixHeadlessSkeleton`.
 
 A sweep rather than a pulse. A block fading in and out reads as something
 broken; a highlight traveling across it reads as work in progress, and it is
@@ -4625,7 +4625,7 @@ the same one property animating either way.
 
 A value chosen from a range by dragging.
 
-Extends `HelixBaseSlider`.
+Extends `HelixHeadlessSlider`.
 
 The track and the thumb are the browser's own, restyled through the range
 pseudo-elements rather than replaced. What that buys is everything a
@@ -4649,19 +4649,19 @@ the thumb being dragged.
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `markerLabels` | `marker-labels` | `boolean` | `false` | `HelixBaseSlider` | Whether each mark says which value it stands at. |
-| `markers` | `markers` | `number` | `0` | `HelixBaseSlider` | How many marks to draw along the track, evenly spaced, ends included. |
-| `max` | `max` | `number` | `100` | `HelixBaseSlider` | The largest value the reader can choose. |
-| `min` | `min` | `number` | `0` | `HelixBaseSlider` | The smallest value the reader can choose. |
+| `markerLabels` | `marker-labels` | `boolean` | `false` | `HelixHeadlessSlider` | Whether each mark says which value it stands at. |
+| `markers` | `markers` | `number` | `0` | `HelixHeadlessSlider` | How many marks to draw along the track, evenly spaced, ends included. |
+| `max` | `max` | `number` | `100` | `HelixHeadlessSlider` | The largest value the reader can choose. |
+| `min` | `min` | `number` | `0` | `HelixHeadlessSlider` | The smallest value the reader can choose. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseSlider` | Which way the track runs, `vertical` standing it on end. |
-| `range` | `range` | `boolean` | `false` | `HelixBaseSlider` | Whether there are two thumbs and the value is a pair. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessSlider` | Which way the track runs, `vertical` standing it on end. |
+| `range` | `range` | `boolean` | `false` | `HelixHeadlessSlider` | Whether there are two thumbs and the value is a pair. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseSlider` | Focus is delegated to the control, so the host is never the target. |
-| `showValue` | `show-value` | `boolean` | `false` | `HelixBaseSlider` | Whether the chosen value is shown beside the track. |
-| `step` | `step` | `number` | `1` | `HelixBaseSlider` | How far one press of an arrow key moves it. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessSlider` | Focus is delegated to the control, so the host is never the target. |
+| `showValue` | `show-value` | `boolean` | `false` | `HelixHeadlessSlider` | Whether the chosen value is shown beside the track. |
+| `step` | `step` | `number` | `1` | `HelixHeadlessSlider` | How far one press of an arrow key moves it. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-| `valueAsNumber` | - | `number` | - | `HelixBaseSlider` | The chosen value as a number, for anything doing arithmetic on it. |
+| `valueAsNumber` | - | `number` | - | `HelixHeadlessSlider` | The chosen value as a number, for anything doing arithmetic on it. |
 
 #### Methods
 
@@ -4716,7 +4716,7 @@ the thumb being dragged.
 
 A line with no axes, for the shape of a series beside the number it belongs to.
 
-Extends `HelixBaseSparkline`.
+Extends `HelixHeadlessSparkline`.
 
 Sized in `em` by default, so a sparkline set beside a figure is a figure-sized
 thing and one set in a table row is a row-sized thing. The type scale is
@@ -4741,13 +4741,13 @@ keeps it out of every other reason it might want to be bigger.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseSparkline` | How the line gets from one reading to the next. |
+| `curve` | `curve` | `Curve \| undefined` | - | `HelixHeadlessSparkline` | How the line gets from one reading to the next. |
 | `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the drawing claims. |
-| `for` | `for` | `string` | `''` | `HelixBaseSparkline` | The id of a table to read instead, when there is one behind the line. |
-| `label` | `label` | `string` | `''` | `HelixBaseSparkline` | What the line says, in a sentence. |
-| `plot` | `plot` | `'area' \| 'bar' \| 'line' \| undefined` | - | `HelixBaseSparkline` | What the readings are drawn as. |
+| `for` | `for` | `string` | `''` | `HelixHeadlessSparkline` | The id of a table to read instead, when there is one behind the line. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessSparkline` | What the line says, in a sentence. |
+| `plot` | `plot` | `'area' \| 'bar' \| 'line' \| undefined` | - | `HelixHeadlessSparkline` | What the readings are drawn as. |
 | `terminus` | `terminus` | `'none' \| 'ring' \| 'square' \| 'triangle' \| undefined` | - | - | The shape of the mark on the last reading. |
-| `values` | `values` | `string` | `''` | `HelixBaseSparkline` | The numbers, separated by whitespace or by commas. |
+| `values` | `values` | `string` | `''` | `HelixHeadlessSparkline` | The numbers, separated by whitespace or by commas. |
 | `weight` | `weight` | `'thick' \| 'thin' \| undefined` | - | - | How heavy the line is drawn. |
 
 #### Parts
@@ -4783,7 +4783,7 @@ keeps it out of every other reason it might want to be bigger.
 
 A button that fans out the few actions a screen is for.
 
-Extends `HelixBaseSpeedDial`.
+Extends `HelixHeadlessSpeedDial`.
 
 Presentation only: the column the actions fan into, and which end they line
 up on. Everything about what opens it, what closes it and how a keyboard
@@ -4794,10 +4794,10 @@ moves through it is the base class.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `label` | `label` | `string` | `'Actions'` | `HelixBaseSpeedDial` | Names the trigger and the set of actions it opens. |
-| `offset` | `offset` | `number` | `12` | `HelixBaseSpeedDial` | Space between the trigger and the actions, in pixels. |
+| `label` | `label` | `string` | `'Actions'` | `HelixHeadlessSpeedDial` | Names the trigger and the set of actions it opens. |
+| `offset` | `offset` | `number` | `12` | `HelixHeadlessSpeedDial` | Space between the trigger and the actions, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placement` | `placement` | `Placement` | `'top-end'` | `HelixBaseSpeedDial` | Which way the actions fan out. They move if that side does not fit. |
+| `placement` | `placement` | `Placement` | `'top-end'` | `HelixHeadlessSpeedDial` | Which way the actions fan out. They move if that side does not fit. |
 
 #### Methods
 
@@ -4838,7 +4838,7 @@ moves through it is the base class.
 
 One action in a speed dial: a mark, and a name beside it.
 
-Extends `HelixBaseSpeedDialItem`.
+Extends `HelixHeadlessSpeedDialItem`.
 
 Presentation only: a round mark the size of a small control, and the name on
 a chip beside it so it can be read against whatever the dial is floating
@@ -4848,17 +4848,17 @@ over. Everything about choosing it is the base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseSpeedDialItem` | Whether the action can be chosen. |
-| `selected` | - | `boolean` | - | `HelixBaseSpeedDialItem` | Whether this is the row the set is on, which here is where focus is. |
-| `value` | `value` | `string` | `''` | `HelixBaseSpeedDialItem` | What this action stands for, carried in the event when it is chosen. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessSpeedDialItem` | Whether the action can be chosen. |
+| `selected` | - | `boolean` | - | `HelixHeadlessSpeedDialItem` | Whether this is the row the set is on, which here is where focus is. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessSpeedDialItem` | What this action stands for, carried in the event when it is chosen. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseSpeedDialItem` | Puts focus on the control inside, which is what a reader can reach. |
-| `focusItem()` | `HelixBaseSpeedDialItem` | `NavigableItem`, so the arrow keys are the shared controller's business. |
-| `select()` | `HelixBaseSpeedDialItem` | Chooses the action, which is the same act as pressing it. |
+| `focus()` | `HelixHeadlessSpeedDialItem` | Puts focus on the control inside, which is what a reader can reach. |
+| `focusItem()` | `HelixHeadlessSpeedDialItem` | `NavigableItem`, so the arrow keys are the shared controller's business. |
+| `select()` | `HelixHeadlessSpeedDialItem` | Chooses the action, which is the same act as pressing it. |
 
 #### Events
 
@@ -4893,7 +4893,7 @@ over. Everything about choosing it is the base class.
 
 Two panes and a divider the reader can move.
 
-Extends `HelixBaseSplitter`.
+Extends `HelixHeadlessSplitter`.
 
 The divider is a line to look at and a box to hit, and they are different
 sizes. Drawn at the border's own width it is a one pixel pointer target, which
@@ -4926,27 +4926,27 @@ gesture.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `collapsed` | `collapsed` | `'end' \| 'start' \| undefined` | - | `HelixBaseSplitter` | Which pane is shut, if either. |
-| `collapsedSize` | `collapsed-size` | `number` | `0` | `HelixBaseSplitter` | How much of a shut pane is still shown, as a percentage. |
-| `cornerLabel` | `corner-label` | `string` | `'Resize both'` | `HelixBaseSplitter` | Accessible name for the handle where two dividers cross. |
-| `defaultCollapsed` | `default-collapsed` | `'end' \| 'start' \| undefined` | - | `HelixBaseSplitter` | Which pane starts shut, where nothing declared it. |
-| `defaultPosition` | `default-position` | `number` | `50` | `HelixBaseSplitter` | Where the divider starts, where nothing declared it. |
-| `label` | `label` | `string` | `'Resize panes'` | `HelixBaseSplitter` | Accessible name for the divider. |
-| `max` | `max` | `number` | `100` | `HelixBaseSplitter` | Nearest it may come to the end. |
-| `min` | `min` | `number` | `0` | `HelixBaseSplitter` | Nearest the divider may come to the start, as a percentage. |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseSplitter` | Which way the panes are laid out. |
-| `position` | `position` | `number` | - | `HelixBaseSplitter` | Where the divider sits, as a percentage of the whole. |
-| `step` | `step` | `number` | `2` | `HelixBaseSplitter` | How far one arrow press moves it, as a percentage. |
+| `collapsed` | `collapsed` | `'end' \| 'start' \| undefined` | - | `HelixHeadlessSplitter` | Which pane is shut, if either. |
+| `collapsedSize` | `collapsed-size` | `number` | `0` | `HelixHeadlessSplitter` | How much of a shut pane is still shown, as a percentage. |
+| `cornerLabel` | `corner-label` | `string` | `'Resize both'` | `HelixHeadlessSplitter` | Accessible name for the handle where two dividers cross. |
+| `defaultCollapsed` | `default-collapsed` | `'end' \| 'start' \| undefined` | - | `HelixHeadlessSplitter` | Which pane starts shut, where nothing declared it. |
+| `defaultPosition` | `default-position` | `number` | `50` | `HelixHeadlessSplitter` | Where the divider starts, where nothing declared it. |
+| `label` | `label` | `string` | `'Resize panes'` | `HelixHeadlessSplitter` | Accessible name for the divider. |
+| `max` | `max` | `number` | `100` | `HelixHeadlessSplitter` | Nearest it may come to the end. |
+| `min` | `min` | `number` | `0` | `HelixHeadlessSplitter` | Nearest the divider may come to the start, as a percentage. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessSplitter` | Which way the panes are laid out. |
+| `position` | `position` | `number` | - | `HelixHeadlessSplitter` | Where the divider sits, as a percentage of the whole. |
+| `step` | `step` | `number` | `2` | `HelixHeadlessSplitter` | How far one arrow press moves it, as a percentage. |
 | `variant` | `variant` | `'grip' \| 'line' \| undefined` | - | - | Whether the divider carries a grip. |
-| `vertical` | - | `boolean` | - | `HelixBaseSplitter` | Public because a nested splitter compares axes with the one it is in. |
+| `vertical` | - | `boolean` | - | `HelixHeadlessSplitter` | Public because a nested splitter compares axes with the one it is in. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `cross()` | `HelixBaseSplitter` | Records that a nested splitter crosses this one at `at` percent along it. |
-| `moveTo()` | `HelixBaseSplitter` | Moves the divider, and optionally says so. |
-| `uncross()` | `HelixBaseSplitter` | Forgets a nested splitter that has left the tree. See `cross`. |
+| `cross()` | `HelixHeadlessSplitter` | Records that a nested splitter crosses this one at `at` percent along it. |
+| `moveTo()` | `HelixHeadlessSplitter` | Moves the divider, and optionally says so. |
+| `uncross()` | `HelixHeadlessSplitter` | Forgets a nested splitter that has left the tree. See `cross`. |
 
 #### Events
 
@@ -4990,7 +4990,7 @@ gesture.
 
 One measurement, with the word for what it measures.
 
-Extends `HelixBaseStat`.
+Extends `HelixHeadlessStat`.
 
 The value is set on the display face at a size the type scale does not reach,
 because a figure is the one place on a page where the number is the design.
@@ -5001,7 +5001,7 @@ pair reads as one object rather than as two lines of text.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `direction` | `direction` | `'column-reverse' \| 'row' \| 'row-reverse' \| undefined` | - | `HelixBaseStat` | Which way the label and the value are arranged. |
+| `direction` | `direction` | `'column-reverse' \| 'row' \| 'row-reverse' \| undefined` | - | `HelixHeadlessStat` | Which way the label and the value are arranged. |
 
 #### Slots
 
@@ -5021,7 +5021,7 @@ pair reads as one object rather than as two lines of text.
 
 A row of related measurements.
 
-Extends `HelixBaseStatGroup`.
+Extends `HelixHeadlessStatGroup`.
 
 Wraps rather than scrolls, and each figure keeps its own width instead of
 every one taking an equal share: a set of figures is read by comparing them,
@@ -5033,7 +5033,7 @@ same quantity.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `divided` | `divided` | `boolean` | `false` | - | Whether the figures are separated by a rule as well as by space. |
-| `label` | `label` | `string` | `''` | `HelixBaseStatGroup` | Accessible name for the set. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessStatGroup` | Accessible name for the set. |
 
 #### Slots
 
@@ -5053,7 +5053,7 @@ same quantity.
 
 A sequence of stages, and where the reader is in it.
 
-Extends `HelixBaseSteps`.
+Extends `HelixHeadlessSteps`.
 
 The numbering is a CSS counter rather than a property, so a step's position
 is drawn by the browser at layout and is right in the server's markup with no
@@ -5070,9 +5070,9 @@ second name for it here would be a second thing to keep in step.
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
-| `label` | `label` | `string` | `'Steps'` | `HelixBaseSteps` | Accessible name for the sequence. |
-| `orientation` | `orientation` | `'vertical' \| undefined` | - | `HelixBaseSteps` | Which way the steps run. |
-| `variant` | `variant` | `'numeric' \| undefined` | - | `HelixBaseSteps` | What each step is marked with. |
+| `label` | `label` | `string` | `'Steps'` | `HelixHeadlessSteps` | Accessible name for the sequence. |
+| `orientation` | `orientation` | `'vertical' \| undefined` | - | `HelixHeadlessSteps` | Which way the steps run. |
+| `variant` | `variant` | `'numeric' \| undefined` | - | `HelixHeadlessSteps` | What each step is marked with. |
 
 #### Methods
 
@@ -5107,22 +5107,22 @@ second name for it here would be a second thing to keep in step.
 
 One stage in a sequence.
 
-Extends `HelixBaseStep`.
+Extends `HelixHeadlessStep`.
 
 #### Properties
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `complete` | `complete` | `boolean` | `false` | `HelixBaseStep` | Whether the reader has finished this stage. |
-| `current` | `current` | `boolean` | `false` | `HelixBaseStep` | Whether this is the stage the reader is in. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseStep` | Whether the reader may go to this stage. |
-| `value` | `value` | `string` | `''` | `HelixBaseStep` | What this stage is called when it announces itself. |
+| `complete` | `complete` | `boolean` | `false` | `HelixHeadlessStep` | Whether the reader has finished this stage. |
+| `current` | `current` | `boolean` | `false` | `HelixHeadlessStep` | Whether this is the stage the reader is in. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessStep` | Whether the reader may go to this stage. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessStep` | What this stage is called when it announces itself. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `select()` | `HelixBaseStep` | Announces the step, unless it is refusing. |
+| `select()` | `HelixHeadlessStep` | Announces the step, unless it is refusing. |
 
 #### Events
 
@@ -5158,7 +5158,7 @@ Extends `HelixBaseStep`.
 
 A control that turns something on or off.
 
-Extends `HelixBaseSwitch`.
+Extends `HelixHeadlessSwitch`.
 
 A thumb traveling in a groove, which is the one place in the library color
 is used to say "on". A checkbox does not, because a tick is legible on its
@@ -5192,14 +5192,14 @@ consumer has to keep.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `value` | `value` | `string` | `'on'` | `HelixBaseSwitch` | Value submitted when the switch is on. |
+| `value` | `value` | `string` | `'on'` | `HelixHeadlessSwitch` | Value submitted when the switch is on. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `HelixBaseSwitch` | Returns the switch to the state its markup declared. |
+| `formResetCallback()` | `HelixHeadlessSwitch` | Returns the switch to the state its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerChecked` | Restores the control when the browser brings a form back. |
 | `requestChecked()` | `MixinControllerChecked` | Requests a checked change, and reports whether it was applied. |
 | `resetChecked()` | `MixinControllerChecked` | Drops the uncontrolled state, so the control reads `defaultChecked` again. |
@@ -5243,7 +5243,7 @@ consumer has to keep.
 
 Tabular data laid out on a grid.
 
-Extends `HelixBaseTable`.
+Extends `HelixHeadlessTable`.
 
 Hairline rules between rows and no fill, per the rule that depth comes from a
 single border rather than from elevation. A dense table earns its density by
@@ -5253,13 +5253,13 @@ decorating none of it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `columns` | `columns` | `string` | `''` | `HelixBaseTable` | Column track list, as CSS. Deprecated: declare columns instead. |
+| `columns` | `columns` | `string` | `''` | `HelixHeadlessTable` | Column track list, as CSS. Deprecated: declare columns instead. |
 | `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
-| `label` | `label` | `string` | `''` | `HelixBaseTable` | Accessible name for the table. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessTable` | Accessible name for the table. |
 | `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
 | `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }` | `HelixBaseTable` | Nothing is assigned by name, so the columns can be put in a row. |
-| `tableColumns` | - | `HelixBaseTableColumn[]` | - | `HelixBaseTable` | The columns declared as children, in the order they are written. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }` | `HelixHeadlessTable` | Nothing is assigned by name, so the columns can be put in a row. |
+| `tableColumns` | - | `HelixHeadlessTableColumn[]` | - | `HelixHeadlessTable` | The columns declared as children, in the order they are written. |
 
 #### Slots
 
@@ -5285,7 +5285,7 @@ decorating none of it.
 
 One cell of a table.
 
-Extends `HelixBaseTableCell`.
+Extends `HelixHeadlessTableCell`.
 
 Hairline rules between rows and no fill, per the rule that depth comes from a
 single border rather than from elevation. A dense table earns its density by
@@ -5295,7 +5295,7 @@ decorating none of it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `header` | `header` | `boolean` | `false` | `HelixBaseTableCell` | Whether the cell heads its column. |
+| `header` | `header` | `boolean` | `false` | `HelixHeadlessTableCell` | Whether the cell heads its column. |
 
 #### Slots
 
@@ -5307,7 +5307,7 @@ decorating none of it.
 
 One column of a table: its heading, and how wide it is.
 
-Extends `HelixBaseTableColumn`.
+Extends `HelixHeadlessTableColumn`.
 
 Styled as the header cell it is, and it carries the same rule and inset as
 the cells beneath it so the heading and its column read as one line down the
@@ -5317,8 +5317,8 @@ table.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `track` | - | `string` | - | `HelixBaseTableColumn` | The track this column contributes, resolved. |
-| `width` | `width` | `string` | `''` | `HelixBaseTableColumn` | The track this column takes, as CSS. |
+| `track` | - | `string` | - | `HelixHeadlessTableColumn` | The track this column contributes, resolved. |
+| `width` | `width` | `string` | `''` | `HelixHeadlessTableColumn` | The track this column takes, as CSS. |
 
 #### Slots
 
@@ -5336,7 +5336,7 @@ table.
 
 One row of a table.
 
-Extends `HelixBaseTableRow`.
+Extends `HelixHeadlessTableRow`.
 
 Hairline rules between rows and no fill, per the rule that depth comes from a
 single border rather than from elevation. A dense table earns its density by
@@ -5354,7 +5354,7 @@ decorating none of it.
 
 A row of tabs and the panel each one shows.
 
-Extends `HelixBaseTabs`.
+Extends `HelixHeadlessTabs`.
 
 Selection is marked with a rule under the active tab rather than a filled
 pill, which keeps the row flat and lets the underline animate between tabs as
@@ -5366,9 +5366,9 @@ a movement instead of two separate fills.
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
-| `label` | `label` | `string` | `'Tabs'` | `HelixBaseTabs` | Accessible name for the tab list. |
-| `manual` | `manual` | `boolean` | `false` | `HelixBaseTabs` | Whether arrowing to a tab also selects it. |
-| `variant` | `variant` | `'segmented' \| 'underlined' \| undefined` | - | `HelixBaseTabs` | How the row reads. |
+| `label` | `label` | `string` | `'Tabs'` | `HelixHeadlessTabs` | Accessible name for the tab list. |
+| `manual` | `manual` | `boolean` | `false` | `HelixHeadlessTabs` | Whether arrowing to a tab also selects it. |
+| `variant` | `variant` | `'segmented' \| 'underlined' \| undefined` | - | `HelixHeadlessTabs` | How the row reads. |
 
 #### Methods
 
@@ -5402,7 +5402,7 @@ a movement instead of two separate fills.
 
 The content shown for one tab.
 
-Extends `HelixBaseTabsPanel`.
+Extends `HelixHeadlessTabsPanel`.
 
 Selection is marked with a rule under the active tab rather than a filled
 pill, which keeps the row flat and lets the underline animate between tabs as
@@ -5412,9 +5412,9 @@ a movement instead of two separate fills.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | - | `string` | `''` | `HelixBaseTabsPanel` | The name of the panel, which is the text of the tab that opens it. |
-| `selected` | `selected` | `boolean` | `false` | `HelixBaseTabsPanel` | Whether this panel is the visible one. |
-| `value` | `value` | `string` | `''` | `HelixBaseTabsPanel` | Pairs the panel with the tab of the same value. |
+| `label` | - | `string` | `''` | `HelixHeadlessTabsPanel` | The name of the panel, which is the text of the tab that opens it. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessTabsPanel` | Whether this panel is the visible one. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessTabsPanel` | Pairs the panel with the tab of the same value. |
 
 #### Slots
 
@@ -5432,7 +5432,7 @@ a movement instead of two separate fills.
 
 One tab in a tab list.
 
-Extends `HelixBaseTabsTab`.
+Extends `HelixHeadlessTabsTab`.
 
 Selection is marked with a rule under the active tab rather than a filled
 pill, which keeps the row flat and lets the underline animate between tabs as
@@ -5442,16 +5442,16 @@ a movement instead of two separate fills.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseTabsTab` | Whether the tab can be chosen. |
-| `selected` | `selected` | `boolean` | `false` | `HelixBaseTabsTab` | Whether this tab is the current one. |
-| `value` | `value` | `string` | `''` | `HelixBaseTabsTab` | Identifies the tab, and pairs it with the panel of the same value. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessTabsTab` | Whether the tab can be chosen. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessTabsTab` | Whether this tab is the current one. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessTabsTab` | Identifies the tab, and pairs it with the panel of the same value. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focusItem()` | `HelixBaseTabsTab` | Moves focus to this tab, for the list's arrow keys. |
-| `select()` | `HelixBaseTabsTab` | Selects this tab and announces it. |
+| `focusItem()` | `HelixHeadlessTabsTab` | Moves focus to this tab, for the list's arrow keys. |
+| `select()` | `HelixHeadlessTabsTab` | Selects this tab and announces it. |
 
 #### Events
 
@@ -5477,7 +5477,7 @@ a movement instead of two separate fills.
 
 Labels content with a short piece of metadata.
 
-Extends `HelixBaseTag`.
+Extends `HelixHeadlessTag`.
 
 Five tones. The fill is a tint of the status color, mixed with
 `color-mix` rather than held as a token per status, so a theme that changes
@@ -5597,7 +5597,7 @@ cross product, which is the explosion a named ramp exists to prevent.
 
 Several lines of text a reader types into.
 
-Extends `HelixBaseTextarea`.
+Extends `HelixHeadlessTextarea`.
 
 The same frame an `Input` wears, so a form of mixed fields reads as one set
 rather than as two kinds of box. What differs is the resize handle, which is
@@ -5608,7 +5608,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `autoGrow` | `auto-grow` | `boolean` | `false` | `HelixBaseTextarea` | Whether the box follows its own content rather than scrolling. |
+| `autoGrow` | `auto-grow` | `boolean` | `false` | `HelixHeadlessTextarea` | Whether the box follows its own content rather than scrolling. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
@@ -5617,21 +5617,21 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `maxLength` | `maxlength` | `number \| undefined` | - | `HelixBaseTextarea` | Most characters the value may have. |
-| `minLength` | `minlength` | `number \| undefined` | - | `HelixBaseTextarea` | Fewest characters the value may have. |
+| `maxLength` | `maxlength` | `number \| undefined` | - | `HelixHeadlessTextarea` | Most characters the value may have. |
+| `minLength` | `minlength` | `number \| undefined` | - | `HelixHeadlessTextarea` | Fewest characters the value may have. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseTextarea` | Shown while the field is empty. Not a label: it goes when typing starts. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseTextarea` | Whether the field refuses input while still submitting its value. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessTextarea` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessTextarea` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `rows` | `rows` | `number` | `3` | `HelixBaseTextarea` | How many lines the box is before anything is typed. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseTextarea` | Focus is delegated to the control, so the host is never the target. |
+| `rows` | `rows` | `number` | `3` | `HelixHeadlessTextarea` | How many lines the box is before anything is typed. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessTextarea` | Focus is delegated to the control, so the host is never the target. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseTextarea` | Puts the caret in the field, the way a label pointing at one would. |
+| `focus()` | `HelixHeadlessTextarea` | Puts the caret in the field, the way a label pointing at one would. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
@@ -5663,7 +5663,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 
 A time, typed or picked from a list.
 
-Extends `HelixBaseTimeInput`.
+Extends `HelixHeadlessTimeInput`.
 
 The frame is the field rather than the input, so the trigger sits inside the
 same box as the text and the focus ring is drawn once around the whole
@@ -5688,26 +5688,26 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseTimeInput` | Language tag the times are written in. Absent uses the runtime's own. |
-| `max` | `max` | `string` | `'23:59'` | `HelixBaseTimeInput` | Latest time that can be chosen, as `HH:mm`. |
-| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseTimeInput` | How many times are shown as tags before the rest are counted, in `multiple`. |
-| `min` | `min` | `string` | `'00:00'` | `HelixBaseTimeInput` | Earliest time that can be chosen, as `HH:mm`. |
-| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixBaseTimeInput` | How many times can be held at once. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessTimeInput` | Language tag the times are written in. Absent uses the runtime's own. |
+| `max` | `max` | `string` | `'23:59'` | `HelixHeadlessTimeInput` | Latest time that can be chosen, as `HH:mm`. |
+| `maxTags` | `max-tags` | `number` | `0` | `HelixHeadlessTimeInput` | How many times are shown as tags before the rest are counted, in `multiple`. |
+| `min` | `min` | `string` | `'00:00'` | `HelixHeadlessTimeInput` | Earliest time that can be chosen, as `HH:mm`. |
+| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixHeadlessTimeInput` | How many times can be held at once. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `'HH:mm'` | `HelixBaseTimeInput` | What the field says before a time is in it. |
+| `placeholder` | `placeholder` | `string` | `'HH:mm'` | `HelixHeadlessTimeInput` | What the field says before a time is in it. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `step` | `step` | `number` | `15` | `HelixBaseTimeInput` | How far apart the offered times are, in minutes. |
-| `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixBaseTimeInput` | Whether the field writes the time out, or holds the value as it is. |
-| `triggerLabel` | `trigger-label` | `string` | `'Choose a time'` | `HelixBaseTimeInput` | Accessible name for the control that opens the list. |
+| `step` | `step` | `number` | `15` | `HelixHeadlessTimeInput` | How far apart the offered times are, in minutes. |
+| `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixHeadlessTimeInput` | Whether the field writes the time out, or holds the value as it is. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a time'` | `HelixHeadlessTimeInput` | Accessible name for the control that opens the list. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-| `variant` | `variant` | `'list' \| 'wheels' \| undefined` | - | `HelixBaseTimeInput` | Whether the panel is one list of times or a column each. |
+| `variant` | `variant` | `'list' \| 'wheels' \| undefined` | - | `HelixHeadlessTimeInput` | Whether the panel is one list of times or a column each. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseTimeInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `focus()` | `HelixHeadlessTimeInput` | Puts the caret in the field, the way a label pointing at one would. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
@@ -5759,7 +5759,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 
 Picks a time, from a list of them.
 
-Extends `HelixBaseTimePicker`.
+Extends `HelixHeadlessTimePicker`.
 
 A bounded list on a surface of its own, because ninety-six rows is taller than
 anywhere it will be put. `--time-picker-list-height` is the bound and it is a height
@@ -5776,31 +5776,31 @@ card would be a card inside a card there.
 | --- | --- | --- | --- | --- | --- |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `disableTimes` | `disable-times` | `string` | `''` | `HelixBaseTimePicker` | Times that cannot be chosen, comma separated, as `HH:mm`. |
+| `disableTimes` | `disable-times` | `string` | `''` | `HelixHeadlessTimePicker` | Times that cannot be chosen, comma separated, as `HH:mm`. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `invalid` | `invalid` | `boolean` | `false` | `HelixBaseTimePicker` | Whether the current selection fails validation. |
-| `label` | `label` | `string` | `'Time'` | `HelixBaseTimePicker` | Accessible name for the list, which has no visible one of its own. |
+| `invalid` | `invalid` | `boolean` | `false` | `HelixHeadlessTimePicker` | Whether the current selection fails validation. |
+| `label` | `label` | `string` | `'Time'` | `HelixHeadlessTimePicker` | Accessible name for the list, which has no visible one of its own. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseTimePicker` | Language tag the times are written in. Absent uses the runtime's own. |
-| `max` | `max` | `string` | `'23:59'` | `HelixBaseTimePicker` | Latest time offered, as `HH:mm`. |
-| `min` | `min` | `string` | `'00:00'` | `HelixBaseTimePicker` | Earliest time offered, as `HH:mm`. |
-| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixBaseTimePicker` | How many times can be held at once. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessTimePicker` | Language tag the times are written in. Absent uses the runtime's own. |
+| `max` | `max` | `string` | `'23:59'` | `HelixHeadlessTimePicker` | Latest time offered, as `HH:mm`. |
+| `min` | `min` | `string` | `'00:00'` | `HelixHeadlessTimePicker` | Earliest time offered, as `HH:mm`. |
+| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixHeadlessTimePicker` | How many times can be held at once. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `step` | `step` | `number` | `15` | `HelixBaseTimePicker` | How far apart the offered times are, in minutes. |
+| `step` | `step` | `number` | `15` | `HelixHeadlessTimePicker` | How far apart the offered times are, in minutes. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-| `variant` | `variant` | `'list' \| 'wheels' \| undefined` | - | `HelixBaseTimePicker` | Whether the times are one list or a column each. |
+| `variant` | `variant` | `'list' \| 'wheels' \| undefined` | - | `HelixHeadlessTimePicker` | Whether the times are one list or a column each. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseTimePicker` | Puts the keyboard on the list, which is the only control here. |
+| `focus()` | `HelixHeadlessTimePicker` | Puts the keyboard on the list, which is the only control here. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-| `reveal()` | `HelixBaseTimePicker` | Each wheel comes to rest on its own answer. |
+| `reveal()` | `HelixHeadlessTimePicker` | Each wheel comes to rest on its own answer. |
 
 #### Events
 
@@ -5835,7 +5835,7 @@ card would be a card inside a card there.
 
 A record of what happened, in the order it happened.
 
-Extends `HelixBaseTimeline`.
+Extends `HelixHeadlessTimeline`.
 
 Presentation only: the direction time runs in, and the spacing between one
 event and the next. Every entry draws its own mark and its own line.
@@ -5844,7 +5844,7 @@ event and the next. Every entry draws its own mark and its own line.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `''` | `HelixBaseTimeline` | Names the record, for a reader arriving at it out of context. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessTimeline` | Names the record, for a reader arriving at it out of context. |
 
 #### Slots
 
@@ -5862,7 +5862,7 @@ event and the next. Every entry draws its own mark and its own line.
 
 One event on a timeline: when it happened, and what it was.
 
-Extends `HelixBaseTimelineItem`.
+Extends `HelixHeadlessTimelineItem`.
 
 Presentation only: the rail down the side, the mark on it, and the line that
 arrives at this entry from the one before.
@@ -5871,8 +5871,8 @@ arrives at this entry from the one before.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `datetime` | `datetime` | `string` | `''` | `HelixBaseTimelineItem` | When it happened, machine-readable. |
-| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseTimelineItem` | What kind of event it was, which decides the mark's color and nothing else. |
+| `datetime` | `datetime` | `string` | `''` | `HelixHeadlessTimelineItem` | When it happened, machine-readable. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | `HelixHeadlessTimelineItem` | What kind of event it was, which decides the mark's color and nothing else. |
 
 #### Slots
 
@@ -5907,7 +5907,7 @@ arrives at this entry from the one before.
 
 The region messages arrive in, and the only thing that announces them.
 
-Extends `HelixBaseToast`.
+Extends `HelixHeadlessToast`.
 
 Fixed to the window, and it catches nothing: the region spans a whole edge,
 so a stack of one message in a corner would otherwise put an invisible bar
@@ -5926,13 +5926,13 @@ into the top layer.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `'Notifications'` | `HelixBaseToast` | Accessible name for the region, such as "Notifications". |
+| `label` | `label` | `string` | `'Notifications'` | `HelixHeadlessToast` | Accessible name for the region, such as "Notifications". |
 | `placement` | `placement` | `\| 'bottom-center'
     \| 'bottom-end'
     \| 'bottom-start'
     \| 'top-center'
     \| 'top-end'
-    \| 'top-start' \| undefined` | - | `HelixBaseToast` | Which corner or edge the stack sits at. |
+    \| 'top-start' \| undefined` | - | `HelixHeadlessToast` | Which corner or edge the stack sits at. |
 
 #### Slots
 
@@ -5958,7 +5958,7 @@ into the top layer.
 
 One message in the toast region.
 
-Extends `HelixBaseToastItem`.
+Extends `HelixHeadlessToastItem`.
 
 A surface with a shadow, because a toast sits over whatever the reader was
 looking at rather than in it. The severity is a bar down the leading edge and
@@ -5971,17 +5971,17 @@ costs contrast for something the mark already says.
 | --- | --- | --- | --- | --- | --- |
 | `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
-| `duration` | `duration` | `number \| undefined` | - | `HelixBaseToastItem` | How long it stays, in milliseconds. Absent means until it is dismissed. |
-| `open` | `open` | `boolean` | - | `HelixBaseToastItem` | Whether the message is still showing. |
-| `tone` | `tone` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseToastItem` | What kind of message it is, which picks the mark and its name. |
+| `duration` | `duration` | `number \| undefined` | - | `HelixHeadlessToastItem` | How long it stays, in milliseconds. Absent means until it is dismissed. |
+| `open` | `open` | `boolean` | - | `HelixHeadlessToastItem` | Whether the message is still showing. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'success' \| 'warning' \| undefined` | - | `HelixHeadlessToastItem` | What kind of message it is, which picks the mark and its name. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
 | `dismiss()` | `MixinDismissible` | Announces that it should go, and reports whether the request stood. |
-| `pause()` | `HelixBaseToastItem` | Stops the clock, leaving whatever is left of it. |
-| `resume()` | `HelixBaseToastItem` | Starts it again from where it stopped. |
+| `pause()` | `HelixHeadlessToastItem` | Stops the clock, leaving whatever is left of it. |
+| `resume()` | `HelixHeadlessToastItem` | Starts it again from where it stopped. |
 
 #### Events
 
@@ -6027,7 +6027,7 @@ costs contrast for something the mark already says.
 
 One option in a toggle group.
 
-Extends `HelixBaseToggle`.
+Extends `HelixHeadlessToggle`.
 
 Carries no background of its own. The selected look comes from the group's
 indicator sitting behind it, which is what lets that marker travel instead of
@@ -6037,17 +6037,17 @@ one fill appearing as another disappears.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseToggle` | Whether the item can be chosen. |
-| `focusable` | - | `boolean` | `false` | `HelixBaseToggle` | Whether this item holds the group's tab stop while nothing is chosen. |
-| `selected` | `selected` | `boolean` | `false` | `HelixBaseToggle` | Whether this item is the current one. |
-| `value` | `value` | `string` | `''` | `HelixBaseToggle` | Identifies the item to the group. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessToggle` | Whether the item can be chosen. |
+| `focusable` | - | `boolean` | `false` | `HelixHeadlessToggle` | Whether this item holds the group's tab stop while nothing is chosen. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessToggle` | Whether this item is the current one. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessToggle` | Identifies the item to the group. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focusItem()` | `HelixBaseToggle` | Moves focus to this item's own control. |
-| `select()` | `HelixBaseToggle` | Chooses this item and announces it. |
+| `focusItem()` | `HelixHeadlessToggle` | Moves focus to this item's own control. |
+| `select()` | `HelixHeadlessToggle` | Chooses this item and announces it. |
 
 #### Events
 
@@ -6071,7 +6071,7 @@ one fill appearing as another disappears.
 
 A row of options with the selection marked by a moving indicator.
 
-Extends `HelixBaseToggleGroup`.
+Extends `HelixHeadlessToggleGroup`.
 
 The indicator travels between items rather than the fill swapping. A fill
 that appears on one item as it disappears from another is two changes at once
@@ -6094,7 +6094,7 @@ corner radius, which is worse than the exception.
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
-| `labelPlacement` | `label-placement` | `'start' \| undefined` | - | `HelixBaseToggleGroup` | Where the group's label sits, `start` putting it on the track's line. |
+| `labelPlacement` | `label-placement` | `'start' \| undefined` | - | `HelixHeadlessToggleGroup` | Where the group's label sits, `start` putting it on the track's line. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
@@ -6144,7 +6144,7 @@ corner radius, which is worse than the exception.
 
 A group of controls that share one tab stop.
 
-Extends `HelixBaseToolbar`.
+Extends `HelixHeadlessToolbar`.
 
 No chrome of its own: a toolbar is a place controls sit, and a border around
 them would be a second frame inside whatever already frames the bar.
@@ -6153,8 +6153,8 @@ them would be a second frame inside whatever already frames the bar.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `'Toolbar'` | `HelixBaseToolbar` | Accessible name for the toolbar. |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseToolbar` | Which way the arrow keys move. |
+| `label` | `label` | `string` | `'Toolbar'` | `HelixHeadlessToolbar` | Accessible name for the toolbar. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessToolbar` | Which way the arrow keys move. |
 
 #### Slots
 
@@ -6180,7 +6180,7 @@ them would be a second frame inside whatever already frames the bar.
 
 A short description that appears beside what it describes.
 
-Extends `HelixBaseTooltip`.
+Extends `HelixHeadlessTooltip`.
 
 The bubble is in the top layer, so it needs no `z-index` and cannot be
 clipped by whatever it sits inside.
@@ -6192,26 +6192,26 @@ still points at the trigger after the bubble has slid along to stay in view.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `content` | `content` | `string` | `''` | `HelixBaseTooltip` | The text shown in the bubble. |
+| `content` | `content` | `string` | `''` | `HelixHeadlessTooltip` | The text shown in the bubble. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `delay` | `delay` | `number` | `400` | `HelixBaseTooltip` | How long the pointer must rest before the bubble appears, in milliseconds. |
-| `delayOut` | `delay-out` | `number` | `100` | `HelixBaseTooltip` | How long the bubble stays after the pointer leaves, in milliseconds. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseTooltip` | Whether the tooltip never shows. |
-| `for` | `for` | `string` | `''` | `HelixBaseTooltip` | The id of the element this describes, in this tooltip's own tree. |
+| `delay` | `delay` | `number` | `400` | `HelixHeadlessTooltip` | How long the pointer must rest before the bubble appears, in milliseconds. |
+| `delayOut` | `delay-out` | `number` | `100` | `HelixHeadlessTooltip` | How long the bubble stays after the pointer leaves, in milliseconds. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessTooltip` | Whether the tooltip never shows. |
+| `for` | `for` | `string` | `''` | `HelixHeadlessTooltip` | The id of the element this describes, in this tooltip's own tree. |
 | `material` | `material` | `'glass' \| undefined` | - | - | What the bubble is made of. |
-| `offset` | `offset` | `number` | `8` | `HelixBaseTooltip` | Space between the trigger and the point of the bubble, in pixels. |
+| `offset` | `offset` | `number` | `8` | `HelixHeadlessTooltip` | Space between the trigger and the point of the bubble, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placement` | `placement` | `Placement` | `'top'` | `HelixBaseTooltip` | Preferred side. It moves if that side does not fit. |
-| `within` | `within` | `string` | `''` | `HelixBaseTooltip` | The id of a box to keep the bubble inside, instead of the viewport. |
+| `placement` | `placement` | `Placement` | `'top'` | `HelixHeadlessTooltip` | Preferred side. It moves if that side does not fit. |
+| `within` | `within` | `string` | `''` | `HelixHeadlessTooltip` | The id of a box to keep the bubble inside, instead of the viewport. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `hide()` | `HelixBaseTooltip` | Closes the bubble, and cancels a show that had not happened yet. |
-| `reposition()` | `HelixBaseTooltip` | Places the bubble again, for an anchor that moved without the page moving. |
+| `hide()` | `HelixHeadlessTooltip` | Closes the bubble, and cancels a show that had not happened yet. |
+| `reposition()` | `HelixHeadlessTooltip` | Places the bubble again, for an anchor that moved without the page moving. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
-| `show()` | `HelixBaseTooltip` | Shows the bubble, unless there is nothing to show. |
+| `show()` | `HelixHeadlessTooltip` | Shows the bubble, unless there is nothing to show. |
 | `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
 
 #### Events
@@ -6250,7 +6250,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 
 A guided run through an interface, one stop at a time.
 
-Extends `HelixBaseTour`.
+Extends `HelixHeadlessTour`.
 
 The styled tier of `BaseTour`. It draws the light and nothing else.
 
@@ -6258,25 +6258,25 @@ The styled tier of `BaseTour`. It draws the light and nothing else.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `backLabel` | `back-label` | `string` | `''` | `HelixBaseTour` | Label for the control that goes back, handed to every stop. |
-| `defaultIndex` | `default-index` | `number` | `0` | `HelixBaseTour` | Stop to start on, where nothing declared one. |
-| `doneLabel` | `done-label` | `string` | `''` | `HelixBaseTour` | Label for the control that goes on from the last stop. |
-| `index` | `index` | `number` | - | `HelixBaseTour` | Which stop the reader is on. |
-| `label` | `label` | `string` | `''` | `HelixBaseTour` | Accessible name for the run, such as "Getting started". |
-| `length` | - | `number` | - | `HelixBaseTour` | How many stops there are. |
-| `nextLabel` | `next-label` | `string` | `''` | `HelixBaseTour` | Label for the control that goes on. |
-| `open` | `open` | `boolean` | `false` | `HelixBaseTour` | Whether the tour is running. |
-| `skipLabel` | `skip-label` | `string` | `''` | `HelixBaseTour` | Label for the control that leaves the tour. |
-| `spotlightPadding` | `spotlight-padding` | `number` | `8` | `HelixBaseTour` | Space left around the target when it is lit, in pixels. |
-| `stops` | - | `HelixBaseTourStop[]` | - | `HelixBaseTour` | The stops, in the order they were written. |
+| `backLabel` | `back-label` | `string` | `''` | `HelixHeadlessTour` | Label for the control that goes back, handed to every stop. |
+| `defaultIndex` | `default-index` | `number` | `0` | `HelixHeadlessTour` | Stop to start on, where nothing declared one. |
+| `doneLabel` | `done-label` | `string` | `''` | `HelixHeadlessTour` | Label for the control that goes on from the last stop. |
+| `index` | `index` | `number` | - | `HelixHeadlessTour` | Which stop the reader is on. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessTour` | Accessible name for the run, such as "Getting started". |
+| `length` | - | `number` | - | `HelixHeadlessTour` | How many stops there are. |
+| `nextLabel` | `next-label` | `string` | `''` | `HelixHeadlessTour` | Label for the control that goes on. |
+| `open` | `open` | `boolean` | `false` | `HelixHeadlessTour` | Whether the tour is running. |
+| `skipLabel` | `skip-label` | `string` | `''` | `HelixHeadlessTour` | Label for the control that leaves the tour. |
+| `spotlightPadding` | `spotlight-padding` | `number` | `8` | `HelixHeadlessTour` | Space left around the target when it is lit, in pixels. |
+| `stops` | - | `HelixHeadlessTourStop[]` | - | `HelixHeadlessTour` | The stops, in the order they were written. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `back()` | `HelixBaseTour` | Goes back, and does nothing on the first stop. |
-| `next()` | `HelixBaseTour` | Goes on, and finishes the run on the last stop. |
-| `skip()` | `HelixBaseTour` | Leaves the run early, which is a close rather than a completion. |
+| `back()` | `HelixHeadlessTour` | Goes back, and does nothing on the first stop. |
+| `next()` | `HelixHeadlessTour` | Goes on, and finishes the run on the last stop. |
+| `skip()` | `HelixHeadlessTour` | Leaves the run early, which is a close rather than a completion. |
 
 #### Events
 
@@ -6309,7 +6309,7 @@ The styled tier of `BaseTour`. It draws the light and nothing else.
 
 One stop on a tour: what it points at, and a panel to say it in.
 
-Extends `HelixBaseTourStop`.
+Extends `HelixHeadlessTourStop`.
 
 The styled tier of `BaseTourStop`. The panel is `Popover`'s panel by another
 name, on purpose.
@@ -6318,16 +6318,16 @@ name, on purpose.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseTourStop` | Label for the control that goes back. |
-| `current` | `current` | `boolean` | `false` | `HelixBaseTourStop` | Whether this is the stop the reader is on. |
-| `doneLabel` | `done-label` | `string` | `'Done'` | `HelixBaseTourStop` | Label for the control that goes on from the last stop. |
-| `first` | `first` | `boolean` | `false` | `HelixBaseTourStop` | Whether this is the first stop, so there is nowhere back to. |
-| `for` | `for` | `string` | `''` | `HelixBaseTourStop` | The id of the element this stop is about. |
-| `last` | `last` | `boolean` | `false` | `HelixBaseTourStop` | Whether this is the last stop, so the control says Done. |
-| `nextLabel` | `next-label` | `string` | `'Next'` | `HelixBaseTourStop` | Label for the control that goes on. |
-| `placement` | `placement` | `Placement` | `'bottom'` | `HelixBaseTourStop` | Which side of the target the panel prefers. |
-| `skipLabel` | `skip-label` | `string` | `'Skip'` | `HelixBaseTourStop` | Label for the control that leaves the tour. |
-| `target` | - | `HTMLElement \| null` | - | `HelixBaseTourStop` | The element this stop is about, or null where the id resolves to nothing. |
+| `backLabel` | `back-label` | `string` | `'Back'` | `HelixHeadlessTourStop` | Label for the control that goes back. |
+| `current` | `current` | `boolean` | `false` | `HelixHeadlessTourStop` | Whether this is the stop the reader is on. |
+| `doneLabel` | `done-label` | `string` | `'Done'` | `HelixHeadlessTourStop` | Label for the control that goes on from the last stop. |
+| `first` | `first` | `boolean` | `false` | `HelixHeadlessTourStop` | Whether this is the first stop, so there is nowhere back to. |
+| `for` | `for` | `string` | `''` | `HelixHeadlessTourStop` | The id of the element this stop is about. |
+| `last` | `last` | `boolean` | `false` | `HelixHeadlessTourStop` | Whether this is the last stop, so the control says Done. |
+| `nextLabel` | `next-label` | `string` | `'Next'` | `HelixHeadlessTourStop` | Label for the control that goes on. |
+| `placement` | `placement` | `Placement` | `'bottom'` | `HelixHeadlessTourStop` | Which side of the target the panel prefers. |
+| `skipLabel` | `skip-label` | `string` | `'Skip'` | `HelixHeadlessTourStop` | Label for the control that leaves the tour. |
+| `target` | - | `HTMLElement \| null` | - | `HelixHeadlessTourStop` | The element this stop is about, or null where the id resolves to nothing. |
 
 #### Events
 
@@ -6371,7 +6371,7 @@ name, on purpose.
 
 A tree of items, navigable entirely from the keyboard.
 
-Extends `HelixBaseTree`.
+Extends `HelixHeadlessTree`.
 
 Quiet by default: no rules between rows and no fill except on the selected
 item. A navigation tree is read by scanning, and every line of chrome added
@@ -6385,7 +6385,7 @@ to it is one more thing between the reader and the label.
 | `chevronPlacement` | `chevron-placement` | `'start' \| 'end' \| undefined` | - | - | Which end of the row the branch chevron sits at. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
-| `label` | `label` | `string` | `'Tree'` | `HelixBaseTree` | Accessible name for the tree. |
+| `label` | `label` | `string` | `'Tree'` | `HelixHeadlessTree` | Accessible name for the tree. |
 | `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
 | `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
 
@@ -6429,7 +6429,7 @@ to it is one more thing between the reader and the label.
 
 One node in a tree.
 
-Extends `HelixBaseTreeItem`.
+Extends `HelixHeadlessTreeItem`.
 
 Indent comes from the `level` the tree sets, as a multiple of one hook, so a
 node moved to another depth re-indents without any nested selector. Nesting
@@ -6445,23 +6445,23 @@ the row itself stays flat.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `focusable` | - | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item holds the tree's single tab stop. |
-| `href` | `href` | `string` | `''` | `HelixBaseTreeItem` | Where this node goes, which makes its row a real link. |
-| `level` | `level` | `number \| undefined` | - | `HelixBaseTreeItem` | Depth from the root, set by the tree so indentation needs no CSS nesting. |
+| `focusable` | - | `boolean` | `false` | `HelixHeadlessTreeItem` | Whether this item holds the tree's single tab stop. |
+| `href` | `href` | `string` | `''` | `HelixHeadlessTreeItem` | Where this node goes, which makes its row a real link. |
+| `level` | `level` | `number \| undefined` | - | `HelixHeadlessTreeItem` | Depth from the root, set by the tree so indentation needs no CSS nesting. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `rel` | `rel` | `string` | `''` | `HelixBaseTreeItem` | What the link declares about where it goes. |
-| `selected` | `selected` | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item is the current one. |
-| `target` | `target` | `string` | `''` | `HelixBaseTreeItem` | Where the link opens, for the rare row that leaves the site. |
-| `value` | `value` | `string` | `''` | `HelixBaseTreeItem` | Identifies the item to the consumer, carried in `helix-select`. |
+| `rel` | `rel` | `string` | `''` | `HelixHeadlessTreeItem` | What the link declares about where it goes. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessTreeItem` | Whether this item is the current one. |
+| `target` | `target` | `string` | `''` | `HelixHeadlessTreeItem` | Where the link opens, for the rare row that leaves the site. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessTreeItem` | Identifies the item to the consumer, carried in `helix-select`. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `activate()` | `HelixBaseTreeItem` | Chooses this node the way a reader does, from a press or from Enter. |
-| `focusItem()` | `HelixBaseTreeItem` | Moves focus to this node. |
+| `activate()` | `HelixHeadlessTreeItem` | Chooses this node the way a reader does, from a press or from Enter. |
+| `focusItem()` | `HelixHeadlessTreeItem` | Moves focus to this node. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
-| `select()` | `HelixBaseTreeItem` | Selects this node and announces it. |
+| `select()` | `HelixHeadlessTreeItem` | Selects this node and announces it. |
 | `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
 
 #### Events
@@ -6507,7 +6507,7 @@ the row itself stays flat.
 
 Which way a measurement moved, and whether that is good news.
 
-Extends `HelixBaseTrend`.
+Extends `HelixHeadlessTrend`.
 
 The arrow takes the judgment color and the number does not, which is the
 opposite of the dashboard convention and is measured rather than preferred:
@@ -6536,8 +6536,8 @@ thing this component exists to stop.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `direction` | `direction` | `'down' \| 'neutral' \| 'up' \| undefined` | - | `HelixBaseTrend` | Which way the measurement moved. |
-| `good` | `good` | `'down' \| 'up' \| undefined` | - | `HelixBaseTrend` | Which direction is the improvement, for this metric. |
+| `direction` | `direction` | `'down' \| 'neutral' \| 'up' \| undefined` | - | `HelixHeadlessTrend` | Which way the measurement moved. |
+| `good` | `good` | `'down' \| 'up' \| undefined` | - | `HelixHeadlessTrend` | Which direction is the improvement, for this metric. |
 
 #### Slots
 
@@ -6567,9 +6567,9 @@ thing this component exists to stop.
 Plays a video, with controls this library draws rather than the
 browser's.
 
-Extends `HelixBaseVideo`.
+Extends `HelixHeadlessVideo`.
 
-The player is the base tier's. What this adds is the bar: where it sits, when
+The player is the headless tier's. What this adds is the bar: where it sits, when
 it is there, and what the two ranges look like, which is the whole reason to
 replace a control set that cannot be styled.
 
@@ -6588,33 +6588,33 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `controls` | `controls` | `boolean` | `false` | `HelixBaseVideo` | Whether the browser draws the controls instead of this element. |
-| `errorLabel` | `error-label` | `string` | `'This video could not be played'` | `HelixBaseVideo` | And what they are told when it will not play at all. |
-| `extraControls` | `extra-controls` | `string` | `''` | `HelixBaseVideo` | Controls beyond the ones every player has, named in the order they appear. |
-| `idleDelay` | `idle-delay` | `number` | `2500` | `HelixBaseVideo` | How long the bar waits after the pointer stops before it goes, in ms. |
-| `label` | `label` | `string` | `''` | `HelixBaseVideo` | Accessible name, since a video is not described by its filename. |
-| `loadingLabel` | `loading-label` | `string` | `'Loading'` | `HelixBaseVideo` | What a reader is told while the picture is waiting for more of itself. |
-| `loop` | `loop` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts again at the end. |
-| `muted` | `muted` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts silent, which is what an autoplaying video must do. |
-| `overflowControls` | `overflow-controls` | `string` | `''` | `HelixBaseVideo` | Controls that go behind one button instead of onto the bar, named the same way. |
-| `pauseLabel` | `pause-label` | `string` | `'Pause'` | `HelixBaseVideo` | And while it would stop it. |
-| `playLabel` | `play-label` | `string` | `'Play'` | `HelixBaseVideo` | What the play control is called while it would start the video. |
-| `playsInline` | `plays-inline` | `boolean` | `true` | `HelixBaseVideo` | Whether it plays where it sits rather than taking over the screen. |
-| `poster` | `poster` | `string` | `''` | `HelixBaseVideo` | A still shown before it plays, which the platform draws itself. |
-| `preload` | `preload` | `'auto' \| 'metadata' \| 'none'` | `'metadata'` | `HelixBaseVideo` | How much to fetch before anything is asked for. |
+| `controls` | `controls` | `boolean` | `false` | `HelixHeadlessVideo` | Whether the browser draws the controls instead of this element. |
+| `errorLabel` | `error-label` | `string` | `'This video could not be played'` | `HelixHeadlessVideo` | And what they are told when it will not play at all. |
+| `extraControls` | `extra-controls` | `string` | `''` | `HelixHeadlessVideo` | Controls beyond the ones every player has, named in the order they appear. |
+| `idleDelay` | `idle-delay` | `number` | `2500` | `HelixHeadlessVideo` | How long the bar waits after the pointer stops before it goes, in ms. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessVideo` | Accessible name, since a video is not described by its filename. |
+| `loadingLabel` | `loading-label` | `string` | `'Loading'` | `HelixHeadlessVideo` | What a reader is told while the picture is waiting for more of itself. |
+| `loop` | `loop` | `boolean` | `false` | `HelixHeadlessVideo` | Whether it starts again at the end. |
+| `muted` | `muted` | `boolean` | `false` | `HelixHeadlessVideo` | Whether it starts silent, which is what an autoplaying video must do. |
+| `overflowControls` | `overflow-controls` | `string` | `''` | `HelixHeadlessVideo` | Controls that go behind one button instead of onto the bar, named the same way. |
+| `pauseLabel` | `pause-label` | `string` | `'Pause'` | `HelixHeadlessVideo` | And while it would stop it. |
+| `playLabel` | `play-label` | `string` | `'Play'` | `HelixHeadlessVideo` | What the play control is called while it would start the video. |
+| `playsInline` | `plays-inline` | `boolean` | `true` | `HelixHeadlessVideo` | Whether it plays where it sits rather than taking over the screen. |
+| `poster` | `poster` | `string` | `''` | `HelixHeadlessVideo` | A still shown before it plays, which the platform draws itself. |
+| `preload` | `preload` | `'auto' \| 'metadata' \| 'none'` | `'metadata'` | `HelixHeadlessVideo` | How much to fetch before anything is asked for. |
 | `separation` | `separation` | `'filled' \| 'plain' \| undefined` | - | - | Whether the bar floats on the picture or sits on its own ground. |
-| `speeds` | `speeds` | `string` | `'0.5 1 1.5 2'` | `HelixBaseVideo` | The speeds offered, slowest first, as multipliers of normal. |
-| `src` | `src` | `string` | `''` | `HelixBaseVideo` | Where the video is, for the common case of one file. |
-| `startControl` | `start-control` | `'none' \| undefined` | - | `HelixBaseVideo` | The big mark over the picture before anything has played, or `none`. |
+| `speeds` | `speeds` | `string` | `'0.5 1 1.5 2'` | `HelixHeadlessVideo` | The speeds offered, slowest first, as multipliers of normal. |
+| `src` | `src` | `string` | `''` | `HelixHeadlessVideo` | Where the video is, for the common case of one file. |
+| `startControl` | `start-control` | `'none' \| undefined` | - | `HelixHeadlessVideo` | The big mark over the picture before anything has played, or `none`. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `pause()` | `HelixBaseVideo` | Stops, leaving the frame up. |
-| `play()` | `HelixBaseVideo` | Starts playing, where the platform allows it. |
-| `seek()` | `HelixBaseVideo` | Moves to a point in seconds, clamped to what exists. |
-| `toggle()` | `HelixBaseVideo` | Toggles playback, which is what every key and the button both come to. |
+| `pause()` | `HelixHeadlessVideo` | Stops, leaving the frame up. |
+| `play()` | `HelixHeadlessVideo` | Starts playing, where the platform allows it. |
+| `seek()` | `HelixHeadlessVideo` | Moves to a point in seconds, clamped to what exists. |
+| `toggle()` | `HelixHeadlessVideo` | Toggles playback, which is what every key and the button both come to. |
 
 #### Events
 
@@ -6691,7 +6691,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 A set of clips and the one player they take turns in.
 
-Extends `HelixBaseVideoPlaylist`.
+Extends `HelixHeadlessVideoPlaylist`.
 
 Presentation only: the arrangement of the two regions and the scroller the
 entries sit in. Everything about which clip is current is the base class.
@@ -6702,7 +6702,7 @@ entries sit in. Everything about which clip is current is the base class.
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
-| `label` | `label` | `string` | `'Playlist'` | `HelixBaseVideoPlaylist` | Accessible name for the list, which usually has no visible heading. |
+| `label` | `label` | `string` | `'Playlist'` | `HelixHeadlessVideoPlaylist` | Accessible name for the list, which usually has no visible heading. |
 
 #### Methods
 
@@ -6741,7 +6741,7 @@ entries sit in. Everything about which clip is current is the base class.
 
 One entry in a video playlist.
 
-Extends `HelixBaseVideoPlaylistItem`.
+Extends `HelixHeadlessVideoPlaylistItem`.
 
 Presentation only: the row, its thumbnail column, and the mark on the one
 playing. The base class holds what the entry is and what it announces.
@@ -6750,12 +6750,12 @@ playing. The base class holds what the entry is and what it announces.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `current` | - | `boolean` | `false` | `HelixBaseVideoPlaylistItem` | Whether the player is on this entry. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseVideoPlaylistItem` | Whether the entry can be chosen. |
-| `poster` | `poster` | `string` | `''` | `HelixBaseVideoPlaylistItem` | What covers the picture before this entry plays, and the row's thumbnail. |
-| `src` | `src` | `string` | `''` | `HelixBaseVideoPlaylistItem` | The file this entry plays. |
-| `text` | - | `string` | - | `HelixBaseVideoPlaylistItem` | The entry's name, which is the words and not everything in it. |
-| `value` | `value` | `string` | `''` | `HelixBaseVideoPlaylistItem` | What identifies the entry, and what `active` is compared against. |
+| `current` | - | `boolean` | `false` | `HelixHeadlessVideoPlaylistItem` | Whether the player is on this entry. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessVideoPlaylistItem` | Whether the entry can be chosen. |
+| `poster` | `poster` | `string` | `''` | `HelixHeadlessVideoPlaylistItem` | What covers the picture before this entry plays, and the row's thumbnail. |
+| `src` | `src` | `string` | `''` | `HelixHeadlessVideoPlaylistItem` | The file this entry plays. |
+| `text` | - | `string` | - | `HelixHeadlessVideoPlaylistItem` | The entry's name, which is the words and not everything in it. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessVideoPlaylistItem` | What identifies the entry, and what `active` is compared against. |
 
 #### Events
 
@@ -6792,7 +6792,7 @@ playing. The base class holds what the entry is and what it announces.
 
 The playlist's entries, as a menu inside the player's control bar.
 
-Extends `HelixBaseVideoPlaylistMenu`.
+Extends `HelixHeadlessVideoPlaylistMenu`.
 
 Presentation only: a control-bar button drawn like the ones beside it, and a
 menu that opens over the picture rather than under it. The base class holds
@@ -6814,8 +6814,8 @@ not.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `'Episodes'` | `HelixBaseVideoPlaylistMenu` | The menu's accessible name, and its trigger's. |
-| `placement` | `placement` | `string` | `'top-end'` | `HelixBaseVideoPlaylistMenu` | Where the menu opens relative to its trigger. |
+| `label` | `label` | `string` | `'Episodes'` | `HelixHeadlessVideoPlaylistMenu` | The menu's accessible name, and its trigger's. |
+| `placement` | `placement` | `string` | `'top-end'` | `HelixHeadlessVideoPlaylistMenu` | Where the menu opens relative to its trigger. |
 
 #### Events
 
@@ -6853,7 +6853,7 @@ not.
 
 Renders the rows of a long set that are on screen, and no others.
 
-Extends `HelixBaseVirtualList`.
+Extends `HelixHeadlessVirtualList`.
 
 The styled tier adds the scrolling box's own treatment and nothing else. Rows
 are the consumer's markup in the light DOM, so they are styled by the
@@ -6865,9 +6865,9 @@ did not write.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `estimate` | `estimate` | `number` | `32` | `HelixBaseVirtualList` | How tall one row is, in pixels, used to map scroll offset to an index. |
-| `for` | `for` | `string` | `''` | `HelixBaseVirtualList` | Id of the element holding the rows, as JSON in a script. |
-| `label` | `label` | `string` | `''` | `HelixBaseVirtualList` | What the list is called, since the rendered rows are only a window on it. |
+| `estimate` | `estimate` | `number` | `32` | `HelixHeadlessVirtualList` | How tall one row is, in pixels, used to map scroll offset to an index. |
+| `for` | `for` | `string` | `''` | `HelixHeadlessVirtualList` | Id of the element holding the rows, as JSON in a script. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessVirtualList` | What the list is called, since the rendered rows are only a window on it. |
 
 #### Parts
 

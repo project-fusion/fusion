@@ -49,8 +49,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart rotation-mark - The glyph on the play and pause control.
  * @csspart track - The scroller the slides sit in.
  */
-@customElement('helix-base-carousel')
-export class HelixBaseCarousel extends HelixElement {
+@customElement('helix-headless-carousel')
+export class HelixHeadlessCarousel extends HelixElement {
   /** Accessible name for the carousel. */
   @property()
   label = 'Carousel'
@@ -638,6 +638,6 @@ export class HelixBaseCarousel extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-carousel': HelixBaseCarousel
+    'helix-headless-carousel': HelixHeadlessCarousel
   }
 }

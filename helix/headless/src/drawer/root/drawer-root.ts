@@ -56,8 +56,8 @@ import { property } from 'lit/decorators.js'
  * @event {HelixCloseEvent} helix-close - Fired before the panel closes, and cancelable.
  * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
  */
-@customElement('helix-base-drawer')
-export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
+@customElement('helix-headless-drawer')
+export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   /* Opened and closed from anywhere on the page, without a line of script:
      `<helix-button commandfor="…" command="--show">`. The same three commands
      the dialog answers, because they are the same act: a drawer and a dialog
@@ -182,6 +182,6 @@ export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-drawer': HelixBaseDrawer
+    'helix-headless-drawer': HelixHeadlessDrawer
   }
 }

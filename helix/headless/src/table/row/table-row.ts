@@ -17,8 +17,8 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  *
  * @slot - The row's cells.
  */
-@customElement('helix-base-table-row')
-export class HelixBaseTableRow extends HelixElement {
+@customElement('helix-headless-table-row')
+export class HelixHeadlessTableRow extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, and required: `display: contents` removes the row's box but
@@ -36,6 +36,6 @@ export class HelixBaseTableRow extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-table-row': HelixBaseTableRow
+    'helix-headless-table-row': HelixHeadlessTableRow
   }
 }

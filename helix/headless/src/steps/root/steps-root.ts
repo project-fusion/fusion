@@ -1,7 +1,7 @@
 import { customElement, HelixElement, hostAria, MixinControllerActive } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { HelixBaseStep } from '../step/step.js'
+import type { HelixHeadlessStep } from '../step/step.js'
 
 /**
  * @summary A sequence of stages, and where the reader is in it.
@@ -46,8 +46,8 @@ import type { HelixBaseStep } from '../step/step.js'
  *
  * @event {HelixChangeEvent} helix-change - Fired when the active step changes.
  */
-@customElement('helix-base-steps')
-export class HelixBaseSteps extends MixinControllerActive(HelixElement) {
+@customElement('helix-headless-steps')
+export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   /**
    * Accessible name for the sequence.
    *
@@ -89,8 +89,10 @@ export class HelixBaseSteps extends MixinControllerActive(HelixElement) {
   variant?: 'numeric'
 
   /** The steps, in the order the consumer wrote them. */
-  private get steps(): HelixBaseStep[] {
-    return [...this.querySelectorAll<HelixBaseStep>(':scope > *')].filter((one) => 'current' in one)
+  private get steps(): HelixHeadlessStep[] {
+    return [...this.querySelectorAll<HelixHeadlessStep>(':scope > *')].filter(
+      (one) => 'current' in one,
+    )
   }
 
   /**
@@ -152,6 +154,6 @@ export class HelixBaseSteps extends MixinControllerActive(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-steps': HelixBaseSteps
+    'helix-headless-steps': HelixHeadlessSteps
   }
 }

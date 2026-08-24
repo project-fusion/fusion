@@ -42,7 +42,7 @@ const OUT = join(ROOT, 'tooling', 'eval', 'questions.json')
  *
  * That is the one failure a self-checking corpus cannot see, so it is guarded
  * from outside rather than by agreement: every family named in the corpus has to
- * be a directory under `helix/web/src` with an `index.ts`, which is the same test
+ * be a directory under `helix/styled/src` with an `index.ts`, which is the same test
  * `check:examples` uses to decide what a family is.
  */
 const familyOf = (declaration) => declaration.modulePath?.split('/').at(-3) ?? declaration.tagName
@@ -50,7 +50,7 @@ const familyOf = (declaration) => declaration.modulePath?.split('/').at(-3) ?? d
 /** Every tagged declaration in the styled manifest, with its Helix metadata. */
 const families = () => {
   const manifest = JSON.parse(
-    readFileSync(join(ROOT, 'helix', 'web', 'custom-elements.json'), 'utf8'),
+    readFileSync(join(ROOT, 'helix', 'styled', 'custom-elements.json'), 'utf8'),
   )
   const found = []
   for (const module of manifest.modules ?? []) {
@@ -196,7 +196,7 @@ for (const entry of all) {
 /* Every question is answerable from something in this repository, and this is
    the list of what. Recorded so a reader can see the corpus has no hand-written
    ground truth in it at all. */
-const sources = ['helix/web/custom-elements.json', 'helix/styles/tokens.json'].filter((path) =>
+const sources = ['helix/styled/custom-elements.json', 'helix/styles/tokens.json'].filter((path) =>
   existsSync(join(ROOT, path)),
 )
 
@@ -206,11 +206,11 @@ const sources = ['helix/web/custom-elements.json', 'helix/styles/tokens.json'].f
    `item` was the answer to twelve questions. So the names are held against the
    directories, which is the same test `check:examples` uses. */
 const directories = new Set(
-  readdirSync(join(ROOT, 'helix', 'web', 'src'), { withFileTypes: true })
+  readdirSync(join(ROOT, 'helix', 'styled', 'src'), { withFileTypes: true })
     .filter(
       (entry) =>
         entry.isDirectory() &&
-        existsSync(join(ROOT, 'helix', 'web', 'src', entry.name, 'index.ts')),
+        existsSync(join(ROOT, 'helix', 'styled', 'src', entry.name, 'index.ts')),
     )
     .map((entry) => entry.name),
 )
@@ -224,7 +224,7 @@ const invented = [
 ]
 if (invented.length > 0) {
   console.error(
-    `The corpus names ${invented.length} things that are not families under helix/web/src: ${invented.join(', ')}.\nA family is a directory with an index.ts, and an answer that is not one is a derivation bug rather than a hard question.`,
+    `The corpus names ${invented.length} things that are not families under helix/styled/src: ${invented.join(', ')}.\nA family is a directory with an index.ts, and an answer that is not one is a derivation bug rather than a hard question.`,
   )
   process.exit(1)
 }

@@ -42,7 +42,7 @@ import { fileURLToPath } from 'node:url'
 import { reference, referenceFamilies } from '../../helix/docs/src/reference.ts'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const MANIFEST = 'helix/web/custom-elements.json'
+const MANIFEST = 'helix/styled/custom-elements.json'
 const OUTPUT = 'docs/component-reference.md'
 
 const manifest = JSON.parse(readFileSync(join(ROOT, MANIFEST), 'utf8'))

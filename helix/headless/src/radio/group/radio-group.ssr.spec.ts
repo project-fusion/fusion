@@ -5,7 +5,9 @@ import '../index.js'
 
 describe('radio group server output', () => {
   test('the question is served, so the set is named before any script', () => {
-    const markup = ssr(html`<helix-base-radio-group label="Label"></helix-base-radio-group>`)
+    const markup = ssr(
+      html`<helix-headless-radio-group label="Label"></helix-headless-radio-group>`,
+    )
     expect(withoutStyles(markup)).toContain('Label')
     expect(hasPart(markup, 'items')).toBe(true)
   })
@@ -14,7 +16,7 @@ describe('radio group server output', () => {
     /* Which is the whole reason they go through internals: an attribute written
        at upgrade is markup a React consumer's server output never had, and
        hydration reports it. */
-    const markup = ssr(html`<helix-base-radio-group label="L"></helix-base-radio-group>`)
+    const markup = ssr(html`<helix-headless-radio-group label="L"></helix-headless-radio-group>`)
     expect(hostTag(markup)).not.toContain('role=')
   })
 
@@ -25,13 +27,13 @@ describe('radio group server output', () => {
        says that rather than comparing two renders, which differ anyway by the
        attribute the consumer wrote on the host. */
     const chosen = ssr(
-      html`<helix-base-radio-group default-value="two" label="L"></helix-base-radio-group>`,
+      html`<helix-headless-radio-group default-value="two" label="L"></helix-headless-radio-group>`,
     )
     expect(withoutStyles(chosen)).not.toContain('selected')
   })
 
   test('a group with nothing to describe serves no description', () => {
-    const markup = ssr(html`<helix-base-radio-group label="L"></helix-base-radio-group>`)
+    const markup = ssr(html`<helix-headless-radio-group label="L"></helix-headless-radio-group>`)
     expect(hasPart(markup, 'hint')).toBe(false)
     expect(hasPart(markup, 'feedback')).toBe(false)
   })

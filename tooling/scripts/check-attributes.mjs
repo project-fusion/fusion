@@ -43,7 +43,7 @@ const MANIFESTS = [
   'helix/core/custom-elements.json',
   'helix/headless/custom-elements.json',
   'helix/sandbox/custom-elements.json',
-  'helix/web/custom-elements.json',
+  'helix/styled/custom-elements.json',
 ]
 
 /**

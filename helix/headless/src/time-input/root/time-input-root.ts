@@ -64,8 +64,8 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart surface - The floating panel.
  * @csspart picker - The list inside it.
  */
-@customElement('helix-base-time-input')
-export class HelixBaseTimeInput extends MixinControllerOpen(
+@customElement('helix-headless-time-input')
+export class HelixHeadlessTimeInput extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
   /**
@@ -449,7 +449,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderPicker(): TemplateResult {
@@ -475,7 +475,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderTag(at: string): TemplateResult {
@@ -505,7 +505,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
    * that renders one ships all 50kB of path data; a named import ships one
    * path. The import is checked when the package compiles, where a `name`
    * string is checked only when `check:icons` runs. And `helix-icon` is not
-   * registered on the headless tier at all, which registers `helix-base-icon`,
+   * registered on the headless tier at all, which registers `helix-headless-icon`,
    * so a headless consumer got an inert unknown element and no mark whatsoever.
    */
   protected renderTrigger(): TemplateResult {
@@ -560,6 +560,6 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-time-input': HelixBaseTimeInput
+    'helix-headless-time-input': HelixHeadlessTimeInput
   }
 }

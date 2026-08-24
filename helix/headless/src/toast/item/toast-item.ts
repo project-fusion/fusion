@@ -81,8 +81,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @cssproperty --toast-duration - How long this message stays, in milliseconds, for a progress hint.
  */
-@customElement('helix-base-toast-item')
-export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
+@customElement('helix-headless-toast-item')
+export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   /**
    * How long it stays, in milliseconds. Absent means until it is dismissed.
    *
@@ -391,6 +391,6 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-toast-item': HelixBaseToastItem
+    'helix-headless-toast-item': HelixHeadlessToastItem
   }
 }

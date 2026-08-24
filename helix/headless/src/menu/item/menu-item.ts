@@ -39,8 +39,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart mark - The trailing mark: a tick when checked, a caret when it opens
  * a page. One column, because a row is never both.
  */
-@customElement('helix-base-menu-item')
-export class HelixBaseMenuItem extends HelixElement {
+@customElement('helix-headless-menu-item')
+export class HelixHeadlessMenuItem extends HelixElement {
   /** What this row stands for, carried in the event when it is chosen. */
   @property()
   value = ''
@@ -389,6 +389,6 @@ export class HelixBaseMenuItem extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-menu-item': HelixBaseMenuItem
+    'helix-headless-menu-item': HelixHeadlessMenuItem
   }
 }

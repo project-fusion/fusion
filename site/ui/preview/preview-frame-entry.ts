@@ -20,7 +20,7 @@
  * around it does.
  */
 
-import '@helix-io/web'
+import '@helix-io/styled'
 
 interface RenderMessage {
   colorMode?: 'dark' | 'light'

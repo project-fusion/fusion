@@ -9,7 +9,7 @@
  * the analyzer does not stop: it reports `ERR_UNKNOWN_FILE_EXTENSION`, falls
  * back to a default configuration, and prints `Created new manifest`.
  *
- * Measured on Node 18.16 in `helix/web`: the manifest it wrote was 69,081 lines
+ * Measured on Node 18.16 in `helix/styled`: the manifest it wrote was 69,081 lines
  * shorter, every Helix plugin's contribution gone, and the command exited as
  * though it had worked. Everything downstream reads that file. The docs site
  * takes its API tables from it, `helix/react` generates wrappers from it, and

@@ -21,8 +21,8 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  *
  * @csspart skeleton - The placeholder surface.
  */
-@customElement('helix-base-skeleton')
-export class HelixBaseSkeleton extends HelixElement {
+@customElement('helix-headless-skeleton')
+export class HelixHeadlessSkeleton extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaBusy = 'true'
@@ -36,6 +36,6 @@ export class HelixBaseSkeleton extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-skeleton': HelixBaseSkeleton
+    'helix-headless-skeleton': HelixHeadlessSkeleton
   }
 }

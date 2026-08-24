@@ -18,7 +18,7 @@
 /** A tag that closes itself in HTML, where every other tag needs a pair. */
 const VOID = new Set([
   'area',
-  'base',
+  'headless',
   'br',
   'col',
   'embed',

@@ -48,7 +48,7 @@ type Row = Record<string, string>
  * before it is a list at all:
  *
  * ```css
- * helix-base-virtual-list::part(viewport) {
+ * helix-headless-virtual-list::part(viewport) {
  *   block-size: 12rem;
  *   overflow-y: auto;
  * }
@@ -75,8 +75,8 @@ type Row = Record<string, string>
  * @csspart before - The space standing in for rows above the window.
  * @csspart viewport - The scrolling box. Needs a block size and an overflow on this tier.
  */
-@customElement('helix-base-virtual-list')
-export class HelixBaseVirtualList extends HelixElement {
+@customElement('helix-headless-virtual-list')
+export class HelixHeadlessVirtualList extends HelixElement {
   /** How tall one row is, in pixels, used to map scroll offset to an index. */
   @property({ type: Number })
   estimate = 32
@@ -204,6 +204,6 @@ export class HelixBaseVirtualList extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-virtual-list': HelixBaseVirtualList
+    'helix-headless-virtual-list': HelixHeadlessVirtualList
   }
 }

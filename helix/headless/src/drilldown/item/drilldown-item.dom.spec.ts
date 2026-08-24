@@ -10,7 +10,7 @@ type Row = HTMLElement & { focusable: boolean; select(): void; updateComplete: P
 
 const row = async (attributes = 'value="a"'): Promise<Row> =>
   (await mount(
-    `<helix-base-drilldown-item ${attributes}>Settings</helix-base-drilldown-item>`,
+    `<helix-headless-drilldown-item ${attributes}>Settings</helix-headless-drilldown-item>`,
   )) as Row
 
 /**

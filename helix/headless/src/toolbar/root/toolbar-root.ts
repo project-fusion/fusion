@@ -78,8 +78,8 @@ const claimed = (event: KeyboardEvent): boolean => {
  *
  * @csspart toolbar - The toolbar container.
  */
-@customElement('helix-base-toolbar')
-export class HelixBaseToolbar extends HelixElement {
+@customElement('helix-headless-toolbar')
+export class HelixHeadlessToolbar extends HelixElement {
   /** Accessible name for the toolbar. */
   @property()
   label = 'Toolbar'
@@ -267,6 +267,6 @@ export class HelixBaseToolbar extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-toolbar': HelixBaseToolbar
+    'helix-headless-toolbar': HelixHeadlessToolbar
   }
 }

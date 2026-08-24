@@ -1,7 +1,7 @@
 import { customElement, HelixElement } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixBaseAccordionItem } from '../item/accordion-item.js'
+import { HelixHeadlessAccordionItem } from '../item/accordion-item.js'
 
 /** Keys that move focus between triggers, per the APG accordion pattern. */
 const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
@@ -22,7 +22,7 @@ const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
  * Membership resolves on demand, so there is no registry to keep in step: an
  * item added a second after render coordinates on its first click.
  *
- * Items are matched with `instanceof HelixBaseAccordionItem`, never by tag
+ * Items are matched with `instanceof HelixHeadlessAccordionItem`, never by tag
  * name. Matching `helix-accordion-item` would tie this tier to the styled one.
  *
  * Every listener is attached on connect, so none of it runs on the server,
@@ -36,8 +36,8 @@ const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
  *
  * @slot - The accordion's items.
  */
-@customElement('helix-base-accordion')
-export class HelixBaseAccordion extends HelixElement {
+@customElement('helix-headless-accordion')
+export class HelixHeadlessAccordion extends HelixElement {
   /**
    * How many sections may be open at once.
    *
@@ -52,9 +52,9 @@ export class HelixBaseAccordion extends HelixElement {
   mode?: 'single' | 'single-collapsible'
 
   /** Direct items, in light-DOM order. Client only: the server has no tree. */
-  get items(): HelixBaseAccordionItem[] {
+  get items(): HelixHeadlessAccordionItem[] {
     return [...this.children].filter(
-      (child): child is HelixBaseAccordionItem => child instanceof HelixBaseAccordionItem,
+      (child): child is HelixHeadlessAccordionItem => child instanceof HelixHeadlessAccordionItem,
     )
   }
 
@@ -63,7 +63,7 @@ export class HelixBaseAccordion extends HelixElement {
       return
     }
     const items = this.items
-    const current = items.indexOf(event.target as HelixBaseAccordionItem)
+    const current = items.indexOf(event.target as HelixHeadlessAccordionItem)
     if (current === -1) {
       return
     }
@@ -102,6 +102,6 @@ export class HelixBaseAccordion extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-accordion': HelixBaseAccordion
+    'helix-headless-accordion': HelixHeadlessAccordion
   }
 }

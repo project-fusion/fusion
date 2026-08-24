@@ -6,12 +6,12 @@
  * so.** A module that calls `customElements.define` at load has done something
  * by being loaded, `@helix-io/headless` says so in its `sideEffects` field, and
  * that field is correct. What follows from it is that a bundler may drop
- * nothing out of its barrel: `import { HelixBaseButton } from
+ * nothing out of its barrel: `import { HelixHeadlessButton } from
  * '@helix-io/headless'` retains all 83 families whether or not one of them is
  * reachable.
  *
  * Measured before this check existed, by `bun run metrics`: 82 of the 88 styled
- * families imported the headless barrel, and `@helix-io/web/button` came to
+ * families imported the headless barrel, and `@helix-io/styled/button` came to
  * 449,026 raw bytes, 115,590 gzipped, against 41,587 and 14,149 after the same
  * import went deep. The whole styled tier is 1.4MB, so one button was 29
  * percent of the library.

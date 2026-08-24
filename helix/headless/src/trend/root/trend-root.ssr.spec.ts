@@ -7,8 +7,8 @@ describe('trend server output', () => {
   test('the direction, the metric and the label are all in the served markup', () => {
     const markup = withoutStyles(
       ssr(
-        html`<helix-base-trend direction="up" good="down"
-          >40ms<span slot="label">p99 latency</span></helix-base-trend
+        html`<helix-headless-trend direction="up" good="down"
+          >40ms<span slot="label">p99 latency</span></helix-headless-trend
         >`,
       ),
     )
@@ -20,12 +20,17 @@ describe('trend server output', () => {
   test('a trend with no direction serves the neutral one', () => {
     // The absent attribute is the neutral case, which the server has to draw
     // the same way the client does or the first paint changes under the reader.
-    expect(withoutStyles(ssr(html`<helix-base-trend>0</helix-base-trend>`))).toContain('Unchanged')
+    expect(withoutStyles(ssr(html`<helix-headless-trend>0</helix-headless-trend>`))).toContain(
+      'Unchanged',
+    )
   })
 
   test('the host carries nothing the consumer did not write', () => {
     expect(
-      hostAttributes(ssr(html`<helix-base-trend>0</helix-base-trend>`), 'helix-base-trend'),
+      hostAttributes(
+        ssr(html`<helix-headless-trend>0</helix-headless-trend>`),
+        'helix-headless-trend',
+      ),
     ).toEqual([])
   })
 })

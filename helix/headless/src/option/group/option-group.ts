@@ -25,8 +25,8 @@ import { property } from 'lit/decorators.js'
  * @csspart label - The heading.
  * @csspart items - The run itself.
  */
-@customElement('helix-base-option-group')
-export class HelixBaseOptionGroup extends HelixElement {
+@customElement('helix-headless-option-group')
+export class HelixHeadlessOptionGroup extends HelixElement {
   /** The heading over the run. */
   @property()
   label = ''
@@ -46,6 +46,6 @@ export class HelixBaseOptionGroup extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-option-group': HelixBaseOptionGroup
+    'helix-headless-option-group': HelixHeadlessOptionGroup
   }
 }

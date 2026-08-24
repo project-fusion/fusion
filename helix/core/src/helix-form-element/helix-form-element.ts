@@ -84,7 +84,7 @@ export class HelixFormElement extends HelixElement {
    * inheritance case that is the only reason this getter exists.
    *
    * Documented away rather than made `protected`, because a subclass in
-   * `helix/web` binds to it and that is exactly what it is for.
+   * `helix/styled` binds to it and that is exactly what it is for.
    */
   get isDisabled(): boolean {
     return this.disabled || this.formDisabled

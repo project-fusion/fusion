@@ -30,14 +30,14 @@ import '../index.js'
 describe('timeline item server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
     expect(
-      withoutStyles(ssr(html`<helix-base-timeline-item></helix-base-timeline-item>`)),
-    ).toContain('helix-base-timeline-item')
+      withoutStyles(ssr(html`<helix-headless-timeline-item></helix-headless-timeline-item>`)),
+    ).toContain('helix-headless-timeline-item')
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-base-timeline-item></helix-base-timeline-item>`),
-      'helix-base-timeline-item',
+      ssr(html`<helix-headless-timeline-item></helix-headless-timeline-item>`),
+      'helix-headless-timeline-item',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })

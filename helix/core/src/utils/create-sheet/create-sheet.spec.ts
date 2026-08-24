@@ -5,7 +5,7 @@ import { createSheet } from './create-sheet.js'
  * One line wrapping `unsafeCSS`, and the test is that it stays that way.
  *
  * There is nothing here to get wrong today, which is the point: every compiled
- * `.css.ts` in `helix/web` hands a whole stylesheet through this, so anything
+ * `.css.ts` in `helix/styled` hands a whole stylesheet through this, so anything
  * that escaped, trimmed or re-parsed the text would silently unstyle the entire
  * library. Lit's `css` tagged template *does* reject most of what a real sheet
  * contains, so "improving" this to use it is a plausible edit, and this is what

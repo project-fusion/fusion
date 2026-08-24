@@ -27,7 +27,7 @@ analysis time rather than left to review.
 ## Install
 
 ```sh
-bun add @helix-io/web @helix-io/styles
+bun add @helix-io/styled @helix-io/styles
 ```
 
 Three imports at your app root, in this order, then the elements are usable
@@ -36,8 +36,8 @@ anywhere:
 ```ts
 import '@helix-io/styles/tokens.css'
 import '@helix-io/styles/base.css'
-import '@helix-io/web/elements.css'
-import '@helix-io/web'
+import '@helix-io/styled/elements.css'
+import '@helix-io/styled'
 ```
 
 ```html
@@ -57,7 +57,7 @@ page for each framework.
 | Package | Use when |
 | --- | --- |
 | `@helix-io/styles` | Always. Tokens and the base layer |
-| `@helix-io/web` | You want Helix components as-is |
+| `@helix-io/styled` | You want Helix components as-is |
 | `@helix-io/headless` | You want the behavior and none of the styling |
 | `@helix-io/theme` | You are generating or validating a theme |
 | `@helix-io/icons` | You are drawing an icon outside a component |

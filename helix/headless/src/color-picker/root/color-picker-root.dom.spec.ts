@@ -10,7 +10,7 @@ type Color = HTMLElement & { format: string; updateComplete: Promise<unknown>; v
 
 const picker = async (attrs = ''): Promise<Color> => {
   const host = (await mount(
-    `<helix-base-color-picker ${attrs}></helix-base-color-picker>`,
+    `<helix-headless-color-picker ${attrs}></helix-headless-color-picker>`,
   )) as Color
   await host.updateComplete
   return host

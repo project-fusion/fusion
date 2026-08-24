@@ -143,7 +143,7 @@ for (const path of STYLES.flatMap((dir) => stylesheets(dir))) {
 }
 
 /* The component side: what each stylesheet declares for its host and its slots. */
-for (const path of stylesheets('helix/web/src')) {
+for (const path of stylesheets('helix/styled/src')) {
   /* **The element this file styles, not the family it lives in.**
    *
    * This read the family from the directory and compared every stylesheet in it

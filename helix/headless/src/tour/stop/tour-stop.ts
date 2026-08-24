@@ -63,8 +63,8 @@ import '../../button/index.js'
  * @csspart next - The control that goes on, and finishes on the last stop.
  * @csspart skip - The control that leaves the tour.
  */
-@customElement('helix-base-tour-stop')
-export class HelixBaseTourStop extends HelixElement {
+@customElement('helix-headless-tour-stop')
+export class HelixHeadlessTourStop extends HelixElement {
   /** The id of the element this stop is about. */
   @property()
   for = ''
@@ -223,6 +223,6 @@ export class HelixBaseTourStop extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-tour-stop': HelixBaseTourStop
+    'helix-headless-tour-stop': HelixHeadlessTourStop
   }
 }

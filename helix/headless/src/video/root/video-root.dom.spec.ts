@@ -9,7 +9,7 @@ beforeAll(async () => {
 type Player = HTMLElement & { updateComplete: Promise<boolean> }
 
 const player = async (
-  markup = '<helix-base-video label="A clip" src="/clip.mp4"></helix-base-video>',
+  markup = '<helix-headless-video label="A clip" src="/clip.mp4"></helix-headless-video>',
 ) => {
   const host = (await mount(markup)) as Player
   await host.updateComplete
@@ -137,7 +137,7 @@ describe('the mark that starts it', () => {
 
   test('and `none` is for a video that is decoration rather than something to start', async () => {
     const host = await player(
-      '<helix-base-video label="A clip" src="/clip.mp4" start-control="none"></helix-base-video>',
+      '<helix-headless-video label="A clip" src="/clip.mp4" start-control="none"></helix-headless-video>',
     )
     expect(part(host, 'start')).toBeNull()
   })
@@ -145,7 +145,7 @@ describe('the mark that starts it', () => {
   test('the browser drawing its own controls takes it away too', async () => {
     // That bar has a play button in it, and two would be two.
     const host = await player(
-      '<helix-base-video controls label="A clip" src="/clip.mp4"></helix-base-video>',
+      '<helix-headless-video controls label="A clip" src="/clip.mp4"></helix-headless-video>',
     )
     expect(part(host, 'start')).toBeNull()
   })
@@ -185,7 +185,7 @@ describe('the download control', () => {
        markup, so it is written only when it holds, and a new tab is the best a
        page can do with somebody else's file. */
     const away = await player(
-      '<helix-base-video extra-controls="download" label="A clip" src="https://example.com/clip.mp4"></helix-base-video>',
+      '<helix-headless-video extra-controls="download" label="A clip" src="https://example.com/clip.mp4"></helix-headless-video>',
     )
     const link = part(away, 'download') as HTMLAnchorElement
     expect(link.hasAttribute('download')).toBe(false)
@@ -202,7 +202,7 @@ describe('the download control', () => {
        environment passes in one and fails in the other, which is what the first
        version of this did. */
     const ours = await player(
-      '<helix-base-video extra-controls="download" label="A clip" src="blob:whatever"></helix-base-video>',
+      '<helix-headless-video extra-controls="download" label="A clip" src="blob:whatever"></helix-headless-video>',
     )
     const link = part(ours, 'download') as HTMLAnchorElement
     expect(link.hasAttribute('download')).toBe(true)
@@ -213,7 +213,7 @@ describe('the download control', () => {
 describe('asking for another item in a set', () => {
   const skipper = async () =>
     player(
-      '<helix-base-video extra-controls="previous next" label="A clip" src="/clip.mp4"></helix-base-video>',
+      '<helix-headless-video extra-controls="previous next" label="A clip" src="/clip.mp4"></helix-headless-video>',
     )
 
   test('both controls are offered without anything being checked', async () => {
@@ -272,7 +272,7 @@ describe('video', () => {
     // Two bars over one video is worse than either alone, and a consumer who
     // asked for the native one has a reason.
     const host = await player(
-      '<helix-base-video controls label="A clip" src="/clip.mp4"></helix-base-video>',
+      '<helix-headless-video controls label="A clip" src="/clip.mp4"></helix-headless-video>',
     )
     expect((part(host, 'video') as HTMLVideoElement).controls).toBe(true)
     expect(part(host, 'controls')).toBeNull()
@@ -297,7 +297,7 @@ describe('video', () => {
        platform answers `watchAvailability` late and often with nothing, so the
        control waits for an actual target rather than for the API to exist. */
     const host = await player(
-      '<helix-base-video extra-controls="remote" label="A clip" src="/clip.mp4"></helix-base-video>',
+      '<helix-headless-video extra-controls="remote" label="A clip" src="/clip.mp4"></helix-headless-video>',
     )
     expect(part(host, 'remote')).toBeNull()
   })
@@ -310,8 +310,12 @@ describe('video', () => {
     if (!session) {
       return
     }
-    const first = await player('<helix-base-video label="First" src="/a.mp4"></helix-base-video>')
-    const second = await player('<helix-base-video label="Second" src="/b.mp4"></helix-base-video>')
+    const first = await player(
+      '<helix-headless-video label="First" src="/a.mp4"></helix-headless-video>',
+    )
+    const second = await player(
+      '<helix-headless-video label="Second" src="/b.mp4"></helix-headless-video>',
+    )
 
     ;(part(first, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
     await (first as Player).updateComplete
@@ -329,11 +333,15 @@ describe('video', () => {
     if (!session) {
       return
     }
-    const first = await player('<helix-base-video label="First" src="/a.mp4"></helix-base-video>')
+    const first = await player(
+      '<helix-headless-video label="First" src="/a.mp4"></helix-headless-video>',
+    )
     ;(part(first, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
     await (first as Player).updateComplete
 
-    const second = await player('<helix-base-video label="Second" src="/b.mp4"></helix-base-video>')
+    const second = await player(
+      '<helix-headless-video label="Second" src="/b.mp4"></helix-headless-video>',
+    )
     ;(part(second, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
     await (second as Player).updateComplete
 
@@ -346,7 +354,7 @@ describe('video', () => {
        immediately pauses. A consumer who asked for the browser's bar asked for
        its keyboard with it, and it brings its own focus stop. */
     const host = await player(
-      '<helix-base-video controls label="A clip" src="/clip.mp4"></helix-base-video>',
+      '<helix-headless-video controls label="A clip" src="/clip.mp4"></helix-headless-video>',
     )
     const stage = part(host, 'stage') as HTMLElement
     expect(stage.hasAttribute('tabindex')).toBe(false)

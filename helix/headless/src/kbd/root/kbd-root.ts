@@ -23,8 +23,8 @@ import { html, type TemplateResult } from 'lit'
  *
  * @csspart kbd - The key.
  */
-@customElement('helix-base-kbd')
-export class HelixBaseKbd extends HelixElement {
+@customElement('helix-headless-kbd')
+export class HelixHeadlessKbd extends HelixElement {
   protected override render(): TemplateResult {
     return html`<kbd part="kbd"><slot></slot></kbd>`
   }
@@ -32,6 +32,6 @@ export class HelixBaseKbd extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-kbd': HelixBaseKbd
+    'helix-headless-kbd': HelixHeadlessKbd
   }
 }

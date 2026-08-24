@@ -22,7 +22,7 @@
     "@helix-io/sandbox": "workspace:*",
     "@helix-io/styles": "workspace:*",
     "@helix-io/theme": "workspace:*",
-    "@helix-io/web": "workspace:*",
+    "@helix-io/styled": "workspace:*",
     "next": "^16.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

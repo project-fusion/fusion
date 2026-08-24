@@ -11,8 +11,8 @@ paths:
 styles     tokens, base layer. Pure CSS, zero dependencies
 core       HelixElement, mixins, event classes
 headless   structure, a11y, state, form participation. NO CSS
-web        styled tier. Extends headless, references tokens
-react      generated wrappers over web and headless
+styled     the styled tier. Extends headless, references tokens
+react      generated wrappers over styled and headless
 ```
 
 **`headless` must never depend on `styles`.** That constraint is what makes the
@@ -25,7 +25,7 @@ already ships four token-free rules into every shadow root through
 a scroll container's `overflow`, and the transition suppression that stops a
 component animating its own arrival. `HIDDEN` is the clearest case, because the
 notes below argue that `hidden` is base-tier *state* on the grounds that the
-platform acts on it, and the way the base tier makes the platform act is a CSS
+platform acts on it, and the way the headless tier makes the platform act is a CSS
 rule shipped from here.
 
 So the test for whether a rule may live in `core` is not "is it CSS" but "does
@@ -33,7 +33,7 @@ it name a token". A mechanism does not: `overflow: auto` is what creates a
 scrollport, and without it `scrollTop` is permanently zero and every scroll API
 on the element is inert. A decision does: a colour, a spacing, a duration, a
 height, an `overscroll-behavior`, a scrollbar treatment. Those stay in
-`helix/web`.
+`helix/styled`.
 
 **A component marks a box whose scroll state it reads, with `data-scroller`, and
 no other.** Three do: `ScrollArea`, `VirtualList` and `Carousel`. `Megamenu`'s
@@ -52,7 +52,7 @@ consumer simply wins, which is the right way round and is verified in Chromium.
 
 **The mechanism is not sufficient on its own, and that is correct.** A scroll
 container also needs a bounded box, and how tall a scroll area is, is a design
-decision: the base examples supply it and each component documents it. What
+decision: the headless examples supply it and each component documents it. What
 changed is that a headless consumer now supplies a *size* rather than a size and
 an `overflow` they had no way of knowing was missing.
 
@@ -63,7 +63,7 @@ an `overflow` they had no way of knowing was missing.
   events, form participation. No CSS, no tokens, no `appearance`/`tone`.
 - **The headless tier is `BaseCard`, not `CardBase`**, and namespaces as
   `BaseCard.Root` beside `Card.Root`. Both tiers register elements
-  (`helix-base-card`, `helix-card`): an unregistered element can only be
+  (`helix-headless-card`, `helix-card`): an unregistered element can only be
   subclassed, which is not "independently consumable".
 - **Mixins add API, controllers add behavior.** If it introduces a property or
   method a consumer uses, it is a mixin. If it only reacts to lifecycle, it is a
@@ -113,7 +113,7 @@ under a trigger reporting `aria-expanded="false"`. The collapse was living in
 the styled tier's `grid-template-rows: 0fr`, an animation that was doing the
 hiding as a side effect.
 
-**The tell is that the styled tier gets it right and the base tier does not.**
+**The tell is that the styled tier gets it right and the headless tier does not.**
 That is not a styling gap, which is the reading that hid this: it means the fact
 was recorded in one tier's CSS rather than in the component. Ask of any
 open/closed, shown/hidden, selected/not: *with every stylesheet deleted, is this
@@ -130,7 +130,7 @@ consumer styles would animate open to nothing. It also needs a `beforematch`
 handler to set the open state, or find-in-page reveals content while the trigger
 still reports collapsed.
 
-### The base tier publishes facts, and CSS is a fine channel for them
+### The headless tier publishes facts, and CSS is a fine channel for them
 
 **Setting a custom property is not styling, so the tier rule does not bar it.**
 A base component knows things CSS cannot compute (where a thumb sits, how deep
@@ -151,7 +151,7 @@ dependency the tier split exists to prevent.
 **The underscore belongs where the package contains a reader.** A styled sheet
 that writes `--_dialog-scrim` and reads it back three rules later has one: the
 value never leaves, and the underscore says so, the same way it does on
-`--_helix-*` primitives. Twenty-odd in `helix/web` are exactly that.
+`--_helix-*` primitives. Twenty-odd in `helix/styled` are exactly that.
 
 **A package that ships no stylesheet cannot have one.** `headless` and `core`
 have no CSS by definition, so every property they write is read by somebody
@@ -198,7 +198,7 @@ protected renderPicker(): TemplateResult {
 }
 ```
 
-`tag()` prefixes the name with the class's `tier`, which is `helix-base-` on
+`tag()` prefixes the name with the class's `tier`, which is `helix-headless-` on
 `HelixElement` and `helix-` on every styled component. One template, and each
 tier renders its own children. The styled subclass declares it in one line:
 
@@ -209,7 +209,7 @@ static override tier = 'helix-'
 **The headless tier may not name a styled tag.** It is the dependency the tiers
 exist to prevent: `helix/headless` composing `helix-select` renders an element it
 does not ship, cannot test the composition (there is no `helix-select` on that
-tier to test against), and leaves the base tier broken for anyone who imports
+tier to test against), and leaves the headless tier broken for anyone who imports
 only it. Forty-two sites across sixteen families did this, on the argument that
 each tier imports its own element under one name, which holds only while nobody
 imports both, and the docs site imports both.
@@ -236,7 +236,7 @@ render is broken in any non-browser context.
 
 Shadow styles now arrive with the definition rather than in the markup, so the
 flash window is "before the element upgrades", covered by
-`@helix-io/web/elements.css`. Within that, the risk is still **state, not
+`@helix-io/styled/elements.css`. Within that, the risk is still **state, not
 styling**.
 
 1. **Never initialize state in `connectedCallback`.** SSR does not call it.
@@ -266,7 +266,7 @@ stylesheet names every part, host attribute, and token the component uses. So
 both saying nothing about what rendered. This has produced a false pass twice,
 once hiding a stale build for several commits.
 
-Use the helpers in `web/src/testing/ssr.ts`: `withoutStyles`, `hasPart`,
+Use the helpers in `styled/src/testing/ssr.ts`: `withoutStyles`, `hasPart`,
 `partTag`, `hostTag`. Attribute bindings render across multiple lines, so match
 with `/<a\s+part="button"/`, never `'<a part="button"'`.
 
@@ -663,7 +663,7 @@ first `Text`. They default to matching, so a heading is correct by doing
 nothing, and `size` is only ever a deliberate exception.
 
 Layout components are presentation with no structure or a11y of their own, so
-they ship in `helix/web` with **no headless tier**. The tier split exists to
+they ship in `helix/styled` with **no headless tier**. The tier split exists to
 keep behavior separate from styling, and there is no behavior to separate.
 
 Styles are authored in sibling `.css` files. `bun run styles` compiles each into
@@ -687,7 +687,7 @@ never edit one.
   source directory from its module path, the way `helix-composition` derives the
   group and the part from the same string, so it cannot disagree with where the
   file is and it survives a move. What it stores is
-  `helix/web/src/accordion`; the site composes
+  `helix/styled/src/accordion`; the site composes
   `{repository}/tree/{ref}/{path}`.
 
   **The split is about versioning and is worth keeping even before it matters.**
@@ -925,7 +925,7 @@ component holds every element import and renders `null`:
 
 ```tsx
 'use client'
-import '@helix-io/web/card'
+import '@helix-io/styled/card'
 export function HelixElements(): null {
   return null
 }
@@ -936,7 +936,7 @@ unregistered tag is just an unknown element in the HTML that upgrades when the
 definition lands. Consumers are on the App Router; asking them to mark every
 page `'use client'` to use a button would not be a design system.
 
-**Import `@helix-io/web/elements.css` beside the base layer.** It is generated
+**Import `@helix-io/styled/elements.css` beside the base layer.** It is generated
 from the element sources by `tooling/scripts/build-elements-css.mjs` and hides
 each tag with `:not(:defined)` until it upgrades, using `visibility` so the page
 does not reflow. Without it a card arrives as a run of unstyled text and then
@@ -1014,7 +1014,7 @@ What survived is the naming, which was never about wrappers:
   with no editor mounted and no DOM required, so it runs during a build and a
   static page ships coloured markup with no JavaScript spent on it. Those
   grammars are already in that package for the editor, so nothing new is
-  installed; putting them in `helix/web` would put CodeMirror in every
+  installed; putting them in `helix/styled` would put CodeMirror in every
   consumer's `dependencies`, which is about 4 MB paid at install time whatever
   anyone imports. `CodeBlock` renders a `<slot>`, so highlighted markup drops
   straight in and the component stays free of it. A snippet on a reference page
@@ -1053,20 +1053,20 @@ What survived is the naming, which was never about wrappers:
 
 ## The sandbox
 
-`@helix-io/web` ships the sandbox shell and `@helix-io/sandbox` the editor and
+`@helix-io/styled` ships the sandbox shell and `@helix-io/sandbox` the editor and
 the spec runner; `site/ui` is the Next site that renders them. Both dev and
 production work the same way as the marketing site, with element registration in
 one client component.
 
-- **The shell ships from `helix/web`; the editor does not.** *Reversed 19 Aug
+- **The shell ships from `helix/styled`; the editor does not.** *Reversed 19 Aug
   2026.* This read "a separate package, never the component library", against
-  the previous Helix having exported ten sandbox classes from `helix/web`'s
+  the previous Helix having exported ten sandbox classes from `helix/styled`'s
   public barrel: 119 kB of 1.22 MB, a tenth of the library, shipped to every
   consumer as tooling for one internal site.
 
   **That measurement was taken when the barrel was the only way in.** Subpath
   exports and honestly declared `sideEffects` are what changed it: a consumer
-  importing `@helix-io/web/card` never sees a sandbox. The cost the old rule was
+  importing `@helix-io/styled/card` never sees a sandbox. The cost the old rule was
   protecting against is now opt-in, and what is left is a question about what
   the thing *is* rather than what it weighs.
 
@@ -1093,7 +1093,7 @@ one client component.
 
   **And `@helix-io/sandbox` is `private` while Helix is pre-release**, so today
   the cost is not opt-in, it is unavailable: a consumer gets the published shell
-  from `@helix-io/web` and brings their own source pane. The shell is slot-based
+  from `@helix-io/styled` and brings their own source pane. The shell is slot-based
   and the root hands its value to whatever is slotted in, so this degrades
   rather than breaks. The scope still says Helix, because the package is Helix;
   `private` is what says it does not ship, and flipping it is a one-line change
@@ -1126,11 +1126,11 @@ one client component.
 Two copies of the library are on that page and they are not the same build.
 
 The sandbox's own chrome (the tabs, the tree, the toolbar) comes through Next's
-module graph from `helix/web/dist`, so `bun run dev:watch` rebuilds it and HMR
+module graph from `helix/styled/dist`, so `bun run dev:watch` rebuilds it and HMR
 shows it immediately. **The preview does not.** It runs `frame.js`, an 873 kB
 classic-script IIFE built by `bun run frame` and served from `public/`, which is
 the only shape that can carry the library into a sandboxed document (see below).
-It was 400 kB before the sandbox shell moved into `@helix-io/web`, which the
+It was 400 kB before the sandbox shell moved into `@helix-io/styled`, which the
 frame imports whole: the shell now rides in every preview, which is what lets an
 example render a `<helix-sandbox>` at all.
 
@@ -1225,7 +1225,7 @@ letting CSS choose costs a little HTML and cannot disagree with itself, which is
 the same trade colour mode already makes.
 
 `display: none`, never a clip. The hidden tier has to leave the accessibility
-tree as well as the page, or a reader being read the styled API gets the base one
+tree as well as the page, or a reader being read the styled API gets the headless one
 read out underneath it and the rail points at sections that are not shown.
 Styled is expressed as the *absence* of the attribute, so the document's resting
 state is the common answer.
@@ -1266,7 +1266,7 @@ large, and every consumer parses this manifest whether or not it renders one.
 A family with an `index.ts` and no `.examples` fails `check:examples`. That is
 what makes a directory a family, the same question the package's `exports` map
 asks, which is why `field/` is exempt and why moving the sandbox into
-`helix/web` obliged it to ship an example.
+`helix/styled` obliged it to ship an example.
 
 There is no check for this. The line is between prose about the component and
 prose that is merely content, which no word count can see, and the two examples
@@ -1280,7 +1280,7 @@ prefix, because that is a real identifier a consumer types.
 
 ## Tree-shaking## Tree-shaking
 
-One family per module, subpath exports (`@helix-io/web/card`) so consumers need
-not import the barrel, and `sideEffects` declared honestly: `web` has them
+One family per module, subpath exports (`@helix-io/styled/card`) so consumers need
+not import the barrel, and `sideEffects` declared honestly: `styled` has them
 because `@customElement` registers on import, `headless` does not. Getting it
 wrong is silent both ways.

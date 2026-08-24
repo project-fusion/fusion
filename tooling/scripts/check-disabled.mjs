@@ -30,7 +30,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const WEB = 'helix/web/src'
+const WEB = 'helix/styled/src'
 const HEADLESS = 'helix/headless/src'
 
 /** Every file under a directory whose name ends in one of `suffixes`. */

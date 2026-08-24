@@ -7,10 +7,10 @@ describe('avatar group server output', () => {
   test('the avatars are served, because they are the consumer’s own markup', () => {
     const markup = withoutStyles(
       ssr(
-        html`<helix-base-avatar-group label="Reviewers" max="2"
-          ><helix-base-avatar name="Ada Lovelace"></helix-base-avatar
-          ><helix-base-avatar name="Grace Hopper"></helix-base-avatar
-        ></helix-base-avatar-group>`,
+        html`<helix-headless-avatar-group label="Reviewers" max="2"
+          ><helix-headless-avatar name="Ada Lovelace"></helix-headless-avatar
+          ><helix-headless-avatar name="Grace Hopper"></helix-headless-avatar
+        ></helix-headless-avatar-group>`,
       ),
     )
     expect(markup).toContain('Ada Lovelace')
@@ -24,9 +24,9 @@ describe('avatar group server output', () => {
     expect(
       hasPart(
         ssr(
-          html`<helix-base-avatar-group max="1"
-            ><helix-base-avatar name="Ada Lovelace"></helix-base-avatar
-          ></helix-base-avatar-group>`,
+          html`<helix-headless-avatar-group max="1"
+            ><helix-headless-avatar name="Ada Lovelace"></helix-headless-avatar
+          ></helix-headless-avatar-group>`,
         ),
         'overflow',
       ),
@@ -36,8 +36,10 @@ describe('avatar group server output', () => {
   test('the host carries only what the consumer wrote', () => {
     expect(
       hostAttributes(
-        ssr(html`<helix-base-avatar-group label="Reviewers" max="4"></helix-base-avatar-group>`),
-        'helix-base-avatar-group',
+        ssr(
+          html`<helix-headless-avatar-group label="Reviewers" max="4"></helix-headless-avatar-group>`,
+        ),
+        'helix-headless-avatar-group',
       ),
     ).toEqual(['label', 'max'])
   })

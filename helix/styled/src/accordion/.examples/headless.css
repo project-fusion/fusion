@@ -1,0 +1,52 @@
+/* What the headless tier asks a consumer to write.
+ *
+ * `helix-headless-accordion` owns which section is open and the disclosure
+ * semantics, and it closes a closed section itself: the content region carries
+ * `hidden`, so nothing below has to hide anything and removing this whole sheet
+ * leaves a working accordion. What it does not own is any of the appearance,
+ * which is everything below.
+ *
+ * There is no open/close transition here, and that is the tier rather than an
+ * omission. Animating to a content's intrinsic height is a grid collapsing from
+ * `0fr` to `1fr`, which is a rule a consumer writes and which has to override
+ * the `hidden` the component sets. The styled tier does exactly that.
+ *
+ * Deliberately skeletal, for the reason the checkbox's sheet gives: a diagram
+ * of what has to be styled rather than a theme to copy.
+ * */
+
+helix-headless-accordion-item {
+  border-block-end: 1px solid;
+  display: block;
+}
+
+helix-headless-accordion-item::part(trigger) {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  inline-size: 100%;
+  padding-block: 0.75rem;
+  text-align: start;
+}
+
+/* The chevron is drawn by the component and turned by it. Only its size is
+   left, and the turn is worth leaving alone: it is keyed on the open state the
+   component resolves, not on a class a consumer has to keep in step. */
+helix-headless-accordion-item::part(chevron) {
+  block-size: 0.75rem;
+  inline-size: 0.75rem;
+}
+
+helix-headless-accordion-item::part(content-inner) {
+  padding-block-end: 0.75rem;
+}
+
+/* The keyboard reaches the trigger, so the ring goes there. Taking the UA
+   outline off without putting one back is the commonest way a headless
+   disclosure stops being operable without a pointer. */
+helix-headless-accordion-item::part(trigger):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}

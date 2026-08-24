@@ -117,8 +117,8 @@ const kind = (file: File): string => {
  * @csspart kind - What kind of file it is.
  * @csspart remove - The control that takes it back out.
  */
-@customElement('helix-base-file-input')
-export class HelixBaseFileInput extends MixinField(HelixFormElement) {
+@customElement('helix-headless-file-input')
+export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   /** Which files the picker offers, as a native `accept` list. */
   @property()
   accept = ''
@@ -373,7 +373,7 @@ export class HelixBaseFileInput extends MixinField(HelixFormElement) {
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * base element, and a styled subclass that sets `tier` renders the styled one
+   * headless element, and a styled subclass that sets `tier` renders the styled one
    * from the same template.
    */
   protected renderMeta(file: File): TemplateResult {
@@ -443,6 +443,6 @@ export class HelixBaseFileInput extends MixinField(HelixFormElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-file-input': HelixBaseFileInput
+    'helix-headless-file-input': HelixHeadlessFileInput
   }
 }

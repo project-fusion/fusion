@@ -6,7 +6,10 @@ import '../index.js'
 describe('toolbar server output', () => {
   test('the row ships, so the controls in it are laid out before hydration', () => {
     expect(
-      hasPart(ssr(html`<helix-base-toolbar label="Actions"></helix-base-toolbar>`), 'toolbar'),
+      hasPart(
+        ssr(html`<helix-headless-toolbar label="Actions"></helix-headless-toolbar>`),
+        'toolbar',
+      ),
     ).toBe(true)
   })
 
@@ -15,8 +18,8 @@ describe('toolbar server output', () => {
     // not written either: the toolbar declares it in CSS rather than as markup.
     expect(
       hostAttributes(
-        ssr(html`<helix-base-toolbar label="Actions"></helix-base-toolbar>`),
-        'helix-base-toolbar',
+        ssr(html`<helix-headless-toolbar label="Actions"></helix-headless-toolbar>`),
+        'helix-headless-toolbar',
       ),
     ).toEqual(['label'])
   })

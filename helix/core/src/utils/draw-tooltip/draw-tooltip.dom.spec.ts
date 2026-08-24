@@ -13,7 +13,7 @@ import type { Row } from '../read-series/read-series.js'
  * which is `Tooltip` with extra steps and a second copy of the hard part.
  *
  * **The tag is the caller's, so this file supplies one.** It used to write
- * `helix-tooltip` itself, which only `helix/web` registers, so a consumer of the
+ * `helix-tooltip` itself, which only `helix/styled` registers, so a consumer of the
  * headless tier alone got an inert unknown element. Passing it in is what lets
  * each tier answer with its own name, and it is asserted below rather than
  * assumed, a tag nothing checks being exactly how the first version was wrong.
@@ -126,13 +126,13 @@ describe('where the bubble points', () => {
   })
 
   /* The whole of the tier fix, asserted from the outside: whatever tag the
-     caller hands over is the tag in the document. A base tier passes
-     `helix-base-tooltip` and a styled one passes `helix-tooltip`, and neither
+     caller hands over is the tag in the document. A headless tier passes
+     `helix-headless-tooltip` and a styled one passes `helix-tooltip`, and neither
      of them is written down in this file. */
   test('under whichever tag the caller named, and no other', () => {
     const into = document.createElement('div')
-    render(drawTooltip(ROWS, 0, unsafeStatic('helix-base-tooltip')), into)
-    expect(into.querySelector('helix-base-tooltip')).not.toBeNull()
+    render(drawTooltip(ROWS, 0, unsafeStatic('helix-headless-tooltip')), into)
+    expect(into.querySelector('helix-headless-tooltip')).not.toBeNull()
     expect(into.querySelector('helix-tooltip')).toBeNull()
   })
 })

@@ -8,12 +8,12 @@ beforeAll(async () => {
 
 describe('list item href', () => {
   test('is a div with nowhere to go', async () => {
-    const el = await mount('<helix-base-list-item>Row</helix-base-list-item>')
+    const el = await mount('<helix-headless-list-item>Row</helix-headless-list-item>')
     expect(el.shadowRoot?.querySelector('[part="row"]')?.tagName).toBe('DIV')
   })
 
   test('becomes the link when given one, and the host stays the list entry', async () => {
-    const el = await mount('<helix-base-list-item href="/a">Row</helix-base-list-item>')
+    const el = await mount('<helix-headless-list-item href="/a">Row</helix-headless-list-item>')
     const row = el.shadowRoot?.querySelector('[part="row"]') as HTMLAnchorElement
     expect(row.tagName).toBe('A')
     expect(row.getAttribute('href')).toBe('/a')
@@ -22,7 +22,7 @@ describe('list item href', () => {
   })
 
   test('writes target and rel only when asked', async () => {
-    const bare = await mount('<helix-base-list-item href="/a">Row</helix-base-list-item>')
+    const bare = await mount('<helix-headless-list-item href="/a">Row</helix-headless-list-item>')
     const row = bare.shadowRoot?.querySelector('[part="row"]') as HTMLAnchorElement
     expect([row.hasAttribute('target'), row.hasAttribute('rel')]).toEqual([false, false])
   })

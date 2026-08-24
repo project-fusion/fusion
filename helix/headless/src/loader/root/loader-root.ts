@@ -39,8 +39,8 @@ import { property } from 'lit/decorators.js'
  * @csspart track - The full circle behind the indicator.
  * @csspart indicator - The arc that turns.
  */
-@customElement('helix-base-loader')
-export class HelixBaseLoader extends HelixElement {
+@customElement('helix-headless-loader')
+export class HelixHeadlessLoader extends HelixElement {
   /** Accessible name, announced while the work is outstanding. */
   @property()
   label = 'Loading'
@@ -62,6 +62,6 @@ export class HelixBaseLoader extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-loader': HelixBaseLoader
+    'helix-headless-loader': HelixHeadlessLoader
   }
 }

@@ -132,8 +132,8 @@ const pathFor = (
  * @csspart finders - The three corner squares, which can take their own color.
  * @csspart logo - The box holding the center mark.
  */
-@customElement('helix-base-qr-code')
-export class HelixBaseQrCode extends HelixElement {
+@customElement('helix-headless-qr-code')
+export class HelixHeadlessQrCode extends HelixElement {
   /** What the code encodes, which is usually a URL. */
   @property()
   value = ''
@@ -247,6 +247,6 @@ export class HelixBaseQrCode extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-qr-code': HelixBaseQrCode
+    'helix-headless-qr-code': HelixHeadlessQrCode
   }
 }

@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 describe('tag', () => {
   test('shows its label and nothing else by default', async () => {
-    const tag = await mount('<helix-base-tag>Draft</helix-base-tag>')
+    const tag = await mount('<helix-headless-tag>Draft</helix-headless-tag>')
     // The host is the box, so the shadow root holds the label slot and, when
     // asked for, the remove control. Nothing else.
     expect(tag.shadowRoot?.querySelector('slot')).not.toBeNull()
@@ -16,7 +16,7 @@ describe('tag', () => {
   })
 
   test('offers a named control when dismissible', async () => {
-    const tag = await mount('<helix-base-tag dismissible>Draft</helix-base-tag>')
+    const tag = await mount('<helix-headless-tag dismissible>Draft</helix-headless-tag>')
     const dismiss = part(tag, 'dismiss')
     expect(dismiss?.tagName).toBe('BUTTON')
     // A real button, so Enter and Space work without a key handler.
@@ -26,7 +26,7 @@ describe('tag', () => {
 
   test('the dismiss control can be named for what it removes', async () => {
     const tag = await mount(
-      '<helix-base-tag dismissible dismiss-label="Remove Draft">Draft</helix-base-tag>',
+      '<helix-headless-tag dismissible dismiss-label="Remove Draft">Draft</helix-headless-tag>',
     )
     expect(part(tag, 'dismiss')?.getAttribute('aria-label')).toBe('Remove Draft')
   })
@@ -34,7 +34,7 @@ describe('tag', () => {
   test('asks to be dismissed rather than removing itself', async () => {
     // The consumer owns the list the tag is in. Taking the node out from under
     // them would put their state and the document out of step.
-    const tag = await mount('<helix-base-tag dismissible>Draft</helix-base-tag>')
+    const tag = await mount('<helix-headless-tag dismissible>Draft</helix-headless-tag>')
     let detail: { label: string } | null = null
     tag.addEventListener('helix-dismiss', (event) => {
       detail = (event as CustomEvent<{ label: string }>).detail
@@ -47,7 +47,7 @@ describe('tag', () => {
   })
 
   test('the request can be refused', async () => {
-    const tag = await mount('<helix-base-tag dismissible>Draft</helix-base-tag>')
+    const tag = await mount('<helix-headless-tag dismissible>Draft</helix-headless-tag>')
     let cancelable = false
     tag.addEventListener('helix-dismiss', (event) => {
       cancelable = event.cancelable
@@ -64,7 +64,7 @@ describe('tag prefix', () => {
     // The same kind of word doing a different job, so weight rather than color:
     // `Priority: high` is one phrase, and coloring half makes it two things.
     const tag = await mount(
-      '<helix-base-tag><span slot="prefix">Priority</span>High</helix-base-tag>',
+      '<helix-headless-tag><span slot="prefix">Priority</span>High</helix-headless-tag>',
     )
     expect(slotted(tag, 'prefix')[0]?.textContent).toBe('Priority')
     /* The label is read off the host rather than through `slotted`, which
@@ -79,7 +79,7 @@ describe('tag prefix', () => {
        `display: flex` to hold the rule is what takes that away, and measured, a
        tag with no prefix carried nine pixels of border and padding for a slot
        with nothing in it. */
-    const tag = await mount('<helix-base-tag>Plain</helix-base-tag>')
+    const tag = await mount('<helix-headless-tag>Plain</helix-headless-tag>')
     expect(slotted(tag, 'prefix')).toHaveLength(0)
   })
 })

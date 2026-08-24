@@ -41,8 +41,8 @@ import '../../copy-button/index.js'
  * @csspart copy - The copy button.
  * @csspart label - The file name or language, where one is given.
  */
-@customElement('helix-base-code-block')
-export class HelixBaseCodeBlock extends HelixElement {
+@customElement('helix-headless-code-block')
+export class HelixHeadlessCodeBlock extends HelixElement {
   /** What to call this block, usually a file name or a language. */
   @property()
   label = ''
@@ -129,6 +129,6 @@ export class HelixBaseCodeBlock extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-code-block': HelixBaseCodeBlock
+    'helix-headless-code-block': HelixHeadlessCodeBlock
   }
 }

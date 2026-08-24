@@ -30,8 +30,8 @@ import { property } from 'lit/decorators.js'
  * @slot - Why, and what to do about it.
  * @slot actions - The way out.
  */
-@customElement('helix-base-empty')
-export class HelixBaseEmpty extends HelixElement {
+@customElement('helix-headless-empty')
+export class HelixHeadlessEmpty extends HelixElement {
   /**
    * Whether the state is announced when it appears.
    *
@@ -58,6 +58,6 @@ export class HelixBaseEmpty extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-empty': HelixBaseEmpty
+    'helix-headless-empty': HelixHeadlessEmpty
   }
 }

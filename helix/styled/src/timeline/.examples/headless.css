@@ -1,0 +1,200 @@
+/* What the headless tier asks a consumer to write for Timeline.
+ *
+ * Deliberately skeletal: a diagram of what has to be styled, not a theme to
+ * copy. No token, because `headless` does not depend on `helix/styles` and a
+ * consumer taking that tier has none to reach for. No corner radius, because
+ * rounding says how a thing should feel and that is not this tier's to say; the
+ * exceptions are shapes that are round rather than softened.
+ *
+ * **Grays, and only grays.** A headless example is a diagram, and color in a
+ * diagram reads as meaning: a blue fill says primary and a red one says danger,
+ * neither of which this tier has an opinion about. A neutral ramp says nothing
+ * except where one surface ends and the next begins, which is the whole job.
+ *
+ * Named by role rather than numbered, because a number implies a scale somebody
+ * maintains and this is seven values in one file. Underscored, because they are
+ * declared and read in that same file and never leave it, which is the one case
+ * the sigil is for: `check:hooks` pairs a public name with an `@cssproperty`
+ * and would otherwise ask this example to publish its own palette. Written through
+ * `light-dark()` with `color-scheme` declared, so the sandbox's dark mode gets
+ * a sheet that inverts rather than a pale card on a dark page: the headless tier
+ * has no theming and this is the cheapest honest substitute.
+ *
+ * A part with no rule below is one the platform already renders acceptably. A
+ * wrong rule is worse than none: the first checkbox sheet painted a box and left
+ * the input at `appearance: auto`, so the browser drew its own control and
+ * nothing written for it was ever visible. */
+
+:root {
+  color-scheme: light dark;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+helix-headless-icon {
+  block-size: 1em;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-timeline-item::part(dot) {
+  background-color: var(--_gray-strong);
+  block-size: 0.75rem;
+  display: block;
+  inline-size: 0.75rem;
+  border-radius: 50%;
+}
+
+helix-headless-timeline-item::part(rail) {
+  background-color: var(--_gray-fill);
+  block-size: 0.5rem;
+  display: block;
+  inline-size: 100%;
+}
+
+helix-headless-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+/* Two rows, named rather than left implicit, because the rail below is a
+   subgrid and a subgrid needs tracks to borrow. The time is the first and the
+   entry is the second. */
+helix-headless-timeline-item {
+  display: grid;
+  gap: 0 0.75rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+/* **The rail takes the entry's own rows**, which is what puts the mark beside
+   the entry rather than beside nothing.
+ *
+ * As a flex column it could not: the connector grew, the mark was pushed to
+ * wherever the growing stopped, and it floated between the time and the first
+ * line of the entry, level with neither. The rail has no idea how tall a time
+ * is, so no gap or margin can answer that question, and a consumer writing two
+ * lines of it moves the mark again.
+ *
+ * A subgrid does answer it, by not asking: the rail borrows the two rows the
+ * entry already has, the line above the mark sits in the first and the mark
+ * itself in the second, so the mark lands on the entry's first line whatever
+ * the time above it does. This is the styled tier's arrangement written out by
+ * hand, which is what a headless example is for. */
+helix-headless-timeline-item::part(rail) {
+  background-color: transparent;
+  block-size: auto;
+  display: grid;
+  grid-column: 1;
+  grid-row: 1 / -1;
+  grid-template-rows: subgrid;
+  inline-size: auto;
+  justify-items: center;
+}
+
+/* The line above the mark, filling the time's row. */
+helix-headless-timeline-item::part(connector) {
+  background-color: var(--_gray-line);
+  block-size: 100%;
+  grid-row: 1;
+  inline-size: 1px;
+}
+
+/* And the line below it, which is a pseudo-element because the component draws
+   only one connector and a rail needs a second segment to carry on down. It
+   shares the mark's row and starts where the mark ends, so the two never draw
+   over each other. */
+helix-headless-timeline-item::part(rail)::after {
+  align-self: stretch;
+  background-color: var(--_gray-line);
+  content: "";
+  grid-column: 1;
+  grid-row: 2;
+  inline-size: 1px;
+  margin-block-start: 1.25rem;
+}
+
+/* The mark's box, and it needs one because two different things go in it.
+   An entry that slots nothing gets the component's own dot; one that slots an
+   icon gets that instead, and with no rule here the span was inline, so the
+   dot came out 0.75rem and the icons came out at the text's own size and sat
+   on its baseline. A fixed square that centres whatever it holds is what makes
+   the four marks line up on one rail. */
+helix-headless-timeline-item::part(marker) {
+  align-items: center;
+  /* The top of the entry's row, which is the line the mark is about. Stretched,
+     it would center itself against the whole entry and drift down as the entry
+     grows. */
+  align-self: start;
+  /* The box is the entry's first line and the mark inside it is smaller, which
+     is what puts the two centres on top of each other. Sized to the mark
+     instead, a 12px square starts where a 20px line starts and its center lands
+     three pixels high on every row: measured, and the styled tier is at zero
+     for exactly this reason. */
+  block-size: 1.25rem;
+  display: flex;
+  grid-column: 1;
+  grid-row: 2;
+  inline-size: 1.25rem;
+  justify-content: center;
+}
+
+/* A slotted mark fills that square rather than following the type around it.
+   `helix-headless-icon` is sized in `em` further up, which is the right default
+   for an icon beside words and the wrong one for a mark on a rail. */
+helix-headless-timeline-item > [slot="marker"],
+helix-headless-timeline-item > [slot="marker"]::part(svg) {
+  block-size: 0.75rem;
+  inline-size: 0.75rem;
+}
+
+/* Timeline's `dot` is a glyph rather than a filled shape, and it is the one
+   place the round-part rule is wrong about a name.
+
+   `ROUND` paints a `dot` as a 0.75rem circle of `--_gray-strong`, which is
+   right for a slider's thumb and for every other family that renders one: a
+   `<span>` the sheet fills. Timeline renders `<svg part="dot"
+   fill="currentColor">`, so that rule painted a *background* behind a glyph
+   that takes its color from the page, and the two moved in opposite
+   directions: measured by `check:contrast`, black on `#2a2a2e` at 1.47:1 in
+   light and white on `#e9e9ec` at 1.21:1 in dark, against a target of 3.
+
+   A generator working from part names cannot know which kind an element is, and
+   `::part()` cannot be qualified by tag from outside the shadow, so the family
+   that differs says so here. The fill goes and the same value becomes the
+   glyph's own color, which puts it on the page rather than on itself. */
+helix-headless-timeline-item::part(dot) {
+  background-color: transparent;
+  block-size: 0.75rem;
+  color: var(--_gray-strong);
+  inline-size: 0.75rem;
+}
+
+helix-headless-timeline-item::part(time) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+  grid-column: 2;
+}
+
+helix-headless-timeline-item::part(content) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  grid-column: 2;
+  padding-block-end: 1rem;
+}
+
+/* The entry's own paragraphs, whose UA margin is the thing the gap above was
+   written to replace. Left alone the two both apply, so the entry is spaced by
+   sixteen pixels it never asked for and its first line starts nineteen below
+   the mark that the subgrid just went to the trouble of aligning with it. */
+helix-headless-timeline-item > p {
+  margin: 0;
+}

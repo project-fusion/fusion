@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 const drawer = async (attrs: string) =>
   (await mount(
-    `<helix-base-drawer label="Settings" ${attrs}>Body</helix-base-drawer>`,
+    `<helix-headless-drawer label="Settings" ${attrs}>Body</helix-headless-drawer>`,
   )) as HTMLElement & {
     modal: boolean
   }

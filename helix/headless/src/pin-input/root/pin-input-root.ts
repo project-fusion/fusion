@@ -48,8 +48,8 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @csspart field - The row of boxes.
  * @csspart cell - One box.
  */
-@customElement('helix-base-pin-input')
-export class HelixBasePinInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+@customElement('helix-headless-pin-input')
+export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(HelixFormElement)) {
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
@@ -371,6 +371,6 @@ export class HelixBasePinInput extends MixinControllerValue(MixinField(HelixForm
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-pin-input': HelixBasePinInput
+    'helix-headless-pin-input': HelixHeadlessPinInput
   }
 }

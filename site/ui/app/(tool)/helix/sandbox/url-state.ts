@@ -34,7 +34,7 @@
  * `localStorage`, set from the drawer and read off `:root[data-api-tier]`, and a
  * preference is exactly what the color mode below is refused for. What makes it
  * different is that it is *also* a property of what is being shown: the
- * workbench loads `@helix-io/headless` or `@helix-io/web` from it, so two
+ * workbench loads `@helix-io/headless` or `@helix-io/styled` from it, so two
  * sandboxes at the same address showing different packages is the link failing
  * to say what it is about. So it is carried, and it forces the tier for this
  * page only. Following somebody's link must never re-set your own drawer, which
@@ -57,7 +57,7 @@ export type Direction = 'ltr' | 'rtl'
 export type Syntax = 'html' | 'tsx'
 
 /** Which tier's package the preview loads. */
-export type Tier = 'base' | 'styled'
+export type Tier = 'headless' | 'styled'
 
 /** A region of the sandbox that can be turned off. */
 export type Section = 'editor' | 'panel' | 'rail' | 'status'
@@ -103,7 +103,7 @@ export const DEFAULTS: SandboxUrlState = {
 const LAYOUTS: Layout[] = ['padded', 'centered', 'fullscreen']
 const DIRECTIONS: Direction[] = ['ltr', 'rtl']
 const SYNTAXES: Syntax[] = ['html', 'tsx']
-const TIERS: Tier[] = ['base', 'styled']
+const TIERS: Tier[] = ['headless', 'styled']
 const SECTIONS: Section[] = ['editor', 'panel', 'rail', 'status']
 
 /**

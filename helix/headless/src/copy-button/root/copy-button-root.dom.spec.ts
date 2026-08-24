@@ -47,17 +47,17 @@ describe('copy button', () => {
   test('writes its value and confirms', async () => {
     const written = clipboard('accept')
     const el = await mount(
-      '<helix-base-copy-button value="bun add @helix-io/web"></helix-base-copy-button>',
+      '<helix-headless-copy-button value="bun add @helix-io/styled"></helix-headless-copy-button>',
     )
     const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
     await press(el)
-    expect(written).toEqual(['bun add @helix-io/web'])
+    expect(written).toEqual(['bun add @helix-io/styled'])
     expect(button.hasAttribute('data-copied')).toBe(true)
   })
 
   test('announces what it copied, after the write', async () => {
     clipboard('accept')
-    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
+    const el = await mount('<helix-headless-copy-button value="one"></helix-headless-copy-button>')
     let detail: unknown
     el.addEventListener('helix-copy', (event) => {
       detail = (event as CustomEvent).detail
@@ -80,7 +80,7 @@ describe('copy button', () => {
   test('says nothing when the platform refuses', async () => {
     clipboard('refuse')
     ;(document as unknown as Record<string, unknown>).execCommand = () => false
-    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
+    const el = await mount('<helix-headless-copy-button value="one"></helix-headless-copy-button>')
     let fired = false
     el.addEventListener('helix-copy', () => {
       fired = true
@@ -95,7 +95,7 @@ describe('copy button', () => {
 
 describe('what it says and shows', () => {
   test('draws both icons itself, so a bare button is a copy button', async () => {
-    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
+    const el = await mount('<helix-headless-copy-button value="one"></helix-headless-copy-button>')
     const slots = [...(el.shadowRoot?.querySelectorAll('slot') ?? [])]
     /* Read off the slot's own children rather than through
        `assignedNodes({ flatten: true })`. That call is the one that answers
@@ -111,8 +111,8 @@ describe('what it says and shows', () => {
      leaves a screen reader user on a button that never acknowledges the press. */
   test('moves its name and its tooltip together', async () => {
     clipboard('accept')
-    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
-    const tip = el.shadowRoot?.querySelector('helix-base-tooltip') as HTMLElement & {
+    const el = await mount('<helix-headless-copy-button value="one"></helix-headless-copy-button>')
+    const tip = el.shadowRoot?.querySelector('helix-headless-tooltip') as HTMLElement & {
       content: string
     }
     const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
@@ -151,7 +151,7 @@ describe('a context that refuses the modern clipboard', () => {
   test('copies anyway, and confirms', async () => {
     clipboard('refuse')
     const written = legacy(true)
-    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
+    const el = await mount('<helix-headless-copy-button value="one"></helix-headless-copy-button>')
     const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
     await press(el)
     expect(written).toEqual(['one'])
@@ -165,7 +165,7 @@ describe('a context that refuses the modern clipboard', () => {
   test('and says nothing at all where that route is refused too', async () => {
     clipboard('refuse')
     legacy(false)
-    const el = await mount('<helix-base-copy-button value="one"></helix-base-copy-button>')
+    const el = await mount('<helix-headless-copy-button value="one"></helix-headless-copy-button>')
     const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
     let heard = 0
     el.addEventListener('helix-copy', () => {

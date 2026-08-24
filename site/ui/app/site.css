@@ -121,7 +121,7 @@ helix-megamenu {
  * height but gives the mark nothing beyond it; at `icon-md` the letter is
  * 11.6px and the mark reads as a mark rather than as a coloured square.
  *
- * Here rather than in `base.css` because the difference is a property of these
+ * Here rather than in `headless.css` because the difference is a property of these
  * two marks and not of megamenus. `icon-lg` was the other candidate and is too
  * far: at 24px the tile is twice the label it sits beside, and it grows the
  * heading enough to push every row in the panel down. */

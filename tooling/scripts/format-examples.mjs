@@ -12,7 +12,7 @@
  * starts costing something.
  *
  * **Three bodies of markup are under it**, because a reader copies whichever one
- * is in front of them: the `.examples` in `helix/web` and `helix/sandbox`, and
+ * is in front of them: the `.examples` in `helix/styled` and `helix/sandbox`, and
  * the fenced HTML in the documentation. The fences were the one place a
  * six-attribute one-liner could survive the sweep, and one had.
  *
@@ -46,7 +46,7 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const ROOTS = ['helix/web/src', 'helix/sandbox/src']
+const ROOTS = ['helix/styled/src', 'helix/sandbox/src']
 
 /* And the prose, whose HTML samples are copied exactly as often as an example
    is. `check:examples` already holds these fences to the rules about inline

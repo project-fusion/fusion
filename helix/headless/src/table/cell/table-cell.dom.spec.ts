@@ -9,7 +9,9 @@ beforeAll(async () => {
 type Cell = HTMLElement & { header: boolean; updateComplete: Promise<boolean> }
 
 const cell = async (attributes = ''): Promise<Cell> =>
-  (await mount(`<helix-base-table-cell ${attributes}>solid</helix-base-table-cell>`)) as Cell
+  (await mount(
+    `<helix-headless-table-cell ${attributes}>solid</helix-headless-table-cell>`,
+  )) as Cell
 
 /**
  * One cell, and the contract that is the cell's rather than the table's.

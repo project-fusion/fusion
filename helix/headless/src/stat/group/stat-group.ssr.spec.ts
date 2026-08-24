@@ -5,7 +5,7 @@ import '../index.js'
 
 describe('stat group server output', () => {
   test('the host carries only what the consumer wrote', () => {
-    const markup = ssr(html`<helix-base-stat-group label="Scale">x</helix-base-stat-group>`)
-    expect(hostAttributes(markup, 'helix-base-stat-group')).toEqual(['label'])
+    const markup = ssr(html`<helix-headless-stat-group label="Scale">x</helix-headless-stat-group>`)
+    expect(hostAttributes(markup, 'helix-headless-stat-group')).toEqual(['label'])
   })
 })

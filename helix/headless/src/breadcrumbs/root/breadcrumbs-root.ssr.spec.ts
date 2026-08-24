@@ -6,10 +6,10 @@ import '../index.js'
    render one: an unimported tag renders as an inert unknown element. */
 import '../../menu/index.js'
 
-const trail = html`<helix-base-breadcrumbs>
-  <helix-base-breadcrumb><a href="/">Home</a></helix-base-breadcrumb>
-  <helix-base-breadcrumb current>Helix</helix-base-breadcrumb>
-</helix-base-breadcrumbs>`
+const trail = html`<helix-headless-breadcrumbs>
+  <helix-headless-breadcrumb><a href="/">Home</a></helix-headless-breadcrumb>
+  <helix-headless-breadcrumb current>Helix</helix-headless-breadcrumb>
+</helix-headless-breadcrumbs>`
 
 describe('breadcrumbs server output', () => {
   test('the list ships with the role that list-style would otherwise strip', () => {
@@ -17,13 +17,13 @@ describe('breadcrumbs server output', () => {
   })
 
   test('the landmark role is on internals, so the host stays as written', () => {
-    expect(hostAttributes(ssr(trail), 'helix-base-breadcrumbs')).toEqual([])
+    expect(hostAttributes(ssr(trail), 'helix-headless-breadcrumbs')).toEqual([])
   })
 
   test('the list-item role is on internals, so the host stays as written', () => {
     // Set in `willUpdate`, which the server does call, unlike
     // `connectedCallback`. Without it the list would have no items.
-    expect(hostAttributes(ssr(trail), 'helix-base-breadcrumb')).toEqual([])
+    expect(hostAttributes(ssr(trail), 'helix-headless-breadcrumb')).toEqual([])
   })
 
   test('the slotted link is crawlable in the served markup', () => {
@@ -42,16 +42,16 @@ describe('breadcrumbs server output', () => {
    with no JavaScript keeps every crumb and the enhancement can only remove. */
 describe('breadcrumbs fold, server rendered', () => {
   /* The fold as it is authored: a menu in the crumb where the gap belongs. */
-  const folded = html`<helix-base-breadcrumbs>
-    <helix-base-breadcrumb href="/">Home</helix-base-breadcrumb>
-    <helix-base-breadcrumb>
-      <helix-base-menu label="Hidden steps">
-        <helix-base-menu-item href="/a">A</helix-base-menu-item>
-        <helix-base-menu-item href="/b">B</helix-base-menu-item>
-      </helix-base-menu>
-    </helix-base-breadcrumb>
-    <helix-base-breadcrumb current>C</helix-base-breadcrumb>
-  </helix-base-breadcrumbs>`
+  const folded = html`<helix-headless-breadcrumbs>
+    <helix-headless-breadcrumb href="/">Home</helix-headless-breadcrumb>
+    <helix-headless-breadcrumb>
+      <helix-headless-menu label="Hidden steps">
+        <helix-headless-menu-item href="/a">A</helix-headless-menu-item>
+        <helix-headless-menu-item href="/b">B</helix-headless-menu-item>
+      </helix-headless-menu>
+    </helix-headless-breadcrumb>
+    <helix-headless-breadcrumb current>C</helix-headless-breadcrumb>
+  </helix-headless-breadcrumbs>`
 
   /* The point of removing the measurement. The trail used to ship every crumb
      visible and hide some after hydrating, because there is no width on a
@@ -59,8 +59,8 @@ describe('breadcrumbs fold, server rendered', () => {
      now, so the served HTML is already the arrangement a reader sees. */
   test('serves the fold itself, menu items and all', () => {
     const markup = withoutStyles(ssr(folded))
-    expect(markup.match(/<helix-base-breadcrumb[\s>]/g)?.length).toBe(3)
-    expect(markup.match(/<helix-base-menu-item[\s>]/g)?.length).toBe(2)
+    expect(markup.match(/<helix-headless-breadcrumb[\s>]/g)?.length).toBe(3)
+    expect(markup.match(/<helix-headless-menu-item[\s>]/g)?.length).toBe(2)
   })
 
   test("hides nothing itself, because which crumbs fold is the consumer's", () => {
@@ -69,7 +69,7 @@ describe('breadcrumbs fold, server rendered', () => {
        markup: that also matches `aria-hidden` on every separator. A bare
        `toContain` here passes and fails for reasons unrelated to what is being
        asked. */
-    const crumbs = markup.match(/<helix-base-breadcrumb\s[^>]*>/g) ?? []
+    const crumbs = markup.match(/<helix-headless-breadcrumb\s[^>]*>/g) ?? []
     expect(crumbs.filter((tag) => tag.includes('hidden'))).toEqual([])
   })
 })

@@ -18,7 +18,7 @@ interface RunMessage {
  * every test, so specs sharing the preview's document would tear down the
  * example a reader is looking at, several dozen times a second.
  *
- * No `@helix-io/web` import here. Each spec bundle brings the family it tests,
+ * No `@helix-io/styled` import here. Each spec bundle brings the family it tests,
  * because that is what the spec file itself imports, so loading every component
  * up front would only mean the definitions race: whichever registered first
  * wins, and `customElements.define` throws on the second.

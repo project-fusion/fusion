@@ -55,8 +55,8 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @cssproperty --meter-fraction - The value as a fraction of the range, 0 to 1.
  * @cssproperty --meter-sweep - How much of the circle the arc covers, as a path length.
  */
-@customElement('helix-base-meter')
-export class HelixBaseMeter extends HelixElement {
+@customElement('helix-headless-meter')
+export class HelixHeadlessMeter extends HelixElement {
   /** Accessible name for the reading. */
   @property()
   label = 'Meter'
@@ -363,6 +363,6 @@ export class HelixBaseMeter extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-meter': HelixBaseMeter
+    'helix-headless-meter': HelixHeadlessMeter
   }
 }

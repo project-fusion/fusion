@@ -23,13 +23,13 @@ describe('button control', () => {
     // root, so a button that could also be a link forced every such navigation
     // to be a full page load. A link that looks like a button is the
     // `data-button` recipe in the base layer instead.
-    const button = await mount('<helix-base-button>Go</helix-base-button>')
+    const button = await mount('<helix-headless-button>Go</helix-headless-button>')
     expect(control(button)?.tagName).toBe('BUTTON')
     expect(button.shadowRoot?.querySelector('a')).toBeNull()
   })
 
   test('is a real button, not a div with a role', async () => {
-    const button = await mount('<helix-base-button>Go</helix-base-button>')
+    const button = await mount('<helix-headless-button>Go</helix-headless-button>')
     expect(control(button)?.tagName).toBe('BUTTON')
     // Always `button`, never `submit`: a submit inside a shadow root has no
     // form to submit, so submission is handled explicitly instead.
@@ -37,7 +37,7 @@ describe('button control', () => {
   })
 
   test('a disabled button takes the native attribute', async () => {
-    const button = await mount('<helix-base-button disabled>X</helix-base-button>')
+    const button = await mount('<helix-headless-button disabled>X</helix-headless-button>')
     expect((control(button) as HTMLButtonElement).disabled).toBe(true)
   })
 })
@@ -45,8 +45,8 @@ describe('button control', () => {
 describe('button form participation', () => {
   test('finds the form it is inside without a form attribute', async () => {
     document.body.innerHTML =
-      '<form><helix-base-button type="submit">Send</helix-base-button></form>'
-    const button = document.querySelector('helix-base-button') as Updatable & {
+      '<form><helix-headless-button type="submit">Send</helix-headless-button></form>'
+    const button = document.querySelector('helix-headless-button') as Updatable & {
       form: HTMLFormElement
     }
     await button.updateComplete
@@ -55,9 +55,9 @@ describe('button form participation', () => {
 
   test('submitting routes through the form, across the shadow boundary', async () => {
     document.body.innerHTML =
-      '<form><helix-base-button type="submit">Send</helix-base-button></form>'
+      '<form><helix-headless-button type="submit">Send</helix-headless-button></form>'
     const form = document.querySelector('form') as HTMLFormElement
-    const button = document.querySelector('helix-base-button') as Updatable
+    const button = document.querySelector('helix-headless-button') as Updatable
     await button.updateComplete
 
     let submitted = 0
@@ -71,9 +71,9 @@ describe('button form participation', () => {
   })
 
   test('a plain button leaves its form alone', async () => {
-    document.body.innerHTML = '<form><helix-base-button>Nothing</helix-base-button></form>'
+    document.body.innerHTML = '<form><helix-headless-button>Nothing</helix-headless-button></form>'
     const form = document.querySelector('form') as HTMLFormElement
-    const button = document.querySelector('helix-base-button') as Updatable
+    const button = document.querySelector('helix-headless-button') as Updatable
     await button.updateComplete
 
     let submitted = 0
@@ -103,7 +103,7 @@ describe('button invokers', () => {
    * match the platform's. */
   test('a command reaches a target inserted after the button rendered', async () => {
     const button = await mount(
-      '<helix-base-button command="--go" commandfor="late">Go</helix-base-button>',
+      '<helix-headless-button command="--go" commandfor="late">Go</helix-headless-button>',
     )
 
     const target = document.createElement('div')

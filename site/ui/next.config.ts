@@ -14,7 +14,7 @@ import type { NextConfig } from 'next'
  *
  * Consumers are on the App Router, so Helix has to work there without asking
  * them to adopt an experimental patch to React. Elements now upgrade on the
- * client like any other custom element, and `@helix-io/web/elements.css` covers
+ * client like any other custom element, and `@helix-io/styled/elements.css` covers
  * the window before they do.
  */
 
@@ -90,7 +90,12 @@ const config: NextConfig = {
   // Helix ships ESM from workspace packages; Next has to compile it rather
   // than treat it as prebuilt CommonJS. Production resolves `dist` through
   // package `exports`, which is what a consumer installs.
-  transpilePackages: ['@helix-io/core', '@helix-io/headless', '@helix-io/sandbox', '@helix-io/web'],
+  transpilePackages: [
+    '@helix-io/core',
+    '@helix-io/headless',
+    '@helix-io/sandbox',
+    '@helix-io/styled',
+  ],
 
   /**
    * Turbopack, not webpack.

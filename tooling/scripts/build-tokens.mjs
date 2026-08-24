@@ -100,7 +100,7 @@ const walk = (dir, found = []) => {
  * **A generated file is the sources counted again.** Three kinds were being
  * counted. `bun run styles` writes a `.css.ts` beside every `.css` holding the
  * same rules as a template literal, which doubled every stylesheet;
- * `helix/web/elements.css` and `site/ui/public/sandbox/frame.css` are the style
+ * `helix/styled/elements.css` and `site/ui/public/sandbox/frame.css` are the style
  * layers concatenated, and `frame.css` alone holds 238 reads that are copies of
  * reads already counted in the files it was built from.
  *

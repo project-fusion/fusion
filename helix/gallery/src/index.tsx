@@ -17,7 +17,7 @@ import { toolingArt } from './tooling'
  * art file was 1,136 lines for exactly that reason. A drawer in the catalog is a
  * drawer in the gallery, so splitting one splits the other. The system they all obey is documented at the top of `core.tsx`.
  *
- * **Eighty-nine, not the eighty-eight folders in `helix/web/src`.** The catalog is
+ * **Eighty-nine, not the eighty-eight folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
  * `@helix-io/sandbox`. Counting directories is how five families were missed on
  * the first pass, and the count that matters is whatever `getFamilies` returns.
@@ -28,7 +28,7 @@ import { toolingArt } from './tooling'
  * it: lockstep-versioned so a consumer's cards match their Helix version,
  * private, and TSX with its stylesheet kept together in `gallery.css`.
  *
- * Not in `helix/web`, which has no React and no JSX transform, and which every
+ * Not in `helix/styled`, which has no React and no JSX transform, and which every
  * consumer installs: documentation illustration in the component library is the
  * shape the sandbox was extracted for. Not a CDN either, and that one fails on
  * mechanics before it reaches the Sovereignty Constraint. An external SVG in an

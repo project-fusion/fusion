@@ -15,7 +15,7 @@ type Toggle = HTMLElement & {
 }
 
 const toggle = async (attributes = 'value="a"'): Promise<Toggle> =>
-  (await mount(`<helix-base-toggle ${attributes}>Grid</helix-base-toggle>`)) as Toggle
+  (await mount(`<helix-headless-toggle ${attributes}>Grid</helix-headless-toggle>`)) as Toggle
 
 /**
  * One toggle, and the contract that is the toggle's rather than the group's.

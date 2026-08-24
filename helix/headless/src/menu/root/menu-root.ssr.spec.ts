@@ -9,7 +9,9 @@ describe('menu server output', () => {
     // an attribute coming off rather than a subtree arriving. The rows inside
     // are the consumer's own light-DOM children and were always in the HTML;
     // what the server adds is the frame around them.
-    const markup = withoutStyles(ssr(html`<helix-base-menu label="Actions"></helix-base-menu>`))
+    const markup = withoutStyles(
+      ssr(html`<helix-headless-menu label="Actions"></helix-headless-menu>`),
+    )
     expect(markup).toContain('name="trigger"')
     expect(hasPart(markup, 'menu')).toBe(true)
     expect(partTag(markup, 'menu')).toContain('hidden')
@@ -19,14 +21,14 @@ describe('menu server output', () => {
     // Sorted by the helper, so this is a set rather than an order.
     expect(
       hostAttributes(
-        ssr(html`<helix-base-menu label="A" open></helix-base-menu>`),
-        'helix-base-menu',
+        ssr(html`<helix-headless-menu label="A" open></helix-headless-menu>`),
+        'helix-headless-menu',
       ),
     ).toEqual(['data-open', 'label', 'open'])
   })
 
   test('a row serves its words and its role', () => {
-    const markup = ssr(html`<helix-base-menu-item value="copy">Copy</helix-base-menu-item>`)
+    const markup = ssr(html`<helix-headless-menu-item value="copy">Copy</helix-headless-menu-item>`)
     expect(hasPart(markup, 'item')).toBe(true)
     expect(withoutStyles(markup)).toContain('menuitem')
   })
@@ -35,8 +37,8 @@ describe('menu server output', () => {
     // `aria-haspopup` on a row that turns out to have no submenu is a promise
     // to a screen reader made on a guess, so the server declines to make it.
     const markup = ssr(
-      html`<helix-base-menu-item value="more"
-        ><helix-base-menu-item slot="submenu" value="x">X</helix-base-menu-item></helix-base-menu-item
+      html`<helix-headless-menu-item value="more"
+        ><helix-headless-menu-item slot="submenu" value="x">X</helix-headless-menu-item></helix-headless-menu-item
       >`,
     )
     expect(withoutStyles(markup)).not.toContain('haspopup')
@@ -45,7 +47,7 @@ describe('menu server output', () => {
   test('a checkable row serves its state', () => {
     expect(
       withoutStyles(
-        ssr(html`<helix-base-menu-item checked value="wrap">Wrap</helix-base-menu-item>`),
+        ssr(html`<helix-headless-menu-item checked value="wrap">Wrap</helix-headless-menu-item>`),
       ),
     ).toContain('menuitemcheckbox')
   })

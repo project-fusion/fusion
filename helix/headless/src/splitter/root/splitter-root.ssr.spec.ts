@@ -3,10 +3,10 @@ import { hasPart, hostAttributes, partTag, ssr } from '@helix-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const split = html`<helix-base-splitter default-position="30">
+const split = html`<helix-headless-splitter default-position="30">
   <div slot="start">one</div>
   <div slot="end">two</div>
-</helix-base-splitter>`
+</helix-headless-splitter>`
 
 describe('splitter server output', () => {
   test('both panes and the divider ship, laid out before any script runs', () => {
@@ -30,22 +30,22 @@ describe('splitter server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(split), 'helix-base-splitter')).toEqual(['default-position'])
+    expect(hostAttributes(ssr(split), 'helix-headless-splitter')).toEqual(['default-position'])
   })
 })
 
-const nest = html`<helix-base-splitter default-position="30">
+const nest = html`<helix-headless-splitter default-position="30">
   <div slot="start">one</div>
-  <helix-base-splitter orientation="vertical" slot="end">
+  <helix-headless-splitter orientation="vertical" slot="end">
     <div slot="start">two</div>
     <div slot="end">three</div>
-  </helix-base-splitter>
-</helix-base-splitter>`
+  </helix-headless-splitter>
+</helix-headless-splitter>`
 
-const shut = html`<helix-base-splitter default-position="40" default-collapsed="start">
+const shut = html`<helix-headless-splitter default-position="40" default-collapsed="start">
   <div slot="start">one</div>
   <div slot="end">two</div>
-</helix-base-splitter>`
+</helix-headless-splitter>`
 
 describe('splitter crossings on a server', () => {
   test('no corner is served, because a server cannot see the tree', () => {
@@ -74,7 +74,7 @@ describe('splitter collapsing on a server', () => {
 
   test('the host still carries only what the consumer wrote', () => {
     // `data-collapsed` is mirrored once the element upgrades, never served.
-    expect(hostAttributes(ssr(shut), 'helix-base-splitter')).toEqual([
+    expect(hostAttributes(ssr(shut), 'helix-headless-splitter')).toEqual([
       'default-collapsed',
       'default-position',
     ])

@@ -58,13 +58,13 @@ const HIDDEN = css`
 /**
  * Makes an element a scroll container, where a component says it is one.
  *
- * **A box that scrolls is the base tier's, and the base tier had no way to say
+ * **A box that scrolls is the headless tier's, and the headless tier had no way to say
  * so.** `overflow` is what creates a scrollport: without it `scrollTop` is
  * permanently zero and every scroll API on the element is inert. So a component
  * that reads `scrollTop` and cannot declare `overflow` is one whose behavior
  * lives in somebody else's stylesheet, and six of them do exactly that.
  *
- * Measured before deciding: `helix-base-scroll-area`, the component whose
+ * Measured before deciding: `helix-headless-scroll-area`, the component whose
  * entire purpose is scrolling, computes `overflow-y: visible` on its viewport
  * with `scrollHeight` equal to `clientHeight`. Standing alone it is a div. The
  * virtual list was worse, because it *acts* on the reading: #174 is the day it
@@ -74,7 +74,7 @@ const HIDDEN = css`
  * three already are.** `BOX_SIZING`, `HIDDEN` and `SETTLED` are token-free
  * structural rules `core` ships into every shadow root, and `HIDDEN` is the
  * exact same category: the rules argue `hidden` is base-tier state because the
- * platform acts on it, and the way the base tier makes the platform act is a
+ * platform acts on it, and the way the headless tier makes the platform act is a
  * CSS rule shipped from here. "The headless tier has no CSS" has never meant
  * `core` has none; it means `helix/headless` must not depend on
  * `@helix-io/styles`, and a rule with no token in it does not.
@@ -89,7 +89,7 @@ const HIDDEN = css`
  *
  * Both axes, and nothing else. Which *kind* of scrolling, how much room,
  * `overscroll-behavior`, `scroll-snap`, a gutter, a scrollbar treatment: those
- * are decisions and stay in `helix/web`. This is only the mechanism, and the
+ * are decisions and stay in `helix/styled`. This is only the mechanism, and the
  * styled sheet is prepended-after so it overrides at equal specificity anyway.
  *
  * **A component marks a box whose scroll state it reads, and no other**, which
@@ -400,7 +400,7 @@ export class HelixElement extends LitElement {
    * The prefix this tier registers its elements under.
    *
    * **A component that renders another renders its own tier's version of it**,
-   * so `helix-base-pagination-size` composes `helix-base-select` and
+   * so `helix-headless-pagination-size` composes `helix-headless-select` and
    * `helix-pagination-size` composes `helix-select`. One template says
    * `${this.tag('select')}` and each tier answers with its own name.
    *
@@ -410,7 +410,7 @@ export class HelixElement extends LitElement {
    * headless tier composes an element it does not ship, and the composition
    * cannot be tested there at all, because there is no `helix-select` on that
    * tier to test it against. Thirty-nine specs had to be moved back to
-   * `helix/web` for exactly that reason.
+   * `helix/styled` for exactly that reason.
    *
    * **A prefix rather than an override per composition**, which was the first
    * plan and does not compile. An override re-renders the fragment from the
@@ -420,7 +420,7 @@ export class HelixElement extends LitElement {
    * Sixteen families of that is a lot of encapsulation spent on saying one
    * word differently.
    */
-  static tier = 'helix-base-'
+  static tier = 'helix-headless-'
 
   /**
    * One composed tag, as a static value a template can interpolate.

@@ -5,12 +5,14 @@ import '../index.js'
 
 describe('empty view server output', () => {
   test('the explanation is in the served markup', () => {
-    const markup = withoutStyles(ssr(html`<helix-base-empty><p>No results.</p></helix-base-empty>`))
+    const markup = withoutStyles(
+      ssr(html`<helix-headless-empty><p>No results.</p></helix-headless-empty>`),
+    )
     expect(markup).toContain('No results.')
   })
 
   test('the host carries only what the consumer wrote', () => {
-    const markup = ssr(html`<helix-base-empty no-announce>x</helix-base-empty>`)
-    expect(hostAttributes(markup, 'helix-base-empty')).toEqual(['no-announce'])
+    const markup = ssr(html`<helix-headless-empty no-announce>x</helix-headless-empty>`)
+    expect(hostAttributes(markup, 'helix-headless-empty')).toEqual(['no-announce'])
   })
 })

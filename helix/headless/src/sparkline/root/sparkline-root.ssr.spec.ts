@@ -10,7 +10,7 @@ describe('sparkline server output', () => {
        the legend it arrives whole and nothing appears on hydration. */
     const markup = withoutStyles(
       ssr(
-        html`<helix-base-sparkline label="Sessions over a week" values="1 5 9"></helix-base-sparkline>`,
+        html`<helix-headless-sparkline label="Sessions over a week" values="1 5 9"></helix-headless-sparkline>`,
       ),
     )
     expect(markup).toContain('M0,32')
@@ -20,15 +20,17 @@ describe('sparkline server output', () => {
 
   test('an unlabelled one is served decorative rather than as an unnamed graphic', () => {
     expect(
-      withoutStyles(ssr(html`<helix-base-sparkline values="1 5 9"></helix-base-sparkline>`)),
+      withoutStyles(
+        ssr(html`<helix-headless-sparkline values="1 5 9"></helix-headless-sparkline>`),
+      ),
     ).toContain('aria-hidden="true"')
   })
 
   test('the host carries nothing the consumer did not write', () => {
     expect(
       hostAttributes(
-        ssr(html`<helix-base-sparkline></helix-base-sparkline>`),
-        'helix-base-sparkline',
+        ssr(html`<helix-headless-sparkline></helix-headless-sparkline>`),
+        'helix-headless-sparkline',
       ),
     ).toEqual([])
   })

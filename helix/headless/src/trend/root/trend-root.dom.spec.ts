@@ -9,14 +9,14 @@ beforeAll(async () => {
 
 const trend = async (attributes: string): Promise<HTMLElement> =>
   mount(
-    `<helix-base-trend ${attributes}>8%<span slot="label">month over month</span></helix-base-trend>`,
+    `<helix-headless-trend ${attributes}>8%<span slot="label">month over month</span></helix-headless-trend>`,
   )
 
 const word = (host: HTMLElement): string => part(host, 'direction')?.textContent?.trim() ?? ''
 
 /* The glyph, by its path rather than by a name.
  *
- * The mark was a `<helix-base-icon name="arrow-up">` and is now an inlined `<svg>`
+ * The mark was a `<helix-headless-icon name="arrow-up">` and is now an inlined `<svg>`
  * from a named import, so there is no name to read: the element indexed the
  * whole icon set at runtime and shipped all of it to every consumer. What
  * identifies a glyph now is the path it draws, which is what the import

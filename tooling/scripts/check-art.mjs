@@ -3,7 +3,7 @@
  * Every family in the catalog has a gallery card, and the prose says how many.
  *
  * The design page's numbers come from the manifests: `getFamilies` groups every
- * declaration in `helix/web`, `helix/headless` and `helix/sandbox` by the source
+ * declaration in `helix/styled`, `helix/headless` and `helix/sandbox` by the source
  * folder its `modulePath` names, and the page renders `families.length`. So the
  * count on screen cannot be wrong.
  *
@@ -29,7 +29,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const MANIFESTS = [
-  'helix/web/custom-elements.json',
+  'helix/styled/custom-elements.json',
   'helix/headless/custom-elements.json',
   'helix/sandbox/custom-elements.json',
 ]
@@ -188,14 +188,14 @@ for (let n = FLOOR; n <= 200; n += 1) {
 const said = wordFor(families.size)
 
 /* Folders that are *families*, which is the question the prose is answering:
-   how many more entries there are than there are components in `helix/web`. A
+   how many more entries there are than there are components in `helix/styled`. A
    directory with an `index.ts` is what the barrel exports and what
    `check:examples` already calls a family, and it is the difference that
    matters: `field/` is a directory holding the shared field stylesheets, it
    exports nothing and has no element, so counting it made this check disagree
    with correct prose on its first run. */
-const folders = readdirSync('helix/web/src', { withFileTypes: true }).filter(
-  (one) => one.isDirectory() && existsSync(join('helix/web/src', one.name, 'index.ts')),
+const folders = readdirSync('helix/styled/src', { withFileTypes: true }).filter(
+  (one) => one.isDirectory() && existsSync(join('helix/styled/src', one.name, 'index.ts')),
 ).length
 const foldersSaid = wordFor(folders)
 
@@ -210,7 +210,7 @@ for (const file of ['index.tsx', 'core.tsx']) {
     if (word !== said && word !== foldersSaid) {
       problems.push(
         `${ART}/${file}: says "${word}" where the catalog has ${families.size} families ` +
-          `("${said}") over ${folders} folders in helix/web/src ("${foldersSaid}"). A number ` +
+          `("${said}") over ${folders} folders in helix/styled/src ("${foldersSaid}"). A number ` +
           `word in these files is one of those two; write any other count as digits.`,
       )
     }

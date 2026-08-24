@@ -12,7 +12,7 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
-import type { HelixBaseListbox } from '../../listbox/root/listbox-root.js'
+import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import '../../listbox/index.js'
 
 /**
@@ -61,8 +61,8 @@ import '../../listbox/index.js'
  * @csspart hint - Help under the trigger.
  * @csspart feedback - What is wrong with it.
  */
-@customElement('helix-base-select')
-export class HelixBaseSelect extends MixinControllerOpen(
+@customElement('helix-headless-select')
+export class HelixHeadlessSelect extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
   /**
@@ -117,8 +117,8 @@ export class HelixBaseSelect extends MixinControllerOpen(
    * invoke, and a controller only runs on a connected element, so they cannot
    * be reached from the server and are left plain.
    */
-  private get listbox(): HelixBaseListbox | null {
-    return this.renderRoot?.querySelector<HelixBaseListbox>('[part="listbox"]') ?? null
+  private get listbox(): HelixHeadlessListbox | null {
+    return this.renderRoot?.querySelector<HelixHeadlessListbox>('[part="listbox"]') ?? null
   }
 
   /* The surface floats *and is in the top layer*, which it was not.
@@ -364,6 +364,6 @@ export class HelixBaseSelect extends MixinControllerOpen(
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-select': HelixBaseSelect
+    'helix-headless-select': HelixHeadlessSelect
   }
 }

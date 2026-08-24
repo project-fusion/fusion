@@ -1,0 +1,25 @@
+<!-- @summary The same popover on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-headless-popover
+  id="details"
+  label="Details"
+>
+  <helix-headless-button slot="trigger">Details</helix-headless-button>
+  <div class="stack">
+    <p>
+      Anything can go in here. The panel is in the top layer, so it clears a
+      scrolling parent without a z-index.
+    </p>
+    <helix-headless-button
+      command="--close"
+      commandfor="details"
+    >
+      Close
+    </helix-headless-button>
+  </div>
+</helix-headless-popover>

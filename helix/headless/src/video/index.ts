@@ -1,1 +1,1 @@
-export { HelixBaseVideo } from './root/video-root.js'
+export { HelixHeadlessVideo } from './root/video-root.js'

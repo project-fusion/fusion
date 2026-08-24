@@ -1561,17 +1561,17 @@
       "tag": "helix-accordion"
     },
     {
-      "answer": "accordion/base",
+      "answer": "accordion/chevron-at-the-end",
       "id": "example-223",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same accordion on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"The mark at the end of the row, for a list read as a table of contents.\"",
       "tag": "helix-accordion"
     },
     {
-      "answer": "accordion/chevron-at-the-end",
+      "answer": "accordion/headless",
       "id": "example-224",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The mark at the end of the row, for a list read as a table of contents.\"",
+      "prompt": "Which Helix example shows this? \"The same accordion on the headless tier, with every rule written by hand.\"",
       "tag": "helix-accordion"
     },
     {
@@ -1603,7 +1603,7 @@
       "tag": "helix-announcement"
     },
     {
-      "answer": "announcement/base",
+      "answer": "announcement/headless",
       "id": "example-229",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same announcement on the headless tier, with every rule written by hand.\"",
@@ -1631,17 +1631,17 @@
       "tag": "helix-app-header"
     },
     {
-      "answer": "app-header/base",
+      "answer": "app-header/glass",
       "id": "example-233",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same app header on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"Blurred over what scrolls beneath it.\"",
       "tag": "helix-app-header"
     },
     {
-      "answer": "app-header/glass",
+      "answer": "app-header/headless",
       "id": "example-234",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Blurred over what scrolls beneath it.\"",
+      "prompt": "Which Helix example shows this? \"The same app header on the headless tier, with every rule written by hand.\"",
       "tag": "helix-app-header"
     },
     {
@@ -1785,24 +1785,24 @@
       "tag": "helix-avatar"
     },
     {
-      "answer": "avatar/base",
-      "id": "example-255",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same avatar on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-avatar"
-    },
-    {
       "answer": "avatar/broken-image",
-      "id": "example-256",
+      "id": "example-255",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A source that fails, falling back to initials rather than a broken image.\"",
       "tag": "helix-avatar"
     },
     {
       "answer": "avatar/group",
-      "id": "example-257",
+      "id": "example-256",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Overlapped faces with a count for the rest.\"",
+      "tag": "helix-avatar"
+    },
+    {
+      "answer": "avatar/headless",
+      "id": "example-257",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same avatar on the headless tier, with every rule written by hand.\"",
       "tag": "helix-avatar"
     },
     {
@@ -1834,24 +1834,24 @@
       "tag": "helix-badge"
     },
     {
-      "answer": "badge/base",
-      "id": "example-262",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same badge on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-badge"
-    },
-    {
       "answer": "badge/capped",
-      "id": "example-263",
+      "id": "example-262",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A count past its maximum, which reads as a ceiling rather than a number.\"",
       "tag": "helix-badge"
     },
     {
       "answer": "badge/dot",
-      "id": "example-264",
+      "id": "example-263",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A mark with no number, for unread rather than how many.\"",
+      "tag": "helix-badge"
+    },
+    {
+      "answer": "badge/headless",
+      "id": "example-264",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same badge on the headless tier, with every rule written by hand.\"",
       "tag": "helix-badge"
     },
     {
@@ -1862,24 +1862,24 @@
       "tag": "helix-bar-chart"
     },
     {
-      "answer": "bar-chart/base",
-      "id": "example-266",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same bar chart on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-bar-chart"
-    },
-    {
       "answer": "bar-chart/emphasis",
-      "id": "example-267",
+      "id": "example-266",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Columns drawn with an edge of their own color, for a dense chart or a busy ground.\"",
       "tag": "helix-bar-chart"
     },
     {
       "answer": "bar-chart/grouped",
-      "id": "example-268",
+      "id": "example-267",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Three series over the same categories, each taking the next series color, with a legend reading the same table.\"",
+      "tag": "helix-bar-chart"
+    },
+    {
+      "answer": "bar-chart/headless",
+      "id": "example-268",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same bar chart on the headless tier, with every rule written by hand.\"",
       "tag": "helix-bar-chart"
     },
     {
@@ -1932,7 +1932,7 @@
       "tag": "helix-blockquote"
     },
     {
-      "answer": "blockquote/base",
+      "answer": "blockquote/headless",
       "id": "example-276",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same blockquote on the headless tier, with every rule written by hand.\"",
@@ -1946,7 +1946,7 @@
       "tag": "helix-breadcrumbs"
     },
     {
-      "answer": "breadcrumbs/base",
+      "answer": "breadcrumbs/headless",
       "id": "example-278",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same breadcrumbs on the headless tier, with every rule written by hand.\"",
@@ -1974,7 +1974,7 @@
       "tag": "helix-button-group"
     },
     {
-      "answer": "button-group/base",
+      "answer": "button-group/headless",
       "id": "example-282",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same button group on the headless tier, with every rule written by hand.\"",
@@ -2016,17 +2016,17 @@
       "tag": "helix-button"
     },
     {
-      "answer": "button/base",
+      "answer": "button/disabled",
       "id": "example-288",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same button on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"Disabled across the appearances, so the difference is visible in each.\"",
       "tag": "helix-button"
     },
     {
-      "answer": "button/disabled",
+      "answer": "button/headless",
       "id": "example-289",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Disabled across the appearances, so the difference is visible in each.\"",
+      "prompt": "Which Helix example shows this? \"The same button on the headless tier, with every rule written by hand.\"",
       "tag": "helix-button"
     },
     {
@@ -2065,7 +2065,7 @@
       "tag": "helix-callout"
     },
     {
-      "answer": "callout/base",
+      "answer": "callout/headless",
       "id": "example-295",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same callout on the headless tier, with every rule written by hand.\"",
@@ -2079,24 +2079,24 @@
       "tag": "helix-card"
     },
     {
-      "answer": "card/base",
-      "id": "example-297",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same card on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-card"
-    },
-    {
       "answer": "card/elevated",
-      "id": "example-298",
+      "id": "example-297",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Lifted off the page with a shadow rather than an outline.\"",
       "tag": "helix-card"
     },
     {
       "answer": "card/filled",
-      "id": "example-299",
+      "id": "example-298",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Told apart by its own color, with neither edge nor lift.\"",
+      "tag": "helix-card"
+    },
+    {
+      "answer": "card/headless",
+      "id": "example-299",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same card on the headless tier, with every rule written by hand.\"",
       "tag": "helix-card"
     },
     {
@@ -2149,17 +2149,17 @@
       "tag": "helix-carousel"
     },
     {
-      "answer": "carousel/base",
+      "answer": "carousel/controlled",
       "id": "example-307",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same carousel on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"A carousel the page owns, so the slide it shows can be driven from elsewhere.\"",
       "tag": "helix-carousel"
     },
     {
-      "answer": "carousel/controlled",
+      "answer": "carousel/headless",
       "id": "example-308",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A carousel the page owns, so the slide it shows can be driven from elsewhere.\"",
+      "prompt": "Which Helix example shows this? \"The same carousel on the headless tier, with every rule written by hand.\"",
       "tag": "helix-carousel"
     },
     {
@@ -2212,7 +2212,7 @@
       "tag": "helix-checkbox-group"
     },
     {
-      "answer": "checkbox-group/base",
+      "answer": "checkbox-group/headless",
       "id": "example-316",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same checkbox group on the headless tier, with every rule written by hand.\"",
@@ -2247,31 +2247,31 @@
       "tag": "helix-checkbox"
     },
     {
-      "answer": "checkbox/base",
-      "id": "example-321",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same checkbox on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-checkbox"
-    },
-    {
       "answer": "checkbox/cards",
-      "id": "example-322",
+      "id": "example-321",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Checkboxes drawn as cards, for options that need room to explain themselves.\"",
       "tag": "helix-checkbox"
     },
     {
       "answer": "checkbox/controlled",
-      "id": "example-323",
+      "id": "example-322",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A box the page owns, answering the event and assigning `checked`.\"",
       "tag": "helix-checkbox"
     },
     {
       "answer": "checkbox/disabled",
-      "id": "example-324",
+      "id": "example-323",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled checked and unchecked, since the two look different.\"",
+      "tag": "helix-checkbox"
+    },
+    {
+      "answer": "checkbox/headless",
+      "id": "example-324",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same checkbox on the headless tier, with every rule written by hand.\"",
       "tag": "helix-checkbox"
     },
     {
@@ -2303,7 +2303,7 @@
       "tag": "helix-code-block"
     },
     {
-      "answer": "code-block/base",
+      "answer": "code-block/headless",
       "id": "example-329",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same code block on the headless tier, with every rule written by hand.\"",
@@ -2317,7 +2317,7 @@
       "tag": "helix-code"
     },
     {
-      "answer": "code/base",
+      "answer": "code/headless",
       "id": "example-331",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same code on the headless tier, with every rule written by hand.\"",
@@ -2338,17 +2338,17 @@
       "tag": "helix-color-input"
     },
     {
-      "answer": "color-input/base",
+      "answer": "color-input/disabled",
       "id": "example-334",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same color input on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"Disabled, with the swatch still showing the value.\"",
       "tag": "helix-color-input"
     },
     {
-      "answer": "color-input/disabled",
+      "answer": "color-input/headless",
       "id": "example-335",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Disabled, with the swatch still showing the value.\"",
+      "prompt": "Which Helix example shows this? \"The same color input on the headless tier, with every rule written by hand.\"",
       "tag": "helix-color-input"
     },
     {
@@ -2394,17 +2394,17 @@
       "tag": "helix-color-picker"
     },
     {
-      "answer": "color-picker/base",
+      "answer": "color-picker/disabled",
       "id": "example-342",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same color picker on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"Disabled, which is a picker that shows a color and does not move.\"",
       "tag": "helix-color-picker"
     },
     {
-      "answer": "color-picker/disabled",
+      "answer": "color-picker/headless",
       "id": "example-343",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Disabled, which is a picker that shows a color and does not move.\"",
+      "prompt": "Which Helix example shows this? \"The same color picker on the headless tier, with every rule written by hand.\"",
       "tag": "helix-color-picker"
     },
     {
@@ -2443,38 +2443,38 @@
       "tag": "helix-combobox"
     },
     {
-      "answer": "combobox/base",
-      "id": "example-349",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same combobox on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-combobox"
-    },
-    {
       "answer": "combobox/chosen",
-      "id": "example-350",
+      "id": "example-349",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Opening with a value already chosen, which is what an edit form does.\"",
       "tag": "helix-combobox"
     },
     {
       "answer": "combobox/creatable",
-      "id": "example-351",
+      "id": "example-350",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Typing something that is not on the list and keeping it.\"",
       "tag": "helix-combobox"
     },
     {
       "answer": "combobox/disabled",
-      "id": "example-352",
+      "id": "example-351",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled with a value, so the value is still readable.\"",
       "tag": "helix-combobox"
     },
     {
       "answer": "combobox/empty",
-      "id": "example-353",
+      "id": "example-352",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A list with nothing in it says so, rather than opening onto a blank panel.\"",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "combobox/headless",
+      "id": "example-353",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same combobox on the headless tier, with every rule written by hand.\"",
       "tag": "helix-combobox"
     },
     {
@@ -2520,7 +2520,7 @@
       "tag": "helix-command"
     },
     {
-      "answer": "command/base",
+      "answer": "command/headless",
       "id": "example-360",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same command on the headless tier, with every rule written by hand.\"",
@@ -2555,7 +2555,7 @@
       "tag": "helix-copy-button"
     },
     {
-      "answer": "copy-button/base",
+      "answer": "copy-button/headless",
       "id": "example-365",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same copy button on the headless tier, with every rule written by hand.\"",
@@ -2569,31 +2569,31 @@
       "tag": "helix-date-input"
     },
     {
-      "answer": "date-input/base",
-      "id": "example-367",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same date input on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-date-input"
-    },
-    {
       "answer": "date-input/bounded",
-      "id": "example-368",
+      "id": "example-367",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A date within a window, with weekends refused.\"",
       "tag": "helix-date-input"
     },
     {
       "answer": "date-input/disabled",
-      "id": "example-369",
+      "id": "example-368",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled with a date in it.\"",
       "tag": "helix-date-input"
     },
     {
       "answer": "date-input/formatted",
-      "id": "example-370",
+      "id": "example-369",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same date written long, medium and short.\"",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "date-input/headless",
+      "id": "example-370",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same date input on the headless tier, with every rule written by hand.\"",
       "tag": "helix-date-input"
     },
     {
@@ -2632,31 +2632,31 @@
       "tag": "helix-date-picker"
     },
     {
-      "answer": "date-picker/base",
-      "id": "example-376",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same date picker on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-date-picker"
-    },
-    {
       "answer": "date-picker/bounded",
-      "id": "example-377",
+      "id": "example-376",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A calendar that only goes as far as it is allowed.\"",
       "tag": "helix-date-picker"
     },
     {
       "answer": "date-picker/controlled-month",
-      "id": "example-378",
+      "id": "example-377",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The month on show owned by the page, which is what paging from outside needs.\"",
       "tag": "helix-date-picker"
     },
     {
       "answer": "date-picker/disabled",
-      "id": "example-379",
+      "id": "example-378",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled, showing its date and refusing to move.\"",
+      "tag": "helix-date-picker"
+    },
+    {
+      "answer": "date-picker/headless",
+      "id": "example-379",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same date picker on the headless tier, with every rule written by hand.\"",
       "tag": "helix-date-picker"
     },
     {
@@ -2695,24 +2695,24 @@
       "tag": "helix-dialog"
     },
     {
-      "answer": "dialog/base",
-      "id": "example-385",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same dialog on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-dialog"
-    },
-    {
       "answer": "dialog/centered",
-      "id": "example-386",
+      "id": "example-385",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A dialog whose content sits centered, for a short confirmation.\"",
       "tag": "helix-dialog"
     },
     {
       "answer": "dialog/full",
-      "id": "example-387",
+      "id": "example-386",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Filling the viewport, for something that needs the whole screen.\"",
+      "tag": "helix-dialog"
+    },
+    {
+      "answer": "dialog/headless",
+      "id": "example-387",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same dialog on the headless tier, with every rule written by hand.\"",
       "tag": "helix-dialog"
     },
     {
@@ -2744,7 +2744,7 @@
       "tag": "helix-divider"
     },
     {
-      "answer": "divider/base",
+      "answer": "divider/headless",
       "id": "example-392",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same divider on the headless tier, with every rule written by hand.\"",
@@ -2786,17 +2786,17 @@
       "tag": "helix-donut-chart"
     },
     {
-      "answer": "donut-chart/base",
+      "answer": "donut-chart/emphasis",
       "id": "example-398",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same donut chart on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"A ring that is context, said quietly beside one that is being read.\"",
       "tag": "helix-donut-chart"
     },
     {
-      "answer": "donut-chart/emphasis",
+      "answer": "donut-chart/headless",
       "id": "example-399",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A ring that is context, said quietly beside one that is being read.\"",
+      "prompt": "Which Helix example shows this? \"The same donut chart on the headless tier, with every rule written by hand.\"",
       "tag": "helix-donut-chart"
     },
     {
@@ -2842,7 +2842,7 @@
       "tag": "helix-drawer"
     },
     {
-      "answer": "drawer/base",
+      "answer": "drawer/headless",
       "id": "example-406",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same drawer on the headless tier, with every rule written by hand.\"",
@@ -2877,7 +2877,7 @@
       "tag": "helix-drilldown"
     },
     {
-      "answer": "drilldown/base",
+      "answer": "drilldown/headless",
       "id": "example-411",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same drilldown on the headless tier, with every rule written by hand.\"",
@@ -2891,7 +2891,7 @@
       "tag": "helix-empty"
     },
     {
-      "answer": "empty/base",
+      "answer": "empty/headless",
       "id": "example-413",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same empty on the headless tier, with every rule written by hand.\"",
@@ -2912,24 +2912,24 @@
       "tag": "helix-file-input"
     },
     {
-      "answer": "file-input/base",
-      "id": "example-416",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same file input on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-file-input"
-    },
-    {
       "answer": "file-input/disabled",
-      "id": "example-417",
+      "id": "example-416",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled, which is a drop zone that refuses a drop.\"",
       "tag": "helix-file-input"
     },
     {
       "answer": "file-input/from-a-camera",
-      "id": "example-418",
+      "id": "example-417",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Asking a phone for its camera rather than its files.\"",
+      "tag": "helix-file-input"
+    },
+    {
+      "answer": "file-input/headless",
+      "id": "example-418",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same file input on the headless tier, with every rule written by hand.\"",
       "tag": "helix-file-input"
     },
     {
@@ -2996,7 +2996,7 @@
       "tag": "helix-icon-button"
     },
     {
-      "answer": "icon-button/base",
+      "answer": "icon-button/headless",
       "id": "example-428",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same icon button on the headless tier, with every rule written by hand.\"",
@@ -3024,7 +3024,7 @@
       "tag": "helix-icon"
     },
     {
-      "answer": "icon/base",
+      "answer": "icon/headless",
       "id": "example-432",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same icon on the headless tier, with every rule written by hand.\"",
@@ -3045,17 +3045,17 @@
       "tag": "helix-image"
     },
     {
-      "answer": "image/base",
+      "answer": "image/fallback",
       "id": "example-435",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same image on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"A picture that never arrives says so, rather than leaving a hole.\"",
       "tag": "helix-image"
     },
     {
-      "answer": "image/fallback",
+      "answer": "image/headless",
       "id": "example-436",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A picture that never arrives says so, rather than leaving a hole.\"",
+      "prompt": "Which Helix example shows this? \"The same image on the headless tier, with every rule written by hand.\"",
       "tag": "helix-image"
     },
     {
@@ -3080,24 +3080,24 @@
       "tag": "helix-input"
     },
     {
-      "answer": "input/base",
-      "id": "example-440",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same input on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-input"
-    },
-    {
       "answer": "input/clearable",
-      "id": "example-441",
+      "id": "example-440",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A field with a control to empty it.\"",
       "tag": "helix-input"
     },
     {
       "answer": "input/disabled",
-      "id": "example-442",
+      "id": "example-441",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled, filled and empty, since the two read differently.\"",
+      "tag": "helix-input"
+    },
+    {
+      "answer": "input/headless",
+      "id": "example-442",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same input on the headless tier, with every rule written by hand.\"",
       "tag": "helix-input"
     },
     {
@@ -3136,7 +3136,7 @@
       "tag": "helix-kbd"
     },
     {
-      "answer": "kbd/base",
+      "answer": "kbd/headless",
       "id": "example-448",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same kbd on the headless tier, with every rule written by hand.\"",
@@ -3150,24 +3150,24 @@
       "tag": "helix-legend"
     },
     {
-      "answer": "legend/base",
-      "id": "example-450",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same legend on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-legend"
-    },
-    {
       "answer": "legend/categories",
-      "id": "example-451",
+      "id": "example-450",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same element reading rows instead of columns, which is what a donut needs and a bar chart does not.\"",
       "tag": "helix-legend"
     },
     {
       "answer": "legend/emphasis",
-      "id": "example-452",
+      "id": "example-451",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A key drawn to match a chart whose forecast series is outlined.\"",
+      "tag": "helix-legend"
+    },
+    {
+      "answer": "legend/headless",
+      "id": "example-452",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same legend on the headless tier, with every rule written by hand.\"",
       "tag": "helix-legend"
     },
     {
@@ -3192,31 +3192,31 @@
       "tag": "helix-line-chart"
     },
     {
-      "answer": "line-chart/base",
-      "id": "example-456",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same line chart on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-line-chart"
-    },
-    {
       "answer": "line-chart/curves",
-      "id": "example-457",
+      "id": "example-456",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The three curves over one series: joined, smoothed, and held until the next reading.\"",
       "tag": "helix-line-chart"
     },
     {
       "answer": "line-chart/emphasis",
-      "id": "example-458",
+      "id": "example-457",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same readings at full strength and as context.\"",
       "tag": "helix-line-chart"
     },
     {
       "answer": "line-chart/from-zero",
-      "id": "example-459",
+      "id": "example-458",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Open incidents, where the distance from none is the reading: its own range turns a quiet year into a collapse.\"",
+      "tag": "helix-line-chart"
+    },
+    {
+      "answer": "line-chart/headless",
+      "id": "example-459",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same line chart on the headless tier, with every rule written by hand.\"",
       "tag": "helix-line-chart"
     },
     {
@@ -3248,7 +3248,7 @@
       "tag": "helix-list"
     },
     {
-      "answer": "list/base",
+      "answer": "list/headless",
       "id": "example-464",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same list on the headless tier, with every rule written by hand.\"",
@@ -3276,31 +3276,31 @@
       "tag": "helix-listbox"
     },
     {
-      "answer": "listbox/base",
-      "id": "example-468",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same listbox on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-listbox"
-    },
-    {
       "answer": "listbox/controlled-filter",
-      "id": "example-469",
+      "id": "example-468",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The filter text owned by the page, for a list narrowed from a box outside it.\"",
       "tag": "helix-listbox"
     },
     {
       "answer": "listbox/disabled",
-      "id": "example-470",
+      "id": "example-469",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A whole list disabled, and one option disabled inside a live list.\"",
       "tag": "helix-listbox"
     },
     {
       "answer": "listbox/filtered",
-      "id": "example-471",
+      "id": "example-470",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A field over the list that narrows it as it is typed.\"",
+      "tag": "helix-listbox"
+    },
+    {
+      "answer": "listbox/headless",
+      "id": "example-471",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same listbox on the headless tier, with every rule written by hand.\"",
       "tag": "helix-listbox"
     },
     {
@@ -3332,7 +3332,7 @@
       "tag": "helix-loader"
     },
     {
-      "answer": "loader/base",
+      "answer": "loader/headless",
       "id": "example-476",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same loader on the headless tier, with every rule written by hand.\"",
@@ -3367,17 +3367,17 @@
       "tag": "helix-megamenu"
     },
     {
-      "answer": "megamenu/base",
+      "answer": "megamenu/full",
       "id": "example-481",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same megamenu on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"A band from edge to edge, for a panel too wide to hang off one word.\"",
       "tag": "helix-megamenu"
     },
     {
-      "answer": "megamenu/full",
+      "answer": "megamenu/headless",
       "id": "example-482",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A band from edge to edge, for a panel too wide to hang off one word.\"",
+      "prompt": "Which Helix example shows this? \"The same megamenu on the headless tier, with every rule written by hand.\"",
       "tag": "helix-megamenu"
     },
     {
@@ -3395,7 +3395,7 @@
       "tag": "helix-menu"
     },
     {
-      "answer": "menu/base",
+      "answer": "menu/headless",
       "id": "example-485",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same menu on the headless tier, with every rule written by hand.\"",
@@ -3437,31 +3437,31 @@
       "tag": "helix-meter"
     },
     {
-      "answer": "meter/base",
-      "id": "example-491",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same meter on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-meter"
-    },
-    {
       "answer": "meter/beyond",
-      "id": "example-492",
+      "id": "example-491",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A value past the maximum, which clamps rather than overflows.\"",
       "tag": "helix-meter"
     },
     {
       "answer": "meter/counted",
-      "id": "example-493",
+      "id": "example-492",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A reading that says its own number, in words the reader chose.\"",
       "tag": "helix-meter"
     },
     {
       "answer": "meter/emphasis",
-      "id": "example-494",
+      "id": "example-493",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"One reading being watched, and two that are context.\"",
+      "tag": "helix-meter"
+    },
+    {
+      "answer": "meter/headless",
+      "id": "example-494",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same meter on the headless tier, with every rule written by hand.\"",
       "tag": "helix-meter"
     },
     {
@@ -3486,7 +3486,7 @@
       "tag": "helix-navigation"
     },
     {
-      "answer": "navigation/base",
+      "answer": "navigation/headless",
       "id": "example-498",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same navigation on the headless tier, with every rule written by hand.\"",
@@ -3500,24 +3500,24 @@
       "tag": "helix-number-input"
     },
     {
-      "answer": "number-input/base",
-      "id": "example-500",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same number input on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-number-input"
-    },
-    {
       "answer": "number-input/bounded",
-      "id": "example-501",
+      "id": "example-500",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A number in a range, and a number with a step.\"",
       "tag": "helix-number-input"
     },
     {
       "answer": "number-input/disabled",
-      "id": "example-502",
+      "id": "example-501",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled, with and without a value.\"",
+      "tag": "helix-number-input"
+    },
+    {
+      "answer": "number-input/headless",
+      "id": "example-502",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same number input on the headless tier, with every rule written by hand.\"",
       "tag": "helix-number-input"
     },
     {
@@ -3556,17 +3556,17 @@
       "tag": "helix-option"
     },
     {
-      "answer": "option/base",
+      "answer": "option/grouped",
       "id": "example-508",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same option on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"Options under headings, for a list long enough to need them.\"",
       "tag": "helix-option"
     },
     {
-      "answer": "option/grouped",
+      "answer": "option/headless",
       "id": "example-509",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Options under headings, for a list long enough to need them.\"",
+      "prompt": "Which Helix example shows this? \"The same option on the headless tier, with every rule written by hand.\"",
       "tag": "helix-option"
     },
     {
@@ -3577,7 +3577,7 @@
       "tag": "helix-outline"
     },
     {
-      "answer": "outline/base",
+      "answer": "outline/headless",
       "id": "example-511",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same outline on the headless tier, with every rule written by hand.\"",
@@ -3598,31 +3598,31 @@
       "tag": "helix-pagination"
     },
     {
-      "answer": "pagination/base",
-      "id": "example-514",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same pagination on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-pagination"
-    },
-    {
       "answer": "pagination/compact-counts",
-      "id": "example-515",
+      "id": "example-514",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Large counts written short, so a summary does not wrap at page nine hundred.\"",
       "tag": "helix-pagination"
     },
     {
       "answer": "pagination/compact",
-      "id": "example-516",
+      "id": "example-515",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Just the arrows and a count, for a footer with no room.\"",
       "tag": "helix-pagination"
     },
     {
       "answer": "pagination/footer",
-      "id": "example-517",
+      "id": "example-516",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Pagination sitting in a table footer beside a total.\"",
+      "tag": "helix-pagination"
+    },
+    {
+      "answer": "pagination/headless",
+      "id": "example-517",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same pagination on the headless tier, with every rule written by hand.\"",
       "tag": "helix-pagination"
     },
     {
@@ -3647,24 +3647,24 @@
       "tag": "helix-pin-input"
     },
     {
-      "answer": "pin-input/base",
-      "id": "example-521",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same pin input on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-pin-input"
-    },
-    {
       "answer": "pin-input/complete",
-      "id": "example-522",
+      "id": "example-521",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The boxes advance as you type, and the last one completes the code.\"",
       "tag": "helix-pin-input"
     },
     {
       "answer": "pin-input/disabled",
-      "id": "example-523",
+      "id": "example-522",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled, with the code still readable.\"",
+      "tag": "helix-pin-input"
+    },
+    {
+      "answer": "pin-input/headless",
+      "id": "example-523",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same pin input on the headless tier, with every rule written by hand.\"",
       "tag": "helix-pin-input"
     },
     {
@@ -3703,17 +3703,17 @@
       "tag": "helix-popover"
     },
     {
-      "answer": "popover/base",
+      "answer": "popover/commanded",
       "id": "example-529",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same popover on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"A popover opened by a button through the command attributes.\"",
       "tag": "helix-popover"
     },
     {
-      "answer": "popover/commanded",
+      "answer": "popover/headless",
       "id": "example-530",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A popover opened by a button through the command attributes.\"",
+      "prompt": "Which Helix example shows this? \"The same popover on the headless tier, with every rule written by hand.\"",
       "tag": "helix-popover"
     },
     {
@@ -3738,24 +3738,24 @@
       "tag": "helix-progress"
     },
     {
-      "answer": "progress/base",
-      "id": "example-534",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same progress on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-progress"
-    },
-    {
       "answer": "progress/counted",
-      "id": "example-535",
+      "id": "example-534",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A bar that says its own number, in words the reader chose.\"",
       "tag": "helix-progress"
     },
     {
       "answer": "progress/emphasis",
-      "id": "example-536",
+      "id": "example-535",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A background task, said quietly beside one that is being watched.\"",
+      "tag": "helix-progress"
+    },
+    {
+      "answer": "progress/headless",
+      "id": "example-536",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same progress on the headless tier, with every rule written by hand.\"",
       "tag": "helix-progress"
     },
     {
@@ -3780,31 +3780,31 @@
       "tag": "helix-qr-code"
     },
     {
-      "answer": "qr-code/base",
-      "id": "example-540",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same qr code on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-qr-code"
-    },
-    {
       "answer": "qr-code/colored",
-      "id": "example-541",
+      "id": "example-540",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A code in a brand color, over a ground that keeps it scannable.\"",
       "tag": "helix-qr-code"
     },
     {
       "answer": "qr-code/correction",
-      "id": "example-542",
+      "id": "example-541",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The four correction levels, which trade size against damage tolerance.\"",
       "tag": "helix-qr-code"
     },
     {
       "answer": "qr-code/finders",
-      "id": "example-543",
+      "id": "example-542",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The three corner marks drawn in each shape they take.\"",
+      "tag": "helix-qr-code"
+    },
+    {
+      "answer": "qr-code/headless",
+      "id": "example-543",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same qr code on the headless tier, with every rule written by hand.\"",
       "tag": "helix-qr-code"
     },
     {
@@ -3836,7 +3836,7 @@
       "tag": "helix-quote"
     },
     {
-      "answer": "quote/base",
+      "answer": "quote/headless",
       "id": "example-548",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same quote on the headless tier, with every rule written by hand.\"",
@@ -3850,31 +3850,31 @@
       "tag": "helix-radio"
     },
     {
-      "answer": "radio/base",
-      "id": "example-550",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same radio on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-radio"
-    },
-    {
       "answer": "radio/cards",
-      "id": "example-551",
+      "id": "example-550",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Radios drawn as cards, for choices that need room to explain themselves.\"",
       "tag": "helix-radio"
     },
     {
       "answer": "radio/chips",
-      "id": "example-552",
+      "id": "example-551",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A satisfaction scale: five marks, five values, five names.\"",
       "tag": "helix-radio"
     },
     {
       "answer": "radio/disabled",
-      "id": "example-553",
+      "id": "example-552",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A whole group disabled, and one option disabled inside a live group.\"",
+      "tag": "helix-radio"
+    },
+    {
+      "answer": "radio/headless",
+      "id": "example-553",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same radio on the headless tier, with every rule written by hand.\"",
       "tag": "helix-radio"
     },
     {
@@ -3906,24 +3906,24 @@
       "tag": "helix-rating"
     },
     {
-      "answer": "rating/base",
-      "id": "example-558",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same rating on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-rating"
-    },
-    {
       "answer": "rating/dots",
-      "id": "example-559",
+      "id": "example-558",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A level rather than a judgment, which is what a plain circle says.\"",
       "tag": "helix-rating"
     },
     {
       "answer": "rating/halves",
-      "id": "example-560",
+      "id": "example-559",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Half marks, which is the case the value is a number for.\"",
+      "tag": "helix-rating"
+    },
+    {
+      "answer": "rating/headless",
+      "id": "example-560",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same rating on the headless tier, with every rule written by hand.\"",
       "tag": "helix-rating"
     },
     {
@@ -4004,7 +4004,7 @@
       "tag": "helix-scroll-area"
     },
     {
-      "answer": "scroll-area/base",
+      "answer": "scroll-area/headless",
       "id": "example-572",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same scroll area on the headless tier, with every rule written by hand.\"",
@@ -4032,24 +4032,24 @@
       "tag": "helix-select"
     },
     {
-      "answer": "select/base",
-      "id": "example-576",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same select on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-select"
-    },
-    {
       "answer": "select/disabled",
-      "id": "example-577",
+      "id": "example-576",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled, and one option disabled inside a live select.\"",
       "tag": "helix-select"
     },
     {
       "answer": "select/filterable",
-      "id": "example-578",
+      "id": "example-577",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A search box in the list, for a set too long to scan.\"",
+      "tag": "helix-select"
+    },
+    {
+      "answer": "select/headless",
+      "id": "example-578",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same select on the headless tier, with every rule written by hand.\"",
       "tag": "helix-select"
     },
     {
@@ -4081,7 +4081,7 @@
       "tag": "helix-skeleton"
     },
     {
-      "answer": "skeleton/base",
+      "answer": "skeleton/headless",
       "id": "example-583",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same skeleton on the headless tier, with every rule written by hand.\"",
@@ -4095,17 +4095,17 @@
       "tag": "helix-slider"
     },
     {
-      "answer": "slider/base",
+      "answer": "slider/disabled",
       "id": "example-585",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same slider on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"Disabled, with the handle still showing where the value is.\"",
       "tag": "helix-slider"
     },
     {
-      "answer": "slider/disabled",
+      "answer": "slider/headless",
       "id": "example-586",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Disabled, with the handle still showing where the value is.\"",
+      "prompt": "Which Helix example shows this? \"The same slider on the headless tier, with every rule written by hand.\"",
       "tag": "helix-slider"
     },
     {
@@ -4158,31 +4158,31 @@
       "tag": "helix-sparkline"
     },
     {
-      "answer": "sparkline/base",
-      "id": "example-594",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same sparkline on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-sparkline"
-    },
-    {
       "answer": "sparkline/curves",
-      "id": "example-595",
+      "id": "example-594",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same seven readings drawn three ways, and each says something different about what happened between them.\"",
       "tag": "helix-sparkline"
     },
     {
       "answer": "sparkline/emphasis",
-      "id": "example-596",
+      "id": "example-595",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"One row being read, and two that are context.\"",
       "tag": "helix-sparkline"
     },
     {
       "answer": "sparkline/from-a-table",
-      "id": "example-597",
+      "id": "example-596",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same line taken from a table instead, for the sparkline that has one behind it. The table is clipped and still read.\"",
+      "tag": "helix-sparkline"
+    },
+    {
+      "answer": "sparkline/headless",
+      "id": "example-597",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same sparkline on the headless tier, with every rule written by hand.\"",
       "tag": "helix-sparkline"
     },
     {
@@ -4214,7 +4214,7 @@
       "tag": "helix-speed-dial"
     },
     {
-      "answer": "speed-dial/base",
+      "answer": "speed-dial/headless",
       "id": "example-602",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same speed dial on the headless tier, with every rule written by hand.\"",
@@ -4235,45 +4235,45 @@
       "tag": "helix-splitter"
     },
     {
-      "answer": "splitter/base",
-      "id": "example-605",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same splitter on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-splitter"
-    },
-    {
       "answer": "splitter/bounds",
-      "id": "example-606",
+      "id": "example-605",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Where the divider may go, how far each nudge moves it, and a pane folded away.\"",
       "tag": "helix-splitter"
     },
     {
       "answer": "splitter/collapsed",
-      "id": "example-607",
+      "id": "example-606",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A pane collapsed to a sliver, and the handle that brings it back.\"",
       "tag": "helix-splitter"
     },
     {
       "answer": "splitter/columns",
-      "id": "example-608",
+      "id": "example-607",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Three panes across, which is two splitters nested.\"",
       "tag": "helix-splitter"
     },
     {
       "answer": "splitter/controlled",
-      "id": "example-609",
+      "id": "example-608",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A divider the page owns, answering the event and assigning `position` and `collapsed`.\"",
       "tag": "helix-splitter"
     },
     {
       "answer": "splitter/grip",
-      "id": "example-610",
+      "id": "example-609",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A divider with a visible grip rather than a bare rule.\"",
+      "tag": "helix-splitter"
+    },
+    {
+      "answer": "splitter/headless",
+      "id": "example-610",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same splitter on the headless tier, with every rule written by hand.\"",
       "tag": "helix-splitter"
     },
     {
@@ -4305,17 +4305,17 @@
       "tag": "helix-stat"
     },
     {
-      "answer": "stat/base",
+      "answer": "stat/directions",
       "id": "example-615",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same stat on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"A figure with a trend beside it, up, down and flat.\"",
       "tag": "helix-stat"
     },
     {
-      "answer": "stat/directions",
+      "answer": "stat/headless",
       "id": "example-616",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A figure with a trend beside it, up, down and flat.\"",
+      "prompt": "Which Helix example shows this? \"The same stat on the headless tier, with every rule written by hand.\"",
       "tag": "helix-stat"
     },
     {
@@ -4333,24 +4333,24 @@
       "tag": "helix-steps"
     },
     {
-      "answer": "steps/base",
-      "id": "example-619",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same steps on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-steps"
-    },
-    {
       "answer": "steps/collapsible",
-      "id": "example-620",
+      "id": "example-619",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Steps that fold to the current one where there is no room for all of them.\"",
       "tag": "helix-steps"
     },
     {
       "answer": "steps/controlled",
-      "id": "example-621",
+      "id": "example-620",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A sequence the page owns, so a step only advances once the work behind it is done.\"",
+      "tag": "helix-steps"
+    },
+    {
+      "answer": "steps/headless",
+      "id": "example-621",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same steps on the headless tier, with every rule written by hand.\"",
       "tag": "helix-steps"
     },
     {
@@ -4375,17 +4375,17 @@
       "tag": "helix-switch"
     },
     {
-      "answer": "switch/base",
+      "answer": "switch/disabled",
       "id": "example-625",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same switch on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"Disabled on and disabled off, since the two look different.\"",
       "tag": "helix-switch"
     },
     {
-      "answer": "switch/disabled",
+      "answer": "switch/headless",
       "id": "example-626",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Disabled on and disabled off, since the two look different.\"",
+      "prompt": "Which Helix example shows this? \"The same switch on the headless tier, with every rule written by hand.\"",
       "tag": "helix-switch"
     },
     {
@@ -4410,17 +4410,17 @@
       "tag": "helix-table"
     },
     {
-      "answer": "table/base",
+      "answer": "table/columns",
       "id": "example-630",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same table on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"The track sizes written once on the table, rather than one width per column.\"",
       "tag": "helix-table"
     },
     {
-      "answer": "table/columns",
+      "answer": "table/headless",
       "id": "example-631",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The track sizes written once on the table, rather than one width per column.\"",
+      "prompt": "Which Helix example shows this? \"The same table on the headless tier, with every rule written by hand.\"",
       "tag": "helix-table"
     },
     {
@@ -4431,17 +4431,17 @@
       "tag": "helix-tabs"
     },
     {
-      "answer": "tabs/base",
+      "answer": "tabs/controlled",
       "id": "example-633",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same tabs on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"A strip the page owns, answering the event and assigning `active`.\"",
       "tag": "helix-tabs"
     },
     {
-      "answer": "tabs/controlled",
+      "answer": "tabs/headless",
       "id": "example-634",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A strip the page owns, answering the event and assigning `active`.\"",
+      "prompt": "Which Helix example shows this? \"The same tabs on the headless tier, with every rule written by hand.\"",
       "tag": "helix-tabs"
     },
     {
@@ -4480,17 +4480,17 @@
       "tag": "helix-tag"
     },
     {
-      "answer": "tag/base",
+      "answer": "tag/dismissible",
       "id": "example-640",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same tag on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"Tags a reader can take off, which is what a filter bar holds.\"",
       "tag": "helix-tag"
     },
     {
-      "answer": "tag/dismissible",
+      "answer": "tag/headless",
       "id": "example-641",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Tags a reader can take off, which is what a filter bar holds.\"",
+      "prompt": "Which Helix example shows this? \"The same tag on the headless tier, with every rule written by hand.\"",
       "tag": "helix-tag"
     },
     {
@@ -4536,17 +4536,17 @@
       "tag": "helix-textarea"
     },
     {
-      "answer": "textarea/base",
+      "answer": "textarea/disabled",
       "id": "example-648",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same textarea on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"Disabled, filled and empty.\"",
       "tag": "helix-textarea"
     },
     {
-      "answer": "textarea/disabled",
+      "answer": "textarea/headless",
       "id": "example-649",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Disabled, filled and empty.\"",
+      "prompt": "Which Helix example shows this? \"The same textarea on the headless tier, with every rule written by hand.\"",
       "tag": "helix-textarea"
     },
     {
@@ -4578,24 +4578,24 @@
       "tag": "helix-time-input"
     },
     {
-      "answer": "time-input/base",
-      "id": "example-654",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same time input on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-time-input"
-    },
-    {
       "answer": "time-input/bounded",
-      "id": "example-655",
+      "id": "example-654",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A time inside a window, moving in named steps.\"",
       "tag": "helix-time-input"
     },
     {
       "answer": "time-input/disabled",
-      "id": "example-656",
+      "id": "example-655",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled with a time in it.\"",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "time-input/headless",
+      "id": "example-656",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same time input on the headless tier, with every rule written by hand.\"",
       "tag": "helix-time-input"
     },
     {
@@ -4634,31 +4634,31 @@
       "tag": "helix-time-picker"
     },
     {
-      "answer": "time-picker/base",
-      "id": "example-662",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same time picker on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-time-picker"
-    },
-    {
       "answer": "time-picker/business",
-      "id": "example-663",
+      "id": "example-662",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Working hours only, at half-hour steps.\"",
       "tag": "helix-time-picker"
     },
     {
       "answer": "time-picker/disable-times",
-      "id": "example-664",
+      "id": "example-663",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Named times taken out of an otherwise open range.\"",
       "tag": "helix-time-picker"
     },
     {
       "answer": "time-picker/disabled",
-      "id": "example-665",
+      "id": "example-664",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Disabled, showing its time and refusing to move.\"",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "time-picker/headless",
+      "id": "example-665",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same time picker on the headless tier, with every rule written by hand.\"",
       "tag": "helix-time-picker"
     },
     {
@@ -4690,7 +4690,7 @@
       "tag": "helix-timeline"
     },
     {
-      "answer": "timeline/base",
+      "answer": "timeline/headless",
       "id": "example-670",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same timeline on the headless tier, with every rule written by hand.\"",
@@ -4718,7 +4718,7 @@
       "tag": "helix-toast"
     },
     {
-      "answer": "toast/base",
+      "answer": "toast/headless",
       "id": "example-674",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same toast on the headless tier, with every rule written by hand.\"",
@@ -4739,17 +4739,17 @@
       "tag": "helix-toggle"
     },
     {
-      "answer": "toggle/base",
+      "answer": "toggle/filled",
       "id": "example-677",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same toggle on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"The pressed member filled rather than outlined.\"",
       "tag": "helix-toggle"
     },
     {
-      "answer": "toggle/filled",
+      "answer": "toggle/headless",
       "id": "example-678",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The pressed member filled rather than outlined.\"",
+      "prompt": "Which Helix example shows this? \"The same toggle on the headless tier, with every rule written by hand.\"",
       "tag": "helix-toggle"
     },
     {
@@ -4781,7 +4781,7 @@
       "tag": "helix-toolbar"
     },
     {
-      "answer": "toolbar/base",
+      "answer": "toolbar/headless",
       "id": "example-683",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same toolbar on the headless tier, with every rule written by hand.\"",
@@ -4802,17 +4802,17 @@
       "tag": "helix-tooltip"
     },
     {
-      "answer": "tooltip/base",
+      "answer": "tooltip/described",
       "id": "example-686",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same tooltip on the headless tier, with every rule written by hand.\"",
+      "prompt": "Which Helix example shows this? \"A tooltip that describes its target rather than naming it.\"",
       "tag": "helix-tooltip"
     },
     {
-      "answer": "tooltip/described",
+      "answer": "tooltip/headless",
       "id": "example-687",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A tooltip that describes its target rather than naming it.\"",
+      "prompt": "Which Helix example shows this? \"The same tooltip on the headless tier, with every rule written by hand.\"",
       "tag": "helix-tooltip"
     },
     {
@@ -4858,7 +4858,7 @@
       "tag": "helix-tour"
     },
     {
-      "answer": "tour/base",
+      "answer": "tour/headless",
       "id": "example-694",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same tour on the headless tier, with every rule written by hand.\"",
@@ -4893,31 +4893,31 @@
       "tag": "helix-tree"
     },
     {
-      "answer": "tree/base",
-      "id": "example-699",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same tree on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-tree"
-    },
-    {
       "answer": "tree/chevron-placement",
-      "id": "example-700",
+      "id": "example-699",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The branch marker at either end of the row.\"",
       "tag": "helix-tree"
     },
     {
       "answer": "tree/controlled",
-      "id": "example-701",
+      "id": "example-700",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A tree whose current node is the page's, which is what a router-driven one needs.\"",
       "tag": "helix-tree"
     },
     {
       "answer": "tree/flattened",
-      "id": "example-702",
+      "id": "example-701",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A node told its own depth, for a tree built from a flat list rather than by nesting.\"",
+      "tag": "helix-tree"
+    },
+    {
+      "answer": "tree/headless",
+      "id": "example-702",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same tree on the headless tier, with every rule written by hand.\"",
       "tag": "helix-tree"
     },
     {
@@ -4935,7 +4935,7 @@
       "tag": "helix-trend"
     },
     {
-      "answer": "trend/base",
+      "answer": "trend/headless",
       "id": "example-705",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same trend on the headless tier, with every rule written by hand.\"",
@@ -4956,24 +4956,24 @@
       "tag": "helix-video-playlist"
     },
     {
-      "answer": "video-playlist/base",
-      "id": "example-708",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same video playlist on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-video-playlist"
-    },
-    {
       "answer": "video-playlist/beside-the-player",
-      "id": "example-709",
+      "id": "example-708",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The list beside the player rather than under it.\"",
       "tag": "helix-video-playlist"
     },
     {
       "answer": "video-playlist/controlled",
-      "id": "example-710",
+      "id": "example-709",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A playlist whose current clip is the page's, so a deep link can choose one.\"",
+      "tag": "helix-video-playlist"
+    },
+    {
+      "answer": "video-playlist/headless",
+      "id": "example-710",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same video playlist on the headless tier, with every rule written by hand.\"",
       "tag": "helix-video-playlist"
     },
     {
@@ -5005,31 +5005,31 @@
       "tag": "helix-video"
     },
     {
-      "answer": "video/base",
-      "id": "example-715",
-      "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same video on the headless tier, with every rule written by hand.\"",
-      "tag": "helix-video"
-    },
-    {
       "answer": "video/captions",
-      "id": "example-716",
+      "id": "example-715",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A clip with subtitle tracks and the control that chooses between them.\"",
       "tag": "helix-video"
     },
     {
       "answer": "video/extra-controls",
-      "id": "example-717",
+      "id": "example-716",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Skip, speed and download added to the bar.\"",
       "tag": "helix-video"
     },
     {
       "answer": "video/filled",
-      "id": "example-718",
+      "id": "example-717",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A filled frame around the picture.\"",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "video/headless",
+      "id": "example-718",
+      "kind": "example",
+      "prompt": "Which Helix example shows this? \"The same video on the headless tier, with every rule written by hand.\"",
       "tag": "helix-video"
     },
     {
@@ -5103,7 +5103,7 @@
       "tag": "helix-virtual-list"
     },
     {
-      "answer": "virtual-list/base",
+      "answer": "virtual-list/headless",
       "id": "example-729",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The same virtual list on the headless tier, with every rule written by hand.\"",
@@ -11358,7 +11358,7 @@
     }
   ],
   "sources": [
-    "helix/web/custom-elements.json",
+    "helix/styled/custom-elements.json",
     "helix/styles/tokens.json"
   ],
   "total": 1672

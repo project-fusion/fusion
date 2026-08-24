@@ -8,11 +8,11 @@ beforeAll(async () => {
 })
 
 const markup = `
-  <helix-base-toolbar label="Actions">
-    <helix-base-button>One</helix-base-button>
-    <helix-base-button>Two</helix-base-button>
-    <helix-base-button>Three</helix-base-button>
-  </helix-base-toolbar>`
+  <helix-headless-toolbar label="Actions">
+    <helix-headless-button>One</helix-headless-button>
+    <helix-headless-button>Two</helix-headless-button>
+    <helix-headless-button>Three</helix-headless-button>
+  </helix-headless-toolbar>`
 
 /**
  * Where the tab stop actually sits, one entry per control.
@@ -96,10 +96,10 @@ describe('toolbar', () => {
 
   test('a disabled control is skipped rather than trapping the tab stop', async () => {
     const toolbar = await mount(`
-      <helix-base-toolbar label="Actions">
-        <helix-base-button>One</helix-base-button>
-        <helix-base-button disabled>Two</helix-base-button>
-      </helix-base-toolbar>`)
+      <helix-headless-toolbar label="Actions">
+        <helix-headless-button>One</helix-headless-button>
+        <helix-headless-button disabled>Two</helix-headless-button>
+      </helix-headless-toolbar>`)
     await settle(toolbar)
     const controls = [...toolbar.children] as HTMLElement[]
     controls[0]?.dispatchEvent(

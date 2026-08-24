@@ -75,7 +75,7 @@
  * and so reached the four top-level sections and not the API entries, which sit
  * one level further in: measured on the Copy Button page, `usage`, `preview`,
  * `api` and `examples` had 80px of margin and `helix-copy-button` and
- * `helix-base-copy-button` had none. Click Root and the heading landed flush
+ * `helix-headless-copy-button` had none. Click Root and the heading landed flush
  * against the top of the window, behind a 57px sticky header, which is a
  * destination a reader cannot see.
  *
@@ -128,17 +128,17 @@
  *
  * `display: none` rather than `visibility` or a clip, because the hidden tier
  * has to leave the accessibility tree as well as the page. A reader being read
- * the styled API does not want the base one read out underneath it, and an
+ * the styled API does not want the headless one read out underneath it, and an
  * anchor in the rail pointing at a section that is not shown is a rail that
  * lies about the page.
  *
  * Styled is the default and is expressed as the absence of the attribute, so
  * the document's resting state is the common answer. */
-:root:not([data-api-tier="base"]) .docsShell [data-tier="headless"] {
+:root:not([data-api-tier="headless"]) .docsShell [data-tier="headless"] {
   display: none;
 }
 
-:root[data-api-tier="base"] .docsShell [data-tier="styled"] {
+:root[data-api-tier="headless"] .docsShell [data-tier="styled"] {
   display: none;
 }
 
@@ -256,7 +256,7 @@
  *
  * A union member is `nowrap`, so it cannot break, and the Type column's floor
  * fits every literal and most named types but not the longest: twenty-four
- * characters of `HelixBaseAccordionItem[]` would need a floor that squeezes the
+ * characters of `HelixHeadlessAccordionItem[]` would need a floor that squeezes the
  * other three columns on every narrow screen to serve one row. Given a member
  * that does not fit, scrolling shows all of it and clipping would show part,
  * which is the difference between a table a reader can use narrow and one they
@@ -355,7 +355,7 @@
  *
  * Scrolling kept every row one line tall, and hid the end of any type longer
  * than its column behind a gesture: a reader cannot see that
- * `HelixBaseAccordionItem[]` is an array without dragging it. A wrapped type is
+ * `HelixHeadlessAccordionItem[]` is an array without dragging it. A wrapped type is
  * longer to look at and entirely visible, which is what a reference is for.
  *
  * `break-word` rather than `anywhere`, so a break is taken only when a single

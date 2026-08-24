@@ -17,8 +17,10 @@ const REVENUE = `<table id="revenue">
 </table>`
 
 const chart = async (table: string, attributes: string): Promise<HTMLElement> => {
-  await mount(`<div>${table}<helix-base-bar-chart ${attributes}></helix-base-bar-chart></div>`)
-  const host = document.querySelector('helix-base-bar-chart') as HTMLElement & {
+  await mount(
+    `<div>${table}<helix-headless-bar-chart ${attributes}></helix-headless-bar-chart></div>`,
+  )
+  const host = document.querySelector('helix-headless-bar-chart') as HTMLElement & {
     updateComplete: Promise<unknown>
   }
   await host.updateComplete
@@ -107,14 +109,14 @@ describe('bar chart', () => {
 
   test('a helix-table is read too, since its roles are in ElementInternals', async () => {
     const host = await chart(
-      `<helix-base-table id="grid" label="Plans">
-        <helix-base-table-column>Plan</helix-base-table-column>
-        <helix-base-table-column>Accounts</helix-base-table-column>
-        <helix-base-table-row>
-          <helix-base-table-cell header>Free</helix-base-table-cell>
-          <helix-base-table-cell>1840</helix-base-table-cell>
-        </helix-base-table-row>
-      </helix-base-table>`,
+      `<helix-headless-table id="grid" label="Plans">
+        <helix-headless-table-column>Plan</helix-headless-table-column>
+        <helix-headless-table-column>Accounts</helix-headless-table-column>
+        <helix-headless-table-row>
+          <helix-headless-table-cell header>Free</helix-headless-table-cell>
+          <helix-headless-table-cell>1840</helix-headless-table-cell>
+        </helix-headless-table-row>
+      </helix-headless-table>`,
       'for="grid"',
     )
     expect(labels(host)).toEqual(['Free'])

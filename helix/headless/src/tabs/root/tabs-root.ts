@@ -7,8 +7,8 @@ import {
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixBaseTabsPanel } from '../panel/tabs-panel.js'
-import { HelixBaseTabsTab } from '../tab/tabs-tab.js'
+import { HelixHeadlessTabsPanel } from '../panel/tabs-panel.js'
+import { HelixHeadlessTabsTab } from '../tab/tabs-tab.js'
 
 /**
  * @summary A row of tabs and the panel each one shows.
@@ -40,8 +40,8 @@ import { HelixBaseTabsTab } from '../tab/tabs-tab.js'
  * @event {HelixChangeEvent} helix-change - Fired before the current tab moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
  */
-@customElement('helix-base-tabs')
-export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
+@customElement('helix-headless-tabs')
+export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   /* Arrow keys, Home and End. Same controller as the radio group and the toggle
      group, which is what the audit asked for once the indicator controller had
      landed, and this is the traversal that had to grow it: `origin: 'focus'`
@@ -108,15 +108,15 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
   /** Watches for anything that moves a tab, since none of it is a property. */
   private observer: ResizeObserver | undefined
 
-  private get tabs(): HelixBaseTabsTab[] {
+  private get tabs(): HelixHeadlessTabsTab[] {
     return [...this.children].filter(
-      (child): child is HelixBaseTabsTab => child instanceof HelixBaseTabsTab,
+      (child): child is HelixHeadlessTabsTab => child instanceof HelixHeadlessTabsTab,
     )
   }
 
-  private get panels(): HelixBaseTabsPanel[] {
+  private get panels(): HelixHeadlessTabsPanel[] {
     return [...this.children].filter(
-      (child): child is HelixBaseTabsPanel => child instanceof HelixBaseTabsPanel,
+      (child): child is HelixHeadlessTabsPanel => child instanceof HelixHeadlessTabsPanel,
     )
   }
 
@@ -253,6 +253,6 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-tabs': HelixBaseTabs
+    'helix-headless-tabs': HelixHeadlessTabs
   }
 }

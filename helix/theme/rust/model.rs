@@ -3,7 +3,7 @@
 //!
 //! **This is the foundation the components are built on rather than a record of
 //! what they currently do.** The alternative was to enumerate pairs by scanning
-//! `helix/web` for inks and grounds used together, and it is the wrong direction
+//! `helix/styled` for inks and grounds used together, and it is the wrong direction
 //! twice over: it makes the guarantee a description of today's stylesheets, and
 //! it means a component pairing two tokens nobody intended would teach the
 //! engine that the pairing is legitimate. The model says what is intended, the

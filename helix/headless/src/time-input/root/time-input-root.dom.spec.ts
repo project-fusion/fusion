@@ -10,7 +10,7 @@ type InputTime = HTMLElement & { open: boolean; updateComplete: Promise<unknown>
 
 const field = async (attrs = ''): Promise<InputTime> => {
   const host = (await mount(
-    `<helix-base-time-input label="Starts" ${attrs}></helix-base-time-input>`,
+    `<helix-headless-time-input label="Starts" ${attrs}></helix-headless-time-input>`,
   )) as InputTime
   await host.updateComplete
   return host
@@ -32,8 +32,8 @@ const type = async (host: InputTime, text: string): Promise<void> => {
 }
 
 describe('input time', () => {
-  test('the list is the real helix-base-time-picker, not a second one written here', async () => {
-    expect(part(await field(), 'picker')?.tagName.toLowerCase()).toBe('helix-base-time-picker')
+  test('the list is the real helix-headless-time-picker, not a second one written here', async () => {
+    expect(part(await field(), 'picker')?.tagName.toLowerCase()).toBe('helix-headless-time-picker')
   })
 
   test('the field renders the time idle and holds the value while edited', async () => {

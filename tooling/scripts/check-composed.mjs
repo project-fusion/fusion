@@ -9,13 +9,13 @@
  *
  * **A template names no tag at all.** It interpolates one:
  * `<${this.tag('date-picker')}>`, which resolves through the class's `tier` to
- * `helix-base-date-picker` in the headless tier and `helix-date-picker` in the
+ * `helix-headless-date-picker` in the headless tier and `helix-date-picker` in the
  * styled one. Each tier side-effect imports its own version of the family, so a
  * consumer on either tier gets children from the tier they are on.
  *
  * **Naming the public tag was the first arrangement, and it was wrong.** A base
  * component rendering `<helix-select>` composes a styled element out of a tier
- * that must not depend on the styled one, and it leaves the base tier broken for
+ * that must not depend on the styled one, and it leaves the headless tier broken for
  * anyone who imports only it: nothing registers that tag, so the control is an
  * inert unknown element. Forty-two sites across sixteen families did this. The
  * argument for it was that each tier imports its own element under one name,
@@ -24,7 +24,7 @@
  * **It went wrong the first time it was used.** Date Input's headless tier
  * imported the base calendar and rendered `helix-date-picker`, and its styled tier
  * imported no calendar at all. Measured: importing that one family registered
- * `helix-date-input` and `helix-base-date-picker`, and left `helix-date-picker`
+ * `helix-date-input` and `helix-headless-date-picker`, and left `helix-date-picker`
  * undefined. Every example still looked right, because the sandbox and the docs
  * site both import the whole barrel, which is exactly the condition under which
  * a missing import is invisible. It would have shipped that way to the first
@@ -63,7 +63,7 @@
  *
  * **The styled tier has to say it is the styled tier**, and forgetting to is the
  * failure this arrangement replaces the old one's with. `tier` defaults to
- * `helix-base-`, so a styled component that inherits an interpolating template
+ * `helix-headless-`, so a styled component that inherits an interpolating template
  * and does not override it renders base children inside a styled shadow root:
  * unstyled, silent, and passing every other check. One line, `static override
  * tier = 'helix-'`, and it is held to it here.
@@ -73,7 +73,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const TIERS = ['helix/headless/src', 'helix/web/src']
+const TIERS = ['helix/headless/src', 'helix/styled/src']
 
 /* **Where a tag can be written by something that is not a component.**
  *
@@ -154,7 +154,7 @@ for (const tier of TIERS) {
   for (const path of sources(tier)) {
     const code = withoutComments(readFileSync(path, 'utf8'))
     read.set(path, code)
-    for (const match of code.matchAll(/@customElement\('helix-(?:base-)?([a-z-]+)'\)/g)) {
+    for (const match of code.matchAll(/@customElement\('helix-(?:headless-)?([a-z-]+)'\)/g)) {
       declaredIn.set(match[1], path.split('/').at(-3))
     }
   }
@@ -166,8 +166,8 @@ for (const [path, code] of read) {
 
   /* A styled component inherits its base's template, so it inherits every tag in
      it. Matched by the path the two tiers share. */
-  const inherited = path.startsWith('helix/web/src')
-    ? read.get(path.replace('helix/web/src', 'helix/headless/src'))
+  const inherited = path.startsWith('helix/styled/src')
+    ? read.get(path.replace('helix/styled/src', 'helix/headless/src'))
     : undefined
   if (inherited) {
     for (const tag of renders(inherited)) {
@@ -178,7 +178,7 @@ for (const [path, code] of read) {
   /* A tag written out is a tag one tier owns. The headless tier may own
      neither: naming a styled tag is the dependency the tiers exist to prevent,
      and naming its own base tag pins the children of every styled subclass to
-     the base tier. A styled component with a tier below it is under the same
+     the headless tier. A styled component with a tier below it is under the same
      obligation, since that template is the one its base wrote. A styled-only
      component has no tier to be agnostic for and may name what it renders. */
   const twin = path.startsWith('helix/headless/src') || inherited !== undefined
@@ -188,12 +188,12 @@ for (const [path, code] of read) {
       problems.push(
         `${path}: writes \`<${tag}>\` into a template. The headless tier may not name a ` +
           `styled tag, and naming a base tag pins the children of every styled subclass ` +
-          `to the base tier. Interpolate it: \`<\${this.tag('${tag.replace(/^helix-(base-)?/, '')}')}>\`.`,
+          `to the headless tier. Interpolate it: \`<\${this.tag('${tag.replace(/^helix-(headless-)?/, '')}')}>\`.`,
       )
-    } else if (tag.startsWith('helix-base-')) {
+    } else if (tag.startsWith('helix-headless-')) {
       problems.push(
         `${path}: writes \`<${tag}>\` into a template. A styled component renders styled ` +
-          'children. Drop the `base-`.',
+          'children. Drop the `headless-`.',
       )
     }
   }
@@ -204,7 +204,7 @@ for (const [path, code] of read) {
   if (inherited && renders(inherited).size > 0 && !/static override tier = 'helix-'/.test(code)) {
     problems.push(
       `${path}: inherits a template that interpolates its children's tags, and never ` +
-        `overrides \`tier\`, so it renders \`helix-base-…\` children inside a styled ` +
+        `overrides \`tier\`, so it renders \`helix-headless-…\` children inside a styled ` +
         `shadow root. Add \`static override tier = 'helix-'\`.`,
     )
   }
@@ -234,7 +234,7 @@ for (const [path, code] of shared) {
       `${path}: writes \`<${tag}>\` into a template, and is on no tier. A shared module ` +
         `renders into whichever tier called it, so naming a tag here picks one for every ` +
         `caller: the headless tier gets an inert unknown element. Take the tag as an ` +
-        `argument and let the caller pass \`this.tag('${tag.replace(/^helix-(base-)?/, '')}')\`.`,
+        `argument and let the caller pass \`this.tag('${tag.replace(/^helix-(headless-)?/, '')}')\`.`,
     )
   }
 }

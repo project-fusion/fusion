@@ -72,8 +72,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @cssproperty --tree-level - How deep this row sits, counting from zero, for the indent.
  */
-@customElement('helix-base-tree-item')
-export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
+@customElement('helix-headless-tree-item')
+export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   /** Identifies the item to the consumer, carried in `helix-select`. */
   @property()
   value = ''
@@ -360,6 +360,6 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-tree-item': HelixBaseTreeItem
+    'helix-headless-tree-item': HelixHeadlessTreeItem
   }
 }

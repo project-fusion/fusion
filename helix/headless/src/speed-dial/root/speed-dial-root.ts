@@ -11,7 +11,7 @@ import {
 import { plus } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { HelixBaseSpeedDialItem } from '../item/speed-dial-item.js'
+import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
 
 /**
  * @summary A button that fans out the few actions a screen is for.
@@ -55,8 +55,8 @@ import type { HelixBaseSpeedDialItem } from '../item/speed-dial-item.js'
  * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
  */
-@customElement('helix-base-speed-dial')
-export class HelixBaseSpeedDial extends MixinControllerOpen(HelixElement) {
+@customElement('helix-headless-speed-dial')
+export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   /** Names the trigger and the set of actions it opens. */
   @property()
   label = 'Actions'
@@ -102,11 +102,11 @@ export class HelixBaseSpeedDial extends MixinControllerOpen(HelixElement) {
   }
 
   /** The actions, which are this element's own rows and nothing else slotted. */
-  private get items(): HelixBaseSpeedDialItem[] {
+  private get items(): HelixHeadlessSpeedDialItem[] {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
     return (slot?.assignedElements?.() ?? []).filter(
-      (one): one is HelixBaseSpeedDialItem =>
-        (one as HelixBaseSpeedDialItem).isSpeedDialItem === true,
+      (one): one is HelixHeadlessSpeedDialItem =>
+        (one as HelixHeadlessSpeedDialItem).isSpeedDialItem === true,
     )
   }
 
@@ -251,6 +251,6 @@ export class HelixBaseSpeedDial extends MixinControllerOpen(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-speed-dial': HelixBaseSpeedDial
+    'helix-headless-speed-dial': HelixHeadlessSpeedDial
   }
 }

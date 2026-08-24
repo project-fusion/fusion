@@ -33,7 +33,7 @@ import { chromium } from 'playwright'
 
 const root = resolve(import.meta.dirname, '../..')
 const frame = join(root, 'site/ui/public/sandbox')
-const source = join(root, 'helix/web/src')
+const source = join(root, 'helix/styled/src')
 
 const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript' }
 

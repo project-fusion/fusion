@@ -7,7 +7,7 @@ import { registerDom } from '@helix-io/testing/dom'
  *
  * **Identity rather than tag name**, which is the rule the headless tier turns
  * on: matching `helix-accordion-item` ties that tier to the styled one by
- * string, and subclassing a base element under a third tag is exactly what the
+ * string, and subclassing a headless element under a third tag is exactly what the
  * split exists to allow. Under a third tag the lookup returned `null`, so an
  * accordion's `mode` was ignored and every section behaved as `multiple`, with
  * no error anywhere.
@@ -62,8 +62,8 @@ describe('walking up for an owner', () => {
 
 describe('what it matches on', () => {
   /* The fault the rule exists for: a subclass under its own tag is still the
-     class, and a lookup by tag name would miss it. `helix/web` is exactly this
-     case, since every styled element is a base element under another name. */
+     class, and a lookup by tag name would miss it. `helix/styled` is exactly this
+     case, since every styled element is a headless element under another name. */
   test('a subclass under a different tag is still an owner', () => {
     document.body.innerHTML = '<probe-renamed><b id="deep">x</b></probe-renamed>'
     const found = closestInstance(document.getElementById('deep'), Owner)

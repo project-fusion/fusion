@@ -6,11 +6,11 @@ import '../index.js'
 /* `default-active`, not `value`. The fixture set `value="one"`, which is not an
    attribute this component has: the line was inert, so every assertion below it
    was made against a set with nothing current at all and still passed. */
-const markup = ssr(html`<helix-base-tabs default-active="one">
-  <helix-base-tabs-tab selected value="one">One</helix-base-tabs-tab>
-  <helix-base-tabs-panel selected slot="panels" value="one">First</helix-base-tabs-panel>
-  <helix-base-tabs-panel slot="panels" value="two">Second</helix-base-tabs-panel>
-</helix-base-tabs>`)
+const markup = ssr(html`<helix-headless-tabs default-active="one">
+  <helix-headless-tabs-tab selected value="one">One</helix-headless-tabs-tab>
+  <helix-headless-tabs-panel selected slot="panels" value="one">First</helix-headless-tabs-panel>
+  <helix-headless-tabs-panel slot="panels" value="two">Second</helix-headless-tabs-panel>
+</helix-headless-tabs>`)
 
 describe('tabs server output', () => {
   test('the tab list is announced before any JavaScript runs', () => {

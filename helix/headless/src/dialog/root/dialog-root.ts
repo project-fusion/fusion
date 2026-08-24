@@ -62,8 +62,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart dialog - The native dialog element.
  */
-@customElement('helix-base-dialog')
-export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
+@customElement('helix-headless-dialog')
+export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   /** Accessible name for the dialog. */
   @property()
   label = ''
@@ -244,6 +244,6 @@ export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-dialog': HelixBaseDialog
+    'helix-headless-dialog': HelixHeadlessDialog
   }
 }

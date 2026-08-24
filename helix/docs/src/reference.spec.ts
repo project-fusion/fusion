@@ -40,7 +40,7 @@ const manifest: HelixManifest = {
           name: 'HelixAccordion',
           slots: [{ description: 'The items.', name: '' }],
           summary: 'Groups collapsible sections.',
-          superclass: { name: 'HelixBaseAccordion' },
+          superclass: { name: 'HelixHeadlessAccordion' },
           tagName: 'helix-accordion',
         },
       ],
@@ -90,7 +90,7 @@ describe('reference', () => {
 
   test('carries the summary, the superclass and the whole description', () => {
     expect(rendered).toContain('Groups collapsible sections.')
-    expect(rendered).toContain('Extends `HelixBaseAccordion`.')
+    expect(rendered).toContain('Extends `HelixHeadlessAccordion`.')
     expect(rendered).toContain('And the reasoning, which a heading keeps.')
   })
 

@@ -28,7 +28,7 @@
  *
  * **It reads the interpolation, not a literal tag**, and reading literals is
  * how it stopped working. A template names no tag now: `tier` resolves
- * `<${this.tag('listbox')}>` to the base element here and the styled one in the
+ * `<${this.tag('listbox')}>` to the headless element here and the styled one in the
  * tier above. The scan for `<helix-…` then matched nothing at all and this
  * reported "0 families compose another" as a pass, which is what `check:floors`
  * exists to catch and did.
@@ -78,7 +78,7 @@ const withoutComments = (text) =>
    name. Same rule `check:composed` settled on, and for the same reason. */
 const families = new Map()
 for (const file of sources(TIER)) {
-  const declared = /@customElement\(['"]helix-base-([a-z0-9-]+)['"]\)/.exec(
+  const declared = /@customElement\(['"]helix-headless-([a-z0-9-]+)['"]\)/.exec(
     readFileSync(file, 'utf8'),
   )
   if (declared) {

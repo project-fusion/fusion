@@ -5,10 +5,10 @@ import { useEffect } from 'react'
 /**
  * Keeps `?tier=` describing the tier the page is actually showing.
  *
- * The parameter was only ever read here. A page arriving with `?tier=base`
- * forces the attribute and documents the base API, which is the half that makes
+ * The parameter was only ever read here. A page arriving with `?tier=headless`
+ * forces the attribute and documents the headless API, which is the half that makes
  * a link work, but flipping the same choice in the drawer left the address
- * alone. So a reader looking at the base tables copied a URL that said nothing
+ * alone. So a reader looking at the headless tables copied a URL that said nothing
  * about tiers, and whoever opened it got their own preference: exactly the
  * failure the parameter exists to prevent, arrived at from the other direction.
  * See 245.
@@ -42,7 +42,7 @@ import { useEffect } from 'react'
 export function TierAddress(): null {
   useEffect(() => {
     const read = (): string =>
-      document.documentElement.dataset.apiTier === 'base' ? 'base' : 'styled'
+      document.documentElement.dataset.apiTier === 'headless' ? 'headless' : 'styled'
 
     /* What the page loaded showing, which the address already describes. */
     let showing = read()
@@ -54,8 +54,8 @@ export function TierAddress(): null {
       }
       showing = now
       const params = new URLSearchParams(window.location.search)
-      if (now === 'base') {
-        params.set('tier', 'base')
+      if (now === 'headless') {
+        params.set('tier', 'headless')
       } else {
         params.delete('tier')
       }

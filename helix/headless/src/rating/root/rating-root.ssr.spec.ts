@@ -3,8 +3,8 @@ import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@helix-io/
 import { html } from 'lit'
 import '../index.js'
 
-const given = html`<helix-base-rating label="Rate this" value="4.2"></helix-base-rating>`
-const shown = html`<helix-base-rating readonly value="4.2"></helix-base-rating>`
+const given = html`<helix-headless-rating label="Rate this" value="4.2"></helix-headless-rating>`
+const shown = html`<helix-headless-rating readonly value="4.2"></helix-headless-rating>`
 
 describe('rating server output', () => {
   test('the score is drawn on the server, from a number it already has', () => {
@@ -39,6 +39,6 @@ describe('rating server output', () => {
     /* `variant` reflected and defaulted to `marks`, so the server stamped
        `variant="marks"` onto every rating anybody rendered and React, which
        holds no such prop, reported a hydration mismatch for each one. */
-    expect(hostAttributes(ssr(given), 'helix-base-rating')).toEqual(['label', 'value'])
+    expect(hostAttributes(ssr(given), 'helix-headless-rating')).toEqual(['label', 'value'])
   })
 })

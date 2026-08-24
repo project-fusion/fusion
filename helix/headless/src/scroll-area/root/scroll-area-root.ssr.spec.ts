@@ -6,7 +6,10 @@ import '../index.js'
 describe('scroll area server output', () => {
   test('ships the box, so the content is scrollable before hydration', () => {
     expect(
-      hasPart(ssr(html`<helix-base-scroll-area><p>One</p></helix-base-scroll-area>`), 'viewport'),
+      hasPart(
+        ssr(html`<helix-headless-scroll-area><p>One</p></helix-headless-scroll-area>`),
+        'viewport',
+      ),
     ).toBe(true)
   })
 
@@ -18,15 +21,15 @@ describe('scroll area server output', () => {
        stylesheet ships inside the output and names `data-more` in its own
        selectors, so a substring check found it every time and passed on nothing. */
     const markup = ssr(
-      html`<helix-base-scroll-area label="Notes"><p>One</p></helix-base-scroll-area>`,
+      html`<helix-headless-scroll-area label="Notes"><p>One</p></helix-headless-scroll-area>`,
     )
-    const attributes = hostAttributes(markup, 'helix-base-scroll-area')
+    const attributes = hostAttributes(markup, 'helix-headless-scroll-area')
     expect(attributes.some((one) => one.startsWith('data-more'))).toBe(false)
   })
 
   test('and gives no tab stop it cannot know is needed', () => {
     const markup = partTag(
-      ssr(html`<helix-base-scroll-area><p>One</p></helix-base-scroll-area>`),
+      ssr(html`<helix-headless-scroll-area><p>One</p></helix-headless-scroll-area>`),
       'viewport',
     )
     expect(markup).not.toContain('tabindex')

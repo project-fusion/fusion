@@ -21,8 +21,8 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The cell's content.
  */
-@customElement('helix-base-table-cell')
-export class HelixBaseTableCell extends HelixElement {
+@customElement('helix-headless-table-cell')
+export class HelixHeadlessTableCell extends HelixElement {
   /** Whether the cell heads its column. */
   @property({ reflect: true, type: Boolean })
   header = false
@@ -40,6 +40,6 @@ export class HelixBaseTableCell extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-table-cell': HelixBaseTableCell
+    'helix-headless-table-cell': HelixHeadlessTableCell
   }
 }

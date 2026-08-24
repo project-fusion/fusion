@@ -1,0 +1,25 @@
+<!-- @summary The same toast on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-headless-toast
+  label="Notifications"
+  placement="bottom-end"
+>
+  <helix-headless-toast-item
+    dismissible
+    tone="success"
+  >
+    Project saved.
+  </helix-headless-toast-item>
+  <helix-headless-toast-item
+    dismissible
+    tone="danger"
+  >
+    Could not reach the server.
+    <helix-headless-button slot="actions">Retry</helix-headless-button>
+  </helix-headless-toast-item>
+</helix-headless-toast>

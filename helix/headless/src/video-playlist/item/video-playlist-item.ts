@@ -41,8 +41,8 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when the entry is chosen.
  */
-@customElement('helix-base-video-playlist-item')
-export class HelixBaseVideoPlaylistItem extends HelixElement {
+@customElement('helix-headless-video-playlist-item')
+export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   /** What identifies the entry, and what `active` is compared against. */
   @property()
   value = ''
@@ -145,6 +145,6 @@ export class HelixBaseVideoPlaylistItem extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-video-playlist-item': HelixBaseVideoPlaylistItem
+    'helix-headless-video-playlist-item': HelixHeadlessVideoPlaylistItem
   }
 }

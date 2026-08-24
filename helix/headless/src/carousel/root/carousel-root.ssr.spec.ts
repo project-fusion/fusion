@@ -3,10 +3,10 @@ import { hasPart, hostAttributes, ssr, withoutStyles } from '@helix-io/testing/s
 import { html } from 'lit'
 import '../index.js'
 
-const carousel = html`<helix-base-carousel label="Verticals">
+const carousel = html`<helix-headless-carousel label="Verticals">
   <div>Design</div>
   <div>Mind</div>
-</helix-base-carousel>`
+</helix-headless-carousel>`
 
 describe('carousel server output', () => {
   test('every slide is in the served markup, not only the one in view', () => {
@@ -27,6 +27,6 @@ describe('carousel server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    expect(hostAttributes(ssr(carousel), 'helix-base-carousel')).toEqual(['label'])
+    expect(hostAttributes(ssr(carousel), 'helix-headless-carousel')).toEqual(['label'])
   })
 })

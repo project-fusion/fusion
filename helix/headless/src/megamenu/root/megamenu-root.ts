@@ -18,7 +18,7 @@ import { property, state } from 'lit/decorators.js'
  * is usually `helix-navigation` and is not required to be. `Video` holds the
  * media session the same way and for the same reason.
  */
-let showing: HelixBaseMegamenu | undefined
+let showing: HelixHeadlessMegamenu | undefined
 
 /**
  * @summary A section of a navigation that opens a panel of destinations.
@@ -88,8 +88,8 @@ let showing: HelixBaseMegamenu | undefined
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  */
-@customElement('helix-base-megamenu')
-export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
+@customElement('helix-headless-megamenu')
+export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   /** The section's name, which names the default trigger and the panel. */
   @property()
   label = ''
@@ -336,7 +336,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     }
     /* No wait when a panel is already down: the bar is open, and the reader
        moving along it is choosing, not passing through. */
-    this.schedule(showing && showing !== this ? 0 : HelixBaseMegamenu.OPEN_DELAY, () => {
+    this.schedule(showing && showing !== this ? 0 : HelixHeadlessMegamenu.OPEN_DELAY, () => {
       this.requestOpen(true)
     })
   }
@@ -345,7 +345,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     if (this.openOn !== 'hover' || event.pointerType !== 'mouse') {
       return
     }
-    this.schedule(HelixBaseMegamenu.CLOSE_DELAY, () => {
+    this.schedule(HelixHeadlessMegamenu.CLOSE_DELAY, () => {
       /* Not `close()`: leaving with the pointer should not pull focus back to
          the trigger, which would scroll the page to a nav bar the reader has
          moved on from. Escape is the one that returns them. */
@@ -530,6 +530,6 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-megamenu': HelixBaseMegamenu
+    'helix-headless-megamenu': HelixHeadlessMegamenu
   }
 }

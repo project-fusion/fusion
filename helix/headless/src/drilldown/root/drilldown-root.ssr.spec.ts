@@ -6,8 +6,8 @@ import '../index.js'
 describe('drilldown server output', () => {
   test('the top page is served, because it is the consumer"s own markup', () => {
     const markup = withoutStyles(
-      ssr(html`<helix-base-drilldown label="Settings"
-        ><helix-base-drilldown-item value="about">About</helix-base-drilldown-item></helix-base-drilldown
+      ssr(html`<helix-headless-drilldown label="Settings"
+        ><helix-headless-drilldown-item value="about">About</helix-headless-drilldown-item></helix-headless-drilldown
       >`),
     )
     expect(markup).toContain('About')
@@ -15,7 +15,7 @@ describe('drilldown server output', () => {
   })
 
   test('no header is served, since nothing has been drilled into yet', () => {
-    const markup = ssr(html`<helix-base-drilldown label="Settings"></helix-base-drilldown>`)
+    const markup = ssr(html`<helix-headless-drilldown label="Settings"></helix-headless-drilldown>`)
     expect(hasPart(markup, 'header')).toBe(false)
     expect(hasPart(markup, 'back')).toBe(false)
   })
@@ -25,7 +25,7 @@ describe('drilldown server output', () => {
     // default of false would serve an empty region and fill it on hydration.
     expect(
       hasPart(
-        ssr(html`<helix-base-drilldown-item value="a">A</helix-base-drilldown-item>`),
+        ssr(html`<helix-headless-drilldown-item value="a">A</helix-headless-drilldown-item>`),
         'item',
       ),
     ).toBe(true)
@@ -36,8 +36,8 @@ describe('drilldown server output', () => {
     // server: it is decided by a tree the server cannot walk.
     expect(
       hostAttributes(
-        ssr(html`<helix-base-drilldown label="Settings"></helix-base-drilldown>`),
-        'helix-base-drilldown',
+        ssr(html`<helix-headless-drilldown label="Settings"></helix-headless-drilldown>`),
+        'helix-headless-drilldown',
       ),
     ).toEqual(['label'])
   })

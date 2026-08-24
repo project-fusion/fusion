@@ -33,8 +33,8 @@ import { property } from 'lit/decorators.js'
  * @csspart nav - The navigation landmark.
  * @csspart indicator - The marker that travels to the current destination.
  */
-@customElement('helix-base-navigation')
-export class HelixBaseNavigation extends HelixElement {
+@customElement('helix-headless-navigation')
+export class HelixHeadlessNavigation extends HelixElement {
   /* The mark, and the RTL sign and border correction that came with it. This
      was hand-written and had neither: the distance was measured from the
      physical left and applied from the inline-start edge, so it traveled the
@@ -129,6 +129,6 @@ export class HelixBaseNavigation extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-navigation': HelixBaseNavigation
+    'helix-headless-navigation': HelixHeadlessNavigation
   }
 }

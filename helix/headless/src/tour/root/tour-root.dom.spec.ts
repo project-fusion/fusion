@@ -21,14 +21,14 @@ const run = async (open = true): Promise<Tour> => {
   const host = (await mount(
     `<div>
       <button id="one">One</button><button id="two">Two</button><button id="three">Three</button>
-      <helix-base-tour label="Getting started" ${open ? 'open' : ''}>
-        <helix-base-tour-stop for="one">First</helix-base-tour-stop>
-        <helix-base-tour-stop for="two">Second</helix-base-tour-stop>
-        <helix-base-tour-stop for="three">Third</helix-base-tour-stop>
-      </helix-base-tour>
+      <helix-headless-tour label="Getting started" ${open ? 'open' : ''}>
+        <helix-headless-tour-stop for="one">First</helix-headless-tour-stop>
+        <helix-headless-tour-stop for="two">Second</helix-headless-tour-stop>
+        <helix-headless-tour-stop for="three">Third</helix-headless-tour-stop>
+      </helix-headless-tour>
     </div>`,
   )) as HTMLElement
-  const tour = host.querySelector('helix-base-tour') as Tour
+  const tour = host.querySelector('helix-headless-tour') as Tour
   await tour.updateComplete
   return tour
 }
@@ -147,7 +147,7 @@ describe('a stop', () => {
 
   test('and finds nothing where the id resolves to nothing', async () => {
     const host = (await mount(
-      '<helix-base-tour open><helix-base-tour-stop for="nowhere">X</helix-base-tour-stop></helix-base-tour>',
+      '<helix-headless-tour open><helix-headless-tour-stop for="nowhere">X</helix-headless-tour-stop></helix-headless-tour>',
     )) as Tour
     await host.updateComplete
     const stop = host.stops[0] as HTMLElement & { target: HTMLElement | null }
@@ -202,11 +202,11 @@ describe('a tour whose stop the consumer owns', () => {
     /* Three stops and starting on the first, because `next()` on the last stop
        is a completion rather than a move and announces nothing at all. */
     const host = (await mount(
-      `<helix-base-tour open index="0">
-        <helix-base-tour-stop for="a">A</helix-base-tour-stop>
-        <helix-base-tour-stop for="b">B</helix-base-tour-stop>
-        <helix-base-tour-stop for="c">C</helix-base-tour-stop>
-      </helix-base-tour>`,
+      `<helix-headless-tour open index="0">
+        <helix-headless-tour-stop for="a">A</helix-headless-tour-stop>
+        <helix-headless-tour-stop for="b">B</helix-headless-tour-stop>
+        <helix-headless-tour-stop for="c">C</helix-headless-tour-stop>
+      </helix-headless-tour>`,
     )) as Tour
     await host.updateComplete
     let heard = 0
@@ -231,10 +231,10 @@ describe('a tour whose stop the consumer owns', () => {
 
   test('and `default-index` seeds without claiming it', async () => {
     const host = (await mount(
-      `<helix-base-tour open default-index="1">
-        <helix-base-tour-stop for="a">A</helix-base-tour-stop>
-        <helix-base-tour-stop for="b">B</helix-base-tour-stop>
-      </helix-base-tour>`,
+      `<helix-headless-tour open default-index="1">
+        <helix-headless-tour-stop for="a">A</helix-headless-tour-stop>
+        <helix-headless-tour-stop for="b">B</helix-headless-tour-stop>
+      </helix-headless-tour>`,
     )) as Tour
     await host.updateComplete
     expect(host.index).toBe(1)

@@ -44,8 +44,8 @@ import { property } from 'lit/decorators.js'
  * @csspart content - The middle region.
  * @csspart end - The trailing region.
  */
-@customElement('helix-base-app-header')
-export class HelixBaseAppHeader extends HelixElement {
+@customElement('helix-headless-app-header')
+export class HelixHeadlessAppHeader extends HelixElement {
   /**
    * Where the middle region sits in the bar.
    *
@@ -132,6 +132,6 @@ export class HelixBaseAppHeader extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-app-header': HelixBaseAppHeader
+    'helix-headless-app-header': HelixHeadlessAppHeader
   }
 }

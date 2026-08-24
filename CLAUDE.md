@@ -78,7 +78,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
 ## Layout
 
 ```
-helix/     styles core headless web icons theme cem docs gallery sandbox
+helix/     styles core headless styled icons theme cem docs gallery sandbox
            testing cli
 cortex/    core trace engram docs
 site/      ui, the Next application that renders everything above and below
@@ -92,7 +92,7 @@ tooling/   CI and build scripts
 - **Product domains at root, packages flat inside.** A new product gets a new
   top-level folder.
 - **The folder drops the domain prefix; the package name keeps it.**
-  `helix/web` is `@helix-io/web`; `cortex/core` is the crate `cortex-core`.
+  `helix/styled` is `@helix-io/styled`; `cortex/core` is the crate `cortex-core`.
   Scope searches by path (`cortex/core`), not folder name, since bare leaf
   names recur across domains.
 - **`<domain>/docs` is a content package, not a site**: versioned MDX plus a
@@ -123,7 +123,7 @@ Every package within a domain shares one version; domains move independently.
 Full-repo lockstep is wrong here because docs packages carry the version of what
 they document: publishing a Cortex fix would bump the Helix docs to a version in
 which nothing about Helix changed. Per-domain keeps the property that matters,
-that `@helix-io/headless@x` works with `@helix-io/web@x`.
+that `@helix-io/headless@x` works with `@helix-io/styled@x`.
 
 **Rust crates carry their own version and never inherit one.**
 `[workspace.package]` holds the edition, the license and the toolchain floor,
@@ -164,8 +164,8 @@ both directions, so the day the flag changes is the day the workflow has to.
   (memory), Trace (provenance), Recall (context). The rest stay descriptive.
 - **npm scopes name the domain, not the audience**: `@helix-io/*` and
   `@cortex-io/*` for anything belonging to that product, `@fusion-io/*` for what
-  spans the company. Package names drop the product prefix: `@helix-io/web`, not
-  `@helix-io/helix-web`.
+  spans the company. Package names drop the product prefix: `@helix-io/styled`, not
+  `@helix-io/helix-styled`.
 - **`private` decides what ships, and the scope does not.** A package can belong
   to Helix and still never leave: `@helix-io/cem` is the analyzer configuration
   and `@helix-io/sandbox` the editor and spec runner, both Helix byproducts and

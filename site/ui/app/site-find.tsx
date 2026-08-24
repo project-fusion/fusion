@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixCommand } from '@helix-io/web'
+import type { HelixCommand } from '@helix-io/styled'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import styles from './chrome.module.css'

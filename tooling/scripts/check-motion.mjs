@@ -45,7 +45,7 @@ import { extname, join } from 'node:path'
    moving `::part()` rules ship unanswered. `::part()` is the one construct that
    lets a document sheet write into a shadow tree, so it is the one place a
    component genuinely cannot answer for itself. */
-const TIERS = ['helix/styles/src', 'helix/web/src', 'helix/sandbox/src', 'helix/gallery/src']
+const TIERS = ['helix/styles/src', 'helix/styled/src', 'helix/sandbox/src', 'helix/gallery/src']
 
 /* `transition` and `animation` both, because both are capped by the rule that
    does not reach here, and a transition on `opacity` moves a reader exactly as

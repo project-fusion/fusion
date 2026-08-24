@@ -40,8 +40,8 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  * @csspart viewport - The scrolling box.
  * @csspart edges - Where the sideways edge cues are drawn.
  */
-@customElement('helix-base-scroll-area')
-export class HelixBaseScrollArea extends HelixElement {
+@customElement('helix-headless-scroll-area')
+export class HelixHeadlessScrollArea extends HelixElement {
   /**
    * Names the region, for a reader arriving at it out of context.
    *
@@ -207,7 +207,7 @@ export class HelixBaseScrollArea extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-scroll-area': HelixBaseScrollArea
+    'helix-headless-scroll-area': HelixHeadlessScrollArea
   }
 }
 

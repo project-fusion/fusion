@@ -15,8 +15,8 @@ type InputFile = HTMLElement & {
 }
 
 const field = async (attrs = ''): Promise<InputFile> => {
-  const host = (await mount(`<helix-base-file-input label="Attachments" ${attrs}>
-  </helix-base-file-input>`)) as InputFile
+  const host = (await mount(`<helix-headless-file-input label="Attachments" ${attrs}>
+  </helix-headless-file-input>`)) as InputFile
   await host.updateComplete
   return host
 }
@@ -132,8 +132,8 @@ describe('input file', () => {
   test('the two readings are tags, not a line of text', async () => {
     const host = await field()
     await choose(host, 'one.txt')
-    expect(part(host, 'size')?.tagName.toLowerCase()).toBe('helix-base-tag')
-    expect(part(host, 'kind')?.tagName.toLowerCase()).toBe('helix-base-tag')
+    expect(part(host, 'size')?.tagName.toLowerCase()).toBe('helix-headless-tag')
+    expect(part(host, 'kind')?.tagName.toLowerCase()).toBe('helix-headless-tag')
   })
 
   test('the remove control is a trash can, because taking a file out is a delete', async () => {
@@ -141,7 +141,7 @@ describe('input file', () => {
     const host = await field()
     await choose(host, 'one.txt')
     // The glyph is an inlined `<svg>` from a named import now, not an element
-    // with a name: `helix-base-icon` indexed the whole set at runtime.
+    // with a name: `helix-headless-icon` indexed the whole set at runtime.
     expect(part(host, 'remove')?.querySelector('svg')?.innerHTML).toContain(
       trash.content.slice(0, 40),
     )

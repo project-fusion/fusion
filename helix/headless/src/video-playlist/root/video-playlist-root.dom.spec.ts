@@ -31,17 +31,17 @@ const watchPlays = (one: Player): (() => number) => {
 }
 
 const list = async (extra = '') =>
-  (await mount(`<helix-base-video-playlist default-active="one" label="Episodes"${extra}>
-    <helix-base-video label="Player" slot="player"></helix-base-video>
-    <helix-base-video-playlist-item poster="/one.jpg" src="/one.mp4" value="one">One</helix-base-video-playlist-item>
-    <helix-base-video-playlist-item src="/two.mp4" value="two">Two</helix-base-video-playlist-item>
-    <helix-base-video-playlist-item disabled src="/three.mp4" value="three">Three</helix-base-video-playlist-item>
-  </helix-base-video-playlist>`)) as Playlist
+  (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes"${extra}>
+    <helix-headless-video label="Player" slot="player"></helix-headless-video>
+    <helix-headless-video-playlist-item poster="/one.jpg" src="/one.mp4" value="one">One</helix-headless-video-playlist-item>
+    <helix-headless-video-playlist-item src="/two.mp4" value="two">Two</helix-headless-video-playlist-item>
+    <helix-headless-video-playlist-item disabled src="/three.mp4" value="three">Three</helix-headless-video-playlist-item>
+  </helix-headless-video-playlist>`)) as Playlist
 
 const entries = (host: Playlist) =>
-  [...host.querySelectorAll('helix-base-video-playlist-item')] as Entry[]
+  [...host.querySelectorAll('helix-headless-video-playlist-item')] as Entry[]
 
-const player = (host: Playlist) => host.querySelector('helix-base-video') as Player
+const player = (host: Playlist) => host.querySelector('helix-headless-video') as Player
 
 describe('a video playlist', () => {
   test('points the slotted player at the current entry', async () => {
@@ -59,10 +59,10 @@ describe('a video playlist', () => {
        session as the title. `textContent` was what this read, and it takes the
        whole subtree: a row with a duration beside it reported "One12:00", and
        that string went all the way to the platform. */
-    const host = (await mount(`<helix-base-video-playlist default-active="one" label="Episodes">
-      <helix-base-video label="Player" slot="player"></helix-base-video>
-      <helix-base-video-playlist-item src="/one.mp4" value="one">One<span slot="meta">12:00</span></helix-base-video-playlist-item>
-    </helix-base-video-playlist>`)) as Playlist
+    const host = (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes">
+      <helix-headless-video label="Player" slot="player"></helix-headless-video>
+      <helix-headless-video-playlist-item src="/one.mp4" value="one">One<span slot="meta">12:00</span></helix-headless-video-playlist-item>
+    </helix-headless-video-playlist>`)) as Playlist
     await host.updateComplete
     expect(player(host).label).toBe('One')
   })

@@ -37,8 +37,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart icon - The icon region.
  * @csspart icon-mark - The tone glyph, where none is slotted.
  */
-@customElement('helix-base-callout')
-export class HelixBaseCallout extends HelixElement {
+@customElement('helix-headless-callout')
+export class HelixHeadlessCallout extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the box.
@@ -95,6 +95,6 @@ export class HelixBaseCallout extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-callout': HelixBaseCallout
+    'helix-headless-callout': HelixHeadlessCallout
   }
 }

@@ -7,7 +7,7 @@ beforeAll(async () => {
 })
 
 const rating = async (attrs = ''): Promise<HTMLElement> =>
-  mount(`<helix-base-rating label="Rate this" ${attrs}></helix-base-rating>`)
+  mount(`<helix-headless-rating label="Rate this" ${attrs}></helix-headless-rating>`)
 
 const options = (host: HTMLElement): HTMLElement[] => [
   ...(host.shadowRoot as ShadowRoot).querySelectorAll<HTMLElement>('[part="option"]'),
@@ -195,7 +195,7 @@ if (hasLayout()) {
         (_, index) => `<i data-shape="${index}" slot="mark"></i>`,
       ).join('')
       const host = await mount(
-        `<helix-base-rating label="Rate" ${attrs}>${slotted}</helix-base-rating>`,
+        `<helix-headless-rating label="Rate" ${attrs}>${slotted}</helix-headless-rating>`,
       )
       await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
       return host

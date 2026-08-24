@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react'
  * Which tier's API a reference page documents.
  *
  * `styled` is the default because it is the tier almost everyone consumes, and
- * because it is a superset: the styled element extends the base one, so its
- * tables already contain every member the base tables would show. A reader who
+ * because it is a superset: the styled element extends the headless one, so its
+ * tables already contain every member the headless tables would show. A reader who
  * has not expressed a preference is better served by the larger, more common
  * answer than by being asked a question they have no reason to have an opinion
  * about yet.
@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react'
  * now two readers: the drawer sets it and the sandbox filters on it. A union
  * written out twice is a union that eventually disagrees with itself.
  */
-export type ApiTier = 'base' | 'styled'
+export type ApiTier = 'headless' | 'styled'
 
 /**
  * The API tier preference, as a value React can render from.
@@ -47,7 +47,7 @@ export function useApiTier(): ApiTier {
 
   useEffect(() => {
     const read = (): void => {
-      setTier(document.documentElement.dataset.apiTier === 'base' ? 'base' : 'styled')
+      setTier(document.documentElement.dataset.apiTier === 'headless' ? 'headless' : 'styled')
     }
     read()
     const watching = new MutationObserver(read)

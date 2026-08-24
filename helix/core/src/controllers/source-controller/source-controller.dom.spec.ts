@@ -57,7 +57,7 @@ describe('what it accepts as a source', () => {
   })
 
   test('and a Helix table on either tier, by name', () => {
-    for (const tag of ['helix-table', 'helix-base-table']) {
+    for (const tag of ['helix-table', 'helix-headless-table']) {
       document.body.innerHTML = `<${tag} id="src"></${tag}>`
       expect(chart('src').controller.element?.id, tag).toBe('src')
     }

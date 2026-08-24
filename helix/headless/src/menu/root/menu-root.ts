@@ -14,7 +14,7 @@ import { caretLeft } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import type { HelixBaseMenuItem } from '../item/menu-item.js'
+import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
 
 /**
  * @summary A menu of commands, opened from a trigger.
@@ -56,8 +56,8 @@ import type { HelixBaseMenuItem } from '../item/menu-item.js'
  * @csspart menu - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
  */
-@customElement('helix-base-menu')
-export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {
+@customElement('helix-headless-menu')
+export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {
   /** Preferred side. It moves if that side does not fit. */
   @property()
   placement: Placement = 'bottom-start'
@@ -84,7 +84,7 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
    * adds a real stack: `back()` returns one level instead of to the root, which
    * this could not do because it only ever went two deep.
    */
-  private readonly drilldown = new DrilldownController<HelixBaseMenuItem>(this, {
+  private readonly drilldown = new DrilldownController<HelixHeadlessMenuItem>(this, {
     isRow: (element: Element): boolean => 'isMenuItem' in element && element.isMenuItem === true,
     root: () => [...this.children].filter((child) => child.slot !== 'trigger'),
     slot: 'submenu',
@@ -141,7 +141,7 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
   }
 
   /** The items on the page that is showing, which is what the keys move over. */
-  private get items(): HelixBaseMenuItem[] {
+  private get items(): HelixHeadlessMenuItem[] {
     /* Disabled rows are not there for the keyboard.
      *
      * A disabled row renders no `tabindex` and cannot take focus, so leaving it
@@ -181,7 +181,7 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
   }
 
   /** Shows an item's submenu in place of the current page. */
-  private enter(item: HelixBaseMenuItem): void {
+  private enter(item: HelixHeadlessMenuItem): void {
     if (!this.drilldown.enter(item)) {
       return
     }
@@ -205,10 +205,10 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
 
   private readonly handleSelect = (event: Event): void => {
     const item = event.target
-    if (!this.items.includes(item as HelixBaseMenuItem)) {
+    if (!this.items.includes(item as HelixHeadlessMenuItem)) {
       return
     }
-    const chosen = item as HelixBaseMenuItem
+    const chosen = item as HelixHeadlessMenuItem
     if (chosen.hasSubmenu) {
       // A row that opens a page has not chosen anything, so its select does not
       // leave this element: a consumer listening for a choice would otherwise
@@ -261,13 +261,13 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const items = this.items
-    const at = items.indexOf(document.activeElement as HelixBaseMenuItem)
+    const at = items.indexOf(document.activeElement as HelixHeadlessMenuItem)
 
     if (event.key === 'Escape') {
       event.stopPropagation()
       this.leave()
     } else if (event.key === 'ArrowRight' && items[at]?.hasSubmenu) {
-      this.enter(items[at] as HelixBaseMenuItem)
+      this.enter(items[at] as HelixHeadlessMenuItem)
     } else if (event.key === 'ArrowLeft') {
       this.leave()
     } else if (event.key === 'Tab') {
@@ -332,7 +332,7 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
     // business, and where an item belongs is the item's. Set as a property, so
     // nothing is written onto a consumer's element.
     for (const child of this.children) {
-      const item = child as HelixBaseMenuItem
+      const item = child as HelixHeadlessMenuItem
       if (item.isMenuItem !== true) {
         continue
       }
@@ -352,11 +352,11 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
    * `slot === 'submenu'` rather than every child, because a row's other
    * children are its label and its icons.
    */
-  private mark(item: HelixBaseMenuItem, onPage: boolean): void {
+  private mark(item: HelixHeadlessMenuItem, onPage: boolean): void {
     item.onPage = onPage
     item.showingSubmenu = item === this.drilldown.page
     for (const child of item.children) {
-      const nested = child as HelixBaseMenuItem
+      const nested = child as HelixHeadlessMenuItem
       if (nested.isMenuItem === true && child.slot === 'submenu') {
         this.mark(nested, item === this.drilldown.page)
       }
@@ -402,6 +402,6 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-menu': HelixBaseMenu
+    'helix-headless-menu': HelixHeadlessMenu
   }
 }

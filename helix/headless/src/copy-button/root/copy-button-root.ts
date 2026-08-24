@@ -4,7 +4,7 @@ import { nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
-import { HelixBaseIconButton } from '../../icon-button/root/icon-button-root.js'
+import { HelixHeadlessIconButton } from '../../icon-button/root/icon-button-root.js'
 import '../../tooltip/index.js'
 
 /** How long the confirmation stands before the button goes back to itself. */
@@ -55,8 +55,8 @@ const CONFIRM = 1600
  * @csspart mark - The clipboard glyph, and the confirmation that replaces it.
  * @csspart tooltip - The bubble, forwarded from the tooltip inside.
  */
-@customElement('helix-base-copy-button')
-export class HelixBaseCopyButton extends HelixBaseIconButton {
+@customElement('helix-headless-copy-button')
+export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   /** What goes on the clipboard. */
   @property()
   value = ''
@@ -171,7 +171,7 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
    * the check holding its green through a hover where this one does not.
    */
   protected renderCopyIcon(): TemplateResult {
-    return html`<slot ?hidden=${this.copied}>${HelixBaseCopyButton.icon(copy)}</slot>`
+    return html`<slot ?hidden=${this.copied}>${HelixHeadlessCopyButton.icon(copy)}</slot>`
   }
 
   /**
@@ -185,7 +185,7 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
    */
   protected renderCopiedIcon(): TemplateResult {
     return html`<slot name="copied" ?hidden=${!this.copied}
-      >${HelixBaseCopyButton.icon(check)}</slot
+      >${HelixHeadlessCopyButton.icon(check)}</slot
     >`
   }
 
@@ -207,6 +207,6 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-copy-button': HelixBaseCopyButton
+    'helix-headless-copy-button': HelixHeadlessCopyButton
   }
 }

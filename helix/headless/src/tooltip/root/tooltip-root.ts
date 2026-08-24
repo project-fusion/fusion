@@ -88,8 +88,8 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @csspart arrow - The point, resting against the trigger.
  * @csspart tooltip - The bubble.
  */
-@customElement('helix-base-tooltip')
-export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
+@customElement('helix-headless-tooltip')
+export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   /**
    * The text shown in the bubble.
    *
@@ -682,6 +682,6 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-tooltip': HelixBaseTooltip
+    'helix-headless-tooltip': HelixHeadlessTooltip
   }
 }

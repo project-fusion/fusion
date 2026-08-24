@@ -9,7 +9,7 @@ beforeAll(async () => {
 type Step = HTMLElement & { complete: boolean; current: boolean; disabled: boolean; select(): void }
 
 const step = async (attributes = ''): Promise<Step> =>
-  (await mount(`<helix-base-step value="one" ${attributes}>One</helix-base-step>`)) as Step
+  (await mount(`<helix-headless-step value="one" ${attributes}>One</helix-headless-step>`)) as Step
 
 /**
  * One stage, and the contract that is the step's own rather than the run's.
@@ -42,7 +42,7 @@ describe('one step', () => {
   /* The content part is always rendered and `current` is what opens it, which
      is a stylesheet's job rather than this tier's: the headless step owns the
      box and the reflected state, and whether the box is shown is a rule in
-     `helix/web`. Asserted as what this tier actually promises, since a spec
+     `helix/styled`. Asserted as what this tier actually promises, since a spec
      with no layout engine cannot see `display` and one that pretended to would
      be passing against nothing. */
   test('always renders the content box, and reflects what opens it', async () => {

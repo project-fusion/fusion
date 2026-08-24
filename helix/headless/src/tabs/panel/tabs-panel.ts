@@ -19,8 +19,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart panel - The panel container.
  */
-@customElement('helix-base-tabs-panel')
-export class HelixBaseTabsPanel extends HelixElement {
+@customElement('helix-headless-tabs-panel')
+export class HelixHeadlessTabsPanel extends HelixElement {
   /** Pairs the panel with the tab of the same value. */
   @property()
   value = ''
@@ -62,6 +62,6 @@ export class HelixBaseTabsPanel extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-tabs-panel': HelixBaseTabsPanel
+    'helix-headless-tabs-panel': HelixHeadlessTabsPanel
   }
 }

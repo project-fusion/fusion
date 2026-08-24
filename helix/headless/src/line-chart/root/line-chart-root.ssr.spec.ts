@@ -11,14 +11,14 @@ describe('line chart server output', () => {
        failure it guards against is a component that reaches for the DOM during
        SSR and throws. */
     const markup = withoutStyles(
-      ssr(html`<helix-base-line-chart for="sessions"></helix-base-line-chart>`),
+      ssr(html`<helix-headless-line-chart for="sessions"></helix-headless-line-chart>`),
     )
     expect(hasPart(markup, 'plot')).toBe(true)
   })
 
   test('serves no lines, there being no table to read on a server', () => {
     const markup = withoutStyles(
-      ssr(html`<helix-base-line-chart for="sessions"></helix-base-line-chart>`),
+      ssr(html`<helix-headless-line-chart for="sessions"></helix-headless-line-chart>`),
     )
     expect(markup).not.toContain('part="line"')
   })
@@ -28,13 +28,15 @@ describe('line chart server output', () => {
        in React and nothing styles on it. `curve`, `area` and `zero` do reflect,
        and none of them takes a default that would write itself onto a host
        nobody configured. */
-    const markup = ssr(html`<helix-base-line-chart for="sessions"></helix-base-line-chart>`)
-    expect(hostAttributes(markup, 'helix-base-line-chart')).toEqual(['for'])
+    const markup = ssr(html`<helix-headless-line-chart for="sessions"></helix-headless-line-chart>`)
+    expect(hostAttributes(markup, 'helix-headless-line-chart')).toEqual(['for'])
   })
 
   test('a declared curve reaches the host, since a stylesheet may ask about it', () => {
-    const markup = ssr(html`<helix-base-line-chart curve="smooth" for="s"></helix-base-line-chart>`)
-    expect(hostAttributes(markup, 'helix-base-line-chart')).toEqual(['curve', 'for'])
+    const markup = ssr(
+      html`<helix-headless-line-chart curve="smooth" for="s"></helix-headless-line-chart>`,
+    )
+    expect(hostAttributes(markup, 'helix-headless-line-chart')).toEqual(['curve', 'for'])
   })
 
   /* The id `within` on the tooltip resolves against, so the bubble is clamped
@@ -44,7 +46,7 @@ describe('line chart server output', () => {
      error anywhere. */
   test('the plot is named, which is what the tooltip is kept inside', () => {
     const markup = withoutStyles(
-      ssr(html`<helix-base-line-chart for="sessions"></helix-base-line-chart>`),
+      ssr(html`<helix-headless-line-chart for="sessions"></helix-headless-line-chart>`),
     )
     expect(markup).toContain('id="helix-chart-plot"')
   })

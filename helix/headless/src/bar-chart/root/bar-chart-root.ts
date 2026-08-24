@@ -80,8 +80,8 @@ const HEIGHT = 100
  * @cssproperty --bar-chart-axis - The color of a single-series axis, taken from that series.
  * @cssproperty --bar-chart-secondary - The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138.
  */
-@customElement('helix-base-bar-chart')
-export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
+@customElement('helix-headless-bar-chart')
+export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   /**
    * Whether the categories run down the side rather than along the bottom.
    *
@@ -682,6 +682,6 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-bar-chart': HelixBaseBarChart
+    'helix-headless-bar-chart': HelixHeadlessBarChart
   }
 }

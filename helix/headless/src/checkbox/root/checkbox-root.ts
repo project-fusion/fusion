@@ -41,8 +41,8 @@ import { property } from 'lit/decorators.js'
  * @csspart label - The label beside it.
  * @csspart mark - The tick, or the dash when the box is indeterminate.
  */
-@customElement('helix-base-checkbox')
-export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {
+@customElement('helix-headless-checkbox')
+export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {
   /** Value submitted when the box is checked. */
   @property()
   value = 'on'
@@ -185,6 +185,6 @@ export class HelixBaseCheckbox extends MixinControllerChecked(MixinField(HelixFo
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-checkbox': HelixBaseCheckbox
+    'helix-headless-checkbox': HelixHeadlessCheckbox
   }
 }

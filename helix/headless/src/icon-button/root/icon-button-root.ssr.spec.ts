@@ -7,18 +7,25 @@ describe('icon button server output', () => {
   test('the accessible name is in the served markup', () => {
     // An icon button has no text, so without the label it announces nothing
     // until JavaScript arrives.
-    const markup = ssr(html`<helix-base-icon-button label="Settings">x</helix-base-icon-button>`)
+    const markup = ssr(
+      html`<helix-headless-icon-button label="Settings">x</helix-headless-icon-button>`,
+    )
     expect(partTag(markup, 'button')).toContain('aria-label="Settings"')
   })
 
   test('it is a button, not a div that listens', () => {
     expect(
-      partTag(ssr(html`<helix-base-icon-button label="x">i</helix-base-icon-button>`), 'button'),
+      partTag(
+        ssr(html`<helix-headless-icon-button label="x">i</helix-headless-icon-button>`),
+        'button',
+      ),
     ).toContain('type="button"')
   })
 
   test('the host carries only what the consumer wrote', () => {
-    const markup = ssr(html`<helix-base-icon-button label="Settings">i</helix-base-icon-button>`)
-    expect(hostAttributes(markup, 'helix-base-icon-button')).toEqual(['label'])
+    const markup = ssr(
+      html`<helix-headless-icon-button label="Settings">i</helix-headless-icon-button>`,
+    )
+    expect(hostAttributes(markup, 'helix-headless-icon-button')).toEqual(['label'])
   })
 })

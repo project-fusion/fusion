@@ -43,8 +43,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart button - The inner control.
  */
-@customElement('helix-base-button')
-export class HelixBaseButton extends HelixFormElement {
+@customElement('helix-headless-button')
+export class HelixHeadlessButton extends HelixFormElement {
   /* A consumer's `aria-describedby` names ids in their tree and this control is
      in a shadow root, so the reference has to be carried down as an element
      rather than copied as an id. See the controller: measured, the host held
@@ -257,6 +257,6 @@ export class HelixBaseButton extends HelixFormElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-button': HelixBaseButton
+    'helix-headless-button': HelixHeadlessButton
   }
 }
