@@ -72,9 +72,8 @@ Two ways to write it, depending on which you meant:
 ```
 
 The constraint is generated from the manifest and covers every controlled
-property in the library, checked in both directions: a constraint that stopped
-constraining and one that grew too strict are the same kind of silent, and the
-second reaches you as "the library will not let me write correct code".
+property in the library. It is regression tested in both directions, so an error
+here is real and an absent one means you answered.
 
 See [State and control](./state-and-control) for what the two modes actually do.
 

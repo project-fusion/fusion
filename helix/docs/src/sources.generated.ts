@@ -30,9 +30,9 @@ open and returns it to whatever opened it. So do \`Drawer\` and the modal path o
 
 **Contrast, by construction rather than by review.** The theme engine measures
 every foreground against the ground it is really painted on and solves for the
-target rather than checking afterwards. Every pairing is re-measured, including
-the two thirds of rules that set an ink or a ground but not both, so a pairing
-nobody thought of is still checked. See [Surfaces and
+target rather than checking afterwards. Every pairing is then re-measured on a
+laid-out page, including the great majority of rules that set an ink or a ground
+but not both, so a pairing nobody thought of is still checked. See [Surfaces and
 separation](./surfaces-and-separation).
 
 **Reduced motion, per component.** Fifty-nine stylesheets answer
@@ -214,9 +214,9 @@ report we want, and it is not one we would have caught.
 | Custom elements and shadow DOM | Everything |
 | \`ElementInternals\` | Form participation, and ARIA that has to cross a shadow boundary |
 | Popover API | Every overlay: menu, tooltip, select, combobox, dialog |
-| \`light-dark()\` | The token layer, in 769 declarations |
+| \`light-dark()\` | 761 declarations, 135 of them in the token layer |
 | \`oklch()\` | Every color in the system |
-| \`:has()\` | 74 rules, mostly relational styling of slotted content |
+| \`:has()\` | 11 rules, mostly relational styling of slotted content |
 | \`@starting-style\` | Entry transitions on overlays |
 | \`:state()\` | Custom states a consumer's CSS can select |
 | \`CSS.highlights\` | Filter-match highlighting, in \`Command\` and \`Combobox\` |
@@ -469,7 +469,7 @@ title: Color
 
 # Color
 
-Seventy-four of the library's 176 tokens are color, which is most of what a
+Seventy-four of the library's 177 tokens are color, which is most of what a
 theme is. They are roles rather than values: nothing in Helix is named after
 what it looks like, because a name like \`--brand-blue-500\` stops being true the
 moment anybody rethemes.
@@ -532,11 +532,11 @@ construction.
 
 That guarantee is only as good as the list of pairs somebody thought of, so two
 things are checked rather than one. The engine's declared surface model is held
-against what components actually paint, and every pairing is then measured,
-which covers the two thirds the first cannot see: of the rules in
-the library, eleven set an ink and a ground together, where 165 set only an ink
-and 112 only a ground, and a pairing assembled by the cascade is still a pairing
-a reader has to be able to read.
+against what components actually paint, and then every pairing is measured on a
+laid-out page, which is the only way to see the ones no stylesheet states: just
+eleven rules in the library set an ink and a ground together, where 165 set only
+an ink and 112 only a ground, and a pairing the cascade assembled is still a
+pairing a reader has to be able to read.
 
 ## Do not reach past the semantic layer
 
@@ -1017,10 +1017,9 @@ title: Forms and validation
 
 # Forms and validation
 
-Seventeen families take part in forms. They are form-associated custom elements,
-so a \`<form>\` collects them, resets them, restores them on back-navigation and
-validates them the way it does a native control. Nothing about that is
-simulated.
+Twenty-two families are form-associated custom elements, so a \`<form>\` collects
+them, resets them, restores them on back-navigation and validates them the way it
+does a native control. Nothing about that is simulated.
 
 \`\`\`html
 <form>
@@ -1721,7 +1720,7 @@ is why it is the whole cost of adopting the base layer on its own.
 | \`base.css\` | 76,605 | 23,845 | 20,570 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
 | \`elements.css\` | 7,884 | 1,823 | 1,547 | The components' own layer, generated from every family's stylesheet. |
 | \`primitives.css\` | 32,648 | 11,331 | 9,635 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
-| \`tokens.css\` | 64,385 | 19,404 | 16,131 | The 176 semantic tokens. Nothing paints without this. |
+| \`tokens.css\` | 64,385 | 19,404 | 16,131 | The 177 semantic tokens. Nothing paints without this. |
 
 ## What the numbers say
 
@@ -2454,9 +2453,8 @@ Two ways to write it, depending on which you meant:
 \`\`\`
 
 The constraint is generated from the manifest and covers every controlled
-property in the library, checked in both directions: a constraint that stopped
-constraining and one that grew too strict are the same kind of silent, and the
-second reaches you as "the library will not let me write correct code".
+property in the library. It is regression tested in both directions, so an error
+here is real and an absent one means you answered.
 
 See [State and control](./state-and-control) for what the two modes actually do.
 
@@ -3060,9 +3058,9 @@ reads as one shape rather than three:
 \`\`\`
 
 The base layer does this for the recipes, and the components do it for
-themselves. Worth knowing if you build your own group: it is the inner corners
-that go flat, not the outer ones, and it is \`border-start-start-radius\` rather
-than \`border-top-left-radius\` so it follows the writing direction.
+themselves. If you build your own group: it is the inner corners that go flat,
+not the outer ones, and it is \`border-start-start-radius\` rather than
+\`border-top-left-radius\` so it follows the writing direction.
 `,
   'size-and-density': `---
 description: Why no control has a size, and what to write instead.
@@ -3237,9 +3235,9 @@ draw with the other two.
 layout that uses it as a gap changes meaning the day a density changes under it.
 
 **Do not use a raw value because the scale has no step for it.** If a gap is
-genuinely between \`sm\` and \`md\`, that is worth saying out loud rather than
-writing \`11px\`, because it is usually a sign the two things being separated
-belong at a different level of the layout.
+genuinely between \`sm\` and \`md\`, say so rather than writing \`11px\`: it is
+usually a sign the two things being separated belong at different levels of the
+layout.
 `,
   'state-and-control': `---
 description: Why writing a property hands the element to you, and what to write instead.
@@ -4350,7 +4348,7 @@ string would be ambiguous:
 <helix-input :value.prop="'42'" />
 \`\`\`
 
-Rarely necessary. Worth knowing it exists before you go looking for it.
+Rarely necessary, and it exists so you do not go looking for it.
 
 ## The controlled-property rule still applies
 

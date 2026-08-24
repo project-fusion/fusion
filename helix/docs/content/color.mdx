@@ -6,7 +6,7 @@ title: Color
 
 # Color
 
-Seventy-four of the library's 176 tokens are color, which is most of what a
+Seventy-four of the library's 177 tokens are color, which is most of what a
 theme is. They are roles rather than values: nothing in Helix is named after
 what it looks like, because a name like `--brand-blue-500` stops being true the
 moment anybody rethemes.
@@ -69,11 +69,11 @@ construction.
 
 That guarantee is only as good as the list of pairs somebody thought of, so two
 things are checked rather than one. The engine's declared surface model is held
-against what components actually paint, and every pairing is then measured,
-which covers the two thirds the first cannot see: of the rules in
-the library, eleven set an ink and a ground together, where 165 set only an ink
-and 112 only a ground, and a pairing assembled by the cascade is still a pairing
-a reader has to be able to read.
+against what components actually paint, and then every pairing is measured on a
+laid-out page, which is the only way to see the ones no stylesheet states: just
+eleven rules in the library set an ink and a ground together, where 165 set only
+an ink and 112 only a ground, and a pairing the cascade assembled is still a
+pairing a reader has to be able to read.
 
 ## Do not reach past the semantic layer
 

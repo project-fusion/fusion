@@ -36,6 +36,12 @@
  *   nothing dispatches is a handler that never runs.
  * - **An exported name.** A mixin, an element class or a helper named in a code
  *   fence has to be something the workspace exports.
+ * - **A package.** `@helix-io/react` was in the Tiers package table, counted
+ *   among "five packages", two pages after the Introduction said there is no
+ *   React package. The rules file went further and documented regenerating
+ *   wrappers in a `helix/react` that has never been in the repository. A package
+ *   name is the cheapest of these to verify and was the one thing the first
+ *   version of this check could not see.
  *
  * **What it deliberately does not check is English.** The word "appearance" in a
  * sentence about how something looks is not an API reference, so only backticked
@@ -117,6 +123,28 @@ const fromManifests = () => {
   return { events, hooks, tags }
 }
 
+/** Every package in the workspace, by the name its manifest declares. */
+const fromPackages = () => {
+  const names = new Set()
+  for (const domain of readdirSync(ROOT, { withFileTypes: true }).filter((one) =>
+    one.isDirectory(),
+  )) {
+    for (const pkg of readdirSync(join(ROOT, domain.name), { withFileTypes: true }).filter((one) =>
+      one.isDirectory(),
+    )) {
+      const manifest = join(ROOT, domain.name, pkg.name, 'package.json')
+      if (!existsSync(manifest)) {
+        continue
+      }
+      const { name } = JSON.parse(readFileSync(manifest, 'utf8'))
+      if (name) {
+        names.add(name)
+      }
+    }
+  }
+  return names
+}
+
 /** Every semantic token, from the generated token set. */
 const fromTokens = () => {
   const names = new Set()
@@ -187,6 +215,7 @@ const exported = () => {
 
 const { events, hooks, tags } = fromManifests()
 const tokens = fromTokens()
+const packages = fromPackages()
 const exports_ = exported()
 const problems = []
 let checked = 0
@@ -268,6 +297,16 @@ for (const page of pages()) {
     }
   }
 
+  /* A scoped package name, which is the whole of this rule: a subpath is the
+     package's business and `@helix-io/web/card` is verified by the export map
+     rather than here. */
+  for (const match of text.matchAll(/@(?:helix|cortex|fusion)-io\/[a-z][a-z0-9-]*/g)) {
+    checked += 1
+    if (!packages.has(match[0]) && !HISTORICAL.test(around(match.index))) {
+      problems.push(`${where}: \`${match[0]}\` is not a package in this workspace.`)
+    }
+  }
+
   /* Only the names this library would own. A backticked `Promise` or `Set` is
      not ours to verify, and a bare capitalised word in prose is a sentence. */
   for (const match of text.matchAll(/`((?:Helix|Mixin|With)[A-Z][A-Za-z0-9]*)`/g)) {
@@ -286,5 +325,5 @@ if (problems.length > 0) {
 }
 
 console.log(
-  `documented: ${checked} API references across ${pages().length} pages, every tag, token, event and exported name real`,
+  `documented: ${checked} API references across ${pages().length} pages, every tag, token, event, hook, package and exported name real`,
 )

@@ -156,6 +156,17 @@ const PACKAGES = [
   { entry: 'lit', note: 'Not ours. Here so it can be subtracted from every row above it.' },
 ]
 
+/**
+ * How many semantic tokens there are, read rather than written.
+ *
+ * The note below said 176 and there are 177, which is the drift this file exists
+ * to prevent everywhere else: every byte on this page is measured, and the one
+ * number that was typed is the one that went stale. Two documentation pages had
+ * the same figure and had drifted the same way.
+ */
+const TOKEN_COUNT = JSON.parse(readFileSync(join(ROOT, 'helix', 'styles', 'tokens.json'), 'utf8'))
+  .tokens.length
+
 /** The stylesheets a consumer links, which no bundler is involved in. */
 const STYLESHEETS = [
   {
@@ -171,7 +182,7 @@ const STYLESHEETS = [
     path: 'helix/styles/src/primitives.css',
   },
   {
-    note: 'The 176 semantic tokens. Nothing paints without this.',
+    note: `The ${TOKEN_COUNT} semantic tokens. Nothing paints without this.`,
     path: 'helix/styles/src/tokens.css',
   },
 ]
