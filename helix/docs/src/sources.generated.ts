@@ -1710,7 +1710,7 @@ repository does that. The per-component tables are what a page pays.
 | \`@helix-io/headless\` | 440,452 | 112,913 | 89,222 | Every headless family, which is what the barrel means. |
 | \`@helix-io/icons\` | 45,442 | 14,544 | 12,328 | The whole glyph set. |
 | \`@helix-io/theme\` | 3,274 | 1,567 | 1,349 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| \`@helix-io/web\` | 1,486,883 | 423,740 | 298,261 | Every styled family. |
+| \`@helix-io/web\` | 1,493,773 | 425,987 | 299,632 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -1730,7 +1730,7 @@ is why it is the whole cost of adopting the base layer on its own.
 
 **Most of a first component is the runtime under it.** The median styled family is 18,915 bytes gzipped alone and adds 6,169 to a page that already has Helix on it, so 67 percent of the first one is shared and 33 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is \`quote\` at 8,705 gzipped alone, the dearest \`color-input\` at 63,228, over 88 components. Every family at once is 423,740.
+Across the tier: the cheapest is \`quote\` at 8,705 gzipped alone, the dearest \`color-input\` at 63,228, over 88 components. Every family at once is 425,987.
 
 **No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@helix-io/headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixBaseButton } from '@helix-io/headless'\` costs 112,913 bytes gzipped whatever else the page does, which is 6 times the median family measured above. The styled tier imports the family it extends instead, all 88 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
 
@@ -1910,7 +1910,7 @@ The headless tier plus presentation. This is what \`bun add @helix-io/web\` give
 | \`date-picker\` | 94,122 | 31,861 | 26,544 | 23,286 | 7,983 | 6,337 |
 | \`dialog\` | 44,823 | 15,829 | 13,815 | 19,840 | 7,458 | 6,032 |
 | \`divider\` | 28,731 | 10,412 | 9,109 | 6,431 | 2,782 | 1,926 |
-| \`donut-chart\` | 96,513 | 32,414 | 28,438 | 42,265 | 13,829 | 11,101 |
+| \`donut-chart\` | 98,481 | 33,048 | 29,008 | 44,233 | 14,473 | 11,736 |
 | \`drawer\` | 42,964 | 15,296 | 13,319 | 18,271 | 6,948 | 5,587 |
 | \`drilldown\` | 83,982 | 28,548 | 23,713 | 14,003 | 4,940 | 3,620 |
 | \`empty\` | 25,738 | 9,252 | 8,176 | 3,188 | 1,514 | 918 |
@@ -1923,7 +1923,7 @@ The headless tier plus presentation. This is what \`bun add @helix-io/web\` give
 | \`input\` | 98,339 | 33,023 | 27,511 | 24,143 | 8,216 | 6,579 |
 | \`kbd\` | 26,487 | 9,783 | 8,602 | 5,108 | 2,338 | 1,665 |
 | \`legend\` | 35,782 | 12,528 | 10,917 | 11,415 | 4,190 | 3,164 |
-| \`line-chart\` | 92,707 | 31,034 | 27,352 | 37,106 | 11,820 | 9,482 |
+| \`line-chart\` | 95,162 | 31,992 | 28,041 | 39,561 | 12,781 | 10,118 |
 | \`list\` | 33,308 | 11,867 | 10,424 | 10,769 | 4,123 | 3,186 |
 | \`listbox\` | 100,225 | 33,592 | 27,767 | 24,156 | 8,119 | 6,265 |
 | \`loader\` | 33,654 | 12,095 | 10,592 | 11,105 | 4,332 | 3,373 |
@@ -1947,7 +1947,7 @@ The headless tier plus presentation. This is what \`bun add @helix-io/web\` give
 | \`select\` | 151,663 | 49,486 | 41,936 | 52,032 | 15,469 | 12,830 |
 | \`skeleton\` | 26,413 | 9,559 | 8,432 | 4,231 | 1,912 | 1,291 |
 | \`slider\` | 67,635 | 21,245 | 18,436 | 38,796 | 12,040 | 9,758 |
-| \`sparkline\` | 42,107 | 15,407 | 13,479 | 16,705 | 6,452 | 5,186 |
+| \`sparkline\` | 44,568 | 16,300 | 14,269 | 19,172 | 7,329 | 6,030 |
 | \`speed-dial\` | 112,369 | 38,517 | 32,605 | 19,397 | 6,191 | 4,769 |
 | \`splitter\` | 51,659 | 16,693 | 14,668 | 28,307 | 8,639 | 7,120 |
 | \`stat\` | 31,428 | 11,207 | 9,856 | 8,884 | 3,505 | 2,663 |
@@ -1986,7 +1986,7 @@ because they ship and no page downloads them.
 | \`@helix-io/icons\` | 84,047 | 17 | 19,847 | none |
 | \`@helix-io/styles\` | 265,664 | 5 | 0 | none |
 | \`@helix-io/theme\` | 612,715 | 28 | 47,856 | none |
-| \`@helix-io/web\` | 8,198,849 | 1,345 | 270,975 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/web\` | 8,241,452 | 1,345 | 271,765 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 

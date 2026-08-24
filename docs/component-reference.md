@@ -1887,9 +1887,11 @@ larger than the default.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the slices claim. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `hole` | `hole` | `'large' \| 'none' \| 'small' \| undefined` | - | `HelixBaseDonutChart` | How much is left open in the middle. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
+| `material` | `material` | `'glass' \| undefined` | - | - | What the ring is made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
@@ -2656,9 +2658,11 @@ answers for a shape.
 | --- | --- | --- | --- | --- | --- |
 | `area` | `area` | `boolean` | `false` | `HelixBaseLineChart` | Whether a wash is drawn under each line. |
 | `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseLineChart` | How the line gets from one reading to the next. |
+| `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the lines claim. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixBaseLineChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
+| `material` | `material` | `'glass' \| undefined` | - | - | What the lines are made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
@@ -4732,6 +4736,7 @@ keeps it out of every other reason it might want to be bigger.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseSparkline` | How the line gets from one reading to the next. |
+| `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the drawing claims. |
 | `for` | `for` | `string` | `''` | `HelixBaseSparkline` | The id of a table to read instead, when there is one behind the line. |
 | `label` | `label` | `string` | `''` | `HelixBaseSparkline` | What the line says, in a sentence. |
 | `plot` | `plot` | `'area' \| 'bar' \| 'line' \| undefined` | - | `HelixBaseSparkline` | What the readings are drawn as. |
@@ -6505,6 +6510,21 @@ and short of what 13px text needs, and there is no darker green in the ramp.
 The number therefore keeps the page's own foreground and stays the most
 legible thing here, which is right anyway, since the number is what a reader
 reads and the judgment is a gloss on it.
+
+**No visual axis applies here, and that is the answer rather than a gap.**
+This family carries `@groups charts`, so `check:axes` reports it beside eight
+that do declare one. Each of the three was asked and each refuses for a reason
+about what this is rather than about the axis. `emphasis` is how much ink a
+mark claims, and there is no mark: an arrow glyph and two runs of text, whose
+weight is `Text`'s business and whose size is the region's. `material` is what
+reads through a surface, and a 13px glyph has nothing behind it. `wash` is a
+gradient across an area, and there is no area.
+
+The meaning axis is here and is *derived*, which is the more interesting half:
+`direction` and `good` together resolve to success, danger or muted, so a
+consumer states the metric's polarity once rather than picking a color. A
+declared `tone` would let the color disagree with the arrow, which is the one
+thing this component exists to stop.
 
 #### Properties
 

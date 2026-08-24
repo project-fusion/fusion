@@ -386,3 +386,43 @@
     print-color-adjust: exact;
   }
 }
+
+/* **Emphasis, and only `subtle`, because the other two are already spoken for.**
+   `outlined` on a column means the edge without the loud fill, and the line
+   chart's version of that is the line without its wash. It already has one, and
+   it is `area`: a boolean the consumer writes, older than this axis and named
+   for what it does. A second way to say it would be exactly the drift the axis
+   registry exists to prevent, so this axis defers to the property that got there
+   first. `ghost` would be a chart with no lines.
+
+   `subtle` mixes toward the page rather than lowering opacity, so a quiet series
+   does not change color depending on what is drawn under it, which on a chart
+   with crossing lines is the whole risk. The wash follows the line, because a
+   quiet line under a full-strength wash reads as the wash being the mark. */
+:host([emphasis="subtle"]) [part="line"] {
+  stroke: color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background));
+}
+
+:host([emphasis="subtle"]) [part="area"] {
+  fill: color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background));
+}
+
+/* **Glass, for the reason `BarChart` gives: the gridlines read through.** That
+   is the thing translucency is for on a chart rather than decoration, and a line
+   chart is where it costs the least, the marks being thin already.
+
+   On the line and not on the area, and that is the interesting half. The wash is
+   *already* scaled by `--helix-material-opacity`, unconditionally, which is the
+   theme's material policy applied to a thing that is a wash by nature. Scaling it
+   a second time here would compound the policy against itself and a glass area
+   over a glass theme would round to nothing. The line has no such scaling and is
+   the mark, so it is the one this axis has anything to say about.
+
+   **No `wash` on this family, and the reason was already in this file.** The area
+   note above says a gradient is `Sparkline`'s because it holds one series; a line
+   chart may hold several, and gradients stacked over one another read as a third
+   color wherever they cross rather than as two series that overlap. That is a
+   measured refusal written before the axis existed, and it still holds. */
+:host([material="glass"]) [part="line"] {
+  stroke-opacity: calc(0.62 * var(--helix-material-opacity));
+}

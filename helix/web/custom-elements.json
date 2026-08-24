@@ -21742,6 +21742,26 @@
           "members": [
             {
               "kind": "field",
+              "name": "emphasis",
+              "type": {
+                "text": "'subtle' | undefined"
+              },
+              "description": "How much ink the slices claim.\n\n`subtle` is the ring as a wash of its own colors: still readable, no longer\nthe loudest thing beside the number it is explaining.\n\n**One value and not three, because a slice is a stroke.** The mark *is* the\nedge here, so there is nothing inside it for `outlined` to fade: `BarChart`\nearns that value by keeping a column's area and fading it toward the page,\nand a donut would have to be drawn as filled paths rather than arcs to do the\nsame. That is changing what a donut is to satisfy a word.",
+              "attribute": "emphasis",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "material",
+              "type": {
+                "text": "'glass' | undefined"
+              },
+              "description": "What the ring is made of.\n\n`glass` lets the page read through the slices, for a chart sitting on a\nsurface that is itself translucent: a glass card with an opaque ring on it is\nthe two-designs-sharing-a-window failure a material policy exists to stop.\nThe track keeps its fill, a see-through groove being a missing one.\n\nThe strength is the theme's, scaled by `--helix-material-opacity`.",
+              "attribute": "material",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "source",
               "privacy": "protected",
               "readonly": true,
@@ -22120,66 +22140,23 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseDonutChart",
-            "package": "@helix-io/headless/donut-chart"
-          },
-          "summary": "Parts of a whole as a ring, read from a table.",
-          "helix": {
-            "category": "charts",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/donut-chart",
-            "aliases": [
-              "Pie Chart",
-              "Ring Chart",
-              "Share Chart"
-            ],
-            "groups": [
-              "charts"
-            ],
-            "tier": "styled",
-            "group": "DonutChart",
-            "part": "Root",
-            "examples": [
-              {
-                "description": "Sessions by source as a ring, read from the table beside it.",
-                "slug": "default"
-              },
-              {
-                "description": "The same shares over a half circle, with the total in the opening.",
-                "slug": "arc"
-              },
-              {
-                "description": "The same donut chart on the headless tier, with every rule written by hand.",
-                "slug": "base"
-              },
-              {
-                "description": "The hole closed, which is a pie: the same drawing with its ring spanning the whole radius.",
-                "slug": "pie"
-              },
-              {
-                "description": "A lighter ring, for a card where the shares matter less than the total.",
-                "slug": "thin"
-              },
-              {
-                "description": "A legend beside the ring, mapping the same palette in the same order.",
-                "slug": "with-a-legend"
-              },
-              {
-                "description": "A pointer resting on a slice, showing the whole row including a column nothing plotted.",
-                "slug": "with-a-tooltip"
-              },
-              {
-                "description": "A total in the hole, which is what the middle of a ring is for.",
-                "slug": "with-a-total"
-              }
-            ],
-            "source": "helix/web/src/donut-chart"
-          },
-          "tagName": "helix-donut-chart",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "emphasis",
+              "type": {
+                "text": "'subtle' | undefined"
+              },
+              "description": "How much ink the slices claim.\n\n`subtle` is the ring as a wash of its own colors: still readable, no longer\nthe loudest thing beside the number it is explaining.\n\n**One value and not three, because a slice is a stroke.** The mark *is* the\nedge here, so there is nothing inside it for `outlined` to fade: `BarChart`\nearns that value by keeping a column's area and fading it toward the page,\nand a donut would have to be drawn as filled paths rather than arcs to do the\nsame. That is changing what a donut is to satisfy a word.",
+              "fieldName": "emphasis"
+            },
+            {
+              "name": "material",
+              "type": {
+                "text": "'glass' | undefined"
+              },
+              "description": "What the ring is made of.\n\n`glass` lets the page read through the slices, for a chart sitting on a\nsurface that is itself translucent: a glass card with an opaque ring on it is\nthe two-designs-sharing-a-window failure a material policy exists to stop.\nThe track keeps its fill, a see-through groove being a missing one.\n\nThe strength is the theme's, scaled by `--helix-material-opacity`.",
+              "fieldName": "material"
+            },
             {
               "name": "for",
               "type": {
@@ -22231,6 +22208,69 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseDonutChart",
+            "package": "@helix-io/headless/donut-chart"
+          },
+          "summary": "Parts of a whole as a ring, read from a table.",
+          "helix": {
+            "category": "charts",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/donut-chart",
+            "aliases": [
+              "Pie Chart",
+              "Ring Chart",
+              "Share Chart"
+            ],
+            "groups": [
+              "charts"
+            ],
+            "tier": "styled",
+            "group": "DonutChart",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "Sessions by source as a ring, read from the table beside it.",
+                "slug": "default"
+              },
+              {
+                "description": "The same shares over a half circle, with the total in the opening.",
+                "slug": "arc"
+              },
+              {
+                "description": "The same donut chart on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
+                "description": "A ring that is context, said quietly beside one that is being read.",
+                "slug": "emphasis"
+              },
+              {
+                "description": "The hole closed, which is a pie: the same drawing with its ring spanning the whole radius.",
+                "slug": "pie"
+              },
+              {
+                "description": "A lighter ring, for a card where the shares matter less than the total.",
+                "slug": "thin"
+              },
+              {
+                "description": "A legend beside the ring, mapping the same palette in the same order.",
+                "slug": "with-a-legend"
+              },
+              {
+                "description": "A pointer resting on a slice, showing the whole row including a column nothing plotted.",
+                "slug": "with-a-tooltip"
+              },
+              {
+                "description": "A total in the hole, which is what the middle of a ring is for.",
+                "slug": "with-a-total"
+              }
+            ],
+            "source": "helix/web/src/donut-chart"
+          },
+          "tagName": "helix-donut-chart",
+          "customElement": true,
           "slots": [
             {
               "description": "Goes in the middle of the ring. A total, usually.",
@@ -30681,6 +30721,26 @@
           "members": [
             {
               "kind": "field",
+              "name": "emphasis",
+              "type": {
+                "text": "'subtle' | undefined"
+              },
+              "description": "How much ink the lines claim.\n\n`subtle` mixes each series toward the page, so a chart that is context stays\nlegible without competing. Toward the page rather than translucent, because a\ntranslucent line takes its color from whatever it crosses, which on a chart\nwith several is the whole risk.\n\n**`outlined` is refused and `area` is why.** On a column, `outlined` is the\nedge without the loud fill; the line chart's version of that is the line\nwithout its wash, and `area` already says exactly that. A second spelling\nwould be the drift this axis exists to prevent, so it defers to the property\nthat got there first.",
+              "attribute": "emphasis",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "material",
+              "type": {
+                "text": "'glass' | undefined"
+              },
+              "description": "What the lines are made of.\n\n`glass` lets the gridlines read through them, which is what translucency is\nfor on a chart rather than decoration.\n\nOn the lines and not the wash: the wash is already scaled by\n`--helix-material-opacity` whatever this says, being a wash by nature, and\nscaling it twice would compound the policy against itself.",
+              "attribute": "material",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "source",
               "privacy": "protected",
               "readonly": true,
@@ -31210,70 +31270,23 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseLineChart",
-            "package": "@helix-io/headless/line-chart"
-          },
-          "summary": "A series over time as a line, read from a table.",
-          "helix": {
-            "category": "charts",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/line-chart",
-            "aliases": [
-              "Time Series",
-              "Trend Chart",
-              "Multi-line Chart"
-            ],
-            "groups": [
-              "charts"
-            ],
-            "tier": "styled",
-            "group": "LineChart",
-            "part": "Root",
-            "examples": [
-              {
-                "description": "Sessions a month, read from the table beside it. The cell text is what a reader sees and data-value is the number.",
-                "slug": "default"
-              },
-              {
-                "description": "A wash under the line, for one series read as a quantity rather than a shape.",
-                "slug": "area"
-              },
-              {
-                "description": "The same line chart on the headless tier, with every rule written by hand.",
-                "slug": "base"
-              },
-              {
-                "description": "The three curves over one series: joined, smoothed, and held until the next reading.",
-                "slug": "curves"
-              },
-              {
-                "description": "Open incidents, where the distance from none is the reading: its own range turns a quiet year into a collapse.",
-                "slug": "from-zero"
-              },
-              {
-                "description": "Two series on one scale, with a legend mapping the same palette.",
-                "slug": "several-series"
-              },
-              {
-                "description": "The same chart given different numbers, moving to the new shape rather than snapping to it.",
-                "slug": "taking-new-data"
-              },
-              {
-                "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
-                "slug": "with-a-tooltip"
-              },
-              {
-                "description": "Rules at the levels a reader would infer, so a reading can be placed against one.",
-                "slug": "with-gridlines"
-              }
-            ],
-            "source": "helix/web/src/line-chart"
-          },
-          "tagName": "helix-line-chart",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "emphasis",
+              "type": {
+                "text": "'subtle' | undefined"
+              },
+              "description": "How much ink the lines claim.\n\n`subtle` mixes each series toward the page, so a chart that is context stays\nlegible without competing. Toward the page rather than translucent, because a\ntranslucent line takes its color from whatever it crosses, which on a chart\nwith several is the whole risk.\n\n**`outlined` is refused and `area` is why.** On a column, `outlined` is the\nedge without the loud fill; the line chart's version of that is the line\nwithout its wash, and `area` already says exactly that. A second spelling\nwould be the drift this axis exists to prevent, so it defers to the property\nthat got there first.",
+              "fieldName": "emphasis"
+            },
+            {
+              "name": "material",
+              "type": {
+                "text": "'glass' | undefined"
+              },
+              "description": "What the lines are made of.\n\n`glass` lets the gridlines read through them, which is what translucency is\nfor on a chart rather than decoration.\n\nOn the lines and not the wash: the wash is already scaled by\n`--helix-material-opacity` whatever this says, being a wash by nature, and\nscaling it twice would compound the policy against itself.",
+              "fieldName": "material"
+            },
             {
               "name": "for",
               "type": {
@@ -31351,6 +31364,73 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseLineChart",
+            "package": "@helix-io/headless/line-chart"
+          },
+          "summary": "A series over time as a line, read from a table.",
+          "helix": {
+            "category": "charts",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/line-chart",
+            "aliases": [
+              "Time Series",
+              "Trend Chart",
+              "Multi-line Chart"
+            ],
+            "groups": [
+              "charts"
+            ],
+            "tier": "styled",
+            "group": "LineChart",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "Sessions a month, read from the table beside it. The cell text is what a reader sees and data-value is the number.",
+                "slug": "default"
+              },
+              {
+                "description": "A wash under the line, for one series read as a quantity rather than a shape.",
+                "slug": "area"
+              },
+              {
+                "description": "The same line chart on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
+                "description": "The three curves over one series: joined, smoothed, and held until the next reading.",
+                "slug": "curves"
+              },
+              {
+                "description": "The same readings at full strength and as context.",
+                "slug": "emphasis"
+              },
+              {
+                "description": "Open incidents, where the distance from none is the reading: its own range turns a quiet year into a collapse.",
+                "slug": "from-zero"
+              },
+              {
+                "description": "Two series on one scale, with a legend mapping the same palette.",
+                "slug": "several-series"
+              },
+              {
+                "description": "The same chart given different numbers, moving to the new shape rather than snapping to it.",
+                "slug": "taking-new-data"
+              },
+              {
+                "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
+                "slug": "with-a-tooltip"
+              },
+              {
+                "description": "Rules at the levels a reader would infer, so a reading can be placed against one.",
+                "slug": "with-gridlines"
+              }
+            ],
+            "source": "helix/web/src/line-chart"
+          },
+          "tagName": "helix-line-chart",
+          "customElement": true,
           "cssParts": [
             {
               "description": "The wash under one line, where `area` is set.",
@@ -54409,6 +54489,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "emphasis",
+              "type": {
+                "text": "'subtle' | undefined"
+              },
+              "description": "How much ink the drawing claims.\n\n`subtle` mixes the drawing toward the page. The case is a table where one row\nis being read and the rest are context.\n\nIt moves the host's `color`, which is what every mark here is drawn in: the\nline strokes it, both gradient stops take it so the wash is the line's own\ncolor, and the terminus fills it. So one declaration quietens all of them,\nand a consumer's `--sparkline-color` is quietened rather than replaced.\n\n**One value, and no `material` at all.** `outlined` needs a fill to remove\nand this is a stroke; `ghost` is an empty cell. Glass exists so what is\nbehind a mark reads through it, and at the size a sparkline draws there is\nnothing behind it a reader could resolve, so the axis would render a\ndifference nobody can see.",
+              "attribute": "emphasis",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "weight",
               "type": {
                 "text": "'thick' | 'thin' | undefined"
@@ -54632,6 +54722,14 @@
           ],
           "attributes": [
             {
+              "name": "emphasis",
+              "type": {
+                "text": "'subtle' | undefined"
+              },
+              "description": "How much ink the drawing claims.\n\n`subtle` mixes the drawing toward the page. The case is a table where one row\nis being read and the rest are context.\n\nIt moves the host's `color`, which is what every mark here is drawn in: the\nline strokes it, both gradient stops take it so the wash is the line's own\ncolor, and the terminus fills it. So one declaration quietens all of them,\nand a consumer's `--sparkline-color` is quietened rather than replaced.\n\n**One value, and no `material` at all.** `outlined` needs a fill to remove\nand this is a stroke; `ghost` is an empty cell. Glass exists so what is\nbehind a mark reads through it, and at the size a sparkline draws there is\nnothing behind it a reader could resolve, so the axis would render a\ndifference nobody can see.",
+              "fieldName": "emphasis"
+            },
+            {
               "name": "weight",
               "type": {
                 "text": "'thick' | 'thin' | undefined"
@@ -54744,6 +54842,10 @@
               {
                 "description": "The same seven readings drawn three ways, and each says something different about what happened between them.",
                 "slug": "curves"
+              },
+              {
+                "description": "One row being read, and two that are context.",
+                "slug": "emphasis"
               },
               {
                 "description": "The same line taken from a table instead, for the sparkline that has one behind it. The table is clipped and still read.",
@@ -70505,7 +70607,7 @@
               "type": {
                 "text": "'glass' | undefined"
               },
-              "description": "What the bubble is made of.\n\nAbsent is the inverse bubble, a dark surface over a light page, which is\nwhat a hint over content the theme cannot know has always been here. `glass`\nmakes it the page's own translucent ground instead, for a page whose surfaces\nare glass, so a hint over a glass header is not the one opaque slab on it.\n\n**It flips the ink and adds an edge, which no other family carrying this axis\nhas to do.** A card is already the page's surface, so glass swaps one ground\nfor another; this one starts inverse, and `--helix-material-translucent` is\nthe page's ground, so taking it without the foreground would put light ink on\na light bubble. An inverse bubble is told from the page by being its\nopposite and a glass one has to be told from what is behind it, which is why\nthe border arrives with the material rather than being there all along.\n\nThe strength is the theme's: `--helix-material-translucent` and\n`--helix-material-backdrop` are what the policy moves.",
+              "description": "What the bubble is made of.\n\nAbsent is the inverse bubble, a dark surface over a light page, which is\nwhat a hint over content the theme cannot know has always been here. `glass`\nmakes it the page's own translucent ground instead, for a page whose surfaces\nare glass, so a hint over a glass header is not the one opaque slab on it.\n\n**It flips the ink and adds an edge, which no other family carrying this axis\nhas to do.** A card is already the page's surface, so glass swaps one ground\nfor another; this one starts inverse, and `--helix-material-translucent` is\nthe page's ground, so taking it without the foreground would put light ink on\na light bubble. An inverse bubble is told from the page by being its\nopposite and a glass one has to be told from what is behind it, which is why\nthe border arrives with the material rather than being there all along.\n\nThe strength is the theme's: `--helix-material-translucent` and\n`--helix-material-backdrop` are what the policy moves.\n\n**`emphasis` is not here and that is not an omission.** It says how much ink\na *mark* claims, and this is a surface: what varies about a surface is where\nit ends, which is `separation`, and a bubble in the top layer with a point on\nit has one answer to that. A quiet tooltip is a tooltip that is not shown.",
               "attribute": "material",
               "reflects": true
             },
@@ -71181,7 +71283,7 @@
               "type": {
                 "text": "'glass' | undefined"
               },
-              "description": "What the bubble is made of.\n\nAbsent is the inverse bubble, a dark surface over a light page, which is\nwhat a hint over content the theme cannot know has always been here. `glass`\nmakes it the page's own translucent ground instead, for a page whose surfaces\nare glass, so a hint over a glass header is not the one opaque slab on it.\n\n**It flips the ink and adds an edge, which no other family carrying this axis\nhas to do.** A card is already the page's surface, so glass swaps one ground\nfor another; this one starts inverse, and `--helix-material-translucent` is\nthe page's ground, so taking it without the foreground would put light ink on\na light bubble. An inverse bubble is told from the page by being its\nopposite and a glass one has to be told from what is behind it, which is why\nthe border arrives with the material rather than being there all along.\n\nThe strength is the theme's: `--helix-material-translucent` and\n`--helix-material-backdrop` are what the policy moves.",
+              "description": "What the bubble is made of.\n\nAbsent is the inverse bubble, a dark surface over a light page, which is\nwhat a hint over content the theme cannot know has always been here. `glass`\nmakes it the page's own translucent ground instead, for a page whose surfaces\nare glass, so a hint over a glass header is not the one opaque slab on it.\n\n**It flips the ink and adds an edge, which no other family carrying this axis\nhas to do.** A card is already the page's surface, so glass swaps one ground\nfor another; this one starts inverse, and `--helix-material-translucent` is\nthe page's ground, so taking it without the foreground would put light ink on\na light bubble. An inverse bubble is told from the page by being its\nopposite and a glass one has to be told from what is behind it, which is why\nthe border arrives with the material rather than being there all along.\n\nThe strength is the theme's: `--helix-material-translucent` and\n`--helix-material-backdrop` are what the policy moves.\n\n**`emphasis` is not here and that is not an omission.** It says how much ink\na *mark* claims, and this is a surface: what varies about a surface is where\nit ends, which is `separation`, and a bubble in the top layer with a point on\nit has one answer to that. A quiet tooltip is a tooltip that is not shown.",
               "fieldName": "material"
             },
             {
@@ -74425,7 +74527,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The arrow takes the judgment color and the number does not, which is the\nopposite of the dashboard convention and is measured rather than preferred:\nin light mode the success token is 3.8:1 on the surface, enough for a glyph\nand short of what 13px text needs, and there is no darker green in the ramp.\nThe number therefore keeps the page's own foreground and stays the most\nlegible thing here, which is right anyway, since the number is what a reader\nreads and the judgment is a gloss on it.",
+          "description": "The arrow takes the judgment color and the number does not, which is the\nopposite of the dashboard convention and is measured rather than preferred:\nin light mode the success token is 3.8:1 on the surface, enough for a glyph\nand short of what 13px text needs, and there is no darker green in the ramp.\nThe number therefore keeps the page's own foreground and stays the most\nlegible thing here, which is right anyway, since the number is what a reader\nreads and the judgment is a gloss on it.\n\n**No visual axis applies here, and that is the answer rather than a gap.**\nThis family carries `@groups charts`, so `check:axes` reports it beside eight\nthat do declare one. Each of the three was asked and each refuses for a reason\nabout what this is rather than about the axis. `emphasis` is how much ink a\nmark claims, and there is no mark: an arrow glyph and two runs of text, whose\nweight is `Text`'s business and whose size is the region's. `material` is what\nreads through a surface, and a 13px glyph has nothing behind it. `wash` is a\ngradient across an area, and there is no area.\n\nThe meaning axis is here and is *derived*, which is the more interesting half:\n`direction` and `good` together resolve to success, danger or muted, so a\nconsumer states the metric's polarity once rather than picking a color. A\ndeclared `tone` would let the color disagree with the arrow, which is the one\nthing this component exists to stop.",
           "name": "HelixTrend",
           "cssProperties": [
             {

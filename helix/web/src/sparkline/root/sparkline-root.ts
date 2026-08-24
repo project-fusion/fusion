@@ -46,6 +46,26 @@ import { styles } from './sparkline-root.css.js'
  */
 @customElement('helix-sparkline')
 export class HelixSparkline extends HelixBaseSparkline {
+  /**
+   * How much ink the drawing claims.
+   *
+   * `subtle` mixes the drawing toward the page. The case is a table where one row
+   * is being read and the rest are context.
+   *
+   * It moves the host's `color`, which is what every mark here is drawn in: the
+   * line strokes it, both gradient stops take it so the wash is the line's own
+   * color, and the terminus fills it. So one declaration quietens all of them,
+   * and a consumer's `--sparkline-color` is quietened rather than replaced.
+   *
+   * **One value, and no `material` at all.** `outlined` needs a fill to remove
+   * and this is a stroke; `ghost` is an empty cell. Glass exists so what is
+   * behind a mark reads through it, and at the size a sparkline draws there is
+   * nothing behind it a reader could resolve, so the axis would render a
+   * difference nobody can see.
+   */
+  @property({ reflect: true })
+  emphasis?: 'subtle'
+
   static override styles: CSSResultGroup = [terminusStyles, styles]
 
   /**

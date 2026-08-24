@@ -46,6 +46,11 @@ export class HelixTooltip extends HelixBaseTooltip {
    *
    * The strength is the theme's: `--helix-material-translucent` and
    * `--helix-material-backdrop` are what the policy moves.
+   *
+   * **`emphasis` is not here and that is not an omission.** It says how much ink
+   * a *mark* claims, and this is a surface: what varies about a surface is where
+   * it ends, which is `separation`, and a bubble in the top layer with a point on
+   * it has one answer to that. A quiet tooltip is a tooltip that is not shown.
    */
   @property({ reflect: true })
   material?: 'glass'

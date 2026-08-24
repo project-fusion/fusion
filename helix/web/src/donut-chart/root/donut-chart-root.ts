@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseDonutChart } from '@helix-io/headless/donut-chart'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../chart/series.css.js'
 import { styles } from './donut-chart-root.css.js'
 import '../../tooltip/index.js'
@@ -39,6 +40,34 @@ import '../../tooltip/index.js'
  */
 @customElement('helix-donut-chart')
 export class HelixDonutChart extends HelixBaseDonutChart {
+  /**
+   * How much ink the slices claim.
+   *
+   * `subtle` is the ring as a wash of its own colors: still readable, no longer
+   * the loudest thing beside the number it is explaining.
+   *
+   * **One value and not three, because a slice is a stroke.** The mark *is* the
+   * edge here, so there is nothing inside it for `outlined` to fade: `BarChart`
+   * earns that value by keeping a column's area and fading it toward the page,
+   * and a donut would have to be drawn as filled paths rather than arcs to do the
+   * same. That is changing what a donut is to satisfy a word.
+   */
+  @property({ reflect: true })
+  emphasis?: 'subtle'
+
+  /**
+   * What the ring is made of.
+   *
+   * `glass` lets the page read through the slices, for a chart sitting on a
+   * surface that is itself translucent: a glass card with an opaque ring on it is
+   * the two-designs-sharing-a-window failure a material policy exists to stop.
+   * The track keeps its fill, a see-through groove being a missing one.
+   *
+   * The strength is the theme's, scaled by `--helix-material-opacity`.
+   */
+  @property({ reflect: true })
+  material?: 'glass'
+
   static override styles: CSSResultGroup = [seriesStyles, styles]
 }
 

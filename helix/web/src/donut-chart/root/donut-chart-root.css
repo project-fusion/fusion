@@ -496,3 +496,38 @@
     print-color-adjust: exact;
   }
 }
+
+/* **Emphasis, and it takes one value rather than three.** A slice is a *stroke*
+   on a ring: the mark is the edge, and there is nothing inside it to fade. That
+   is what refuses `outlined` here, and it is the one place this sweep parts
+   company with the row that asked for it, which reasoned from the bar's shape.
+   `BarChart` can keep the area and fade it toward the page because a column has
+   an area; making a donut do the same would mean drawing each slice as a filled
+   path rather than an arc, which is changing what a donut is in order to satisfy
+   a word.
+
+   `subtle` is real and needs no new geometry: the ring is still a ring and stops
+   being the loudest thing in the region, which is what a donut beside the number
+   it is explaining should be. Mixed toward the track rather than faded toward
+   transparent, since a slice sits on the track and a translucent one would take
+   its color from whatever the track is. */
+:host([emphasis="subtle"]) [part="segment"] {
+  stroke: color-mix(
+    in oklab,
+    var(--chart-series) 30%,
+    var(--donut-chart-track-color, var(--helix-color-surface-sunken))
+  );
+}
+
+/* **Glass, so a ring on a glass card is in the same substance as the card.**
+   `BarChart` argues this from its gridlines reading through the columns, and a
+   donut has none; what reads through here is the page, which is the case that
+   matters when the chart is on a surface that is itself translucent. A glass
+   header over an opaque ring is the two-designs-sharing-a-window failure the
+   material policy exists to stop, whatever shape the opaque thing is.
+
+   Scaled by the policy, and applied to the slices rather than the track: the
+   track is a groove and a see-through groove is a missing groove. */
+:host([material="glass"]) [part="segment"] {
+  stroke-opacity: calc(0.62 * var(--helix-material-opacity));
+}

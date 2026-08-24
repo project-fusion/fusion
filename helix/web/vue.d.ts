@@ -2514,6 +2514,26 @@ here has to be. */
 export type HelixDividerVueEvents = {};
 
 export type HelixDonutChartVueProps = {
+  /** How much ink the slices claim.
+
+`subtle` is the ring as a wash of its own colors: still readable, no longer
+the loudest thing beside the number it is explaining.
+
+**One value and not three, because a slice is a stroke.** The mark *is* the
+edge here, so there is nothing inside it for `outlined` to fade: `BarChart`
+earns that value by keeping a column's area and fading it toward the page,
+and a donut would have to be drawn as filled paths rather than arcs to do the
+same. That is changing what a donut is to satisfy a word. */
+  emphasis?: HelixDonutChart["emphasis"];
+  /** What the ring is made of.
+
+`glass` lets the page read through the slices, for a chart sitting on a
+surface that is itself translucent: a glass card with an opaque ring on it is
+the two-designs-sharing-a-window failure a material policy exists to stop.
+The track keeps its fill, a see-through groove being a missing one.
+
+The strength is the theme's, scaled by `--helix-material-opacity`. */
+  material?: HelixDonutChart["material"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -3258,6 +3278,28 @@ shadow root names a table in that root rather than in the document.
 export type HelixLegendVueEvents = {};
 
 export type HelixLineChartVueProps = {
+  /** How much ink the lines claim.
+
+`subtle` mixes each series toward the page, so a chart that is context stays
+legible without competing. Toward the page rather than translucent, because a
+translucent line takes its color from whatever it crosses, which on a chart
+with several is the whole risk.
+
+**`outlined` is refused and `area` is why.** On a column, `outlined` is the
+edge without the loud fill; the line chart's version of that is the line
+without its wash, and `area` already says exactly that. A second spelling
+would be the drift this axis exists to prevent, so it defers to the property
+that got there first. */
+  emphasis?: HelixLineChart["emphasis"];
+  /** What the lines are made of.
+
+`glass` lets the gridlines read through them, which is what translucency is
+for on a chart rather than decoration.
+
+On the lines and not the wash: the wash is already scaled by
+`--helix-material-opacity` whatever this says, being a wash by nature, and
+scaling it twice would compound the policy against itself. */
+  material?: HelixLineChart["material"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -5384,6 +5426,22 @@ export type HelixSliderVueEvents = {
 };
 
 export type HelixSparklineVueProps = {
+  /** How much ink the drawing claims.
+
+`subtle` mixes the drawing toward the page. The case is a table where one row
+is being read and the rest are context.
+
+It moves the host's `color`, which is what every mark here is drawn in: the
+line strokes it, both gradient stops take it so the wash is the line's own
+color, and the terminus fills it. So one declaration quietens all of them,
+and a consumer's `--sparkline-color` is quietened rather than replaced.
+
+**One value, and no `material` at all.** `outlined` needs a fill to remove
+and this is a stroke; `ghost` is an empty cell. Glass exists so what is
+behind a mark reads through it, and at the size a sparkline draws there is
+nothing behind it a reader could resolve, so the axis would render a
+difference nobody can see. */
+  emphasis?: HelixSparkline["emphasis"];
   /** How heavy the line is drawn.
 
 Absent is the weight a sparkline is usually drawn at. `thin` suits one set
@@ -6808,7 +6866,12 @@ opposite and a glass one has to be told from what is behind it, which is why
 the border arrives with the material rather than being there all along.
 
 The strength is the theme's: `--helix-material-translucent` and
-`--helix-material-backdrop` are what the policy moves. */
+`--helix-material-backdrop` are what the policy moves.
+
+**`emphasis` is not here and that is not an omission.** It says how much ink
+a *mark* claims, and this is a surface: what varies about a surface is where
+it ends, which is `separation`, and a bubble in the top layer with a point on
+it has one answer to that. A quiet tooltip is a tooltip that is not shown. */
   material?: HelixTooltip["material"];
   /** Whether the element is open.
 
@@ -8977,7 +9040,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixTreeVueProps,
     HelixTreeVueEvents
   >;
-  /** The arrow takes the judgment color and the number does not, which is the opposite of the dashboard convention and is measured rather than preferred: in light mode the success token is 3.8:1 on the surface, enough for a glyph and short of what 13px text needs, and there is no darker green in the ramp. The number therefore keeps the page's own foreground and stays the most legible thing here, which is right anyway, since the number is what a reader reads and the judgment is a gloss on it. */
+  /** The arrow takes the judgment color and the number does not, which is the opposite of the dashboard convention and is measured rather than preferred: in light mode the success token is 3.8:1 on the surface, enough for a glyph and short of what 13px text needs, and there is no darker green in the ramp. The number therefore keeps the page's own foreground and stays the most legible thing here, which is right anyway, since the number is what a reader reads and the judgment is a gloss on it.  **No visual axis applies here, and that is the answer rather than a gap.** This family carries '@groups charts', so 'check:axes' reports it beside eight that do declare one. Each of the three was asked and each refuses for a reason about what this is rather than about the axis. 'emphasis' is how much ink a mark claims, and there is no mark: an arrow glyph and two runs of text, whose weight is 'Text''s business and whose size is the region's. 'material' is what reads through a surface, and a 13px glyph has nothing behind it. 'wash' is a gradient across an area, and there is no area.  The meaning axis is here and is *derived*, which is the more interesting half: 'direction' and 'good' together resolve to success, danger or muted, so a consumer states the metric's polarity once rather than picking a color. A declared 'tone' would let the color disagree with the arrow, which is the one thing this component exists to stop. */
   "helix-trend": DefineCustomElement<
     HelixTrend,
     HelixTrendVueProps,

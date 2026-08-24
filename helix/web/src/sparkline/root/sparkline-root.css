@@ -1,8 +1,13 @@
 :host {
   block-size: var(--sparkline-block-size, 2.5em);
   /* Set once and read by the line, the wash and the terminus, so a consumer
-     moving `--sparkline-color` cannot end up with three that disagree. */
-  color: var(--sparkline-color, var(--helix-color-series-1));
+     moving `--sparkline-color` cannot end up with three that disagree. Named as
+     well as assigned, because `emphasis` has to quieten the same value and
+     cannot reach it through `currentColor`: see the note at the foot of this
+     file. */
+  color: var(--_sparkline-ink);
+
+  --_sparkline-ink: var(--sparkline-color, var(--helix-color-series-1));
   /* The mark is positioned against this box, so the box has to be one. */
   position: relative;
 
@@ -185,4 +190,39 @@
     box-shadow: none;
     print-color-adjust: exact;
   }
+}
+
+/* **Emphasis, and one value, for a drawing whose whole point is its size.**
+   A sparkline sits inside a line of text or a table cell, and the case that
+   arises there is a row that is context beside a row that is being read, which is
+   `subtle` exactly. `outlined` needs a fill to remove and this is a stroke;
+   `ghost` would be an empty cell.
+
+   **And no `material` here, which is a judgment about the size rather than about
+   the axis.** Glass exists so what is behind a mark reads through it. At the size
+   this draws, nothing behind it is resolvable, so the axis would render a
+   difference nobody can see. `BarChart` earns it with gridlines to read through
+   and a donut with a card under it; a sparkline has neither.
+
+   **On the host's `color` and not on the parts, which is the whole trick and was
+   the first version's bug.** Every mark in this file is `currentColor`: the line
+   strokes it, both gradient stops take it so the wash is the line's own color,
+   and the terminus fills it. Quietening the line alone left the wash and the
+   terminus at full strength, which measured as no visible change at all, three
+   sparklines rendering identically. One declaration at the top moves all five.
+
+   **`currentColor` cannot be used here, and it is the trap this rule was written
+   into twice.** In a declaration that sets `color` on the same element,
+   `currentColor` is the *inherited* value, not the one the element's other rule
+   computed: `:host` and `:host([emphasis="subtle"])` both match this host, so
+   `currentColor` resolved to whatever the page's text color was rather than to
+   the series color. Measured, a `subtle` sparkline came out gray. It reads as
+   plausible, which is what makes this survive review: quiet and gray look like
+   the same intention until the loud one beside it is blue.
+
+   So the source value is named on `:host` and mixed by name. A consumer's
+   `--sparkline-color` is then quietened rather than replaced, which is the
+   behaviour the wrong version only appeared to have. */
+:host([emphasis="subtle"]) {
+  color: color-mix(in oklab, var(--_sparkline-ink) 40%, var(--helix-color-background));
 }
