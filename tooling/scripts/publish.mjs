@@ -41,7 +41,15 @@
  *   node tooling/scripts/publish.mjs --domain helix --promote latest --version 1.4.0
  */
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readdirSync } from 'node:fs'
+import {
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { DOMAINS, domainOf, manifests, publishes, root } from './workspace.mjs'
@@ -159,6 +167,73 @@ if (promote !== undefined) {
   process.exit(0)
 }
 
+/**
+ * Removes the source maps from a packed tarball, and their references with them.
+ *
+ * **Every map we ship is inert, measured rather than assumed.** Packed for real:
+ * 1,158 maps across `@helix-io/core`, `@helix-io/headless` and `@helix-io/web`,
+ * **none with `sourcesContent`, and all 1,158 naming a `sources` path that is
+ * not in the tarball**. `files` is `custom-elements.json` plus `dist`, so
+ * `package/src/` has no entries at all. The trade this was meant to buy, a
+ * consumer stepping into `HelixBaseButton` and getting our TypeScript, was
+ * never on offer: it is cost with nothing bought.
+ *
+ * **Four peers, unpacked the same day.** MUI, Base UI and Web Awesome ship zero
+ * maps and, sampled at 400 code files each, zero `sourceMappingURL` comments:
+ * stripped, not merely omitted. React Spectrum is the one that publishes them
+ * and does it thoroughly, 47 percent of a 13MB tarball with every source
+ * inlined and no declaration maps at all. Nobody ships the state we were in.
+ *
+ * **Stripping the files alone would be worse than shipping them.** Every emitted
+ * file ends in `//# sourceMappingURL=…`, so dropping the maps and leaving the
+ * comments points every published file at something that is not there. Zero
+ * dangling references is the one thing all six peer packages have in common, so
+ * the comment goes with the file.
+ *
+ * **Here rather than in `tsconfig`**, because the maps work in this repository
+ * and only stop working once packed: `dist/tag/root/tag-root.js.map` resolves to
+ * `helix/web/src/tag/root/tag-root.ts`, which is there, and `declarationMap` is
+ * what lands go-to-definition on the source for `site/ui` and every
+ * cross-package import. Turning the compiler options off would strip the tarball
+ * and take that with it.
+ *
+ * Payoff, unpacked: 596K off headless, 261K off web, 135K off core and 47K off
+ * theme in a consumer's `node_modules`. See 193.
+ */
+const strip = (tarball, into) => {
+  const opened = join(into, 'opened')
+  mkdirSync(opened, { recursive: true })
+  run('tar', ['-xzf', tarball, '-C', opened], root)
+
+  const maps = []
+  const walk = (dir) => {
+    for (const entry of readdirSync(dir)) {
+      const path = join(dir, entry)
+      if (statSync(path).isDirectory()) {
+        walk(path)
+      } else if (path.endsWith('.map')) {
+        maps.push(path)
+      } else if (/\.(js|cjs|mjs|d\.ts|d\.cts|d\.mts)$/.test(path)) {
+        const code = readFileSync(path, 'utf8')
+        const clean = code.replace(/\n?\/\/# sourceMappingURL=.*$/gm, '')
+        if (clean !== code) {
+          writeFileSync(path, clean.endsWith('\n') ? clean : `${clean}\n`)
+        }
+      }
+    }
+  }
+  walk(opened)
+  for (const path of maps) {
+    rmSync(path)
+  }
+
+  rmSync(tarball)
+  /* Repacked under the name npm expects, from `package/`, which is the one
+     directory a tarball may contain. */
+  run('tar', ['-czf', tarball, 'package'], opened)
+  return maps.length
+}
+
 const version = packages[0][1].manifest.version
 const staging = mkdtempSync(join(tmpdir(), `${domain}-publish-`))
 const published = []
@@ -192,7 +267,9 @@ for (const [name, { directory, manifest }] of packages) {
     }
   }
 
-  console.log(`  ${name}@${version} (${file})`)
+  const dropped = strip(join(into, file), into)
+
+  console.log(`  ${name}@${version} (${file}, ${dropped} source maps stripped)`)
   if (!dry) {
     npm(
       [
