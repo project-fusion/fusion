@@ -1,0 +1,81 @@
+/* The shell every argued document on this site shares.
+ *
+ * **Insights, Trust and Thesis are the same kind of page**, which is what 206
+ * settled: each is a single argued document rather than a marketing surface,
+ * and an insight page already was one. Trust and Thesis were carrying a layout
+ * apiece that reproduced most of this and none of its reasoning, so the
+ * measure, the leading and the block rhythm differed between three pages that
+ * are read the same way.
+ *
+ * What stays post-specific is in `insights.module.css`: the crumb, the byline
+ * row and the Keep reading list are facts about a post in a series, and Trust
+ * has no series to be in.
+ */
+
+/* **90ch, and in characters rather than rems for the reason a measure is.**
+   `44rem` is a length that happens to hold about 70 characters at the current
+   type size and holds a different number at any other: state the column in the
+   unit it is actually about, and it survives a change to the ramp. */
+.documentShell {
+  margin-inline: auto;
+  max-inline-size: 90ch;
+  /* **Not a band at the top, because a document is not a section of the landing
+     page.** `--site-band` is the rhythm that gives each claim on the front page
+     a screen of its own, and it clamps to 12vh, which is 108 on a laptop. Above
+     an article that is 108 pixels of nothing between the masthead and the way
+     out, before a reader reaches a single word of the thing they opened. A page
+     of prose wants to start.
+
+     The end keeps the band. There the space is doing work: it separates the
+     last line of the argument from the footer, and running an article straight
+     into the chrome is the fault the top padding does not have. */
+  padding-block: var(--helix-space-2xl) var(--site-band);
+  padding-inline: var(--site-inset);
+}
+
+/* **Left, with the prose under it.**
+ *
+ * This was centered, on the argument that a centered measure is a column the eye
+ * can find. That holds for a narrow column and stops holding at 90ch: the head
+ * and the body now share an edge wide enough that a centered title starts in a
+ * different place from every line beneath it, and the reader's eye has two left
+ * edges to keep. One edge, and the title, the labels and the byline all return
+ * to it. */
+.documentHead {
+  text-align: start;
+}
+
+/* Larger than a section title and smaller than the hero's, which is the whole
+   scale a document needs: it is the only heading on the page at this level and
+   everything under it is an `h2` the base layer already sizes.
+
+   Headings derive their leading from size through `--helix-leading-heading`,
+   which the base layer applies to `h1`, so nothing is said here: this size is a
+   `clamp` across 32 to 44, and a ratio gives one gap over that whole range
+   where a fixed number gives the right one at a single point in it. */
+.documentTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
+  letter-spacing: var(--helix-tracking-tight);
+  text-wrap: balance;
+}
+
+.documentLede {
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  max-inline-size: 34rem;
+  text-wrap: balance;
+}
+
+/* Air between the blocks, said once here rather than on every element: the base
+   layer resets the UA margins and themes prose under `[data-prose]`, and what it
+   cannot know is how far apart this particular kind of page wants its
+   paragraphs. */
+.documentBody > * + * {
+  margin-block-start: var(--helix-space-lg);
+}
+
+/* A heading needs more above it than a paragraph does, or a new section starts
+   at the same distance as the next sentence. */
+.documentBody > * + :where(h2, h3) {
+  margin-block-start: var(--helix-space-2xl);
+}

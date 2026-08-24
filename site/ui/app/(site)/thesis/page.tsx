@@ -1,6 +1,6 @@
 import { findSitePage, sitePageSources } from '@fusion-io/site-content'
 import { renderMdx } from '../../../lib/mdx'
-import styles from './thesis.module.css'
+import { DocumentPage } from '../document-page'
 
 /**
  * The thesis, rendered from `@fusion-io/site-content`.
@@ -14,6 +14,12 @@ import styles from './thesis.module.css'
  *
  * What is left here is the two things a document cannot carry: where it sits on
  * the page, and the hero above it. Everything else is in the file.
+ *
+ * **It takes the shared document shell**, which is 206's finding: this page,
+ * Trust and an insight are the same kind of thing, a single sustained argument,
+ * and the insight page had already worked the layout out. Carrying a layout of
+ * its own meant the measure, the heading scale and the block rhythm differed
+ * between three pages a reader reads identically.
  */
 const page = findSitePage('/thesis')
 
@@ -25,23 +31,11 @@ export default async function Page() {
   }
   const source = sitePageSources[page.slug]
   return (
-    <>
-      {/* One band, because it is one document. The hero and the prose under it
-          were two bands, which put a whole band of space between a title and
-          its own first sentence. */}
-      <section data-band>
-        <helix-flex data-shell direction="column" gap="lg">
-          <helix-text tone="subtle" variant="label">
-            {page.kicker}
-          </helix-text>
-          <helix-text as="h1" data-measure data-section-title>
-            {page.title}
-          </helix-text>
-          <div className={styles.prose} data-measure data-prose>
-            {source ? await renderMdx(source) : null}
-          </div>
-        </helix-flex>
-      </section>
-    </>
+    <DocumentPage
+      body={source ? await renderMdx(source) : null}
+      kicker={page.kicker}
+      lede={page.lede}
+      title={page.title}
+    />
   )
 }

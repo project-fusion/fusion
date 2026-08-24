@@ -1,6 +1,7 @@
 import { findSitePage, sitePageSources } from '@fusion-io/site-content'
 import { renderMdx } from '../../../lib/mdx'
 import { SERVICES } from '../../services'
+import documents from '../document-page.module.css'
 import styles from './services.module.css'
 
 export const metadata = {
@@ -128,7 +129,14 @@ export default async function Page() {
           than a paragraph in one, and neither belongs in a `.md`. */}
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="lg">
-          <div data-measure data-prose>
+          {/* The document shell's block rhythm, not just its theming.
+              `[data-prose]` resets the UA margins and themes what is inside it,
+              and deliberately says nothing about how far apart the blocks sit,
+              because that is a fact about the kind of page rather than about
+              prose. Without it a heading sat directly on its own paragraph
+              while whole bands of space separated the sections around it, which
+              is the rhythm inverted: too much between, none within. */}
+          <div className={documents.documentBody} data-measure data-prose>
             {source ? await renderMdx(source) : null}
           </div>
           <helix-flex data-density="lg" gap="sm" wrap>

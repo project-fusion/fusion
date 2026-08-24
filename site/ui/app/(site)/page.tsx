@@ -324,7 +324,13 @@ export default function Home() {
             </helix-text>
           </helix-flex>
 
-          <helix-grid gap="xl" min="18rem">
+          {/* Two columns, because there are four reasons.
+              At `18rem` this fitted three at desktop width and left the fourth
+              alone on a row with two empty columns beside it, which reads as a
+              missing item rather than as a list of four. The same floor the
+              contact page's four take, and it still collapses to one column
+              when there is no room for two. */}
+          <helix-grid gap="xl" min="26rem">
             {(LANDING.blocks[3]?.items ?? []).map((reason) => (
               <helix-flex data-substrate direction="column" gap="sm" key={reason.name}>
                 <helix-text as="h3" data-substrate-name>

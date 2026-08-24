@@ -55,7 +55,14 @@ export default function Page() {
           <helix-text as="h2" data-measure data-section-title>
             {CONTACT.blocks[0]?.title}
           </helix-text>
-          <helix-grid gap="xl" min="18rem">
+          {/* Two columns, because there are four of these.
+              At `18rem` the grid fitted three at desktop width and orphaned the
+              fourth onto a row of its own with two empty columns beside it,
+              which reads as a missing item rather than as a list of four. A
+              wider floor makes the same auto-fit grid land on two, so four
+              items fill two rows evenly and it still collapses to one column
+              when there is no room for two. */}
+          <helix-grid gap="xl" min="26rem">
             {INCLUDE.map((item) => (
               <helix-flex data-substrate direction="column" gap="sm" key={item.name}>
                 <helix-text as="h3" data-substrate-name>
