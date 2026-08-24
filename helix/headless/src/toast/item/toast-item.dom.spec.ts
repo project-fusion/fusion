@@ -9,7 +9,9 @@ beforeAll(async () => {
 type Item = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
 
 const message = async (attributes = ''): Promise<Item> =>
-  (await mount(`<helix-base-toast-item ${attributes}>Project saved</helix-base-toast-item>`)) as Item
+  (await mount(
+    `<helix-base-toast-item ${attributes}>Project saved</helix-base-toast-item>`,
+  )) as Item
 
 /**
  * One message, and the contract that is the message's rather than the region's.

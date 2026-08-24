@@ -9,7 +9,9 @@ beforeAll(async () => {
 type Stop = HTMLElement & { updateComplete: Promise<boolean> }
 
 const stop = async (attributes = 'current'): Promise<Stop> =>
-  (await mount(`<helix-base-tour-stop ${attributes}>This is the sidebar.</helix-base-tour-stop>`)) as Stop
+  (await mount(
+    `<helix-base-tour-stop ${attributes}>This is the sidebar.</helix-base-tour-stop>`,
+  )) as Stop
 
 const asked = async (host: Stop, name: string): Promise<string | undefined> => {
   let what: string | undefined

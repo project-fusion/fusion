@@ -6,8 +6,13 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-const entry = async (attributes = '', inner = '<span slot="time">March</span>Shipped'): Promise<HTMLElement> =>
-  (await mount(`<helix-base-timeline-item ${attributes}>${inner}</helix-base-timeline-item>`)) as HTMLElement
+const entry = async (
+  attributes = '',
+  inner = '<span slot="time">March</span>Shipped',
+): Promise<HTMLElement> =>
+  (await mount(
+    `<helix-base-timeline-item ${attributes}>${inner}</helix-base-timeline-item>`,
+  )) as HTMLElement
 
 /**
  * One entry, and the contract that is the entry's rather than the line's.

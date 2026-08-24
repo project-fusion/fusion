@@ -26,7 +26,7 @@ describe('one tab', () => {
      and leaving the strip to decide. */
   test('announces its value when selected, and stays silent when it is refusing', async () => {
     const host = await tab()
-    let heard: string[] = []
+    const heard: string[] = []
     host.addEventListener('helix-select', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
