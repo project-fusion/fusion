@@ -1,10 +1,10 @@
-import { CATEGORIES, type HelixDeclaration, type Plugin } from '../types.js'
+import { CATEGORIES, GROUPS, type HelixDeclaration, type Plugin } from '../types.js'
 
 /** Tags Helix reads that the CEM spec does not define. */
 const SINGLE = ['category', 'description', 'since', 'status', 'documentation'] as const
 
 /** Comma-separated, so one tag rather than a stack of near-identical lines. */
-const LIST = ['aliases'] as const
+const LIST = ['aliases', 'groups'] as const
 
 /** Values `@status` may take. Anything else is ignored rather than trusted. */
 const STATUSES = ['deprecated', 'experimental', 'stable'] as const
@@ -51,6 +51,7 @@ export const metadata = (): Plugin => ({
     }
 
     const aliases: string[] = []
+    const groups: string[] = []
     const found: Record<string, string> = {}
 
     for (const tag of ts.getJSDocTags(node)) {
@@ -60,12 +61,15 @@ export const metadata = (): Plugin => ({
         continue
       }
       if ((LIST as readonly string[]).includes(tagName)) {
-        aliases.push(
-          ...value
-            .split(',')
-            .map((entry) => entry.trim())
-            .filter(Boolean),
-        )
+        const entries = value
+          .split(',')
+          .map((entry) => entry.trim())
+          .filter(Boolean)
+        if (tagName === 'groups') {
+          groups.push(...entries)
+        } else {
+          aliases.push(...entries)
+        }
       } else if ((SINGLE as readonly string[]).includes(tagName)) {
         found[tagName] = value
       }
@@ -79,6 +83,10 @@ export const metadata = (): Plugin => ({
 
     const status = STATUSES.find((candidate) => candidate === found.status)
     const category = CATEGORIES.find((candidate) => candidate === found.category)
+    /* Unknown words dropped rather than trusted, the same way a category is: a
+       typo lands a family in a group of one, which is invisible, where dropping
+       it makes the family simply ungrouped and the check says so. */
+    const declared = GROUPS.filter((candidate) => groups.includes(candidate))
 
     declaration.helix = {
       ...declaration.helix,
@@ -87,6 +95,7 @@ export const metadata = (): Plugin => ({
       ...(status ? { status } : {}),
       ...(found.documentation ? { documentation: found.documentation } : {}),
       ...(aliases.length > 0 ? { aliases } : {}),
+      ...(declared.length > 0 ? { groups: declared } : {}),
     }
   },
   name: 'helix-metadata',

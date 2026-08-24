@@ -16,6 +16,7 @@ import { styles } from './tooltip-root.css.js'
  * @since 0.1.0
  * @status experimental
  * @category overlays
+ * @groups charts
  * @aliases Hint, Popup label
  * @documentation https://helix.fusion.dev/components/tooltip
  *

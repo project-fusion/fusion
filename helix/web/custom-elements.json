@@ -4704,6 +4704,9 @@
               "Column Chart",
               "Categorical Chart"
             ],
+            "groups": [
+              "charts"
+            ],
             "tier": "styled",
             "group": "BarChart",
             "part": "Root",
@@ -22132,6 +22135,9 @@
               "Ring Chart",
               "Share Chart"
             ],
+            "groups": [
+              "charts"
+            ],
             "tier": "styled",
             "group": "DonutChart",
             "part": "Root",
@@ -30423,6 +30429,9 @@
               "Key",
               "Series Key"
             ],
+            "groups": [
+              "charts"
+            ],
             "tier": "styled",
             "group": "Legend",
             "part": "Root",
@@ -31120,6 +31129,9 @@
               "Time Series",
               "Trend Chart",
               "Multi-line Chart"
+            ],
+            "groups": [
+              "charts"
             ],
             "tier": "styled",
             "group": "LineChart",
@@ -37086,6 +37098,9 @@
               "Gauge",
               "Level",
               "Capacity"
+            ],
+            "groups": [
+              "charts"
             ],
             "tier": "styled",
             "group": "Meter",
@@ -44771,6 +44786,9 @@
             "aliases": [
               "Progress bar",
               "Loading bar"
+            ],
+            "groups": [
+              "charts"
             ],
             "tier": "styled",
             "group": "Progress",
@@ -54568,6 +54586,9 @@
               "Micro Chart",
               "Trend Line",
               "Inline Chart"
+            ],
+            "groups": [
+              "charts"
             ],
             "tier": "styled",
             "group": "Sparkline",
@@ -71015,6 +71036,9 @@
               "Hint",
               "Popup label"
             ],
+            "groups": [
+              "charts"
+            ],
             "tier": "styled",
             "group": "Tooltip",
             "part": "Root",
@@ -74398,6 +74422,9 @@
               "Delta",
               "Change",
               "Movement"
+            ],
+            "groups": [
+              "charts"
             ],
             "tier": "styled",
             "group": "Trend",

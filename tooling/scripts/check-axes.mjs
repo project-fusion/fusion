@@ -150,6 +150,12 @@ const seenUnswept = new Set()
 const seenPending = new Set()
 const seenLengths = new Set()
 
+/* Which visual axes each family declares, and which groups it is read beside.
+   Collected across both tiers before anything is judged, because a group is
+   only comparable once every member has been seen. */
+const declaresAxis = new Map()
+const inGroups = new Map()
+
 for (const tier of ['headless', 'web']) {
   const manifest = JSON.parse(
     readFileSync(join(ROOT, `helix/${tier}/custom-elements.json`), 'utf8'),
@@ -161,7 +167,19 @@ for (const tier of ['headless', 'web']) {
         continue
       }
       const family = module.path.split('/')[1]
+      for (const group of declaration.helix?.groups ?? []) {
+        if (!inGroups.has(group)) {
+          inGroups.set(group, new Set())
+        }
+        inGroups.get(group).add(family)
+      }
       for (const attribute of declaration.attributes ?? []) {
+        if (attribute.name in AXES) {
+          if (!declaresAxis.has(family)) {
+            declaresAxis.set(family, new Set())
+          }
+          declaresAxis.get(family).add(attribute.name)
+        }
         const name = attribute.name
         if (name === 'appearance') {
           seenUnswept.add(family)
@@ -240,12 +258,63 @@ for (const family of Object.keys(UNSWEPT)) {
   }
 }
 
+/**
+ * A family declaring a visual axis that the families it is read beside do not.
+ *
+ * **Absence is not checkable and this is not absence.** Whether a component
+ * *should* have an axis needs a reading of what it is for: a sparkline
+ * plausibly takes `wash` and not `glass`, because at its size there is nothing
+ * to see through. A check that guessed would file work that is wrong more often
+ * than right. What a script can see is disagreement between families that owe
+ * each other an answer, which is a different claim and a true one.
+ *
+ * **`@groups` rather than `category`, and the measurement is why.** The nine
+ * chart-adjacent families span three categories, so a rule keyed on purpose
+ * would never compare a meter against a bar chart, and `content` held 27
+ * families, so it would compare a bar chart against a blockquote. Too coarse and
+ * too narrow at once. A group says which families are read together.
+ *
+ * The sharpest case is the one that motivated it: `legend` renders a swatch, and
+ * a key whose swatches are solid while the bars they key are outlined is a
+ * legend that does not match its own chart. Nothing else here could see that.
+ *
+ * Reported rather than failed on, for the reason `check:routes` counts its
+ * stubs: the answer to a disagreement is sometimes that the axis genuinely does
+ * not apply, and failing would pressure someone into declaring an axis to
+ * silence a script. A count that does not fall is visible work.
+ */
+const disagreements = []
+for (const [group, families] of inGroups) {
+  const declared = new Map()
+  for (const family of families) {
+    for (const axis of declaresAxis.get(family) ?? []) {
+      declared.set(axis, (declared.get(axis) ?? 0) + 1)
+    }
+  }
+  for (const [axis, count] of declared) {
+    if (count === families.size) {
+      continue
+    }
+    const missing = [...families].filter((family) => !declaresAxis.get(family)?.has(axis)).sort()
+    disagreements.push(
+      `${group}: ${count} of ${families.size} declare \`${axis}\`, and ${missing.join(', ')} do not`,
+    )
+  }
+}
+
 if (problems.length > 0) {
   console.error(`Axes off the registry (${problems.length}):\n`)
   for (const problem of problems) {
     console.error(`  ${problem}\n`)
   }
   process.exit(1)
+}
+
+if (disagreements.length > 0) {
+  console.log(`  ${disagreements.length} disagreements inside a group:`)
+  for (const line of disagreements.sort()) {
+    console.log(`    ${line}`)
+  }
 }
 
 const swept = Object.keys(AXES).length

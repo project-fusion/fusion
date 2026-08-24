@@ -146,6 +146,35 @@ export const CATEGORIES = [
 export type Category = (typeof CATEGORIES)[number]
 
 /**
+ * Which families a family is read beside, and owes a consistent answer to.
+ *
+ * **A second grouping, because `category` cannot be this and measurement says
+ * so.** The nine chart-adjacent families span three categories: `content` holds
+ * the six that draw, `feedback` holds `meter` and `progress`, and `overlays`
+ * holds `tooltip`. So a rule keyed on category would never compare a meter
+ * against a bar chart. And `content` carried 27 families before `charts` was
+ * split out of it, so the same rule would have compared a bar chart against a
+ * blockquote. Too coarse and too narrow in one measurement.
+ *
+ * **Multi-valued, because the interesting members belong to two things at
+ * once.** `tooltip` is genuinely an overlay and genuinely something a chart
+ * draws, and a family that can only be in one group forces that choice to be
+ * made wrongly. So this is shaped like `aliases` rather than like `category`.
+ *
+ * **What it is for** is the visual axes: a legend whose swatches are solid while
+ * the bars it keys are outlined is a legend that does not match its own chart,
+ * and that is a fault no check could see while the only grouping was purpose.
+ * `check:axes` reads it. See 176.
+ *
+ * Closed, the way `CATEGORIES` and the statuses are, so a typo lands a family
+ * in a group of one rather than being trusted.
+ */
+export const GROUPS = ['charts'] as const
+
+/** One of the groups a component may declare itself part of. */
+export type Group = (typeof GROUPS)[number]
+
+/**
  * Fields Helix adds to the manifest beyond the CEM spec.
  *
  * The spec permits extra properties. Namespacing them under `helix` keeps them
@@ -163,6 +192,9 @@ export interface HelixMetadata {
    * rather than becoming a category of one.
    */
   category?: Category
+
+  /** Which families this one is read beside, for the axes it owes them. */
+  groups?: Group[]
 
   /** URL of the component's documentation page. */
   documentation?: string
