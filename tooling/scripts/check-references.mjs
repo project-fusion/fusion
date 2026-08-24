@@ -28,14 +28,25 @@
  * CSS value or a piece of English, and guessing which would report the prose
  * that is doing its job.
  *
+ * **And a markdown link target, which is the fourth shape and was the gap.**
+ * The three above all live inside comments, so a link written as
+ * `[the plan](../the internal plan)` was invisible to every one of them:
+ * markdown prose is not a comment. Moving the strategy into `docs/plan` found
+ * three links that had been broken before the move and that this check had been
+ * reporting green over, all the same slip of naming `theming.md` where the file
+ * is `theming.mdx`. Resolved relative to the file that holds the link, which is
+ * how a reader follows it, and only for targets that look like a repository
+ * file: anything with a scheme, an anchor alone, or a bare word is left alone.
+ *
  * Run with `bun run check:references` (also part of `bun run verify`).
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 
 const ROOTS = ['helix', 'cortex', 'tooling', 'docs', 'site/ui']
 const EXTENSIONS = /\.(css|html|json|md|mjs|rs|toml|ts|tsx|txt)$/
 const SOURCE = /\.(css|mjs|ts|tsx)$/
+const PROSE = /\.mdx?$/
 
 /* Scripts from the nearest `package.json` and every one above it, not the root
    alone. The icons package names its own build script in a comment and is right
@@ -64,6 +75,10 @@ const scriptsFor = (file) => {
 }
 
 const files = []
+/* Markdown is walked into its own list rather than into `files`, because the
+   comment scan above has nothing to say about it and counting it there would
+   make the success line claim a corpus it had not read. */
+const prose = []
 const walk = (dir) => {
   if (!existsSync(dir)) {
     return
@@ -77,6 +92,8 @@ const walk = (dir) => {
       walk(path)
     } else if (SOURCE.test(entry) && !entry.endsWith('.css.ts')) {
       files.push(path)
+    } else if (PROSE.test(entry)) {
+      prose.push(path)
     }
   }
 }
@@ -121,6 +138,26 @@ for (const file of files) {
   }
 }
 
+/* Markdown links, resolved the way a reader follows them: relative to the file
+   holding the link rather than to the repository. */
+for (const file of prose) {
+  const from = dirname(file)
+  /* Inline code spans are stripped first, because a link inside one is an
+     illustration of the shape rather than a link: `12-ai-native-web.md`
+     describes the format of an `llms.txt` line as `- [Title](url.md)`, and
+     `url.md` is not a file anybody meant to exist. */
+  const text = readFileSync(file, 'utf8').replace(/`[^`\n]*`/g, '')
+  for (const [, target] of text.matchAll(/\]\(([^)\s]+)\)/g)) {
+    const path = target.split('#')[0]
+    if (path === '' || /^[a-z]+:/i.test(path) || !EXTENSIONS.test(path)) {
+      continue
+    }
+    if (!existsSync(join(from, path))) {
+      problems.push(`${file}: links to \`${target}\`, which is not there.`)
+    }
+  }
+}
+
 const unique = [...new Set(problems)]
 if (unique.length > 0) {
   console.error(
@@ -129,4 +166,6 @@ if (unique.length > 0) {
   process.exit(1)
 }
 
-console.log(`references: ${files.length} files, every path and script a comment names exists`)
+console.log(
+  `references: ${files.length} sources and ${prose.length} documents, every path a comment names and every markdown link resolves`,
+)
