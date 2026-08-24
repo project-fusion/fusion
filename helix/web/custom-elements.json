@@ -48913,6 +48913,13 @@
             },
             {
               "kind": "field",
+              "name": "handleFrameLoad",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The frame's document has finished loading, so its listener exists.\n\n**The announcement is one shot and the parent can miss it.** The frame\nposts `helix-preview-ready` at the end of its own module evaluation and\nnever repeats it, and `handleMessage` drops anything whose `source` is not\n`this.frame?.contentWindow`. That getter reads the render root, so it is\nnull until this element has rendered once. A frame that loads before that\nrender commits therefore announces into a guard that refuses it, `ready`\nstays false, and `send` returns early forever: the source is set, the\nmarkup is correct, and the preview is blank with nothing logged.\n\n**It is a race, so it hides in the one place nobody looks.** The frame is\nonly fast enough to win when its document and its bundle are already in the\nHTTP cache, which is a client-side navigation and never a cold load.\nMeasured on the theme builder reached by clicking a link: `ready` false, a\n9,382 character `source` in place, and an empty preview, where the same\npage loaded directly rendered correctly.\n\n`load` closes it without a retry protocol and without weakening either\ncheck on the way in. The frame's script is `defer`, so it has run by the\ntime this fires, which makes the event a guarantee that the listener is\nthere rather than a guess that it might be. The message path stays, because\nit is the one that works when the frame is slower than the render, and\neither arriving is enough."
+            },
+            {
+              "kind": "field",
               "name": "handleMessage",
               "privacy": "private",
               "readonly": true,

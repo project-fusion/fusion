@@ -146,6 +146,37 @@ export class HelixSandboxPreview extends HelixElement {
   }
 
   /**
+   * The frame's document has finished loading, so its listener exists.
+   *
+   * **The announcement is one shot and the parent can miss it.** The frame
+   * posts `helix-preview-ready` at the end of its own module evaluation and
+   * never repeats it, and `handleMessage` drops anything whose `source` is not
+   * `this.frame?.contentWindow`. That getter reads the render root, so it is
+   * null until this element has rendered once. A frame that loads before that
+   * render commits therefore announces into a guard that refuses it, `ready`
+   * stays false, and `send` returns early forever: the source is set, the
+   * markup is correct, and the preview is blank with nothing logged.
+   *
+   * **It is a race, so it hides in the one place nobody looks.** The frame is
+   * only fast enough to win when its document and its bundle are already in the
+   * HTTP cache, which is a client-side navigation and never a cold load.
+   * Measured on the theme builder reached by clicking a link: `ready` false, a
+   * 9,382 character `source` in place, and an empty preview, where the same
+   * page loaded directly rendered correctly.
+   *
+   * `load` closes it without a retry protocol and without weakening either
+   * check on the way in. The frame's script is `defer`, so it has run by the
+   * time this fires, which makes the event a guarantee that the listener is
+   * there rather than a guess that it might be. The message path stays, because
+   * it is the one that works when the frame is slower than the render, and
+   * either arriving is enough.
+   */
+  private readonly handleFrameLoad = (): void => {
+    this.ready = true
+    this.send()
+  }
+
+  /**
    * Takes messages from the frame.
    *
    * Two checks, and both earn their place.
@@ -288,6 +319,7 @@ export class HelixSandboxPreview extends HelixElement {
   protected override render(): TemplateResult {
     return html`<iframe
       part="frame"
+      @load=${this.handleFrameLoad}
       src=${this.src}
       title=${this.label}
       allow="clipboard-write *; fullscreen *"
