@@ -104,7 +104,7 @@ which nothing about Helix changed. Per-domain keeps the property that matters,
 that `@helix-io/headless@x` works with `@helix-io/web@x`.
 
 **Rust crates carry their own version and never inherit one.**
-`[workspace.package]` holds the edition, the licence and the toolchain floor,
+`[workspace.package]` holds the edition, the license and the toolchain floor,
 which are facts about the workspace; a version is a fact about a domain, and the
 workspace is about to hold two. This said "split it when Helix gains a Rust
 crate" until the split was done ahead of that crate, which is the right order:
@@ -159,6 +159,13 @@ both directions, so the day the flag changes is the day the workflow has to.
 
 - **No em dashes** in code, docs, comments, or copy. Use periods, colons,
   commas, or parentheses.
+- **American spelling** everywhere, comments and prose alike, held by
+  `check:dialect`. It is checked rather than asked for because it was asked for
+  once and did not survive: a sweep on 19 Aug 2026 took it from 658 occurrences
+  to 239, and four days later it was 1,685 across 386 files. An unwritten
+  convention is learned from the corpus, so prose in the wrong dialect teaches
+  the next contributor to write it, which is why comments are in scope and not
+  only copy. `bun run dialect` rewrites; `check:dialect` judges.
 - **Alphabetize** object keys, interface members, and exported types
   (case-insensitive). Skip where order is semantic: positional arguments,
   middleware chains, CSS box-side shorthand, export conditions.
