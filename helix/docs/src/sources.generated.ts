@@ -373,8 +373,17 @@ renders from.
 ## The manifest
 
 \`\`\`
+https://fusion.dev/helix/custom-elements.json
 @helix-io/web/custom-elements.json
 \`\`\`
+
+A URL and a package path, the same file either way. **The URL exists because this
+page's own argument required it**: an agent that found the library through
+\`llms.txt\` has this site and no checkout, and a specifier is reachable from a
+\`node_modules\` and from nowhere else. It was only the specifier until 24 Aug 2026,
+and the specifier did not resolve either: \`exports\` carried a \`./*\` pattern
+pointing at \`./dist/*/index.js\`, so the path two pages recommended was one
+\`require.resolve\` refused.
 
 Every element, every property with its literal type union, every event with its
 class, every slot, every part, every custom property. It is what the framework
@@ -435,7 +444,10 @@ a sentence. Generated from the same route registry the sitemap comes from, so a
 page cannot exist without appearing here and cannot appear here without
 existing.
 
-Start there rather than crawling. It is one request and it names all 149.
+Start there rather than crawling: one request, and it names every page on the
+site plus the two machine-readable surfaces above. No count here, because a
+number typed into prose is a number that goes stale, which the read of these pages
+on 24 Aug 2026 found five of.
 
 ## From a component's page
 
@@ -458,8 +470,8 @@ already here. \`llms.txt\` is the index, one request, and each family's \`.md\` 
 the document. Fetch the families you are using.
 
 **A search index.** The site has one for humans; there is nothing an agent can
-query yet, and \`llms.txt\` plus 149 documents is a smaller thing to read than
-most search APIs are to learn.
+query yet, and \`llms.txt\` plus the documents it names is a smaller thing to read
+than most search APIs are to learn.
 `,
   color: `---
 description: The roles, the ramps, and why the palette is solved rather than picked.

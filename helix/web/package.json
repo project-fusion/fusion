@@ -20,6 +20,7 @@
       "types": "./dist/*/index.d.ts",
       "default": "./dist/*/index.js"
     },
+    "./custom-elements.json": "./custom-elements.json",
     "./elements.css": "./elements.css",
     "./jsx": "./jsx.d.ts",
     "./svelte": "./svelte.d.ts",

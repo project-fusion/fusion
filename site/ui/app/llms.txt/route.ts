@@ -28,10 +28,29 @@ export async function GET() {
     '',
     'Every page on this site has a sibling `.md` at the same path plus the',
     'extension. The component reference and the design-system documentation are',
-    'generated from a custom elements manifest, which is published as part of',
-    '`@helix-io/web` and is the authoritative description of every component.',
+    'generated from a custom elements manifest, which is the authoritative',
+    'description of every component and is linked below.',
     '',
   ]
+
+  /* **The machine-readable surfaces first, because they are not pages.**
+     Everything after this is a document with a sentence about it; these three are
+     the vocabulary, and an agent that reads the manifest does not need to be told
+     in prose what a component accepts. It went above the sections rather than
+     below them for the reason `coding-agents.mdx` gives about starting here
+     rather than crawling: the useful order is the cheapest answer first.
+
+     The manifest had no URL at all until this was written. It was documented as
+     `@helix-io/web/custom-elements.json`, which is a specifier reachable from a
+     `node_modules`, on a page whose own argument is that an agent has this site
+     and no checkout. */
+  lines.push(
+    '## Machine-readable',
+    '',
+    `- [Custom elements manifest](${SITE}/helix/custom-elements.json): Every tag, property with its literal union, event with its class, slot, part and custom property. The vocabulary: a tag not in it does not exist.`,
+    `- [One family as data](${SITE}/helix/components/button.json): Any family's \`.md\` also answers as \`.json\`, the same content structured. Swap the slug.`,
+    '',
+  )
 
   for (const { routes, section } of routeSections()) {
     lines.push(`## ${section}`, '')
