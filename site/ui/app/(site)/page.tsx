@@ -324,6 +324,18 @@ export default function Home() {
       </section>
 
       <section data-band data-reveal>
+        {/* The second field. Same shape, same tuning, its own box: see
+            `.reelAuraLate`, and 225 for the measurement that says one taller box
+            draws a wash rather than a braid. */}
+        <helix-aura
+          class={styles.reelAuraLate}
+          gain={0.85}
+          scale={1.7}
+          shape="flow"
+          speed={1}
+          terminus={0.5625}
+        ></helix-aura>
+        <div className={styles.reelScrimLate} />
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text tone="subtle" variant="label">

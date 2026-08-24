@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.ts`](../helix/styles/src/tokens.ts) by
 `bun run tokens`. Do not edit.*
 
-177 semantic tokens in 15 categories, every one in exactly
+178 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -26,7 +26,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 67 |
+| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 70 |
 | `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 28 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 17 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 21 |
@@ -296,6 +296,7 @@ Position in the stack. Positional, never named after a component.
 
 | Token | Value | Reads |
 |---|---|---|
+| `--helix-layer-beneath` | `-1` | 2 |
 | `--helix-layer-base` | `0` | 5 |
 | `--helix-layer-raised` | `10` | 17 |
 | `--helix-layer-sticky` | `100` | 4 |

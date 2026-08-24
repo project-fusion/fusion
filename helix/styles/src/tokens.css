@@ -1186,6 +1186,14 @@
      offered them was wrong the moment `popover` stopped using it. A dead rung
      named after a component is worse than an absent one: it reads as a
      guarantee about where that component sits. */
+  /* Beneath the content of the box that declares it, and not beneath the page.
+     A negative index inside a stacking context reaches its own parent's
+     background and stops, which is exactly the job: a decorative field that is a
+     *child* of the band it lights has to sit behind that band's words, where the
+     same field as a sibling of the bands gets the order for free. The ramp began
+     at the document with nothing under it, so the only way to write this was a
+     raw -1, which is the thing a token ramp exists to stop. See 251. */
+  --helix-layer-beneath: -1;
   --helix-layer-base: 0;
   --helix-layer-raised: 10;
   --helix-layer-sticky: 100;

@@ -170,6 +170,74 @@
   position: absolute;
 }
 
+/* **A second field, because the aspect correction is per box.**
+ *
+ * 225 tried making the first one taller and measured why that fails: stretched
+ * over the 4690 reel the box goes from 1.41 to 3.66, and at `scale` 1.7 the
+ * braid does not thin out, it disappears, photographing as plain white. Raising
+ * `scale` to 4.41 in proportion brings light back and it is a diffuse wash
+ * rather than a braid. So the field is not one thing made longer, it is two
+ * things the same size.
+ *
+ * **Same box, so the tuning transfers exactly.** `terminus={0.5625}` is derived
+ * against a reel twice the viewport's height and reads 26.0 degrees at 1280,
+ * 23.1 at 1512 and 28.5 from 1920 up. A second box of the same `200svh` has the
+ * same aspect at every width, so it draws the same angle without a number being
+ * re-derived. That is the whole reason to repeat the size rather than fit the
+ * light to the gap.
+ *
+ * **Anchored to the band rather than to a pixel.** It sits inside the section
+ * that opens the second transparent run, so it moves when the copy above it
+ * does; `.reel > section` is already positioned, which makes that section the
+ * containing block. The two opaque bands are what bound it in practice: 225
+ * measured that only the showcase and the closing band paint a background, and
+ * they hide the light rather than being lit by it.
+ *
+ * **The mask fades in as well as out**, which the first one does not need. That
+ * one starts at the top of the page where there is nothing above it; this one
+ * starts at a band edge with an opaque band over it, so without the top stop the
+ * light would appear at a hard horizontal line. */
+.reelAuraLate {
+  /* **Behind the band's own words, which the first field gets for free.** That
+     one is a sibling *before* every section, and the sections are positioned, so
+     they stack over it in tree order. This one is a child of the band it lights,
+     where an absolutely positioned element paints above static flow content: the
+     first attempt washed out the two headings it was meant to sit behind.
+     `data-reveal` animates opacity, so the section is already a stacking
+     context, which is what keeps this negative index inside the band rather than
+     sending it behind the page. */
+  z-index: var(--helix-layer-beneath);
+  block-size: 200svh;
+  inset-block-start: 0;
+  inset-inline: 0;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 62%, transparent 100%);
+  pointer-events: none;
+  position: absolute;
+}
+
+.reelScrimLate {
+  /* **Behind the band's own words, which the first field gets for free.** That
+     one is a sibling *before* every section, and the sections are positioned, so
+     they stack over it in tree order. This one is a child of the band it lights,
+     where an absolutely positioned element paints above static flow content: the
+     first attempt washed out the two headings it was meant to sit behind.
+     `data-reveal` animates opacity, so the section is already a stacking
+     context, which is what keeps this negative index inside the band rather than
+     sending it behind the page. */
+  z-index: var(--helix-layer-beneath);
+  background: radial-gradient(
+    ellipse 62% 26% at 50% 32%,
+    color-mix(in srgb, var(--helix-color-background) 70%, transparent) 0%,
+    color-mix(in srgb, var(--helix-color-background) 34%, transparent) 55%,
+    color-mix(in srgb, var(--helix-color-background) 0%, transparent) 100%
+  );
+  block-size: 200svh;
+  inset-block-start: 0;
+  inset-inline: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
 /* Every band sits over the light, so every band has to be positioned or it
    paints under a fixed element instead of over it. */
 .reel > section {
