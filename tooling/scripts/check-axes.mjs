@@ -60,7 +60,22 @@ const AXES = {
      It was in the first sketch of this registry and nothing needs it, which is
      the same test `UNSWEPT` applies to itself. */
   material: ['frosted', 'glass', 'transparent'],
-  /* **These are the states of `ThemeIntent.separation`'s mechanisms, one to
+  /* **`outlined` is here and on `emphasis`, and that is not a collision because
+     the two axes partition the library.** Measured 24 Aug 2026 from the styled
+     manifest: 11 families declare `emphasis`, 5 declare `separation`, and none
+     declares both. Emphasis is asked of controls and marks, how loud this one
+     is; separation is asked of containers, where the surface ends. `outlined`
+     means bordered in each, one word with one meaning applied to two kinds of
+     thing, and `solid` beside `filled` and `ghost` beside `plain` are the same
+     pattern: near-synonyms that never meet.
+
+     What was never true is that anything stopped a family declaring both, and
+     the day one does `outlined` is two answers to one question. The guard below
+     refuses it. A guard rather than a rename, because the words are right where
+     they are: a button is not `plain` and a card is not `ghost`, and one merged
+     list would hand every component the other's vocabulary. See 254.
+
+     **These are the states of `ThemeIntent.separation`'s mechanisms, one to
      one, and the two word forms are the point rather than a collision.** The
      theme names what does the separating and a component names what the surface
      then is: `border` and `outlined`, `fill` and `filled`, `shadow` and
@@ -300,6 +315,37 @@ for (const [group, families] of inGroups) {
       `${group}: ${count} of ${families.size} declare \`${axis}\`, and ${missing.join(', ')} do not`,
     )
   }
+}
+
+/* **`outlined` is in two vocabularies, and no component may be asked both.**
+ *
+ * `emphasis` is `ghost | outlined | solid | subtle` and `separation` is
+ * `elevated | filled | outlined | plain`, and `outlined` is in both verbatim,
+ * with `solid` beside `filled` and `ghost` beside `plain` as near-synonyms. That
+ * looks like a collision and is not one, because the two axes partition the
+ * library: measured, 11 families declare `emphasis`, 5 declare `separation`, and
+ * **none declares both**. Emphasis is asked of controls and marks, how loud this
+ * one is; separation is asked of containers, where the surface ends. `outlined`
+ * means bordered in both, which is one word with one meaning applied to two kinds
+ * of thing.
+ *
+ * What has never been true is that anything stopped a family from declaring both,
+ * and the day one does, `outlined` becomes two answers to one question with
+ * nothing to say which wins. This is that stop. It is a guard rather than a
+ * rename because the words are right: a button is not `plain` and a card is not
+ * `ghost`, and merging the two lists would hand every component the other's
+ * vocabulary. See 254. */
+const bothSurfaceAxes = [...declaresAxis]
+  .filter(([, axes]) => axes.has('emphasis') && axes.has('separation'))
+  .map(([family]) => family)
+  .sort()
+
+for (const family of bothSurfaceAxes) {
+  problems.push(
+    `${family}: declares \`emphasis\` and \`separation\` together, and they share the value ` +
+      '`outlined`. One of the two has to lose it here, or the family has to pick the axis it is ' +
+      'really on: emphasis is how loud a control is, separation is where a container ends.',
+  )
 }
 
 if (problems.length > 0) {
