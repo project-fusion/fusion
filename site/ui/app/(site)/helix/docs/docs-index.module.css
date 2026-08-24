@@ -12,7 +12,19 @@
  */
 .section {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  /* **More below the last row than above the next heading**, which is not
+     symmetry for its own sake: the rule belongs to the section that follows it,
+     so it should sit nearer the heading it introduces than the rows it closes
+     off. Measured before this, the gap was zero, and a row's hover rectangle
+     landed exactly on the rule. */
+  padding-block-end: var(--helix-space-2xl);
   padding-block-start: var(--helix-space-lg);
+}
+
+/* The last section has no rule under it, so its end padding is the footer's
+   business rather than a gap before nothing. */
+.section:last-of-type {
+  padding-block-end: var(--helix-space-none);
 }
 
 /* Two columns where there is room, one where there is not, and the section
