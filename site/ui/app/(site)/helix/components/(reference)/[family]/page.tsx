@@ -666,7 +666,15 @@ export default async function FamilyDocs({
               <ComponentPreview
                 css={headline.css}
                 html={headline.html}
-                sandboxHref={`/helix/sandbox?e=${family.slug}.${headline.slug}`}
+                /* **The tier travels with the link.** A reader on the base
+                   reference who opens the sandbox was looking at the headless
+                   API and arrived at the styled example, because the sandbox
+                   reads its own tier from a preference this page had already
+                   overridden. Carried only when it was forced, so an ordinary
+                   link stays `?e=family.slug`. */
+                sandboxHref={`/helix/sandbox?e=${family.slug}.${headline.slug}${
+                  forced ? `&tier=${forced}` : ''
+                }`}
               />
             ) : (
               <helix-empty>
@@ -718,7 +726,9 @@ export default async function FamilyDocs({
                           foreground on hover. */}
                       <Link
                         data-link="quiet"
-                        href={`/helix/sandbox?e=${family.slug}.${example.slug}`}
+                        href={`/helix/sandbox?e=${family.slug}.${example.slug}${
+                          forced ? `&tier=${forced}` : ''
+                        }`}
                       >
                         {example.label}
                       </Link>

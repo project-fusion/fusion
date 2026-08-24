@@ -18,6 +18,11 @@
  * one address rather than two settings and a reader should be able to edit it
  * by hand.
  *
+ * `tier` is the second word and it is one for a different reason: the reference
+ * pages already took `?tier=`, and one concept with two spellings is worse than
+ * a long key. It was `t` for a day, which failed the rule anyway, since `base`
+ * and `styled` do not say "tier" the way `centered` says "layout".
+ *
  * `panes` lists what is rendered rather than what is not. Naming the absences
  * reads better right up until a region is off by default, and the status bar
  * is: "hidden" would then have to carry the status bar in the common case and
@@ -138,7 +143,7 @@ export const readUrlState = (search: string): SandboxUrlState => {
     layout: oneOf(params.get('l'), LAYOUTS, DEFAULTS.layout),
     panes,
     syntax: oneOf(params.get('x'), SYNTAXES, DEFAULTS.syntax),
-    tier: oneOf(params.get('t'), TIERS, null as never) || null,
+    tier: oneOf(params.get('tier'), TIERS, null as never) || null,
   }
 }
 
@@ -169,7 +174,7 @@ export const writeUrlState = (state: SandboxUrlState): string => {
     params.set('c', state.colorMode)
   }
   if (state.tier) {
-    params.set('t', state.tier)
+    params.set('tier', state.tier)
   }
   // In the order the regions appear, not the order they were switched on, and
   // only when the set differs from the one a fresh sandbox has.
