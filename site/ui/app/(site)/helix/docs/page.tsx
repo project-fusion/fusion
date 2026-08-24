@@ -1,6 +1,7 @@
 import { navigation } from '@helix-io/docs'
 import Link from 'next/link'
-import styles from '../../vertical-page.module.css'
+import shell from '../../vertical-page.module.css'
+import styles from './docs-index.module.css'
 
 /**
  * The guides index, which is a page now rather than a redirect.
@@ -28,36 +29,48 @@ export const metadata = {
 
 export default function DocsIndex() {
   return (
-    <helix-flex class={styles.verticalShell} data-shell direction="column" gap="xl">
+    <helix-flex class={shell.verticalShell} data-shell direction="column" gap="xl">
       <helix-flex direction="column" gap="sm">
         <helix-flex align="center" data-density="sm" gap="xs">
           <helix-tag>Helix</helix-tag>
         </helix-flex>
         <helix-text as="h1">Docs</helix-text>
-        <helix-text as="p" class={styles.lede} tone="muted">
+        <helix-text as="p" class={shell.lede} tone="muted">
           Install it, theme it, and the ideas underneath. Every family's own API lives on its page
           under Components; these are the guides that cross families.
         </helix-text>
       </helix-flex>
 
-      <helix-grid columns={2} gap="xl">
-        {navigation().map((section) => (
-          <helix-card key={section.title} separation="outlined">
-            <helix-text as="h2" slot="header" variant="title">
-              {section.title}
-            </helix-text>
-            <helix-list kind="unordered">
-              {section.pages.map((page) => (
-                <helix-list-item key={page.slug}>
-                  <Link data-link="subtle" href={`/helix/docs/${page.slug}`}>
-                    {page.title}
-                  </Link>
-                </helix-list-item>
-              ))}
-            </helix-list>
-          </helix-card>
-        ))}
-      </helix-grid>
+      {/* **Descriptions, which is what the sidebar cannot show.** Every page
+          carries a one-line summary in its frontmatter and this rendered none of
+          them, so the index was the navigation again in boxes: the same six
+          sections and the same forty-two titles a reader already had two inches
+          to the left, at 3,838px of page. A card per section added a border and
+          an inset and no information.
+
+          The sections flow rather than sitting in a grid of equal-height cards,
+          because they have six, seven, ten and eleven pages: any row of two
+          leaves one of them padded to the other's height, which is the void this
+          page opened with and is a shape the content will keep producing. */}
+      {navigation().map((section) => (
+        <helix-flex class={styles.section} direction="column" gap="md" key={section.title}>
+          <helix-text as="h2" variant="subheading">
+            {section.title}
+          </helix-text>
+          <div className={styles.pages}>
+            {section.pages.map((page) => (
+              <Link className={styles.page} href={`/helix/docs/${page.slug}`} key={page.slug}>
+                <helix-text class={styles.title} variant="body-strong">
+                  {page.title}
+                </helix-text>
+                <helix-text as="span" class={styles.summary} variant="caption">
+                  {page.description}
+                </helix-text>
+              </Link>
+            ))}
+          </div>
+        </helix-flex>
+      ))}
     </helix-flex>
   )
 }
