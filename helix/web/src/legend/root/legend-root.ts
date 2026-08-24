@@ -1,6 +1,6 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseLegend } from '@helix-io/headless/legend'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../chart/series.css.js'
 import { styles } from './legend-root.css.js'
@@ -28,6 +28,8 @@ import { styles } from './legend-root.css.js'
  * @cssproperty --legend-direction - `row`, which wraps, or `column`.
  * @cssproperty --legend-gap - Space between entries.
  * @cssproperty --legend-swatch-size - Size of the color patch.
+ * @cssproperty --legend-swatch-stroke - Width of the edge an `outlined` or
+ *   `subtle` swatch is drawn with.
  */
 @customElement('helix-legend')
 export class HelixLegend extends HelixBaseLegend {
@@ -53,6 +55,102 @@ export class HelixLegend extends HelixBaseLegend {
    */
   @property({ reflect: true })
   placement?: 'end' | 'start'
+
+  /**
+   * How much ink the swatches claim.
+   *
+   * **The same axis as the chart's, with the same values, because a legend that
+   * does not match its chart is worse than no legend.** A key whose swatches are
+   * solid while the columns they key are outlined tells a reader the two are
+   * different kinds of fact, which is the exact thing `outlined` on a chart
+   * exists to say. `outlined` is the series color as an edge over a fill faded
+   * toward the page, `subtle` is that edge over a wash, and absent is the filled
+   * patch, per the rule that a reflected property takes no default.
+   *
+   * **The legend declares it rather than reading it off the chart, and that is a
+   * decision rather than a shortcut.** A legend has no reference to a chart: it
+   * points at a *table* through `for`, which is what lets two charts share one,
+   * and the chart points at the same table independently. Giving it a chart to
+   * read would make a list of names depend on a drawing it is deliberately not
+   * part of, and would still not answer the per-series case, where `outlined` is
+   * a set of names rather than one value. Two attributes carrying the same word
+   * is the honest cost of the legend being a sibling.
+   */
+  @property({ reflect: true })
+  emphasis?: 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * What the swatches are made of.
+   *
+   * `glass` thins whatever emphasis drew, the way it does on a column, so a
+   * legend beside a glass chart is in the same substance as the chart. Scaled by
+   * `--helix-material-opacity`, so a theme that is more see-through everywhere is
+   * more see-through here.
+   */
+  @property({ reflect: true })
+  material?: 'glass'
+
+  /**
+   * Which entries are drawn as an outline rather than a fill, by name.
+   *
+   * Space or comma separated and matched against the names this legend is
+   * showing, which are the same names the chart matches its own `outlined`
+   * against, since both read one table. So a chart and its key say the same
+   * thing the same way: `outlined="Forecast"` on both.
+   */
+  @property()
+  outlined?: string
+
+  /** Which entries are drawn as a wash of their color, by name. Matched as `outlined` is. */
+  @property()
+  subtle?: string
+
+  /** Which entries are glass rather than solid, by name. Matched as `outlined` is. */
+  @property()
+  glass?: string
+
+  /**
+   * Marks each entry with the treatment its name was given.
+   *
+   * After the update rather than during it, because the entries are what the
+   * tier below rendered and matching happens against the names it chose to show.
+   * The same shape `BarChart.updated` uses on its bars, and for the same reason:
+   * a per-series answer cannot be a selector, since CSS cannot match an
+   * attribute against a list.
+   */
+  protected override updated(changed: PropertyValues<this>): void {
+    super.updated(changed)
+
+    const showing = this.names().map((name) => name.trim().toLowerCase())
+    const slots = (value: string | undefined): Set<number> =>
+      new Set(
+        (value ?? '')
+          .split(/[\s,]+/)
+          .filter(Boolean)
+          .map((name) => name.toLowerCase())
+          .flatMap((name) => {
+            const at = showing.indexOf(name)
+            return at < 0 ? [] : [at]
+          }),
+      )
+
+    const mark = (entry: Element, name: string, value: string | undefined): void => {
+      if (value) {
+        entry.setAttribute(`data-${name}`, value)
+      } else {
+        entry.removeAttribute(`data-${name}`)
+      }
+    }
+
+    const outlined = slots(this.outlined)
+    const subtle = slots(this.subtle)
+    const glass = slots(this.glass)
+    const entries = [...this.renderRoot.querySelectorAll('[part="entry"]')]
+    for (const [at, entry] of entries.entries()) {
+      mark(entry, 'emphasis', outlined.has(at) ? 'outlined' : subtle.has(at) ? 'subtle' : undefined)
+      mark(entry, 'material', glass.has(at) ? 'glass' : undefined)
+    }
+  }
 }
 
 declare global {

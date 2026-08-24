@@ -2603,9 +2603,14 @@ custom property set inline would be the headless tier naming a color.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `emphasis` | `emphasis` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much ink the swatches claim. |
 | `entries` | `entries` | `'categories' \| 'series' \| undefined` | - | `HelixBaseLegend` | Which way to read the table. |
 | `for` | `for` | `string` | `''` | `HelixBaseLegend` | The id of the table to take the names from. |
+| `glass` | `glass` | `string \| undefined` | - | - | Which entries are glass rather than solid, by name. Matched as `outlined` is. |
+| `material` | `material` | `'glass' \| undefined` | - | - | What the swatches are made of. |
+| `outlined` | `outlined` | `string \| undefined` | - | - | Which entries are drawn as an outline rather than a fill, by name. |
 | `placement` | `placement` | `'end' \| 'start' \| undefined` | - | - | Where the legend sits and which way its entries run. |
+| `subtle` | `subtle` | `string \| undefined` | - | - | Which entries are drawn as a wash of their color, by name. Matched as `outlined` is. |
 
 #### Parts
 
@@ -2623,6 +2628,7 @@ custom property set inline would be the headless tier naming a color.
 | `--legend-direction` | `row`, which wraps, or `column`. |
 | `--legend-gap` | Space between entries. |
 | `--legend-swatch-size` | Size of the color patch. |
+| `--legend-swatch-stroke` | Width of the edge an `outlined` or `subtle` swatch is drawn with. |
 
 ## Line Chart
 
@@ -3143,6 +3149,7 @@ reading are what say how far past.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `band` | `band` | `MeterBand \| undefined` | - | `HelixBaseMeter` | The band, said outright, where the three thresholds cannot say it. |
+| `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the reading claims. |
 | `high` | `high` | `number \| undefined` | - | `HelixBaseMeter` | Bottom of the high band. Absent leaves the range unbanded. |
 | `label` | `label` | `string` | `'Meter'` | `HelixBaseMeter` | Accessible name for the reading. |
 | `low` | `low` | `number \| undefined` | - | `HelixBaseMeter` | Top of the low band. Absent leaves the range unbanded. |
@@ -3757,6 +3764,7 @@ thing advancing.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the bar claims. |
 | `fraction` | - | `number` | - | `HelixBaseProgress` | What is done, as a fraction of the whole, between 0 and 1. |
 | `indeterminate` | `indeterminate` | `boolean` | `false` | `HelixBaseProgress` | Whether the work has a knowable end. |
 | `label` | `label` | `string` | `'Progress'` | `HelixBaseProgress` | Accessible name for what is in progress. |
@@ -6179,6 +6187,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 | `delayOut` | `delay-out` | `number` | `100` | `HelixBaseTooltip` | How long the bubble stays after the pointer leaves, in milliseconds. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseTooltip` | Whether the tooltip never shows. |
 | `for` | `for` | `string` | `''` | `HelixBaseTooltip` | The id of the element this describes, in this tooltip's own tree. |
+| `material` | `material` | `'glass' \| undefined` | - | - | What the bubble is made of. |
 | `offset` | `offset` | `number` | `8` | `HelixBaseTooltip` | Space between the trigger and the point of the bubble, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `Placement` | `'top'` | `HelixBaseTooltip` | Preferred side. It moves if that side does not fit. |
@@ -6220,6 +6229,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 | Property | Description |
 | --- | --- |
 | `--tooltip-arrow-size` | Size of the point at the bubble's edge. |
+| `--tooltip-backdrop` | Blur behind a `glass` bubble. |
 | `--tooltip-background-color` | Fill of the bubble. |
 | `--tooltip-max-inline-size` | Widest the bubble grows before wrapping. |
 

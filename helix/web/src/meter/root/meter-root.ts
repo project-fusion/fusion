@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseMeter } from '@helix-io/headless/meter'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './meter-root.css.js'
 
 /**
@@ -57,6 +58,25 @@ import { styles } from './meter-root.css.js'
  */
 @customElement('helix-meter')
 export class HelixMeter extends HelixBaseMeter {
+  /**
+   * How much ink the reading claims.
+   *
+   * `subtle` is the reading as a wash of its own color: still legible, no longer
+   * the loudest thing in the region. The case is a dashboard: several meters where one is the number being watched and the rest are context, which is a fact about the region rather than about any one of them and is exactly what this axis is for.
+   *
+   * **One value and not the four, which is the judgment this axis asks for
+   * rather than a partial sweep.** `ghost` would leave a track with nothing in
+   * it, which is not a quiet reading but an absent one. `outlined` is the
+   * interesting refusal: `BarChart` makes it work by keeping the area and fading
+   * it toward the page, so an outlined column still encodes its value, and the
+   * reason it earns the value there is that a chart has other series for the
+   * outlined one to be a *different kind of fact from* (a forecast, a target,
+   * a budget). A meter reports one quantity against its own range, and the bands it already carries say which part of that range it is in, so there is no second kind of fact for an outline to name. `solid` is the resting state and is written by not
+   * writing it, per the rule that a reflected property takes no default.
+   */
+  @property({ reflect: true })
+  emphasis?: 'subtle'
+
   static override styles: CSSResultGroup = styles
 }
 

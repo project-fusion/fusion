@@ -70,8 +70,61 @@
    no selector able to use it. Measured, `::part(bar)[data-series="2"]` is
    dropped at parse time. `data-series` stays, because it is what a spec asserts
    and what a document rule reaching in through the light DOM would still use. */
+/* **The axes, drawn so a key matches the chart it keys.** Two knobs and not a
+   rule per combination, the same shape `bar-chart` uses and for the same reason:
+   `--_legend-area` is what emphasis draws and `--_legend-through` is how much of
+   it material lets past, so the two compose instead of multiplying into a rule
+   for every pairing.
+
+   A swatch is a box and a column is an SVG mark, so the declarations differ and
+   the *treatments* do not: `fill` here is `background-color`, `stroke` is a
+   border, and the fill under an outline is the same `60%` fade toward the page
+   the chart settled on after two arrangements that read in one mode only. Mixing
+   toward `transparent` rather than setting `opacity`, because `opacity` on the
+   box would take the border with it and the edge is the part that has to
+   survive. */
 [part="entry"] [part="swatch"] {
-  background-color: var(--chart-series);
+  background-color: color-mix(
+    in oklab,
+    var(--chart-series) calc(var(--_legend-area, 1) * var(--_legend-through, 1) * 100%),
+    transparent
+  );
+}
+
+/* The edge, and the fill stays under it, which is what `outlined` means on a
+   mark whose area encodes a value rather than on a control whose fill is the
+   loud part. */
+[part="entry"][data-emphasis="outlined"] [part="swatch"],
+:host([emphasis="outlined"]) [part="entry"]:not([data-emphasis]) [part="swatch"] {
+  background-color: color-mix(
+    in oklab,
+    var(--_legend-shade) calc(var(--_legend-through, 1) * 100%),
+    transparent
+  );
+  border: var(--legend-swatch-stroke, var(--helix-border-thick)) solid
+    color-mix(in oklab, var(--chart-series) calc(var(--_legend-through, 1) * 100%), transparent);
+}
+
+/* A wash under the same edge, which is the quiet end of the axis. */
+[part="entry"][data-emphasis="subtle"] [part="swatch"],
+:host([emphasis="subtle"]) [part="entry"]:not([data-emphasis]) [part="swatch"] {
+  border: var(--legend-swatch-stroke, var(--helix-border-thick)) solid
+    color-mix(in oklab, var(--chart-series) calc(var(--_legend-through, 1) * 100%), transparent);
+
+  --_legend-area: 0.2;
+}
+
+[part="swatch"] {
+  --_legend-shade: color-mix(in oklab, var(--chart-series) 60%, var(--helix-color-background));
+}
+
+/* Glass, thinning whatever emphasis drew, so an outlined swatch goes see-through
+   at its edge rather than the material being a no-op on a box with no fill. That
+   corner is the one `bar-chart` measured as inert before the two knobs were
+   split apart. */
+[part="entry"][data-material="glass"] [part="swatch"],
+:host([material="glass"]) [part="entry"]:not([data-material]) [part="swatch"] {
+  --_legend-through: calc(0.62 * var(--helix-material-opacity));
 }
 
 /* Print: what the colours in the drawing beside it mean.

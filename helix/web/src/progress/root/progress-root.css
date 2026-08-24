@@ -374,3 +374,38 @@
     print-color-adjust: exact;
   }
 }
+
+/* **Subtle, which is the quiet end of the axis: the bar keeps its area and stops
+   claiming to be the point.** A wash of its own color rather than a different
+   color, so what it means does not change with how loudly it is said: `tone` is
+   the other axis and this one must not borrow from it.
+
+   `color-mix` toward the track rather than an `opacity`, because the indicator
+   sits on a groove that is already a surface: fading toward transparent would
+   show the groove through it and the reading would depend on what the groove
+   happened to be. Mixing toward the groove's own token lands where a translucent
+   fill would, without the compositing.
+
+   **Two rules, because the shapes do not paint the same way.** A bar is a box
+   with a `background-color` and the ring is an SVG circle with a `stroke`, which
+   this file already splits every other paint decision across. A single
+   `background-color` rule would have been silently inert on the ring, which is
+   the same quiet failure a `[part=]` selector for an unrendered part has.
+
+   The indeterminate segment needs nothing of its own: it is this same
+   `[part="indicator"]`, running rather than filling. */
+:host([emphasis="subtle"]) [part="indicator"] {
+  background-color: color-mix(
+    in oklab,
+    var(--progress-color, var(--helix-color-primary)) 30%,
+    var(--progress-track-color, var(--helix-color-surface-sunken))
+  );
+}
+
+:host([emphasis="subtle"][shape="ring"]) [part="indicator"] {
+  stroke: color-mix(
+    in oklab,
+    var(--progress-color, var(--helix-color-primary)) 30%,
+    var(--progress-track-color, var(--helix-color-surface-sunken))
+  );
+}

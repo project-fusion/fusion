@@ -22300,14 +22300,14 @@
             },
             {
               "kind": "method",
-              "name": "#names",
-              "privacy": "private",
+              "name": "names",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "string[]"
                 }
               },
-              "description": "The names, in the order the chart will draw them."
+              "description": "The names, in the order the chart will draw them.\n\n`protected` rather than private because the styled tier has to match a\nper-series treatment against them, the way `BarChart` matches `outlined` and\n`subtle` against the headings its table gives. A legend keys a chart, so the\ntwo answer the same question about the same series, and the tier that paints\ncannot do that without knowing which entry is which."
             },
             {
               "kind": "field",

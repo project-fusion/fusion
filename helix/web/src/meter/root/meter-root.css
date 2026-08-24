@@ -60,7 +60,9 @@
    inline start, so it grows from the same edge in both writing directions
    without the component knowing which one it is in. */
 [part="indicator"] {
-  background-color: var(--meter-color, var(--helix-color-primary));
+  background-color: var(--_meter-hue);
+
+  --_meter-hue: var(--meter-color, var(--helix-color-primary));
   block-size: 100%;
   border-radius: inherit;
   inline-size: 100%;
@@ -79,15 +81,21 @@
    a reading that only says "poor" in red says nothing to a reader who cannot see
    red, and says nothing at all in a screenshot printed in gray. */
 [part="indicator"][data-band="good"] {
-  background-color: var(--meter-color, var(--helix-color-success));
+  background-color: var(--_meter-hue);
+
+  --_meter-hue: var(--meter-color, var(--helix-color-success));
 }
 
 [part="indicator"][data-band="fair"] {
-  background-color: var(--meter-color, var(--helix-color-warning));
+  background-color: var(--_meter-hue);
+
+  --_meter-hue: var(--meter-color, var(--helix-color-warning));
 }
 
 [part="indicator"][data-band="poor"] {
-  background-color: var(--meter-color, var(--helix-color-danger));
+  background-color: var(--_meter-hue);
+
+  --_meter-hue: var(--meter-color, var(--helix-color-danger));
 }
 
 /* Past an end, where the bar has run out of room to say so.
@@ -223,7 +231,13 @@
 :host([shape="arc"]) [part="indicator"],
 :host([shape="ring"]) [part="indicator"] {
   scale: none;
-  stroke: var(--helix-color-foreground-muted);
+  stroke: var(--_meter-hue);
+
+  /* The ring's unbanded ink, which is muted rather than the bar's primary and
+     has been since it was written. Named here rather than left in the `stroke`
+     declaration so `emphasis` has one property to quieten, whichever shape and
+     whichever band chose the color. */
+  --_meter-hue: var(--helix-color-foreground-muted);
   stroke-dasharray: var(--meter-along) 100;
   stroke-linecap: round;
   transition: stroke-dasharray var(--helix-duration-normal) var(--helix-easing-standard);
@@ -255,17 +269,23 @@
    already resolved and written onto the element that carries the reading. */
 :host([shape="arc"]) [part="indicator"][data-band="good"],
 :host([shape="ring"]) [part="indicator"][data-band="good"] {
-  stroke: var(--helix-color-success);
+  stroke: var(--_meter-hue);
+
+  --_meter-hue: var(--helix-color-success);
 }
 
 :host([shape="arc"]) [part="indicator"][data-band="fair"],
 :host([shape="ring"]) [part="indicator"][data-band="fair"] {
-  stroke: var(--helix-color-warning);
+  stroke: var(--_meter-hue);
+
+  --_meter-hue: var(--helix-color-warning);
 }
 
 :host([shape="arc"]) [part="indicator"][data-band="poor"],
 :host([shape="ring"]) [part="indicator"][data-band="poor"] {
-  stroke: var(--helix-color-danger);
+  stroke: var(--_meter-hue);
+
+  --_meter-hue: var(--helix-color-danger);
 }
 
 /* In the middle, which is why the round shapes exist at all. */
@@ -290,4 +310,40 @@
     box-shadow: none;
     print-color-adjust: exact;
   }
+}
+
+/* **Subtle, which is the quiet end of the axis: the reading keeps its area and
+   stops claiming to be the point.** A wash of its own color rather than a
+   different color, so what it means does not change with how loudly it is said:
+   the bands are the other axis and this one must not borrow from them. Written
+   against `--_meter-hue`, which is whatever the band or the shape chose, so one
+   pair of rules quietens all four colors in all three shapes.
+
+   `color-mix` toward the track rather than an `opacity`, because the indicator
+   sits on a groove that is already a surface: fading toward transparent would
+   show the groove through it and the reading would depend on what the groove
+   happened to be. Mixing toward the groove's own token lands where a translucent
+   fill would, without the compositing.
+
+   **Two rules and not one, because the shapes do not paint the same way.** A bar
+   is a box with a `background-color` and a ring is an SVG circle with a
+   `stroke`, which is the same split the bands themselves are written across four
+   rules for. A single `background-color` rule here would have been silently inert
+   on two of the three shapes, which is the failure mode a `[part=]` selector for
+   an unrendered part has and is just as quiet. */
+:host([emphasis="subtle"]) [part="indicator"] {
+  background-color: color-mix(
+    in oklab,
+    var(--_meter-hue) 30%,
+    var(--meter-track-color, var(--helix-color-surface-sunken))
+  );
+}
+
+:host([emphasis="subtle"][shape="arc"]) [part="indicator"],
+:host([emphasis="subtle"][shape="ring"]) [part="indicator"] {
+  stroke: color-mix(
+    in oklab,
+    var(--_meter-hue) 30%,
+    var(--meter-track-color, var(--helix-color-surface-sunken))
+  );
 }

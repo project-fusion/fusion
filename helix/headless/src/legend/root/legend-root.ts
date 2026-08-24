@@ -83,8 +83,16 @@ export class HelixBaseLegend extends HelixElement {
     }
   }
 
-  /** The names, in the order the chart will draw them. */
-  #names(): string[] {
+  /**
+   * The names, in the order the chart will draw them.
+   *
+   * `protected` rather than private because the styled tier has to match a
+   * per-series treatment against them, the way `BarChart` matches `outlined` and
+   * `subtle` against the headings its table gives. A legend keys a chart, so the
+   * two answer the same question about the same series, and the tier that paints
+   * cannot do that without knowing which entry is which.
+   */
+  protected names(): string[] {
     const series: Series[] = this.source.series
     return this.entries === 'categories'
       ? (series[0]?.points.map((point) => point.label) ?? [])
@@ -101,7 +109,7 @@ export class HelixBaseLegend extends HelixElement {
      * is still a hue collision and a chart with nine series has a worse problem
      * than the palette does; twenty-four is where it stops being able to help. */
     return html`<ul part="list" role="list">
-      ${this.#names().map(
+      ${this.names().map(
         (name, index) => html`<li
           data-series=${(index % PALETTE) + 1}
           part="entry"

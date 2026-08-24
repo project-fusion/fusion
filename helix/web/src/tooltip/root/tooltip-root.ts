@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseTooltip } from '@helix-io/headless/tooltip'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './tooltip-root.css.js'
 
 /**
@@ -21,11 +22,34 @@ import { styles } from './tooltip-root.css.js'
  * @documentation https://helix.fusion.dev/components/tooltip
  *
  * @cssproperty --tooltip-arrow-size - Size of the point at the bubble's edge.
+ * @cssproperty --tooltip-backdrop - Blur behind a `glass` bubble.
  * @cssproperty --tooltip-background-color - Fill of the bubble.
  * @cssproperty --tooltip-max-inline-size - Widest the bubble grows before wrapping.
  */
 @customElement('helix-tooltip')
 export class HelixTooltip extends HelixBaseTooltip {
+  /**
+   * What the bubble is made of.
+   *
+   * Absent is the inverse bubble, a dark surface over a light page, which is
+   * what a hint over content the theme cannot know has always been here. `glass`
+   * makes it the page's own translucent ground instead, for a page whose surfaces
+   * are glass, so a hint over a glass header is not the one opaque slab on it.
+   *
+   * **It flips the ink and adds an edge, which no other family carrying this axis
+   * has to do.** A card is already the page's surface, so glass swaps one ground
+   * for another; this one starts inverse, and `--helix-material-translucent` is
+   * the page's ground, so taking it without the foreground would put light ink on
+   * a light bubble. An inverse bubble is told from the page by being its
+   * opposite and a glass one has to be told from what is behind it, which is why
+   * the border arrives with the material rather than being there all along.
+   *
+   * The strength is the theme's: `--helix-material-translucent` and
+   * `--helix-material-backdrop` are what the policy moves.
+   */
+  @property({ reflect: true })
+  material?: 'glass'
+
   static override styles: CSSResultGroup = styles
 }
 

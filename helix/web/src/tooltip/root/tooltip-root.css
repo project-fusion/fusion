@@ -89,6 +89,45 @@
   rotate: 45deg;
 }
 
+/* **Glass, and it takes the ink with it, which is what makes this different from
+   every other family that carries the axis.** A card and a drawer are already
+   the page's own surface, so glass swaps an opaque ground for a translucent one
+   and nothing else has to move. A tooltip is not: its resting state is
+   `surface-inverse` with `foreground-inverse` on it, a dark bubble over a light
+   page, and `--helix-material-translucent` is the *page's* ground, `neutral-0`
+   in light and `neutral-900` in dark. Take the one without the other and a light
+   bubble carries light ink.
+
+   So the whole pair flips. The ground becomes the page's translucent one, the
+   ink becomes the page's, and the bubble gains the hairline it did not need
+   while it was the darkest thing on the screen: an inverse bubble is told from
+   the page by being the opposite of it, and a glass one has to be told from what
+   is *behind* it, which is the page.
+
+   The arrow follows the bubble in both, because a point in a different substance
+   from the surface it is on is a seam rather than a point.
+
+   **The edge is a hairline and not `--helix-border-floating`**, which is the
+   theme's answer for a floating surface and defaults to zero because floating is
+   shadow-first. This bubble has no shadow: `border: none` and no `box-shadow`
+   anywhere in this file, because being the darkest thing on the page was the
+   whole of how it separated. Take the inversion away and it has neither, so the
+   replacement cannot be a token whose resting value is nothing. The component is
+   what knows the inversion went, so the component is what replaces it.
+
+   The strength is the theme's, and both hooks still win, so a consumer who set
+   `--tooltip-background-color` gets it in either material. */
+:host([material="glass"]) [part="tooltip"],
+:host([material="glass"]) [part="arrow"] {
+  backdrop-filter: var(--tooltip-backdrop, var(--helix-material-backdrop));
+  background-color: var(--tooltip-background-color, var(--helix-material-translucent));
+}
+
+:host([material="glass"]) [part="tooltip"] {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  color: var(--helix-color-foreground);
+}
+
 [part="tooltip"][data-placement^="bottom"] [part="arrow"] {
   inset-block-start: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
 }

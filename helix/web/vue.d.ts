@@ -3203,6 +3203,43 @@ its own. That is worse: it makes the legend's position a fact about the
 chart, so two charts sharing one legend becomes impossible, and it puts a
 list inside a drawing that is `aria-hidden`. */
   placement?: HelixLegend["placement"];
+  /** How much ink the swatches claim.
+
+**The same axis as the chart's, with the same values, because a legend that
+does not match its chart is worse than no legend.** A key whose swatches are
+solid while the columns they key are outlined tells a reader the two are
+different kinds of fact, which is the exact thing `outlined` on a chart
+exists to say. `outlined` is the series color as an edge over a fill faded
+toward the page, `subtle` is that edge over a wash, and absent is the filled
+patch, per the rule that a reflected property takes no default.
+
+**The legend declares it rather than reading it off the chart, and that is a
+decision rather than a shortcut.** A legend has no reference to a chart: it
+points at a *table* through `for`, which is what lets two charts share one,
+and the chart points at the same table independently. Giving it a chart to
+read would make a list of names depend on a drawing it is deliberately not
+part of, and would still not answer the per-series case, where `outlined` is
+a set of names rather than one value. Two attributes carrying the same word
+is the honest cost of the legend being a sibling. */
+  emphasis?: HelixLegend["emphasis"];
+  /** What the swatches are made of.
+
+`glass` thins whatever emphasis drew, the way it does on a column, so a
+legend beside a glass chart is in the same substance as the chart. Scaled by
+`--helix-material-opacity`, so a theme that is more see-through everywhere is
+more see-through here. */
+  material?: HelixLegend["material"];
+  /** Which entries are drawn as an outline rather than a fill, by name.
+
+Space or comma separated and matched against the names this legend is
+showing, which are the same names the chart matches its own `outlined`
+against, since both read one table. So a chart and its key say the same
+thing the same way: `outlined="Forecast"` on both. */
+  outlined?: HelixLegend["outlined"];
+  /** Which entries are drawn as a wash of their color, by name. Matched as `outlined` is. */
+  subtle?: HelixLegend["subtle"];
+  /** Which entries are glass rather than solid, by name. Matched as `outlined` is. */
+  glass?: HelixLegend["glass"];
   /** Which way to read the table.
 
 Absent is `series`, one entry per data column. `categories` reads one entry
@@ -3734,6 +3771,21 @@ export type HelixMenuVueEvents = {
 };
 
 export type HelixMeterVueProps = {
+  /** How much ink the reading claims.
+
+`subtle` is the reading as a wash of its own color: still legible, no longer
+the loudest thing in the region. The case is a dashboard: several meters where one is the number being watched and the rest are context, which is a fact about the region rather than about any one of them and is exactly what this axis is for.
+
+**One value and not the four, which is the judgment this axis asks for
+rather than a partial sweep.** `ghost` would leave a track with nothing in
+it, which is not a quiet reading but an absent one. `outlined` is the
+interesting refusal: `BarChart` makes it work by keeping the area and fading
+it toward the page, so an outlined column still encodes its value, and the
+reason it earns the value there is that a chart has other series for the
+outlined one to be a *different kind of fact from* (a forecast, a target,
+a budget). A meter reports one quantity against its own range, and the bands it already carries say which part of that range it is in, so there is no second kind of fact for an outline to name. `solid` is the resting state and is written by not
+writing it, per the rule that a reflected property takes no default. */
+  emphasis?: HelixMeter["emphasis"];
   /** Accessible name for the reading. */
   label?: HelixMeter["label"];
   /** Bottom of the range. */
@@ -4445,6 +4497,21 @@ export type HelixPopoverVueEvents = {
 };
 
 export type HelixProgressVueProps = {
+  /** How much ink the bar claims.
+
+`subtle` is the bar as a wash of its own color: still legible, no longer
+the loudest thing in the region. The case is a background task: something uploading while the reader is doing something else has to be visible and must not compete with what they are actually looking at.
+
+**One value and not the four, which is the judgment this axis asks for
+rather than a partial sweep.** `ghost` would leave a track with nothing in
+it, which is not a quiet reading but an absent one. `outlined` is the
+interesting refusal: `BarChart` makes it work by keeping the area and fading
+it toward the page, so an outlined column still encodes its value, and the
+reason it earns the value there is that a chart has other series for the
+outlined one to be a *different kind of fact from* (a forecast, a target,
+a budget). A progress bar is alone in its region and has nothing to differ from, so an outline there costs legibility and buys no distinction. `solid` is the resting state and is written by not
+writing it, per the rule that a reflected property takes no default. */
+  emphasis?: HelixProgress["emphasis"];
   /** Accessible name for what is in progress. */
   label?: HelixProgress["label"];
   /** Whether the work has a knowable end.
@@ -6725,6 +6792,24 @@ export type HelixTooltipHelixCloseElementEvent =
   HelixTooltipElementEvent<HelixCloseEvent>;
 
 export type HelixTooltipVueProps = {
+  /** What the bubble is made of.
+
+Absent is the inverse bubble, a dark surface over a light page, which is
+what a hint over content the theme cannot know has always been here. `glass`
+makes it the page's own translucent ground instead, for a page whose surfaces
+are glass, so a hint over a glass header is not the one opaque slab on it.
+
+**It flips the ink and adds an edge, which no other family carrying this axis
+has to do.** A card is already the page's surface, so glass swaps one ground
+for another; this one starts inverse, and `--helix-material-translucent` is
+the page's ground, so taking it without the foreground would put light ink on
+a light bubble. An inverse bubble is told from the page by being its
+opposite and a glass one has to be told from what is behind it, which is why
+the border arrives with the material rather than being there all along.
+
+The strength is the theme's: `--helix-material-translucent` and
+`--helix-material-backdrop` are what the policy moves. */
+  material?: HelixTooltip["material"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -7763,6 +7848,8 @@ export type CustomCssProperties = {
   "--legend-gap"?: string;
   /** Size of the color patch. */
   "--legend-swatch-size"?: string;
+  /** Width of the edge an `outlined` or `subtle` swatch is drawn with. */
+  "--legend-swatch-stroke"?: string;
   /** The slot the pointer is resting in. */
   "--line-chart-band-color"?: string;
   /** One rule across the plot, under `gridlines`. */
@@ -8137,6 +8224,8 @@ export type CustomCssProperties = {
   "--toggle-group-indicator-color"?: string;
   /** Size of the point at the bubble's edge. */
   "--tooltip-arrow-size"?: string;
+  /** Blur behind a `glass` bubble. */
+  "--tooltip-backdrop"?: string;
   /** Fill of the bubble. */
   "--tooltip-background-color"?: string;
   /** Widest the bubble grows before wrapping. */
