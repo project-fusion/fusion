@@ -71,13 +71,17 @@ export default async function Page() {
         <helix-grid data-shell gap="xl" min="22rem">
           {SERVICES.map((service) => (
             <helix-card class="serviceCard" key={service.name} separation="outlined">
+              {/* **No icon.** Three line glyphs carried nothing the names did
+                  not: a magnifier over "AI capability audit", a cube over "Design
+                  system sprint", a pair of figures over "Conversational build".
+                  A metaphor a reader decodes before the words beside it is a cost
+                  with no return, and the landing band dropped them first. The
+                  wrapping flex went with it, having existed only to sit a glyph
+                  beside a heading. */}
               <helix-flex align="center" gap="md" justify="between" slot="header" wrap>
-                <helix-flex align="center" gap="sm">
-                  <helix-icon name={service.icon}></helix-icon>
-                  <helix-text as="h2" variant="title">
-                    {service.name}
-                  </helix-text>
-                </helix-flex>
+                <helix-text as="h2" variant="title">
+                  {service.name}
+                </helix-text>
               </helix-flex>
 
               {/* **One column, and what you keep is the card's bottom line.**

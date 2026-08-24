@@ -13,10 +13,6 @@ export interface Service {
    */
   duration: string
   /**
-   * The mark on its card, from the curated set in `helix/icons`.
-   */
-  icon: string
-  /**
    * What is in it. Deliverables, not adjectives.
    */
   includes: string[]
@@ -80,7 +76,6 @@ export interface Service {
 export const SERVICES: Service[] = [
   {
     duration: 'One to two weeks, two days a week',
-    icon: 'magnifying-glass',
     includes: [
       'A written map of where the work actually is, and where it only looks like it is',
       'Model, tooling and cost review against what you are trying to do',
@@ -96,7 +91,6 @@ export const SERVICES: Service[] = [
   },
   {
     duration: 'Four weeks, two days a week',
-    icon: 'cube',
     includes: [
       'A token layer that derives an accessible palette from your brand color',
       'The components you actually ship, built as custom elements',
@@ -112,7 +106,6 @@ export const SERVICES: Service[] = [
   },
   {
     duration: 'Six to eight weeks, two days a week',
-    icon: 'users',
     includes: [
       'Building alongside your team rather than beside it',
       'Interface and intelligence work the substrates make faster to do well',

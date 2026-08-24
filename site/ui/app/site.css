@@ -304,9 +304,23 @@ helix-drawer {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
 }
 
-[data-row]:hover {
-  background-color: var(--helix-color-surface-raised);
-}
+/* **No hover fill, because nothing here responds to a pointer.**
+ *
+ * Settled with 221, which asked for a hover accent on the substrate blocks and
+ * found the same problem in both places: neither is a target. The substrate
+ * blocks carry their own button, and this row's only use, on `/contact`, is a
+ * `helix-flex` listing what to put in a first message. A fill that arrives under
+ * the pointer says "this does something", and when nothing does, a reader has
+ * been told something untrue and finds out by clicking.
+ *
+ * So the site's rule is one sentence: **a hover response means the thing
+ * responds.** That refuses the accent 221 asked for and takes this one away,
+ * which is the half that made the site inconsistent with itself. The row offered
+ * the other resolution, declaring decorative hover allowed, and it is the wrong
+ * one for a page whose whole argument is that its surfaces mean something.
+ *
+ * The transition above stays: it costs nothing while no property animates, and
+ * the day a row becomes a link it is already there. */
 
 [data-row-name] {
   font-size: clamp(var(--helix-text-lg), 2.5vw, var(--helix-text-xl));

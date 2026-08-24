@@ -237,6 +237,32 @@ export default function Home() {
           can hire. `Why us` is a reason to prefer the third and belongs after
           it, not between them. */}
       <section data-band data-reveal>
+        {/* **The middle field, and it lives here rather than in the band it
+            lights.** The showcase runs 2202 to 3046 and the two other fields run
+            0 to 1800 and 3046 to 4846, so it sat exactly in the gap with nothing
+            behind it, which is what 222 measured and what made its glass
+            decoration rather than material.
+
+            It cannot be a child of the showcase itself. An absolutely positioned
+            child at a negative index paints behind that band's *content* and in
+            front of its *background*, so a field placed there would sit on top of
+            the glass instead of behind it, which is the opposite of the point.
+            Anchored to the services band above, which is transparent, it reaches
+            down under the showcase, and the showcase paints over it in tree
+            order: exactly the relationship the first field has with every band.
+
+            Same `200svh` box as the other two, so `terminus` needs no
+            re-deriving. See 251 for why the size repeats rather than being fitted
+            to the gap, and 252 for the frame-rate cost of a third context. */}
+        <helix-aura
+          class={styles.reelAuraLate}
+          gain={0.85}
+          scale={1.7}
+          shape="flow"
+          speed={1}
+          terminus={0.5625}
+        ></helix-aura>
+        <div className={styles.reelScrimLate} />
         <helix-flex data-shell direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text tone="subtle" variant="label">
