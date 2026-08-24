@@ -19,6 +19,7 @@ import { sourceUrl } from '../../../../../../utils/source/source'
 import styles from '../docs.module.css'
 import { DocumentActions } from './document-actions'
 import { ComponentPreview } from './preview'
+import { TierAddress } from './tier-address'
 
 /**
  * One component family, in full.
@@ -573,6 +574,7 @@ export default async function FamilyDocs({
     /* The shell and the rail are the layout's, so the nav survives a navigation
        between families and keeps the state a reader set on it. See #119. */
     <>
+      <TierAddress />
       {forced && (
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: one of two literals this file chose
