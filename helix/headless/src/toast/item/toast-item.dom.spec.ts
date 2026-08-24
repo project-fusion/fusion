@@ -1,0 +1,78 @@
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { mount, part, registerDom } from '@helix-io/testing/dom'
+
+beforeAll(async () => {
+  registerDom()
+  await import('../index.js')
+})
+
+type Item = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
+
+const message = async (attributes = ''): Promise<Item> =>
+  (await mount(`<helix-base-toast-item ${attributes}>Project saved</helix-base-toast-item>`)) as Item
+
+/**
+ * One message, and the contract that is the message's rather than the region's.
+ *
+ * **The toast region already proves the arrangement**, which is where messages
+ * stack, how many are held and the order they leave in: it is named 39 times in
+ * this family's specs. What one message owns alone is that it goes when it is
+ * asked to, and every assertion here is about a message with no region around
+ * it, because the region answering for it is exactly the bug this contract was
+ * written after: the item waited to be told in every case, so its own dismiss
+ * control looked broken to anyone who pressed it.
+ */
+describe('one toast message', () => {
+  /* Undeclared, the message is its own. It says it is going and then goes, the
+     same as Dialog and Accordion, and the consumer still hears it and takes it
+     out of their list. */
+  test('goes when it is asked to, where nobody claimed it', async () => {
+    const host = await message('dismissible')
+    let heard = 0
+    host.addEventListener('helix-dismiss', () => {
+      heard += 1
+    })
+    expect(host.open).toBe(true)
+
+    ;(part(host, 'dismiss') as HTMLElement).click()
+    await host.updateComplete
+
+    expect(heard).toBe(1)
+    expect(host.open).toBe(false)
+  })
+
+  /* Declared, it announces and waits, which is the same decide-once contract
+     every other stateful thing here carries. */
+  test('announces and waits, where the markup claimed it', async () => {
+    const host = await message('dismissible open')
+    let heard = 0
+    host.addEventListener('helix-dismiss', () => {
+      heard += 1
+    })
+
+    ;(part(host, 'dismiss') as HTMLElement).click()
+    await host.updateComplete
+
+    expect(heard).toBe(1)
+    expect(host.open).toBe(true)
+  })
+
+  /* No tone, no mark. "Project saved" is not an error, a warning or an
+     announcement, and a glyph there would be decoration standing where meaning
+     is supposed to be. Callout falls back to `info` and this deliberately does
+     not, which is a difference only a spec on the item can hold. */
+  test('draws no mark for a message that means nothing in particular', async () => {
+    expect(part(await message(), 'icon')).toBeNull()
+    expect(part(await message('tone="danger"'), 'icon')).not.toBeNull()
+  })
+
+  /* The duration is published as a custom property rather than drawn, so
+     whatever the styled tier does with the remaining time, the message is the
+     one that knows how long it has. */
+  test('publishes how long it has, and draws no timer where it has forever', async () => {
+    const timed = part(await message('duration="4000"'), 'timer')
+    expect(timed?.getAttribute('style')).toContain('--toast-duration: 4000ms')
+    expect(timed?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(await message(), 'timer')).toBeNull()
+  })
+})
