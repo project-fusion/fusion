@@ -10971,6 +10971,10 @@
             {
               "description": "The fragment's size. Defaults to `text-sm`.",
               "name": "--code-size"
+            },
+            {
+              "description": "Space either side of the fragment. Defaults to half of `space-2xs`, which is what keeps a bracket beside the chip rather than a space away from it.",
+              "name": "--code-padding"
             }
           ],
           "members": [

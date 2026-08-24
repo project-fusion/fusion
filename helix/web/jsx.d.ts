@@ -16306,6 +16306,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--code-size`: The fragment's size. Defaults to `text-sm`. (default: `undefined`)
+   * - `--code-padding`: Space either side of the fragment. Defaults to half of `space-2xs`, which is what keeps a bracket beside the chip rather than a space away from it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -27702,6 +27703,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--code-size`: The fragment's size. Defaults to `text-sm`. (default: `undefined`)
+   * - `--code-padding`: Space either side of the fragment. Defaults to half of `space-2xs`, which is what keeps a bracket beside the chip rather than a space away from it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -37567,6 +37569,8 @@ export type CustomCssProperties = {
   "--code-block-background"?: string;
   /** The fragment's size. Defaults to `text-sm`. */
   "--code-size"?: string;
+  /** Space either side of the fragment. Defaults to half of `space-2xs`, which is what keeps a bracket beside the chip rather than a space away from it. */
+  "--code-padding"?: string;
   /** Fill behind the field. */
   "--color-input-background-color"?: string;
   /** Colour of the panel's edge. */

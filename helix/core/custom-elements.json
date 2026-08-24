@@ -6180,6 +6180,12 @@
               }
             },
             {
+              "name": "tag",
+              "type": {
+                "text": "StaticValue"
+              }
+            },
+            {
               "name": "where",
               "optional": true,
               "type": {
