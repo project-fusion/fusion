@@ -16,7 +16,6 @@ import {
   SCOPE,
   type Settings,
 } from './defaults'
-import { ThemedPage } from './themed-page'
 import { THEMED_PAGE_STYLES } from './themed-page-styles'
 import './theme.css'
 import styles from '../workbench.module.css'
@@ -96,6 +95,7 @@ const MONO_FACES: Face[] = [
 export function ThemeBuilder({
   findable,
   initialTheme,
+  pageMarkup,
 }: {
   findable: Findable[]
   /**
@@ -110,6 +110,15 @@ export function ThemeBuilder({
    * the module transfer and the rest was hydration.
    */
   initialTheme: DerivedTheme
+  /**
+   * The preview's page, already a string.
+   *
+   * Rendered by the server component above, for the reason written out there:
+   * taking it back out of the DOM with `innerHTML` loses every value React set
+   * as a property rather than as an attribute, which on a client navigation is
+   * all of them.
+   */
+  pageMarkup: string
 }) {
   useSandboxEditor()
 
@@ -332,27 +341,11 @@ export function ThemeBuilder({
       .join('&')}&display=swap`
   }, [bodyFace, displayFace, monoFace])
 
-  /* Serialised once, because the page is static and only the palette moves: the
-     frame is sent markup, which is the same path the workbench takes with an
-     example.
-
-     **Rendered in this tree and read back, rather than into a root of its own.**
-     A second `createRoot` into a detached node wants `flushSync` to be readable
-     synchronously, and that produced an empty string with no error to say why.
-     Here React does the rendering it was always going to do, the holder is
-     hidden while it happens, and it unmounts the moment its markup has been
-     taken. */
-  const [markup, setMarkup] = useState('')
-  const holder = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    setMarkup((held) => held || (holder.current?.innerHTML ?? ''))
-  }, [])
-
-  useEffect(() => {
-    if (!preview.current || !markup) {
+    if (!preview.current) {
       return
     }
-    preview.current.source = markup
+    preview.current.source = pageMarkup
     /* **The palette, the layout and the faces, because the frame has none of
        them.** A sandboxed document cannot fetch the site's stylesheet, so the
        page's own rules travel with its markup the way the theme does. The theme
@@ -377,7 +370,7 @@ export function ThemeBuilder({
       THEMED_PAGE_STYLES,
       framed,
     ].join('\n')
-  }, [fontsHref, framed, markup])
+  }, [fontsHref, framed, pageMarkup])
 
   /* **Lightness only, and in whichever direction reaches the target.** The
      solver moves one component: a brand keeps its hue and its chroma and gives
@@ -914,12 +907,6 @@ export function ThemeBuilder({
 
                 `color-mode` rather than a wrapper attribute, because the frame is
                 a document and inherits nothing from this one. */}
-            {markup ? null : (
-              <div hidden ref={holder}>
-                <ThemedPage />
-              </div>
-            )}
-
             <helix-sandbox-preview
               color-mode={scheme}
               label="The themed page"

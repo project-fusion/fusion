@@ -3,6 +3,7 @@ import { INSIGHTS } from '../../../../content/insights'
 import { serverTheme } from '../../../../utils/theme-engine/theme-engine.server'
 import { ThemeBuilder } from './builder'
 import { INITIAL, intentFrom, SCOPE } from './defaults'
+import { THEMED_PAGE_MARKUP } from './themed-page-markup.generated'
 
 /**
  * The theme builder.
@@ -30,6 +31,30 @@ export default async function ThemePage() {
      imported either would pull it into the browser to display a list of names.
      What crosses is the list. */
   const families = getFamilies()
+
+  /* **The preview's markup is a generated string, not a DOM read-back.**
+
+     The builder used to render `<ThemedPage />` into a hidden holder and take
+     its `innerHTML`. That works exactly once, on a cold load, and silently
+     loses half the page on a client navigation: React assigns to an element's
+     *property* when the property exists, and on a soft navigation the Helix
+     definitions are already registered, so `name` and `command` were set on
+     accessors rather than written as attributes. Lit reflects neither, so
+     `innerHTML` could not see them. Measured on the same button: a cold load
+     serialised `arrow-right` twice and a navigation zero times, and the hero's
+     trigger arrived in the frame as `<helix-button commandfor="walkthrough">`
+     with no `command` at all, which is a missing arrow and a dialog that does
+     nothing.
+
+     A string cannot have that problem, because there is no DOM in between: JSX
+     props become attributes and the frame receives what was written. It is also
+     one fewer copy of the page in the document, the holder having rendered the
+     whole thing a second time to be read and thrown away.
+
+     Rendered by `bun run themed-page` rather than here, because a server
+     component resolves under the `react-server` condition and `react-dom/server`
+     is not exported there: Next refuses the import outright. `check:themed-page`
+     holds the string and the JSX to each other. */
 
   /* **The default theme, derived before anything renders.** The engine used to
      be synchronous JavaScript and did this without being asked, which is what
@@ -61,6 +86,7 @@ export default async function ThemePage() {
         },
       ]}
       initialTheme={theme}
+      pageMarkup={THEMED_PAGE_MARKUP}
     />
   )
 }
