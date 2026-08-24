@@ -33,6 +33,7 @@ const DESTINATIONS: Findable[] = [
     group: 'Products',
     items: [
       { href: '/helix', label: 'Helix, the design system' },
+      { href: '/helix/components', label: 'Components, every family Helix ships' },
       { href: '/cortex', label: 'Cortex, memory and provenance' },
       /* The workbench, not the component. `Sandbox` is a family like any other
          and the catalog already offers its reference page; this is the tool

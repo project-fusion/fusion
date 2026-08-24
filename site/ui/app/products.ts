@@ -165,7 +165,7 @@ export const PRODUCTS: Product[] = [
         title: 'Docs',
       },
       {
-        href: '/helix',
+        href: '/helix/components',
         summary: 'Every family, with its API and a live example.',
         title: 'Components',
       },

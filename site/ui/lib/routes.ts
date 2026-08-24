@@ -102,6 +102,22 @@ const PROSE: Route[] = [
     title: 'Helix',
   },
   {
+    description: 'Install it, theme it, and the ideas underneath.',
+    kind: 'page',
+    path: '/helix/docs',
+    priority: 0.9,
+    section: 'Helix',
+    title: 'Docs',
+  },
+  {
+    description: 'Every family Helix ships, with its API and a live example.',
+    kind: 'page',
+    path: '/helix/components',
+    priority: 0.9,
+    section: 'Helix',
+    title: 'Components',
+  },
+  {
     description: 'The cognitive substrate: memory, provenance, and context.',
     kind: 'page',
     path: '/cortex',

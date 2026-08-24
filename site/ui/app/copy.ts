@@ -46,7 +46,7 @@ export interface CopyBlock {
    * duplication this whole arrangement exists to remove. The renderers resolve
    * it; this only says which list.
    */
-  from?: 'insights' | 'products' | 'services' | 'verticals'
+  from?: 'families' | 'guides' | 'insights' | 'products' | 'services' | 'verticals'
   /** Cards written here, for a block whose items belong to it alone. */
   items?: CopyItem[]
   /** The small line above the heading. */

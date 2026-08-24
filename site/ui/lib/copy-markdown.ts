@@ -1,3 +1,4 @@
+import { navigation } from '@helix-io/docs'
 import { CONTACT } from '../app/contact'
 import type { CopyBlock, PageCopy } from '../app/copy'
 import { LANDING } from '../app/landing'
@@ -5,6 +6,7 @@ import { PRODUCTS } from '../app/products'
 import { SERVICES } from '../app/services'
 import { AURA, SANDBOX, THEME_BUILDER } from '../app/tools'
 import { VERTICALS } from '../app/verticals'
+import { getFamilies } from './catalog'
 import { INSIGHTS } from './insights'
 import type { Route } from './routes'
 
@@ -32,6 +34,17 @@ import type { Route } from './routes'
 
 /** The lists a block may draw its cards from, resolved to name and body. */
 const LISTS = {
+  /* Every family, from the manifest the page renders from. An agent reading
+     this document gets the same list a reader sees, in the same order, without
+     a second copy of it existing anywhere. */
+  families: () => getFamilies().map((entry) => ({ body: entry.summary, name: entry.label })),
+  /* Each documentation section and what it covers, from the same registry the
+     sidebar and the index page both read. */
+  guides: () =>
+    navigation().map((section) => ({
+      body: section.pages.map((page) => page.title).join(', '),
+      name: section.title,
+    })),
   insights: () => INSIGHTS.map((entry) => ({ body: entry.summary, name: entry.title })),
   products: () => PRODUCTS.map((entry) => ({ body: entry.body, name: entry.name })),
   services: () => SERVICES.map((entry) => ({ body: entry.summary, name: entry.name })),
@@ -103,10 +116,50 @@ const insightsCopy = (): PageCopy => ({
   title: 'Insights',
 })
 
+/**
+ * The component index, which is the catalog with a sentence over it.
+ *
+ * The same shape as `insightsCopy` and for the same reason: the page is a
+ * registry rendered, so its document is that registry rendered too. Writing a
+ * copy module for it would be a second list of 89 families that could disagree
+ * with the manifest, which is the whole thing this arrangement exists to
+ * prevent.
+ *
+ * Each family's own document says what it can do. This one exists so a reader
+ * or an agent can find out *which* family they want, which is the question an
+ * index answers and a reference does not.
+ */
+const componentsCopy = (): PageCopy => ({
+  blocks: [{ from: 'families', title: 'Every family' }],
+  lede: 'Every family Helix ships, with its API and a live example. The styled tier is what an application writes; each family extends a headless one and inherits its API.',
+  source: 'custom-elements.json, which the page also renders from',
+  title: 'Components',
+})
+
+/**
+ * The guides index, which is the documentation registry with a sentence over it.
+ *
+ * Same shape as the two above. Each page's own document is served from its MDX,
+ * so this one exists to say what the sections are rather than to restate any of
+ * them.
+ */
+const guidesCopy = (): PageCopy => ({
+  blocks: [{ from: 'guides', title: 'Sections' }],
+  lede: "Install it, theme it, and the ideas underneath. Every family's own API lives on its page under Components; these are the guides that cross families.",
+  source: 'the docs registry, which the page also renders from',
+  title: 'Docs',
+})
+
 /** The copy module for a path, where one exists. */
 export const copyFor = (path: string): PageCopy | undefined => {
   if (path === '/insights') {
     return insightsCopy()
+  }
+  if (path === '/helix/components') {
+    return componentsCopy()
+  }
+  if (path === '/helix/docs') {
+    return guidesCopy()
   }
   return COPY[path] ?? verticalCopy(path)
 }
