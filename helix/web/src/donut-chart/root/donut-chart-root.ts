@@ -29,7 +29,7 @@ import '../../tooltip/index.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category charts
  * @aliases Pie Chart, Ring Chart, Share Chart
  * @documentation https://helix.fusion.dev/components/donut-chart
  *

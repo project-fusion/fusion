@@ -30,7 +30,7 @@ import { styles } from './sparkline-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category charts
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://helix.fusion.dev/components/sparkline
  *

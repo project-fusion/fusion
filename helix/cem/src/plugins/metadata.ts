@@ -1,4 +1,4 @@
-import type { HelixDeclaration, Plugin } from '../types.js'
+import { CATEGORIES, type HelixDeclaration, type Plugin } from '../types.js'
 
 /** Tags Helix reads that the CEM spec does not define. */
 const SINGLE = ['category', 'description', 'since', 'status', 'documentation'] as const
@@ -8,33 +8,6 @@ const LIST = ['aliases'] as const
 
 /** Values `@status` may take. Anything else is ignored rather than trusted. */
 const STATUSES = ['deprecated', 'experimental', 'stable'] as const
-
-/**
- * What a component is for, as the one axis the catalog groups on.
- *
- * A closed set, checked the same way `@status` is: a typo lands a component in
- * a category of one rather than failing, and a category of one is invisible
- * until someone counts. Eight, which is the coarsest split that still puts
- * every family somewhere a reader would look for it.
- *
- * **This exists because the alternative was inferring it.** The gallery grouped
- * families by which of five art files their drawing happened to live in, and
- * those files are split for authoring convenience: one of them is named for the
- * ten components the drawing system was worked out on, which is a fact about
- * the order they were made in. Twenty-nine of sixty-five sat in a bucket that
- * did not describe them. A category is a fact about a component, so it belongs
- * on the component, in the manifest, beside `@status`.
- */
-const CATEGORIES = [
-  'actions',
-  'content',
-  'feedback',
-  'forms',
-  'layout',
-  'navigation',
-  'overlays',
-  'tooling',
-] as const
 
 const text = (comment: unknown): string => {
   if (typeof comment === 'string') {

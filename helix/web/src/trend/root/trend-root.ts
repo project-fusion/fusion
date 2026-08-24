@@ -19,7 +19,7 @@ import { styles } from './trend-root.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @category content
+ * @category charts
  * @aliases Delta, Change, Movement
  * @documentation https://helix.fusion.dev/components/trend
  *

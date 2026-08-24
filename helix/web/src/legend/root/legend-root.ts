@@ -20,7 +20,7 @@ import { styles } from './legend-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @category content
+ * @category charts
  * @aliases Key, Series Key
  * @documentation https://helix.fusion.dev/components/legend
  *

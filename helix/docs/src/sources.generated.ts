@@ -1986,7 +1986,7 @@ because they ship and no page downloads them.
 | \`@helix-io/icons\` | 84,047 | 17 | 19,847 | none |
 | \`@helix-io/styles\` | 265,019 | 5 | 0 | none |
 | \`@helix-io/theme\` | 612,744 | 28 | 47,856 | none |
-| \`@helix-io/web\` | 8,129,688 | 1,345 | 268,198 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/web\` | 8,129,670 | 1,345 | 268,198 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 

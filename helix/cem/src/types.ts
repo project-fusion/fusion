@@ -101,6 +101,51 @@ export interface HelixEvent extends Documented {
 }
 
 /**
+ * What a component is for, and the one axis the catalog groups on.
+ *
+ * A closed set, checked the same way `@status` is: a typo lands a component in
+ * no category rather than failing, and a category of one is invisible until
+ * someone counts.
+ *
+ * **This exists because the alternative was inferring it.** The gallery grouped
+ * families by which of five art files their drawing happened to live in, and
+ * those files are split for authoring convenience: one of them is named for the
+ * ten components the drawing system was worked out on, which is a fact about
+ * the order they were made in. Twenty-nine of sixty-five sat in a bucket that
+ * did not describe them. A category is a fact about a component, so it belongs
+ * on the component, in the manifest, beside `@status`.
+ *
+ * **`charts` was split out of `content` on 23 Aug 2026, and the count is the
+ * argument.** `content` held 27 of 88 families and meant "none of the other
+ * seven", which is a drawer rather than a category: six drew a reading, four
+ * displayed data, six were media, six typographic and three markers. A reader
+ * filtering by it was filtering by nothing. The six that draw are the clearest
+ * cluster in it and the one another component can be wrong about, since a
+ * legend whose swatches disagree with the chart they key is a visible fault.
+ * Whether the rest of `content` splits further is open.
+ *
+ * **The list and the type are one declaration, because they were two.** The
+ * array lived in `metadata.ts` and the union was written out here, so adding a
+ * category meant editing both. `charts` went into one of them and `analyze`
+ * failed on a word that had just been made legal, which is the argument for
+ * deriving one from the other rather than a story about a typo.
+ */
+export const CATEGORIES = [
+  'actions',
+  'charts',
+  'content',
+  'feedback',
+  'forms',
+  'layout',
+  'navigation',
+  'overlays',
+  'tooling',
+] as const
+
+/** One of the categories a component may declare. */
+export type Category = (typeof CATEGORIES)[number]
+
+/**
  * Fields Helix adds to the manifest beyond the CEM spec.
  *
  * The spec permits extra properties. Namespacing them under `helix` keeps them
@@ -117,15 +162,7 @@ export interface HelixMetadata {
    * A closed set the metadata plugin checks, so an unknown word is dropped
    * rather than becoming a category of one.
    */
-  category?:
-    | 'actions'
-    | 'content'
-    | 'feedback'
-    | 'forms'
-    | 'layout'
-    | 'navigation'
-    | 'overlays'
-    | 'tooling'
+  category?: Category
 
   /** URL of the component's documentation page. */
   documentation?: string

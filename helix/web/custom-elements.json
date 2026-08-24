@@ -4696,7 +4696,7 @@
           },
           "summary": "Categories as columns, read from a table.",
           "helix": {
-            "category": "content",
+            "category": "charts",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/bar-chart",
@@ -22119,7 +22119,7 @@
           },
           "summary": "Parts of a whole as a ring, read from a table.",
           "helix": {
-            "category": "content",
+            "category": "charts",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/donut-chart",
@@ -30411,7 +30411,7 @@
           },
           "summary": "The names a chart draws, each beside the colour it is drawn in.",
           "helix": {
-            "category": "content",
+            "category": "charts",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/legend",
@@ -31108,7 +31108,7 @@
           },
           "summary": "A series over time as a line, read from a table.",
           "helix": {
-            "category": "content",
+            "category": "charts",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/line-chart",
@@ -54556,7 +54556,7 @@
           },
           "summary": "A line with no axes, for the shape of a series beside the number it belongs to.",
           "helix": {
-            "category": "content",
+            "category": "charts",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/sparkline",
@@ -74386,7 +74386,7 @@
           },
           "summary": "Which way a measurement moved, and whether that is good news.",
           "helix": {
-            "category": "content",
+            "category": "charts",
             "since": "0.1.0",
             "status": "stable",
             "documentation": "https://helix.fusion.dev/components/trend",
