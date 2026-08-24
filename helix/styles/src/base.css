@@ -262,7 +262,22 @@ helix-card > [slot="media"] {
   text-decoration: underline;
 }
 
-/* `md` is absent, because it is what the surrounding text already is. */
+/* **`md` is absent, because it is what the surrounding text already is**, and
+   `xl` upward is absent for a different reason worth writing down. Raised by
+   226: a recipe naming a step of a ramp should reach the whole ramp or say where
+   it stops. This one reaches `xs`, `sm` and `lg` of a seven-step text ramp, and
+   the three above it are not a gap.
+
+   The ramp stops being text there. `data-text` puts `title` at `lg`, `heading`
+   at `2xl` and `display` at `3xl`, so a link asking for `2xl` is asking to be a
+   heading, and a heading that navigates is a heading containing an anchor rather
+   than a link wearing a heading's size. Writing the rules would make that
+   mistake spellable and would say, by covering the range, that the library
+   thinks a link can be display type.
+
+   `lg` is the ceiling because it is the largest size at which the ramp is still
+   prose. See 226, and `data-level` above for the same argument coming out the
+   other way, where the range was real and the rules stopped short of it. */
 [data-link-size="xs"] {
   font-size: var(--helix-text-xs);
 }
@@ -729,6 +744,49 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
  * Custom properties rather than a class per component, so it crosses every
  * shadow boundary on its own and costs no component any API.
  */
+/* **The scale is continuous, and `sm`/`md`/`lg` are three stops on it.**
+ *
+ * Raised as two rows that turned out to be one question. 226 asked that a recipe
+ * naming a step of a ramp reach the whole ramp or say where it stops; 227 asked
+ * that density be a number the tokens calculate from. For density the second is
+ * the answer to the first: enumerating nine steps of a control ramp that only
+ * has three would invent sizes nothing was drawn at, while a multiplier covers
+ * every value between them without naming any.
+ *
+ * **A container cannot do this by setting the seed, and that is measured rather
+ * than argued.** `--helix-seed-density` is a real `ThemeIntent` knob and it
+ * multiplies the primitive ramps, but the derived tokens are declared once on
+ * `:root`, and custom properties substitute at computed-value time: a descendant
+ * inherits the *already substituted* value. Setting the seed on a div and
+ * reading `--helix-space-md` inside it returns `calc(1rem * 1)` and resolves to
+ * 16px, the same as the page. The 0.5 is read by nothing.
+ *
+ * It works when the rule redeclares the tokens, which is what the named stops
+ * below already do, only with step aliases instead of arithmetic. So the region
+ * is the attribute and the amount is the property: `data-density` says a region
+ * is one, `--helix-density` says how much, and it defaults to 1 so the bare
+ * attribute is the resting size rather than a collapse.
+ *
+ * **Nesting does not compound, and that comes for free.** Each rule redeclares
+ * from the same `md` stop rather than from whatever it inherited, so a 0.8
+ * region inside a 0.8 region is 0.8 and not 0.64. Measured: 12.7969px in both.
+ * That is the behavior a reader expects and the one they would have to write a
+ * reset to get from a multiplying model.
+ *
+ * **The named stops win because they come after**, at equal specificity. They
+ * are not the same numbers as any multiplier: `sm` is the size the checkbox,
+ * icon, switch and tag ramps were each drawn at, and a number that happened to
+ * land near it would be a coincidence rather than that drawing. */
+[data-density] {
+  --helix-text-control: calc(var(--helix-text-sm) * var(--helix-density, 1));
+  --helix-space-control: calc(var(--helix-space-md) * var(--helix-density, 1));
+  --helix-size-checkbox: calc(var(--helix-size-checkbox-md) * var(--helix-density, 1));
+  --helix-size-icon: calc(var(--helix-size-icon-md) * var(--helix-density, 1));
+  --helix-size-control: calc(var(--helix-size-control-md) * var(--helix-density, 1));
+  --helix-size-switch: calc(var(--helix-size-switch-md) * var(--helix-density, 1));
+  --helix-size-tag: calc(var(--helix-size-tag-md) * var(--helix-density, 1));
+}
+
 [data-density="sm"] {
   --helix-text-control: var(--helix-text-xs);
   --helix-space-control: var(--helix-space-sm);

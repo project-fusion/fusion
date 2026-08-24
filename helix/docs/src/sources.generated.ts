@@ -1756,7 +1756,7 @@ is why it is the whole cost of adopting the base layer on its own.
 
 | File | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
-| \`base.css\` | 76,605 | 23,845 | 20,570 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
+| \`base.css\` | 80,265 | 25,072 | 21,580 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
 | \`elements.css\` | 7,884 | 1,823 | 1,547 | The components' own layer, generated from every family's stylesheet. |
 | \`primitives.css\` | 32,648 | 11,331 | 9,635 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
 | \`tokens.css\` | 64,385 | 19,404 | 16,131 | The 177 semantic tokens. Nothing paints without this. |
@@ -2020,7 +2020,7 @@ column is what was removed rather than part of what remains.
 | \`@helix-io/core\` | 777,402 | 103 | 139,228 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
 | \`@helix-io/headless\` | 7,231,209 | 390 | 614,039 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 64,200 | 11 | 19,847 | none |
-| \`@helix-io/styles\` | 268,379 | 5 | 0 | none |
+| \`@helix-io/styles\` | 272,039 | 5 | 0 | none |
 | \`@helix-io/theme\` | 564,859 | 16 | 47,856 | none |
 | \`@helix-io/web\` | 7,989,541 | 675 | 272,699 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
