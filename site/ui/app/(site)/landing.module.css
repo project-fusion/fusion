@@ -507,9 +507,53 @@
  * lighter than its ground either way. The old arrangement had it the other way
  * round, the panel sunken and the page plain, which is what a recess is and is
  * why the comments further down still say so. */
+/* **What a full-bleed band has to fix about `data-material="glass"`.**
+ *
+ * Two bands wear it, the showcase and the closing call to action, and both need
+ * the same two corrections, so this is the shared half rather than the same
+ * declarations written twice.
+ *
+ * **A band running to both window edges has no left or right edge to draw.** The
+ * material's border is not decoration: it is what keeps a translucent surface a
+ * shape when it takes its color from whatever is behind it. That holds for a card
+ * and not for a band whose sides *are* the window, where drawing them puts a box
+ * around the page. Top and bottom are real and stay.
+ *
+ * **And glass admits what is behind it, which in light mode is nothing.** The
+ * ground is white at 72%, so over a near-white page the band reads *lighter* than
+ * the page and stops being a band at all. The sunken ground is what light mode
+ * wants and the translucent one is what dark mode wants, which `light-dark()`
+ * says in one declaration. The blur comes off with it: an opaque ground is in
+ * front of it, and a `backdrop-filter` that changes nothing still makes the
+ * compositor re-read the page on every frame the element moves, which these do
+ * for a whole scroll.
+ *
+ * Two rules for that, because the attribute is absent for a reader who has never
+ * chosen, which is most of them. `[data-color-mode="light"]` catches an explicit
+ * choice and the query catches the system following light with nothing declared.
+ * `:not([data-color-mode])` rather than `:not([data-color-mode="dark"])`, since
+ * the second also matches a system-dark reader and would take the blur away from
+ * the one mode it is for. */
+.glassBand {
+  background-color: light-dark(
+    var(--helix-color-surface-sunken),
+    var(--helix-material-translucent)
+  );
+  border-inline-width: 0;
+}
+
+[data-color-mode="light"] .glassBand {
+  backdrop-filter: none;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-color-mode]) .glassBand {
+    backdrop-filter: none;
+  }
+}
+
 .showcaseBand {
   align-content: stretch;
-  background-color: var(--helix-color-surface-sunken);
   block-size: calc(100svh - var(--helix-size-header));
 }
 

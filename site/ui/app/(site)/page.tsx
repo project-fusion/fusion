@@ -151,7 +151,13 @@ export default function Home() {
 
           <helix-grid gap="xl" min="22rem">
             {PRODUCTS.map((product) => (
-              <helix-flex data-substrate direction="column" gap="sm" key={product.name}>
+              <helix-flex
+                data-material="glass"
+                data-substrate
+                direction="column"
+                gap="sm"
+                key={product.name}
+              >
                 <helix-flex align="center" data-density="sm" gap="sm">
                   <helix-text tone="subtle" variant="label">
                     {product.role}
@@ -232,8 +238,20 @@ export default function Home() {
 
           <helix-grid gap="xl" min="18rem">
             {SERVICES.map((service) => (
-              <helix-flex data-substrate direction="column" gap="sm" key={service.name}>
-                <helix-icon name={service.icon}></helix-icon>
+              <helix-flex
+                data-material="glass"
+                data-substrate
+                direction="column"
+                gap="sm"
+                key={service.name}
+              >
+                {/* **No icon.** Three line glyphs sat over three headings and
+                    carried nothing the heading did not: a magnifier over "AI
+                    capability audit", a cube over "Design system sprint", a pair
+                    of figures over "Conversational build". None of them is the
+                    idea, and a metaphor a reader has to decode before the words
+                    beneath it is a cost with no return. The names are short and
+                    concrete and do the work. */}
                 <helix-text as="h3" data-substrate-name>
                   {service.name}
                 </helix-text>
@@ -290,7 +308,12 @@ export default function Home() {
           the whole panel reads as a thing being looked into. What overflows is
           masked rather than cut: a hard edge says the layout ran out, a fade
           says there is more, which there is. */}
-      <section className={styles.showcaseBand} data-band data-reveal>
+      <section
+        className={`${styles.showcaseBand} ${styles.glassBand}`}
+        data-band
+        data-material="glass"
+        data-reveal
+      >
         {/* **No rule between them, and more room instead.** A line is one way
             to say two things are separate and whitespace is the other, and
             whitespace does not have to be looked past. The splitter that was
@@ -360,7 +383,13 @@ export default function Home() {
               when there is no room for two. */}
           <helix-grid gap="xl" min="26rem">
             {(LANDING.blocks[3]?.items ?? []).map((reason) => (
-              <helix-flex data-substrate direction="column" gap="sm" key={reason.name}>
+              <helix-flex
+                data-material="glass"
+                data-substrate
+                direction="column"
+                gap="sm"
+                key={reason.name}
+              >
                 <helix-text as="h3" data-substrate-name>
                   {reason.name}
                 </helix-text>
@@ -422,7 +451,13 @@ export default function Home() {
 
       {/* The story, last and short. It is why the work compounds rather than
           why anyone should buy it, and a reader who wants it can follow it. */}
-      <section data-band data-closing data-material="glass" data-reveal>
+      <section
+        className={styles.glassBand}
+        data-band
+        data-closing
+        data-material="glass"
+        data-reveal
+      >
         <helix-flex align="center" data-shell direction="column" gap="lg">
           <helix-text as="h2" data-section-title>
             {LANDING.blocks[5]?.title}
