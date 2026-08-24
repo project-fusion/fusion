@@ -17,13 +17,40 @@
    type size and holds a different number at any other: state the column in the
    unit it is actually about, and it survives a change to the ramp. */
 .documentShell {
+  /* **Fixed, not `--site-inset`.** That clamp opens to seven rem on a wide
+     screen, which is right for a layout running to the viewport edge and wrong
+     inside a box that is capped and centred: above the cap this shell is nowhere
+     near an edge, so the growing gutter had nothing to hold the text off and ate
+     the reading column instead. Enough to keep the text clear below the cap,
+     and the same on every screen above it. */
+  padding-inline: var(--helix-space-lg);
   margin-inline: auto;
-  /* 100ch rather than the 90 it held for a long time, which is the part of the
-     wider-head experiment worth keeping: the column really was tight, and ten
-     characters is the difference between a title breaking early and breaking
-     where a title should. Every line on the page gets it, so there is still one
-     column. */
-  max-inline-size: 100ch;
+
+  /* Tuned so a paragraph sets at about seventy characters, which is where the
+     eye keeps the line. Measured rather than picked: the body is 14px here. */
+  --document-measure: 41rem;
+  /* **The measure, plus the gutter, rather than a number in `ch` that is not
+     about the text it caps.**
+   *
+   * This was `90ch` and then `100ch` on the shell, and a `ch` here resolves
+   * against the *shell's* font size rather than the body's, so it was never a
+   * count of the characters it was supposed to be counting. Worse, the cap is a
+   * border box and the padding came from `[data-shell]`, which is
+   * `clamp(space-lg, 6vw, 7rem)`: a gutter meant to hold *full width* layouts
+   * off the viewport edge. This box is capped and centred, so above the cap it
+   * is nowhere near that edge, and the only thing the growing gutter did was eat
+   * the column.
+   *
+   * Measured: the shell sat at 928px from 1024 upward while its padding went 61,
+   * 77, 86, 112, so the reading column ran 805, 775, 755, 704. The line got
+   * *shorter* as the screen got wider, 80 characters at 1440 and 85 at 1024,
+   * both past the point where the eye loses the line.
+   *
+   * Said as the measure plus the gutter, one number moves the column and the
+   * gutter stays a gutter. `--document-measure` is in `rem` because that is what
+   * it is: the shell and the body are set at different sizes, so a `ch` on one
+   * cannot describe the other. */
+  max-inline-size: calc(var(--document-measure) + 2 * var(--helix-space-lg));
   /* **Not a band at the top, because a document is not a section of the landing
      page.** `--site-band` is the rhythm that gives each claim on the front page
      a screen of its own, and it clamps to 12vh, which is 108 on a laptop. Above
@@ -35,7 +62,6 @@
      last line of the argument from the footer, and running an article straight
      into the chrome is the fault the top padding does not have. */
   padding-block: var(--helix-space-2xl) var(--site-band);
-  padding-inline: var(--site-inset);
 }
 
 /* **Left, with the prose under it.**

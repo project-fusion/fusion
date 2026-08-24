@@ -43,8 +43,13 @@ export function DocumentPage({
   /** The way back, where this document is one of a set. */
   trail?: ReactNode
 }) {
+  /* **No `data-shell` on the shell.** That attribute means "full width, held off
+     the edges by the inset", and this box is neither: it is capped and centred,
+     so above the cap it is nowhere near an edge, and its `6vw` inset was eating
+     the reading column as the window grew. The shell supplies its own fixed
+     one. */
   return (
-    <helix-flex class={styles.documentShell} data-shell direction="column" gap="xl">
+    <helix-flex class={styles.documentShell} direction="column" gap="xl">
       <helix-flex align="start" class={styles.documentHead} direction="column" gap="lg">
         {trail}
         <helix-flex align="start" direction="column" gap="md">
