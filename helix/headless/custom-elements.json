@@ -11593,10 +11593,6 @@
               "name": "listbox"
             },
             {
-              "description": "The field itself.",
-              "name": "search-field"
-            },
-            {
               "description": "The row under the list.",
               "name": "footer"
             },

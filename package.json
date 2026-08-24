@@ -63,6 +63,7 @@
     "trust": "node tooling/scripts/trust.mjs",
     "lint": "biome lint .",
     "metrics": "bun tooling/scripts/build-metrics.mjs",
+    "metrics:timing": "bun tooling/scripts/build-timings.mjs",
     "metrics:peers": "bun tooling/scripts/build-peers.mjs",
     "order": "node tooling/scripts/order-manifests.mjs",
     "rs:build": "cargo build --workspace",

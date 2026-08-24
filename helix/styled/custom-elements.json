@@ -16771,14 +16771,6 @@
               }
             },
             {
-              "description": "The field itself.",
-              "name": "search-field",
-              "inheritedFrom": {
-                "name": "HelixHeadlessCommand",
-                "module": "src/command/root/command-root.ts"
-              }
-            },
-            {
               "description": "The row under the list.",
               "name": "footer",
               "inheritedFrom": {

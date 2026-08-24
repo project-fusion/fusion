@@ -41,7 +41,37 @@ const SCRATCH = join(ROOT, '.local/metrics-peers')
 const OUTPUT = join(ROOT, 'helix/docs/peers.json')
 
 /**
+ * **When these go stale, and why nothing stops them.** Asked by 192, answered on
+ * 24 Aug 2026: the date on the page is the whole answer, and it is deliberate
+ * rather than a gap somebody has not got to.
+ *
+ * A check on the calendar would fire for a reason nobody caused, because nothing
+ * in this repository changes when Shoelace releases. A check that installed the
+ * latest on every run would put a registry in the middle of `verify`, which
+ * makes an offline machine fail a gate about our own bytes. And there is no
+ * dependency-bump schedule to hang it on: this repository has no Dependabot and
+ * no Renovate, so "do it with the bumps" would be scheduling against a thing
+ * that does not exist.
+ *
+ * So the refresh is a hand command and the page says when it last ran. What a
+ * reader needs is not a fresh number, it is knowing how old the one they are
+ * reading is, and a date supplies that without pretending to more.
+ *
  * The four, pinned exactly.
+ *
+ * **Seven components now, and the two added clear the same bar the first five
+ * did**: each is a thing every one of the four ships, under a name nobody has to
+ * argue about. `radio` and `switch` are both universal; what differs is only
+ * spelling, and a naming note is what the table already uses for `dialog` being
+ * Carbon's Modal and `tabs` being Shoelace's Tab Group. Carbon calls a radio a
+ * Radio Button and a switch a Toggle, which is the same kind of difference.
+ *
+ * **What was refused, and why, because the refusals are the rule.** Anything
+ * charting, anything with a date in it, and `select`, which is a listbox in one
+ * system and a combobox in another: comparing those compares our reading of
+ * somebody else's library rather than the libraries. `tag` fails too, Material
+ * shipping a Chip, and `accordion` fails because Material ships none and
+ * Shoelace calls its own Details. See 191.
  *
  * Exact rather than a range, because a caret would silently re-measure on
  * somebody else's machine and the table would say a version it had not read.
@@ -54,11 +84,13 @@ const SYSTEMS = [
       button: '@carbon/web-components/es/components/button/index.js',
       checkbox: '@carbon/web-components/es/components/checkbox/index.js',
       dialog: '@carbon/web-components/es/components/modal/index.js',
+      radio: '@carbon/web-components/es/components/radio-button/index.js',
+      switch: '@carbon/web-components/es/components/toggle/index.js',
       tabs: '@carbon/web-components/es/components/tabs/index.js',
       tooltip: '@carbon/web-components/es/components/tooltip/index.js',
     },
     name: 'Carbon',
-    note: 'Its dialog is called Modal.',
+    note: 'Its dialog is Modal, its radio is Radio Button, and its switch is Toggle.',
     package: '@carbon/web-components',
   },
   {
@@ -67,6 +99,8 @@ const SYSTEMS = [
       button: '@material/web/button/filled-button.js',
       checkbox: '@material/web/checkbox/checkbox.js',
       dialog: '@material/web/dialog/dialog.js',
+      radio: '@material/web/radio/radio.js',
+      switch: '@material/web/switch/switch.js',
       tabs: '@material/web/tabs/tabs.js',
     },
     name: 'Material Web',
@@ -79,6 +113,8 @@ const SYSTEMS = [
       button: '@shoelace-style/shoelace/dist/components/button/button.js',
       checkbox: '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js',
       dialog: '@shoelace-style/shoelace/dist/components/dialog/dialog.js',
+      radio: '@shoelace-style/shoelace/dist/components/radio/radio.js',
+      switch: '@shoelace-style/shoelace/dist/components/switch/switch.js',
       tabs: '@shoelace-style/shoelace/dist/components/tab-group/tab-group.js',
       tooltip: '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js',
     },
@@ -91,6 +127,8 @@ const SYSTEMS = [
       '@spectrum-web-components/button': '1.12.2',
       '@spectrum-web-components/checkbox': '1.12.2',
       '@spectrum-web-components/dialog': '1.12.2',
+      '@spectrum-web-components/radio': '1.12.2',
+      '@spectrum-web-components/switch': '1.12.2',
       '@spectrum-web-components/tabs': '1.12.2',
       '@spectrum-web-components/tooltip': '1.12.2',
     },
@@ -98,6 +136,8 @@ const SYSTEMS = [
       button: '@spectrum-web-components/button/sp-button.js',
       checkbox: '@spectrum-web-components/checkbox/sp-checkbox.js',
       dialog: '@spectrum-web-components/dialog/sp-dialog.js',
+      radio: '@spectrum-web-components/radio/sp-radio.js',
+      switch: '@spectrum-web-components/switch/sp-switch.js',
       tabs: '@spectrum-web-components/tabs/sp-tabs.js',
       tooltip: '@spectrum-web-components/tooltip/sp-tooltip.js',
     },

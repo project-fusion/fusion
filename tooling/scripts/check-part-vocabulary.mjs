@@ -104,7 +104,7 @@ for (const tier of TIERS) {
     }
     const text = readFileSync(path, 'utf8')
     const code = withoutComments(text)
-    for (const match of code.matchAll(/part="([a-z0-9 -]+)"/g)) {
+    for (const match of code.matchAll(/(?<!\[)part="([a-z0-9 -]+)"/g)) {
       for (const one of match[1].split(/\s+/)) {
         const line = text.slice(0, match.index).split('\n').length
         if (!seen.has(one)) {

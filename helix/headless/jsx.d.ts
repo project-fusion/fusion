@@ -14732,7 +14732,6 @@ export type CustomElements = {
    *
    * - `dialog`: The overlay's own box, forwarded from the dialog.
    * - `listbox`: The list inside it.
-   * - `search-field`: The field itself.
    * - `footer`: The row under the list.
    * - `listbox-empty`: Shown when a filter has hidden everything.
    * - `listbox-feedback`: What is wrong with it.
@@ -26159,7 +26158,6 @@ export type CustomElementsSolidJs = {
    *
    * - `dialog`: The overlay's own box, forwarded from the dialog.
    * - `listbox`: The list inside it.
-   * - `search-field`: The field itself.
    * - `footer`: The row under the list.
    * - `listbox-empty`: Shown when a filter has hidden everything.
    * - `listbox-feedback`: What is wrong with it.

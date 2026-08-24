@@ -65,7 +65,7 @@ for (const dir of readdirSync('helix/core/src/utils', { withFileTypes: true })) 
            `Tooltip`'s bubble rather than drawing one: read for `part` alone,
            three charts documented a `tooltip` nothing appeared to render. */
         [
-          ...[...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]),
+          ...[...code.matchAll(/(?<!\[)part="([a-z0-9-]+)"/g)].map((m) => m[1]),
           ...[...code.matchAll(/exportparts="([^"]+)"/g)].flatMap((m) =>
             m[1]
               .split(',')
@@ -125,7 +125,7 @@ for (const tier of TIERS) {
       .filter(Boolean)
       .flat()
     const rendered = [
-      ...[...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]),
+      ...[...code.matchAll(/(?<!\[)part="([a-z0-9-]+)"/g)].map((m) => m[1]),
       ...forwarded,
       ...drawn,
     ]

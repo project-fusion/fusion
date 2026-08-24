@@ -113,7 +113,7 @@ export const partsByTag = () => {
       const [, name, base = ''] = declaration
       const code = withoutComments(text)
       const parts = new Set()
-      for (const [, value] of code.matchAll(/part="([a-z0-9 -]+)"/g)) {
+      for (const [, value] of code.matchAll(/(?<!\[)part="([a-z0-9 -]+)"/g)) {
         for (const one of value.split(/\s+/)) {
           parts.add(one)
         }

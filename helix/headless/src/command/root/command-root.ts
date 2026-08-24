@@ -71,7 +71,6 @@ const parse = (hotkey: string) => {
  *
  * @csspart dialog - The overlay's own box, forwarded from the dialog.
  * @csspart listbox - The list inside it.
- * @csspart search-field - The field itself.
  * @csspart footer - The row under the list.
  * @csspart listbox-empty - Shown when a filter has hidden everything.
  * @csspart listbox-feedback - What is wrong with it.

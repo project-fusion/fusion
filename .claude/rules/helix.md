@@ -794,6 +794,26 @@ twice in a file whose own comment says splitter has a `separator` and no
 `divider`, and `overriding-a-component.mdx`, the page that teaches parts, styled
 `helix-dialog::part(panel)` on an element publishing `dialog`.
 
+**A `[part=]` written in TypeScript is checked like one written in CSS**, and
+only `check:selectors` reads stylesheets, so a rename verified against CSS alone
+is verified against half the callers. A stale `querySelector('[part="x"]')`
+returns `null`, so what breaks is behavior rather than appearance and an optional
+chain swallows it. Ninety-seven lookups exist. Only a lookup on the component's
+*own* root counts: `Command` walks into the listbox's `renderRoot` for
+`search-field`, which is the listbox's part and is checked where the listbox is.
+`helix/core` is out of it, a controller reading `[part="plot"]` out of whatever
+host applies it and owning no parts of its own.
+
+**And a `[part="x"]` inside a selector string is not a render.** Harvesting
+`part="x"` without excluding the bracket let a lookup satisfy itself, so the very
+selector under test counted as evidence the part exists. Live across 53 files and
+five checks, including `check:parts`, whose whole purpose it defeats. It was
+holding one real failure green: `command` documented `search-field` after that
+name stopped being forwarded, and a `querySelector('[part="search-field"]')` two
+hundred lines away was the only thing making it look rendered. Same shape as this
+file's older note about a JSDoc that quotes markup, and worth assuming of any new
+check that reads a template.
+
 **Words that name a position draw from a registry; words that name a thing do
 not.** `check:vocabulary` holds the first set to one spelling each: `box`,
 `container`, `content`, `panel`, `surface`, `viewport`. A `thumb`, a `terminus`,

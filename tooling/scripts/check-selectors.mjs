@@ -121,7 +121,7 @@ for (const dir of readdirSync('helix/core/src/utils', { withFileTypes: true })) 
     if (name) {
       helpers.set(
         name,
-        [...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]),
+        [...code.matchAll(/(?<!\[)part="([a-z0-9-]+)"/g)].map((m) => m[1]),
       )
     }
   }
@@ -425,6 +425,100 @@ for (const tier of TIERS) {
   }
 }
 
+/**
+ * The same rule for a `[part=]` written in TypeScript rather than in CSS.
+ *
+ * **A stale `querySelector('[part="x"]')` is worse than a stale rule**, because
+ * what it returns is `null` and what breaks is behavior rather than appearance.
+ * A component reads its own scrollport, its own dialog, its own surface this
+ * way, and a renamed part turns each of those into a silent no-op with an
+ * optional chain swallowing it.
+ *
+ * Nothing covered it. Everything above reads stylesheets, so a rename verified
+ * against CSS alone is verified against half the callers. Ninety-seven lookups
+ * exist and were audited by hand once, which is the argument for doing it here
+ * instead: a hand audit is right on the day it is run.
+ *
+ * The family rather than the file, because a lookup may legitimately reach an
+ * element the family rendered in another file: `megamenu-root.ts` reads
+ * `[part="surface"]` out of the root it renders, and Tabs reads a panel its
+ * sibling declares.
+ *
+ * **`helix/core` is out of it, because a controller owns no parts.**
+ * `ChartPointerController` reads `[part="plot"]` and `[part="tooltip-anchor"]`
+ * out of whatever host applies it, so there is no family to check it against and
+ * the charts that do render those are checked in their own right.
+ *
+ * **And a `[part="x"]` inside a selector string is not a render**, which is the
+ * hole this rule fell into first. Harvesting `part="x"` without excluding the
+ * bracket let a lookup satisfy itself: the very selector being checked was
+ * counted as evidence that the part exists, so this rule passed on a name
+ * nothing rendered. It is the same shape as `check:parts` counting a JSDoc that
+ * quotes markup, and it was live across 53 files. Once fixed it found one:
+ * `command` documented `search-field` after that name stopped being forwarded,
+ * and the `querySelector('[part="search-field"]')` three hundred lines away had
+ * been holding `check:parts` green over it.
+ */
+const OWNS_PARTS = (tier) => tier !== 'helix/core/src'
+
+/**
+ * A `[part=]` lookup on the component's *own* root, and only that.
+ *
+ * **A lookup reaching into another element's root is that element's business.**
+ * `Command` walks `this.renderRoot.querySelector('[part="listbox"]')` and then
+ * `?.renderRoot?.querySelector('[part="search-field"]')`, and the second name is
+ * the listbox's, checked where the listbox is. Reading every lookup regardless
+ * of receiver reported that one as broken, which it is not.
+ *
+ * The receiver may sit on its own line, so the whitespace is not optional.
+ */
+const OWN_ROOT_LOOKUP =
+  /this\.(?:renderRoot|shadowRoot)\??\s*\.\s*querySelector(?:All)?(?:<[^>(]*>)?\(\s*['"`]\[part=["']([a-z0-9-]+)["']\]/g
+
+const rendersInFamily = new Map()
+for (const tier of TIERS.filter(OWNS_PARTS)) {
+  for (const path of sources(tier)) {
+    const family = path.split('/')[3]
+    const code = readFileSync(path, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+    const found = rendersInFamily.get(family) ?? new Set()
+    for (const [, value] of code.matchAll(/(?<!\[)part="([a-z0-9 -]+)"/g)) {
+      for (const one of value.split(/\s+/)) {
+        found.add(one)
+      }
+    }
+    /* A forwarded name is reachable on the host too, so a lookup for one is
+       not a mistake even though nothing in this family writes it as a part. */
+    for (const [, value] of code.matchAll(/exportparts="([^"]*)"/g)) {
+      for (const one of value.split(',')) {
+        found.add(one.split(':').pop().trim())
+      }
+    }
+    rendersInFamily.set(family, found)
+  }
+}
+
+for (const tier of TIERS.filter(OWNS_PARTS)) {
+  for (const path of sources(tier)) {
+    const family = path.split('/')[3]
+    const text = readFileSync(path, 'utf8')
+    /* Blanked to the same length, so the offset below is a real line number.
+       Collapsing a comment moves every character after it. */
+    const code = text.replace(/\/\*[\s\S]*?\*\//g, (found) => found.replace(/[^\n]/g, ' '))
+    for (const match of code.matchAll(OWN_ROOT_LOOKUP)) {
+      const part = match[1]
+      if (rendersInFamily.get(family)?.has(part)) {
+        continue
+      }
+      const line = text.slice(0, match.index).split('\n').length
+      problems.push(
+        `${path}:${line}: looks up \`[part="${part}"]\` and nothing in \`${family}\` renders it, ` +
+          'so this returns null and whatever it was going to do silently does not happen. ' +
+          `The family renders: ${[...(rendersInFamily.get(family) ?? [])].sort().join(', ')}.`,
+      )
+    }
+  }
+}
+
 if (problems.length > 0) {
   console.error(`Selectors that match nothing (${problems.length}):\n`)
   for (const problem of problems) {
@@ -433,5 +527,6 @@ if (problems.length > 0) {
   process.exit(1)
 }
 console.log(
-  `selectors: ${checked} stylesheets, every part accounted for, no slotted-only type, no :has() in :host()`,
+  `selectors: ${checked} stylesheets and every \`[part=]\` lookup in TypeScript, every part ` +
+    'accounted for, no slotted-only type, no :has() in :host()',
 )

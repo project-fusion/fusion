@@ -1,10 +1,10 @@
 {
   "bun": "1.1.43",
-  "measured": "2026-08-23",
+  "measured": "2026-08-24",
   "systems": [
     {
       "name": "Carbon",
-      "note": "Its dialog is called Modal.",
+      "note": "Its dialog is Modal, its radio is Radio Button, and its switch is Toggle.",
       "package": "@carbon/web-components",
       "parts": {
         "button": {
@@ -24,6 +24,18 @@
           "gzip": 67390,
           "raw": 510866,
           "specifier": "@carbon/web-components/es/components/modal/index.js"
+        },
+        "radio": {
+          "brotli": 14605,
+          "gzip": 16887,
+          "raw": 63055,
+          "specifier": "@carbon/web-components/es/components/radio-button/index.js"
+        },
+        "switch": {
+          "brotli": 14764,
+          "gzip": 17127,
+          "raw": 69423,
+          "specifier": "@carbon/web-components/es/components/toggle/index.js"
         },
         "tabs": {
           "brotli": 43235,
@@ -63,6 +75,18 @@
           "raw": 34238,
           "specifier": "@material/web/dialog/dialog.js"
         },
+        "radio": {
+          "brotli": 11757,
+          "gzip": 13234,
+          "raw": 41044,
+          "specifier": "@material/web/radio/radio.js"
+        },
+        "switch": {
+          "brotli": 12935,
+          "gzip": 14577,
+          "raw": 50155,
+          "specifier": "@material/web/switch/switch.js"
+        },
         "tabs": {
           "brotli": 11368,
           "gzip": 12820,
@@ -94,6 +118,18 @@
           "gzip": 17698,
           "raw": 52754,
           "specifier": "@shoelace-style/shoelace/dist/components/dialog/dialog.js"
+        },
+        "radio": {
+          "brotli": 10559,
+          "gzip": 12027,
+          "raw": 34865,
+          "specifier": "@shoelace-style/shoelace/dist/components/radio/radio.js"
+        },
+        "switch": {
+          "brotli": 10568,
+          "gzip": 11814,
+          "raw": 37833,
+          "specifier": "@shoelace-style/shoelace/dist/components/switch/switch.js"
         },
         "tabs": {
           "brotli": 15068,
@@ -132,6 +168,18 @@
           "gzip": 31899,
           "raw": 155708,
           "specifier": "@spectrum-web-components/dialog/sp-dialog.js"
+        },
+        "radio": {
+          "brotli": 9370,
+          "gzip": 10660,
+          "raw": 38685,
+          "specifier": "@spectrum-web-components/radio/sp-radio.js"
+        },
+        "switch": {
+          "brotli": 13321,
+          "gzip": 15059,
+          "raw": 62322,
+          "specifier": "@spectrum-web-components/switch/sp-switch.js"
         },
         "tabs": {
           "brotli": 16283,

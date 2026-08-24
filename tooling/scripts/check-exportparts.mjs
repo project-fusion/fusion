@@ -79,7 +79,7 @@ for (const tier of TIERS) {
   for (const path of walk(tier)) {
     const code = withoutComments(readFileSync(path, 'utf8'))
     const own = new Set()
-    for (const [, value] of code.matchAll(/part="([a-z0-9 -]+)"/g)) {
+    for (const [, value] of code.matchAll(/(?<!\[)part="([a-z0-9 -]+)"/g)) {
       for (const one of value.split(/\s+/)) {
         own.add(one)
       }
