@@ -255,6 +255,48 @@
      Light has no such floor. White is 1.0 with nothing above it competing, so
      300 could take the whole reduction and did. The asymmetry is the ramps
      being asymmetric, not the border meaning two different things. */
+  /* **These four are not moving, and the asymmetry that argued they should is
+     mostly an artifact of which metric was used to see it.**
+   *
+   * The complaint was that the surface ramp separates four to fourteen times
+   * harder in dark than in light, measured as OKLab lightness against the page.
+   * That number is real and it is one of four, and they do not agree. Measured
+   * in Chromium as painted sRGB, then converted, for `surface` against the page:
+   *
+   *   OKLab L      light 0.0152  dark 0.2100   dark separates 13.8x more
+   *   sRGB code    light 0.0200  dark 0.0950   dark separates  4.8x more
+   *   WCAG excess  light 0.045   dark 0.185    dark separates  4.2x more
+   *   linear Y     light 0.0449  dark 0.0093   LIGHT separates 4.8x more
+   *
+   * The last line is the one that matters most and it reverses the finding.
+   * Linear luminance is what the display emits and what every contrast formula
+   * is built on, and by it the light ramp separates its surfaces *more* than the
+   * dark one does. `surface-sunken` behaves the same way: light 0.053 against
+   * dark 0.043 in sRGB, and light ahead by 1.9x on WCAG, where OKLab L alone
+   * says dark is 3.7x ahead.
+   *
+   * A fault whose magnitude runs from 0.2x to 14x and whose *sign* depends on
+   * the metric is not a measured fault. OKLab L is perceptually uniform for
+   * judging one lightness against another and is not a model of discriminating
+   * two large emissive areas near the ends of the range, which is what a surface
+   * on a page is. The original filing rejected the WCAG ratio for understating
+   * dark, which is true, and did not check that OKLab L overstates it.
+   *
+   * Moving these would also drag three unrelated roles with them, which is the
+   * second reason. `neutral-900` is dark `surface` *and* light
+   * `surface-inverse` *and* the dark translucent material; `neutral-950` is dark
+   * `surface-sunken` *and* the modal scrim in both modes. There is no rung to
+   * move that moves only a surface.
+   *
+   * **What is left, and it is one thing rather than a ramp.**
+   * `surface-overlay` in light is `neutral-0`, the page color exactly, so its
+   * separation is zero by all four metrics rather than small by three of them.
+   * That is deliberate and the policy says so: floating leads with shadow, which
+   * is why `border-floating` rests at 0. It is still the one rung with nothing
+   * of its own, and a theme that zeroes shadows has an invisible menu. Closing
+   * it needs a new primitive between 1.0 and 0.985, since nothing sits there,
+   * and it buys about seven thousandths of sRGB. That trade is a palette
+   * decision and not a contrast one, which is where this now rests. */
   --_helix-neutral-700: oklch(0.33 var(--_helix-neutral-cast));
   --_helix-neutral-800: oklch(0.29 var(--_helix-neutral-cast));
   --_helix-neutral-900: oklch(0.21 var(--_helix-neutral-cast));
