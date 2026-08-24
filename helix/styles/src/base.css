@@ -1476,6 +1476,92 @@ helix-toggle[disabled]::part(item) {
   font-weight: var(--helix-weight-medium);
 }
 
+/* **The two surface axes, reachable from the document.**
+ *
+ * `material` and `separation` are registered axes with full token sets, and
+ * until now a plain element could take neither: only a component could be
+ * glass, only a component could be elevated. Every other recipe here is control
+ * shaped, `button` and `link` and `list-item` and `navigation-item`, because
+ * components owned every surface. A landing page building its own bands is what
+ * ran out of vocabulary first.
+ *
+ * **The values are the axis's own, verbatim**, so one word means one thing on a
+ * component and on a `<section>`. That is the argument for these existing rather
+ * than each page inventing a translucent background: `check:axes` already holds
+ * the components to this list, and a document recipe spelling it differently
+ * would be a second vocabulary for one idea.
+ *
+ * There is no collision with the component attribute. A component takes
+ * `material="glass"` as its own attribute and this is `data-material`, which is
+ * the same freedom `data-card` and `Card` already have.
+ *
+ * **`frosted` gets its first implementation here**, which is worth saying
+ * plainly: it has been in `AXES` and in the documentation with nothing anywhere
+ * rendering it, and `--helix-material-translucent-strong` was a token nothing
+ * read. The registry's own test for a value is that something needs it, which is
+ * why `matte` was refused. This is `frosted` passing that test rather than going
+ * on failing it quietly.
+ *
+ * Blur is the expensive one and the ramp is deliberate: `glass` takes the `md`
+ * step through `--helix-material-backdrop` and `frosted` the `lg`. A
+ * `backdrop-filter` makes the compositor re-read what is behind the element on
+ * every frame it moves, so a full-width band that stays on screen through a
+ * scroll pays continuously. Where the effect is about depth rather than texture,
+ * `separation` is the cheaper axis and the honest one. */
+[data-material="glass"] {
+  backdrop-filter: var(--helix-material-backdrop);
+  background-color: var(--helix-material-translucent);
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+}
+
+[data-material="frosted"] {
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+  background-color: var(--helix-material-translucent-strong);
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+}
+
+/* Nothing of its own, and it takes three declarations rather than none: the
+   point of writing it is to *undo* a ground the element already has, which is
+   what `app-header` uses the same value for. */
+[data-material="transparent"] {
+  backdrop-filter: none;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+/* **What sets a surface apart from what is behind it**, which is the question
+   `separation` asks and the four mechanisms `ThemeIntent.separation` names.
+   These render what the components render: a shadow for `elevated`, a border for
+   `outlined`, a fill for `filled`, and nothing for `plain`.
+
+   `elevated` carries the surface as well as the shadow, where `Card` does not
+   have to because it already has one. A shadow cast by a transparent box reads
+   as a smudge under nothing. */
+[data-separation="elevated"] {
+  background-color: var(--helix-color-surface);
+  border-color: transparent;
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-md);
+}
+
+[data-separation="filled"] {
+  background-color: var(--helix-color-surface);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+}
+
+[data-separation="outlined"] {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+}
+
+/* The resting state, written down because it is the one that undoes. */
+[data-separation="plain"] {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
 /* The clickable-card recipe.
  *
  * The other half of the same decision, and the one that keeps `selected` and

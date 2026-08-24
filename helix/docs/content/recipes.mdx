@@ -65,6 +65,29 @@ context says so on its own, rather than surprising the reader.
 than about the control: `data-dock-within` scopes it to the nearest positioned
 ancestor instead of the window.
 
+## Surface axes
+
+Two of the [visual axes](./visual-axes) describe a surface rather than a control,
+and these are how a plain element reaches them:
+
+```html
+<section data-material="glass">…</section>
+<div data-separation="elevated">…</div>
+```
+
+`data-material` takes `glass`, `frosted` and `transparent`, and `data-separation`
+takes `elevated`, `filled`, `outlined` and `plain`. The values are the axes' own,
+so one word means the same thing here as it does on a component: a `<section>`
+that is `glass` and a component that is `material="glass"` are asking for the
+same optical treatment. See [Elevation and
+material](./elevation-and-material).
+
+**Blur is the expensive one.** `glass` and `frosted` both carry a
+`backdrop-filter`, which makes the compositor re-read what is behind the element
+on every frame it moves, so a full-width band that stays on screen through a
+scroll pays continuously. Where the effect is about depth rather than texture,
+`data-separation` is the cheaper axis.
+
 ## Prose
 
 ```html

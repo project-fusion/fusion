@@ -18,7 +18,7 @@ a consumer can reach for a rung we happen not to use. It is worth seeing
 because nothing else can see it, `check:tokens` asking only that every token
 *referenced* exists.
 
-Currently unread anywhere: `--helix-color-accent-active`, `--helix-color-accent-subtle`, `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-translucent-strong`, `--helix-size-avatar-md`.
+Currently unread anywhere: `--helix-color-accent-active`, `--helix-color-accent-subtle`, `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-size-avatar-md`.
 
 ## color
 
@@ -27,13 +27,13 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 70 |
-| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 28 |
+| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 30 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 17 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 21 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 47 |
 | `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | 10 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 12 |
-| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 163 |
+| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 164 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 97 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 66 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 25 |
@@ -41,7 +41,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 9 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 3 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 4 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 123 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 124 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 75 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 5 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
@@ -125,7 +125,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 32 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 114 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 117 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 10 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 6 |
 | `--helix-radii-full` | `9999px` | 39 |
@@ -192,7 +192,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 125 |
+| `--helix-border-thin` | `1px` | 128 |
 | `--helix-border-thick` | `2px` | 37 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 1 |
 | `--helix-border-floating` | `0` | 10 |
@@ -205,7 +205,7 @@ Elevation.
 |---|---|---|
 | `--helix-shadow-none` | `none` | 2 |
 | `--helix-shadow-sm` | `0 1px 2px var(--_helix-shadow-ink-sm)` | 8 |
-| `--helix-shadow-md` | `0 4px 12px var(--_helix-shadow-ink-md)` | 11 |
+| `--helix-shadow-md` | `0 4px 12px var(--_helix-shadow-ink-md)` | 12 |
 | `--helix-shadow-lg` | `0 12px 32px var(--_helix-shadow-ink-lg)` | 7 |
 | `--helix-shadow-surface` | `var(--helix-shadow-none)` | 1 |
 | `--helix-shadow-floating` | `var(--helix-shadow-lg)` | 12 |
@@ -216,14 +216,14 @@ Blur and translucency, for a surface that lets the page through.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | 5 |
+| `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | 6 |
 | `--helix-material-opacity` | `1` | 9 |
 | `--helix-material-blur-sm` | `8px` | 0 |
 | `--helix-material-blur-md` | `16px` | 2 |
-| `--helix-material-blur-lg` | `32px` | 3 |
-| `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 9 |
-| `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 0 |
-| `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 1 |
+| `--helix-material-blur-lg` | `32px` | 4 |
+| `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 10 |
+| `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 1 |
+| `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 3 |
 
 ## duration
 

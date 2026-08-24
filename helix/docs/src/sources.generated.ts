@@ -1757,7 +1757,7 @@ is why it is the whole cost of adopting the base layer on its own.
 
 | File | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
-| \`base.css\` | 80,265 | 25,072 | 21,580 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
+| \`base.css\` | 84,136 | 26,210 | 22,556 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
 | \`elements.css\` | 7,887 | 1,823 | 1,543 | The components' own layer, generated from every family's stylesheet. |
 | \`primitives.css\` | 32,648 | 11,331 | 9,635 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
 | \`tokens.css\` | 64,966 | 19,617 | 16,301 | The 178 semantic tokens. Nothing paints without this. |
@@ -2021,7 +2021,7 @@ column is what was removed rather than part of what remains.
 | \`@helix-io/core\` | 777,550 | 103 | 139,230 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
 | \`@helix-io/headless\` | 7,254,478 | 390 | 614,494 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 64,200 | 11 | 19,847 | none |
-| \`@helix-io/styles\` | 273,298 | 5 | 0 | none |
+| \`@helix-io/styles\` | 277,169 | 5 | 0 | none |
 | \`@helix-io/theme\` | 564,859 | 16 | 47,856 | none |
 | \`@helix-io/styled\` | 8,004,318 | 675 | 272,993 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
@@ -2589,6 +2589,29 @@ context says so on its own, rather than surprising the reader.
 \`data-dock\` pins something to a corner, which is a fact about the page rather
 than about the control: \`data-dock-within\` scopes it to the nearest positioned
 ancestor instead of the window.
+
+## Surface axes
+
+Two of the [visual axes](./visual-axes) describe a surface rather than a control,
+and these are how a plain element reaches them:
+
+\`\`\`html
+<section data-material="glass">…</section>
+<div data-separation="elevated">…</div>
+\`\`\`
+
+\`data-material\` takes \`glass\`, \`frosted\` and \`transparent\`, and \`data-separation\`
+takes \`elevated\`, \`filled\`, \`outlined\` and \`plain\`. The values are the axes' own,
+so one word means the same thing here as it does on a component: a \`<section>\`
+that is \`glass\` and a component that is \`material="glass"\` are asking for the
+same optical treatment. See [Elevation and
+material](./elevation-and-material).
+
+**Blur is the expensive one.** \`glass\` and \`frosted\` both carry a
+\`backdrop-filter\`, which makes the compositor re-read what is behind the element
+on every frame it moves, so a full-width band that stays on screen through a
+scroll pays continuously. Where the effect is about depth rather than texture,
+\`data-separation\` is the cheaper axis.
 
 ## Prose
 
