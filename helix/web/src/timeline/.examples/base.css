@@ -155,6 +155,28 @@ helix-base-timeline-item > [slot="marker"]::part(svg) {
   inline-size: 0.75rem;
 }
 
+/* Timeline's `dot` is a glyph rather than a filled shape, and it is the one
+   place the round-part rule is wrong about a name.
+
+   `ROUND` paints a `dot` as a 0.75rem circle of `--_gray-strong`, which is
+   right for a slider's thumb and for every other family that renders one: a
+   `<span>` the sheet fills. Timeline renders `<svg part="dot"
+   fill="currentColor">`, so that rule painted a *background* behind a glyph
+   that takes its color from the page, and the two moved in opposite
+   directions: measured by `check:contrast`, black on `#2a2a2e` at 1.47:1 in
+   light and white on `#e9e9ec` at 1.21:1 in dark, against a target of 3.
+
+   A generator working from part names cannot know which kind an element is, and
+   `::part()` cannot be qualified by tag from outside the shadow, so the family
+   that differs says so here. The fill goes and the same value becomes the
+   glyph's own color, which puts it on the page rather than on itself. */
+helix-base-timeline-item::part(dot) {
+  background-color: transparent;
+  block-size: 0.75rem;
+  color: var(--_gray-strong);
+  inline-size: 0.75rem;
+}
+
 helix-base-timeline-item::part(time) {
   color: var(--_gray-muted);
   font-size: 0.875em;
