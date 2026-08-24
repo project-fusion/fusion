@@ -281,6 +281,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   // same reason.
   useEffect(() => {
     const url = readUrlState(window.location.search)
+    setRead(true)
     setFamilySlug(url.family)
     setExampleSlug(url.example)
     setLayout(url.layout)
@@ -378,6 +379,17 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      half of the color-mode argument in `url-state.ts` that still applies to a
      tier. Null until the URL is read, which is after mount, so the first paint
      follows the drawer exactly as it did. See 211. */
+  /* Whether the address has been read yet.
+     **State rather than a ref, and the difference is the whole fix.** A ref set
+     inside the reading effect is true before the values it read have landed:
+     effects run in order on one flush, so the writing effect below saw
+     `read.current === true` beside a `familySlug` still null, wrote an empty
+     query and emptied the address of the link it had just arrived on. Measured,
+     not reasoned about: `?e=accordion.default&l=centered&d=rtl&tier=base`
+     became `/helix/sandbox` within a frame. A `setState` batches with the other
+     setters, so this turns true on the same render that carries the values, and
+     the effect that reads it cannot run early. */
+  const [read, setRead] = useState(false)
   const [forcedTier, setForcedTier] = useState<'base' | 'styled' | null>(null)
   const preferredTier = useApiTier()
   const wanted = (forcedTier ?? preferredTier) === 'base' ? 'headless' : 'styled'
@@ -492,11 +504,18 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      panel off is not somewhere to go Back to, and a settings menu that filled
      the history would make the browser's own Back button useless for leaving.
 
-     Guarded on `familySlug`, which is null until the first effect has read the
-     address: writing before then would replace a real query with an empty one
-     and lose whatever the link said. */
+     Guarded on whether the address has been read, which is a different question
+     from whether an example is open and used to be answered with the same
+     value. `familySlug` is null before the first effect runs, so testing it did
+     stop the empty write that would have replaced a real query on load. It is
+     also null for as long as nobody has chosen an example, and at a bare
+     `/helix/sandbox` that is forever: every setting a reader changed there,
+     tier and layout and direction and panes and syntax alike, went unrecorded,
+     while the same sandbox reached from a component's preview worked because
+     that link always carries `?e=`. One symptom, two paths, and the difference
+     was a proxy standing in for a fact. `read` is the fact. */
   useEffect(() => {
-    if (!familySlug) {
+    if (!read) {
       return
     }
     const panes: Section[] = []
@@ -553,6 +572,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
         : window.location.hash
     window.history.replaceState(null, '', `${window.location.pathname}${query}${hash}`)
   }, [
+    read,
     direction,
     exampleSlug,
     familySlug,
