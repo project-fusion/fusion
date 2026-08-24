@@ -1,0 +1,31 @@
+{
+  "families": [
+    {
+      "family": "button",
+      "render": 0.09999999403953552,
+      "upgrade": 5.800000011920929
+    },
+    {
+      "family": "checkbox",
+      "render": 0.19999998807907104,
+      "upgrade": 6.0999999940395355
+    },
+    {
+      "family": "dialog",
+      "render": 0.09999999403953552,
+      "upgrade": 6
+    },
+    {
+      "family": "tabs",
+      "render": 0.09999999403953552,
+      "upgrade": 6.5999999940395355
+    },
+    {
+      "family": "tooltip",
+      "render": 0.09999999403953552,
+      "upgrade": 7.200000017881393
+    }
+  ],
+  "measured": "2026-08-24",
+  "runs": 9
+}
