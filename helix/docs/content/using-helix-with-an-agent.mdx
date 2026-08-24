@@ -102,28 +102,29 @@ helix-input[disabled] { … }  /* wrong: a fieldset sets no attribute */
 A control inside `<fieldset disabled>` is disabled by the platform and carries no
 attribute, so the attribute selector paints it as live while it refuses input.
 
-### 4. Four stylesheets, in this order
+### 4. Two stylesheets, then the elements
 
 ```ts
-import '@helix-io/styles/primitives.css'
-import '@helix-io/styles/tokens.css'
-import '@helix-io/styles/base.css'
+import '@helix-io/styles/all.css'
 import '@helix-io/styled/elements.css'
 import '@helix-io/styled'
 ```
+
+`all.css` is `primitives.css`, `tokens.css` and `base.css` in the order they
+have to be in. Write those three yourself only to substitute one of them.
 
 `elements.css` is the one people leave out, and everything works without it
 until the page is server-rendered: an element that has not upgraded has no
 styles of its own, so the markup flashes unstyled and then snaps into place.
 
 The tell for a missing layer is which. A flash before hydration is
-`elements.css`; bare headings are `base.css`. **No color anywhere is either of
-the top two, and they are told apart by what is in the stylesheet rather than by
-what you see**: `tokens.css` missing leaves nothing declaring
-`--helix-color-*` at all, while `primitives.css` missing leaves all 177 declared
-and every one of them resolving to `rgba(0, 0, 0, 0)`, because `tokens.css`
-refers to a primitive 235 times and to nothing else. The second is the one that
-looks like a working install.
+`elements.css`; bare headings are `base.css`. **No color anywhere means the
+ramp or the semantic layer, and the two are told apart by what is in the
+stylesheet rather than by what is on screen**: without `tokens.css` nothing
+declares `--helix-color-*` at all, while without `primitives.css` all 177 are
+declared and every one resolves to `rgba(0, 0, 0, 0)`, since `tokens.css` refers
+to a primitive 235 times and to nothing else. The second is the one that looks
+like a working install, and it is the reason `all.css` exists.
 
 ## Choosing a family
 

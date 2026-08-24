@@ -1,6 +1,4 @@
-import '@helix-io/styles/primitives.css'
-import '@helix-io/styles/tokens.css'
-import '@helix-io/styles/base.css'
+import '@helix-io/styles/all.css'
 import '@helix-io/styled/elements.css'
 import '@helix-io/gallery/gallery.css'
 import './fonts.css'

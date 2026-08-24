@@ -10,6 +10,7 @@
   },
   "type": "module",
   "exports": {
+    "./all.css": "./src/all.css",
     "./base.css": "./src/base.css",
     "./primitives.css": "./src/primitives.css",
     "./tokens.css": "./src/tokens.css",
