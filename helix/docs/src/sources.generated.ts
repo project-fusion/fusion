@@ -656,7 +656,7 @@ what to import and what to write.
 
 ## Namespaces mean composition
 
-\`Card.Root\` contains \`Card.Header\`. The namespace says *this goes inside that*.
+\`Tabs.Root\` contains \`Tabs.Tab\`. The namespace says *this goes inside that*.
 
 It never says *this is a version of that*. An icon-only button is not a part of
 \`Button\`, so \`IconButton\` is top-level. The rule falls out of one line:
@@ -1290,7 +1290,7 @@ import '@helix-io/web/elements.css'
 
 Three files, and each one needs what is above it.
 
-- **\`tokens.css\`** declares the semantic layer, 176 custom properties in 15
+- **\`tokens.css\`** declares the semantic layer, 177 custom properties in 15
   categories, plus \`color-scheme: light dark\` on \`:root\`. Everything below reads
   from it.
 - **\`base.css\`** is the element reset, the type scale on bare \`h1\` through
@@ -3726,8 +3726,8 @@ title: Tiers
 
 # Tiers
 
-Helix ships as five packages. Each has one job, and the dependency direction
-never reverses.
+Helix ships as four stacked packages. Each has one job, and the dependency
+direction never reverses.
 
 | Package | Owns | Depends on |
 | --- | --- | --- |
@@ -3735,7 +3735,12 @@ never reverses.
 | \`@helix-io/core\` | Element base class, mixins, decorators | Lit |
 | \`@helix-io/headless\` | Structure, accessibility, state, form participation | \`core\` |
 | \`@helix-io/web\` | Presentation: tokens, parts, and the visual axes | \`headless\`, \`styles\` |
-| \`@helix-io/react\` | Generated React wrappers | \`web\` |
+
+\`@helix-io/theme\` and \`@helix-io/icons\` ship beside the stack rather than in it:
+neither is a tier, and neither is needed to render a component. **There is no
+React package.** The framework typings are generated into \`@helix-io/web\`, and
+the bridge that repairs React's hydration of custom events is in
+\`@helix-io/core\`. See [React](./react).
 
 ## Why the split
 

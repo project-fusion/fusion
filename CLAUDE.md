@@ -78,7 +78,8 @@ Rust for backend and substrate cores. TypeScript for frontend.
 ## Layout
 
 ```
-helix/     styles core headless web react icons theme cem docs gallery
+helix/     styles core headless web icons theme cem docs gallery sandbox
+           testing cli
 cortex/    core trace engram docs
 docs/      plan/ is the numbered strategy; the queue and two generated
            references sit above it, being infrastructure rather than plan

@@ -7,8 +7,8 @@ title: Tiers
 
 # Tiers
 
-Helix ships as five packages. Each has one job, and the dependency direction
-never reverses.
+Helix ships as four stacked packages. Each has one job, and the dependency
+direction never reverses.
 
 | Package | Owns | Depends on |
 | --- | --- | --- |
@@ -16,7 +16,12 @@ never reverses.
 | `@helix-io/core` | Element base class, mixins, decorators | Lit |
 | `@helix-io/headless` | Structure, accessibility, state, form participation | `core` |
 | `@helix-io/web` | Presentation: tokens, parts, and the visual axes | `headless`, `styles` |
-| `@helix-io/react` | Generated React wrappers | `web` |
+
+`@helix-io/theme` and `@helix-io/icons` ship beside the stack rather than in it:
+neither is a tier, and neither is needed to render a component. **There is no
+React package.** The framework typings are generated into `@helix-io/web`, and
+the bridge that repairs React's hydration of custom events is in
+`@helix-io/core`. See [React](./react).
 
 ## Why the split
 
