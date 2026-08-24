@@ -1,5 +1,5 @@
 import { helixNavigation } from '@/lib/helix-nav'
-import { DocsNav } from '../docs-nav'
+import { DocsNav } from '../../docs-nav'
 import styles from './docs.module.css'
 
 /**
@@ -35,6 +35,16 @@ import styles from './docs.module.css'
  * That is also why `DocsNav` reads the route itself rather than taking a prop:
  * this layout is not handed the family, because not being handed it is the
  * whole point. A navigation knowing where it is, is not a burden on it.
+ *
+ * **`(reference)` is a route group, which is what keeps the index out of this
+ * shell.** When the gallery moved to `/helix/components` it landed in the same
+ * directory as the family pages and this layout caught it, so the index of 89
+ * cards rendered inside a documentation sidebar in a narrow column. Putting the
+ * layout inside `[family]` is not the fix and the paragraph above says why: a
+ * layout in a dynamic segment is keyed by that segment, so it remounts per
+ * family and the collapsed-branch bug comes back. A group has no URL of its
+ * own, so `/helix/components/button` is unchanged and the layout wraps every
+ * family and nothing else. See 189.
  */
 export default function ComponentsLayout({ children }: { children: React.ReactNode }) {
   return (

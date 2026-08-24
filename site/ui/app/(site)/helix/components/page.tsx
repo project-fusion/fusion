@@ -1,11 +1,13 @@
 import { ComponentArt } from '@helix-io/gallery'
 import Link from 'next/link'
 import { type Family, getFamilies } from '../../../../lib/catalog'
+import { PRODUCTS } from '../../../products'
 import { findVertical, stageAppearance } from '../../../verticals'
 import { ComponentBrowser } from './component-browser'
 import styles from './gallery.module.css'
 
 const vertical = findVertical('/helix')
+const product = PRODUCTS.find((entry) => entry.href === '/helix')
 
 /* `Components`, because this is the index and no longer the product page.
    `/helix` was both at once and every awkward route below it was downstream of
@@ -76,7 +78,7 @@ export default async function Page({
 
   return (
     <ComponentBrowser
-      eyebrow={vertical.name}
+      eyebrow={product?.name ?? vertical.name}
       index={index}
       /* Seeded from the URL on the server, so a shared link arrives already
          filtered rather than rendering all sixty-five and hiding most of them a
@@ -96,7 +98,7 @@ export default async function Page({
       sorts={Object.keys(SORTS)}
       stage={vertical.stage}
       stageTone={stageAppearance(vertical.stage)}
-      title="Helix"
+      title="Components"
     >
       <helix-grid className={styles.familyGrid} columns={5} gap="2xl">
         {families.map((family) => (

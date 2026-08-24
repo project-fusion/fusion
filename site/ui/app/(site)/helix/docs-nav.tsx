@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { type MouseEvent as ReactMouseEvent, useCallback, useRef } from 'react'
 import type { NavEntry, NavSection } from '@/lib/helix-nav'
-import styles from './components/docs.module.css'
+import styles from './components/(reference)/docs.module.css'
 
 /**
  * The sidebar for everything under `/helix`, from `helixNavigation()`.
