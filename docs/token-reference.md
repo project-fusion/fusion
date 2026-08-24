@@ -114,7 +114,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-md` | `var(--_helix-scale-4)` | 80 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 69 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 35 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 41 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 42 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 7 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
 
@@ -148,8 +148,8 @@ Font size.
 |---|---|---|
 | `--helix-text-xs` | `var(--_helix-size-12)` | 52 |
 | `--helix-text-sm` | `var(--_helix-size-13)` | 59 |
-| `--helix-text-md` | `var(--_helix-size-14)` | 25 |
-| `--helix-text-lg` | `var(--_helix-size-18)` | 11 |
+| `--helix-text-md` | `var(--_helix-size-14)` | 26 |
+| `--helix-text-lg` | `var(--_helix-size-18)` | 12 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 11 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 6 |
 | `--helix-text-3xl` | `var(--_helix-size-44)` | 7 |

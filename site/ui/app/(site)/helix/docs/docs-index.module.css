@@ -65,3 +65,20 @@
   display: block;
   margin-block-start: var(--helix-space-2xs);
 }
+
+/* The standfirst, at the size the product pages set for one.
+ *
+ * Carried here rather than imported from `vertical-page.module.css`, which is
+ * where it was: that module also holds the marketing band inset, and taking one
+ * class from it meant wearing the other. See the note on `docsMain` in the page.
+ */
+.lede {
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  max-inline-size: 68ch;
+}
+
+/* The rhythm the flex wrapper used to supply. `main` is not a flex container, so
+   the space between the standfirst and the first section has to be said. */
+.head {
+  margin-block-end: var(--helix-space-2xl);
+}

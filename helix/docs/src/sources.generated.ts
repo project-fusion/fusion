@@ -1515,7 +1515,7 @@ Everything else in the library reads \`--helix-*\`, so changing it is a decision
 about your own surface rather than about Helix's.
 `,
   introduction: `---
-description: What Helix is, and the five tiers it ships as.
+description: What Helix is, and the four packages it stacks into.
 order: 1
 section: Getting started
 title: Introduction
@@ -3787,7 +3787,7 @@ the bridge that repairs React's hydration of custom events is in
 That single constraint is what makes the headless tier independently
 consumable. Consume it and bring your own
 styling entirely; nothing about how Helix looks comes with it. If styling leaks
-downward, the five packages are one package in five files.
+downward, the four are one package in four files.
 
 ## What belongs where
 

@@ -1,6 +1,6 @@
 import { navigation } from '@helix-io/docs'
 import Link from 'next/link'
-import shell from '../../vertical-page.module.css'
+import shell from '../components/(reference)/docs.module.css'
 import styles from './docs-index.module.css'
 
 /**
@@ -29,13 +29,20 @@ export const metadata = {
 
 export default function DocsIndex() {
   return (
-    <helix-flex class={shell.verticalShell} data-shell direction="column" gap="xl">
-      <helix-flex direction="column" gap="sm">
+    /* **`docsMain`, not the vertical product shell.** This wore
+       `vertical-page.module.css`, whose `padding-block: var(--site-band)` is the
+       marketing band inset that `/helix` and `/cortex` need because they have no
+       chrome above them. Inside the docs layout, which already pads 48px below
+       the header, the two stacked: the index's title sat at 249 where every page
+       it links to starts at 134, and 108px below its own sidebar. An index that
+       does not line up with its siblings reads as a different kind of page. */
+    <main className={shell.docsMain}>
+      <helix-flex class={styles.head} direction="column" gap="sm">
         <helix-flex align="center" data-density="sm" gap="xs">
           <helix-tag>Helix</helix-tag>
         </helix-flex>
         <helix-text as="h1">Docs</helix-text>
-        <helix-text as="p" class={shell.lede} tone="muted">
+        <helix-text as="p" class={styles.lede} tone="muted">
           Install it, theme it, and the ideas underneath. Every family's own API lives on its page
           under Components; these are the guides that cross families.
         </helix-text>
@@ -71,6 +78,6 @@ export default function DocsIndex() {
           </div>
         </helix-flex>
       ))}
-    </helix-flex>
+    </main>
   )
 }

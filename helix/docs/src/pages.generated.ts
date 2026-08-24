@@ -96,7 +96,7 @@ export const docPages: DocPage[] = [
     title: 'Intent reference',
   },
   {
-    description: 'What Helix is, and the five tiers it ships as.',
+    description: 'What Helix is, and the four packages it stacks into.',
     order: 1,
     section: 'Getting started',
     slug: 'introduction',
