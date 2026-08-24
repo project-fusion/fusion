@@ -63,6 +63,35 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart trigger-icon - The mark on the button that opens the clock.
  * @csspart surface - The floating panel.
  * @csspart picker - The list inside it.
+ * @csspart picker-column - One of them.
+ * @csspart picker-columns - The row of columns, in `wheels`.
+ * @csspart picker-empty - What it says when nothing matches, forwarded from the listbox.
+ * @csspart picker-items - The scrolling column inside it, forwarded from the listbox.
+ * @csspart picker-list - The listbox holding the times, in `list`.
+ * @csspart picker-option - One time in it. Carries `data-between` inside a range.
+ * @csspart time-dismiss - The remove button, when `dismissible`.
+ * @csspart time-dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart time-prefix - The category before the label.
+ * @csspart picker-column-empty - Shown when a filter has hidden everything.
+ * @csspart picker-column-feedback - What is wrong with it.
+ * @csspart picker-column-filter-icon - The mark beside that field.
+ * @csspart picker-column-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart picker-column-hint - Help under the list.
+ * @csspart picker-column-items - The list itself.
+ * @csspart picker-column-label - The question, over the list.
+ * @csspart picker-column-search - The region holding the field that narrows the list.
+ * @csspart picker-column-search-field - The field itself.
+ * @csspart picker-list-empty - Shown when a filter has hidden everything.
+ * @csspart picker-list-feedback - What is wrong with it.
+ * @csspart picker-list-filter-icon - The mark beside that field.
+ * @csspart picker-list-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart picker-list-hint - Help under the list.
+ * @csspart picker-list-items - The list itself.
+ * @csspart picker-list-label - The question, over the list.
+ * @csspart picker-list-search - The region holding the field that narrows the list.
+ * @csspart picker-list-search-field - The field itself.
+ * @csspart picker-option-item - The row.
+ * @csspart picker-option-label - The words.
  */
 @customElement('helix-headless-time-input')
 export class HelixHeadlessTimeInput extends MixinControllerOpen(
@@ -455,6 +484,17 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   protected renderPicker(): TemplateResult {
     return html`<${this.tag('time-picker')}
       part="picker"
+      exportparts="column: picker-column, column-empty: picker-column-empty,
+        column-feedback: picker-column-feedback, column-filter-icon: picker-column-filter-icon,
+        column-filter-mark: picker-column-filter-mark, column-hint: picker-column-hint,
+        column-items: picker-column-items, column-label: picker-column-label,
+        column-search: picker-column-search, column-search-field: picker-column-search-field,
+        columns: picker-columns, empty: picker-empty, items: picker-items, list: picker-list,
+        list-empty: picker-list-empty, list-feedback: picker-list-feedback,
+        list-filter-icon: picker-list-filter-icon, list-filter-mark: picker-list-filter-mark,
+        list-hint: picker-list-hint, list-items: picker-list-items, list-label: picker-list-label,
+        list-search: picker-list-search, list-search-field: picker-list-search-field,
+        option: picker-option, option-item: picker-option-item, option-label: picker-option-label"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
       appearance=${this.variant ?? nothing}
@@ -481,6 +521,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   protected renderTag(at: string): TemplateResult {
     return html`<${this.tag('tag')}
                   part="time"
+      exportparts="dismiss: time-dismiss, dismiss-mark: time-dismiss-mark, prefix: time-prefix"
                   dismissible
                   dismiss-label=${`Remove ${this.written(at)}`}
                   ?disabled=${this.isDisabled}

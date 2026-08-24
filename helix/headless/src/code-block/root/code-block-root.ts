@@ -40,6 +40,10 @@ import '../../copy-button/index.js'
  * @csspart header - The bar carrying the name, where there is one.
  * @csspart copy - The copy button.
  * @csspart label - The file name or language, where one is given.
+ * @csspart copy-button - The inner button.
+ * @csspart copy-mark - The clipboard glyph, and the confirmation that replaces it.
+ * @csspart copy-tooltip - The bubble, forwarded from the tooltip inside.
+ * @csspart copy-tooltip-arrow - The point, resting against the trigger.
  */
 @customElement('helix-headless-code-block')
 export class HelixHeadlessCodeBlock extends HelixElement {
@@ -121,6 +125,8 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   protected renderCopyButton(): TemplateResult {
     return html`<${this.tag('copy-button')}
       part="copy"
+      exportparts="button: copy-button, mark: copy-mark, tooltip: copy-tooltip,
+        tooltip-arrow: copy-tooltip-arrow"
       label="Copy code"
       .value=${this.text}
     ></${this.tag('copy-button')}>`

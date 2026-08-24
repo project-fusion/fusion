@@ -81,7 +81,7 @@ let showing: HelixHeadlessMegamenu | undefined
  * @slot trigger - The control that opens it. Falls back to a button named by `label`.
  *
  * @csspart trigger - The default trigger, where none was slotted.
- * @csspart panel - The region that opens.
+ * @csspart surface - The floating panel, which is what opens.
  *
  * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
@@ -184,7 +184,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     onDismiss: () => this.close(),
     place: () => !this.banded,
     placement: () => 'bottom-start',
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="panel"]'),
+    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
   })
 
   /** What the consumer slotted, if they slotted anything. */
@@ -516,7 +516,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
        panel has not left this element and fires no leave. */
     return html`${this.renderTrigger()}
       <div
-        part="panel"
+        part="surface"
         id="panel"
         popover="manual"
         aria-label=${this.label || nothing}

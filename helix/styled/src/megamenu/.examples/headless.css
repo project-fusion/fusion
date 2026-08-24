@@ -49,7 +49,7 @@ helix-headless-megamenu::part(trigger) {
   cursor: pointer;
 }
 
-helix-headless-megamenu::part(panel) {
+helix-headless-megamenu::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
   color: var(--_gray-strong);

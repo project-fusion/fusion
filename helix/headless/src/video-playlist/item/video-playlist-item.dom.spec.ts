@@ -72,8 +72,8 @@ describe('one playlist entry', () => {
      a list of buttons is not a list to anything reading it. */
   test('is a row containing a control, not a control claiming to be a row', async () => {
     const host = await entry()
-    expect(part(host, 'wrapper')?.getAttribute('role')).toBe('listitem')
+    expect(part(host, 'container')?.getAttribute('role')).toBe('listitem')
     expect(part(host, 'item')?.tagName).toBe('BUTTON')
-    expect(part(host, 'wrapper')?.contains(part(host, 'item') as Node)).toBe(true)
+    expect(part(host, 'container')?.contains(part(host, 'item') as Node)).toBe(true)
   })
 })

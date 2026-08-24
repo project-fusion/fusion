@@ -203,7 +203,7 @@ describe('menu', () => {
     const el = await menu()
     expect(el.hasAttribute('role')).toBe(false)
     expect(role(el)).toBeNull()
-    expect(el.shadowRoot?.querySelector('[part="menu"]')?.getAttribute('role')).toBe('menu')
+    expect(el.shadowRoot?.querySelector('[part="surface"]')?.getAttribute('role')).toBe('menu')
   })
 
   test('asking to open is announced first, so it can be refused', async () => {

@@ -62,6 +62,14 @@ const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
  * @csspart poster - An entry's still, where it has one.
  * @csspart menu - The menu that holds the entries.
  * @csspart trigger - The button that opens it.
+ * @csspart entry-item - The row, which is an `<a>` where `href` is set.
+ * @csspart entry-mark - The trailing mark: a tick when checked, a caret when it opens
+ * @csspart entry-start - The leading column, which is a slot and is always there.
+ * @csspart menu-back - The control that returns from a submenu.
+ * @csspart menu-back-mark - The glyph on the back control of a submenu.
+ * @csspart menu-header - The bar above a submenu, holding the way back and its name.
+ * @csspart menu-title - The name of the submenu that is showing.
+ * @csspart menu-surface - The floating panel the menu is drawn on.
  *
  * @slot trigger - Replaces the button that opens the menu.
  *
@@ -186,13 +194,16 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   /** The menu itself, behind a method so a styled tier can render another one. */
   protected renderMenu(): TemplateResult {
     const active = this.playlist?.active
-    return html`<${this.tag('menu')} part="menu" label=${this.label} placement=${this.placement}>
+    return html`<${this.tag('menu')} part="menu"
+    exportparts="back: menu-back, back-mark: menu-back-mark, header: menu-header, surface: menu-surface,
+      title: menu-title" label=${this.label} placement=${this.placement}>
       <slot name="trigger" slot="trigger">
         <button part="trigger" type="button" aria-label=${this.label}>${drawIcon(list)}</button>
       </slot>
       ${this.entries.map(
         (entry) => html`<${this.tag('menu-item')}
           part="entry"
+      exportparts="item: entry-item, mark: entry-mark, start: entry-start"
           value=${entry.value}
           aria-checked=${entry.value === active ? 'true' : 'false'}
           ?disabled=${entry.disabled}

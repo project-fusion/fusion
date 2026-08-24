@@ -129,8 +129,18 @@ const isInsertion = (event: Event): boolean =>
  * @csspart indicator - The caret.
  * @csspart surface - The floating panel.
  * @csspart listbox - The list inside it.
- * @csspart items - The scrolling box of options, forwarded from the listbox.
- * @csspart empty - What shows where the filter has hidden everything, forwarded
+ * @csspart listbox-empty - Shown when a filter has hidden everything.
+ * @csspart listbox-feedback - What is wrong with it.
+ * @csspart listbox-filter-icon - The mark beside that field.
+ * @csspart listbox-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart listbox-hint - Help under the list.
+ * @csspart listbox-items - The list itself.
+ * @csspart listbox-label - The question, over the list.
+ * @csspart listbox-search - The region holding the field that narrows the list.
+ * @csspart listbox-search-field - The field itself.
+ * @csspart tag-dismiss - The remove button, when `dismissible`.
+ * @csspart tag-dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart tag-prefix - The category before the label.
  * from the listbox.
  *
  * @event {HelixChangeEvent} helix-change - Fired when the chosen option changes.
@@ -647,7 +657,9 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     return html`<${this.tag('listbox')}
       part="listbox"
       id="listbox"
-      exportparts="items, empty"
+      exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
+        filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
+        label: listbox-label, search: listbox-search, search-field: listbox-search-field"
       aria-label=${this.listLabel}
       empty-text=${this.emptyText}
       loading-text=${this.loadingText}
@@ -678,6 +690,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   protected renderTag(option: { text: string; value: string }): TemplateResult {
     return html`<${this.tag('tag')}
                     part="tag"
+      exportparts="dismiss: tag-dismiss, dismiss-mark: tag-dismiss-mark, prefix: tag-prefix"
                     data-value=${option.value}
                     dismiss-label=${this.removeLabel}
                     ?dismissible=${!this.isDisabled}

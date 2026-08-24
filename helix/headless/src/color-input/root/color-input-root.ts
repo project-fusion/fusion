@@ -68,6 +68,30 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @csspart preview - The chip showing the color, inside the trigger.
  * @csspart surface - The floating panel.
  * @csspart picker - The color picker inside it.
+ * @csspart picker-actions - The group holding the eyedropper and the syntax toggle.
+ * @csspart picker-channel - One ramp.
+ * @csspart picker-channels - The ramps beside it.
+ * @csspart picker-controls - The row under the square.
+ * @csspart picker-eyedropper - The control that samples a color from the screen.
+ * @csspart picker-footer - The row holding the value and the tools.
+ * @csspart picker-format - The control that changes the syntax the value is written in.
+ * @csspart picker-grid - The saturation and brightness square.
+ * @csspart picker-grid-brightness - The range input for its vertical axis.
+ * @csspart picker-grid-handle - The mark showing where in the square the color sits.
+ * @csspart picker-grid-saturation - The range input for the square's horizontal axis.
+ * @csspart picker-icon - A glyph this component draws.
+ * @csspart picker-sample - The chip of the current color, which copies it when pressed.
+ * @csspart picker-swatch - One preset.
+ * @csspart picker-swatches - The row of presets.
+ * @csspart picker-value - The color as text, which can be typed or pasted.
+ * @csspart picker-channel-control - The range input.
+ * @csspart picker-channel-field - The row: the control and its readout.
+ * @csspart picker-channel-marker - One mark.
+ * @csspart picker-channel-marker-label - The value a mark stands at, when `marker-labels` is set.
+ * @csspart picker-channel-markers - The row of marks along the track.
+ * @csspart picker-channel-output - The current value, shown beside it.
+ * @csspart picker-eyedropper-button - The inner control.
+ * @csspart picker-format-button - The inner control.
  *
  * @cssproperty --color-input-swatch - The chosen color, to paint over the transparency check.
  */
@@ -350,6 +374,15 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
   protected renderPicker(): TemplateResult {
     return html`<${this.tag('color-picker')}
       part="picker"
+      exportparts="actions: picker-actions, channel: picker-channel, channel-control: picker-channel-control,
+        channel-field: picker-channel-field, channel-marker: picker-channel-marker,
+        channel-marker-label: picker-channel-marker-label, channel-markers: picker-channel-markers,
+        channel-output: picker-channel-output, channels: picker-channels, controls: picker-controls,
+        eyedropper: picker-eyedropper, eyedropper-button: picker-eyedropper-button,
+        footer: picker-footer, format: picker-format, format-button: picker-format-button,
+        grid: picker-grid, grid-brightness: picker-grid-brightness, grid-handle: picker-grid-handle,
+        grid-saturation: picker-grid-saturation, icon: picker-icon, sample: picker-sample,
+        swatch: picker-swatch, swatches: picker-swatches, value: picker-value"
       ?invalid=${this.resolvedFeedback !== ''}
       ?alpha=${this.alpha}
       ?no-format=${this.noFormat}

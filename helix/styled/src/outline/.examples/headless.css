@@ -49,7 +49,7 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-helix-headless-outline::part(list) {
+helix-headless-outline::part(nav) {
   position: relative;
 }
 
@@ -63,7 +63,7 @@ helix-headless-outline::part(indicator) {
   translate: var(--indicator-x, 0) var(--indicator-y, 0);
 }
 
-helix-headless-outline::part(list) {
+helix-headless-outline::part(nav) {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;

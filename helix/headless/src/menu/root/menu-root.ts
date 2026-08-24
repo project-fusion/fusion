@@ -53,7 +53,7 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @csspart back - The control that returns from a submenu.
  * @csspart back-mark - The glyph on the back control of a submenu.
  * @csspart header - The bar above a submenu, holding the way back and its name.
- * @csspart menu - The floating panel the menu is drawn on.
+ * @csspart surface - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
  */
 @customElement('helix-headless-menu')
@@ -129,7 +129,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     offset: () => this.offset,
     onDismiss: () => this.hide(),
     placement: () => this.placement,
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="menu"]'),
+    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
   })
 
   /** The element the surface opens against. */
@@ -255,7 +255,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        with no scroller and took the page behind the menu with it, which is the
        one thing that method exists to prevent. The controller three lines up
        had the right name all along. */
-    const surface = this.renderRoot.querySelector<HTMLElement>('[part="menu"]')
+    const surface = this.renderRoot.querySelector<HTMLElement>('[part="surface"]')
     scrollItemIntoView(item, { padding: 4, ...(surface ? { scroller: surface } : {}) })
   }
 
@@ -366,7 +366,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   protected override render(): TemplateResult {
     return html`<slot name="trigger" @click=${this.handleTriggerClick}></slot>
       <div
-        part="menu"
+        part="surface"
         popover="manual"
         role="menu"
         aria-busy=${this.loading ? 'true' : nothing}

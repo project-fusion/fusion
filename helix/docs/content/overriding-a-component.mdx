@@ -65,7 +65,7 @@ helix-select::part(trigger) {
   font-variant-numeric: tabular-nums;
 }
 
-helix-dialog::part(panel) {
+helix-dialog::part(dialog) {
   max-inline-size: 40rem;
 }
 ```
@@ -84,12 +84,53 @@ published a `nav` part the family does not render; `Checkbox` renders the
 
 Each component's page lists its parts.
 
-### Parts do not nest by default
+### A composed component forwards what it renders
 
-`::part()` reaches one level. A part inside a part inside a component is not
-addressable from outside unless the component forwards it, which it does with
-`exportparts`. If you find yourself wanting a part that is not published, that
-is worth reporting rather than working around: the missing part is the bug.
+`::part()` reaches one shadow boundary and stops, so a component that renders
+another would hide that child's whole part surface. Every one of them forwards
+it instead, and the forwarded name is prefixed with the role the child plays:
+
+```css
+helix-date-input::part(picker-cell) { … }
+helix-select::part(listbox-items) { … }
+helix-video::part(overflow-header) { … }
+```
+
+`<helix-date-input>` renders a date picker as its `picker`, so the picker's
+`cell` is `picker-cell` here. Where the child's part is already the role, the
+role stands alone: the tooltip inside `<helix-copy-button>` is `tooltip`, and
+its arrow is `tooltip-arrow`.
+
+**The prefix is not decoration.** Two levels can agree on a word, and did:
+`Command` forwarded the listbox's `search-field` under a name it also rendered
+itself, so `::part(search-field)` matched two elements at once.
+
+This is checked in both directions. `check:parts` holds a published part and a
+rendered one to each other, and `check:exportparts` holds a composition to
+forwarding everything its child publishes, under one prefix, colliding with
+nothing. Before it existed, 148 published child parts were unreachable: all
+sixteen of the color picker's from inside a color input, all thirteen of the
+date picker's from inside a date input.
+
+If you still find a part you cannot reach, that is worth reporting rather than
+working around: the missing part is the bug.
+
+### Words that name a position mean one thing
+
+A part that names a *role* rather than a thing draws from a fixed vocabulary, so
+you learn it once instead of per component:
+
+| Part | What it is |
+|---|---|
+| `box` | The drawn control, where the host is not it. |
+| `container` | An element's own outer box. |
+| `content` | A region you fill. |
+| `panel` | A region switched between, or a sheet anchored to an edge. |
+| `surface` | A floating panel drawn over the page. |
+| `viewport` | A scrollport the component reads the position of. |
+
+Anything naming a thing the component actually has, a `thumb`, a `swatch`, a
+`weekday`, is that component's own word and is on its page.
 
 ## What not to do
 

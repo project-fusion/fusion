@@ -4,7 +4,7 @@
   display: contents;
 }
 
-[part="menu"] {
+[part="surface"] {
   /* A menu taller than the window has to scroll, and could not.
    *
    * There was no `max-block-size` and no `overflow`, so a long menu ran off the
@@ -48,7 +48,7 @@
   padding-inline: var(--helix-space-none);
 }
 
-[part="menu"][hidden] {
+[part="surface"][hidden] {
   display: none;
 }
 
@@ -85,7 +85,7 @@
  *
  * Small on purpose. `2xs` is enough to read as motion and short enough that a
  * fast reader who opens and picks in one gesture is not waiting on it. */
-[part="menu"] {
+[part="surface"] {
   opacity: 0;
   --_travel: calc(var(--helix-space-2xs) * -1);
   transform: translateY(var(--_travel));
@@ -101,35 +101,35 @@
 /* Opening upward, it comes up from the control rather than down onto it. Only
    the custom property moves, so this rule cannot race the settled one below on
    equal specificity: source order would decide it, and this sits above. */
-[part="menu"][data-placement^="top"] {
+[part="surface"][data-placement^="top"] {
   --_travel: var(--helix-space-2xs);
 }
 
-[part="menu"][data-placed] {
+[part="surface"][data-placed] {
   opacity: 1;
   scale: 1;
   transform: none;
 }
 
-[part="menu"][data-placement^="top"] {
+[part="surface"][data-placement^="top"] {
   transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
 
-[part="menu"][data-placement^="bottom"] {
+[part="surface"][data-placement^="bottom"] {
   transform-origin: var(--floating-arrow-x, 50%) 0;
 }
 
-[part="menu"][data-placement^="left"] {
+[part="surface"][data-placement^="left"] {
   transform-origin: 100% var(--floating-arrow-y, 50%);
 }
 
-[part="menu"][data-placement^="right"] {
+[part="surface"][data-placement^="right"] {
   transform-origin: 0 var(--floating-arrow-y, 50%);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [part="menu"],
-  [part="menu"][data-placed] {
+  [part="surface"],
+  [part="surface"][data-placed] {
     scale: 1;
     transform: none;
     transition: none;
@@ -205,7 +205,7 @@
 /* Anything that is not a row leaves with the page it was on. An item takes
    itself off, having been told which page is showing; a divider has no such
    idea, and a rule left behind on a submenu is a rule between nothing. */
-[part="menu"][data-drilled] slot::slotted(:not(helix-menu-item)) {
+[part="surface"][data-drilled] slot::slotted(:not(helix-menu-item)) {
   display: none;
 }
 
@@ -246,7 +246,7 @@
 /* Rows that are already there stay, and dim, while a new set arrives. Removing
    them would collapse the box and throw the page around under the reader for
    as long as the request takes; dimming says the same thing and holds still. */
-:host([loading]) [part="menu"] {
+:host([loading]) [part="surface"] {
   opacity: 0.5;
 }
 

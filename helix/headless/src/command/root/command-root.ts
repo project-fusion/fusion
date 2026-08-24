@@ -71,12 +71,17 @@ const parse = (hotkey: string) => {
  *
  * @csspart dialog - The overlay's own box, forwarded from the dialog.
  * @csspart listbox - The list inside it.
- * @csspart items - The scrolling box of commands, forwarded from the listbox.
- * @csspart empty - What shows where the filter has hidden everything.
- * @csspart filter-mark - The glyph beside the field, forwarded from the listbox.
- * @csspart search - The region holding the field that narrows the list.
  * @csspart search-field - The field itself.
  * @csspart footer - The row under the list.
+ * @csspart listbox-empty - Shown when a filter has hidden everything.
+ * @csspart listbox-feedback - What is wrong with it.
+ * @csspart listbox-filter-icon - The mark beside that field.
+ * @csspart listbox-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart listbox-hint - Help under the list.
+ * @csspart listbox-items - The list itself.
+ * @csspart listbox-label - The question, over the list.
+ * @csspart listbox-search - The region holding the field that narrows the list.
+ * @csspart listbox-search-field - The field itself.
  *
  * @event {HelixSelectEvent} helix-select - Fired when a command is chosen.
  * @event {HelixOpenEvent} helix-open - Fired when the palette opens.
@@ -301,7 +306,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   protected renderDialog(): TemplateResult {
     return html`<${this.tag('dialog')}
-      exportparts="dialog"
+    exportparts="dialog"
       label=${this.label}
       .open=${this.open}
       @helix-close=${() => {
@@ -312,7 +317,9 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     >
       <${this.tag('listbox')}
         part="listbox"
-        exportparts="empty, filter-mark, items, search, search-field"
+      exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
+        filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
+        label: listbox-label, search: listbox-search, search-field: listbox-search-field"
         aria-label=${this.label}
         empty-text=${this.emptyText}
         filter-label=${this.placeholder}

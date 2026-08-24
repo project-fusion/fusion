@@ -67,10 +67,16 @@ helix-headless-combobox::part(listbox) {
   padding: 0.5rem;
 }
 
-helix-headless-combobox::part(items) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
+helix-headless-combobox::part(listbox-filter-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-combobox::part(tag-dismiss-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-headless-option::part(item) {

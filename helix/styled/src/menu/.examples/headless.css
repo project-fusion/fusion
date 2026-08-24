@@ -55,7 +55,7 @@ helix-headless-menu::part(back-mark) {
   inline-size: 1em;
 }
 
-helix-headless-menu::part(menu) {
+helix-headless-menu::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
   color: var(--_gray-strong);

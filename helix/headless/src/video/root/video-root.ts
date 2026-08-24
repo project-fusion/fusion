@@ -182,6 +182,20 @@ const SKIP_SECONDS = 10
  * @csspart overflow - The menu holding the controls kept off the bar.
  * @csspart more - The button that opens it.
  * @csspart fullscreen - The whole screen, and back.
+ * @csspart captions-menu-back - The control that returns from a submenu.
+ * @csspart captions-menu-back-mark - The glyph on the back control of a submenu.
+ * @csspart captions-menu-header - The bar above a submenu, holding the way back and its name.
+ * @csspart captions-menu-title - The name of the submenu that is showing.
+ * @csspart entry - One row in a menu this player opens.
+ * @csspart entry-item - The row, which is an `<a>` where `href` is set.
+ * @csspart entry-mark - The trailing mark: a tick when checked, a caret when it opens
+ * @csspart entry-start - The leading column, which is a slot and is always there.
+ * @csspart overflow-back - The control that returns from a submenu.
+ * @csspart overflow-back-mark - The glyph on the back control of a submenu.
+ * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
+ * @csspart overflow-title - The name of the submenu that is showing.
+ * @csspart captions-menu-surface - The floating panel the menu is drawn on.
+ * @csspart overflow-surface - The floating panel the menu is drawn on.
  *
  * @event {HelixNextEvent} helix-next - Fired when the reader asks for the next item.
  * @event {HelixPreviousEvent} helix-previous - Fired when they ask for the previous one.
@@ -1299,11 +1313,15 @@ export class HelixHeadlessVideo extends HelixElement {
         ${drawIcon(closedCaptioning)}
       </button>`
     }
-    return html`<${this.tag('menu')} part="captions-menu" label="Subtitles" placement="top-end">
+    return html`<${this.tag('menu')} part="captions-menu"
+    exportparts="back: captions-menu-back, back-mark: captions-menu-back-mark, header: captions-menu-header,
+      surface: captions-menu-surface, title: captions-menu-title" label="Subtitles" placement="top-end">
       <button part="captions" slot="trigger" type="button" aria-label="Subtitles">
         ${drawIcon(closedCaptioning)}
       </button>
       <${this.tag('menu-item')}
+        part="entry"
+      exportparts="item: entry-item, mark: entry-mark, start: entry-start"
         value="off"
         aria-checked=${this.captionIndex < 0 ? 'true' : 'false'}
         role="menuitemradio"
@@ -1312,7 +1330,8 @@ export class HelixHeadlessVideo extends HelixElement {
         Off
       </${this.tag('menu-item')}>
       ${tracks.map(
-        (track, at) => html`<${this.tag('menu-item')}
+        (track, at) => html`<${this.tag('menu-item')} part="entry"
+        exportparts="item: entry-item, mark: entry-mark, start: entry-start"
           value=${track.language || String(at)}
           aria-checked=${this.captionIndex === at ? 'true' : 'false'}
           role="menuitemradio"
@@ -1328,7 +1347,8 @@ export class HelixHeadlessVideo extends HelixElement {
      tier above simply could not reach it. */
   protected renderOverflowItem(one: string): TemplateResult {
     if (one === 'remote') {
-      return html`<${this.tag('menu-item')}
+      return html`<${this.tag('menu-item')} part="entry"
+      exportparts="item: entry-item, mark: entry-mark, start: entry-start"
         value="remote"
         @helix-select=${() => void this.promptRemote()}
       >
@@ -1337,14 +1357,16 @@ export class HelixHeadlessVideo extends HelixElement {
       </${this.tag('menu-item')}>`
     }
     if (one === 'speed') {
-      return html`<${this.tag('menu-item')} value="speed" @helix-select=${() => this.cycleSpeed()}>
+      return html`<${this.tag('menu-item')} part="entry"
+      exportparts="item: entry-item, mark: entry-mark, start: entry-start" value="speed" @helix-select=${() => this.cycleSpeed()}>
         ${drawIcon(gauge, { slot: 'start' })}
         Playback speed: ${this.rate}x
       </${this.tag('menu-item')}>`
     }
     if (one === 'rewind' || one === 'forward') {
       const back = one === 'rewind'
-      return html`<${this.tag('menu-item')}
+      return html`<${this.tag('menu-item')} part="entry"
+      exportparts="item: entry-item, mark: entry-mark, start: entry-start"
         value=${one}
         @helix-select=${() => this.skipBy(back ? -SKIP_SECONDS : SKIP_SECONDS)}
       >
@@ -1353,20 +1375,23 @@ export class HelixHeadlessVideo extends HelixElement {
       </${this.tag('menu-item')}>`
     }
     if (one === 'previous') {
-      return html`<${this.tag('menu-item')} value="previous" @helix-select=${() => this.skip(true)}>
+      return html`<${this.tag('menu-item')} part="entry"
+      exportparts="item: entry-item, mark: entry-mark, start: entry-start" value="previous" @helix-select=${() => this.skip(true)}>
         ${drawIcon(skipBack, { slot: 'start' })}
         Previous
       </${this.tag('menu-item')}>`
     }
     if (one === 'next') {
-      return html`<${this.tag('menu-item')} value="next" @helix-select=${() => this.skip(false)}>
+      return html`<${this.tag('menu-item')} part="entry"
+      exportparts="item: entry-item, mark: entry-mark, start: entry-start" value="next" @helix-select=${() => this.skip(false)}>
         ${drawIcon(skipForward, { slot: 'start' })}
         Next
       </${this.tag('menu-item')}>`
     }
     if (one === 'download') {
       const local = this.localFile
-      return html`<${this.tag('menu-item')}
+      return html`<${this.tag('menu-item')} part="entry"
+      exportparts="item: entry-item, mark: entry-mark, start: entry-start"
         ?download=${local}
         href=${this.src}
         rel=${local ? nothing : 'noreferrer'}
@@ -1377,7 +1402,8 @@ export class HelixHeadlessVideo extends HelixElement {
         Download
       </${this.tag('menu-item')}>`
     }
-    return html`<${this.tag('menu-item')} value="pip" @helix-select=${() => void this.togglePip()}>
+    return html`<${this.tag('menu-item')} part="entry"
+    exportparts="item: entry-item, mark: entry-mark, start: entry-start" value="pip" @helix-select=${() => void this.togglePip()}>
       ${drawIcon(pictureInPicture, { slot: 'start' })}
       Picture in picture
     </${this.tag('menu-item')}>`
@@ -1448,7 +1474,9 @@ export class HelixHeadlessVideo extends HelixElement {
       ${
         this.overflow.length === 0
           ? nothing
-          : html`<${this.tag('menu')} part="overflow" label="More controls" placement="top-end">
+          : html`<${this.tag('menu')} part="overflow"
+          exportparts="back: overflow-back, back-mark: overflow-back-mark, header: overflow-header,
+            surface: overflow-surface, title: overflow-title" label="More controls" placement="top-end">
               <button part="more" slot="trigger" type="button" aria-label="More controls">
                 ${drawIcon(dotsThreeVertical)}
               </button>

@@ -2,7 +2,7 @@
   "counts": {
     "alias": 221,
     "example": 508,
-    "part": 589,
+    "part": 743,
     "token": 356
   },
   "questions": [
@@ -7897,3473 +7897,4551 @@
       "tag": "helix-code-block"
     },
     {
-      "answer": "no",
+      "answer": "yes",
       "id": "part-1179",
       "kind": "part",
-      "prompt": "Does `helix-code-block` publish a CSS part named `wrapper`?",
+      "prompt": "Does `helix-code-block` publish a CSS part named `copy-button`?",
       "tag": "helix-code-block"
     },
     {
       "answer": "yes",
       "id": "part-1180",
       "kind": "part",
+      "prompt": "Does `helix-code-block` publish a CSS part named `copy-mark`?",
+      "tag": "helix-code-block"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1181",
+      "kind": "part",
+      "prompt": "Does `helix-code-block` publish a CSS part named `copy-tooltip`?",
+      "tag": "helix-code-block"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1182",
+      "kind": "part",
+      "prompt": "Does `helix-code-block` publish a CSS part named `copy-tooltip-arrow`?",
+      "tag": "helix-code-block"
+    },
+    {
+      "answer": "no",
+      "id": "part-1183",
+      "kind": "part",
+      "prompt": "Does `helix-code-block` publish a CSS part named `wrapper`?",
+      "tag": "helix-code-block"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1184",
+      "kind": "part",
       "prompt": "Does `helix-code` publish a CSS part named `code`?",
       "tag": "helix-code"
     },
     {
       "answer": "no",
-      "id": "part-1181",
+      "id": "part-1185",
       "kind": "part",
       "prompt": "Does `helix-code` publish a CSS part named `wrapper`?",
       "tag": "helix-code"
     },
     {
       "answer": "yes",
-      "id": "part-1182",
+      "id": "part-1186",
       "kind": "part",
       "prompt": "Does `helix-color-input` publish a CSS part named `field`?",
       "tag": "helix-color-input"
     },
     {
       "answer": "yes",
-      "id": "part-1183",
+      "id": "part-1187",
       "kind": "part",
       "prompt": "Does `helix-color-input` publish a CSS part named `control`?",
       "tag": "helix-color-input"
     },
     {
       "answer": "yes",
-      "id": "part-1184",
+      "id": "part-1188",
       "kind": "part",
       "prompt": "Does `helix-color-input` publish a CSS part named `trigger`?",
       "tag": "helix-color-input"
     },
     {
       "answer": "yes",
-      "id": "part-1185",
+      "id": "part-1189",
       "kind": "part",
       "prompt": "Does `helix-color-input` publish a CSS part named `preview`?",
       "tag": "helix-color-input"
     },
     {
       "answer": "yes",
-      "id": "part-1186",
+      "id": "part-1190",
       "kind": "part",
       "prompt": "Does `helix-color-input` publish a CSS part named `surface`?",
       "tag": "helix-color-input"
     },
     {
       "answer": "yes",
-      "id": "part-1187",
+      "id": "part-1191",
       "kind": "part",
       "prompt": "Does `helix-color-input` publish a CSS part named `picker`?",
       "tag": "helix-color-input"
     },
     {
+      "answer": "yes",
+      "id": "part-1192",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-actions`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1193",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-channel`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1194",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-channels`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1195",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-controls`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1196",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-eyedropper`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1197",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-footer`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1198",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-format`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1199",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-grid`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1200",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-grid-brightness`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1201",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-grid-handle`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1202",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-grid-saturation`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1203",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-icon`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1204",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-sample`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1205",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-swatch`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1206",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-swatches`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1207",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-value`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1208",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-channel-control`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1209",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-channel-field`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1210",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-channel-marker`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1211",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-channel-marker-label`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1212",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-channel-markers`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1213",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-channel-output`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1214",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-eyedropper-button`?",
+      "tag": "helix-color-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1215",
+      "kind": "part",
+      "prompt": "Does `helix-color-input` publish a CSS part named `picker-format-button`?",
+      "tag": "helix-color-input"
+    },
+    {
       "answer": "no",
-      "id": "part-1188",
+      "id": "part-1216",
       "kind": "part",
       "prompt": "Does `helix-color-input` publish a CSS part named `wrapper`?",
       "tag": "helix-color-input"
     },
     {
       "answer": "yes",
-      "id": "part-1189",
+      "id": "part-1217",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `grid`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1190",
+      "id": "part-1218",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `grid-handle`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1191",
+      "id": "part-1219",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `grid-saturation`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1192",
+      "id": "part-1220",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `grid-brightness`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1193",
+      "id": "part-1221",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `controls`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1194",
+      "id": "part-1222",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `icon`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1195",
+      "id": "part-1223",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `sample`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1196",
+      "id": "part-1224",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `channels`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1197",
+      "id": "part-1225",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `channel`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1198",
+      "id": "part-1226",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `actions`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1199",
+      "id": "part-1227",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `eyedropper`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1200",
+      "id": "part-1228",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `footer`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1201",
+      "id": "part-1229",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `value`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1202",
+      "id": "part-1230",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `format`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1203",
+      "id": "part-1231",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `swatches`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1204",
+      "id": "part-1232",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `swatch`?",
       "tag": "helix-color-picker"
     },
     {
+      "answer": "yes",
+      "id": "part-1233",
+      "kind": "part",
+      "prompt": "Does `helix-color-picker` publish a CSS part named `channel-control`?",
+      "tag": "helix-color-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1234",
+      "kind": "part",
+      "prompt": "Does `helix-color-picker` publish a CSS part named `channel-field`?",
+      "tag": "helix-color-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1235",
+      "kind": "part",
+      "prompt": "Does `helix-color-picker` publish a CSS part named `channel-marker`?",
+      "tag": "helix-color-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1236",
+      "kind": "part",
+      "prompt": "Does `helix-color-picker` publish a CSS part named `channel-marker-label`?",
+      "tag": "helix-color-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1237",
+      "kind": "part",
+      "prompt": "Does `helix-color-picker` publish a CSS part named `channel-markers`?",
+      "tag": "helix-color-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1238",
+      "kind": "part",
+      "prompt": "Does `helix-color-picker` publish a CSS part named `channel-output`?",
+      "tag": "helix-color-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1239",
+      "kind": "part",
+      "prompt": "Does `helix-color-picker` publish a CSS part named `eyedropper-button`?",
+      "tag": "helix-color-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1240",
+      "kind": "part",
+      "prompt": "Does `helix-color-picker` publish a CSS part named `format-button`?",
+      "tag": "helix-color-picker"
+    },
+    {
       "answer": "no",
-      "id": "part-1205",
+      "id": "part-1241",
       "kind": "part",
       "prompt": "Does `helix-color-picker` publish a CSS part named `wrapper`?",
       "tag": "helix-color-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1206",
+      "id": "part-1242",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `field`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1207",
+      "id": "part-1243",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `control`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1208",
+      "id": "part-1244",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `tags`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1209",
+      "id": "part-1245",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `tag`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1210",
+      "id": "part-1246",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `rest`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1211",
+      "id": "part-1247",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `create`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1212",
+      "id": "part-1248",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `indicator`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1213",
+      "id": "part-1249",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `surface`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1214",
+      "id": "part-1250",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `listbox`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1215",
+      "id": "part-1251",
       "kind": "part",
-      "prompt": "Does `helix-combobox` publish a CSS part named `items`?",
+      "prompt": "Does `helix-combobox` publish a CSS part named `listbox-empty`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1216",
+      "id": "part-1252",
       "kind": "part",
-      "prompt": "Does `helix-combobox` publish a CSS part named `empty`?",
+      "prompt": "Does `helix-combobox` publish a CSS part named `listbox-feedback`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1253",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `listbox-filter-icon`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1254",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `listbox-filter-mark`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1255",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `listbox-hint`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1256",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `listbox-items`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1257",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `listbox-label`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1258",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `listbox-search`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1259",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `listbox-search-field`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1260",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `tag-dismiss`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1261",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `tag-dismiss-mark`?",
+      "tag": "helix-combobox"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1262",
+      "kind": "part",
+      "prompt": "Does `helix-combobox` publish a CSS part named `tag-prefix`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "no",
-      "id": "part-1217",
+      "id": "part-1263",
       "kind": "part",
       "prompt": "Does `helix-combobox` publish a CSS part named `wrapper`?",
       "tag": "helix-combobox"
     },
     {
       "answer": "yes",
-      "id": "part-1218",
+      "id": "part-1264",
       "kind": "part",
       "prompt": "Does `helix-command` publish a CSS part named `dialog`?",
       "tag": "helix-command"
     },
     {
       "answer": "yes",
-      "id": "part-1219",
+      "id": "part-1265",
       "kind": "part",
       "prompt": "Does `helix-command` publish a CSS part named `listbox`?",
       "tag": "helix-command"
     },
     {
       "answer": "yes",
-      "id": "part-1220",
-      "kind": "part",
-      "prompt": "Does `helix-command` publish a CSS part named `items`?",
-      "tag": "helix-command"
-    },
-    {
-      "answer": "yes",
-      "id": "part-1221",
-      "kind": "part",
-      "prompt": "Does `helix-command` publish a CSS part named `empty`?",
-      "tag": "helix-command"
-    },
-    {
-      "answer": "yes",
-      "id": "part-1222",
-      "kind": "part",
-      "prompt": "Does `helix-command` publish a CSS part named `filter-mark`?",
-      "tag": "helix-command"
-    },
-    {
-      "answer": "yes",
-      "id": "part-1223",
-      "kind": "part",
-      "prompt": "Does `helix-command` publish a CSS part named `search`?",
-      "tag": "helix-command"
-    },
-    {
-      "answer": "yes",
-      "id": "part-1224",
+      "id": "part-1266",
       "kind": "part",
       "prompt": "Does `helix-command` publish a CSS part named `search-field`?",
       "tag": "helix-command"
     },
     {
       "answer": "yes",
-      "id": "part-1225",
+      "id": "part-1267",
       "kind": "part",
       "prompt": "Does `helix-command` publish a CSS part named `footer`?",
       "tag": "helix-command"
     },
     {
+      "answer": "yes",
+      "id": "part-1268",
+      "kind": "part",
+      "prompt": "Does `helix-command` publish a CSS part named `listbox-empty`?",
+      "tag": "helix-command"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1269",
+      "kind": "part",
+      "prompt": "Does `helix-command` publish a CSS part named `listbox-feedback`?",
+      "tag": "helix-command"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1270",
+      "kind": "part",
+      "prompt": "Does `helix-command` publish a CSS part named `listbox-filter-icon`?",
+      "tag": "helix-command"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1271",
+      "kind": "part",
+      "prompt": "Does `helix-command` publish a CSS part named `listbox-filter-mark`?",
+      "tag": "helix-command"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1272",
+      "kind": "part",
+      "prompt": "Does `helix-command` publish a CSS part named `listbox-hint`?",
+      "tag": "helix-command"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1273",
+      "kind": "part",
+      "prompt": "Does `helix-command` publish a CSS part named `listbox-items`?",
+      "tag": "helix-command"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1274",
+      "kind": "part",
+      "prompt": "Does `helix-command` publish a CSS part named `listbox-label`?",
+      "tag": "helix-command"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1275",
+      "kind": "part",
+      "prompt": "Does `helix-command` publish a CSS part named `listbox-search`?",
+      "tag": "helix-command"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1276",
+      "kind": "part",
+      "prompt": "Does `helix-command` publish a CSS part named `listbox-search-field`?",
+      "tag": "helix-command"
+    },
+    {
       "answer": "no",
-      "id": "part-1226",
+      "id": "part-1277",
       "kind": "part",
       "prompt": "Does `helix-command` publish a CSS part named `wrapper`?",
       "tag": "helix-command"
     },
     {
       "answer": "yes",
-      "id": "part-1227",
+      "id": "part-1278",
       "kind": "part",
       "prompt": "Does `helix-copy-button` publish a CSS part named `button`?",
       "tag": "helix-copy-button"
     },
     {
       "answer": "yes",
-      "id": "part-1228",
+      "id": "part-1279",
       "kind": "part",
       "prompt": "Does `helix-copy-button` publish a CSS part named `mark`?",
       "tag": "helix-copy-button"
     },
     {
       "answer": "yes",
-      "id": "part-1229",
+      "id": "part-1280",
       "kind": "part",
       "prompt": "Does `helix-copy-button` publish a CSS part named `tooltip`?",
       "tag": "helix-copy-button"
     },
     {
+      "answer": "yes",
+      "id": "part-1281",
+      "kind": "part",
+      "prompt": "Does `helix-copy-button` publish a CSS part named `tooltip-arrow`?",
+      "tag": "helix-copy-button"
+    },
+    {
       "answer": "no",
-      "id": "part-1230",
+      "id": "part-1282",
       "kind": "part",
       "prompt": "Does `helix-copy-button` publish a CSS part named `wrapper`?",
       "tag": "helix-copy-button"
     },
     {
       "answer": "yes",
-      "id": "part-1231",
+      "id": "part-1283",
       "kind": "part",
       "prompt": "Does `helix-date-input` publish a CSS part named `field`?",
       "tag": "helix-date-input"
     },
     {
       "answer": "yes",
-      "id": "part-1232",
+      "id": "part-1284",
       "kind": "part",
       "prompt": "Does `helix-date-input` publish a CSS part named `control`?",
       "tag": "helix-date-input"
     },
     {
       "answer": "yes",
-      "id": "part-1233",
+      "id": "part-1285",
       "kind": "part",
       "prompt": "Does `helix-date-input` publish a CSS part named `date`?",
       "tag": "helix-date-input"
     },
     {
       "answer": "yes",
-      "id": "part-1234",
+      "id": "part-1286",
       "kind": "part",
       "prompt": "Does `helix-date-input` publish a CSS part named `rest`?",
       "tag": "helix-date-input"
     },
     {
       "answer": "yes",
-      "id": "part-1235",
+      "id": "part-1287",
       "kind": "part",
       "prompt": "Does `helix-date-input` publish a CSS part named `trigger`?",
       "tag": "helix-date-input"
     },
     {
       "answer": "yes",
-      "id": "part-1236",
+      "id": "part-1288",
       "kind": "part",
       "prompt": "Does `helix-date-input` publish a CSS part named `trigger-icon`?",
       "tag": "helix-date-input"
     },
     {
       "answer": "yes",
-      "id": "part-1237",
+      "id": "part-1289",
       "kind": "part",
       "prompt": "Does `helix-date-input` publish a CSS part named `surface`?",
       "tag": "helix-date-input"
     },
     {
       "answer": "yes",
-      "id": "part-1238",
+      "id": "part-1290",
       "kind": "part",
       "prompt": "Does `helix-date-input` publish a CSS part named `picker`?",
       "tag": "helix-date-input"
     },
     {
+      "answer": "yes",
+      "id": "part-1291",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `date-dismiss`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1292",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `date-dismiss-mark`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1293",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `date-prefix`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1294",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-cell`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1295",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-day`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1296",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-grid`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1297",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-header`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1298",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-heading`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1299",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-month`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1300",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-months`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1301",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-next`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1302",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-next-mark`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1303",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-previous`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1304",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-previous-mark`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1305",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-week`?",
+      "tag": "helix-date-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1306",
+      "kind": "part",
+      "prompt": "Does `helix-date-input` publish a CSS part named `picker-weekday`?",
+      "tag": "helix-date-input"
+    },
+    {
       "answer": "no",
-      "id": "part-1239",
+      "id": "part-1307",
       "kind": "part",
       "prompt": "Does `helix-date-input` publish a CSS part named `wrapper`?",
       "tag": "helix-date-input"
     },
     {
       "answer": "yes",
-      "id": "part-1240",
+      "id": "part-1308",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `cell`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1241",
+      "id": "part-1309",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `day`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1242",
+      "id": "part-1310",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `grid`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1243",
+      "id": "part-1311",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `header`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1244",
+      "id": "part-1312",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `heading`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1245",
+      "id": "part-1313",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `month`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1246",
+      "id": "part-1314",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `months`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1247",
+      "id": "part-1315",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `next`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1248",
+      "id": "part-1316",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `next-mark`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1249",
+      "id": "part-1317",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `previous`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1250",
+      "id": "part-1318",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `previous-mark`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1251",
+      "id": "part-1319",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `week`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1252",
+      "id": "part-1320",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `weekday`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "no",
-      "id": "part-1253",
+      "id": "part-1321",
       "kind": "part",
       "prompt": "Does `helix-date-picker` publish a CSS part named `wrapper`?",
       "tag": "helix-date-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1254",
+      "id": "part-1322",
       "kind": "part",
       "prompt": "Does `helix-dialog` publish a CSS part named `dialog`?",
       "tag": "helix-dialog"
     },
     {
       "answer": "no",
-      "id": "part-1255",
+      "id": "part-1323",
       "kind": "part",
       "prompt": "Does `helix-dialog` publish a CSS part named `wrapper`?",
       "tag": "helix-dialog"
     },
     {
       "answer": "yes",
-      "id": "part-1256",
+      "id": "part-1324",
       "kind": "part",
       "prompt": "Does `helix-divider` publish a CSS part named `line`?",
       "tag": "helix-divider"
     },
     {
       "answer": "yes",
-      "id": "part-1257",
+      "id": "part-1325",
       "kind": "part",
       "prompt": "Does `helix-divider` publish a CSS part named `content`?",
       "tag": "helix-divider"
     },
     {
       "answer": "no",
-      "id": "part-1258",
+      "id": "part-1326",
       "kind": "part",
       "prompt": "Does `helix-divider` publish a CSS part named `wrapper`?",
       "tag": "helix-divider"
     },
     {
       "answer": "yes",
-      "id": "part-1259",
+      "id": "part-1327",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `center`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1260",
+      "id": "part-1328",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `plot`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1261",
+      "id": "part-1329",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `tooltip`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1262",
+      "id": "part-1330",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `tooltip-anchor`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1263",
+      "id": "part-1331",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `mark`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1264",
+      "id": "part-1332",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `tooltip-cell`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1265",
+      "id": "part-1333",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `tooltip-label`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1266",
+      "id": "part-1334",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `tooltip-name`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1267",
+      "id": "part-1335",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `tooltip-value`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1268",
+      "id": "part-1336",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `segment`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1269",
+      "id": "part-1337",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `track`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "no",
-      "id": "part-1270",
+      "id": "part-1338",
       "kind": "part",
       "prompt": "Does `helix-donut-chart` publish a CSS part named `wrapper`?",
       "tag": "helix-donut-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1271",
+      "id": "part-1339",
       "kind": "part",
       "prompt": "Does `helix-drawer` publish a CSS part named `panel`?",
       "tag": "helix-drawer"
     },
     {
       "answer": "yes",
-      "id": "part-1272",
+      "id": "part-1340",
       "kind": "part",
       "prompt": "Does `helix-drawer` publish a CSS part named `header`?",
       "tag": "helix-drawer"
     },
     {
       "answer": "yes",
-      "id": "part-1273",
+      "id": "part-1341",
       "kind": "part",
       "prompt": "Does `helix-drawer` publish a CSS part named `content`?",
       "tag": "helix-drawer"
     },
     {
       "answer": "no",
-      "id": "part-1274",
+      "id": "part-1342",
       "kind": "part",
       "prompt": "Does `helix-drawer` publish a CSS part named `wrapper`?",
       "tag": "helix-drawer"
     },
     {
       "answer": "yes",
-      "id": "part-1275",
+      "id": "part-1343",
       "kind": "part",
       "prompt": "Does `helix-drilldown-item` publish a CSS part named `item`?",
       "tag": "helix-drilldown-item"
     },
     {
       "answer": "yes",
-      "id": "part-1276",
+      "id": "part-1344",
       "kind": "part",
       "prompt": "Does `helix-drilldown-item` publish a CSS part named `label`?",
       "tag": "helix-drilldown-item"
     },
     {
       "answer": "no",
-      "id": "part-1277",
+      "id": "part-1345",
       "kind": "part",
       "prompt": "Does `helix-drilldown-item` publish a CSS part named `wrapper`?",
       "tag": "helix-drilldown-item"
     },
     {
       "answer": "yes",
-      "id": "part-1278",
+      "id": "part-1346",
       "kind": "part",
       "prompt": "Does `helix-drilldown` publish a CSS part named `back`?",
       "tag": "helix-drilldown"
     },
     {
       "answer": "yes",
-      "id": "part-1279",
+      "id": "part-1347",
       "kind": "part",
       "prompt": "Does `helix-drilldown` publish a CSS part named `back-mark`?",
       "tag": "helix-drilldown"
     },
     {
       "answer": "yes",
-      "id": "part-1280",
+      "id": "part-1348",
       "kind": "part",
       "prompt": "Does `helix-drilldown` publish a CSS part named `header`?",
       "tag": "helix-drilldown"
     },
     {
       "answer": "yes",
-      "id": "part-1281",
+      "id": "part-1349",
       "kind": "part",
       "prompt": "Does `helix-drilldown` publish a CSS part named `page`?",
       "tag": "helix-drilldown"
     },
     {
       "answer": "yes",
-      "id": "part-1282",
+      "id": "part-1350",
       "kind": "part",
       "prompt": "Does `helix-drilldown` publish a CSS part named `title`?",
       "tag": "helix-drilldown"
     },
     {
       "answer": "no",
-      "id": "part-1283",
+      "id": "part-1351",
       "kind": "part",
       "prompt": "Does `helix-drilldown` publish a CSS part named `wrapper`?",
       "tag": "helix-drilldown"
     },
     {
       "answer": "no",
-      "id": "part-1284",
+      "id": "part-1352",
       "kind": "part",
       "prompt": "Does `helix-empty` publish a CSS part named `wrapper`?",
       "tag": "helix-empty"
     },
     {
       "answer": "yes",
-      "id": "part-1285",
+      "id": "part-1353",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `field`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1286",
+      "id": "part-1354",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `control`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1287",
+      "id": "part-1355",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `icon`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1288",
+      "id": "part-1356",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `trigger`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1289",
+      "id": "part-1357",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `list`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1290",
+      "id": "part-1358",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `file`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1291",
+      "id": "part-1359",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `detail`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1292",
+      "id": "part-1360",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `name`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1293",
+      "id": "part-1361",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `meta`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1294",
+      "id": "part-1362",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `size`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1295",
+      "id": "part-1363",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `kind`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "yes",
-      "id": "part-1296",
+      "id": "part-1364",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `remove`?",
       "tag": "helix-file-input"
     },
     {
+      "answer": "yes",
+      "id": "part-1365",
+      "kind": "part",
+      "prompt": "Does `helix-file-input` publish a CSS part named `kind-dismiss`?",
+      "tag": "helix-file-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1366",
+      "kind": "part",
+      "prompt": "Does `helix-file-input` publish a CSS part named `kind-dismiss-mark`?",
+      "tag": "helix-file-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1367",
+      "kind": "part",
+      "prompt": "Does `helix-file-input` publish a CSS part named `kind-prefix`?",
+      "tag": "helix-file-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1368",
+      "kind": "part",
+      "prompt": "Does `helix-file-input` publish a CSS part named `size-dismiss`?",
+      "tag": "helix-file-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1369",
+      "kind": "part",
+      "prompt": "Does `helix-file-input` publish a CSS part named `size-dismiss-mark`?",
+      "tag": "helix-file-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1370",
+      "kind": "part",
+      "prompt": "Does `helix-file-input` publish a CSS part named `size-prefix`?",
+      "tag": "helix-file-input"
+    },
+    {
       "answer": "no",
-      "id": "part-1297",
+      "id": "part-1371",
       "kind": "part",
       "prompt": "Does `helix-file-input` publish a CSS part named `wrapper`?",
       "tag": "helix-file-input"
     },
     {
       "answer": "no",
-      "id": "part-1298",
+      "id": "part-1372",
       "kind": "part",
       "prompt": "Does `helix-flex` publish a CSS part named `wrapper`?",
       "tag": "helix-flex"
     },
     {
       "answer": "no",
-      "id": "part-1299",
+      "id": "part-1373",
       "kind": "part",
       "prompt": "Does `helix-grid` publish a CSS part named `wrapper`?",
       "tag": "helix-grid"
     },
     {
       "answer": "yes",
-      "id": "part-1300",
+      "id": "part-1374",
       "kind": "part",
       "prompt": "Does `helix-icon-button` publish a CSS part named `button`?",
       "tag": "helix-icon-button"
     },
     {
       "answer": "no",
-      "id": "part-1301",
+      "id": "part-1375",
       "kind": "part",
       "prompt": "Does `helix-icon-button` publish a CSS part named `wrapper`?",
       "tag": "helix-icon-button"
     },
     {
       "answer": "yes",
-      "id": "part-1302",
+      "id": "part-1376",
       "kind": "part",
       "prompt": "Does `helix-icon` publish a CSS part named `svg`?",
       "tag": "helix-icon"
     },
     {
       "answer": "no",
-      "id": "part-1303",
+      "id": "part-1377",
       "kind": "part",
       "prompt": "Does `helix-icon` publish a CSS part named `wrapper`?",
       "tag": "helix-icon"
     },
     {
       "answer": "yes",
-      "id": "part-1304",
+      "id": "part-1378",
       "kind": "part",
       "prompt": "Does `helix-image` publish a CSS part named `image`?",
       "tag": "helix-image"
     },
     {
       "answer": "yes",
-      "id": "part-1305",
+      "id": "part-1379",
       "kind": "part",
       "prompt": "Does `helix-image` publish a CSS part named `placeholder`?",
       "tag": "helix-image"
     },
     {
       "answer": "yes",
-      "id": "part-1306",
+      "id": "part-1380",
       "kind": "part",
       "prompt": "Does `helix-image` publish a CSS part named `fallback`?",
       "tag": "helix-image"
     },
     {
       "answer": "no",
-      "id": "part-1307",
+      "id": "part-1381",
       "kind": "part",
       "prompt": "Does `helix-image` publish a CSS part named `wrapper`?",
       "tag": "helix-image"
     },
     {
       "answer": "yes",
-      "id": "part-1308",
+      "id": "part-1382",
       "kind": "part",
       "prompt": "Does `helix-input` publish a CSS part named `field`?",
       "tag": "helix-input"
     },
     {
       "answer": "yes",
-      "id": "part-1309",
+      "id": "part-1383",
       "kind": "part",
       "prompt": "Does `helix-input` publish a CSS part named `control`?",
       "tag": "helix-input"
     },
     {
       "answer": "yes",
-      "id": "part-1310",
+      "id": "part-1384",
       "kind": "part",
       "prompt": "Does `helix-input` publish a CSS part named `clear`?",
       "tag": "helix-input"
     },
     {
       "answer": "yes",
-      "id": "part-1311",
+      "id": "part-1385",
       "kind": "part",
       "prompt": "Does `helix-input` publish a CSS part named `icon`?",
       "tag": "helix-input"
     },
     {
       "answer": "yes",
-      "id": "part-1312",
+      "id": "part-1386",
       "kind": "part",
       "prompt": "Does `helix-input` publish a CSS part named `reveal`?",
       "tag": "helix-input"
     },
     {
       "answer": "no",
-      "id": "part-1313",
+      "id": "part-1387",
       "kind": "part",
       "prompt": "Does `helix-input` publish a CSS part named `wrapper`?",
       "tag": "helix-input"
     },
     {
       "answer": "yes",
-      "id": "part-1314",
+      "id": "part-1388",
       "kind": "part",
       "prompt": "Does `helix-kbd` publish a CSS part named `kbd`?",
       "tag": "helix-kbd"
     },
     {
       "answer": "no",
-      "id": "part-1315",
+      "id": "part-1389",
       "kind": "part",
       "prompt": "Does `helix-kbd` publish a CSS part named `wrapper`?",
       "tag": "helix-kbd"
     },
     {
       "answer": "yes",
-      "id": "part-1316",
+      "id": "part-1390",
       "kind": "part",
       "prompt": "Does `helix-legend` publish a CSS part named `entry`?",
       "tag": "helix-legend"
     },
     {
       "answer": "yes",
-      "id": "part-1317",
+      "id": "part-1391",
       "kind": "part",
       "prompt": "Does `helix-legend` publish a CSS part named `list`?",
       "tag": "helix-legend"
     },
     {
       "answer": "yes",
-      "id": "part-1318",
+      "id": "part-1392",
       "kind": "part",
       "prompt": "Does `helix-legend` publish a CSS part named `name`?",
       "tag": "helix-legend"
     },
     {
       "answer": "yes",
-      "id": "part-1319",
+      "id": "part-1393",
       "kind": "part",
       "prompt": "Does `helix-legend` publish a CSS part named `swatch`?",
       "tag": "helix-legend"
     },
     {
       "answer": "no",
-      "id": "part-1320",
+      "id": "part-1394",
       "kind": "part",
       "prompt": "Does `helix-legend` publish a CSS part named `wrapper`?",
       "tag": "helix-legend"
     },
     {
       "answer": "yes",
-      "id": "part-1321",
+      "id": "part-1395",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `area`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1322",
+      "id": "part-1396",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `band`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1323",
+      "id": "part-1397",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `baseline`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1324",
+      "id": "part-1398",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `gridline`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1325",
+      "id": "part-1399",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `guide`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1326",
+      "id": "part-1400",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `label`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1327",
+      "id": "part-1401",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `labels`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1328",
+      "id": "part-1402",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `line`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1329",
+      "id": "part-1403",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `mark`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1330",
+      "id": "part-1404",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `plot`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1331",
+      "id": "part-1405",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `svg`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1332",
+      "id": "part-1406",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `tooltip`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1333",
+      "id": "part-1407",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `tooltip-anchor`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1334",
+      "id": "part-1408",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `tooltip-cell`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1335",
+      "id": "part-1409",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `tooltip-label`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1336",
+      "id": "part-1410",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `tooltip-name`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1337",
+      "id": "part-1411",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `tooltip-value`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "no",
-      "id": "part-1338",
+      "id": "part-1412",
       "kind": "part",
       "prompt": "Does `helix-line-chart` publish a CSS part named `wrapper`?",
       "tag": "helix-line-chart"
     },
     {
       "answer": "yes",
-      "id": "part-1339",
+      "id": "part-1413",
       "kind": "part",
       "prompt": "Does `helix-list-item` publish a CSS part named `row`?",
       "tag": "helix-list-item"
     },
     {
       "answer": "no",
-      "id": "part-1340",
+      "id": "part-1414",
       "kind": "part",
       "prompt": "Does `helix-list-item` publish a CSS part named `wrapper`?",
       "tag": "helix-list-item"
     },
     {
       "answer": "no",
-      "id": "part-1341",
+      "id": "part-1415",
       "kind": "part",
       "prompt": "Does `helix-list` publish a CSS part named `wrapper`?",
       "tag": "helix-list"
     },
     {
       "answer": "yes",
-      "id": "part-1342",
+      "id": "part-1416",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `empty`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "yes",
-      "id": "part-1343",
+      "id": "part-1417",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `feedback`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "yes",
-      "id": "part-1344",
+      "id": "part-1418",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `filter-icon`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "yes",
-      "id": "part-1345",
+      "id": "part-1419",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `filter-mark`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "yes",
-      "id": "part-1346",
+      "id": "part-1420",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `hint`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "yes",
-      "id": "part-1347",
+      "id": "part-1421",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `items`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "yes",
-      "id": "part-1348",
+      "id": "part-1422",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `label`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "yes",
-      "id": "part-1349",
+      "id": "part-1423",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `search`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "yes",
-      "id": "part-1350",
+      "id": "part-1424",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `search-field`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "no",
-      "id": "part-1351",
+      "id": "part-1425",
       "kind": "part",
       "prompt": "Does `helix-listbox` publish a CSS part named `wrapper`?",
       "tag": "helix-listbox"
     },
     {
       "answer": "yes",
-      "id": "part-1352",
+      "id": "part-1426",
       "kind": "part",
       "prompt": "Does `helix-loader` publish a CSS part named `svg`?",
       "tag": "helix-loader"
     },
     {
       "answer": "yes",
-      "id": "part-1353",
+      "id": "part-1427",
       "kind": "part",
       "prompt": "Does `helix-loader` publish a CSS part named `mark`?",
       "tag": "helix-loader"
     },
     {
       "answer": "yes",
-      "id": "part-1354",
+      "id": "part-1428",
       "kind": "part",
       "prompt": "Does `helix-loader` publish a CSS part named `track`?",
       "tag": "helix-loader"
     },
     {
       "answer": "yes",
-      "id": "part-1355",
+      "id": "part-1429",
       "kind": "part",
       "prompt": "Does `helix-loader` publish a CSS part named `indicator`?",
       "tag": "helix-loader"
     },
     {
       "answer": "no",
-      "id": "part-1356",
+      "id": "part-1430",
       "kind": "part",
       "prompt": "Does `helix-loader` publish a CSS part named `wrapper`?",
       "tag": "helix-loader"
     },
     {
       "answer": "yes",
-      "id": "part-1357",
+      "id": "part-1431",
       "kind": "part",
       "prompt": "Does `helix-megamenu` publish a CSS part named `trigger`?",
       "tag": "helix-megamenu"
     },
     {
       "answer": "yes",
-      "id": "part-1358",
+      "id": "part-1432",
       "kind": "part",
-      "prompt": "Does `helix-megamenu` publish a CSS part named `panel`?",
+      "prompt": "Does `helix-megamenu` publish a CSS part named `surface`?",
       "tag": "helix-megamenu"
     },
     {
       "answer": "no",
-      "id": "part-1359",
+      "id": "part-1433",
       "kind": "part",
       "prompt": "Does `helix-megamenu` publish a CSS part named `wrapper`?",
       "tag": "helix-megamenu"
     },
     {
       "answer": "yes",
-      "id": "part-1360",
+      "id": "part-1434",
       "kind": "part",
       "prompt": "Does `helix-menu-item` publish a CSS part named `item`?",
       "tag": "helix-menu-item"
     },
     {
       "answer": "yes",
-      "id": "part-1361",
+      "id": "part-1435",
       "kind": "part",
       "prompt": "Does `helix-menu-item` publish a CSS part named `start`?",
       "tag": "helix-menu-item"
     },
     {
       "answer": "yes",
-      "id": "part-1362",
+      "id": "part-1436",
       "kind": "part",
       "prompt": "Does `helix-menu-item` publish a CSS part named `mark`?",
       "tag": "helix-menu-item"
     },
     {
       "answer": "no",
-      "id": "part-1363",
+      "id": "part-1437",
       "kind": "part",
       "prompt": "Does `helix-menu-item` publish a CSS part named `wrapper`?",
       "tag": "helix-menu-item"
     },
     {
       "answer": "yes",
-      "id": "part-1364",
+      "id": "part-1438",
       "kind": "part",
       "prompt": "Does `helix-menu` publish a CSS part named `back`?",
       "tag": "helix-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1365",
+      "id": "part-1439",
       "kind": "part",
       "prompt": "Does `helix-menu` publish a CSS part named `back-mark`?",
       "tag": "helix-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1366",
+      "id": "part-1440",
       "kind": "part",
       "prompt": "Does `helix-menu` publish a CSS part named `header`?",
       "tag": "helix-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1367",
+      "id": "part-1441",
       "kind": "part",
-      "prompt": "Does `helix-menu` publish a CSS part named `menu`?",
+      "prompt": "Does `helix-menu` publish a CSS part named `surface`?",
       "tag": "helix-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1368",
+      "id": "part-1442",
       "kind": "part",
       "prompt": "Does `helix-menu` publish a CSS part named `title`?",
       "tag": "helix-menu"
     },
     {
       "answer": "no",
-      "id": "part-1369",
+      "id": "part-1443",
       "kind": "part",
       "prompt": "Does `helix-menu` publish a CSS part named `wrapper`?",
       "tag": "helix-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1370",
+      "id": "part-1444",
       "kind": "part",
       "prompt": "Does `helix-meter` publish a CSS part named `track`?",
       "tag": "helix-meter"
     },
     {
       "answer": "yes",
-      "id": "part-1371",
+      "id": "part-1445",
       "kind": "part",
       "prompt": "Does `helix-meter` publish a CSS part named `indicator`?",
       "tag": "helix-meter"
     },
     {
       "answer": "yes",
-      "id": "part-1372",
+      "id": "part-1446",
       "kind": "part",
       "prompt": "Does `helix-meter` publish a CSS part named `tick`?",
       "tag": "helix-meter"
     },
     {
       "answer": "yes",
-      "id": "part-1373",
+      "id": "part-1447",
       "kind": "part",
       "prompt": "Does `helix-meter` publish a CSS part named `value`?",
       "tag": "helix-meter"
     },
     {
       "answer": "yes",
-      "id": "part-1374",
+      "id": "part-1448",
       "kind": "part",
       "prompt": "Does `helix-meter` publish a CSS part named `groove`?",
       "tag": "helix-meter"
     },
     {
       "answer": "no",
-      "id": "part-1375",
+      "id": "part-1449",
       "kind": "part",
       "prompt": "Does `helix-meter` publish a CSS part named `wrapper`?",
       "tag": "helix-meter"
     },
     {
       "answer": "yes",
-      "id": "part-1376",
+      "id": "part-1450",
       "kind": "part",
       "prompt": "Does `helix-navigation` publish a CSS part named `nav`?",
       "tag": "helix-navigation"
     },
     {
       "answer": "yes",
-      "id": "part-1377",
+      "id": "part-1451",
       "kind": "part",
       "prompt": "Does `helix-navigation` publish a CSS part named `indicator`?",
       "tag": "helix-navigation"
     },
     {
       "answer": "no",
-      "id": "part-1378",
+      "id": "part-1452",
       "kind": "part",
       "prompt": "Does `helix-navigation` publish a CSS part named `wrapper`?",
       "tag": "helix-navigation"
     },
     {
       "answer": "yes",
-      "id": "part-1379",
+      "id": "part-1453",
       "kind": "part",
       "prompt": "Does `helix-number-input` publish a CSS part named `field`?",
       "tag": "helix-number-input"
     },
     {
       "answer": "yes",
-      "id": "part-1380",
+      "id": "part-1454",
       "kind": "part",
       "prompt": "Does `helix-number-input` publish a CSS part named `control`?",
       "tag": "helix-number-input"
     },
     {
       "answer": "yes",
-      "id": "part-1381",
+      "id": "part-1455",
       "kind": "part",
       "prompt": "Does `helix-number-input` publish a CSS part named `decrement`?",
       "tag": "helix-number-input"
     },
     {
       "answer": "yes",
-      "id": "part-1382",
+      "id": "part-1456",
       "kind": "part",
       "prompt": "Does `helix-number-input` publish a CSS part named `increment`?",
       "tag": "helix-number-input"
     },
     {
       "answer": "yes",
-      "id": "part-1383",
+      "id": "part-1457",
       "kind": "part",
       "prompt": "Does `helix-number-input` publish a CSS part named `decrement-mark`?",
       "tag": "helix-number-input"
     },
     {
       "answer": "yes",
-      "id": "part-1384",
+      "id": "part-1458",
       "kind": "part",
       "prompt": "Does `helix-number-input` publish a CSS part named `increment-mark`?",
       "tag": "helix-number-input"
     },
     {
       "answer": "yes",
-      "id": "part-1385",
+      "id": "part-1459",
       "kind": "part",
       "prompt": "Does `helix-number-input` publish a CSS part named `label`?",
       "tag": "helix-number-input"
     },
     {
       "answer": "no",
-      "id": "part-1386",
+      "id": "part-1460",
       "kind": "part",
       "prompt": "Does `helix-number-input` publish a CSS part named `wrapper`?",
       "tag": "helix-number-input"
     },
     {
       "answer": "yes",
-      "id": "part-1387",
+      "id": "part-1461",
       "kind": "part",
       "prompt": "Does `helix-option-group` publish a CSS part named `label`?",
       "tag": "helix-option-group"
     },
     {
       "answer": "yes",
-      "id": "part-1388",
+      "id": "part-1462",
       "kind": "part",
       "prompt": "Does `helix-option-group` publish a CSS part named `items`?",
       "tag": "helix-option-group"
     },
     {
       "answer": "no",
-      "id": "part-1389",
+      "id": "part-1463",
       "kind": "part",
       "prompt": "Does `helix-option-group` publish a CSS part named `wrapper`?",
       "tag": "helix-option-group"
     },
     {
       "answer": "yes",
-      "id": "part-1390",
+      "id": "part-1464",
       "kind": "part",
       "prompt": "Does `helix-option` publish a CSS part named `item`?",
       "tag": "helix-option"
     },
     {
       "answer": "yes",
-      "id": "part-1391",
+      "id": "part-1465",
       "kind": "part",
       "prompt": "Does `helix-option` publish a CSS part named `label`?",
       "tag": "helix-option"
     },
     {
       "answer": "no",
-      "id": "part-1392",
+      "id": "part-1466",
       "kind": "part",
       "prompt": "Does `helix-option` publish a CSS part named `wrapper`?",
       "tag": "helix-option"
     },
     {
       "answer": "yes",
-      "id": "part-1393",
+      "id": "part-1467",
       "kind": "part",
       "prompt": "Does `helix-outline` publish a CSS part named `nav`?",
       "tag": "helix-outline"
     },
     {
       "answer": "yes",
-      "id": "part-1394",
+      "id": "part-1468",
       "kind": "part",
       "prompt": "Does `helix-outline` publish a CSS part named `indicator`?",
       "tag": "helix-outline"
     },
     {
       "answer": "no",
-      "id": "part-1395",
+      "id": "part-1469",
       "kind": "part",
       "prompt": "Does `helix-outline` publish a CSS part named `wrapper`?",
       "tag": "helix-outline"
     },
     {
       "answer": "yes",
-      "id": "part-1396",
+      "id": "part-1470",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `list`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1397",
+      "id": "part-1471",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `item`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1398",
+      "id": "part-1472",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `page`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1399",
+      "id": "part-1473",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `gap`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1400",
+      "id": "part-1474",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `previous`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1401",
+      "id": "part-1475",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `next`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1402",
+      "id": "part-1476",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `first`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1403",
+      "id": "part-1477",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `last`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1404",
+      "id": "part-1478",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `status`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1405",
+      "id": "part-1479",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `live`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1406",
+      "id": "part-1480",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `mark`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "no",
-      "id": "part-1407",
+      "id": "part-1481",
       "kind": "part",
       "prompt": "Does `helix-pagination` publish a CSS part named `wrapper`?",
       "tag": "helix-pagination"
     },
     {
       "answer": "yes",
-      "id": "part-1408",
+      "id": "part-1482",
       "kind": "part",
       "prompt": "Does `helix-pagination-size` publish a CSS part named `control`?",
       "tag": "helix-pagination-size"
     },
     {
       "answer": "yes",
-      "id": "part-1409",
+      "id": "part-1483",
       "kind": "part",
       "prompt": "Does `helix-pagination-size` publish a CSS part named `label`?",
       "tag": "helix-pagination-size"
     },
     {
       "answer": "yes",
-      "id": "part-1410",
+      "id": "part-1484",
       "kind": "part",
       "prompt": "Does `helix-pagination-size` publish a CSS part named `trigger`?",
       "tag": "helix-pagination-size"
     },
     {
       "answer": "yes",
-      "id": "part-1411",
+      "id": "part-1485",
       "kind": "part",
       "prompt": "Does `helix-pagination-size` publish a CSS part named `value`?",
       "tag": "helix-pagination-size"
     },
     {
       "answer": "no",
-      "id": "part-1412",
+      "id": "part-1486",
       "kind": "part",
       "prompt": "Does `helix-pagination-size` publish a CSS part named `wrapper`?",
       "tag": "helix-pagination-size"
     },
     {
       "answer": "no",
-      "id": "part-1413",
+      "id": "part-1487",
       "kind": "part",
       "prompt": "Does `helix-pagination-summary` publish a CSS part named `wrapper`?",
       "tag": "helix-pagination-summary"
     },
     {
       "answer": "yes",
-      "id": "part-1414",
+      "id": "part-1488",
       "kind": "part",
       "prompt": "Does `helix-pin-input` publish a CSS part named `field`?",
       "tag": "helix-pin-input"
     },
     {
       "answer": "yes",
-      "id": "part-1415",
+      "id": "part-1489",
       "kind": "part",
       "prompt": "Does `helix-pin-input` publish a CSS part named `cell`?",
       "tag": "helix-pin-input"
     },
     {
       "answer": "no",
-      "id": "part-1416",
+      "id": "part-1490",
       "kind": "part",
       "prompt": "Does `helix-pin-input` publish a CSS part named `wrapper`?",
       "tag": "helix-pin-input"
     },
     {
       "answer": "yes",
-      "id": "part-1417",
+      "id": "part-1491",
       "kind": "part",
       "prompt": "Does `helix-popover` publish a CSS part named `content`?",
       "tag": "helix-popover"
     },
     {
       "answer": "yes",
-      "id": "part-1418",
+      "id": "part-1492",
       "kind": "part",
       "prompt": "Does `helix-popover` publish a CSS part named `popover`?",
       "tag": "helix-popover"
     },
     {
       "answer": "no",
-      "id": "part-1419",
+      "id": "part-1493",
       "kind": "part",
       "prompt": "Does `helix-popover` publish a CSS part named `wrapper`?",
       "tag": "helix-popover"
     },
     {
       "answer": "yes",
-      "id": "part-1420",
+      "id": "part-1494",
       "kind": "part",
       "prompt": "Does `helix-progress` publish a CSS part named `track`?",
       "tag": "helix-progress"
     },
     {
       "answer": "yes",
-      "id": "part-1421",
+      "id": "part-1495",
       "kind": "part",
       "prompt": "Does `helix-progress` publish a CSS part named `indicator`?",
       "tag": "helix-progress"
     },
     {
       "answer": "yes",
-      "id": "part-1422",
+      "id": "part-1496",
       "kind": "part",
       "prompt": "Does `helix-progress` publish a CSS part named `groove`?",
       "tag": "helix-progress"
     },
     {
       "answer": "yes",
-      "id": "part-1423",
+      "id": "part-1497",
       "kind": "part",
       "prompt": "Does `helix-progress` publish a CSS part named `value`?",
       "tag": "helix-progress"
     },
     {
       "answer": "no",
-      "id": "part-1424",
+      "id": "part-1498",
       "kind": "part",
       "prompt": "Does `helix-progress` publish a CSS part named `wrapper`?",
       "tag": "helix-progress"
     },
     {
       "answer": "yes",
-      "id": "part-1425",
+      "id": "part-1499",
       "kind": "part",
       "prompt": "Does `helix-qr-code` publish a CSS part named `code`?",
       "tag": "helix-qr-code"
     },
     {
       "answer": "yes",
-      "id": "part-1426",
+      "id": "part-1500",
       "kind": "part",
       "prompt": "Does `helix-qr-code` publish a CSS part named `modules`?",
       "tag": "helix-qr-code"
     },
     {
       "answer": "yes",
-      "id": "part-1427",
+      "id": "part-1501",
       "kind": "part",
       "prompt": "Does `helix-qr-code` publish a CSS part named `finders`?",
       "tag": "helix-qr-code"
     },
     {
       "answer": "yes",
-      "id": "part-1428",
+      "id": "part-1502",
       "kind": "part",
       "prompt": "Does `helix-qr-code` publish a CSS part named `logo`?",
       "tag": "helix-qr-code"
     },
     {
       "answer": "no",
-      "id": "part-1429",
+      "id": "part-1503",
       "kind": "part",
       "prompt": "Does `helix-qr-code` publish a CSS part named `wrapper`?",
       "tag": "helix-qr-code"
     },
     {
       "answer": "yes",
-      "id": "part-1430",
+      "id": "part-1504",
       "kind": "part",
       "prompt": "Does `helix-quote` publish a CSS part named `quote`?",
       "tag": "helix-quote"
     },
     {
       "answer": "no",
-      "id": "part-1431",
+      "id": "part-1505",
       "kind": "part",
       "prompt": "Does `helix-quote` publish a CSS part named `wrapper`?",
       "tag": "helix-quote"
     },
     {
       "answer": "yes",
-      "id": "part-1432",
+      "id": "part-1506",
       "kind": "part",
       "prompt": "Does `helix-radio-group` publish a CSS part named `label`?",
       "tag": "helix-radio-group"
     },
     {
       "answer": "yes",
-      "id": "part-1433",
+      "id": "part-1507",
       "kind": "part",
       "prompt": "Does `helix-radio-group` publish a CSS part named `items`?",
       "tag": "helix-radio-group"
     },
     {
       "answer": "yes",
-      "id": "part-1434",
+      "id": "part-1508",
       "kind": "part",
       "prompt": "Does `helix-radio-group` publish a CSS part named `hint`?",
       "tag": "helix-radio-group"
     },
     {
       "answer": "yes",
-      "id": "part-1435",
+      "id": "part-1509",
       "kind": "part",
       "prompt": "Does `helix-radio-group` publish a CSS part named `feedback`?",
       "tag": "helix-radio-group"
     },
     {
       "answer": "no",
-      "id": "part-1436",
+      "id": "part-1510",
       "kind": "part",
       "prompt": "Does `helix-radio-group` publish a CSS part named `wrapper`?",
       "tag": "helix-radio-group"
     },
     {
       "answer": "yes",
-      "id": "part-1437",
+      "id": "part-1511",
       "kind": "part",
       "prompt": "Does `helix-radio` publish a CSS part named `item`?",
       "tag": "helix-radio"
     },
     {
       "answer": "yes",
-      "id": "part-1438",
+      "id": "part-1512",
       "kind": "part",
       "prompt": "Does `helix-radio` publish a CSS part named `box`?",
       "tag": "helix-radio"
     },
     {
       "answer": "yes",
-      "id": "part-1439",
+      "id": "part-1513",
       "kind": "part",
       "prompt": "Does `helix-radio` publish a CSS part named `mark`?",
       "tag": "helix-radio"
     },
     {
       "answer": "yes",
-      "id": "part-1440",
+      "id": "part-1514",
       "kind": "part",
       "prompt": "Does `helix-radio` publish a CSS part named `label`?",
       "tag": "helix-radio"
     },
     {
       "answer": "no",
-      "id": "part-1441",
+      "id": "part-1515",
       "kind": "part",
       "prompt": "Does `helix-radio` publish a CSS part named `wrapper`?",
       "tag": "helix-radio"
     },
     {
       "answer": "yes",
-      "id": "part-1442",
+      "id": "part-1516",
       "kind": "part",
       "prompt": "Does `helix-rating` publish a CSS part named `marks`?",
       "tag": "helix-rating"
     },
     {
       "answer": "yes",
-      "id": "part-1443",
+      "id": "part-1517",
       "kind": "part",
       "prompt": "Does `helix-rating` publish a CSS part named `track`?",
       "tag": "helix-rating"
     },
     {
       "answer": "yes",
-      "id": "part-1444",
+      "id": "part-1518",
       "kind": "part",
       "prompt": "Does `helix-rating` publish a CSS part named `fill`?",
       "tag": "helix-rating"
     },
     {
       "answer": "yes",
-      "id": "part-1445",
+      "id": "part-1519",
       "kind": "part",
       "prompt": "Does `helix-rating` publish a CSS part named `mark`?",
       "tag": "helix-rating"
     },
     {
       "answer": "yes",
-      "id": "part-1446",
+      "id": "part-1520",
       "kind": "part",
       "prompt": "Does `helix-rating` publish a CSS part named `option`?",
       "tag": "helix-rating"
     },
     {
       "answer": "yes",
-      "id": "part-1447",
+      "id": "part-1521",
       "kind": "part",
       "prompt": "Does `helix-rating` publish a CSS part named `value`?",
       "tag": "helix-rating"
     },
     {
       "answer": "no",
-      "id": "part-1448",
+      "id": "part-1522",
       "kind": "part",
       "prompt": "Does `helix-rating` publish a CSS part named `wrapper`?",
       "tag": "helix-rating"
     },
     {
       "answer": "yes",
-      "id": "part-1449",
+      "id": "part-1523",
       "kind": "part",
       "prompt": "Does `helix-sandbox-preview` publish a CSS part named `frame`?",
       "tag": "helix-sandbox-preview"
     },
     {
       "answer": "no",
-      "id": "part-1450",
+      "id": "part-1524",
       "kind": "part",
       "prompt": "Does `helix-sandbox-preview` publish a CSS part named `wrapper`?",
       "tag": "helix-sandbox-preview"
     },
     {
       "answer": "yes",
-      "id": "part-1451",
+      "id": "part-1525",
       "kind": "part",
       "prompt": "Does `helix-sandbox` publish a CSS part named `body`?",
       "tag": "helix-sandbox"
     },
     {
       "answer": "yes",
-      "id": "part-1452",
+      "id": "part-1526",
       "kind": "part",
       "prompt": "Does `helix-sandbox` publish a CSS part named `corner`?",
       "tag": "helix-sandbox"
     },
     {
       "answer": "yes",
-      "id": "part-1453",
+      "id": "part-1527",
       "kind": "part",
       "prompt": "Does `helix-sandbox` publish a CSS part named `pane`?",
       "tag": "helix-sandbox"
     },
     {
       "answer": "yes",
-      "id": "part-1454",
+      "id": "part-1528",
       "kind": "part",
       "prompt": "Does `helix-sandbox` publish a CSS part named `panel`?",
       "tag": "helix-sandbox"
     },
     {
       "answer": "yes",
-      "id": "part-1455",
+      "id": "part-1529",
       "kind": "part",
       "prompt": "Does `helix-sandbox` publish a CSS part named `panes`?",
       "tag": "helix-sandbox"
     },
     {
       "answer": "yes",
-      "id": "part-1456",
+      "id": "part-1530",
       "kind": "part",
       "prompt": "Does `helix-sandbox` publish a CSS part named `separator`?",
       "tag": "helix-sandbox"
     },
     {
       "answer": "no",
-      "id": "part-1457",
+      "id": "part-1531",
       "kind": "part",
       "prompt": "Does `helix-sandbox` publish a CSS part named `wrapper`?",
       "tag": "helix-sandbox"
     },
     {
       "answer": "yes",
-      "id": "part-1458",
+      "id": "part-1532",
       "kind": "part",
       "prompt": "Does `helix-sandbox-source` publish a CSS part named `source`?",
       "tag": "helix-sandbox-source"
     },
     {
       "answer": "no",
-      "id": "part-1459",
+      "id": "part-1533",
       "kind": "part",
       "prompt": "Does `helix-sandbox-source` publish a CSS part named `wrapper`?",
       "tag": "helix-sandbox-source"
     },
     {
       "answer": "yes",
-      "id": "part-1460",
+      "id": "part-1534",
       "kind": "part",
       "prompt": "Does `helix-sandbox-status-bar` publish a CSS part named `caret`?",
       "tag": "helix-sandbox-status-bar"
     },
     {
       "answer": "yes",
-      "id": "part-1461",
+      "id": "part-1535",
       "kind": "part",
       "prompt": "Does `helix-sandbox-status-bar` publish a CSS part named `language`?",
       "tag": "helix-sandbox-status-bar"
     },
     {
       "answer": "no",
-      "id": "part-1462",
+      "id": "part-1536",
       "kind": "part",
       "prompt": "Does `helix-sandbox-status-bar` publish a CSS part named `wrapper`?",
       "tag": "helix-sandbox-status-bar"
     },
     {
       "answer": "yes",
-      "id": "part-1463",
+      "id": "part-1537",
       "kind": "part",
       "prompt": "Does `helix-sandbox-terminal` publish a CSS part named `log`?",
       "tag": "helix-sandbox-terminal"
     },
     {
       "answer": "yes",
-      "id": "part-1464",
+      "id": "part-1538",
       "kind": "part",
       "prompt": "Does `helix-sandbox-terminal` publish a CSS part named `entry`?",
       "tag": "helix-sandbox-terminal"
     },
     {
       "answer": "yes",
-      "id": "part-1465",
+      "id": "part-1539",
       "kind": "part",
       "prompt": "Does `helix-sandbox-terminal` publish a CSS part named `level`?",
       "tag": "helix-sandbox-terminal"
     },
     {
       "answer": "yes",
-      "id": "part-1466",
+      "id": "part-1540",
       "kind": "part",
       "prompt": "Does `helix-sandbox-terminal` publish a CSS part named `message`?",
       "tag": "helix-sandbox-terminal"
     },
     {
       "answer": "yes",
-      "id": "part-1467",
+      "id": "part-1541",
       "kind": "part",
       "prompt": "Does `helix-sandbox-terminal` publish a CSS part named `count`?",
       "tag": "helix-sandbox-terminal"
     },
     {
       "answer": "yes",
-      "id": "part-1468",
+      "id": "part-1542",
       "kind": "part",
       "prompt": "Does `helix-sandbox-terminal` publish a CSS part named `empty`?",
       "tag": "helix-sandbox-terminal"
     },
     {
       "answer": "no",
-      "id": "part-1469",
+      "id": "part-1543",
       "kind": "part",
       "prompt": "Does `helix-sandbox-terminal` publish a CSS part named `wrapper`?",
       "tag": "helix-sandbox-terminal"
     },
     {
       "answer": "no",
-      "id": "part-1470",
+      "id": "part-1544",
       "kind": "part",
       "prompt": "Does `helix-sandbox-toolbar` publish a CSS part named `wrapper`?",
       "tag": "helix-sandbox-toolbar"
     },
     {
       "answer": "yes",
-      "id": "part-1471",
+      "id": "part-1545",
       "kind": "part",
       "prompt": "Does `helix-scroll-area` publish a CSS part named `viewport`?",
       "tag": "helix-scroll-area"
     },
     {
       "answer": "yes",
-      "id": "part-1472",
+      "id": "part-1546",
       "kind": "part",
       "prompt": "Does `helix-scroll-area` publish a CSS part named `edges`?",
       "tag": "helix-scroll-area"
     },
     {
       "answer": "no",
-      "id": "part-1473",
+      "id": "part-1547",
       "kind": "part",
       "prompt": "Does `helix-scroll-area` publish a CSS part named `wrapper`?",
       "tag": "helix-scroll-area"
     },
     {
       "answer": "yes",
-      "id": "part-1474",
+      "id": "part-1548",
       "kind": "part",
       "prompt": "Does `helix-select` publish a CSS part named `label`?",
       "tag": "helix-select"
     },
     {
       "answer": "yes",
-      "id": "part-1475",
+      "id": "part-1549",
       "kind": "part",
       "prompt": "Does `helix-select` publish a CSS part named `value`?",
       "tag": "helix-select"
     },
     {
       "answer": "yes",
-      "id": "part-1476",
+      "id": "part-1550",
       "kind": "part",
       "prompt": "Does `helix-select` publish a CSS part named `indicator`?",
       "tag": "helix-select"
     },
     {
       "answer": "yes",
-      "id": "part-1477",
+      "id": "part-1551",
       "kind": "part",
       "prompt": "Does `helix-select` publish a CSS part named `trigger`?",
       "tag": "helix-select"
     },
     {
       "answer": "yes",
-      "id": "part-1478",
+      "id": "part-1552",
       "kind": "part",
       "prompt": "Does `helix-select` publish a CSS part named `surface`?",
       "tag": "helix-select"
     },
     {
       "answer": "yes",
-      "id": "part-1479",
+      "id": "part-1553",
       "kind": "part",
       "prompt": "Does `helix-select` publish a CSS part named `listbox`?",
       "tag": "helix-select"
     },
     {
       "answer": "yes",
-      "id": "part-1480",
-      "kind": "part",
-      "prompt": "Does `helix-select` publish a CSS part named `items`?",
-      "tag": "helix-select"
-    },
-    {
-      "answer": "yes",
-      "id": "part-1481",
-      "kind": "part",
-      "prompt": "Does `helix-select` publish a CSS part named `empty`?",
-      "tag": "helix-select"
-    },
-    {
-      "answer": "yes",
-      "id": "part-1482",
+      "id": "part-1554",
       "kind": "part",
       "prompt": "Does `helix-select` publish a CSS part named `hint`?",
       "tag": "helix-select"
     },
     {
       "answer": "yes",
-      "id": "part-1483",
+      "id": "part-1555",
       "kind": "part",
       "prompt": "Does `helix-select` publish a CSS part named `feedback`?",
       "tag": "helix-select"
     },
     {
+      "answer": "yes",
+      "id": "part-1556",
+      "kind": "part",
+      "prompt": "Does `helix-select` publish a CSS part named `listbox-empty`?",
+      "tag": "helix-select"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1557",
+      "kind": "part",
+      "prompt": "Does `helix-select` publish a CSS part named `listbox-feedback`?",
+      "tag": "helix-select"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1558",
+      "kind": "part",
+      "prompt": "Does `helix-select` publish a CSS part named `listbox-filter-icon`?",
+      "tag": "helix-select"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1559",
+      "kind": "part",
+      "prompt": "Does `helix-select` publish a CSS part named `listbox-filter-mark`?",
+      "tag": "helix-select"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1560",
+      "kind": "part",
+      "prompt": "Does `helix-select` publish a CSS part named `listbox-hint`?",
+      "tag": "helix-select"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1561",
+      "kind": "part",
+      "prompt": "Does `helix-select` publish a CSS part named `listbox-items`?",
+      "tag": "helix-select"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1562",
+      "kind": "part",
+      "prompt": "Does `helix-select` publish a CSS part named `listbox-label`?",
+      "tag": "helix-select"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1563",
+      "kind": "part",
+      "prompt": "Does `helix-select` publish a CSS part named `listbox-search`?",
+      "tag": "helix-select"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1564",
+      "kind": "part",
+      "prompt": "Does `helix-select` publish a CSS part named `listbox-search-field`?",
+      "tag": "helix-select"
+    },
+    {
       "answer": "no",
-      "id": "part-1484",
+      "id": "part-1565",
       "kind": "part",
       "prompt": "Does `helix-select` publish a CSS part named `wrapper`?",
       "tag": "helix-select"
     },
     {
       "answer": "yes",
-      "id": "part-1485",
+      "id": "part-1566",
       "kind": "part",
       "prompt": "Does `helix-skeleton` publish a CSS part named `skeleton`?",
       "tag": "helix-skeleton"
     },
     {
       "answer": "no",
-      "id": "part-1486",
+      "id": "part-1567",
       "kind": "part",
       "prompt": "Does `helix-skeleton` publish a CSS part named `wrapper`?",
       "tag": "helix-skeleton"
     },
     {
       "answer": "yes",
-      "id": "part-1487",
+      "id": "part-1568",
       "kind": "part",
       "prompt": "Does `helix-slider` publish a CSS part named `field`?",
       "tag": "helix-slider"
     },
     {
       "answer": "yes",
-      "id": "part-1488",
+      "id": "part-1569",
       "kind": "part",
       "prompt": "Does `helix-slider` publish a CSS part named `control`?",
       "tag": "helix-slider"
     },
     {
       "answer": "yes",
-      "id": "part-1489",
+      "id": "part-1570",
       "kind": "part",
       "prompt": "Does `helix-slider` publish a CSS part named `markers`?",
       "tag": "helix-slider"
     },
     {
       "answer": "yes",
-      "id": "part-1490",
+      "id": "part-1571",
       "kind": "part",
       "prompt": "Does `helix-slider` publish a CSS part named `marker`?",
       "tag": "helix-slider"
     },
     {
       "answer": "yes",
-      "id": "part-1491",
+      "id": "part-1572",
       "kind": "part",
       "prompt": "Does `helix-slider` publish a CSS part named `marker-label`?",
       "tag": "helix-slider"
     },
     {
       "answer": "yes",
-      "id": "part-1492",
+      "id": "part-1573",
       "kind": "part",
       "prompt": "Does `helix-slider` publish a CSS part named `output`?",
       "tag": "helix-slider"
     },
     {
       "answer": "no",
-      "id": "part-1493",
+      "id": "part-1574",
       "kind": "part",
       "prompt": "Does `helix-slider` publish a CSS part named `wrapper`?",
       "tag": "helix-slider"
     },
     {
       "answer": "yes",
-      "id": "part-1494",
+      "id": "part-1575",
       "kind": "part",
       "prompt": "Does `helix-sparkline` publish a CSS part named `area`?",
       "tag": "helix-sparkline"
     },
     {
       "answer": "yes",
-      "id": "part-1495",
+      "id": "part-1576",
       "kind": "part",
       "prompt": "Does `helix-sparkline` publish a CSS part named `bar`?",
       "tag": "helix-sparkline"
     },
     {
       "answer": "yes",
-      "id": "part-1496",
+      "id": "part-1577",
       "kind": "part",
       "prompt": "Does `helix-sparkline` publish a CSS part named `line`?",
       "tag": "helix-sparkline"
     },
     {
       "answer": "yes",
-      "id": "part-1497",
+      "id": "part-1578",
       "kind": "part",
       "prompt": "Does `helix-sparkline` publish a CSS part named `svg`?",
       "tag": "helix-sparkline"
     },
     {
       "answer": "yes",
-      "id": "part-1498",
+      "id": "part-1579",
       "kind": "part",
       "prompt": "Does `helix-sparkline` publish a CSS part named `terminus`?",
       "tag": "helix-sparkline"
     },
     {
       "answer": "yes",
-      "id": "part-1499",
+      "id": "part-1580",
       "kind": "part",
       "prompt": "Does `helix-sparkline` publish a CSS part named `wash-end`?",
       "tag": "helix-sparkline"
     },
     {
       "answer": "yes",
-      "id": "part-1500",
+      "id": "part-1581",
       "kind": "part",
       "prompt": "Does `helix-sparkline` publish a CSS part named `wash-start`?",
       "tag": "helix-sparkline"
     },
     {
       "answer": "no",
-      "id": "part-1501",
+      "id": "part-1582",
       "kind": "part",
       "prompt": "Does `helix-sparkline` publish a CSS part named `wrapper`?",
       "tag": "helix-sparkline"
     },
     {
       "answer": "yes",
-      "id": "part-1502",
+      "id": "part-1583",
       "kind": "part",
       "prompt": "Does `helix-speed-dial-item` publish a CSS part named `item`?",
       "tag": "helix-speed-dial-item"
     },
     {
       "answer": "yes",
-      "id": "part-1503",
+      "id": "part-1584",
       "kind": "part",
       "prompt": "Does `helix-speed-dial-item` publish a CSS part named `icon`?",
       "tag": "helix-speed-dial-item"
     },
     {
       "answer": "yes",
-      "id": "part-1504",
+      "id": "part-1585",
       "kind": "part",
       "prompt": "Does `helix-speed-dial-item` publish a CSS part named `label`?",
       "tag": "helix-speed-dial-item"
     },
     {
       "answer": "no",
-      "id": "part-1505",
+      "id": "part-1586",
       "kind": "part",
       "prompt": "Does `helix-speed-dial-item` publish a CSS part named `wrapper`?",
       "tag": "helix-speed-dial-item"
     },
     {
       "answer": "yes",
-      "id": "part-1506",
+      "id": "part-1587",
       "kind": "part",
       "prompt": "Does `helix-speed-dial` publish a CSS part named `icon`?",
       "tag": "helix-speed-dial"
     },
     {
       "answer": "yes",
-      "id": "part-1507",
+      "id": "part-1588",
       "kind": "part",
       "prompt": "Does `helix-speed-dial` publish a CSS part named `trigger`?",
       "tag": "helix-speed-dial"
     },
     {
       "answer": "yes",
-      "id": "part-1508",
+      "id": "part-1589",
       "kind": "part",
       "prompt": "Does `helix-speed-dial` publish a CSS part named `actions`?",
       "tag": "helix-speed-dial"
     },
     {
       "answer": "no",
-      "id": "part-1509",
+      "id": "part-1590",
       "kind": "part",
       "prompt": "Does `helix-speed-dial` publish a CSS part named `wrapper`?",
       "tag": "helix-speed-dial"
     },
     {
       "answer": "yes",
-      "id": "part-1510",
+      "id": "part-1591",
       "kind": "part",
       "prompt": "Does `helix-splitter` publish a CSS part named `start`?",
       "tag": "helix-splitter"
     },
     {
       "answer": "yes",
-      "id": "part-1511",
+      "id": "part-1592",
       "kind": "part",
       "prompt": "Does `helix-splitter` publish a CSS part named `end`?",
       "tag": "helix-splitter"
     },
     {
       "answer": "yes",
-      "id": "part-1512",
+      "id": "part-1593",
       "kind": "part",
       "prompt": "Does `helix-splitter` publish a CSS part named `separator`?",
       "tag": "helix-splitter"
     },
     {
       "answer": "yes",
-      "id": "part-1513",
+      "id": "part-1594",
       "kind": "part",
       "prompt": "Does `helix-splitter` publish a CSS part named `corner`?",
       "tag": "helix-splitter"
     },
     {
       "answer": "no",
-      "id": "part-1514",
+      "id": "part-1595",
       "kind": "part",
       "prompt": "Does `helix-splitter` publish a CSS part named `wrapper`?",
       "tag": "helix-splitter"
     },
     {
       "answer": "no",
-      "id": "part-1515",
+      "id": "part-1596",
       "kind": "part",
       "prompt": "Does `helix-stat-group` publish a CSS part named `wrapper`?",
       "tag": "helix-stat-group"
     },
     {
       "answer": "no",
-      "id": "part-1516",
+      "id": "part-1597",
       "kind": "part",
       "prompt": "Does `helix-stat` publish a CSS part named `wrapper`?",
       "tag": "helix-stat"
     },
     {
       "answer": "no",
-      "id": "part-1517",
+      "id": "part-1598",
       "kind": "part",
       "prompt": "Does `helix-steps` publish a CSS part named `wrapper`?",
       "tag": "helix-steps"
     },
     {
       "answer": "yes",
-      "id": "part-1518",
+      "id": "part-1599",
       "kind": "part",
       "prompt": "Does `helix-step` publish a CSS part named `body`?",
       "tag": "helix-step"
     },
     {
       "answer": "yes",
-      "id": "part-1519",
+      "id": "part-1600",
       "kind": "part",
       "prompt": "Does `helix-step` publish a CSS part named `content`?",
       "tag": "helix-step"
     },
     {
       "answer": "yes",
-      "id": "part-1520",
+      "id": "part-1601",
       "kind": "part",
       "prompt": "Does `helix-step` publish a CSS part named `description`?",
       "tag": "helix-step"
     },
     {
       "answer": "yes",
-      "id": "part-1521",
+      "id": "part-1602",
       "kind": "part",
       "prompt": "Does `helix-step` publish a CSS part named `label`?",
       "tag": "helix-step"
     },
     {
       "answer": "yes",
-      "id": "part-1522",
+      "id": "part-1603",
       "kind": "part",
       "prompt": "Does `helix-step` publish a CSS part named `lead`?",
       "tag": "helix-step"
     },
     {
       "answer": "yes",
-      "id": "part-1523",
+      "id": "part-1604",
       "kind": "part",
       "prompt": "Does `helix-step` publish a CSS part named `mark`?",
       "tag": "helix-step"
     },
     {
       "answer": "yes",
-      "id": "part-1524",
+      "id": "part-1605",
       "kind": "part",
       "prompt": "Does `helix-step` publish a CSS part named `marker`?",
       "tag": "helix-step"
     },
     {
       "answer": "yes",
-      "id": "part-1525",
+      "id": "part-1606",
       "kind": "part",
       "prompt": "Does `helix-step` publish a CSS part named `trail`?",
       "tag": "helix-step"
     },
     {
+      "answer": "yes",
+      "id": "part-1607",
+      "kind": "part",
+      "prompt": "Does `helix-step` publish a CSS part named `label-button`?",
+      "tag": "helix-step"
+    },
+    {
       "answer": "no",
-      "id": "part-1526",
+      "id": "part-1608",
       "kind": "part",
       "prompt": "Does `helix-step` publish a CSS part named `wrapper`?",
       "tag": "helix-step"
     },
     {
       "answer": "yes",
-      "id": "part-1527",
+      "id": "part-1609",
       "kind": "part",
       "prompt": "Does `helix-switch` publish a CSS part named `field`?",
       "tag": "helix-switch"
     },
     {
       "answer": "yes",
-      "id": "part-1528",
+      "id": "part-1610",
       "kind": "part",
       "prompt": "Does `helix-switch` publish a CSS part named `track`?",
       "tag": "helix-switch"
     },
     {
       "answer": "yes",
-      "id": "part-1529",
+      "id": "part-1611",
       "kind": "part",
       "prompt": "Does `helix-switch` publish a CSS part named `control`?",
       "tag": "helix-switch"
     },
     {
       "answer": "yes",
-      "id": "part-1530",
+      "id": "part-1612",
       "kind": "part",
       "prompt": "Does `helix-switch` publish a CSS part named `thumb`?",
       "tag": "helix-switch"
     },
     {
       "answer": "yes",
-      "id": "part-1531",
+      "id": "part-1613",
       "kind": "part",
       "prompt": "Does `helix-switch` publish a CSS part named `label`?",
       "tag": "helix-switch"
     },
     {
       "answer": "no",
-      "id": "part-1532",
+      "id": "part-1614",
       "kind": "part",
       "prompt": "Does `helix-switch` publish a CSS part named `wrapper`?",
       "tag": "helix-switch"
     },
     {
       "answer": "no",
-      "id": "part-1533",
+      "id": "part-1615",
       "kind": "part",
       "prompt": "Does `helix-table-cell` publish a CSS part named `wrapper`?",
       "tag": "helix-table-cell"
     },
     {
       "answer": "yes",
-      "id": "part-1534",
+      "id": "part-1616",
       "kind": "part",
       "prompt": "Does `helix-table-column` publish a CSS part named `column`?",
       "tag": "helix-table-column"
     },
     {
       "answer": "no",
-      "id": "part-1535",
+      "id": "part-1617",
       "kind": "part",
       "prompt": "Does `helix-table-column` publish a CSS part named `wrapper`?",
       "tag": "helix-table-column"
     },
     {
       "answer": "yes",
-      "id": "part-1536",
+      "id": "part-1618",
       "kind": "part",
       "prompt": "Does `helix-table` publish a CSS part named `table`?",
       "tag": "helix-table"
     },
     {
       "answer": "yes",
-      "id": "part-1537",
+      "id": "part-1619",
       "kind": "part",
       "prompt": "Does `helix-table` publish a CSS part named `head`?",
       "tag": "helix-table"
     },
     {
       "answer": "no",
-      "id": "part-1538",
+      "id": "part-1620",
       "kind": "part",
       "prompt": "Does `helix-table` publish a CSS part named `wrapper`?",
       "tag": "helix-table"
     },
     {
       "answer": "no",
-      "id": "part-1539",
+      "id": "part-1621",
       "kind": "part",
       "prompt": "Does `helix-table-row` publish a CSS part named `wrapper`?",
       "tag": "helix-table-row"
     },
     {
       "answer": "yes",
-      "id": "part-1540",
+      "id": "part-1622",
       "kind": "part",
       "prompt": "Does `helix-tabs-panel` publish a CSS part named `panel`?",
       "tag": "helix-tabs-panel"
     },
     {
       "answer": "no",
-      "id": "part-1541",
+      "id": "part-1623",
       "kind": "part",
       "prompt": "Does `helix-tabs-panel` publish a CSS part named `wrapper`?",
       "tag": "helix-tabs-panel"
     },
     {
       "answer": "yes",
-      "id": "part-1542",
+      "id": "part-1624",
       "kind": "part",
       "prompt": "Does `helix-tabs` publish a CSS part named `tabs`?",
       "tag": "helix-tabs"
     },
     {
       "answer": "yes",
-      "id": "part-1543",
+      "id": "part-1625",
       "kind": "part",
       "prompt": "Does `helix-tabs` publish a CSS part named `panels`?",
       "tag": "helix-tabs"
     },
     {
       "answer": "yes",
-      "id": "part-1544",
+      "id": "part-1626",
       "kind": "part",
       "prompt": "Does `helix-tabs` publish a CSS part named `indicator`?",
       "tag": "helix-tabs"
     },
     {
       "answer": "no",
-      "id": "part-1545",
+      "id": "part-1627",
       "kind": "part",
       "prompt": "Does `helix-tabs` publish a CSS part named `wrapper`?",
       "tag": "helix-tabs"
     },
     {
       "answer": "yes",
-      "id": "part-1546",
+      "id": "part-1628",
       "kind": "part",
       "prompt": "Does `helix-tabs-tab` publish a CSS part named `tab`?",
       "tag": "helix-tabs-tab"
     },
     {
       "answer": "no",
-      "id": "part-1547",
+      "id": "part-1629",
       "kind": "part",
       "prompt": "Does `helix-tabs-tab` publish a CSS part named `wrapper`?",
       "tag": "helix-tabs-tab"
     },
     {
       "answer": "yes",
-      "id": "part-1548",
+      "id": "part-1630",
       "kind": "part",
       "prompt": "Does `helix-tag` publish a CSS part named `dismiss`?",
       "tag": "helix-tag"
     },
     {
       "answer": "yes",
-      "id": "part-1549",
+      "id": "part-1631",
       "kind": "part",
       "prompt": "Does `helix-tag` publish a CSS part named `dismiss-mark`?",
       "tag": "helix-tag"
     },
     {
       "answer": "yes",
-      "id": "part-1550",
+      "id": "part-1632",
       "kind": "part",
       "prompt": "Does `helix-tag` publish a CSS part named `prefix`?",
       "tag": "helix-tag"
     },
     {
       "answer": "no",
-      "id": "part-1551",
+      "id": "part-1633",
       "kind": "part",
       "prompt": "Does `helix-tag` publish a CSS part named `wrapper`?",
       "tag": "helix-tag"
     },
     {
       "answer": "yes",
-      "id": "part-1552",
+      "id": "part-1634",
       "kind": "part",
       "prompt": "Does `helix-text` publish a CSS part named `text`?",
       "tag": "helix-text"
     },
     {
       "answer": "no",
-      "id": "part-1553",
+      "id": "part-1635",
       "kind": "part",
       "prompt": "Does `helix-text` publish a CSS part named `wrapper`?",
       "tag": "helix-text"
     },
     {
       "answer": "yes",
-      "id": "part-1554",
+      "id": "part-1636",
       "kind": "part",
       "prompt": "Does `helix-textarea` publish a CSS part named `field`?",
       "tag": "helix-textarea"
     },
     {
       "answer": "yes",
-      "id": "part-1555",
+      "id": "part-1637",
       "kind": "part",
       "prompt": "Does `helix-textarea` publish a CSS part named `control`?",
       "tag": "helix-textarea"
     },
     {
       "answer": "no",
-      "id": "part-1556",
+      "id": "part-1638",
       "kind": "part",
       "prompt": "Does `helix-textarea` publish a CSS part named `wrapper`?",
       "tag": "helix-textarea"
     },
     {
       "answer": "yes",
-      "id": "part-1557",
+      "id": "part-1639",
       "kind": "part",
       "prompt": "Does `helix-time-input` publish a CSS part named `field`?",
       "tag": "helix-time-input"
     },
     {
       "answer": "yes",
-      "id": "part-1558",
+      "id": "part-1640",
       "kind": "part",
       "prompt": "Does `helix-time-input` publish a CSS part named `control`?",
       "tag": "helix-time-input"
     },
     {
       "answer": "yes",
-      "id": "part-1559",
+      "id": "part-1641",
       "kind": "part",
       "prompt": "Does `helix-time-input` publish a CSS part named `time`?",
       "tag": "helix-time-input"
     },
     {
       "answer": "yes",
-      "id": "part-1560",
+      "id": "part-1642",
       "kind": "part",
       "prompt": "Does `helix-time-input` publish a CSS part named `rest`?",
       "tag": "helix-time-input"
     },
     {
       "answer": "yes",
-      "id": "part-1561",
+      "id": "part-1643",
       "kind": "part",
       "prompt": "Does `helix-time-input` publish a CSS part named `trigger`?",
       "tag": "helix-time-input"
     },
     {
       "answer": "yes",
-      "id": "part-1562",
+      "id": "part-1644",
       "kind": "part",
       "prompt": "Does `helix-time-input` publish a CSS part named `trigger-icon`?",
       "tag": "helix-time-input"
     },
     {
       "answer": "yes",
-      "id": "part-1563",
+      "id": "part-1645",
       "kind": "part",
       "prompt": "Does `helix-time-input` publish a CSS part named `surface`?",
       "tag": "helix-time-input"
     },
     {
       "answer": "yes",
-      "id": "part-1564",
+      "id": "part-1646",
       "kind": "part",
       "prompt": "Does `helix-time-input` publish a CSS part named `picker`?",
       "tag": "helix-time-input"
     },
     {
+      "answer": "yes",
+      "id": "part-1647",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1648",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-columns`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1649",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-empty`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1650",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-items`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1651",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1652",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-option`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1653",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `time-dismiss`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1654",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `time-dismiss-mark`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1655",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `time-prefix`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1656",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column-empty`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1657",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column-feedback`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1658",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column-filter-icon`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1659",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column-filter-mark`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1660",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column-hint`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1661",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column-items`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1662",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column-label`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1663",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column-search`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1664",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-column-search-field`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1665",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list-empty`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1666",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list-feedback`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1667",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list-filter-icon`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1668",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list-filter-mark`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1669",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list-hint`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1670",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list-items`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1671",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list-label`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1672",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list-search`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1673",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-list-search-field`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1674",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-option-item`?",
+      "tag": "helix-time-input"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1675",
+      "kind": "part",
+      "prompt": "Does `helix-time-input` publish a CSS part named `picker-option-label`?",
+      "tag": "helix-time-input"
+    },
+    {
       "answer": "no",
-      "id": "part-1565",
+      "id": "part-1676",
       "kind": "part",
       "prompt": "Does `helix-time-input` publish a CSS part named `wrapper`?",
       "tag": "helix-time-input"
     },
     {
       "answer": "yes",
-      "id": "part-1566",
+      "id": "part-1677",
       "kind": "part",
       "prompt": "Does `helix-time-picker` publish a CSS part named `list`?",
       "tag": "helix-time-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1567",
+      "id": "part-1678",
       "kind": "part",
       "prompt": "Does `helix-time-picker` publish a CSS part named `columns`?",
       "tag": "helix-time-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1568",
+      "id": "part-1679",
       "kind": "part",
       "prompt": "Does `helix-time-picker` publish a CSS part named `column`?",
       "tag": "helix-time-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1569",
-      "kind": "part",
-      "prompt": "Does `helix-time-picker` publish a CSS part named `items`?",
-      "tag": "helix-time-picker"
-    },
-    {
-      "answer": "yes",
-      "id": "part-1570",
-      "kind": "part",
-      "prompt": "Does `helix-time-picker` publish a CSS part named `empty`?",
-      "tag": "helix-time-picker"
-    },
-    {
-      "answer": "yes",
-      "id": "part-1571",
+      "id": "part-1680",
       "kind": "part",
       "prompt": "Does `helix-time-picker` publish a CSS part named `option`?",
       "tag": "helix-time-picker"
     },
     {
+      "answer": "yes",
+      "id": "part-1681",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `column-empty`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1682",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `column-feedback`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1683",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `column-filter-icon`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1684",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `column-filter-mark`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1685",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `column-hint`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1686",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `column-items`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1687",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `column-label`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1688",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `column-search`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1689",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `column-search-field`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1690",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `list-empty`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1691",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `list-feedback`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1692",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `list-filter-icon`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1693",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `list-filter-mark`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1694",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `list-hint`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1695",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `list-items`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1696",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `list-label`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1697",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `list-search`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1698",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `list-search-field`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1699",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `option-item`?",
+      "tag": "helix-time-picker"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1700",
+      "kind": "part",
+      "prompt": "Does `helix-time-picker` publish a CSS part named `option-label`?",
+      "tag": "helix-time-picker"
+    },
+    {
       "answer": "no",
-      "id": "part-1572",
+      "id": "part-1701",
       "kind": "part",
       "prompt": "Does `helix-time-picker` publish a CSS part named `wrapper`?",
       "tag": "helix-time-picker"
     },
     {
       "answer": "yes",
-      "id": "part-1573",
+      "id": "part-1702",
       "kind": "part",
       "prompt": "Does `helix-timeline-item` publish a CSS part named `connector`?",
       "tag": "helix-timeline-item"
     },
     {
       "answer": "yes",
-      "id": "part-1574",
+      "id": "part-1703",
       "kind": "part",
       "prompt": "Does `helix-timeline-item` publish a CSS part named `dot`?",
       "tag": "helix-timeline-item"
     },
     {
       "answer": "yes",
-      "id": "part-1575",
+      "id": "part-1704",
       "kind": "part",
       "prompt": "Does `helix-timeline-item` publish a CSS part named `content`?",
       "tag": "helix-timeline-item"
     },
     {
       "answer": "yes",
-      "id": "part-1576",
+      "id": "part-1705",
       "kind": "part",
       "prompt": "Does `helix-timeline-item` publish a CSS part named `marker`?",
       "tag": "helix-timeline-item"
     },
     {
       "answer": "yes",
-      "id": "part-1577",
+      "id": "part-1706",
       "kind": "part",
       "prompt": "Does `helix-timeline-item` publish a CSS part named `rail`?",
       "tag": "helix-timeline-item"
     },
     {
       "answer": "yes",
-      "id": "part-1578",
+      "id": "part-1707",
       "kind": "part",
       "prompt": "Does `helix-timeline-item` publish a CSS part named `time`?",
       "tag": "helix-timeline-item"
     },
     {
       "answer": "no",
-      "id": "part-1579",
+      "id": "part-1708",
       "kind": "part",
       "prompt": "Does `helix-timeline-item` publish a CSS part named `wrapper`?",
       "tag": "helix-timeline-item"
     },
     {
       "answer": "no",
-      "id": "part-1580",
+      "id": "part-1709",
       "kind": "part",
       "prompt": "Does `helix-timeline` publish a CSS part named `wrapper`?",
       "tag": "helix-timeline"
     },
     {
       "answer": "yes",
-      "id": "part-1581",
+      "id": "part-1710",
       "kind": "part",
       "prompt": "Does `helix-toast-item` publish a CSS part named `actions`?",
       "tag": "helix-toast-item"
     },
     {
       "answer": "yes",
-      "id": "part-1582",
+      "id": "part-1711",
       "kind": "part",
       "prompt": "Does `helix-toast-item` publish a CSS part named `content`?",
       "tag": "helix-toast-item"
     },
     {
       "answer": "yes",
-      "id": "part-1583",
+      "id": "part-1712",
       "kind": "part",
       "prompt": "Does `helix-toast-item` publish a CSS part named `dismiss`?",
       "tag": "helix-toast-item"
     },
     {
       "answer": "yes",
-      "id": "part-1584",
+      "id": "part-1713",
       "kind": "part",
       "prompt": "Does `helix-toast-item` publish a CSS part named `dismiss-mark`?",
       "tag": "helix-toast-item"
     },
     {
       "answer": "yes",
-      "id": "part-1585",
+      "id": "part-1714",
       "kind": "part",
       "prompt": "Does `helix-toast-item` publish a CSS part named `icon`?",
       "tag": "helix-toast-item"
     },
     {
       "answer": "yes",
-      "id": "part-1586",
+      "id": "part-1715",
       "kind": "part",
       "prompt": "Does `helix-toast-item` publish a CSS part named `icon-mark`?",
       "tag": "helix-toast-item"
     },
     {
       "answer": "yes",
-      "id": "part-1587",
+      "id": "part-1716",
       "kind": "part",
       "prompt": "Does `helix-toast-item` publish a CSS part named `item`?",
       "tag": "helix-toast-item"
     },
     {
       "answer": "yes",
-      "id": "part-1588",
+      "id": "part-1717",
       "kind": "part",
       "prompt": "Does `helix-toast-item` publish a CSS part named `timer`?",
       "tag": "helix-toast-item"
     },
     {
       "answer": "no",
-      "id": "part-1589",
+      "id": "part-1718",
       "kind": "part",
       "prompt": "Does `helix-toast-item` publish a CSS part named `wrapper`?",
       "tag": "helix-toast-item"
     },
     {
       "answer": "yes",
-      "id": "part-1590",
+      "id": "part-1719",
       "kind": "part",
       "prompt": "Does `helix-toast` publish a CSS part named `region`?",
       "tag": "helix-toast"
     },
     {
       "answer": "no",
-      "id": "part-1591",
+      "id": "part-1720",
       "kind": "part",
       "prompt": "Does `helix-toast` publish a CSS part named `wrapper`?",
       "tag": "helix-toast"
     },
     {
       "answer": "yes",
-      "id": "part-1592",
+      "id": "part-1721",
       "kind": "part",
       "prompt": "Does `helix-toggle-group` publish a CSS part named `indicator`?",
       "tag": "helix-toggle-group"
     },
     {
       "answer": "yes",
-      "id": "part-1593",
+      "id": "part-1722",
       "kind": "part",
       "prompt": "Does `helix-toggle-group` publish a CSS part named `row`?",
       "tag": "helix-toggle-group"
     },
     {
       "answer": "yes",
-      "id": "part-1594",
+      "id": "part-1723",
       "kind": "part",
       "prompt": "Does `helix-toggle-group` publish a CSS part named `track`?",
       "tag": "helix-toggle-group"
     },
     {
       "answer": "yes",
-      "id": "part-1595",
+      "id": "part-1724",
       "kind": "part",
       "prompt": "Does `helix-toggle-group` publish a CSS part named `divider`?",
       "tag": "helix-toggle-group"
     },
     {
       "answer": "no",
-      "id": "part-1596",
+      "id": "part-1725",
       "kind": "part",
       "prompt": "Does `helix-toggle-group` publish a CSS part named `wrapper`?",
       "tag": "helix-toggle-group"
     },
     {
       "answer": "yes",
-      "id": "part-1597",
+      "id": "part-1726",
       "kind": "part",
       "prompt": "Does `helix-toggle` publish a CSS part named `item`?",
       "tag": "helix-toggle"
     },
     {
       "answer": "no",
-      "id": "part-1598",
+      "id": "part-1727",
       "kind": "part",
       "prompt": "Does `helix-toggle` publish a CSS part named `wrapper`?",
       "tag": "helix-toggle"
     },
     {
       "answer": "yes",
-      "id": "part-1599",
+      "id": "part-1728",
       "kind": "part",
       "prompt": "Does `helix-toolbar` publish a CSS part named `toolbar`?",
       "tag": "helix-toolbar"
     },
     {
       "answer": "no",
-      "id": "part-1600",
+      "id": "part-1729",
       "kind": "part",
       "prompt": "Does `helix-toolbar` publish a CSS part named `wrapper`?",
       "tag": "helix-toolbar"
     },
     {
       "answer": "yes",
-      "id": "part-1601",
+      "id": "part-1730",
       "kind": "part",
       "prompt": "Does `helix-tooltip` publish a CSS part named `arrow`?",
       "tag": "helix-tooltip"
     },
     {
       "answer": "yes",
-      "id": "part-1602",
+      "id": "part-1731",
       "kind": "part",
       "prompt": "Does `helix-tooltip` publish a CSS part named `tooltip`?",
       "tag": "helix-tooltip"
     },
     {
       "answer": "no",
-      "id": "part-1603",
+      "id": "part-1732",
       "kind": "part",
       "prompt": "Does `helix-tooltip` publish a CSS part named `wrapper`?",
       "tag": "helix-tooltip"
     },
     {
       "answer": "yes",
-      "id": "part-1604",
+      "id": "part-1733",
       "kind": "part",
       "prompt": "Does `helix-tour` publish a CSS part named `spotlight`?",
       "tag": "helix-tour"
     },
     {
       "answer": "no",
-      "id": "part-1605",
+      "id": "part-1734",
       "kind": "part",
       "prompt": "Does `helix-tour` publish a CSS part named `wrapper`?",
       "tag": "helix-tour"
     },
     {
       "answer": "yes",
-      "id": "part-1606",
+      "id": "part-1735",
       "kind": "part",
       "prompt": "Does `helix-tour-stop` publish a CSS part named `bubble`?",
       "tag": "helix-tour-stop"
     },
     {
       "answer": "yes",
-      "id": "part-1607",
+      "id": "part-1736",
       "kind": "part",
       "prompt": "Does `helix-tour-stop` publish a CSS part named `arrow`?",
       "tag": "helix-tour-stop"
     },
     {
       "answer": "yes",
-      "id": "part-1608",
+      "id": "part-1737",
       "kind": "part",
       "prompt": "Does `helix-tour-stop` publish a CSS part named `content`?",
       "tag": "helix-tour-stop"
     },
     {
       "answer": "yes",
-      "id": "part-1609",
+      "id": "part-1738",
       "kind": "part",
       "prompt": "Does `helix-tour-stop` publish a CSS part named `actions`?",
       "tag": "helix-tour-stop"
     },
     {
       "answer": "yes",
-      "id": "part-1610",
+      "id": "part-1739",
       "kind": "part",
       "prompt": "Does `helix-tour-stop` publish a CSS part named `back`?",
       "tag": "helix-tour-stop"
     },
     {
       "answer": "yes",
-      "id": "part-1611",
+      "id": "part-1740",
       "kind": "part",
       "prompt": "Does `helix-tour-stop` publish a CSS part named `next`?",
       "tag": "helix-tour-stop"
     },
     {
       "answer": "yes",
-      "id": "part-1612",
+      "id": "part-1741",
       "kind": "part",
       "prompt": "Does `helix-tour-stop` publish a CSS part named `skip`?",
       "tag": "helix-tour-stop"
     },
     {
+      "answer": "yes",
+      "id": "part-1742",
+      "kind": "part",
+      "prompt": "Does `helix-tour-stop` publish a CSS part named `back-button`?",
+      "tag": "helix-tour-stop"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1743",
+      "kind": "part",
+      "prompt": "Does `helix-tour-stop` publish a CSS part named `next-button`?",
+      "tag": "helix-tour-stop"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1744",
+      "kind": "part",
+      "prompt": "Does `helix-tour-stop` publish a CSS part named `skip-button`?",
+      "tag": "helix-tour-stop"
+    },
+    {
       "answer": "no",
-      "id": "part-1613",
+      "id": "part-1745",
       "kind": "part",
       "prompt": "Does `helix-tour-stop` publish a CSS part named `wrapper`?",
       "tag": "helix-tour-stop"
     },
     {
       "answer": "yes",
-      "id": "part-1614",
+      "id": "part-1746",
       "kind": "part",
       "prompt": "Does `helix-tree-item` publish a CSS part named `item`?",
       "tag": "helix-tree-item"
     },
     {
       "answer": "yes",
-      "id": "part-1615",
+      "id": "part-1747",
       "kind": "part",
       "prompt": "Does `helix-tree-item` publish a CSS part named `row`?",
       "tag": "helix-tree-item"
     },
     {
       "answer": "yes",
-      "id": "part-1616",
+      "id": "part-1748",
       "kind": "part",
       "prompt": "Does `helix-tree-item` publish a CSS part named `toggle`?",
       "tag": "helix-tree-item"
     },
     {
       "answer": "yes",
-      "id": "part-1617",
+      "id": "part-1749",
       "kind": "part",
       "prompt": "Does `helix-tree-item` publish a CSS part named `label`?",
       "tag": "helix-tree-item"
     },
     {
       "answer": "yes",
-      "id": "part-1618",
+      "id": "part-1750",
       "kind": "part",
       "prompt": "Does `helix-tree-item` publish a CSS part named `group`?",
       "tag": "helix-tree-item"
     },
     {
       "answer": "no",
-      "id": "part-1619",
+      "id": "part-1751",
       "kind": "part",
       "prompt": "Does `helix-tree-item` publish a CSS part named `wrapper`?",
       "tag": "helix-tree-item"
     },
     {
       "answer": "yes",
-      "id": "part-1620",
+      "id": "part-1752",
       "kind": "part",
       "prompt": "Does `helix-tree` publish a CSS part named `tree`?",
       "tag": "helix-tree"
     },
     {
       "answer": "no",
-      "id": "part-1621",
+      "id": "part-1753",
       "kind": "part",
       "prompt": "Does `helix-tree` publish a CSS part named `wrapper`?",
       "tag": "helix-tree"
     },
     {
       "answer": "yes",
-      "id": "part-1622",
+      "id": "part-1754",
       "kind": "part",
       "prompt": "Does `helix-trend` publish a CSS part named `direction`?",
       "tag": "helix-trend"
     },
     {
       "answer": "yes",
-      "id": "part-1623",
+      "id": "part-1755",
       "kind": "part",
       "prompt": "Does `helix-trend` publish a CSS part named `icon`?",
       "tag": "helix-trend"
     },
     {
       "answer": "no",
-      "id": "part-1624",
+      "id": "part-1756",
       "kind": "part",
       "prompt": "Does `helix-trend` publish a CSS part named `wrapper`?",
       "tag": "helix-trend"
     },
     {
       "answer": "yes",
-      "id": "part-1625",
+      "id": "part-1757",
       "kind": "part",
-      "prompt": "Does `helix-video-playlist-item` publish a CSS part named `wrapper`?",
+      "prompt": "Does `helix-video-playlist-item` publish a CSS part named `container`?",
       "tag": "helix-video-playlist-item"
     },
     {
       "answer": "yes",
-      "id": "part-1626",
+      "id": "part-1758",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-item` publish a CSS part named `item`?",
       "tag": "helix-video-playlist-item"
     },
     {
       "answer": "yes",
-      "id": "part-1627",
+      "id": "part-1759",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-item` publish a CSS part named `media`?",
       "tag": "helix-video-playlist-item"
     },
     {
       "answer": "yes",
-      "id": "part-1628",
+      "id": "part-1760",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-item` publish a CSS part named `thumbnail`?",
       "tag": "helix-video-playlist-item"
     },
     {
       "answer": "yes",
-      "id": "part-1629",
+      "id": "part-1761",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-item` publish a CSS part named `label`?",
       "tag": "helix-video-playlist-item"
     },
     {
       "answer": "no",
-      "id": "part-1630",
+      "id": "part-1762",
       "kind": "part",
-      "prompt": "Does `helix-video-playlist-item` publish a CSS part named `inner`?",
+      "prompt": "Does `helix-video-playlist-item` publish a CSS part named `wrapper`?",
       "tag": "helix-video-playlist-item"
     },
     {
       "answer": "yes",
-      "id": "part-1631",
+      "id": "part-1763",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `entry`?",
       "tag": "helix-video-playlist-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1632",
+      "id": "part-1764",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `icon`?",
       "tag": "helix-video-playlist-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1633",
+      "id": "part-1765",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `poster`?",
       "tag": "helix-video-playlist-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1634",
+      "id": "part-1766",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `menu`?",
       "tag": "helix-video-playlist-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1635",
+      "id": "part-1767",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `trigger`?",
       "tag": "helix-video-playlist-menu"
     },
     {
+      "answer": "yes",
+      "id": "part-1768",
+      "kind": "part",
+      "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `entry-item`?",
+      "tag": "helix-video-playlist-menu"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1769",
+      "kind": "part",
+      "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `entry-mark`?",
+      "tag": "helix-video-playlist-menu"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1770",
+      "kind": "part",
+      "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `entry-start`?",
+      "tag": "helix-video-playlist-menu"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1771",
+      "kind": "part",
+      "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `menu-back`?",
+      "tag": "helix-video-playlist-menu"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1772",
+      "kind": "part",
+      "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `menu-back-mark`?",
+      "tag": "helix-video-playlist-menu"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1773",
+      "kind": "part",
+      "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `menu-header`?",
+      "tag": "helix-video-playlist-menu"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1774",
+      "kind": "part",
+      "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `menu-title`?",
+      "tag": "helix-video-playlist-menu"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1775",
+      "kind": "part",
+      "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `menu-surface`?",
+      "tag": "helix-video-playlist-menu"
+    },
+    {
       "answer": "no",
-      "id": "part-1636",
+      "id": "part-1776",
       "kind": "part",
       "prompt": "Does `helix-video-playlist-menu` publish a CSS part named `wrapper`?",
       "tag": "helix-video-playlist-menu"
     },
     {
       "answer": "yes",
-      "id": "part-1637",
+      "id": "part-1777",
       "kind": "part",
       "prompt": "Does `helix-video-playlist` publish a CSS part named `player`?",
       "tag": "helix-video-playlist"
     },
     {
       "answer": "yes",
-      "id": "part-1638",
+      "id": "part-1778",
       "kind": "part",
       "prompt": "Does `helix-video-playlist` publish a CSS part named `items`?",
       "tag": "helix-video-playlist"
     },
     {
       "answer": "no",
-      "id": "part-1639",
+      "id": "part-1779",
       "kind": "part",
       "prompt": "Does `helix-video-playlist` publish a CSS part named `wrapper`?",
       "tag": "helix-video-playlist"
     },
     {
       "answer": "yes",
-      "id": "part-1640",
+      "id": "part-1780",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `icon`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1641",
+      "id": "part-1781",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `stage`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1642",
+      "id": "part-1782",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `video`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1643",
+      "id": "part-1783",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `poster`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1644",
+      "id": "part-1784",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `back`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1645",
+      "id": "part-1785",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `failure`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1646",
+      "id": "part-1786",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `loading`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1647",
+      "id": "part-1787",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `loading-mark`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1648",
+      "id": "part-1788",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `cue`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1649",
+      "id": "part-1789",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `controls`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1650",
+      "id": "part-1790",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `play`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1651",
+      "id": "part-1791",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `scrubber`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1652",
+      "id": "part-1792",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `time`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1653",
+      "id": "part-1793",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `sound`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1654",
+      "id": "part-1794",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `mute`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1655",
+      "id": "part-1795",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `volume`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1656",
+      "id": "part-1796",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `captions`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1657",
+      "id": "part-1797",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `captions-menu`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1658",
+      "id": "part-1798",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `rewind`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1659",
+      "id": "part-1799",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `forward`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1660",
+      "id": "part-1800",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `remote`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1661",
+      "id": "part-1801",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `speed`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1662",
+      "id": "part-1802",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `pip`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1663",
+      "id": "part-1803",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `start`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1664",
+      "id": "part-1804",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `next`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1665",
+      "id": "part-1805",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `previous`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1666",
+      "id": "part-1806",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `download`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1667",
+      "id": "part-1807",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `overflow`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1668",
+      "id": "part-1808",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `more`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1669",
+      "id": "part-1809",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `fullscreen`?",
       "tag": "helix-video"
     },
     {
+      "answer": "yes",
+      "id": "part-1810",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `captions-menu-back`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1811",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `captions-menu-back-mark`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1812",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `captions-menu-header`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1813",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `captions-menu-title`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1814",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `entry`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1815",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `entry-item`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1816",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `entry-mark`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1817",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `entry-start`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1818",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `overflow-back`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1819",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `overflow-back-mark`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1820",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `overflow-header`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1821",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `overflow-title`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1822",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `captions-menu-surface`?",
+      "tag": "helix-video"
+    },
+    {
+      "answer": "yes",
+      "id": "part-1823",
+      "kind": "part",
+      "prompt": "Does `helix-video` publish a CSS part named `overflow-surface`?",
+      "tag": "helix-video"
+    },
+    {
       "answer": "no",
-      "id": "part-1670",
+      "id": "part-1824",
       "kind": "part",
       "prompt": "Does `helix-video` publish a CSS part named `wrapper`?",
       "tag": "helix-video"
     },
     {
       "answer": "yes",
-      "id": "part-1671",
+      "id": "part-1825",
       "kind": "part",
       "prompt": "Does `helix-virtual-list` publish a CSS part named `after`?",
       "tag": "helix-virtual-list"
     },
     {
       "answer": "yes",
-      "id": "part-1672",
+      "id": "part-1826",
       "kind": "part",
       "prompt": "Does `helix-virtual-list` publish a CSS part named `before`?",
       "tag": "helix-virtual-list"
     },
     {
       "answer": "yes",
-      "id": "part-1673",
+      "id": "part-1827",
       "kind": "part",
       "prompt": "Does `helix-virtual-list` publish a CSS part named `viewport`?",
       "tag": "helix-virtual-list"
     },
     {
       "answer": "no",
-      "id": "part-1674",
+      "id": "part-1828",
       "kind": "part",
       "prompt": "Does `helix-virtual-list` publish a CSS part named `wrapper`?",
       "tag": "helix-virtual-list"
@@ -11373,5 +12451,5 @@
     "helix/styled/custom-elements.json",
     "helix/styles/tokens.json"
   ],
-  "total": 1674
+  "total": 1828
 }

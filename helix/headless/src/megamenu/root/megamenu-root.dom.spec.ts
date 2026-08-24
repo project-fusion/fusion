@@ -218,7 +218,7 @@ describe('a megamenu', () => {
        region is showing is the pattern the APG gives for site navigation, and it
        leaves a middle click and a modified click working. */
     const host = await section()
-    expect(role(part(host, 'panel') as HTMLElement)).not.toBe('menu')
+    expect(role(part(host, 'surface') as HTMLElement)).not.toBe('menu')
     expect(trigger(host).tagName).toBe('BUTTON')
     expect(trigger(host).getAttribute('aria-expanded')).toBe('false')
     expect(trigger(host).getAttribute('aria-controls')).toBe('panel')

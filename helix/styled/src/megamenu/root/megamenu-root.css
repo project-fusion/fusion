@@ -63,7 +63,7 @@
  * specificity, so a rule here naming the anchors would have lost to the base
  * layer's own and the panel would have gone on drawing prose links in a box.
  * Which is what it did. */
-[part="panel"] {
+[part="surface"] {
   /* The page's own ground, not a raised surface. White in the light and black in
      the dark: a navigation panel is the site continuing, and `surface-overlay`
      put a gray card in front of a black page as though the nav were a dialog.
@@ -194,7 +194,7 @@
  *
  * The bottom inset is `100%`, so the clip sits on the panel's own top edge
  * whatever height the content gave it. */
-[part="panel"]:popover-open {
+[part="surface"]:popover-open {
   clip-path: inset(
     0 calc(var(--helix-space-xl) * -1) calc(var(--helix-space-xl) * -1)
       calc(var(--helix-space-xl) * -1)
@@ -208,7 +208,7 @@
  * panel arrives already open. `Drawer` records the same bug, found the same way
  * and fixed by the same move. */
 @starting-style {
-  [part="panel"]:popover-open {
+  [part="surface"]:popover-open {
     clip-path: inset(0 calc(var(--helix-space-xl) * -1) 100% calc(var(--helix-space-xl) * -1));
   }
 }
@@ -231,8 +231,8 @@
  * The corners go, because an edge-to-edge band has no outside corner to round.
  * What is left is the page's own surface and a shadow, which is what a band
  * under a header is: it is not a card, so it is not outlined like one. */
-:host([variant="full"]) [part="panel"],
-:host([data-narrow]) [part="panel"] {
+:host([variant="full"]) [part="surface"],
+:host([data-narrow]) [part="surface"] {
   /* The same ground the card takes, and the same one the header above it is
      painted with, so the band reads as the header continuing downward rather
      than as a card laid over it. Both follow the hooks for the same reason: if
@@ -301,14 +301,14 @@
  * sides and its only shadow is below, so the sides are clipped at zero rather
  * than let out. Sharing one starting value would have let the band's shadow out
  * sideways for the length of the animation and pulled it back at the end. */
-:host([variant="full"]) [part="panel"]:popover-open,
-:host([data-narrow]) [part="panel"]:popover-open {
+:host([variant="full"]) [part="surface"]:popover-open,
+:host([data-narrow]) [part="surface"]:popover-open {
   clip-path: inset(0 0 calc(var(--helix-space-xl) * -1) 0);
 }
 
 @starting-style {
-  :host([variant="full"]) [part="panel"]:popover-open,
-  :host([data-narrow]) [part="panel"]:popover-open {
+  :host([variant="full"]) [part="surface"]:popover-open,
+  :host([data-narrow]) [part="surface"]:popover-open {
     clip-path: inset(0 0 100% 0);
   }
 }
@@ -321,7 +321,7 @@
  *
  * `data-narrow` comes from the element, which owns the width it happens at:
  * see `full-below`. */
-:host([data-narrow]) [part="panel"] {
+:host([data-narrow]) [part="surface"] {
   grid-auto-flow: row;
   grid-template-columns: 1fr;
   /* Down to the bottom of the screen, less the height it starts at and a margin
@@ -339,19 +339,19 @@
  *
  * **The specificity is the whole point, so do not lower it.** `:host` prefixes
  * a selector that would otherwise be (0,2,0) and lose: the band is
- * `:host([variant="full"]) [part="panel"]`, which is (0,3,0), so a bare
- * `[part="panel"][hidden]` was outranked and a closed band kept its
+ * `:host([variant="full"]) [part="surface"]`, which is (0,3,0), so a bare
+ * `[part="surface"][hidden]` was outranked and a closed band kept its
  * `display: grid`. Measured on the site: `open` false, `hidden` present,
  * `:popover-open` false, and a 1280 by 267 box still laid out over the page the
  * reader had just navigated to. The card never showed it, because a card is
- * styled by the plain `[part="panel"]` at (0,1,0), which the guard did beat.
+ * styled by the plain `[part="surface"]` at (0,1,0), which the guard did beat.
  *
  * `[hidden]` rather than `:not(:popover-open)`, which is what the others use:
  * the attribute is bound from `open` in the template, so it is the element's
  * own answer and is right whether or not the panel was ever put in the top
  * layer. A band that is placed by the bar rather than by the popover is exactly
  * the case where those two can disagree. */
-:host [part="panel"][hidden] {
+:host [part="surface"][hidden] {
   display: none;
 }
 
@@ -368,7 +368,7 @@
      panel would still be in the top layer with nothing drawn, which is a worse
      answer to the preference than an instant one. So the clip is removed and
      the panel opens and closes at once. */
-  [part="panel"] {
+  [part="surface"] {
     clip-path: none;
     transition:
       display var(--helix-duration-instant) allow-discrete,

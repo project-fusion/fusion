@@ -49,7 +49,7 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-helix-headless-navigation::part(list) {
+helix-headless-navigation::part(nav) {
   position: relative;
 }
 

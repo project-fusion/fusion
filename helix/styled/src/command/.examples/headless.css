@@ -57,13 +57,7 @@ helix-headless-command::part(listbox) {
   padding: 0.5rem;
 }
 
-helix-headless-command::part(items) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-}
-
-helix-headless-command::part(filter-mark) {
+helix-headless-command::part(listbox-filter-mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
@@ -94,7 +88,7 @@ helix-headless-option::part(item):focus-visible {
   outline-offset: 2px;
 }
 
-helix-headless-command::part(items) {
+helix-headless-command::part(listbox-items) {
   align-items: stretch;
   flex-direction: column;
 }

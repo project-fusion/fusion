@@ -13827,6 +13827,10 @@ export type CustomElements = {
    * - `header`: The bar carrying the name, where there is one.
    * - `copy`: The copy button.
    * - `label`: The file name or language, where one is given.
+   * - `copy-button`: The inner button.
+   * - `copy-mark`: The clipboard glyph, and the confirmation that replaces it.
+   * - `copy-tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `copy-tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-headless-code-block": Partial<
     HelixHeadlessCodeBlockProps & BaseProps<HelixHeadlessCodeBlock> & BaseEvents
@@ -14087,6 +14091,30 @@ export type CustomElements = {
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
    * - `picker`: The color picker inside it.
+   * - `picker-actions`: The group holding the eyedropper and the syntax toggle.
+   * - `picker-channel`: One ramp.
+   * - `picker-channels`: The ramps beside it.
+   * - `picker-controls`: The row under the square.
+   * - `picker-eyedropper`: The control that samples a color from the screen.
+   * - `picker-footer`: The row holding the value and the tools.
+   * - `picker-format`: The control that changes the syntax the value is written in.
+   * - `picker-grid`: The saturation and brightness square.
+   * - `picker-grid-brightness`: The range input for its vertical axis.
+   * - `picker-grid-handle`: The mark showing where in the square the color sits.
+   * - `picker-grid-saturation`: The range input for the square's horizontal axis.
+   * - `picker-icon`: A glyph this component draws.
+   * - `picker-sample`: The chip of the current color, which copies it when pressed.
+   * - `picker-swatch`: One preset.
+   * - `picker-swatches`: The row of presets.
+   * - `picker-value`: The color as text, which can be typed or pasted.
+   * - `picker-channel-control`: The range input.
+   * - `picker-channel-field`: The row: the control and its readout.
+   * - `picker-channel-marker`: One mark.
+   * - `picker-channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `picker-channel-markers`: The row of marks along the track.
+   * - `picker-channel-output`: The current value, shown beside it.
+   * - `picker-eyedropper-button`: The inner control.
+   * - `picker-format-button`: The inner control.
    */
   "helix-headless-color-input": Partial<
     HelixHeadlessColorInputProps &
@@ -14300,6 +14328,14 @@ export type CustomElements = {
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
+   * - `channel-control`: The range input.
+   * - `channel-field`: The row: the control and its readout.
+   * - `channel-marker`: One mark.
+   * - `channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `channel-markers`: The row of marks along the track.
+   * - `channel-output`: The current value, shown beside it.
+   * - `eyedropper-button`: The inner control.
+   * - `format-button`: The inner control.
    */
   "helix-headless-color-picker": Partial<
     HelixHeadlessColorPickerProps &
@@ -14585,8 +14621,18 @@ export type CustomElements = {
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of options, forwarded from the listbox.
-   * - `empty`: What shows where the filter has hidden everything, forwarded from the listbox.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
+   * - `tag-dismiss`: The remove button, when `dismissible`.
+   * - `tag-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `tag-prefix`: The category before the label. from the listbox.
    */
   "helix-headless-combobox": Partial<
     HelixHeadlessComboboxProps & BaseProps<HelixHeadlessCombobox> & BaseEvents
@@ -14686,12 +14732,17 @@ export type CustomElements = {
    *
    * - `dialog`: The overlay's own box, forwarded from the dialog.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of commands, forwarded from the listbox.
-   * - `empty`: What shows where the filter has hidden everything.
-   * - `filter-mark`: The glyph beside the field, forwarded from the listbox.
-   * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
    * - `footer`: The row under the list.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
    */
   "helix-headless-command": Partial<
     HelixHeadlessCommandProps & BaseProps<HelixHeadlessCommand> & BaseEvents
@@ -14855,6 +14906,7 @@ export type CustomElements = {
    * - `button`: The inner button.
    * - `mark`: The clipboard glyph, and the confirmation that replaces it.
    * - `tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-headless-copy-button": Partial<
     HelixHeadlessCopyButtonProps &
@@ -15104,6 +15156,22 @@ export type CustomElements = {
    * - `trigger-icon`: The mark on the button that opens the calendar.
    * - `surface`: The floating panel.
    * - `picker`: The date picker inside it.
+   * - `date-dismiss`: The remove button, when `dismissible`.
+   * - `date-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `date-prefix`: The category before the label.
+   * - `picker-cell`: One column of a row, which is what a range paints.
+   * - `picker-day`: The shape inside a cell, which is what a single date paints.
+   * - `picker-grid`: The grid of days.
+   * - `picker-header`: The month name and its controls.
+   * - `picker-heading`: The month and year being shown.
+   * - `picker-month`: One month, its header and its grid.
+   * - `picker-months`: The run of months.
+   * - `picker-next`: The control that moves to the next month.
+   * - `picker-next-mark`: The glyph on the next month control.
+   * - `picker-previous`: The control that moves to the previous month.
+   * - `picker-previous-mark`: The glyph on the previous month control.
+   * - `picker-week`: One row of days.
+   * - `picker-weekday`: A column header naming a day of the week.
    */
   "helix-headless-date-input": Partial<
     HelixHeadlessDateInputProps & BaseProps<HelixHeadlessDateInput> & BaseEvents
@@ -16078,6 +16146,12 @@ export type CustomElements = {
    * - `size`: How big it is.
    * - `kind`: What kind of file it is.
    * - `remove`: The control that takes it back out.
+   * - `kind-dismiss`: The remove button, when `dismissible`.
+   * - `kind-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `kind-prefix`: The category before the label.
+   * - `size-dismiss`: The remove button, when `dismissible`.
+   * - `size-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `size-prefix`: The category before the label.
    */
   "helix-headless-file-input": Partial<
     HelixHeadlessFileInputProps & BaseProps<HelixHeadlessFileInput> & BaseEvents
@@ -17348,7 +17422,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `trigger`: The default trigger, where none was slotted.
-   * - `panel`: The region that opens.
+   * - `surface`: The floating panel, which is what opens.
    */
   "helix-headless-megamenu": Partial<
     HelixHeadlessMegamenuProps & BaseProps<HelixHeadlessMegamenu> & BaseEvents
@@ -17579,7 +17653,7 @@ export type CustomElements = {
    * - `back`: The control that returns from a submenu.
    * - `back-mark`: The glyph on the back control of a submenu.
    * - `header`: The bar above a submenu, holding the way back and its name.
-   * - `menu`: The floating panel the menu is drawn on.
+   * - `surface`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
    */
   "helix-headless-menu": Partial<
@@ -19643,10 +19717,17 @@ export type CustomElements = {
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of options, forwarded from the listbox.
-   * - `empty`: What shows with no options in it, forwarded from the listbox.
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
    */
   "helix-headless-select": Partial<
     HelixHeadlessSelectProps & BaseProps<HelixHeadlessSelect> & BaseEvents
@@ -20627,6 +20708,7 @@ export type CustomElements = {
    * - `mark`: The glyph inside the marker: a tick, a dot, or an empty ring.
    * - `marker`: The shape carrying the number or the check.
    * - `trail`: The half line running on to the next.
+   * - `label-button`: The inner control.
    */
   "helix-headless-step": Partial<
     HelixHeadlessStepProps & BaseProps<HelixHeadlessStep> & BaseEvents
@@ -21546,6 +21628,35 @@ export type CustomElements = {
    * - `trigger-icon`: The mark on the button that opens the clock.
    * - `surface`: The floating panel.
    * - `picker`: The list inside it.
+   * - `picker-column`: One of them.
+   * - `picker-columns`: The row of columns, in `wheels`.
+   * - `picker-empty`: What it says when nothing matches, forwarded from the listbox.
+   * - `picker-items`: The scrolling column inside it, forwarded from the listbox.
+   * - `picker-list`: The listbox holding the times, in `list`.
+   * - `picker-option`: One time in it. Carries `data-between` inside a range.
+   * - `time-dismiss`: The remove button, when `dismissible`.
+   * - `time-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `time-prefix`: The category before the label.
+   * - `picker-column-empty`: Shown when a filter has hidden everything.
+   * - `picker-column-feedback`: What is wrong with it.
+   * - `picker-column-filter-icon`: The mark beside that field.
+   * - `picker-column-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `picker-column-hint`: Help under the list.
+   * - `picker-column-items`: The list itself.
+   * - `picker-column-label`: The question, over the list.
+   * - `picker-column-search`: The region holding the field that narrows the list.
+   * - `picker-column-search-field`: The field itself.
+   * - `picker-list-empty`: Shown when a filter has hidden everything.
+   * - `picker-list-feedback`: What is wrong with it.
+   * - `picker-list-filter-icon`: The mark beside that field.
+   * - `picker-list-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `picker-list-hint`: Help under the list.
+   * - `picker-list-items`: The list itself.
+   * - `picker-list-label`: The question, over the list.
+   * - `picker-list-search`: The region holding the field that narrows the list.
+   * - `picker-list-search-field`: The field itself.
+   * - `picker-option-item`: The row.
+   * - `picker-option-label`: The words.
    */
   "helix-headless-time-input": Partial<
     HelixHeadlessTimeInputProps & BaseProps<HelixHeadlessTimeInput> & BaseEvents
@@ -21770,9 +21881,27 @@ export type CustomElements = {
    * - `list`: The listbox holding the times, in `list`.
    * - `columns`: The row of columns, in `wheels`.
    * - `column`: One of them.
-   * - `items`: The scrolling column inside it, forwarded from the listbox.
-   * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it. Carries `data-between` inside a range.
+   * - `column-empty`: Shown when a filter has hidden everything.
+   * - `column-feedback`: What is wrong with it.
+   * - `column-filter-icon`: The mark beside that field.
+   * - `column-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `column-hint`: Help under the list.
+   * - `column-items`: The list itself.
+   * - `column-label`: The question, over the list.
+   * - `column-search`: The region holding the field that narrows the list.
+   * - `column-search-field`: The field itself.
+   * - `list-empty`: Shown when a filter has hidden everything.
+   * - `list-feedback`: What is wrong with it.
+   * - `list-filter-icon`: The mark beside that field.
+   * - `list-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `list-hint`: Help under the list.
+   * - `list-items`: The list itself.
+   * - `list-label`: The question, over the list.
+   * - `list-search`: The region holding the field that narrows the list.
+   * - `list-search-field`: The field itself.
+   * - `option-item`: The row.
+   * - `option-label`: The words.
    */
   "helix-headless-time-picker": Partial<
     HelixHeadlessTimePickerProps &
@@ -22709,6 +22838,9 @@ export type CustomElements = {
    * - `back`: The control that goes to the previous stop.
    * - `next`: The control that goes on, and finishes on the last stop.
    * - `skip`: The control that leaves the tour.
+   * - `back-button`: The inner control.
+   * - `next-button`: The inner control.
+   * - `skip-button`: The inner control.
    */
   "helix-headless-tour-stop": Partial<
     HelixHeadlessTourStopProps & BaseProps<HelixHeadlessTourStop> & BaseEvents
@@ -23075,7 +23207,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `wrapper`: The `listitem`, which the button sits in.
+   * - `container`: The `listitem`, which the button sits in.
    * - `item`: The row, which is a button.
    * - `media`: The leading column.
    * - `thumbnail`: The image `poster` falls back to.
@@ -23154,6 +23286,14 @@ export type CustomElements = {
    * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
+   * - `entry-item`: The row, which is an `<a>` where `href` is set.
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `menu-back`: The control that returns from a submenu.
+   * - `menu-back-mark`: The glyph on the back control of a submenu.
+   * - `menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `menu-title`: The name of the submenu that is showing.
+   * - `menu-surface`: The floating panel the menu is drawn on.
    */
   "helix-headless-video-playlist-menu": Partial<
     HelixHeadlessVideoPlaylistMenuProps &
@@ -23460,6 +23600,20 @@ export type CustomElements = {
    * - `overflow`: The menu holding the controls kept off the bar.
    * - `more`: The button that opens it.
    * - `fullscreen`: The whole screen, and back.
+   * - `captions-menu-back`: The control that returns from a submenu.
+   * - `captions-menu-back-mark`: The glyph on the back control of a submenu.
+   * - `captions-menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `captions-menu-title`: The name of the submenu that is showing.
+   * - `entry`: One row in a menu this player opens.
+   * - `entry-item`: The row, which is an `<a>` where `href` is set.
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `overflow-back`: The control that returns from a submenu.
+   * - `overflow-back-mark`: The glyph on the back control of a submenu.
+   * - `overflow-header`: The bar above a submenu, holding the way back and its name.
+   * - `overflow-title`: The name of the submenu that is showing.
+   * - `captions-menu-surface`: The floating panel the menu is drawn on.
+   * - `overflow-surface`: The floating panel the menu is drawn on.
    */
   "helix-headless-video": Partial<
     HelixHeadlessVideoProps & BaseProps<HelixHeadlessVideo> & BaseEvents
@@ -25089,6 +25243,10 @@ export type CustomElementsSolidJs = {
    * - `header`: The bar carrying the name, where there is one.
    * - `copy`: The copy button.
    * - `label`: The file name or language, where one is given.
+   * - `copy-button`: The inner button.
+   * - `copy-mark`: The clipboard glyph, and the confirmation that replaces it.
+   * - `copy-tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `copy-tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-headless-code-block": Partial<
     HelixHeadlessCodeBlockProps &
@@ -25355,6 +25513,30 @@ export type CustomElementsSolidJs = {
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
    * - `picker`: The color picker inside it.
+   * - `picker-actions`: The group holding the eyedropper and the syntax toggle.
+   * - `picker-channel`: One ramp.
+   * - `picker-channels`: The ramps beside it.
+   * - `picker-controls`: The row under the square.
+   * - `picker-eyedropper`: The control that samples a color from the screen.
+   * - `picker-footer`: The row holding the value and the tools.
+   * - `picker-format`: The control that changes the syntax the value is written in.
+   * - `picker-grid`: The saturation and brightness square.
+   * - `picker-grid-brightness`: The range input for its vertical axis.
+   * - `picker-grid-handle`: The mark showing where in the square the color sits.
+   * - `picker-grid-saturation`: The range input for the square's horizontal axis.
+   * - `picker-icon`: A glyph this component draws.
+   * - `picker-sample`: The chip of the current color, which copies it when pressed.
+   * - `picker-swatch`: One preset.
+   * - `picker-swatches`: The row of presets.
+   * - `picker-value`: The color as text, which can be typed or pasted.
+   * - `picker-channel-control`: The range input.
+   * - `picker-channel-field`: The row: the control and its readout.
+   * - `picker-channel-marker`: One mark.
+   * - `picker-channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `picker-channel-markers`: The row of marks along the track.
+   * - `picker-channel-output`: The current value, shown beside it.
+   * - `picker-eyedropper-button`: The inner control.
+   * - `picker-format-button`: The inner control.
    */
   "helix-headless-color-input": Partial<
     HelixHeadlessColorInputProps &
@@ -25569,6 +25751,14 @@ export type CustomElementsSolidJs = {
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
+   * - `channel-control`: The range input.
+   * - `channel-field`: The row: the control and its readout.
+   * - `channel-marker`: One mark.
+   * - `channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `channel-markers`: The row of marks along the track.
+   * - `channel-output`: The current value, shown beside it.
+   * - `eyedropper-button`: The inner control.
+   * - `format-button`: The inner control.
    */
   "helix-headless-color-picker": Partial<
     HelixHeadlessColorPickerProps &
@@ -25855,8 +26045,18 @@ export type CustomElementsSolidJs = {
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of options, forwarded from the listbox.
-   * - `empty`: What shows where the filter has hidden everything, forwarded from the listbox.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
+   * - `tag-dismiss`: The remove button, when `dismissible`.
+   * - `tag-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `tag-prefix`: The category before the label. from the listbox.
    */
   "helix-headless-combobox": Partial<
     HelixHeadlessComboboxProps &
@@ -25959,12 +26159,17 @@ export type CustomElementsSolidJs = {
    *
    * - `dialog`: The overlay's own box, forwarded from the dialog.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of commands, forwarded from the listbox.
-   * - `empty`: What shows where the filter has hidden everything.
-   * - `filter-mark`: The glyph beside the field, forwarded from the listbox.
-   * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
    * - `footer`: The row under the list.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
    */
   "helix-headless-command": Partial<
     HelixHeadlessCommandProps &
@@ -26131,6 +26336,7 @@ export type CustomElementsSolidJs = {
    * - `button`: The inner button.
    * - `mark`: The clipboard glyph, and the confirmation that replaces it.
    * - `tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-headless-copy-button": Partial<
     HelixHeadlessCopyButtonProps &
@@ -26381,6 +26587,22 @@ export type CustomElementsSolidJs = {
    * - `trigger-icon`: The mark on the button that opens the calendar.
    * - `surface`: The floating panel.
    * - `picker`: The date picker inside it.
+   * - `date-dismiss`: The remove button, when `dismissible`.
+   * - `date-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `date-prefix`: The category before the label.
+   * - `picker-cell`: One column of a row, which is what a range paints.
+   * - `picker-day`: The shape inside a cell, which is what a single date paints.
+   * - `picker-grid`: The grid of days.
+   * - `picker-header`: The month name and its controls.
+   * - `picker-heading`: The month and year being shown.
+   * - `picker-month`: One month, its header and its grid.
+   * - `picker-months`: The run of months.
+   * - `picker-next`: The control that moves to the next month.
+   * - `picker-next-mark`: The glyph on the next month control.
+   * - `picker-previous`: The control that moves to the previous month.
+   * - `picker-previous-mark`: The glyph on the previous month control.
+   * - `picker-week`: One row of days.
+   * - `picker-weekday`: A column header naming a day of the week.
    */
   "helix-headless-date-input": Partial<
     HelixHeadlessDateInputProps &
@@ -27376,6 +27598,12 @@ export type CustomElementsSolidJs = {
    * - `size`: How big it is.
    * - `kind`: What kind of file it is.
    * - `remove`: The control that takes it back out.
+   * - `kind-dismiss`: The remove button, when `dismissible`.
+   * - `kind-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `kind-prefix`: The category before the label.
+   * - `size-dismiss`: The remove button, when `dismissible`.
+   * - `size-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `size-prefix`: The category before the label.
    */
   "helix-headless-file-input": Partial<
     HelixHeadlessFileInputProps &
@@ -28680,7 +28908,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `trigger`: The default trigger, where none was slotted.
-   * - `panel`: The region that opens.
+   * - `surface`: The floating panel, which is what opens.
    */
   "helix-headless-megamenu": Partial<
     HelixHeadlessMegamenuProps &
@@ -28917,7 +29145,7 @@ export type CustomElementsSolidJs = {
    * - `back`: The control that returns from a submenu.
    * - `back-mark`: The glyph on the back control of a submenu.
    * - `header`: The bar above a submenu, holding the way back and its name.
-   * - `menu`: The floating panel the menu is drawn on.
+   * - `surface`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
    */
   "helix-headless-menu": Partial<
@@ -31022,10 +31250,17 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of options, forwarded from the listbox.
-   * - `empty`: What shows with no options in it, forwarded from the listbox.
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
    */
   "helix-headless-select": Partial<
     HelixHeadlessSelectProps &
@@ -32034,6 +32269,7 @@ export type CustomElementsSolidJs = {
    * - `mark`: The glyph inside the marker: a tick, a dot, or an empty ring.
    * - `marker`: The shape carrying the number or the check.
    * - `trail`: The half line running on to the next.
+   * - `label-button`: The inner control.
    */
   "helix-headless-step": Partial<
     HelixHeadlessStepProps &
@@ -32984,6 +33220,35 @@ export type CustomElementsSolidJs = {
    * - `trigger-icon`: The mark on the button that opens the clock.
    * - `surface`: The floating panel.
    * - `picker`: The list inside it.
+   * - `picker-column`: One of them.
+   * - `picker-columns`: The row of columns, in `wheels`.
+   * - `picker-empty`: What it says when nothing matches, forwarded from the listbox.
+   * - `picker-items`: The scrolling column inside it, forwarded from the listbox.
+   * - `picker-list`: The listbox holding the times, in `list`.
+   * - `picker-option`: One time in it. Carries `data-between` inside a range.
+   * - `time-dismiss`: The remove button, when `dismissible`.
+   * - `time-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `time-prefix`: The category before the label.
+   * - `picker-column-empty`: Shown when a filter has hidden everything.
+   * - `picker-column-feedback`: What is wrong with it.
+   * - `picker-column-filter-icon`: The mark beside that field.
+   * - `picker-column-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `picker-column-hint`: Help under the list.
+   * - `picker-column-items`: The list itself.
+   * - `picker-column-label`: The question, over the list.
+   * - `picker-column-search`: The region holding the field that narrows the list.
+   * - `picker-column-search-field`: The field itself.
+   * - `picker-list-empty`: Shown when a filter has hidden everything.
+   * - `picker-list-feedback`: What is wrong with it.
+   * - `picker-list-filter-icon`: The mark beside that field.
+   * - `picker-list-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `picker-list-hint`: Help under the list.
+   * - `picker-list-items`: The list itself.
+   * - `picker-list-label`: The question, over the list.
+   * - `picker-list-search`: The region holding the field that narrows the list.
+   * - `picker-list-search-field`: The field itself.
+   * - `picker-option-item`: The row.
+   * - `picker-option-label`: The words.
    */
   "helix-headless-time-input": Partial<
     HelixHeadlessTimeInputProps &
@@ -33211,9 +33476,27 @@ export type CustomElementsSolidJs = {
    * - `list`: The listbox holding the times, in `list`.
    * - `columns`: The row of columns, in `wheels`.
    * - `column`: One of them.
-   * - `items`: The scrolling column inside it, forwarded from the listbox.
-   * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it. Carries `data-between` inside a range.
+   * - `column-empty`: Shown when a filter has hidden everything.
+   * - `column-feedback`: What is wrong with it.
+   * - `column-filter-icon`: The mark beside that field.
+   * - `column-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `column-hint`: Help under the list.
+   * - `column-items`: The list itself.
+   * - `column-label`: The question, over the list.
+   * - `column-search`: The region holding the field that narrows the list.
+   * - `column-search-field`: The field itself.
+   * - `list-empty`: Shown when a filter has hidden everything.
+   * - `list-feedback`: What is wrong with it.
+   * - `list-filter-icon`: The mark beside that field.
+   * - `list-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `list-hint`: Help under the list.
+   * - `list-items`: The list itself.
+   * - `list-label`: The question, over the list.
+   * - `list-search`: The region holding the field that narrows the list.
+   * - `list-search-field`: The field itself.
+   * - `option-item`: The row.
+   * - `option-label`: The words.
    */
   "helix-headless-time-picker": Partial<
     HelixHeadlessTimePickerProps &
@@ -34174,6 +34457,9 @@ export type CustomElementsSolidJs = {
    * - `back`: The control that goes to the previous stop.
    * - `next`: The control that goes on, and finishes on the last stop.
    * - `skip`: The control that leaves the tour.
+   * - `back-button`: The inner control.
+   * - `next-button`: The inner control.
+   * - `skip-button`: The inner control.
    */
   "helix-headless-tour-stop": Partial<
     HelixHeadlessTourStopProps &
@@ -34552,7 +34838,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `wrapper`: The `listitem`, which the button sits in.
+   * - `container`: The `listitem`, which the button sits in.
    * - `item`: The row, which is a button.
    * - `media`: The leading column.
    * - `thumbnail`: The image `poster` falls back to.
@@ -34632,6 +34918,14 @@ export type CustomElementsSolidJs = {
    * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
+   * - `entry-item`: The row, which is an `<a>` where `href` is set.
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `menu-back`: The control that returns from a submenu.
+   * - `menu-back-mark`: The glyph on the back control of a submenu.
+   * - `menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `menu-title`: The name of the submenu that is showing.
+   * - `menu-surface`: The floating panel the menu is drawn on.
    */
   "helix-headless-video-playlist-menu": Partial<
     HelixHeadlessVideoPlaylistMenuProps &
@@ -34940,6 +35234,20 @@ export type CustomElementsSolidJs = {
    * - `overflow`: The menu holding the controls kept off the bar.
    * - `more`: The button that opens it.
    * - `fullscreen`: The whole screen, and back.
+   * - `captions-menu-back`: The control that returns from a submenu.
+   * - `captions-menu-back-mark`: The glyph on the back control of a submenu.
+   * - `captions-menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `captions-menu-title`: The name of the submenu that is showing.
+   * - `entry`: One row in a menu this player opens.
+   * - `entry-item`: The row, which is an `<a>` where `href` is set.
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `overflow-back`: The control that returns from a submenu.
+   * - `overflow-back-mark`: The glyph on the back control of a submenu.
+   * - `overflow-header`: The bar above a submenu, holding the way back and its name.
+   * - `overflow-title`: The name of the submenu that is showing.
+   * - `captions-menu-surface`: The floating panel the menu is drawn on.
+   * - `overflow-surface`: The floating panel the menu is drawn on.
    */
   "helix-headless-video": Partial<
     HelixHeadlessVideoProps &

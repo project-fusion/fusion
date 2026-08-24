@@ -33,7 +33,7 @@ import { property } from 'lit/decorators.js'
  * @slot media - A thumbnail. Falls back to an image of `poster`.
  * @slot meta - After the name. A duration, or a date.
  *
- * @csspart wrapper - The `listitem`, which the button sits in.
+ * @csspart container - The `listitem`, which the button sits in.
  * @csspart item - The row, which is a button.
  * @csspart media - The leading column.
  * @csspart thumbnail - The image `poster` falls back to.
@@ -125,7 +125,7 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
     /* `aria-current="true"`, and absent rather than `"false"` otherwise. A
        reader is told which one is playing; being told about each of the others
        that it is not playing is the same fact eleven times. */
-    return html`<div part="wrapper" role="listitem">
+    return html`<div part="container" role="listitem">
       <button
         part="item"
         type="button"

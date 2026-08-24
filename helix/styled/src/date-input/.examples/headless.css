@@ -66,6 +66,24 @@ helix-headless-date-input::part(surface) {
   padding: 0.5rem;
 }
 
+helix-headless-date-input::part(date-dismiss-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-date-input::part(picker-next-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-date-input::part(picker-previous-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

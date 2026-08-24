@@ -49,16 +49,22 @@ helix-headless-time-picker::part(list) {
   gap: 0.25rem;
 }
 
-helix-headless-time-picker::part(items) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-}
-
 helix-headless-time-picker::part(option) {
   background-color: transparent;
   border: 0;
   padding: 0.25rem 0.5rem;
+}
+
+helix-headless-time-picker::part(column-filter-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-time-picker::part(list-filter-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-headless-icon::part(svg) {
@@ -76,7 +82,8 @@ helix-headless-time-picker::part(option):focus-visible {
 }
 
 helix-headless-time-picker::part(list),
-helix-headless-time-picker::part(items) {
+helix-headless-time-picker::part(list-items),
+helix-headless-time-picker::part(column-items) {
   align-items: stretch;
   display: flex;
   flex-direction: column;

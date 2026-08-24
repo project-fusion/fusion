@@ -80,8 +80,8 @@ if (hasLayout()) {
         await settled(part(host, 'panel'))
         expect(host.open).toBe(false)
         /* The band was 1280 by 267 here, and `open` was already false.
-           `:host([variant="full"]) [part="panel"]` is (0,3,0) and the guard
-           was a bare `[part="panel"][hidden]` at (0,2,0), so it lost. */
+           `:host([variant="full"]) [part="surface"]` is (0,3,0) and the guard
+           was a bare `[part="surface"][hidden]` at (0,2,0), so it lost. */
         expect(panelBox(host).height).toBe(0)
         expect(panelBox(host).width).toBe(0)
       })

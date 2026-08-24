@@ -68,12 +68,6 @@ helix-headless-select::part(listbox) {
   padding: 0.5rem;
 }
 
-helix-headless-select::part(items) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-}
-
 helix-headless-select::part(hint) {
   color: var(--_gray-muted);
   font-size: 0.875em;
@@ -82,6 +76,12 @@ helix-headless-select::part(hint) {
 helix-headless-select::part(feedback) {
   color: var(--_gray-muted);
   font-size: 0.875em;
+}
+
+helix-headless-select::part(listbox-filter-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-headless-icon::part(svg) {

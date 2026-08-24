@@ -48,6 +48,12 @@ helix-headless-code-block::part(label) {
   font-weight: 600;
 }
 
+helix-headless-code-block::part(copy-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

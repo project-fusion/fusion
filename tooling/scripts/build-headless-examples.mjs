@@ -501,7 +501,7 @@ helix-headless-divider[orientation="vertical"] {
 
 /* The divider is the component's whole point, so it has to be visible before
    anything else here matters. */
-helix-headless-splitter::part(divider) {
+helix-headless-splitter::part(separator) {
   background-color: var(--_gray-line);
 }`,
   /* A row with air between the readings, and each one a column.
@@ -536,7 +536,16 @@ helix-headless-table-cell {
 
 /* Where the active item is, published by \`IndicatorController\` and reachable
    since #137. The mark is a rule the consumer writes, which is the point: the
-   controller measures and says nothing about what is drawn. */
+   controller measures and says nothing about what is drawn.
+
+   \`container\` has to be a part the family actually renders, and for three of
+   the four it was not: navigation and outline render \`nav\` and were given
+   \`list\`, toggle group renders \`track\` and was given \`group\`. A
+   \`::part()\` naming nothing is valid CSS that matches nothing, so the
+   \`position: relative\` never landed and every indicator in those three
+   examples was positioned against the wrong containing block. Nothing reported
+   it, because nothing checks a \`::part()\` from outside: \`check:selectors\`
+   reads \`[part=]\` inside a component's own sheet and stops there. */
 const INDICATOR = (tag, container, along) => `${tag}::part(${container}) {
   position: relative;
 }
@@ -551,10 +560,10 @@ ${tag}::part(indicator) {
 }`
 
 const INDICATORS = {
-  navigation: INDICATOR('helix-headless-navigation', 'list', 'inline'),
-  outline: INDICATOR('helix-headless-outline', 'list', 'block'),
+  navigation: INDICATOR('helix-headless-navigation', 'nav', 'inline'),
+  outline: INDICATOR('helix-headless-outline', 'nav', 'block'),
   tabs: INDICATOR('helix-headless-tabs', 'tabs', 'inline'),
-  toggle: INDICATOR('helix-headless-toggle-group', 'group', 'inline'),
+  toggle: INDICATOR('helix-headless-toggle-group', 'track', 'inline'),
 }
 
 /**
@@ -667,7 +676,7 @@ helix-headless-blockquote::part(attribution) {
    
      The dialog is the surface here. A listbox inside a command palette is the
      palette, so it carries nothing of its own and the rows stack. */
-  command: `helix-headless-command::part(items) {
+  command: `helix-headless-command::part(listbox-items) {
   align-items: stretch;
   flex-direction: column;
 }
@@ -769,7 +778,7 @@ helix-headless-meter:is([shape="ring"], [shape="arc"])::part(track) {
   stroke: var(--_gray-fill);
   stroke-width: 8;
 }`,
-  outline: `helix-headless-outline::part(list) {
+  outline: `helix-headless-outline::part(nav) {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -1030,7 +1039,8 @@ helix-headless-table-row {
   padding: 0.125rem 0.5rem;
 }`,
   'time-picker': `helix-headless-time-picker::part(list),
-helix-headless-time-picker::part(items) {
+helix-headless-time-picker::part(list-items),
+helix-headless-time-picker::part(column-items) {
   align-items: stretch;
   display: flex;
   flex-direction: column;

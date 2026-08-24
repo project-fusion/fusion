@@ -19,7 +19,7 @@ describe('megamenu server output', () => {
     const markup = withoutStyles(
       ssr(html`<helix-headless-megamenu label="Products"></helix-headless-megamenu>`),
     )
-    expect(hasPart(markup, 'panel')).toBe(true)
+    expect(hasPart(markup, 'surface')).toBe(true)
     expect(markup).toContain('hidden')
   })
 

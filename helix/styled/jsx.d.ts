@@ -15669,8 +15669,8 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--breadcrumbs-separator-color`: Color of the chevron. (default: `undefined`)
-   * - `--breadcrumb-hover-color`: Fill behind a step under the pointer. (default: `undefined`)
-   * - `--breadcrumb-control-size`: How tall a control slotted into a crumb is. (default: `undefined`)
+   * - `--breadcrumbs-hover-color`: Fill behind a step under the pointer. (default: `undefined`)
+   * - `--breadcrumbs-control-size`: How tall a control slotted into a crumb is. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16623,6 +16623,10 @@ export type CustomElements = {
    * - `header`: The bar carrying the name, where there is one.
    * - `copy`: The copy button.
    * - `label`: The file name or language, where one is given.
+   * - `copy-button`: The inner button.
+   * - `copy-mark`: The clipboard glyph, and the confirmation that replaces it.
+   * - `copy-tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `copy-tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-code-block": Partial<
     HelixCodeBlockProps & BaseProps<HelixCodeBlock> & BaseEvents
@@ -16877,6 +16881,30 @@ export type CustomElements = {
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
    * - `picker`: The color picker inside it.
+   * - `picker-actions`: The group holding the eyedropper and the syntax toggle.
+   * - `picker-channel`: One ramp.
+   * - `picker-channels`: The ramps beside it.
+   * - `picker-controls`: The row under the square.
+   * - `picker-eyedropper`: The control that samples a color from the screen.
+   * - `picker-footer`: The row holding the value and the tools.
+   * - `picker-format`: The control that changes the syntax the value is written in.
+   * - `picker-grid`: The saturation and brightness square.
+   * - `picker-grid-brightness`: The range input for its vertical axis.
+   * - `picker-grid-handle`: The mark showing where in the square the color sits.
+   * - `picker-grid-saturation`: The range input for the square's horizontal axis.
+   * - `picker-icon`: A glyph this component draws.
+   * - `picker-sample`: The chip of the current color, which copies it when pressed.
+   * - `picker-swatch`: One preset.
+   * - `picker-swatches`: The row of presets.
+   * - `picker-value`: The color as text, which can be typed or pasted.
+   * - `picker-channel-control`: The range input.
+   * - `picker-channel-field`: The row: the control and its readout.
+   * - `picker-channel-marker`: One mark.
+   * - `picker-channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `picker-channel-markers`: The row of marks along the track.
+   * - `picker-channel-output`: The current value, shown beside it.
+   * - `picker-eyedropper-button`: The inner control.
+   * - `picker-format-button`: The inner control.
    */
   "helix-color-input": Partial<
     HelixColorInputProps & BaseProps<HelixColorInput> & BaseEvents
@@ -17082,6 +17110,14 @@ export type CustomElements = {
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
+   * - `channel-control`: The range input.
+   * - `channel-field`: The row: the control and its readout.
+   * - `channel-marker`: One mark.
+   * - `channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `channel-markers`: The row of marks along the track.
+   * - `channel-output`: The current value, shown beside it.
+   * - `eyedropper-button`: The inner control.
+   * - `format-button`: The inner control.
    */
   "helix-color-picker": Partial<
     HelixColorPickerProps & BaseProps<HelixColorPicker> & BaseEvents
@@ -17311,8 +17347,18 @@ export type CustomElements = {
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of options, forwarded from the listbox.
-   * - `empty`: What shows where the filter has hidden everything, forwarded from the listbox.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
+   * - `tag-dismiss`: The remove button, when `dismissible`.
+   * - `tag-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `tag-prefix`: The category before the label. from the listbox.
    */
   "helix-combobox": Partial<
     HelixComboboxProps & BaseProps<HelixCombobox> & BaseEvents
@@ -17402,12 +17448,17 @@ export type CustomElements = {
    *
    * - `dialog`: The overlay's own box, forwarded from the dialog.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of commands, forwarded from the listbox.
-   * - `empty`: What shows where the filter has hidden everything.
-   * - `filter-mark`: The glyph beside the field, forwarded from the listbox.
-   * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
    * - `footer`: The row under the list.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
    */
   "helix-command": Partial<
     HelixCommandProps & BaseProps<HelixCommand> & BaseEvents
@@ -17572,6 +17623,7 @@ export type CustomElements = {
    * - `button`: The inner button.
    * - `mark`: The clipboard glyph, and the confirmation that replaces it.
    * - `tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-copy-button": Partial<
     HelixCopyButtonProps & BaseProps<HelixCopyButton> & BaseEvents
@@ -17815,6 +17867,22 @@ export type CustomElements = {
    * - `trigger-icon`: The mark on the button that opens the calendar.
    * - `surface`: The floating panel.
    * - `picker`: The date picker inside it.
+   * - `date-dismiss`: The remove button, when `dismissible`.
+   * - `date-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `date-prefix`: The category before the label.
+   * - `picker-cell`: One column of a row, which is what a range paints.
+   * - `picker-day`: The shape inside a cell, which is what a single date paints.
+   * - `picker-grid`: The grid of days.
+   * - `picker-header`: The month name and its controls.
+   * - `picker-heading`: The month and year being shown.
+   * - `picker-month`: One month, its header and its grid.
+   * - `picker-months`: The run of months.
+   * - `picker-next`: The control that moves to the next month.
+   * - `picker-next-mark`: The glyph on the next month control.
+   * - `picker-previous`: The control that moves to the previous month.
+   * - `picker-previous-mark`: The glyph on the previous month control.
+   * - `picker-week`: One row of days.
+   * - `picker-weekday`: A column header naming a day of the week.
    */
   "helix-date-input": Partial<
     HelixDateInputProps & BaseProps<HelixDateInput> & BaseEvents
@@ -18741,6 +18809,12 @@ export type CustomElements = {
    * - `size`: How big it is.
    * - `kind`: What kind of file it is.
    * - `remove`: The control that takes it back out.
+   * - `kind-dismiss`: The remove button, when `dismissible`.
+   * - `kind-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `kind-prefix`: The category before the label.
+   * - `size-dismiss`: The remove button, when `dismissible`.
+   * - `size-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `size-prefix`: The category before the label.
    */
   "helix-file-input": Partial<
     HelixFileInputProps & BaseProps<HelixFileInput> & BaseEvents
@@ -20051,7 +20125,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `trigger`: The default trigger, where none was slotted.
-   * - `panel`: The region that opens.
+   * - `surface`: The floating panel, which is what opens.
    */
   "helix-megamenu": Partial<
     HelixMegamenuProps & BaseProps<HelixMegamenu> & BaseEvents
@@ -20278,7 +20352,7 @@ export type CustomElements = {
    * - `back`: The control that returns from a submenu.
    * - `back-mark`: The glyph on the back control of a submenu.
    * - `header`: The bar above a submenu, holding the way back and its name.
-   * - `menu`: The floating panel the menu is drawn on.
+   * - `surface`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
    */
   "helix-menu": Partial<HelixMenuProps & BaseProps<HelixMenu> & BaseEvents> & HelixMenuControlled;
@@ -21218,7 +21292,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--pin-gap`: Space between one box and the next. (default: `undefined`)
+   * - `--pin-input-gap`: Space between one box and the next. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22272,7 +22346,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--status-bar-color`: Color of the bar's text. (default: `undefined`)
+   * - `--sandbox-status-bar-color`: Color of the bar's text. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22321,7 +22395,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--terminal-size`: Height of the scrolling region. (default: `undefined`)
+   * - `--sandbox-terminal-size`: Height of the scrolling region. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22361,7 +22435,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--toolbar-gap`: Space between items. (default: `undefined`)
+   * - `--sandbox-toolbar-gap`: Space between items. (default: `undefined`)
    * - `--sandbox-toolbar-size`: The bar's height. Defaults to a large control. (default: `undefined`)
    */
   "helix-sandbox-toolbar": Partial<
@@ -22623,10 +22697,17 @@ export type CustomElements = {
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of options, forwarded from the listbox.
-   * - `empty`: What shows with no options in it, forwarded from the listbox.
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
    */
   "helix-select": Partial<
     HelixSelectProps & BaseProps<HelixSelect> & BaseEvents
@@ -23524,6 +23605,7 @@ export type CustomElements = {
    * - `mark`: The glyph inside the marker: a tick, a dot, or an empty ring.
    * - `marker`: The shape carrying the number or the check.
    * - `trail`: The half line running on to the next.
+   * - `label-button`: The inner control.
    */
   "helix-step": Partial<HelixStepProps & BaseProps<HelixStep> & BaseEvents>;
 
@@ -24495,6 +24577,35 @@ export type CustomElements = {
    * - `trigger-icon`: The mark on the button that opens the clock.
    * - `surface`: The floating panel.
    * - `picker`: The list inside it.
+   * - `picker-column`: One of them.
+   * - `picker-columns`: The row of columns, in `wheels`.
+   * - `picker-empty`: What it says when nothing matches, forwarded from the listbox.
+   * - `picker-items`: The scrolling column inside it, forwarded from the listbox.
+   * - `picker-list`: The listbox holding the times, in `list`.
+   * - `picker-option`: One time in it. Carries `data-between` inside a range.
+   * - `time-dismiss`: The remove button, when `dismissible`.
+   * - `time-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `time-prefix`: The category before the label.
+   * - `picker-column-empty`: Shown when a filter has hidden everything.
+   * - `picker-column-feedback`: What is wrong with it.
+   * - `picker-column-filter-icon`: The mark beside that field.
+   * - `picker-column-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `picker-column-hint`: Help under the list.
+   * - `picker-column-items`: The list itself.
+   * - `picker-column-label`: The question, over the list.
+   * - `picker-column-search`: The region holding the field that narrows the list.
+   * - `picker-column-search-field`: The field itself.
+   * - `picker-list-empty`: Shown when a filter has hidden everything.
+   * - `picker-list-feedback`: What is wrong with it.
+   * - `picker-list-filter-icon`: The mark beside that field.
+   * - `picker-list-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `picker-list-hint`: Help under the list.
+   * - `picker-list-items`: The list itself.
+   * - `picker-list-label`: The question, over the list.
+   * - `picker-list-search`: The region holding the field that narrows the list.
+   * - `picker-list-search-field`: The field itself.
+   * - `picker-option-item`: The row.
+   * - `picker-option-label`: The words.
    */
   "helix-time-input": Partial<
     HelixTimeInputProps & BaseProps<HelixTimeInput> & BaseEvents
@@ -24719,9 +24830,27 @@ export type CustomElements = {
    * - `list`: The listbox holding the times, in `list`.
    * - `columns`: The row of columns, in `wheels`.
    * - `column`: One of them.
-   * - `items`: The scrolling column inside it, forwarded from the listbox.
-   * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it. Carries `data-between` inside a range.
+   * - `column-empty`: Shown when a filter has hidden everything.
+   * - `column-feedback`: What is wrong with it.
+   * - `column-filter-icon`: The mark beside that field.
+   * - `column-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `column-hint`: Help under the list.
+   * - `column-items`: The list itself.
+   * - `column-label`: The question, over the list.
+   * - `column-search`: The region holding the field that narrows the list.
+   * - `column-search-field`: The field itself.
+   * - `list-empty`: Shown when a filter has hidden everything.
+   * - `list-feedback`: What is wrong with it.
+   * - `list-filter-icon`: The mark beside that field.
+   * - `list-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `list-hint`: Help under the list.
+   * - `list-items`: The list itself.
+   * - `list-label`: The question, over the list.
+   * - `list-search`: The region holding the field that narrows the list.
+   * - `list-search-field`: The field itself.
+   * - `option-item`: The row.
+   * - `option-label`: The words.
    */
   "helix-time-picker": Partial<
     HelixTimePickerProps & BaseProps<HelixTimePicker> & BaseEvents
@@ -25521,6 +25650,9 @@ export type CustomElements = {
    * - `back`: The control that goes to the previous stop.
    * - `next`: The control that goes on, and finishes on the last stop.
    * - `skip`: The control that leaves the tour.
+   * - `back-button`: The inner control.
+   * - `next-button`: The inner control.
+   * - `skip-button`: The inner control.
    */
   "helix-tour-stop": Partial<
     HelixTourStopProps & BaseProps<HelixTourStop> & BaseEvents
@@ -25885,7 +26017,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `wrapper`: The `listitem`, which the button sits in.
+   * - `container`: The `listitem`, which the button sits in.
    * - `item`: The row, which is a button.
    * - `media`: The leading column.
    * - `thumbnail`: The image `poster` falls back to.
@@ -25954,6 +26086,14 @@ export type CustomElements = {
    * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
+   * - `entry-item`: The row, which is an `<a>` where `href` is set.
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `menu-back`: The control that returns from a submenu.
+   * - `menu-back-mark`: The glyph on the back control of a submenu.
+   * - `menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `menu-title`: The name of the submenu that is showing.
+   * - `menu-surface`: The floating panel the menu is drawn on.
    */
   "helix-video-playlist-menu": Partial<
     HelixVideoPlaylistMenuProps & BaseProps<HelixVideoPlaylistMenu> & BaseEvents
@@ -26209,6 +26349,20 @@ export type CustomElements = {
    * - `overflow`: The menu holding the controls kept off the bar.
    * - `more`: The button that opens it.
    * - `fullscreen`: The whole screen, and back.
+   * - `captions-menu-back`: The control that returns from a submenu.
+   * - `captions-menu-back-mark`: The glyph on the back control of a submenu.
+   * - `captions-menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `captions-menu-title`: The name of the submenu that is showing.
+   * - `entry`: One row in a menu this player opens.
+   * - `entry-item`: The row, which is an `<a>` where `href` is set.
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `overflow-back`: The control that returns from a submenu.
+   * - `overflow-back-mark`: The glyph on the back control of a submenu.
+   * - `overflow-header`: The bar above a submenu, holding the way back and its name.
+   * - `overflow-title`: The name of the submenu that is showing.
+   * - `captions-menu-surface`: The floating panel the menu is drawn on.
+   * - `overflow-surface`: The floating panel the menu is drawn on.
    */
   "helix-video": Partial<HelixVideoProps & BaseProps<HelixVideo> & BaseEvents>;
 
@@ -27210,8 +27364,8 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--breadcrumbs-separator-color`: Color of the chevron. (default: `undefined`)
-   * - `--breadcrumb-hover-color`: Fill behind a step under the pointer. (default: `undefined`)
-   * - `--breadcrumb-control-size`: How tall a control slotted into a crumb is. (default: `undefined`)
+   * - `--breadcrumbs-hover-color`: Fill behind a step under the pointer. (default: `undefined`)
+   * - `--breadcrumbs-control-size`: How tall a control slotted into a crumb is. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -28190,6 +28344,10 @@ export type CustomElementsSolidJs = {
    * - `header`: The bar carrying the name, where there is one.
    * - `copy`: The copy button.
    * - `label`: The file name or language, where one is given.
+   * - `copy-button`: The inner button.
+   * - `copy-mark`: The clipboard glyph, and the confirmation that replaces it.
+   * - `copy-tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `copy-tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-code-block": Partial<
     HelixCodeBlockProps &
@@ -28449,6 +28607,30 @@ export type CustomElementsSolidJs = {
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
    * - `picker`: The color picker inside it.
+   * - `picker-actions`: The group holding the eyedropper and the syntax toggle.
+   * - `picker-channel`: One ramp.
+   * - `picker-channels`: The ramps beside it.
+   * - `picker-controls`: The row under the square.
+   * - `picker-eyedropper`: The control that samples a color from the screen.
+   * - `picker-footer`: The row holding the value and the tools.
+   * - `picker-format`: The control that changes the syntax the value is written in.
+   * - `picker-grid`: The saturation and brightness square.
+   * - `picker-grid-brightness`: The range input for its vertical axis.
+   * - `picker-grid-handle`: The mark showing where in the square the color sits.
+   * - `picker-grid-saturation`: The range input for the square's horizontal axis.
+   * - `picker-icon`: A glyph this component draws.
+   * - `picker-sample`: The chip of the current color, which copies it when pressed.
+   * - `picker-swatch`: One preset.
+   * - `picker-swatches`: The row of presets.
+   * - `picker-value`: The color as text, which can be typed or pasted.
+   * - `picker-channel-control`: The range input.
+   * - `picker-channel-field`: The row: the control and its readout.
+   * - `picker-channel-marker`: One mark.
+   * - `picker-channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `picker-channel-markers`: The row of marks along the track.
+   * - `picker-channel-output`: The current value, shown beside it.
+   * - `picker-eyedropper-button`: The inner control.
+   * - `picker-format-button`: The inner control.
    */
   "helix-color-input": Partial<
     HelixColorInputProps &
@@ -28657,6 +28839,14 @@ export type CustomElementsSolidJs = {
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
+   * - `channel-control`: The range input.
+   * - `channel-field`: The row: the control and its readout.
+   * - `channel-marker`: One mark.
+   * - `channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `channel-markers`: The row of marks along the track.
+   * - `channel-output`: The current value, shown beside it.
+   * - `eyedropper-button`: The inner control.
+   * - `format-button`: The inner control.
    */
   "helix-color-picker": Partial<
     HelixColorPickerProps &
@@ -28889,8 +29079,18 @@ export type CustomElementsSolidJs = {
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of options, forwarded from the listbox.
-   * - `empty`: What shows where the filter has hidden everything, forwarded from the listbox.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
+   * - `tag-dismiss`: The remove button, when `dismissible`.
+   * - `tag-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `tag-prefix`: The category before the label. from the listbox.
    */
   "helix-combobox": Partial<
     HelixComboboxProps &
@@ -28983,12 +29183,17 @@ export type CustomElementsSolidJs = {
    *
    * - `dialog`: The overlay's own box, forwarded from the dialog.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of commands, forwarded from the listbox.
-   * - `empty`: What shows where the filter has hidden everything.
-   * - `filter-mark`: The glyph beside the field, forwarded from the listbox.
-   * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
    * - `footer`: The row under the list.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
    */
   "helix-command": Partial<
     HelixCommandProps &
@@ -29156,6 +29361,7 @@ export type CustomElementsSolidJs = {
    * - `button`: The inner button.
    * - `mark`: The clipboard glyph, and the confirmation that replaces it.
    * - `tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-copy-button": Partial<
     HelixCopyButtonProps &
@@ -29402,6 +29608,22 @@ export type CustomElementsSolidJs = {
    * - `trigger-icon`: The mark on the button that opens the calendar.
    * - `surface`: The floating panel.
    * - `picker`: The date picker inside it.
+   * - `date-dismiss`: The remove button, when `dismissible`.
+   * - `date-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `date-prefix`: The category before the label.
+   * - `picker-cell`: One column of a row, which is what a range paints.
+   * - `picker-day`: The shape inside a cell, which is what a single date paints.
+   * - `picker-grid`: The grid of days.
+   * - `picker-header`: The month name and its controls.
+   * - `picker-heading`: The month and year being shown.
+   * - `picker-month`: One month, its header and its grid.
+   * - `picker-months`: The run of months.
+   * - `picker-next`: The control that moves to the next month.
+   * - `picker-next-mark`: The glyph on the next month control.
+   * - `picker-previous`: The control that moves to the previous month.
+   * - `picker-previous-mark`: The glyph on the previous month control.
+   * - `picker-week`: One row of days.
+   * - `picker-weekday`: A column header naming a day of the week.
    */
   "helix-date-input": Partial<
     HelixDateInputProps &
@@ -30357,6 +30579,12 @@ export type CustomElementsSolidJs = {
    * - `size`: How big it is.
    * - `kind`: What kind of file it is.
    * - `remove`: The control that takes it back out.
+   * - `kind-dismiss`: The remove button, when `dismissible`.
+   * - `kind-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `kind-prefix`: The category before the label.
+   * - `size-dismiss`: The remove button, when `dismissible`.
+   * - `size-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `size-prefix`: The category before the label.
    */
   "helix-file-input": Partial<
     HelixFileInputProps &
@@ -31708,7 +31936,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `trigger`: The default trigger, where none was slotted.
-   * - `panel`: The region that opens.
+   * - `surface`: The floating panel, which is what opens.
    */
   "helix-megamenu": Partial<
     HelixMegamenuProps &
@@ -31941,7 +32169,7 @@ export type CustomElementsSolidJs = {
    * - `back`: The control that returns from a submenu.
    * - `back-mark`: The glyph on the back control of a submenu.
    * - `header`: The bar above a submenu, holding the way back and its name.
-   * - `menu`: The floating panel the menu is drawn on.
+   * - `surface`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
    */
   "helix-menu": Partial<
@@ -32912,7 +33140,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--pin-gap`: Space between one box and the next. (default: `undefined`)
+   * - `--pin-input-gap`: Space between one box and the next. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -34003,7 +34231,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--status-bar-color`: Color of the bar's text. (default: `undefined`)
+   * - `--sandbox-status-bar-color`: Color of the bar's text. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -34055,7 +34283,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--terminal-size`: Height of the scrolling region. (default: `undefined`)
+   * - `--sandbox-terminal-size`: Height of the scrolling region. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -34098,7 +34326,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--toolbar-gap`: Space between items. (default: `undefined`)
+   * - `--sandbox-toolbar-gap`: Space between items. (default: `undefined`)
    * - `--sandbox-toolbar-size`: The bar's height. Defaults to a large control. (default: `undefined`)
    */
   "helix-sandbox-toolbar": Partial<
@@ -34366,10 +34594,17 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
-   * - `items`: The scrolling box of options, forwarded from the listbox.
-   * - `empty`: What shows with no options in it, forwarded from the listbox.
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
+   * - `listbox-empty`: Shown when a filter has hidden everything.
+   * - `listbox-feedback`: What is wrong with it.
+   * - `listbox-filter-icon`: The mark beside that field.
+   * - `listbox-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `listbox-hint`: Help under the list.
+   * - `listbox-items`: The list itself.
+   * - `listbox-label`: The question, over the list.
+   * - `listbox-search`: The region holding the field that narrows the list.
+   * - `listbox-search-field`: The field itself.
    */
   "helix-select": Partial<
     HelixSelectProps &
@@ -35298,6 +35533,7 @@ export type CustomElementsSolidJs = {
    * - `mark`: The glyph inside the marker: a tick, a dot, or an empty ring.
    * - `marker`: The shape carrying the number or the check.
    * - `trail`: The half line running on to the next.
+   * - `label-button`: The inner control.
    */
   "helix-step": Partial<
     HelixStepProps & HelixStepSolidJsProps & BaseProps<HelixStep> & BaseEvents
@@ -36303,6 +36539,35 @@ export type CustomElementsSolidJs = {
    * - `trigger-icon`: The mark on the button that opens the clock.
    * - `surface`: The floating panel.
    * - `picker`: The list inside it.
+   * - `picker-column`: One of them.
+   * - `picker-columns`: The row of columns, in `wheels`.
+   * - `picker-empty`: What it says when nothing matches, forwarded from the listbox.
+   * - `picker-items`: The scrolling column inside it, forwarded from the listbox.
+   * - `picker-list`: The listbox holding the times, in `list`.
+   * - `picker-option`: One time in it. Carries `data-between` inside a range.
+   * - `time-dismiss`: The remove button, when `dismissible`.
+   * - `time-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `time-prefix`: The category before the label.
+   * - `picker-column-empty`: Shown when a filter has hidden everything.
+   * - `picker-column-feedback`: What is wrong with it.
+   * - `picker-column-filter-icon`: The mark beside that field.
+   * - `picker-column-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `picker-column-hint`: Help under the list.
+   * - `picker-column-items`: The list itself.
+   * - `picker-column-label`: The question, over the list.
+   * - `picker-column-search`: The region holding the field that narrows the list.
+   * - `picker-column-search-field`: The field itself.
+   * - `picker-list-empty`: Shown when a filter has hidden everything.
+   * - `picker-list-feedback`: What is wrong with it.
+   * - `picker-list-filter-icon`: The mark beside that field.
+   * - `picker-list-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `picker-list-hint`: Help under the list.
+   * - `picker-list-items`: The list itself.
+   * - `picker-list-label`: The question, over the list.
+   * - `picker-list-search`: The region holding the field that narrows the list.
+   * - `picker-list-search-field`: The field itself.
+   * - `picker-option-item`: The row.
+   * - `picker-option-label`: The words.
    */
   "helix-time-input": Partial<
     HelixTimeInputProps &
@@ -36530,9 +36795,27 @@ export type CustomElementsSolidJs = {
    * - `list`: The listbox holding the times, in `list`.
    * - `columns`: The row of columns, in `wheels`.
    * - `column`: One of them.
-   * - `items`: The scrolling column inside it, forwarded from the listbox.
-   * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it. Carries `data-between` inside a range.
+   * - `column-empty`: Shown when a filter has hidden everything.
+   * - `column-feedback`: What is wrong with it.
+   * - `column-filter-icon`: The mark beside that field.
+   * - `column-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `column-hint`: Help under the list.
+   * - `column-items`: The list itself.
+   * - `column-label`: The question, over the list.
+   * - `column-search`: The region holding the field that narrows the list.
+   * - `column-search-field`: The field itself.
+   * - `list-empty`: Shown when a filter has hidden everything.
+   * - `list-feedback`: What is wrong with it.
+   * - `list-filter-icon`: The mark beside that field.
+   * - `list-filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `list-hint`: Help under the list.
+   * - `list-items`: The list itself.
+   * - `list-label`: The question, over the list.
+   * - `list-search`: The region holding the field that narrows the list.
+   * - `list-search-field`: The field itself.
+   * - `option-item`: The row.
+   * - `option-label`: The words.
    */
   "helix-time-picker": Partial<
     HelixTimePickerProps &
@@ -37363,6 +37646,9 @@ export type CustomElementsSolidJs = {
    * - `back`: The control that goes to the previous stop.
    * - `next`: The control that goes on, and finishes on the last stop.
    * - `skip`: The control that leaves the tour.
+   * - `back-button`: The inner control.
+   * - `next-button`: The inner control.
+   * - `skip-button`: The inner control.
    */
   "helix-tour-stop": Partial<
     HelixTourStopProps &
@@ -37740,7 +38026,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `wrapper`: The `listitem`, which the button sits in.
+   * - `container`: The `listitem`, which the button sits in.
    * - `item`: The row, which is a button.
    * - `media`: The leading column.
    * - `thumbnail`: The image `poster` falls back to.
@@ -37812,6 +38098,14 @@ export type CustomElementsSolidJs = {
    * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
+   * - `entry-item`: The row, which is an `<a>` where `href` is set.
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `menu-back`: The control that returns from a submenu.
+   * - `menu-back-mark`: The glyph on the back control of a submenu.
+   * - `menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `menu-title`: The name of the submenu that is showing.
+   * - `menu-surface`: The floating panel the menu is drawn on.
    */
   "helix-video-playlist-menu": Partial<
     HelixVideoPlaylistMenuProps &
@@ -38073,6 +38367,20 @@ export type CustomElementsSolidJs = {
    * - `overflow`: The menu holding the controls kept off the bar.
    * - `more`: The button that opens it.
    * - `fullscreen`: The whole screen, and back.
+   * - `captions-menu-back`: The control that returns from a submenu.
+   * - `captions-menu-back-mark`: The glyph on the back control of a submenu.
+   * - `captions-menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `captions-menu-title`: The name of the submenu that is showing.
+   * - `entry`: One row in a menu this player opens.
+   * - `entry-item`: The row, which is an `<a>` where `href` is set.
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `overflow-back`: The control that returns from a submenu.
+   * - `overflow-back-mark`: The glyph on the back control of a submenu.
+   * - `overflow-header`: The bar above a submenu, holding the way back and its name.
+   * - `overflow-title`: The name of the submenu that is showing.
+   * - `captions-menu-surface`: The floating panel the menu is drawn on.
+   * - `overflow-surface`: The floating panel the menu is drawn on.
    */
   "helix-video": Partial<
     HelixVideoProps &
@@ -38180,9 +38488,9 @@ export type CustomCssProperties = {
   /** Color of the chevron. */
   "--breadcrumbs-separator-color"?: string;
   /** Fill behind a step under the pointer. */
-  "--breadcrumb-hover-color"?: string;
+  "--breadcrumbs-hover-color"?: string;
   /** How tall a control slotted into a crumb is. */
-  "--breadcrumb-control-size"?: string;
+  "--breadcrumbs-control-size"?: string;
   /** Space between items and separators. */
   "--breadcrumbs-gap"?: string;
   /** Space between the buttons, when `spaced`. */
@@ -38532,7 +38840,7 @@ export type CustomCssProperties = {
   /** The box every control in the row takes. */
   "--pagination-size"?: string;
   /** Space between one box and the next. */
-  "--pin-gap"?: string;
+  "--pin-input-gap"?: string;
   /** Color of the panel's edge. */
   "--popover-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
@@ -38618,11 +38926,11 @@ export type CustomCssProperties = {
   /** Minimum height of the pane. */
   "--sandbox-source-min-block-size"?: string;
   /** Color of the bar's text. */
-  "--status-bar-color"?: string;
+  "--sandbox-status-bar-color"?: string;
   /** Height of the scrolling region. */
-  "--terminal-size"?: string;
+  "--sandbox-terminal-size"?: string;
   /** Space between items. */
-  "--toolbar-gap"?: string;
+  "--sandbox-toolbar-gap"?: string;
   /** The bar's height. Defaults to a large control. */
   "--sandbox-toolbar-size"?: string;
   /** How deep the fades are, at both edges. */
@@ -38807,6 +39115,8 @@ export type CustomCssProperties = {
   "--toast-inline-size"?: string;
   /** Fill of the moving marker. */
   "--toggle-group-indicator-color"?: string;
+  /** Space between controls. */
+  "--toolbar-gap"?: string;
   /** Size of the point at the bubble's edge. */
   "--tooltip-arrow-size"?: string;
   /** Blur behind a `glass` bubble. */

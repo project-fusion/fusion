@@ -225,6 +225,23 @@ exactly that reason, and every example still looked right, because the sandbox
 and the docs site import the whole barrel. That is the condition under which this
 failure is invisible: it appears only for the consumer who imports one component.
 
+**Registering a taken tag returns quietly and says so.** `customElement` in
+`helix/core` declines rather than throwing, because Next.js evaluates a module in
+both graphs and `customElements.define` throwing takes down the whole prerender.
+Declining in silence is the other half, and it was missing: the registry keeps
+the first constructor, so on a page carrying two copies of Helix every
+`<helix-button>` is the first copy's class whatever the second exports.
+`el instanceof HelixButton` then returns `false` against an element that is
+visibly a button, and a version's fixes are absent from elements a consumer
+believes are on that version. Nothing throws and nothing renders wrong, which is
+the worst shape a library failure takes.
+
+So it warns, once per tag, and **only in a browser**. Lit's SSR shim provides
+`customElements` and `document` and leaves `window` undefined, measured against
+`@lit-labs/ssr` rather than assumed, so `typeof window` separates a real page
+from the render pass the guard was written for. A diagnostic that fires during a
+build is one somebody turns off.
+
 `bun run check:composed` enforces all three: no literal tag in a template with a
 tier below it, `tier` overridden wherever a base template interpolates, and the
 family imported by both tiers.
@@ -628,6 +645,34 @@ looks correct and the component is quietly unstyled.
 Per-component hooks (`--card-padding`) are not Helix tokens and are exempt. They
 should default to a semantic token.
 
+**A hook is named after the family that owns it, and owned by one family.**
+`check:hooks` holds both. A consumer predicts `--card-padding` from
+`<helix-card>` and predicts nothing from a name that does not follow, and a
+custom property naming no declaration is inert with no error: the same silence
+as a `::part()` that resolves to nothing. Six were unguessable.
+`<helix-pin-input>` published `--pin-gap`; the sandbox published
+`--status-bar-color` and `--terminal-size`, which name no component at all; and
+`<helix-breadcrumb>` published `--breadcrumb-hover-color` beside its own
+`--breadcrumbs-separator-color`, so one component shipped both spellings and
+neither reading was wrong from inside it.
+
+**The family, not the element**, which took a measurement to settle. The obvious
+rule is the tag and it is wrong in both tiers at once: the headless elements are
+`helix-headless-slider` and publish `--slider-*` because the hook is shared with
+the styled tier, and `<helix-tree-item>` publishes `--tree-*` because the hook is
+Tree's rather than the row's. Fifty-odd correct names fail a tag rule and none of
+them should change.
+
+**And a public name cannot be shared**, which is the rule `--_color` was split
+for, applied one level up. Two elements of one family documenting one hook is
+inheritance and is fine. Two *families* is a collision: `--toolbar-gap` was
+declared by `<helix-toolbar>` defaulting to `space-2xs` and by
+`<helix-sandbox-toolbar>` defaulting to `space-sm`, so one declaration on a
+container holding both set two different things and neither component could be
+blamed. A vocabulary genuinely shared across families is registered in `SHARED`
+instead, which `--chart-*` is: `chart/series.css` is imported by four families
+and `MixinChartSource` writes `--chart-series-N` for all of them.
+
 ### The base layer holds helpers, a component holds itself
 
 **A shadow rule loses to a document rule, whatever the specificity and whatever
@@ -704,6 +749,76 @@ keep behavior separate from styling, and there is no behavior to separate.
 Styles are authored in sibling `.css` files. `bun run styles` compiles each into
 a generated `.css.ts` calling `createSheet`. Generated files are gitignored;
 never edit one.
+
+## Parts
+
+**A component that renders another has to publish what it rendered.**
+`::part()` reaches one shadow boundary and stops, so a composition hides its
+child's entire part surface unless it forwards it. Measured before
+`check:exportparts` existed: thirty-seven sites across nineteen families
+composed another element, eight forwarded anything at all, and 148 published
+child parts were unreachable. `color-input` hid all sixteen of `color-picker`'s
+and `date-input` all thirteen of `date-picker`'s, which are the components a
+consumer reaches for first, so the composed half of the library was also the
+least styleable half.
+
+- **Forward everything the child publishes.** Withholding a part protects
+  nothing, the child publishing it on its own element already; the only effect
+  is that the composed component is less useful than its parts.
+- **Prefix with the role**, which is the `part` the parent gave the child, or
+  the name it chose for the child's contribution where it renders no part of its
+  own. Bare forwarding collides and had: `command` forwarded the listbox's
+  `search-field` under a name it also rendered itself, so
+  `helix-command::part(search-field)` matched two elements.
+- **A part already named for its role keeps the role alone.** A `dialog` inside
+  the `dialog` role is `dialog`, not `dialog-dialog`. The two forwards that
+  predate the rule were both written this way, which is the usual sign of the
+  right one, and what keeps the collapse safe is that the parent may not then
+  render the role itself.
+- **A forwarded part still needs its `@csspart`**, and `check:parts` is what
+  asks: it counts an `exportparts` name as rendered, so a forward without a
+  declaration fails there rather than in `check:exportparts`. The two are one
+  contract read from two ends.
+
+**A `::part()` written from outside is checked too, and nothing checked it
+before.** `check:selectors` reads `[part="x"]` inside a component's own sheet and
+stops there, so a selector naming a part nothing publishes was unchecked in every
+example sheet, doc page and app file in the repository. `check:exportparts`
+covers it, and it had eight. `INDICATOR` in `build-headless-examples.mjs` names
+the box its indicator is positioned against, and three of its four families were
+given a part they do not render, so the `position: relative` never landed and
+every indicator in those examples measured against the wrong containing block:
+measured after the fix, the toggle group's indicator now reports `track` as its
+`offsetParent` and reported something else before. `splitter` was given `divider`
+twice in a file whose own comment says splitter has a `separator` and no
+`divider`, and `overriding-a-component.mdx`, the page that teaches parts, styled
+`helix-dialog::part(panel)` on an element publishing `dialog`.
+
+**Words that name a position draw from a registry; words that name a thing do
+not.** `check:vocabulary` holds the first set to one spelling each: `box`,
+`container`, `content`, `panel`, `surface`, `viewport`. A `thumb`, a `terminus`,
+a `swatch` is that component's own word and no registry should have an opinion
+about it.
+
+This is `check:axes` one stage later. That check exists because `appearance` had
+become one word for four questions; this one exists because the reverse happened
+to parts, nine words meaning "the box in the middle" across 204 names. `drawer`
+used both `panel` and `content`; `accordion` used both `content` and
+`container`.
+
+**Two renames were the component telling on itself**, which is the kind worth
+trusting. `Menu` published its floating panel as `menu` and described it in its
+own JSDoc as "the floating panel the menu is drawn on", which is the sentence
+five other families spell `surface`. `Megamenu` published `panel` while the
+accessor reading it, one file over, is called `surface`. The third, `wrapper` to
+`container`, was simply the library's only one.
+
+**And one word looked like a synonym and was not.** `Steps` renders `body` and
+`content` both, and they are different boxes: `content` is what the stage holds
+while it is open, `body` is the step's name and its description together.
+Renaming it would have merged two things. It sits in `UNRESOLVED` naming what it
+turns out to be, the way `check:axes` names work rather than blocking on it.
+
 
 ## The manifest
 

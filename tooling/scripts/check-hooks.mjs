@@ -54,7 +54,8 @@
  * `<helix-pin-input>` published `--pin-gap`. `<helix-breadcrumb>` published
  * `--breadcrumb-hover-color` and `--breadcrumb-control-size` beside its own
  * `--breadcrumbs-separator-color`, so one component shipped both spellings and
- * neither reading was wrong from inside it.
+ * neither reading was wrong from inside it. The sandbox published
+ * `--status-bar-color` and `--terminal-size`, which name no component at all.
  *
  * **The family, not the element**, which took a measurement to settle. The
  * obvious rule is the tag, and it is wrong in both tiers at once: the headless

@@ -56,10 +56,17 @@ import '../../listbox/index.js'
  * @csspart trigger - The closed control, which says what is chosen.
  * @csspart surface - The floating panel.
  * @csspart listbox - The list inside it.
- * @csspart items - The scrolling box of options, forwarded from the listbox.
- * @csspart empty - What shows with no options in it, forwarded from the listbox.
  * @csspart hint - Help under the trigger.
  * @csspart feedback - What is wrong with it.
+ * @csspart listbox-empty - Shown when a filter has hidden everything.
+ * @csspart listbox-feedback - What is wrong with it.
+ * @csspart listbox-filter-icon - The mark beside that field.
+ * @csspart listbox-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart listbox-hint - Help under the list.
+ * @csspart listbox-items - The list itself.
+ * @csspart listbox-label - The question, over the list.
+ * @csspart listbox-search - The region holding the field that narrows the list.
+ * @csspart listbox-search-field - The field itself.
  */
 @customElement('helix-headless-select')
 export class HelixHeadlessSelect extends MixinControllerOpen(
@@ -289,7 +296,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       loading-text=${this.loadingText}
       ?loading=${this.loading}
       part="listbox"
-      exportparts="items, empty"
+      exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
+        filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
+        label: listbox-label, search: listbox-search, search-field: listbox-search-field"
       .value=${this.value}
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}

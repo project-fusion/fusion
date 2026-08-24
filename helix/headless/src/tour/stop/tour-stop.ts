@@ -62,6 +62,9 @@ import '../../button/index.js'
  * @csspart back - The control that goes to the previous stop.
  * @csspart next - The control that goes on, and finishes on the last stop.
  * @csspart skip - The control that leaves the tour.
+ * @csspart back-button - The inner control.
+ * @csspart next-button - The inner control.
+ * @csspart skip-button - The inner control.
  */
 @customElement('helix-headless-tour-stop')
 export class HelixHeadlessTourStop extends HelixElement {
@@ -163,7 +166,9 @@ export class HelixHeadlessTourStop extends HelixElement {
    */
   protected renderActions(): TemplateResult {
     return html`<slot name="actions">
-      <${this.tag('button')} part="skip" appearance="ghost" @click=${() => this.ask('skip')}>
+      <${this.tag('button')}
+        part="skip"
+      exportparts="button: skip-button" appearance="ghost" @click=${() => this.ask('skip')}>
         ${this.skipLabel}
       </${this.tag('button')}>
       ${
@@ -171,6 +176,7 @@ export class HelixHeadlessTourStop extends HelixElement {
           ? ''
           : html`<${this.tag('button')}
               part="back"
+      exportparts="button: back-button"
               appearance="outlined"
               @click=${() => this.ask('back')}
             >
@@ -179,6 +185,7 @@ export class HelixHeadlessTourStop extends HelixElement {
       }
       <${this.tag('button')}
         part="next"
+      exportparts="button: next-button"
         appearance="solid"
         tone="primary"
         @click=${() => this.ask('next')}

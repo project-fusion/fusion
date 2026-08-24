@@ -89,6 +89,22 @@ const dates = (value: string): string[] =>
  * @csspart trigger-icon - The mark on the button that opens the calendar.
  * @csspart surface - The floating panel.
  * @csspart picker - The date picker inside it.
+ * @csspart date-dismiss - The remove button, when `dismissible`.
+ * @csspart date-dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart date-prefix - The category before the label.
+ * @csspart picker-cell - One column of a row, which is what a range paints.
+ * @csspart picker-day - The shape inside a cell, which is what a single date paints.
+ * @csspart picker-grid - The grid of days.
+ * @csspart picker-header - The month name and its controls.
+ * @csspart picker-heading - The month and year being shown.
+ * @csspart picker-month - One month, its header and its grid.
+ * @csspart picker-months - The run of months.
+ * @csspart picker-next - The control that moves to the next month.
+ * @csspart picker-next-mark - The glyph on the next month control.
+ * @csspart picker-previous - The control that moves to the previous month.
+ * @csspart picker-previous-mark - The glyph on the previous month control.
+ * @csspart picker-week - One row of days.
+ * @csspart picker-weekday - A column header naming a day of the week.
  */
 @customElement('helix-headless-date-input')
 export class HelixHeadlessDateInput extends MixinControllerOpen(
@@ -569,6 +585,10 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   protected renderPicker(): TemplateResult {
     return html`<${this.tag('date-picker')}
       part="picker"
+      exportparts="cell: picker-cell, day: picker-day, grid: picker-grid, header: picker-header,
+        heading: picker-heading, month: picker-month, months: picker-months, next: picker-next,
+        next-mark: picker-next-mark, previous: picker-previous, previous-mark: picker-previous-mark,
+        week: picker-week, weekday: picker-weekday"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
       months=${this.months}
@@ -596,6 +616,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   protected renderTag(date: string): TemplateResult {
     return html`<${this.tag('tag')}
                   part="date"
+      exportparts="dismiss: date-dismiss, dismiss-mark: date-dismiss-mark, prefix: date-prefix"
                   dismissible
                   dismiss-label=${`Remove ${date}`}
                   ?disabled=${this.isDisabled}

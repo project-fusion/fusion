@@ -7690,9 +7690,9 @@ export type CustomCssProperties = {
   /** Color of the chevron. */
   "--breadcrumbs-separator-color"?: string;
   /** Fill behind a step under the pointer. */
-  "--breadcrumb-hover-color"?: string;
+  "--breadcrumbs-hover-color"?: string;
   /** How tall a control slotted into a crumb is. */
-  "--breadcrumb-control-size"?: string;
+  "--breadcrumbs-control-size"?: string;
   /** Space between items and separators. */
   "--breadcrumbs-gap"?: string;
   /** Space between the buttons, when `spaced`. */
@@ -8042,7 +8042,7 @@ export type CustomCssProperties = {
   /** The box every control in the row takes. */
   "--pagination-size"?: string;
   /** Space between one box and the next. */
-  "--pin-gap"?: string;
+  "--pin-input-gap"?: string;
   /** Color of the panel's edge. */
   "--popover-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
@@ -8128,11 +8128,11 @@ export type CustomCssProperties = {
   /** Minimum height of the pane. */
   "--sandbox-source-min-block-size"?: string;
   /** Color of the bar's text. */
-  "--status-bar-color"?: string;
+  "--sandbox-status-bar-color"?: string;
   /** Height of the scrolling region. */
-  "--terminal-size"?: string;
+  "--sandbox-terminal-size"?: string;
   /** Space between items. */
-  "--toolbar-gap"?: string;
+  "--sandbox-toolbar-gap"?: string;
   /** The bar's height. Defaults to a large control. */
   "--sandbox-toolbar-size"?: string;
   /** How deep the fades are, at both edges. */
@@ -8317,6 +8317,8 @@ export type CustomCssProperties = {
   "--toast-inline-size"?: string;
   /** Fill of the moving marker. */
   "--toggle-group-indicator-color"?: string;
+  /** Space between controls. */
+  "--toolbar-gap"?: string;
   /** Size of the point at the bubble's edge. */
   "--tooltip-arrow-size"?: string;
   /** Blur behind a `glass` bubble. */

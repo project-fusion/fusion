@@ -66,6 +66,24 @@ helix-headless-time-input::part(surface) {
   padding: 0.5rem;
 }
 
+helix-headless-time-input::part(time-dismiss-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-time-input::part(picker-column-filter-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-time-input::part(picker-list-filter-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

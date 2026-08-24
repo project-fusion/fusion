@@ -85,6 +85,24 @@ helix-headless-video::part(previous) {
   cursor: pointer;
 }
 
+helix-headless-video::part(captions-menu-back-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-video::part(entry-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-video::part(overflow-back-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-headless-video-playlist-item::part(item) {
   background-color: transparent;
   border: 0;
@@ -113,6 +131,18 @@ helix-headless-video-playlist-menu::part(trigger) {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
+}
+
+helix-headless-video-playlist-menu::part(entry-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-video-playlist-menu::part(menu-back-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-headless-icon::part(svg) {

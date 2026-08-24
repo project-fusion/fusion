@@ -76,7 +76,7 @@ helix-headless-toggle::part(item):focus-visible {
   outline-offset: 2px;
 }
 
-helix-headless-toggle-group::part(group) {
+helix-headless-toggle-group::part(track) {
   position: relative;
 }
 

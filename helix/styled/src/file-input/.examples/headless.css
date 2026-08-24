@@ -71,6 +71,18 @@ helix-headless-file-input::part(list) {
   gap: 0.25rem;
 }
 
+helix-headless-file-input::part(kind-dismiss-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-file-input::part(size-dismiss-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

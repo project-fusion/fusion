@@ -13,8 +13,8 @@ describe('menu server output', () => {
       ssr(html`<helix-headless-menu label="Actions"></helix-headless-menu>`),
     )
     expect(markup).toContain('name="trigger"')
-    expect(hasPart(markup, 'menu')).toBe(true)
-    expect(partTag(markup, 'menu')).toContain('hidden')
+    expect(hasPart(markup, 'surface')).toBe(true)
+    expect(partTag(markup, 'surface')).toContain('hidden')
   })
 
   test('open reaches the served markup as the hook the styles select on', () => {

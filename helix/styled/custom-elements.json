@@ -5280,11 +5280,11 @@
             },
             {
               "description": "Fill behind a step under the pointer.",
-              "name": "--breadcrumb-hover-color"
+              "name": "--breadcrumbs-hover-color"
             },
             {
               "description": "How tall a control slotted into a crumb is.",
-              "name": "--breadcrumb-control-size"
+              "name": "--breadcrumbs-control-size"
             }
           ],
           "cssParts": [
@@ -10878,6 +10878,38 @@
                 "name": "HelixHeadlessCodeBlock",
                 "module": "src/code-block/root/code-block-root.ts"
               }
+            },
+            {
+              "description": "The inner button.",
+              "name": "copy-button",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCodeBlock",
+                "module": "src/code-block/root/code-block-root.ts"
+              }
+            },
+            {
+              "description": "The clipboard glyph, and the confirmation that replaces it.",
+              "name": "copy-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCodeBlock",
+                "module": "src/code-block/root/code-block-root.ts"
+              }
+            },
+            {
+              "description": "The bubble, forwarded from the tooltip inside.",
+              "name": "copy-tooltip",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCodeBlock",
+                "module": "src/code-block/root/code-block-root.ts"
+              }
+            },
+            {
+              "description": "The point, resting against the trigger.",
+              "name": "copy-tooltip-arrow",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCodeBlock",
+                "module": "src/code-block/root/code-block-root.ts"
+              }
             }
           ],
           "attributes": [
@@ -12641,6 +12673,198 @@
                 "name": "HelixHeadlessColorInput",
                 "module": "src/color-input/root/color-input-root.ts"
               }
+            },
+            {
+              "description": "The group holding the eyedropper and the syntax toggle.",
+              "name": "picker-actions",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "One ramp.",
+              "name": "picker-channel",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The ramps beside it.",
+              "name": "picker-channels",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The row under the square.",
+              "name": "picker-controls",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The control that samples a color from the screen.",
+              "name": "picker-eyedropper",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The row holding the value and the tools.",
+              "name": "picker-footer",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The control that changes the syntax the value is written in.",
+              "name": "picker-format",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The saturation and brightness square.",
+              "name": "picker-grid",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The range input for its vertical axis.",
+              "name": "picker-grid-brightness",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The mark showing where in the square the color sits.",
+              "name": "picker-grid-handle",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The range input for the square's horizontal axis.",
+              "name": "picker-grid-saturation",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "A glyph this component draws.",
+              "name": "picker-icon",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The chip of the current color, which copies it when pressed.",
+              "name": "picker-sample",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "One preset.",
+              "name": "picker-swatch",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The row of presets.",
+              "name": "picker-swatches",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The color as text, which can be typed or pasted.",
+              "name": "picker-value",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The range input.",
+              "name": "picker-channel-control",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The row: the control and its readout.",
+              "name": "picker-channel-field",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "One mark.",
+              "name": "picker-channel-marker",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The value a mark stands at, when `marker-labels` is set.",
+              "name": "picker-channel-marker-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The row of marks along the track.",
+              "name": "picker-channel-markers",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The current value, shown beside it.",
+              "name": "picker-channel-output",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The inner control.",
+              "name": "picker-eyedropper-button",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The inner control.",
+              "name": "picker-format-button",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
             }
           ],
           "events": [
@@ -13899,6 +14123,70 @@
             {
               "description": "One preset.",
               "name": "swatch",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The range input.",
+              "name": "channel-control",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The row: the control and its readout.",
+              "name": "channel-field",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "One mark.",
+              "name": "channel-marker",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The value a mark stands at, when `marker-labels` is set.",
+              "name": "channel-marker-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The row of marks along the track.",
+              "name": "channel-markers",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The current value, shown beside it.",
+              "name": "channel-output",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The inner control.",
+              "name": "eyedropper-button",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The inner control.",
+              "name": "format-button",
               "inheritedFrom": {
                 "name": "HelixHeadlessColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -15728,16 +16016,96 @@
               }
             },
             {
-              "description": "The scrolling box of options, forwarded from the listbox.",
-              "name": "items",
+              "description": "Shown when a filter has hidden everything.",
+              "name": "listbox-empty",
               "inheritedFrom": {
                 "name": "HelixHeadlessCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
               }
             },
             {
-              "description": "What shows where the filter has hidden everything, forwarded from the listbox.",
-              "name": "empty",
+              "description": "What is wrong with it.",
+              "name": "listbox-feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The mark beside that field.",
+              "name": "listbox-filter-icon",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The glyph beside the filter field, where none is slotted.",
+              "name": "listbox-filter-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "Help under the list.",
+              "name": "listbox-hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The list itself.",
+              "name": "listbox-items",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the list.",
+              "name": "listbox-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "listbox-search",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "listbox-search-field",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The remove button, when `dismissible`.",
+              "name": "tag-dismiss",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "tag-dismiss-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The category before the label. from the listbox.",
+              "name": "tag-prefix",
               "inheritedFrom": {
                 "name": "HelixHeadlessCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -16403,38 +16771,6 @@
               }
             },
             {
-              "description": "The scrolling box of commands, forwarded from the listbox.",
-              "name": "items",
-              "inheritedFrom": {
-                "name": "HelixHeadlessCommand",
-                "module": "src/command/root/command-root.ts"
-              }
-            },
-            {
-              "description": "What shows where the filter has hidden everything.",
-              "name": "empty",
-              "inheritedFrom": {
-                "name": "HelixHeadlessCommand",
-                "module": "src/command/root/command-root.ts"
-              }
-            },
-            {
-              "description": "The glyph beside the field, forwarded from the listbox.",
-              "name": "filter-mark",
-              "inheritedFrom": {
-                "name": "HelixHeadlessCommand",
-                "module": "src/command/root/command-root.ts"
-              }
-            },
-            {
-              "description": "The region holding the field that narrows the list.",
-              "name": "search",
-              "inheritedFrom": {
-                "name": "HelixHeadlessCommand",
-                "module": "src/command/root/command-root.ts"
-              }
-            },
-            {
               "description": "The field itself.",
               "name": "search-field",
               "inheritedFrom": {
@@ -16445,6 +16781,78 @@
             {
               "description": "The row under the list.",
               "name": "footer",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "Shown when a filter has hidden everything.",
+              "name": "listbox-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "listbox-feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "The mark beside that field.",
+              "name": "listbox-filter-icon",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "The glyph beside the filter field, where none is slotted.",
+              "name": "listbox-filter-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "Help under the list.",
+              "name": "listbox-hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "The list itself.",
+              "name": "listbox-items",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the list.",
+              "name": "listbox-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "listbox-search",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "listbox-search-field",
               "inheritedFrom": {
                 "name": "HelixHeadlessCommand",
                 "module": "src/command/root/command-root.ts"
@@ -17353,6 +17761,14 @@
             {
               "description": "The bubble, forwarded from the tooltip inside.",
               "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCopyButton",
+                "module": "src/copy-button/root/copy-button-root.ts"
+              }
+            },
+            {
+              "description": "The point, resting against the trigger.",
+              "name": "tooltip-arrow",
               "inheritedFrom": {
                 "name": "HelixHeadlessCopyButton",
                 "module": "src/copy-button/root/copy-button-root.ts"
@@ -19132,6 +19548,134 @@
             {
               "description": "The date picker inside it.",
               "name": "picker",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The remove button, when `dismissible`.",
+              "name": "date-dismiss",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "date-dismiss-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The category before the label.",
+              "name": "date-prefix",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "One column of a row, which is what a range paints.",
+              "name": "picker-cell",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The shape inside a cell, which is what a single date paints.",
+              "name": "picker-day",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The grid of days.",
+              "name": "picker-grid",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The month name and its controls.",
+              "name": "picker-header",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The month and year being shown.",
+              "name": "picker-heading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "One month, its header and its grid.",
+              "name": "picker-month",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The run of months.",
+              "name": "picker-months",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The control that moves to the next month.",
+              "name": "picker-next",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the next month control.",
+              "name": "picker-next-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The control that moves to the previous month.",
+              "name": "picker-previous",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the previous month control.",
+              "name": "picker-previous-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "One row of days.",
+              "name": "picker-week",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "A column header naming a day of the week.",
+              "name": "picker-weekday",
               "inheritedFrom": {
                 "name": "HelixHeadlessDateInput",
                 "module": "src/date-input/root/date-input-root.ts"
@@ -25570,6 +26114,54 @@
             {
               "description": "The control that takes it back out.",
               "name": "remove",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "The remove button, when `dismissible`.",
+              "name": "kind-dismiss",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "kind-dismiss-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "The category before the label.",
+              "name": "kind-prefix",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "The remove button, when `dismissible`.",
+              "name": "size-dismiss",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "size-dismiss-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "The category before the label.",
+              "name": "size-prefix",
               "inheritedFrom": {
                 "name": "HelixHeadlessFileInput",
                 "module": "src/file-input/root/file-input-root.ts"
@@ -34563,7 +35155,7 @@
               "name": "panel",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.trigger, /* The host, not the panel. A press on the trigger is a press on this element, and counting it as outside would close the panel on the way to the click that toggles it. `Menu` says the same about its own. */ boundary: () => this, onDismiss: () => this.close(), place: () => !this.banded, placement: () => 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"panel\"]'), })",
+              "default": "new PopoverController(this, { anchor: () => this.trigger, /* The host, not the panel. A press on the trigger is a press on this element, and counting it as outside would close the panel on the way to the click that toggles it. `Menu` says the same about its own. */ boundary: () => this, onDismiss: () => this.close(), place: () => !this.banded, placement: () => 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
               "inheritedFrom": {
                 "name": "HelixHeadlessMegamenu",
                 "module": "src/megamenu/root/megamenu-root.ts"
@@ -35069,8 +35661,8 @@
               }
             },
             {
-              "description": "The region that opens.",
-              "name": "panel",
+              "description": "The floating panel, which is what opens.",
+              "name": "surface",
               "inheritedFrom": {
                 "name": "HelixHeadlessMegamenu",
                 "module": "src/megamenu/root/megamenu-root.ts"
@@ -36173,7 +36765,7 @@
               "name": "panel",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.trigger, // The host is `display: contents`, so it has no box a press can land in. // What counts as inside is the surface, plus the trigger, whose own click // handler decides what a press there means. boundary: () => this, offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"menu\"]'), })",
+              "default": "new PopoverController(this, { anchor: () => this.trigger, // The host is `display: contents`, so it has no box a press can land in. // What counts as inside is the surface, plus the trigger, whose own click // handler decides what a press there means. boundary: () => this, offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"surface\"]'), })",
               "inheritedFrom": {
                 "name": "HelixHeadlessMenu",
                 "module": "src/menu/root/menu-root.ts"
@@ -36658,7 +37250,7 @@
             },
             {
               "description": "The floating panel the menu is drawn on.",
-              "name": "menu",
+              "name": "surface",
               "inheritedFrom": {
                 "name": "HelixHeadlessMenu",
                 "module": "src/menu/root/menu-root.ts"
@@ -42806,7 +43398,7 @@
           "cssProperties": [
             {
               "description": "Space between one box and the next.",
-              "name": "--pin-gap"
+              "name": "--pin-input-gap"
             }
           ],
           "cssParts": [
@@ -50219,7 +50811,7 @@
           "cssProperties": [
             {
               "description": "Color of the bar's text.",
-              "name": "--status-bar-color"
+              "name": "--sandbox-status-bar-color"
             }
           ],
           "cssParts": [
@@ -50485,7 +51077,7 @@
           "cssProperties": [
             {
               "description": "Height of the scrolling region.",
-              "name": "--terminal-size"
+              "name": "--sandbox-terminal-size"
             }
           ],
           "cssParts": [
@@ -50797,7 +51389,7 @@
           "cssProperties": [
             {
               "description": "Space between items.",
-              "name": "--toolbar-gap"
+              "name": "--sandbox-toolbar-gap"
             },
             {
               "description": "The bar's height. Defaults to a large control.",
@@ -52716,22 +53308,6 @@
               }
             },
             {
-              "description": "The scrolling box of options, forwarded from the listbox.",
-              "name": "items",
-              "inheritedFrom": {
-                "name": "HelixHeadlessSelect",
-                "module": "src/select/root/select-root.ts"
-              }
-            },
-            {
-              "description": "What shows with no options in it, forwarded from the listbox.",
-              "name": "empty",
-              "inheritedFrom": {
-                "name": "HelixHeadlessSelect",
-                "module": "src/select/root/select-root.ts"
-              }
-            },
-            {
               "description": "Help under the trigger.",
               "name": "hint",
               "inheritedFrom": {
@@ -52742,6 +53318,78 @@
             {
               "description": "What is wrong with it.",
               "name": "feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "Shown when a filter has hidden everything.",
+              "name": "listbox-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "listbox-feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "The mark beside that field.",
+              "name": "listbox-filter-icon",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "The glyph beside the filter field, where none is slotted.",
+              "name": "listbox-filter-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "Help under the list.",
+              "name": "listbox-hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "The list itself.",
+              "name": "listbox-items",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the list.",
+              "name": "listbox-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "listbox-search",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "listbox-search-field",
               "inheritedFrom": {
                 "name": "HelixHeadlessSelect",
                 "module": "src/select/root/select-root.ts"
@@ -58715,6 +59363,14 @@
             {
               "description": "The half line running on to the next.",
               "name": "trail",
+              "inheritedFrom": {
+                "name": "HelixHeadlessStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "The inner control.",
+              "name": "label-button",
               "inheritedFrom": {
                 "name": "HelixHeadlessStep",
                 "module": "src/steps/step/step.ts"
@@ -65865,6 +66521,238 @@
                 "name": "HelixHeadlessTimeInput",
                 "module": "src/time-input/root/time-input-root.ts"
               }
+            },
+            {
+              "description": "One of them.",
+              "name": "picker-column",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The row of columns, in `wheels`.",
+              "name": "picker-columns",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "What it says when nothing matches, forwarded from the listbox.",
+              "name": "picker-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The scrolling column inside it, forwarded from the listbox.",
+              "name": "picker-items",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The listbox holding the times, in `list`.",
+              "name": "picker-list",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "One time in it. Carries `data-between` inside a range.",
+              "name": "picker-option",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The remove button, when `dismissible`.",
+              "name": "time-dismiss",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "time-dismiss-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The category before the label.",
+              "name": "time-prefix",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "Shown when a filter has hidden everything.",
+              "name": "picker-column-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "picker-column-feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The mark beside that field.",
+              "name": "picker-column-filter-icon",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph beside the filter field, where none is slotted.",
+              "name": "picker-column-filter-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the list.",
+              "name": "picker-column-hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The list itself.",
+              "name": "picker-column-items",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the list.",
+              "name": "picker-column-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "picker-column-search",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "picker-column-search-field",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "Shown when a filter has hidden everything.",
+              "name": "picker-list-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "picker-list-feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The mark beside that field.",
+              "name": "picker-list-filter-icon",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph beside the filter field, where none is slotted.",
+              "name": "picker-list-filter-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the list.",
+              "name": "picker-list-hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The list itself.",
+              "name": "picker-list-items",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the list.",
+              "name": "picker-list-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "picker-list-search",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "picker-list-search-field",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The row.",
+              "name": "picker-option-item",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The words.",
+              "name": "picker-option-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
             }
           ],
           "events": [
@@ -67091,24 +67979,168 @@
               }
             },
             {
-              "description": "The scrolling column inside it, forwarded from the listbox.",
-              "name": "items",
-              "inheritedFrom": {
-                "name": "HelixHeadlessTimePicker",
-                "module": "src/time-picker/root/time-picker-root.ts"
-              }
-            },
-            {
-              "description": "What it says when nothing matches, forwarded from the listbox.",
-              "name": "empty",
-              "inheritedFrom": {
-                "name": "HelixHeadlessTimePicker",
-                "module": "src/time-picker/root/time-picker-root.ts"
-              }
-            },
-            {
               "description": "One time in it. Carries `data-between` inside a range.",
               "name": "option",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "Shown when a filter has hidden everything.",
+              "name": "column-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "column-feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The mark beside that field.",
+              "name": "column-filter-icon",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The glyph beside the filter field, where none is slotted.",
+              "name": "column-filter-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "Help under the list.",
+              "name": "column-hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The list itself.",
+              "name": "column-items",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the list.",
+              "name": "column-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "column-search",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "column-search-field",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "Shown when a filter has hidden everything.",
+              "name": "list-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "list-feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The mark beside that field.",
+              "name": "list-filter-icon",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The glyph beside the filter field, where none is slotted.",
+              "name": "list-filter-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "Help under the list.",
+              "name": "list-hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The list itself.",
+              "name": "list-items",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the list.",
+              "name": "list-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "list-search",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "list-search-field",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The row.",
+              "name": "option-item",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The words.",
+              "name": "option-label",
               "inheritedFrom": {
                 "name": "HelixHeadlessTimePicker",
                 "module": "src/time-picker/root/time-picker-root.ts"
@@ -71108,6 +72140,7 @@
               "name": "showNow",
               "privacy": "private",
               "readonly": true,
+              "description": "Focus opens the bubble, but only the kind of focus a reader chose.\n\n**A mouse press focuses the button it pressed**, so an unconditional focus\nhold meant that after any click the bubble was held up by a reader who was\nnot asking for it: moving the pointer away released the pointer hold, found\na focus hold still set, and left the tooltip on screen until something else\nblurred the control.\n\nIt never showed until `persist` arrived, because activation used to clear\nevery hold and hide, so the click path threw the stale hold away before\nanyone could see it. A tooltip that survives its own activation is the first\none to hold that focus long enough to matter.\n\n`:focus-visible` is the platform's own answer to \"did they mean it\", and a\nbutton does not match it on a mouse press. Keyboard focus still opens with no\ndelay, which is the case this branch exists for: a reader who tabbed to a\ncontrol has already committed to it. Where it does not match there is nothing\nto do, the pointer having opened the bubble already if a pointer is involved.",
               "inheritedFrom": {
                 "name": "HelixHeadlessTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
@@ -72849,6 +73882,30 @@
             {
               "description": "The control that leaves the tour.",
               "name": "skip",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTourStop",
+                "module": "src/tour/stop/tour-stop.ts"
+              }
+            },
+            {
+              "description": "The inner control.",
+              "name": "back-button",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTourStop",
+                "module": "src/tour/stop/tour-stop.ts"
+              }
+            },
+            {
+              "description": "The inner control.",
+              "name": "next-button",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTourStop",
+                "module": "src/tour/stop/tour-stop.ts"
+              }
+            },
+            {
+              "description": "The inner control.",
+              "name": "skip-button",
               "inheritedFrom": {
                 "name": "HelixHeadlessTourStop",
                 "module": "src/tour/stop/tour-stop.ts"
@@ -75203,7 +76260,7 @@
           "cssParts": [
             {
               "description": "The `listitem`, which the button sits in.",
-              "name": "wrapper",
+              "name": "container",
               "inheritedFrom": {
                 "name": "HelixHeadlessVideoPlaylistItem",
                 "module": "src/video-playlist/item/video-playlist-item.ts"
@@ -75680,6 +76737,70 @@
             {
               "description": "The button that opens it.",
               "name": "trigger",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "The row, which is an `<a>` where `href` is set.",
+              "name": "entry-item",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "The trailing mark: a tick when checked, a caret when it opens",
+              "name": "entry-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "The leading column, which is a slot and is always there.",
+              "name": "entry-start",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "The control that returns from a submenu.",
+              "name": "menu-back",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "The glyph on the back control of a submenu.",
+              "name": "menu-back-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "The bar above a submenu, holding the way back and its name.",
+              "name": "menu-header",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "The name of the submenu that is showing.",
+              "name": "menu-title",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "The floating panel the menu is drawn on.",
+              "name": "menu-surface",
               "inheritedFrom": {
                 "name": "HelixHeadlessVideoPlaylistMenu",
                 "module": "src/video-playlist/menu/video-playlist-menu.ts"
@@ -78148,6 +79269,118 @@
             {
               "description": "The whole screen, and back.",
               "name": "fullscreen",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The control that returns from a submenu.",
+              "name": "captions-menu-back",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the back control of a submenu.",
+              "name": "captions-menu-back-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The bar above a submenu, holding the way back and its name.",
+              "name": "captions-menu-header",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The name of the submenu that is showing.",
+              "name": "captions-menu-title",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "One row in a menu this player opens.",
+              "name": "entry",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The row, which is an `<a>` where `href` is set.",
+              "name": "entry-item",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The trailing mark: a tick when checked, a caret when it opens",
+              "name": "entry-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The leading column, which is a slot and is always there.",
+              "name": "entry-start",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The control that returns from a submenu.",
+              "name": "overflow-back",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the back control of a submenu.",
+              "name": "overflow-back-mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The bar above a submenu, holding the way back and its name.",
+              "name": "overflow-header",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The name of the submenu that is showing.",
+              "name": "overflow-title",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The floating panel the menu is drawn on.",
+              "name": "captions-menu-surface",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The floating panel the menu is drawn on.",
+              "name": "overflow-surface",
               "inheritedFrom": {
                 "name": "HelixHeadlessVideo",
                 "module": "src/video/root/video-root.ts"

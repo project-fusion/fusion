@@ -80,6 +80,7 @@ import '../../button/index.js'
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
  * @csspart marker - The shape carrying the number or the check.
  * @csspart trail - The half line running on to the next.
+ * @csspart label-button - The inner control.
  *
  * @event {HelixSelectEvent} helix-select - Fired when the step is pressed.
  */
@@ -156,6 +157,7 @@ export class HelixHeadlessStep extends HelixElement {
   protected renderLabel(): TemplateResult {
     return html`<${this.tag('button')}
       part="label"
+      exportparts="button: label-button"
       appearance="ghost"
       ?disabled=${this.disabled}
       @click=${this.select}

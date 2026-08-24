@@ -104,9 +104,27 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart list - The listbox holding the times, in `list`.
  * @csspart columns - The row of columns, in `wheels`.
  * @csspart column - One of them.
- * @csspart items - The scrolling column inside it, forwarded from the listbox.
- * @csspart empty - What it says when nothing matches, forwarded from the listbox.
  * @csspart option - One time in it. Carries `data-between` inside a range.
+ * @csspart column-empty - Shown when a filter has hidden everything.
+ * @csspart column-feedback - What is wrong with it.
+ * @csspart column-filter-icon - The mark beside that field.
+ * @csspart column-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart column-hint - Help under the list.
+ * @csspart column-items - The list itself.
+ * @csspart column-label - The question, over the list.
+ * @csspart column-search - The region holding the field that narrows the list.
+ * @csspart column-search-field - The field itself.
+ * @csspart list-empty - Shown when a filter has hidden everything.
+ * @csspart list-feedback - What is wrong with it.
+ * @csspart list-filter-icon - The mark beside that field.
+ * @csspart list-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart list-hint - Help under the list.
+ * @csspart list-items - The list itself.
+ * @csspart list-label - The question, over the list.
+ * @csspart list-search - The region holding the field that narrows the list.
+ * @csspart list-search-field - The field itself.
+ * @csspart option-item - The row.
+ * @csspart option-label - The words.
  */
 @customElement('helix-headless-time-picker')
 export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormElement) {
@@ -492,7 +510,9 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     return html`<${this.tag('listbox')}
       part="column"
       data-column=${part}
-      exportparts="items"
+      exportparts="empty: column-empty, feedback: column-feedback, filter-icon: column-filter-icon,
+        filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
+        search: column-search, search-field: column-search-field"
       aria-label=${label}
       ?disabled=${this.isDisabled}
       .value=${value}
@@ -503,7 +523,8 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     >
       ${values.map(
         (one) =>
-          html`<${this.tag('option')} part="option" value=${one} ?disabled=${barred(one)}
+          html`<${this.tag('option')} part="option"
+          exportparts="item: option-item, label: option-label" value=${one} ?disabled=${barred(one)}
             >${written(one)}</${this.tag('option')}
           >`,
       )}
@@ -567,7 +588,9 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   protected renderList(): TemplateResult {
     return html`<${this.tag('listbox')}
       part="list"
-      exportparts="items, empty"
+      exportparts="empty: list-empty, feedback: list-feedback, filter-icon: list-filter-icon,
+        filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,
+        search: list-search, search-field: list-search-field"
       aria-label=${this.label}
       data-unset=${this.value === '' ? '' : nothing}
       ?disabled=${this.isDisabled}
@@ -579,6 +602,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
         const at = fromMinutes(minutes)
         return html`<${this.tag('option')}
           part="option"
+      exportparts="item: option-item, label: option-label"
           value=${at}
           ?disabled=${this.barred(at)}
           data-between=${this.between(at) ? '' : nothing}

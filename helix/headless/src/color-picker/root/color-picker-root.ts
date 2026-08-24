@@ -114,6 +114,14 @@ interface EyeDropperConstructor {
  * @csspart format - The control that changes the syntax the value is written in.
  * @csspart swatches - The row of presets.
  * @csspart swatch - One preset.
+ * @csspart channel-control - The range input.
+ * @csspart channel-field - The row: the control and its readout.
+ * @csspart channel-marker - One mark.
+ * @csspart channel-marker-label - The value a mark stands at, when `marker-labels` is set.
+ * @csspart channel-markers - The row of marks along the track.
+ * @csspart channel-output - The current value, shown beside it.
+ * @csspart eyedropper-button - The inner control.
+ * @csspart format-button - The inner control.
  *
  * @cssproperty --color-picker-brightness - The chosen brightness, 0 to 100, as a percentage.
  * @cssproperty --color-picker-hue - The chosen hue, 0 to 360, unitless.
@@ -393,6 +401,8 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   ): TemplateResult {
     return html`<${this.tag('slider')}
       part="channel"
+      exportparts="control: channel-control, field: channel-field, marker: channel-marker,
+        marker-label: channel-marker-label, markers: channel-markers, output: channel-output"
       data-channel=${channel}
       label=${label}
       max=${max}
@@ -450,6 +460,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                   this.sampling && !this.noEyedropper
                     ? html`<${this.tag('button')}
                         part="eyedropper"
+      exportparts="button: eyedropper-button"
                         aria-label="Sample a color from the screen"
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
@@ -463,6 +474,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                     ? nothing
                     : html`<${this.tag('button')}
                         part="format"
+      exportparts="button: format-button"
                         aria-label=${`Syntax: ${this.format ?? 'hex'}. Change it.`}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}
