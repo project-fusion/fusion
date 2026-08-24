@@ -80,7 +80,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
 ```
 helix/     styles core headless web react icons theme cem docs gallery
 cortex/    core trace engram docs
-docs/      company strategy, tracked
+docs/      company strategy, numbered; two generated references, not
 tooling/   CI and build scripts
 .local/    per-machine scratch, gitignored
 ```

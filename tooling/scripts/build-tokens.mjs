@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process'
 /**
- * Writes `docs/16-token-reference.md` from the token registry.
+ * Writes `docs/token-reference.md` from the token registry.
  *
  * It read `tokens.css` and matched declarations out of it with a regular
  * expression, which worked and was the only reader that source had. The tokens
@@ -35,7 +35,7 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const SOURCE = 'helix/styles/tokens.json'
-const OUTPUT = 'docs/16-token-reference.md'
+const OUTPUT = 'docs/token-reference.md'
 const ROOTS = ['helix', 'site']
 
 /** The fifteen, in the order the stylesheet declares them. */

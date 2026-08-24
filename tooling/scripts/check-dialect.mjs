@@ -141,7 +141,7 @@ const IGNORED = new Set([
    beside it come from the component sources; the references and the catalog
    come from those manifests. */
 const GENERATED =
-  /(\.generated\.\w+|custom-elements\.json|jsx\.d\.ts|vue\.d\.ts|elements\.css|\.css\.ts|11-component-reference\.md|16-token-reference\.md|catalog\.generated\.json|peers\.json|oracle\.json|metrics\.mdx)$/
+  /(\.generated\.\w+|custom-elements\.json|jsx\.d\.ts|vue\.d\.ts|elements\.css|\.css\.ts|component-reference\.md|token-reference\.md|catalog\.generated\.json|peers\.json|oracle\.json|metrics\.mdx)$/
 
 const EXTENSIONS = /\.(css|html|md|mdx|mjs|rs|toml|ts|tsx|yml)$/
 

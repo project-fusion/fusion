@@ -1,6 +1,16 @@
 #!/usr/bin/env bun
 /**
- * Writes `docs/11-component-reference.md` from the manifest.
+ * Writes `docs/component-reference.md` from the manifest.
+ *
+ * **Unnumbered, and that is the point of the name.** It sat at
+ * `11-component-reference.md`, taking a slot in the 00 to 99 strategy sequence
+ * because that is where prose about this repository already lived, and it
+ * arrived there in `2812a45f` beside a List port rather than by decision. A
+ * sequence number is a reading order for documents somebody wrote; this one is
+ * written by a script and nobody reads it in order. `docs/` is still the right
+ * folder: it is repository-internal, which is exactly what this is, and moving
+ * it under `helix/` would either publish a whole-library download that
+ * `coding-agents.mdx` argues against or leave it somewhere with no reader.
  *
  * The document it replaces was transcribed by hand, and had drifted in both
  * directions at once: missing `Divider`, `Menu`, `Tree`, `Flex`, `Grid` and
@@ -33,7 +43,7 @@ import { reference, referenceFamilies } from '../../helix/docs/src/reference.ts'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const MANIFEST = 'helix/web/custom-elements.json'
-const OUTPUT = 'docs/11-component-reference.md'
+const OUTPUT = 'docs/component-reference.md'
 
 const manifest = JSON.parse(readFileSync(join(ROOT, MANIFEST), 'utf8'))
 
