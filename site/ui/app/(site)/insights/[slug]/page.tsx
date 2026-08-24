@@ -61,60 +61,53 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     <DocumentPage
       body={await renderMdx(source)}
       footer={
-        <>
-          <helix-flex class="insightMore" direction="column" gap="lg">
-            <helix-divider></helix-divider>
-            <helix-flex align="center" gap="md" justify="between" wrap>
-              <helix-text as="h2" variant="title">
-                Keep reading
-              </helix-text>
-              {/* Quiet rather than the default link treatment: a bright underlined
+        <helix-flex class="insightMore" direction="column" gap="lg">
+          <helix-divider></helix-divider>
+          <helix-flex align="center" gap="md" justify="between" wrap>
+            <helix-text as="h2" variant="title">
+              Keep reading
+            </helix-text>
+            {/* Quiet rather than the default link treatment: a bright underlined
                   link beside a section heading competes with the heading, and this
                   is an escape hatch under three rows that are themselves the main
                   way on. No arrow. The rows carry one because each of them is a
                   destination in a stack of destinations and the glyph says which
                   way they go; this sits beside a heading, where the same glyph is
                   decoration on a link that already reads as one. */}
-              <Link data-link="quiet" href="/insights">
-                All insights
-              </Link>
-            </helix-flex>
+            <Link data-link="quiet" href="/insights">
+              All insights
+            </Link>
+          </helix-flex>
 
-            {/* A hair of space between the rows now that no line divides them. Not
+          {/* A hair of space between the rows now that no line divides them. Not
                 more: these are one list, and a gap wide enough to read as a break
                 would make three lists of them. */}
-            <helix-flex direction="column" gap="2xs">
-              {others.map((other) => (
-                <Link
-                  className={styles.insightNext}
-                  href={`/insights/${other.slug}`}
-                  key={other.slug}
-                >
-                  <helix-flex
-                    align="center"
-                    class={styles.insightNextRow}
-                    gap="md"
-                    justify="between"
-                  >
-                    <helix-flex direction="column" gap="2xs">
-                      <helix-flex align="center" data-density="sm" gap="xs">
-                        <helix-tag>{other.topic}</helix-tag>
-                        <helix-text tone="subtle" variant="caption">
-                          {other.minutes} min
-                        </helix-text>
-                      </helix-flex>
-                      <helix-text variant="title">{other.title}</helix-text>
-                      <helix-text data-measure tone="muted" variant="caption">
-                        {other.summary}
+          <helix-flex direction="column" gap="2xs">
+            {others.map((other) => (
+              <Link
+                className={styles.insightNext}
+                href={`/insights/${other.slug}`}
+                key={other.slug}
+              >
+                <helix-flex align="center" class={styles.insightNextRow} gap="md" justify="between">
+                  <helix-flex direction="column" gap="2xs">
+                    <helix-flex align="center" data-density="sm" gap="xs">
+                      <helix-tag>{other.topic}</helix-tag>
+                      <helix-text tone="subtle" variant="caption">
+                        {other.minutes} min
                       </helix-text>
                     </helix-flex>
-                    <helix-icon name="arrow-right"></helix-icon>
+                    <helix-text variant="title">{other.title}</helix-text>
+                    <helix-text data-measure tone="muted" variant="caption">
+                      {other.summary}
+                    </helix-text>
                   </helix-flex>
-                </Link>
-              ))}
-            </helix-flex>
+                  <helix-icon name="arrow-right"></helix-icon>
+                </helix-flex>
+              </Link>
+            ))}
           </helix-flex>
-        </>
+        </helix-flex>
       }
       lede={insight.summary}
       meta={

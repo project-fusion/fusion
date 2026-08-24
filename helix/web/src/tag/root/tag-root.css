@@ -35,8 +35,26 @@
    * 4.00, with only neutral passing. That is what coloring text with a hue and
    * then washing the background with the same hue does, and no choice of hue
    * fixes it. Darkening the label is what opens the gap back up. */
-  --_tag-fill: color-mix(in oklab, var(--_tag-color) 14%, var(--helix-color-background));
-  --_tag-edge: color-mix(in oklab, var(--_tag-color) 28%, var(--helix-color-background));
+  /* **These mix in sRGB, and the measurement is why.**
+ *
+ * oklab is the right space for choosing a color *between* two colors, which is
+ * what this is, and that is why it was used. What it does against a near-black
+ * ground is compress: measured in Chromium at 14 percent, a tone fill separates
+ * from the page by 30 to 33 sRGB levels in light and by **4 to 10 in dark**,
+ * where the same mix in sRGB gives 26 to 37 in both. A success tag in dark mode
+ * had no fill anybody could see, from a token that works in light.
+ *
+ * That is the same asymmetry #188 records in the surface ramp, arriving through
+ * a mix rather than through a token, and it is the compression #187 predicted
+ * from the hero's wash without yet measuring here.
+ *
+ * Only the mixes toward a *ground* change. `--_tag-label` mixes toward the
+ * foreground and the solid fill mixes toward it too, which is a different
+ * question and is left; the wash toward `transparent` further down is already
+ * the pattern to copy, since the alpha survives and the compositor does the
+ * rest in sRGB at paint time. */
+  --_tag-fill: color-mix(in srgb, var(--_tag-color) 14%, var(--helix-color-background));
+  --_tag-edge: color-mix(in srgb, var(--_tag-color) 28%, var(--helix-color-background));
   --_tag-label: color-mix(in oklab, var(--_tag-color) 55%, var(--helix-color-foreground));
 }
 
@@ -119,7 +137,7 @@ slot:not([name])::slotted(helix-icon) {
    rather than becoming a mosaic. */
 :host([emphasis="outlined"]) {
   --_tag-fill: transparent;
-  --_tag-edge: color-mix(in oklab, var(--_tag-color) 45%, var(--helix-color-background));
+  --_tag-edge: color-mix(in srgb, var(--_tag-color) 45%, var(--helix-color-background));
 }
 
 :host([tone="primary"]) {
