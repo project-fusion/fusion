@@ -1,5 +1,4 @@
-import '@helix-io/styles/all.css'
-import '@helix-io/styled/elements.css'
+import '@helix-io/styled/helix.css'
 import '@helix-io/gallery/gallery.css'
 import './fonts.css'
 import './site.css'

@@ -8,7 +8,7 @@ title: Installation
 # Installation
 
 ```sh
-bun add @helix-io/styled @helix-io/styles
+bun add @helix-io/styled
 ```
 
 `@helix-io/styles` is not optional and not a peer dependency by accident. The
@@ -19,23 +19,21 @@ rather than an unthemed version of itself.
 ## The stylesheets go in this order
 
 ```ts
-import '@helix-io/styles/all.css'
-import '@helix-io/styled/elements.css'
+import '@helix-io/styled/helix.css'
 ```
 
-Two imports, and the second needs the first.
+One import, and it is four files in the order they have to be in:
+`primitives.css`, `tokens.css`, `base.css`, `elements.css`. The order is
+load-bearing and the failure is silent, which these instructions demonstrated
+for longer than anyone would like, so it is stated once inside the package
+rather than by every consumer.
 
-- **`all.css`** is the three layers `@helix-io/styles` owns, in the order they
-  have to be in: `primitives.css`, then `tokens.css`, then `base.css`. It is one
-  entry point rather than three because the order is load-bearing and the
-  failure is silent, which these instructions demonstrated for longer than
-  anyone would like. See below.
-- **`elements.css`** is the components' own layer. It is generated from the
-  component stylesheets and is what lets a page render correct-looking Helix
-  before any JavaScript arrives. It belongs to `@helix-io/styled`, which is why
-  it stays a second import.
+It resolves `@helix-io/styles` through this package's own dependency, so
+installing `@helix-io/styled` is enough. A bare specifier in an `@import` is
+resolved by a bundler and never by a browser, so a page serving CSS through a
+`<link>` takes the four by path instead.
 
-### What is in `all.css`, for anyone substituting a layer
+### The four, for anyone substituting a layer
 
 Each file keeps its own export, so a consumer bringing their own reset or their
 own ramp imports the two they want and skips the bundle.

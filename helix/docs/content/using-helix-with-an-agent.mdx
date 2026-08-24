@@ -105,13 +105,12 @@ attribute, so the attribute selector paints it as live while it refuses input.
 ### 4. Two stylesheets, then the elements
 
 ```ts
-import '@helix-io/styles/all.css'
-import '@helix-io/styled/elements.css'
+import '@helix-io/styled/helix.css'
 import '@helix-io/styled'
 ```
 
-`all.css` is `primitives.css`, `tokens.css` and `base.css` in the order they
-have to be in. Write those three yourself only to substitute one of them.
+`helix.css` is `primitives.css`, `tokens.css`, `base.css` and `elements.css` in
+the order they have to be in. Write them out yourself only to substitute one.
 
 `elements.css` is the one people leave out, and everything works without it
 until the page is server-rendered: an element that has not upgraded has no

@@ -145,8 +145,17 @@ export function DocsNav({ sections }: { sections: readonly NavSection[] }) {
                 <helix-tree-item
                   key={entry.href}
                   slot="children"
-                  value={entry.href}
-                  {...(children.length > 0 ? {} : { href: entry.href })}
+                  {...(children.length > 0
+                    ? /* **A group's value is not its page's path.**
+                       *
+                       * `Tree` marks active whatever `value` matches its
+                       * `active`, so a group that kept the href of the page it
+                       * now holds as a child was selected at the same moment
+                       * that child was: two rows lit for one destination, and
+                       * the group is not a destination at all. It takes the
+                       * same shape a section does. */
+                      { value: `group-${entry.href}` }
+                    : { href: entry.href, value: entry.href })}
                   {...(rows.some((row) => row.href === pathname) ? { 'default-open': true } : {})}
                 >
                   {entry.label}

@@ -22,6 +22,7 @@
     },
     "./custom-elements.json": "./custom-elements.json",
     "./elements.css": "./elements.css",
+    "./helix.css": "./helix.css",
     "./jsx": "./jsx.d.ts",
     "./svelte": "./svelte.d.ts",
     "./vue": "./vue.d.ts"
