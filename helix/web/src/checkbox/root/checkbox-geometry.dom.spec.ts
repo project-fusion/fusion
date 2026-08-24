@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasLayout, mount, part, readyToMove, registerDom } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -95,6 +95,10 @@ if (hasLayout()) {
       const mark = part(host, 'mark') as HTMLElement
       expect(getComputedStyle(mark).maskImage).not.toBe('none')
 
+      /* Transitions are suppressed until the host settles, a frame after its
+         first update, so without this the scale below jumps to its resting
+         value and the moment this test exists to catch never happens. */
+      await readyToMove(host)
       host.checked = false
       await host.updateComplete
       expect(getComputedStyle(mark).scale).toBe('1')
@@ -113,6 +117,7 @@ if (hasLayout()) {
       const mark = part(host, 'mark') as HTMLElement
       expect(getComputedStyle(mark).scale).toBe('0')
 
+      await readyToMove(host)
       host.checked = true
       await host.updateComplete
       expect(mark.getAnimations().map((a) => a.transitionProperty)).toContain('scale')

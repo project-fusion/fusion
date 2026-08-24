@@ -242,6 +242,53 @@ export const settled = async (element: Element | null): Promise<void> => {
 }
 
 /**
+ * Waits until a component's transitions are switched on.
+ *
+ * **`HelixElement` suppresses every transition until it has settled**, with
+ * `:host(:not([data-settled])) *  { transition: none !important }`, and sets
+ * `data-settled` a frame after `firstUpdated` rather than in it. That is
+ * deliberate and is what stops a component animating its own arrival. It also
+ * means `await mount(...)` is not enough for any spec that asserts a transition:
+ * `updateComplete` resolves in the same microtask checkpoint the suppression is
+ * still active in, so the property jumps to its resting value and
+ * `getAnimations()` is empty.
+ *
+ * Two checkbox specs failed exactly that way and were read as a token or a
+ * cascade fault for days. Measured on the mark: the rule was in the adopted
+ * sheet, `--helix-duration-fast` resolved to `120ms` on the element itself,
+ * `prefers-reduced-motion` was false, and a plain div took the identical
+ * declaration, while the mark computed `transition-property: none`. The only
+ * rule that reached it was the settle guard.
+ *
+ * Waits on the attribute rather than on a frame count, so it is right whether
+ * the component settles in one frame or the runner is busy. `settled()` is the
+ * other half and is not this: that one waits for animations to *finish*, where
+ * this one waits for them to become possible at all.
+ */
+export const readyToMove = async (element: Element | null): Promise<void> => {
+  if (!element || element.hasAttribute('data-settled')) {
+    return
+  }
+  await new Promise<void>((resolve) => {
+    const watching = new MutationObserver(() => {
+      if (element.hasAttribute('data-settled')) {
+        watching.disconnect()
+        resolve()
+      }
+    })
+    watching.observe(element, { attributeFilter: ['data-settled'], attributes: true })
+    /* happy-dom never calls `requestAnimationFrame`'s callback the way a browser
+       does, so the observer alone would hang there. A macrotask is enough in
+       both: a browser has painted by then and happy-dom has nothing to wait
+       for. */
+    setTimeout(() => {
+      watching.disconnect()
+      resolve()
+    }, 50)
+  })
+}
+
+/**
  * Whether this environment lays anything out.
  *
  * happy-dom has no layout engine, so every rectangle in it is zero and every
