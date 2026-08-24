@@ -246,6 +246,44 @@
  * sized to. Left alone, a 40 control inside a chip built for 13px type sets the
  * height of the whole thing and the command ends up floating in a control's
  * worth of air. */
+/* **`max-content` around `stretch`, so the buttons name the width.**
+ *
+ * The install pill sized itself to its own text, 214 around 164 of code, under
+ * a button pair measuring 412: the hero column ended in an element hugging
+ * itself beneath a row twice its width. Padding is the gentler lever and does
+ * not reach, `md` measuring 222 and `lg` 238.
+ *
+ * A `min-inline-size` on the pill would be 412 written down, and wrong the day
+ * either button's label changes. Here the wrapper is as wide as its widest
+ * child, which is the button row, and the pill stretches to it. The number
+ * stays a consequence of the copy rather than a constant beside it. */
+.heroActions {
+  align-items: stretch;
+  inline-size: max-content;
+  /* `max-content` alone re-broke the thing the button row already handled: it
+     is the width the row wants *unwrapped*, so at 375 the wrapper stood 412
+     wide and hung off the viewport while the row's own `wrap` had nothing left
+     to do. The cap hands the decision back. */
+  max-inline-size: 100%;
+}
+
+/* **The buttons grow, which is what makes the agreement hold once they stack.**
+ *
+ * With the cap in place the wrapper is the viewport at 375 and the pill took
+ * all of it, 327 against two 200 buttons: the desktop mismatch inverted, the
+ * pill now the wide one. Growing the buttons settles both layouts with one
+ * rule. Side by side there is no free space to take, 200 and 200 and a gap
+ * being exactly the 412 the wrapper asked for, so nothing moves. Stacked, each
+ * button is alone on its line and fills it, so the three elements measure 327
+ * together.
+ *
+ * `flex-grow` on the child rather than a width from the recipe: how an item
+ * divides a line is the row's business, and `data-button-width` is still the
+ * floor it starts from. */
+.heroActions [data-button] {
+  flex-grow: 1;
+}
+
 .heroInstall {
   background-color: var(--helix-color-surface);
   border: var(--helix-border-thin) solid var(--helix-color-border);
@@ -253,7 +291,9 @@
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-sm);
   padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-sm);
+  /* `md` rather than `sm`, now that the box is the button row's width: the
+     command sits off the edge by the same amount the buttons' labels do. */
+  padding-inline: var(--helix-space-md);
 }
 
 @media (max-width: 48rem) {

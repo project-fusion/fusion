@@ -72,21 +72,36 @@ export default function Home() {
             <helix-tag>Fusion Development Group</helix-tag>
           </helix-flex>
           <HeroCopy lede={LANDING.lede} title={LANDING.title} />
-          <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
-            <Link
-              data-button="solid"
-              data-button-tone="primary"
-              data-button-width="standard"
-              href="/services"
-            >
-              See what we do
-            </Link>
-            <Link data-button data-button-width="standard" href="/helix">
-              Open Helix
-            </Link>
-          </helix-flex>
+          {/* **The buttons and the install line are one block, and the block is
+              what makes them the same width.**
 
-          {/* The shortest true path into the thing the page is about.
+              The pill used to size itself to its own text: 214 around 164 of
+              code, under a button pair measuring 412, so the hero column ended
+              in an element hugging itself under a row twice its width. Padding
+              was the first lever and it does not reach: `md` is 222 and `lg` is
+              238 against 412.
+
+              A width on the pill would be the number 412 written down, and it
+              would be wrong the day either button's label changes. This wrapper
+              is `max-content` around `align-items: stretch`, so the row sets the
+              width by being the wider child and the pill takes it, whatever the
+              copy turns out to say. */}
+          <helix-flex class={styles.heroActions} direction="column" gap="md">
+            <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
+              <Link
+                data-button="solid"
+                data-button-tone="primary"
+                data-button-width="standard"
+                href="/services"
+              >
+                See what we do
+              </Link>
+              <Link data-button data-button-width="standard" href="/helix">
+                Open Helix
+              </Link>
+            </helix-flex>
+
+            {/* The shortest true path into the thing the page is about.
               
               Two buttons ask a reader to go somewhere and read; this asks them
               to type one line and have the library. It is the only element in
@@ -97,13 +112,14 @@ export default function Home() {
               `CopyButton` rather than a code block with a button beside it,
               because the whole line is the payload and the copy is the only
               interaction it has. */}
-          <helix-flex align="center" class={styles.heroInstall} gap="2xs">
-            <code>{INSTALL}</code>
-            <helix-copy-button
-              copied-label="Copied"
-              label="Copy the install command"
-              value={INSTALL}
-            ></helix-copy-button>
+            <helix-flex align="center" class={styles.heroInstall} gap="2xs" justify="between">
+              <code>{INSTALL}</code>
+              <helix-copy-button
+                copied-label="Copied"
+                label="Copy the install command"
+                value={INSTALL}
+              ></helix-copy-button>
+            </helix-flex>
           </helix-flex>
         </helix-flex>
       </section>
