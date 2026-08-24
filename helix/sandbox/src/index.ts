@@ -16,4 +16,3 @@
  */
 export * from './jsx/html-to-jsx.js'
 export * from './jsx/jsx-to-html.js'
-export * from './sandbox/specs/sandbox-specs.js'

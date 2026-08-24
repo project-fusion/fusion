@@ -36,7 +36,7 @@ export function HelixElements(): null {
 
   useEffect(() => {
     let live = true
-    void Promise.all([import('@helix-io/web'), import('@helix-io/sandbox')]).then(() => {
+    void Promise.all([import('@helix-io/web'), import('@helix-io/sandbox/specs')]).then(() => {
       if (live) {
         setRegistered(true)
       }

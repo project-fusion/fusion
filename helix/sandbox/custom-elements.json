@@ -503,14 +503,6 @@
             "name": "*",
             "module": "src/jsx/jsx-to-html.js"
           }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/sandbox/specs/sandbox-specs.js"
-          }
         }
       ]
     },
@@ -1010,6 +1002,21 @@
           "declaration": {
             "name": "HelixSandboxSpecs",
             "module": "src/sandbox/specs/sandbox-specs.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/specs/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/sandbox/specs/sandbox-specs.js"
           }
         }
       ]
