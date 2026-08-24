@@ -18,7 +18,9 @@ Set `dir` and the layout flips:
 ```
 
 Every component is written in logical properties, `inline-start` rather than
-`left`, `margin-block` rather than `margin-top`, across sixty-one stylesheets.
+`left`, `margin-block` rather than `margin-top`. Sixty-seven stylesheets name a
+direction, and **not one of them names a physical side**: there is no
+`margin-left`, no `padding-right` and no `inset-top` anywhere in the library.
 Nothing infers the direction for you and nothing needs to: the document says it
 and the components follow.
 
@@ -52,8 +54,8 @@ to keep up to date.
 
 ## Translatable strings
 
-Forty-nine properties across the headless tier are strings a reader sees, and
-every one is a property rather than a hardcoded word. The ones that combine
+Seventy properties across the headless tier are strings a reader sees, and every
+one is a property rather than a hardcoded word. The ones that combine
 values are format templates:
 
 ```html
