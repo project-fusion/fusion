@@ -4110,7 +4110,7 @@ Pairs an editable source pane with a live preview.
 Extends `HelixElement`.
 
 Coordination is by event, the same way the accordion does it: a source pane
-dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+dispatches `helix-change`, which bubbles, and the sandbox hands the value to
 whatever preview is slotted into it. Neither child knows the other exists, so
 either can be replaced or used alone.
 
@@ -4296,7 +4296,7 @@ is the documented escape hatch for exactly this trade.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `fieldLabel` | `field-label` | `string` | `'Example source'` | - | Accessible name for the editable region. |
-| `name` | `name` | `string` | `'html'` | - | Which source this pane holds, echoed in every `SourceChange`. |
+| `name` | `name` | `string` | `'html'` | - | Which source this pane holds, echoed in every `helix-change`. |
 | `tabIndents` | `tab-indents` | `boolean` | `true` | - | Whether Tab indents rather than moving focus. |
 | `value` | `value` | `string` | `''` | - | The source being edited. |
 

@@ -43,7 +43,7 @@ export class HelixSandboxSource extends HelixElement {
   value = ''
 
   /**
-   * Which source this pane holds, echoed in every `SourceChange`.
+   * Which source this pane holds, echoed in every `helix-change`.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
    * passed through untouched for a consumer wiring their own panes.

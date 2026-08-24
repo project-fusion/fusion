@@ -33,7 +33,7 @@ const PANEL_MAX = 0.8
  *
  * @description
  * Coordination is by event, the same way the accordion does it: a source pane
- * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+ * dispatches `helix-change`, which bubbles, and the sandbox hands the value to
  * whatever preview is slotted into it. Neither child knows the other exists, so
  * either can be replaced or used alone.
  *

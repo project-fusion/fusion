@@ -36,6 +36,12 @@
  *   nothing dispatches is a handler that never runs.
  * - **An exported name.** A mixin, an element class or a helper named in a code
  *   fence has to be something the workspace exports.
+ * - **Anything said to be dispatched.** `SourceChange` was named as the sandbox's
+ *   coordination event in this page, in the rules file, and in two JSDoc blocks
+ *   that carry it into the manifest and from there into `jsx.d.ts` and
+ *   `vue.d.ts`. Nothing has ever dispatched it: the event is `helix-change`. It
+ *   slipped the rule above because it carries none of this library's prefixes,
+ *   so the verb is what catches it instead.
  * - **A package.** `@helix-io/react` was in the Tiers package table, counted
  *   among "five packages", two pages after the Introduction said there is no
  *   React package. The rules file went further and documented regenerating
@@ -304,6 +310,17 @@ for (const page of pages()) {
     checked += 1
     if (!packages.has(match[0]) && !HISTORICAL.test(around(match.index))) {
       problems.push(`${where}: \`${match[0]}\` is not a package in this workspace.`)
+    }
+  }
+
+  /* Whatever a page says is dispatched, whether or not it looks like ours. The
+     verb is the tell: a sentence claiming something is sent has to name a thing
+     that is sent. */
+  for (const match of text.matchAll(/dispatch(?:es|ed|ing)?\s+`([A-Za-z][\w-]*)`/g)) {
+    const name = match[1]
+    checked += 1
+    if (!events.has(name) && !exports_.has(name) && !HISTORICAL.test(around(match.index))) {
+      problems.push(`${where}: says \`${name}\` is dispatched, and nothing dispatches it.`)
     }
   }
 

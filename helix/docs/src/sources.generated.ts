@@ -576,9 +576,9 @@ stylesheet, no \`.dark\` class to toggle, and nothing to remember to update twic
 
 Every token is written once, with both halves in a \`light-dark()\`. Which half
 resolves is decided by \`color-scheme\` and nothing else, so the mode is a single
-inherited property and no token is restated to honor it. That is 769
-declarations in the token layer expressing two modes without a second copy of
-anything.
+inherited property and no token is restated to honor it. That is 761
+declarations across the library, 135 of them in the token layer, expressing two
+modes without a second copy of anything.
 
 ## Setting the mode
 
@@ -2045,10 +2045,10 @@ reader who asked not to be moved. **It does not reach a single component.**
 \`\`\`
 
 \`*\` does not cross a shadow boundary. So that rule reaches your prose, your
-layout and the base layer's own recipes, and none of the fifty-odd components
+layout and the base layer's own recipes, and none of the ninety-odd components
 that draw inside a shadow root. Each one answers \`prefers-reduced-motion\` in its
-own stylesheet, and fifty-nine of them do, and a component that animates
-without one fails the build.
+own stylesheet, fifty-nine of them do because fifty-nine of them animate, and a
+component that animates without one fails the build.
 
 **The same is true of yours.** If you write a component with a shadow root, the
 global rule will not cover it either. That is not a Helix behavior, it is how
@@ -2835,7 +2835,7 @@ document the page cannot reach into and which cannot reach back out.
 
 ## Coordination is by event
 
-A source pane dispatches \`SourceChange\`, which bubbles, and the sandbox hands
+A source pane dispatches \`helix-change\`, which bubbles, and the sandbox hands
 the value to whatever preview is slotted into it. Neither child knows the other
 exists, so either can be replaced or used alone.
 
@@ -3887,11 +3887,12 @@ them to nudge one component; use the semantic tokens to move everything.
 
 ## What is enforced
 
-Three things fail the build:
+Four things fail the build:
 
-1. **A raw value where a token exists.** \`#e5e5e5\` when a neutral is right
-   there. 2. **A primitive referenced from outside \`@helix-io/styles\`.** 3. **A
-   reference to a token that does not exist.**
+1. **A raw value where a token exists.** \`#e5e5e5\` when a neutral is right there.
+2. **A primitive referenced from outside \`@helix-io/styles\`.**
+3. **A reference to a token that does not exist.**
+4. **A component hook nothing reads**, and a primitive nothing resolves into.
 
 The third earns its keep on its own: a renamed token resolves to nothing, the
 property silently falls back to a browser default, and the code looks correct
@@ -3948,15 +3949,29 @@ than the type scale.
 :where([data-prose] h2) { font-size: var(--helix-text-2xl); }
 \`\`\`
 
-There is no \`Text\` component and no \`Heading\` component, and that is deliberate.
-A component would have to take the level as a prop, which tempts \`size\` to be
-set independently of it, which is how a page ends up with an \`<h4>\` that looks
-like a title and an outline nothing can navigate. Styling the element means the
-markup and the appearance cannot disagree.
+Styling the element rather than a component means the markup and the appearance
+cannot disagree by default, and it reaches prose the design system never renders:
+anything out of a CMS, a markdown file, or a rich-text field lands inside
+\`[data-prose]\` and comes out right without being rewritten.
 
-It also reaches prose the design system never renders: anything out of a CMS, a
-markdown file, or a rich-text field lands inside \`[data-prose]\` and comes out
-right without being rewritten.
+**\`Text\` exists for the case where they genuinely have to come apart.** A
+section's second heading sometimes has to look smaller without lying about the
+outline, and a \`<p>\` sometimes has to read as a caption, so \`as\` chooses the
+element and \`variant\` chooses the ramp:
+
+\`\`\`html
+<helix-text
+  as="h3"
+  variant="body"
+>Reads as body, outlines as a heading</helix-text>
+\`\`\`
+
+They default to matching, so \`as="h2"\` and nothing else is the common case, and
+the pairing is resolved in CSS rather than by writing an attribute onto the host,
+because that would be a hydration mismatch in every React consumer. Size, weight
+and leading are not properties: a ramp is a decision the system already made, and
+exposing the parts offers a few hundred combinations of which a handful are
+right. There is no separate \`Heading\` component, because that is \`as\`.
 
 ## Applying it to your own text
 

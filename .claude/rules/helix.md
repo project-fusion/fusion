@@ -1115,7 +1115,7 @@ one client component.
   color, and the preview would be a worse likeness the more the design system
   does.
 - **Source and preview never speak directly.** The source pane dispatches
-  `SourceChange` and the root hands the value to whatever preview is slotted
+  `helix-change` and the root hands the value to whatever preview is slotted
   into it, the same event-not-registration shape the accordion uses.
 - **The divider is a real `role="separator"`** with `aria-valuenow`, moved by
   arrow keys as well as by pointer. A divider only a mouse can move is unusable

@@ -49,10 +49,10 @@ reader who asked not to be moved. **It does not reach a single component.**
 ```
 
 `*` does not cross a shadow boundary. So that rule reaches your prose, your
-layout and the base layer's own recipes, and none of the fifty-odd components
+layout and the base layer's own recipes, and none of the ninety-odd components
 that draw inside a shadow root. Each one answers `prefers-reduced-motion` in its
-own stylesheet, and fifty-nine of them do, and a component that animates
-without one fails the build.
+own stylesheet, fifty-nine of them do because fifty-nine of them animate, and a
+component that animates without one fails the build.
 
 **The same is true of yours.** If you write a component with a shadow root, the
 global rule will not cover it either. That is not a Helix behavior, it is how

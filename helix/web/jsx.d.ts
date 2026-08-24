@@ -9916,7 +9916,7 @@ export type HelixSandboxSourceHelixChangeElementEvent =
 export type HelixSandboxSourceProps = {
   /** The source being edited. */
   value?: HelixSandboxSource["value"];
-  /** Which source this pane holds, echoed in every `SourceChange`.
+  /** Which source this pane holds, echoed in every `helix-change`.
 
 `html` and `css` are what the sandbox root routes on; any other name is
 passed through untouched for a consumer wiring their own panes.
@@ -9941,7 +9941,7 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
 export type HelixSandboxSourceSolidJsProps = {
   /** The source being edited. */
   "prop:value"?: HelixSandboxSource["value"];
-  /** Which source this pane holds, echoed in every `SourceChange`.
+  /** Which source this pane holds, echoed in every `helix-change`.
 
 `html` and `css` are what the sandbox root routes on; any other name is
 passed through untouched for a consumer wiring their own panes.
@@ -22036,7 +22036,7 @@ export type CustomElements = {
 
   /**
    * Coordination is by event, the same way the accordion does it: a source pane
-   * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+   * dispatches `helix-change`, which bubbles, and the sandbox hands the value to
    * whatever preview is slotted into it. Neither child knows the other exists, so
    * either can be replaced or used alone.
    *
@@ -22173,7 +22173,7 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `value`: The source being edited.
-   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
+   * - `name`: Which source this pane holds, echoed in every `helix-change`.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
    * passed through untouched for a consumer wiring their own panes.
@@ -33741,7 +33741,7 @@ export type CustomElementsSolidJs = {
 
   /**
    * Coordination is by event, the same way the accordion does it: a source pane
-   * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+   * dispatches `helix-change`, which bubbles, and the sandbox hands the value to
    * whatever preview is slotted into it. Neither child knows the other exists, so
    * either can be replaced or used alone.
    *
@@ -33881,7 +33881,7 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `value`: The source being edited.
-   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
+   * - `name`: Which source this pane holds, echoed in every `helix-change`.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
    * passed through untouched for a consumer wiring their own panes.
