@@ -11,6 +11,9 @@ import { styles } from './code-root.css.js'
  * around it at the same nominal size. `--code-size` overrides it.
  *
  * @cssproperty --code-size - The fragment's size. Defaults to `text-sm`.
+ * @cssproperty --code-padding - Space either side of the fragment. Defaults to half
+ * of `space-2xs`, which is what keeps a bracket beside the chip rather than a space
+ * away from it.
  *
  * @since 0.1.0
  * @status stable

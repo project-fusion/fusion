@@ -65,7 +65,25 @@
      `--code-size` is how a consumer puts the ratio back. */
   font-size: var(--code-size, var(--helix-text-sm));
   padding-block: var(--helix-space-none);
-  padding-inline: var(--helix-space-2xs);
+  /* Half a step, and the punctuation is why.
+   *
+   * At `space-2xs`, which is 4px, the chip sat one space too far from anything
+   * that is not a word. Measured against a word space of 3.5px in the same
+   * type: beside a word the gap reads as the ordinary space between any two
+   * words and is right, beside a bracket there is no word space to share the
+   * job and 4px is the whole gap, so `(code)` renders as `( code )` and a
+   * trailing period sits away from the word it ends.
+   *
+   * A margin was the other candidate and is worse: it adds space beside a word
+   * and beside a comma alike, CSS cannot tell them apart, so it would have
+   * doubled exactly this fault rather than fixed it.
+   *
+   * There is no smaller step to reach for, `2xs` being the smallest non-zero
+   * rung, and a raw value is refused. So the scale is halved, which is a factor
+   * rather than a length and is the same shape `--_travel` and the video's
+   * level gap already use. `--code-padding` is how a consumer puts a full step
+   * back, matching `--code-size` directly above. */
+  padding-inline: var(--code-padding, calc(var(--helix-space-2xs) * 0.5));
 }
 
 /* Print: the same, inline.
