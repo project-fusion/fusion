@@ -102,6 +102,9 @@ if (families.length === 0) {
 /** How long one family may block the page before the run gives up on it. */
 const STUCK = 60_000
 
+/** How much to divide the CPU by, for reproducing a runner locally. */
+const THROTTLE = Number(process.env.SPECS_THROTTLE ?? 1)
+
 const browser = await chromium.launch()
 const crashes = []
 
@@ -116,6 +119,18 @@ const crashes = []
 const freshPage = async () => {
   const made = await browser.newPage()
   made.on('pageerror', (error) => crashes.push(String(error)))
+
+  /* **A way to reproduce a runner's speed on a desk**, because three specs
+     failed only in CI and two rounds of guessing at why cost more than this
+     took to write. A GitHub runner is two slow cores; this machine is neither,
+     and every timing assertion in here was written against the fast one.
+     `SPECS_THROTTLE=4 bun run specs:browser` divides the CPU by four through
+     the same CDP switch DevTools uses. */
+  if (THROTTLE > 1) {
+    const session = await made.context().newCDPSession(made)
+    await session.send('Emulation.setCPUThrottlingRate', { rate: THROTTLE })
+  }
+
   await made.goto(origin, { waitUntil: 'load' })
   return made
 }

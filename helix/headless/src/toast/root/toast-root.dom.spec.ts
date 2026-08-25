@@ -37,13 +37,17 @@ const closes = async (found: Item): Promise<void> => {
 }
 
 /**
- * What was holding the clock, for when one of these does fail. A boolean says
- * the timer did not fire and nothing else; `data-paused` says whether it was
- * stopped on purpose, which is the difference between a slow runner and a
- * component that pauses when it should not.
+ * The state, compared as a string so the failure carries it.
+ *
+ * **`expect(value, message)` drops the message under bun**, which cost a CI
+ * round trip that reported `expected true to be false` and nothing else. What
+ * is needed is whether the clock was stopped on purpose: a timer that did not
+ * fire and a timer that was deliberately held are different faults, and the
+ * pause on hover and focus is exactly what makes the second one possible.
+ * Folding it into the compared value is the only form bun prints.
  */
-const why = (found: Item): string =>
-  `open=${found.open} data-paused=${found.hasAttribute('data-paused')}`
+const state = (found: Item): string =>
+  `open=${found.open} paused=${found.hasAttribute('data-paused')}`
 
 const region = async (items = ''): Promise<HTMLElement> =>
   (await mount(
@@ -138,7 +142,7 @@ describe('toast item', () => {
   test('a timer that runs out hides it, which is what a duration is for', async () => {
     const found = await item('duration="40"')
     await closes(found)
-    expect(found.open).toBe(false)
+    expect(state(found)).toBe('open=false paused=false')
   })
 
   test('a refused dismissal reports that it was refused', async () => {
@@ -163,7 +167,7 @@ describe('toast item', () => {
       found.addEventListener('helix-dismiss', () => done(true))
       setTimeout(() => done(false), LATEST)
     })
-    expect(asked, why(found)).toBe(true)
+    expect(`asked=${asked} ${state(found)}`).toBe('asked=true open=false paused=false')
   })
 
   test('the clock stops while it is being read, and goes on from there', async () => {

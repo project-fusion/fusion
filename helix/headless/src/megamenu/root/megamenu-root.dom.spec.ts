@@ -33,6 +33,14 @@ const press = (host: Section, pointerType: string, detail = 1): void => {
   trigger(host).dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
 }
 
+/**
+ * The `pointerType` the component recorded, folded into the assertion because
+ * bun prints the compared value and nothing else. Whether a touch enter was
+ * seen as a touch is the whole question this suite asks, and `expected true to
+ * be false` cannot answer it.
+ */
+const saw = (host: Section): string => String((host as unknown as { pointer?: string }).pointer)
+
 const settle = (ms: number): Promise<void> =>
   new Promise((done) => {
     setTimeout(done, ms)
@@ -154,10 +162,22 @@ describe('a megamenu opening on hover', () => {
        opened a panel it never touched. */
     expect(host.open).toBe(false)
 
+    /* The `pointerType` a listener on this host actually receives, folded into
+       the assertion because bun prints the compared value and nothing else.
+       This failed on runners and nowhere else, reporting `expected true to be
+       false`, which cannot say whether the guard ran and let a touch through
+       or the synthetic `pointerType` did not survive dispatch in that browser.
+       `Object.defineProperty` on a plain `Event` is what carries it, and that
+       is a browser behavior rather than a component one. */
+    let carried: unknown
+    host.addEventListener('pointerenter', (event) => {
+      carried = (event as PointerEvent).pointerType
+    })
+
     host.dispatchEvent(pointer('pointerenter', 'touch'))
     await settle(200)
     await host.updateComplete
-    expect(host.open).toBe(false)
+    expect(`open=${host.open} type=${String(carried)}`).toBe('open=false type=touch')
 
     press(host, 'touch')
     await host.updateComplete
