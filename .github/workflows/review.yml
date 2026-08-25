@@ -99,6 +99,11 @@ jobs:
           anthropic_service_account_id: svac_01KZ8JktTjLUiuDVoF3Aq837
           anthropic_workspace_id: wrkspc_017UiVfcccArL54cKMJ4khbA
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # TEMPORARY with the subject step above. The action hides the
+          # SDK's output, so a failed token exchange and a failed API call
+          # look identical from the log: one turn, zero cost, no model
+          # usage. This prints what actually came back.
+          show_full_output: true
           track_progress: true
           use_sticky_comment: true
           claude_args: --model claude-opus-5
