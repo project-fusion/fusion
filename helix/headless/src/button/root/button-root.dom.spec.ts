@@ -9,7 +9,7 @@ beforeAll(async () => {
 const control = (host: HTMLElement): Element | null => part(host, 'button')
 
 /* **The `variant` shorthand had two tests here and they are gone with it.**
-   `ac10015f` folded the four presets back into the `emphasis` and `tone` pair
+   `c2dd5df8` folded the four presets back into the `emphasis` and `tone` pair
    they were short for, and the CSS mapping went with them, but the tests stayed.
    What they asserted by then was that `getAttribute('variant')` returns what the
    markup wrote, on a tier that declares neither `variant` nor `emphasis`: the

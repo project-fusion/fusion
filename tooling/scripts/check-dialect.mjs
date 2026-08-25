@@ -3,7 +3,7 @@
  * Holds every word this repository writes to American spelling.
  *
  * **The rule was never written down, which is why it did not survive.**
- * `3e39ad2f` swept it on 19 Aug 2026, titled 391 words in 105 files, and took
+ * `1f1a8af9` swept it on 19 Aug 2026, titled 391 words in 105 files, and took
  * the count from 658 occurrences to 239. Four days later it was 1,685 across
  * 386 files. Nothing checked it and `CLAUDE.md` stated the em dash rule and
  * said nothing about spelling, so there was no line for a contributor to have
