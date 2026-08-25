@@ -167,7 +167,8 @@ impl Graph {
         // children otherwise, so the index grows monotonically across a
         // long-lived session and every later cascade re-walks ids that are
         // already gone.
-        self.dependents.retain(|parent, _| self.nodes.contains_key(parent));
+        self.dependents
+            .retain(|parent, _| self.nodes.contains_key(parent));
         for children in self.dependents.values_mut() {
             children.retain(|child| !seen.contains(child));
         }
@@ -254,9 +255,15 @@ mod tests {
         graph.delete_cascade(memory);
 
         for (parent, children) in &graph.dependents {
-            assert!(graph.nodes.contains_key(parent), "index keyed on deleted {parent}");
+            assert!(
+                graph.nodes.contains_key(parent),
+                "index keyed on deleted {parent}"
+            );
             for child in children {
-                assert!(graph.nodes.contains_key(child), "index points at deleted {child}");
+                assert!(
+                    graph.nodes.contains_key(child),
+                    "index points at deleted {child}"
+                );
             }
         }
         assert!(graph.get(source).is_some());
@@ -284,4 +291,3 @@ mod tests {
         assert!(graph.get(source).is_some());
     }
 }
-

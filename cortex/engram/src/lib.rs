@@ -255,4 +255,3 @@ mod tests {
         assert!((Fact::new("x", vec![], -3.0).confidence).abs() < f32::EPSILON);
     }
 }
-
