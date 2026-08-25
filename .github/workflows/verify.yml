@@ -228,7 +228,7 @@ jobs:
       # this caught on its first green run was in dark.
       - run: bun run check:contrast
 
-      # Every base example, pixel for pixel against a committed baseline. This
+      # Every headless example, pixel for pixel against a committed baseline. This
       # is the one fault class the rest of `verify` cannot reach: everything
       # else reads source or asserts a fact somebody thought to assert, and a
       # chevron drawn at 233 pixels breaks nothing anybody wrote down. Here
@@ -236,3 +236,20 @@ jobs:
       # on this runner: the comparison never crosses platforms, so on a
       # contributor's Mac the check says so and exits clean. See 148.
       - run: bun run check:visual
+
+      # **The pictures, when it fails, because nothing else can show them.**
+      # `check:visual` marks the changed pixels into `headless.diff.png` beside
+      # each baseline and those files die with the runner, so a reviewer got a
+      # pixel count and no way to see what moved. Reviewing 28 retaken baselines
+      # on 25 Aug 2026 meant checking the branch out and opening the images by
+      # hand, which is the step most likely to be skipped on the day a diff
+      # looks obviously fine, and 216 already says that is the day it matters.
+      #
+      # `failure()` rather than `always()`: a green run has nothing to look at,
+      # and an artifact uploaded every time is one nobody opens.
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: ignore
+          name: visual-diffs
+          path: helix/styled/src/*/.examples/headless.diff.png
