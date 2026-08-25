@@ -155,14 +155,12 @@ const server = createServer(async (request, response) => {
     response.writeHead(200, { 'content-type': 'text/html' })
     response.end(
       '<!doctype html><meta charset="utf-8"><title>specs</title>' +
-        '<link rel="stylesheet" href="/headless.css">',
+        '<link rel="stylesheet" href="/frame.css">',
     )
     return
   }
   try {
-    const body = await readFile(
-      path === '/headless.css' ? base : join(out, path.replace(/^\/+/, '')),
-    )
+    const body = await readFile(path === '/frame.css' ? base : join(out, path.replace(/^\/+/, '')))
     response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'text/plain' })
     response.end(body)
   } catch {

@@ -8,7 +8,7 @@ import { property, state } from 'lit/decorators.js'
  * @description
  * **An element rather than a recipe, because of the part CSS cannot do.**
  * Reserving the box is `aspect-ratio` and needs nothing from anybody; `Link` and
- * the megamenu row are recipes in `headless.css` for exactly that reason. What
+ * the megamenu row are recipes in `preview.css` for exactly that reason. What
  * cannot be written as a rule is *when the picture arrived*: a stylesheet has no
  * way to know, and no way to hear that it never will. So this owns three states
  * and the two events that move between them, and leaves the box to the

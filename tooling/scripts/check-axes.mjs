@@ -91,7 +91,7 @@ const AXES = {
      that clears its target and so sits on the AA floor: headroom over 4.5 runs
      0.17 for `primary` down to zero for `success` and `warning`, against 2.70
      for `foreground`. A quieter danger has nowhere to go, so the cross product
-     `headless.css` feared has one populated column and these two are values here. */
+     `preview.css` feared has one populated column and these two are values here. */
   tone: [
     'accent',
     'danger',

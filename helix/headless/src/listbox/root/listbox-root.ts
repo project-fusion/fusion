@@ -34,7 +34,7 @@ const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
  */
 const matched = new Map<Element, Range[]>()
 
-/** What the marks are called in `CSS.highlights`, and in `headless.css`. */
+/** What the marks are called in `CSS.highlights`, and in `preview.css`. */
 const HIGHLIGHT = 'helix-filter-match'
 
 /*
@@ -47,7 +47,7 @@ const HIGHLIGHT = 'helix-filter-match'
  * nothing is removed, so an option holding a link or an icon is marked as
  * readily as one holding a bare word.
  *
- * The rule that paints it lives in `headless.css` rather than in a component's
+ * The rule that paints it lives in `preview.css` rather than in a component's
  * styles, which is not a choice either: a highlight is styled from the tree its
  * text lives in, and that text lives in the consumer's document.
  */

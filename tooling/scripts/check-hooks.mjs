@@ -42,9 +42,11 @@
  * Two things are deliberately outside it. `helix/styles` is excluded because
  * its primitives are a scale, and `check:tokens` says in as many words that a
  * rung with no reader is fine: `--_helix-neutral-500` is not dead, it is a step
- * nothing has needed yet. And `.examples/` is excluded because a headless example's
- * gray palette is emitted whole for every family by `build-headless-examples.mjs`,
- * so a family that uses four of the seven is not a fault in the example.
+ * nothing has needed yet. And `.examples/` is excluded because a headless
+ * example's gray palette is written whole in every family's `preview.css`, so a
+ * family that uses four of the seven is not a fault in the example. It was
+ * emitted whole by a generator when this was written and is authored whole now,
+ * which changes who repeats it and not that it repeats.
  *
  * **A hook is named after the family that owns it, and that is the third
  * silent failure this file covers.** A consumer predicts `--card-padding` from

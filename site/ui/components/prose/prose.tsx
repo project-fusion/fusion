@@ -29,7 +29,7 @@ import {
  * say the anchor carried that attribute already and it did not. Nothing put it
  * there, no plugin added one, and the only `data-link` in this package was that
  * sentence. It was invisible because `:where([data-prose] a)` and `[data-link]`
- * share a declaration block in `headless.css`, so a prose link had the base
+ * share a declaration block in `preview.css`, so a prose link had the base
  * appearance without the base's attribute, and every check that could have
  * noticed reads the source rather than the document.
  *

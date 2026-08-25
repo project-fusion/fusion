@@ -233,10 +233,13 @@ for (const file of walk(root)) {
    * reaching for one would teach the opposite of what it is for, and a reader
    * copying it would get a stylesheet resolving to nothing.
    *
-   * Read off the markup rather than the filename: a stylesheet is exempt when
-   * the example beside it renders a `helix-headless-` element, which is the thing
-   * that makes it a headless example. `headless.css` would be a convention to remember;
-   * this is the fact itself. */
+   * Read off the markup rather than the filename, which used to be the better of
+   * two ways and is now the only one: a stylesheet is exempt when the example
+   * beside it renders a `helix-headless-` element, which is the thing that makes
+   * it a headless example. The file was called `headless.css` when this was
+   * written, so the name carried the answer and was merely a convention to
+   * remember. Both tiers call it `preview.css` now, the directory carrying the
+   * tier, so the name cannot answer at all and the markup is the fact itself. */
   if (rel.includes('.examples') && file.endsWith('.css')) {
     const markup = file.replace(/\.css$/, '.html')
     if (existsSync(markup) && readFileSync(markup, 'utf8').includes('<helix-headless-')) {

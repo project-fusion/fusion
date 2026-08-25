@@ -2,10 +2,12 @@
 /**
  * One attribute per line in an open tag, shared by everything that writes one.
  *
- * Extracted when `build-headless-examples.mjs` arrived, because two writers of the
- * same files have to agree: the generator wrote its markup one way, the
+ * Extracted when a generator for the headless examples arrived, because two
+ * writers of the same files have to agree: it wrote its markup one way, the
  * formatter rewrote it the other, and `bun run check` cleaned nine files that
- * the very next `--check` then reported as drifted. That is the same rule the
+ * the very next `--check` then reported as drifted. That generator is gone,
+ * both tiers being authored now, and this stays because the formatter still
+ * has other writers to agree with. That is the same rule the
  * React wrappers already record, that a generator formats its own output or
  * every build dirties what `check` just cleaned, and the only way two of them
  * can hold it is to run the same code.

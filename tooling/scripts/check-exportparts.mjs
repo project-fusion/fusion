@@ -46,7 +46,8 @@
  * every sheet, doc and page in the repository. It is the same silence as every
  * other part failure, in the one place nobody looks, and it had eight:
  *
- * - `INDICATOR` in `build-headless-examples.mjs` names the box the indicator is
+ * - `INDICATOR`, in the generator that then wrote the headless examples, names
+ *   the box the indicator is
  *   positioned against, and three of its four families were given a part they do
  *   not render: navigation and outline render `nav` and were given `list`,
  *   toggle group renders `track` and was given `group`. The `position: relative`
