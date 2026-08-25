@@ -98,6 +98,57 @@ helix-accordion {
 }
 ```
 
+## The window before an element upgrades
+
+A custom element is an inline, unstyled box until its definition loads, and its
+light-DOM children render immediately in document order. So a card arrives as a
+run of unstyled text and then snaps into a card. The window is short and it is
+most visible on a server-rendered page, where the markup is there long before
+the JavaScript is.
+
+`@helix-io/styled` closes it with `elements.css`, which hides every one of its
+tags until the definition lands:
+
+```css
+helix-card:not(:defined) {
+  visibility: hidden;
+}
+```
+
+**The base tier ships no such file, and that is deliberate rather than
+missing.** Three reasons, and the third is the one that matters to you.
+
+It is a decision rather than a mechanism. The rules the library ships below the
+styled tier are the ones a component cannot work without: `overflow` is what
+creates a scrollport, `[hidden]` is the platform's own semantics. Hiding an
+element that has not upgraded is a preference between two imperfect frames, and
+the content is in the markup either way, so a crawler reads it regardless.
+
+It is a document rule, not a component one. Nothing can help from inside,
+because before the upgrade there is no shadow root to put a rule in. It has to
+live in your stylesheet, which makes it yours to decide.
+
+And a blanket file would be wrong for you anyway. You import the handful of
+base elements you use, not all of them, so a generated list would hide tags you
+never ship. Write the ones you have:
+
+```css
+helix-base-accordion:not(:defined),
+helix-base-dialog:not(:defined) {
+  visibility: hidden;
+}
+```
+
+`visibility` rather than `display`, so the element keeps its place in the
+layout and the page does not reflow when it upgrades. `display: none` collapses
+the box and the content jumps in when the definition arrives, which trades a
+flash of unstyled text for a shift of everything under it.
+
+You may want neither. A page whose first paint matters more than its last
+inch, or one that has to be readable with JavaScript disabled, is better off
+letting the unstyled markup show. That choice is the reason this file is not
+made for you.
+
 ## Mixins and tooling
 
 `open` and `defaultOpen` come from `MixinControllerOpen` in `@helix-io/core`.
