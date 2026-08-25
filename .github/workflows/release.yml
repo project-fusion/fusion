@@ -26,6 +26,16 @@
 # pushed after promotion and says a release happened. Version computation reads
 # both, so a number is never handed out twice; everything else reads only the
 # second.
+# **`vars.PUBLISHING` has three states, and they are ordered by how much they
+# permit.** Unset, nothing publishes anywhere. `experimental`, previews and
+# staging publish but nothing is ever promoted, so a version exists at a dist-tag
+# a consumer has to ask for by name and `latest` does not move. `on`, the whole
+# pipeline runs and `latest` follows main.
+#
+# A single ordered variable rather than one flag per workflow, because two flags
+# can disagree and somebody has to remember which of the four combinations is
+# meant. Three states have one meaning each and a reader can hold them in order.
+#
 # **Publishing is switched off, deliberately, and this is the switch.**
 #
 # `vars.PUBLISHING` is a repository variable. Unset, it is the empty string, so
@@ -92,7 +102,9 @@ jobs:
 
   release:
     needs: intent
-    if: needs.intent.outputs.domains != '[]' && vars.PUBLISHING == 'on'
+    if: >-
+      needs.intent.outputs.domains != '[]'
+      && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING)
     runs-on: ubuntu-latest
     timeout-minutes: 40
     strategy:
@@ -180,7 +192,13 @@ jobs:
       - name: Prove the staged release installs
         run: bun run test:template --domain "${{ matrix.target.domain }}" --registry-tag next
 
+      # **Only at `on`.** At `experimental` the version is published, proved and
+      # left at the `next` dist-tag: it exists, a consumer can install it by
+      # asking for it, and `latest` still points at whatever it pointed at
+      # before. The number is already burnt by the attempt tag above, so
+      # stopping here costs nothing and repeats nothing.
       - name: Promote to production
+        if: vars.PUBLISHING == 'on'
         run: |
           node tooling/scripts/publish.mjs \
             --domain "${{ matrix.target.domain }}" \
@@ -188,8 +206,11 @@ jobs:
             --version "${{ steps.version.outputs.version }}"
 
       # Last, because the tag is the record of a release that happened. Written
-      # before promotion it would name one that might not have.
+      # before promotion it would name one that might not have, which is exactly
+      # what `experimental` does on purpose: a `helix-v*` tag means promoted, so
+      # a run that stops at staging leaves only its `attempt` tag behind.
       - name: Record the release
+        if: vars.PUBLISHING == 'on'
         run: |
           set -euo pipefail
           tag="${{ matrix.target.domain }}-v${{ steps.version.outputs.version }}"

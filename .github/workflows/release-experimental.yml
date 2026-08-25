@@ -33,11 +33,14 @@
 # The dist-tag is `pr-42` and never `next` or `latest`. A pre-release also sorts
 # below its own release and satisfies no caret range, so `^1.4.0` can never
 # resolve to one even by accident.
-# **Publishing is switched off, and `vars.PUBLISHING` is the switch**, the same
-# one `release.yml` carries. Unset, this job is skipped however the pull request
-# is labeled, so a preview build cannot reach the registry while the release
-# pipeline is held. The label and the environment approval both still apply once
-# it is on: this is a third lock rather than a replacement for either.
+# **`vars.PUBLISHING` is the switch, the same one `release.yml` carries, and it
+# has three states.** Unset, this job is skipped however the pull request is
+# labeled. `experimental` or `on`, it runs: a preview is the thing the middle
+# state exists for, so holding it back until the whole pipeline is live would
+# make the middle state mean nothing.
+#
+# The label and the environment approval both still apply. This is a third lock
+# rather than a replacement for either, and it is the loosest of the three.
 
 name: release-experimental
 
@@ -59,7 +62,7 @@ jobs:
   publish:
     if: >-
       contains(github.event.pull_request.labels.*.name, 'release:experimental')
-      && vars.PUBLISHING == 'on'
+      && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: experimental
