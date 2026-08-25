@@ -224,7 +224,7 @@ if (declared !== 'false' && !releases) {
   problems.push(
     `Cargo.toml: \`[workspace.package] publish\` is ${declared}, so the crates are meant to be ` +
       'published, and `release.yml` runs no `cargo publish`. A `cortex-v*` tag would name a ' +
-      'release of cortex-core, cortex-engram and cortex-trace that never happened.',
+      'release of fusion-cortex-core, fusion-cortex-engram and fusion-cortex-trace that never happened.',
   )
 }
 if (declared === 'false' && releases) {
@@ -238,7 +238,7 @@ if (declared === 'false' && releases) {
    half of one-version-per-domain.
  *
  * `[workspace.package] version` was the Cortex version only because every crate
- * was Cortex. This workspace is about to hold `helix-theme` and `helix-cli`, and
+ * was Cortex. This workspace is about to hold `fusion-helix-theme` and `fusion-helix-cli`, and
  * `release.yml` matrices over `helix` and `cortex` and computes each domain's
  * number from its own tags: two numbers, one shared field, and whichever
  * stamped last would win. Nothing else would say so, which is the failure this

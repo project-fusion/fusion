@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use helix_theme::css::to_css;
+use fusion_helix_theme::css::to_css;
 
 use crate::args::Build;
 use crate::error::{Failure, Outcome};

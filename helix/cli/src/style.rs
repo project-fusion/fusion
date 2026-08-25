@@ -95,8 +95,8 @@ impl Paint {
 /// The rule is general: pad before colouring, never after. Anything formatting to
 /// a width has to be looking at the text.
 #[must_use]
-pub fn glyph(outcome: helix_theme::derive::report::Outcome) -> &'static str {
-    use helix_theme::derive::report::Outcome::{Fail, Pass, Unverifiable};
+pub fn glyph(outcome: fusion_helix_theme::derive::report::Outcome) -> &'static str {
+    use fusion_helix_theme::derive::report::Outcome::{Fail, Pass, Unverifiable};
     match outcome {
         Fail => " x",
         Pass => "ok",

@@ -1,5 +1,5 @@
 [package]
-name = "cortex-trace"
+name = "fusion-cortex-trace"
 description = "Provenance. The spine: every memory, context assembly, and output traces to its inputs."
 edition.workspace = true
 license.workspace = true
@@ -14,7 +14,7 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 uuid.workspace = true
-cortex-core.workspace = true
+fusion-cortex-core.workspace = true
 
 [lints]
 workspace = true

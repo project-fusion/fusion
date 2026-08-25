@@ -23,7 +23,7 @@
  * }))
  * ```
  */
-import initWasm, { derive, hexToOklch as readHex } from '../wasm/helix_theme.js'
+import initWasm, { derive, hexToOklch as readHex } from '../wasm/fusion_helix_theme.js'
 import type { DerivedTheme, Oklch, ThemeIntent } from './types.js'
 
 export type {
@@ -64,10 +64,10 @@ export interface ThemeEngine {
  * Where the module is fetched from.
  *
  * **Required, because every default was wrong for somebody.** The obvious one,
- * `new URL('helix_theme_bg.wasm', import.meta.url)`, is what the generated
+ * `new URL('fusion_helix_theme_bg.wasm', import.meta.url)`, is what the generated
  * loader does and it works for neither caller here: Turbopack reads it as a
  * module specifier and fails the build with "Can't resolve
- * 'helix_theme_bg.wasm'", and Node's `fetch` refuses a `file:` URL outright.
+ * 'fusion_helix_theme_bg.wasm'", and Node's `fetch` refuses a `file:` URL outright.
  * Reading the file here instead would put a `node:fs` import into a package
  * whose purpose is to run in a browser.
  *

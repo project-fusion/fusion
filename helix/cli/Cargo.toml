@@ -1,5 +1,5 @@
 [package]
-name = "helix-cli"
+name = "fusion-helix-cli"
 description = "The Helix command line: theme derivation, auditing and scaffolding."
 edition.workspace = true
 license.workspace = true
@@ -8,7 +8,7 @@ rust-version.workspace = true
 # Its own, never `workspace = true`. See the note in the root manifest.
 version = "0.0.0-dev"
 
-# **The binary drops the suffix**, per the naming rule: the crate is `helix-cli`
+# **The binary drops the suffix**, per the naming rule: the crate is `fusion-helix-cli`
 # and the command a reader types is `helix`.
 [[bin]]
 name = "helix"
@@ -16,12 +16,12 @@ path = "src/main.rs"
 
 [dependencies]
 # **The derivation is a library and this is a caller.** A binary that scaffolds
-# projects is not the home of color math, so `helix-theme` stays its own crate
+# projects is not the home of color math, so `fusion-helix-theme` stays its own crate
 # and keeps its WASM wrapper buildable without dragging the command surface into
 # `@helix-io/theme`.
-helix-theme = { path = "../theme", features = ["serde"] }
+fusion-helix-theme = { path = "../theme", features = ["serde"] }
 clap = { version = "4", features = ["derive"] }
-# **Only the CLI takes this.** `helix-theme` computes and does not draw, and a
+# **Only the CLI takes this.** `fusion-helix-theme` computes and does not draw, and a
 # library that pulled a terminal backend in would carry it into the WASM build.
 ratatui = { workspace = true }
 serde = { workspace = true }

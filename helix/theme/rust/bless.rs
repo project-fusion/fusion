@@ -19,7 +19,7 @@
 //! that updates itself when the suite is red is a suite that always passes.
 //!
 //! ```text
-//! HELIX_BLESS_ORACLE=1 cargo test -p helix-theme -- --ignored bless
+//! HELIX_BLESS_ORACLE=1 cargo test -p fusion-helix-theme -- --ignored bless
 //! ```
 
 use serde_json::{json, Map, Value};
@@ -97,7 +97,7 @@ pub fn oracle() -> Value {
     the header says what to run rather than leaving a reader to guess. */
     out.insert(
         "//".to_owned(),
-        json!("Generated from the Rust engine by `HELIX_BLESS_ORACLE=1 cargo test -p helix-theme -- --ignored bless`. Do not edit."),
+        json!("Generated from the Rust engine by `HELIX_BLESS_ORACLE=1 cargo test -p fusion-helix-theme -- --ignored bless`. Do not edit."),
     );
 
     out.insert(

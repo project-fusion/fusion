@@ -1,5 +1,5 @@
 /**
- * Builds the browser distribution of `helix-theme`.
+ * Builds the browser distribution of `fusion-helix-theme`.
  *
  * **One folder, two distributions**, which is what `helix/theme` is for: the
  * crate is the engine and this is how a browser reaches it. Two implementations
@@ -17,7 +17,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
-const ARTIFACT = 'target/wasm32-unknown-unknown/release/helix_theme.wasm'
+const ARTIFACT = 'target/wasm32-unknown-unknown/release/fusion_helix_theme.wasm'
 export const OUT = join(ROOT, 'helix/theme/wasm')
 
 /**
@@ -25,9 +25,9 @@ export const OUT = join(ROOT, 'helix/theme/wasm')
  *
  * **A bundler cannot be asked to find this, which was measured rather than
  * assumed.** The generated loader resolves its module with
- * `new URL('helix_theme_bg.wasm', import.meta.url)`, and Turbopack treats that
+ * `new URL('fusion_helix_theme_bg.wasm', import.meta.url)`, and Turbopack treats that
  * as a module specifier and fails the build outright: "Can't resolve
- * 'helix_theme_bg.wasm'". Node cannot use that default either, its `fetch`
+ * 'fusion_helix_theme_bg.wasm'". Node cannot use that default either, its `fetch`
  * refusing a `file:` URL. So `initTheme` takes the source as a required
  * argument, and the site says where it put it.
  *
@@ -49,7 +49,7 @@ const run = (command, args) => {
 run('cargo', [
   'build',
   '-p',
-  'helix-theme',
+  'fusion-helix-theme',
   '--features',
   'wasm',
   '--target',
@@ -66,9 +66,9 @@ mkdirSync(OUT, { recursive: true })
 run('wasm-bindgen', ['--target', 'web', '--out-dir', OUT, ARTIFACT])
 
 mkdirSync(dirname(SERVED), { recursive: true })
-copyFileSync(join(OUT, 'helix_theme_bg.wasm'), SERVED)
+copyFileSync(join(OUT, 'fusion_helix_theme_bg.wasm'), SERVED)
 
 console.log(
-  `wasm: helix-theme built for the browser into ${OUT.replace(`${ROOT}/`, '')}, ` +
+  `wasm: fusion-helix-theme built for the browser into ${OUT.replace(`${ROOT}/`, '')}, ` +
     `and served from ${SERVED.replace(`${ROOT}/`, '')}`,
 )

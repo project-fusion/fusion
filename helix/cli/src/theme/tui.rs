@@ -30,8 +30,8 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Row as TableRow, Table, TableState};
 use ratatui::{Frame, Terminal};
 
-use helix_theme::derive::report::Outcome;
-use helix_theme::derive::theme::Theme;
+use fusion_helix_theme::derive::report::Outcome;
+use fusion_helix_theme::derive::theme::Theme;
 
 use super::report::{measured, rows, Counts, Filter, Order, Row};
 
@@ -271,7 +271,7 @@ fn footer(view: &View) -> Vec<Line<'_>> {
 mod tests {
     use super::{render, View};
     use crate::theme::report::{Counts, Filter, Order};
-    use helix_theme::derive::report::{Outcome, Pairing};
+    use fusion_helix_theme::derive::report::{Outcome, Pairing};
     use ratatui::backend::TestBackend;
     use ratatui::Terminal;
 

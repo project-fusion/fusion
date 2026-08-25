@@ -2,8 +2,8 @@
 //!
 //! The substrate every Cortex module builds on: identifiers, the provider
 //! abstraction, and the errors they share. Deliberately small. Anything that
-//! belongs to memory lives in `cortex-engram`; anything that belongs to
-//! provenance lives in `cortex-trace`.
+//! belongs to memory lives in `fusion-cortex-engram`; anything that belongs to
+//! provenance lives in `fusion-cortex-trace`.
 
 use serde::{Deserialize, Serialize};
 

@@ -16,10 +16,10 @@ spine, not a module.
 
 | Module | Crate | Owns |
 |---|---|---|
-| **Engram** | `cortex-engram` | Memory: episodic, semantic, later procedural |
-| **Trace** | `cortex-trace` | Provenance: `why()`, replay, cascading deletion |
+| **Engram** | `fusion-cortex-engram` | Memory: episodic, semantic, later procedural |
+| **Trace** | `fusion-cortex-trace` | Provenance: `why()`, replay, cascading deletion |
 | **Recall** | `cortex-recall` | Context assembly. Not built |
-| Core | `cortex-core` | Ids, provider abstraction, shared errors |
+| Core | `fusion-cortex-core` | Ids, provider abstraction, shared errors |
 
 ## Invariants
 

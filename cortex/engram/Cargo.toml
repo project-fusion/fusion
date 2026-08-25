@@ -1,5 +1,5 @@
 [package]
-name = "cortex-engram"
+name = "fusion-cortex-engram"
 description = "Memory. Episodic and semantic stores with consolidation."
 edition.workspace = true
 license.workspace = true
@@ -15,7 +15,7 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 uuid.workspace = true
-cortex-core.workspace = true
+fusion-cortex-core.workspace = true
 
 [lints]
 workspace = true

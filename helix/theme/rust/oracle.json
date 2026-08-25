@@ -1,5 +1,5 @@
 {
-  "//": "Generated from the Rust engine by `HELIX_BLESS_ORACLE=1 cargo test -p helix-theme -- --ignored bless`. Do not edit.",
+  "//": "Generated from the Rust engine by `HELIX_BLESS_ORACLE=1 cargo test -p fusion-helix-theme -- --ignored bless`. Do not edit.",
   "colors": [
     {
       "chroma": 0.0,

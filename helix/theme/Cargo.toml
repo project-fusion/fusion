@@ -1,5 +1,5 @@
 [package]
-name = "helix-theme"
+name = "fusion-helix-theme"
 description = "Helix theme derivation: OKLCH color math and contrast-solved palettes."
 edition.workspace = true
 license.workspace = true
@@ -22,7 +22,7 @@ version = "0.0.0-dev"
 path = "rust/lib.rs"
 # **`cdylib` for the browser and `rlib` for everything else, and both are
 # required.** `wasm-bindgen` reads a `cdylib`, and declaring only that would stop
-# `helix-cli` linking against this crate at all: `crate-type` replaces the default
+# `fusion-helix-cli` linking against this crate at all: `crate-type` replaces the default
 # rather than adding to it, so the day the wrapper was added would be the day the
 # CLI stopped building, for a reason whose error message says nothing about WASM.
 crate-type = ["cdylib", "rlib"]

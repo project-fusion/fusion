@@ -12,7 +12,7 @@
 //! needs a backend and a size before it renders a character; a row does not, so
 //! every decision worth asserting lives on this side of the boundary.
 
-use helix_theme::derive::report::{Outcome, Pairing};
+use fusion_helix_theme::derive::report::{Outcome, Pairing};
 
 use crate::style::glyph;
 
@@ -179,7 +179,7 @@ pub fn measured(row: &Row) -> String {
 #[cfg(test)]
 mod tests {
     use super::{measured, rows, widths, Counts, Filter, Order, Row};
-    use helix_theme::derive::report::{Outcome, Pairing};
+    use fusion_helix_theme::derive::report::{Outcome, Pairing};
 
     /// Four pairs, arranged so every decision in this module is observable in at
     /// least one of them: a failure, two passes at different margins, and an

@@ -97,7 +97,7 @@ tooling/   CI and build scripts
 - **Product domains at root, packages flat inside.** A new product gets a new
   top-level folder.
 - **The folder drops the domain prefix; the package name keeps it.**
-  `helix/styled` is `@helix-io/styled`; `cortex/core` is the crate `cortex-core`.
+  `helix/styled` is `@helix-io/styled`; `cortex/core` is the crate `fusion-cortex-core`.
   Scope searches by path (`cortex/core`), not folder name, since bare leaf
   names recur across domains.
 - **`<domain>/docs` is a content package, not a site**: versioned MDX plus a

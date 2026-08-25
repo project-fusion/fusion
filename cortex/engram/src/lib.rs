@@ -10,7 +10,7 @@
 //! because it is a research problem and the first two already differentiate.
 
 use chrono::{DateTime, Utc};
-use cortex_core::Id;
+use fusion_cortex_core::Id;
 use serde::{Deserialize, Serialize};
 
 /// A raw, timestamped record of something that happened. Append-only.

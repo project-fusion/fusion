@@ -21,7 +21,7 @@
 
 use std::path::{Path, PathBuf};
 
-use helix_theme::intent::ThemeIntent;
+use fusion_helix_theme::intent::ThemeIntent;
 
 use crate::error::{Failure, Outcome};
 

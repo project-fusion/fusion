@@ -14,7 +14,7 @@
 use std::collections::{HashMap, HashSet, VecDeque};
 
 use chrono::{DateTime, Utc};
-use cortex_core::Id;
+use fusion_cortex_core::Id;
 use serde::{Deserialize, Serialize};
 
 /// What a node represents.

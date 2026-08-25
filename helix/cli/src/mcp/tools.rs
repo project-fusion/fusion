@@ -11,9 +11,9 @@
 //! hands back what was measured. An agent picking a brand color wants the second
 //! long before it wants the first.
 
-use helix_theme::derive::report::Outcome as Pair;
-use helix_theme::derive::theme::derive_theme;
-use helix_theme::intent::ThemeIntent;
+use fusion_helix_theme::derive::report::Outcome as Pair;
+use fusion_helix_theme::derive::theme::derive_theme;
+use fusion_helix_theme::intent::ThemeIntent;
 
 /// What the tools take, described for a client that has never seen Helix.
 ///
@@ -114,7 +114,7 @@ pub fn call(name: &str, arguments: &serde_json::Value) -> Result<String, String>
                     theme.violations.join(" ")
                 ));
             }
-            Ok(helix_theme::css::to_css(&theme, ":root"))
+            Ok(fusion_helix_theme::css::to_css(&theme, ":root"))
         }
         /* Unreachable: the guard above is exhaustive over the two names, and it
         is there rather than here so the message can be written once. */

@@ -8,7 +8,7 @@ pub mod tui;
 
 use std::path::Path;
 
-use helix_theme::derive::theme::{derive_theme, Theme};
+use fusion_helix_theme::derive::theme::{derive_theme, Theme};
 
 use crate::config;
 use crate::error::{Failure, Outcome};

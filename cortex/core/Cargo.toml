@@ -1,5 +1,5 @@
 [package]
-name = "cortex-core"
+name = "fusion-cortex-core"
 description = "Cortex primitives: provider abstraction, typed extraction, storage traits."
 edition.workspace = true
 license.workspace = true

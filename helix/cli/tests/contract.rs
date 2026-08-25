@@ -1,7 +1,7 @@
 //! The contract, asserted.
 //!
 //! **These test the interface rather than the derivation**, which
-//! `helix-theme`'s own suite covers against the TypeScript. What is here is
+//! `fusion-helix-theme`'s own suite covers against the TypeScript. What is here is
 //! everything a caller depends on and no library test can see: which stream each
 //! thing lands on, what the process exits with, and whether `--json` is really
 //! parseable rather than merely present.
@@ -66,7 +66,7 @@ struct Sandbox(PathBuf);
 
 impl Sandbox {
     fn new(name: &str, intent: Option<&str>) -> Self {
-        let path = std::env::temp_dir().join(format!("helix-cli-{name}"));
+        let path = std::env::temp_dir().join(format!("fusion-helix-cli-{name}"));
         let _ = std::fs::remove_dir_all(&path);
         std::fs::create_dir_all(&path).expect("a temp directory");
         /* A `.git` marker, so discovery stops here rather than walking out of the

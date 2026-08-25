@@ -15,8 +15,8 @@
 use std::io::IsTerminal;
 use std::path::Path;
 
-use helix_theme::derive::report::Outcome as Pair;
-use helix_theme::derive::theme::Theme;
+use fusion_helix_theme::derive::report::Outcome as Pair;
+use fusion_helix_theme::derive::theme::Theme;
 
 use crate::args::{Audit, Common};
 use crate::error::{Failure, Outcome};

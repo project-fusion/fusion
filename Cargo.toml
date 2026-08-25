@@ -27,10 +27,10 @@ tracing = "0.1"
 uuid = { version = "1", features = ["serde", "v4", "v7"] }
 
 # Internal crates. Path deps are relative: same-domain is `../<role>`.
-cortex-core = { path = "cortex/core" }
-cortex-engram = { path = "cortex/engram" }
-cortex-trace = { path = "cortex/trace" }
-helix-theme = { path = "helix/theme" }
+fusion-cortex-core = { path = "cortex/core" }
+fusion-cortex-engram = { path = "cortex/engram" }
+fusion-cortex-trace = { path = "cortex/trace" }
+fusion-helix-theme = { path = "helix/theme" }
 
 # **No `version` here, and its absence is the point.**
 #
@@ -38,7 +38,7 @@ helix-theme = { path = "helix/theme" }
 # licence, the toolchain floor. A version is a fact about a *domain*, and this
 # workspace is about to hold two. `version = "0.0.0-dev"` inherited by every
 # crate was the Cortex version only because every crate was Cortex, and the day
-# `helix-theme` lands with `version.workspace = true` the two domains are back
+# `fusion-helix-theme` lands with `version.workspace = true` the two domains are back
 # in full lockstep with nothing saying so: `release.yml` matrices over `helix`
 # and `cortex` and computes each from its own tags, so they would compute two
 # numbers and stamp them into one shared field.

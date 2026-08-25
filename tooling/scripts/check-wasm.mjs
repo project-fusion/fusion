@@ -39,7 +39,7 @@ const WASM = join(ROOT, 'helix/theme/wasm')
  */
 const TOLERANCE = 1e-12
 
-if (!existsSync(join(WASM, 'helix_theme.js'))) {
+if (!existsSync(join(WASM, 'fusion_helix_theme.js'))) {
   /* **Refused rather than built here, and rather than skipped.** `bun run wasm`
      is the build and `check:wasm` runs it first, so reaching this line means the
      toolchain is missing rather than the artifact being stale. Saying so and
@@ -55,11 +55,11 @@ if (!existsSync(join(WASM, 'helix_theme.js'))) {
   process.exit(1)
 }
 
-const engine = await import(join(WASM, 'helix_theme.js'))
+const engine = await import(join(WASM, 'fusion_helix_theme.js'))
 /* `--target web` exports an `init` taking a URL or the bytes. Node has no
    `fetch` for a `file:` URL, so the bytes are read rather than pointed at, which
    is also what a bundler ends up doing. */
-await engine.default({ module_or_path: readFileSync(join(WASM, 'helix_theme_bg.wasm')) })
+await engine.default({ module_or_path: readFileSync(join(WASM, 'fusion_helix_theme_bg.wasm')) })
 
 const oracle = JSON.parse(readFileSync(join(ROOT, 'helix/theme/rust/oracle.json'), 'utf8'))
 const intents = new Map(INTENTS.map(({ intent, label }) => [label, intent]))
