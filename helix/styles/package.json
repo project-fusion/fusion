@@ -10,18 +10,20 @@
   },
   "type": "module",
   "exports": {
-    "./all.css": "./src/all.css",
-    "./base.css": "./src/base.css",
-    "./primitives.css": "./src/primitives.css",
-    "./tokens.css": "./src/tokens.css",
+    "./all.css": "./dist/all.css",
+    "./base.css": "./dist/base.css",
+    "./primitives.css": "./dist/primitives.css",
+    "./tokens.css": "./dist/tokens.css",
     "./tokens.json": "./tokens.json"
   },
   "files": [
-    "src",
+    "dist",
     "tokens.json"
   ],
   "sideEffects": true,
-  "scripts": {},
+  "scripts": {
+    "build": "node ../../tooling/scripts/build-styles-dist.mjs"
+  },
   "publishConfig": {
     "access": "restricted"
   }

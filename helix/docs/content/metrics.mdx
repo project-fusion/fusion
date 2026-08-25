@@ -67,16 +67,19 @@ repository does that. The per-component tables are what a page pays.
 
 ## The stylesheets
 
-Linked rather than bundled, so these are the files as shipped and a consumer
-minifies them or does not. `@helix-io/styles` has no JavaScript at all, which
-is why it is the whole cost of adopting the base layer on its own.
+Linked rather than bundled, so these are the files exactly as a browser
+receives them. `@helix-io/styles` ships its stylesheets with the comments
+removed and keeps the reasoning in the repository, which is why these numbers
+are a quarter of what the sources weigh. It has no JavaScript at all, so this
+is the whole cost of adopting the base layer on its own.
 
 | File | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
-| `base.css` | 84,136 | 26,210 | 22,556 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
+| `base.css` | 21,595 | 3,484 | 2,992 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
 | `elements.css` | 7,887 | 1,823 | 1,543 | The components' own layer, generated from every family's stylesheet. |
-| `primitives.css` | 32,648 | 11,331 | 9,635 | The primitive layer. Private, shipped because `tokens.css` resolves into it. |
-| `tokens.css` | 64,966 | 19,617 | 16,301 | The 178 semantic tokens. Nothing paints without this. |
+| `all.css` | 171 | 136 | 96 | The three above in one import, in the order they have to be in. |
+| `primitives.css` | 6,108 | 1,217 | 1,048 | The primitive layer. Private, shipped because `tokens.css` resolves into it. |
+| `tokens.css` | 19,337 | 2,364 | 1,981 | The 178 semantic tokens. Nothing paints without this. |
 
 ## What the numbers say
 
@@ -369,7 +372,7 @@ column is what was removed rather than part of what remains.
 | `@helix-io/core` | 779,283 | 103 | 139,763 | `@floating-ui/dom`, `@helix-io/icons` |
 | `@helix-io/headless` | 7,333,707 | 390 | 615,325 | `@helix-io/core`, `@helix-io/icons`, `uqr` |
 | `@helix-io/icons` | 64,200 | 11 | 19,847 | none |
-| `@helix-io/styles` | 278,844 | 6 | 0 | none |
+| `@helix-io/styles` | 79,699 | 5 | 0 | none |
 | `@helix-io/theme` | 564,859 | 16 | 47,856 | none |
 | `@helix-io/styled` | 8,078,242 | 675 | 272,993 | `@helix-io/core`, `@helix-io/headless`, `@helix-io/styles` |
 

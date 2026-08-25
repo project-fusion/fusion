@@ -645,6 +645,33 @@ looks correct and the component is quietly unstyled.
 Per-component hooks (`--card-padding`) are not Helix tokens and are exempt. They
 should default to a semantic token.
 
+**`helix/styles` authors in `src` and ships `dist`, and the comment is the
+difference.** The package exported `./src/*.css` until 24 Aug 2026, so every
+consumer downloaded the reasoning: `tokens.css` is 71 percent comment,
+`primitives.css` 82, `base.css` 75, and the set was 60,944 bytes gzipped against
+8,219 of declarations. `bun run styles:dist` strips comments into `dist` and
+`exports` points there, so a consumer writing `@helix-io/styles/tokens.css` is
+unaffected and gets a quarter of the bytes.
+
+**Comments only.** Squeezing whitespace on top saves a further 4,395 raw and 354
+gzipped, four percent of what is left, which does not pay for a minifier or for
+a transform that could change a value. `postcss` is in the tree because Next
+brought it and is not ours to depend on.
+
+**The eleven scripts that read these files keep reading `src`**, because what
+they check is what somebody wrote. Only `exports` moved. `build-metrics.mjs` is
+the exception and measures `dist`, that page's own rule being that what is
+measured is what npm ships.
+
+**The stripper is a scanner and its check is a second implementation.** A regex
+is safe against today's content rather than by construction, since a comment
+marker inside a string is legal CSS. The build extracts every declaration from
+both sides and compares, and the first version of that check ran the scanner
+over both sides, so it compared the output to itself: breaking the scanner on
+purpose left the build green while it dropped 293 bytes of real CSS. A check
+that shares an implementation with the thing it checks agrees with itself.
+Reaching the two sides by two methods is what gives it teeth.
+
 **A hook is named after the family that owns it, and owned by one family.**
 `check:hooks` holds both. A consumer predicts `--card-padding` from
 `<helix-card>` and predicts nothing from a name that does not follow, and a

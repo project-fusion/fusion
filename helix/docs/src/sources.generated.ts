@@ -1768,16 +1768,19 @@ repository does that. The per-component tables are what a page pays.
 
 ## The stylesheets
 
-Linked rather than bundled, so these are the files as shipped and a consumer
-minifies them or does not. \`@helix-io/styles\` has no JavaScript at all, which
-is why it is the whole cost of adopting the base layer on its own.
+Linked rather than bundled, so these are the files exactly as a browser
+receives them. \`@helix-io/styles\` ships its stylesheets with the comments
+removed and keeps the reasoning in the repository, which is why these numbers
+are a quarter of what the sources weigh. It has no JavaScript at all, so this
+is the whole cost of adopting the base layer on its own.
 
 | File | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
-| \`base.css\` | 84,136 | 26,210 | 22,556 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
+| \`base.css\` | 21,595 | 3,484 | 2,992 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
 | \`elements.css\` | 7,887 | 1,823 | 1,543 | The components' own layer, generated from every family's stylesheet. |
-| \`primitives.css\` | 32,648 | 11,331 | 9,635 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
-| \`tokens.css\` | 64,966 | 19,617 | 16,301 | The 178 semantic tokens. Nothing paints without this. |
+| \`all.css\` | 171 | 136 | 96 | The three above in one import, in the order they have to be in. |
+| \`primitives.css\` | 6,108 | 1,217 | 1,048 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
+| \`tokens.css\` | 19,337 | 2,364 | 1,981 | The 178 semantic tokens. Nothing paints without this. |
 
 ## What the numbers say
 
@@ -2070,7 +2073,7 @@ column is what was removed rather than part of what remains.
 | \`@helix-io/core\` | 779,283 | 103 | 139,763 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
 | \`@helix-io/headless\` | 7,333,707 | 390 | 615,325 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 64,200 | 11 | 19,847 | none |
-| \`@helix-io/styles\` | 278,844 | 6 | 0 | none |
+| \`@helix-io/styles\` | 79,699 | 5 | 0 | none |
 | \`@helix-io/theme\` | 564,859 | 16 | 47,856 | none |
 | \`@helix-io/styled\` | 8,078,242 | 675 | 272,993 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
@@ -4783,11 +4786,7 @@ no build step at all. Two ways, and they suit different things.
 
 \`\`\`html
 <link
-  href="/vendor/helix/tokens.css"
-  rel="stylesheet"
-/>
-<link
-  href="/vendor/helix/base.css"
+  href="/vendor/helix/all.css"
   rel="stylesheet"
 />
 
@@ -4862,11 +4861,7 @@ control](./state-and-control).
 
 \`\`\`html
 <link
-  href="/vendor/helix/tokens.css"
-  rel="stylesheet"
-/>
-<link
-  href="/vendor/helix/base.css"
+  href="/vendor/helix/all.css"
   rel="stylesheet"
 />
 <link
@@ -4875,8 +4870,22 @@ control](./state-and-control).
 />
 \`\`\`
 
-In that order, and \`elements.css\` matters more here than anywhere: with no
-bundler the module graph arrives over the network, so the interval where the
-markup exists and the definitions do not is longer than it is in a built app.
+\`all.css\` carries \`primitives.css\`, \`tokens.css\` and \`base.css\` in the order they
+have to be in, and its \`@import\`s are relative, so a browser resolves them
+against the stylesheet's own URL with no bundler involved. Copy the whole
+\`dist\` folder and link the one file. Verified in Chromium: one \`<link>\` produces
+four requests and both layers resolve.
+
+*This page listed \`tokens.css\` and \`base.css\` and no \`primitives.css\` until 24
+Aug 2026, which is the same omission \`installation.mdx\`, \`introduction.mdx\` and
+the agent page carried. \`tokens.css\` refers to a primitive 235 times and imports
+nothing, so a reader who followed this got all 178 semantic tokens declared and
+every one resolving to \`rgba(0, 0, 0, 0)\`. Linking \`all.css\` is the fix that
+cannot be got wrong again.*
+
+\`elements.css\` stays its own link, being \`@helix-io/styled\`'s rather than this
+package's, and it matters more here than anywhere: with no bundler the module
+graph arrives over the network, so the interval where the markup exists and the
+definitions do not is longer than it is in a built app.
 `,
 }

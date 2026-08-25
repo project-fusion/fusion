@@ -15,11 +15,7 @@ no build step at all. Two ways, and they suit different things.
 
 ```html
 <link
-  href="/vendor/helix/tokens.css"
-  rel="stylesheet"
-/>
-<link
-  href="/vendor/helix/base.css"
+  href="/vendor/helix/all.css"
   rel="stylesheet"
 />
 
@@ -94,11 +90,7 @@ control](./state-and-control).
 
 ```html
 <link
-  href="/vendor/helix/tokens.css"
-  rel="stylesheet"
-/>
-<link
-  href="/vendor/helix/base.css"
+  href="/vendor/helix/all.css"
   rel="stylesheet"
 />
 <link
@@ -107,6 +99,20 @@ control](./state-and-control).
 />
 ```
 
-In that order, and `elements.css` matters more here than anywhere: with no
-bundler the module graph arrives over the network, so the interval where the
-markup exists and the definitions do not is longer than it is in a built app.
+`all.css` carries `primitives.css`, `tokens.css` and `base.css` in the order they
+have to be in, and its `@import`s are relative, so a browser resolves them
+against the stylesheet's own URL with no bundler involved. Copy the whole
+`dist` folder and link the one file. Verified in Chromium: one `<link>` produces
+four requests and both layers resolve.
+
+*This page listed `tokens.css` and `base.css` and no `primitives.css` until 24
+Aug 2026, which is the same omission `installation.mdx`, `introduction.mdx` and
+the agent page carried. `tokens.css` refers to a primitive 235 times and imports
+nothing, so a reader who followed this got all 178 semantic tokens declared and
+every one resolving to `rgba(0, 0, 0, 0)`. Linking `all.css` is the fix that
+cannot be got wrong again.*
+
+`elements.css` stays its own link, being `@helix-io/styled`'s rather than this
+package's, and it matters more here than anywhere: with no bundler the module
+graph arrives over the network, so the interval where the markup exists and the
+definitions do not is longer than it is in a built app.

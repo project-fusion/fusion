@@ -74,6 +74,7 @@
     "specs": "bun tooling/scripts/build-specs.mjs",
     "specs:browser": "bun run specs && node tooling/scripts/run-browser-specs.mjs",
     "smoke": "node tooling/scripts/run-example-smoke.mjs",
+    "styles:dist": "node tooling/scripts/build-styles-dist.mjs",
     "styles": "turbo run styles",
     "test": "turbo run test",
     "test:template": "node tooling/scripts/run-template-test.mjs",

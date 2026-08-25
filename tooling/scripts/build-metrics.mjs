@@ -170,23 +170,36 @@ const PACKAGES = [
 const TOKEN_COUNT = JSON.parse(readFileSync(join(ROOT, 'helix', 'styles', 'tokens.json'), 'utf8'))
   .tokens.length
 
-/** The stylesheets a consumer links, which no bundler is involved in. */
+/**
+ * The stylesheets a consumer links, which no bundler is involved in.
+ *
+ * **`dist` rather than `src`, for the reason this whole page gives about
+ * JavaScript: what is measured is what npm ships.** `@helix-io/styles` exported
+ * its authoring copies until 24 Aug 2026, so these rows counted the reasoning
+ * as payload: `tokens.css` was 71 percent comment, `primitives.css` 82 and
+ * `base.css` 75, and the three together were 60,944 bytes gzipped against 8,219
+ * of declarations.
+ */
 const STYLESHEETS = [
   {
     note: 'The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all.',
-    path: 'helix/styles/src/base.css',
+    path: 'helix/styles/dist/base.css',
   },
   {
     note: "The components' own layer, generated from every family's stylesheet.",
     path: 'helix/styled/elements.css',
   },
   {
+    note: 'The three above in one import, in the order they have to be in.',
+    path: 'helix/styles/dist/all.css',
+  },
+  {
     note: 'The primitive layer. Private, shipped because `tokens.css` resolves into it.',
-    path: 'helix/styles/src/primitives.css',
+    path: 'helix/styles/dist/primitives.css',
   },
   {
     note: `The ${TOKEN_COUNT} semantic tokens. Nothing paints without this.`,
-    path: 'helix/styles/src/tokens.css',
+    path: 'helix/styles/dist/tokens.css',
   },
 ]
 
@@ -646,9 +659,11 @@ const lines = [
   '',
   '## The stylesheets',
   '',
-  'Linked rather than bundled, so these are the files as shipped and a consumer',
-  'minifies them or does not. `@helix-io/styles` has no JavaScript at all, which',
-  'is why it is the whole cost of adopting the base layer on its own.',
+  'Linked rather than bundled, so these are the files exactly as a browser',
+  'receives them. `@helix-io/styles` ships its stylesheets with the comments',
+  'removed and keeps the reasoning in the repository, which is why these numbers',
+  'are a quarter of what the sources weigh. It has no JavaScript at all, so this',
+  'is the whole cost of adopting the base layer on its own.',
   '',
   '| File | Raw | Gzip | Brotli | |',
   '|---|---|---|---|---|',
