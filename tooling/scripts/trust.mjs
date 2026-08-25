@@ -57,7 +57,7 @@
 import { execFileSync } from 'node:child_process'
 import { domainOf, manifests, publishes } from './workspace.mjs'
 
-const REPOSITORY = 'former-org/former-repo'
+const REPOSITORY = 'project-fusion/fusion'
 
 /** Which workflow may publish, and the environment it must be running in. */
 const PUBLISHERS = [

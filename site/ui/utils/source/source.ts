@@ -11,7 +11,7 @@
  * selector in preferences resolves to, at which point this is the only file
  * that changes.
  */
-const REPOSITORY = 'https://github.com/former-org/former-repo'
+const REPOSITORY = 'https://github.com/project-fusion/fusion'
 
 /** The ref a link points at. One value today, a reader's choice later. */
 export const REF = 'main'

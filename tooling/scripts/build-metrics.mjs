@@ -540,7 +540,7 @@ const comparison = () => {
       (system) => `- **${system.name}** \`${system.package}@${system.version}\`. ${system.note}`,
     ),
     '',
-    'Every specifier measured is in [`peers.json`](https://github.com/former-org/former-repo/blob/main/helix/docs/peers.json), so a disagreement with these numbers is a thing that can be run rather than argued.',
+    'Every specifier measured is in [`peers.json`](https://github.com/project-fusion/fusion/blob/main/helix/docs/peers.json), so a disagreement with these numbers is a thing that can be run rather than argued.',
     '',
   ]
 }
