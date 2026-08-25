@@ -1434,6 +1434,10 @@ for (const slug of wanted) {
   const linked = body.replace(/<link\b[^>]*rel=["']stylesheet["'][^>]*>\s*/gi, '')
   const html =
     format(`<!-- @summary The same ${displayName(slug).toLowerCase()} on the headless tier, with every rule written by hand. -->
+<!-- Generated from \`default.html\` beside it by \`bun run examples:headless\`. Do not edit.
+     It lives in the styled package because that is where it is derived from: the two
+     examples show the same content on both tiers, which is only checkable while they
+     sit together. \`helix/headless\` holds no examples of its own. See 275. -->
 
 <link href="styles.css" rel="stylesheet" />
 
