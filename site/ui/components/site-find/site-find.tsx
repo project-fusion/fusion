@@ -32,17 +32,17 @@ const DESTINATIONS: Findable[] = [
   {
     group: 'Products',
     items: [
-      { href: '/helix', label: 'Helix, the design system' },
-      { href: '/helix/components', label: 'Components, every family Helix ships' },
-      { href: '/cortex', label: 'Cortex, memory and provenance' },
+      { description: 'The design system', href: '/helix', label: 'Helix' },
+      { description: 'Every family Helix ships', href: '/helix/components', label: 'Components' },
+      { description: 'Memory and provenance', href: '/cortex', label: 'Cortex' },
       /* The workbench, not the component. `Sandbox` is a family like any other
          and the catalog already offers its reference page; this is the tool
          that page describes, which nothing else in the palette could reach. */
-      { href: '/helix/sandbox', label: 'Sandbox, the component workbench' },
+      { description: 'The component workbench', href: '/helix/sandbox', label: 'Sandbox' },
       /* The other tool, and the same reasoning: `@helix-io/theme` is a package
          rather than a component family, so the catalog cannot offer it and
          nothing else in the palette could reach the thing that drives it. */
-      { href: '/helix/theme', label: 'Theme builder, a palette and its audit' },
+      { description: 'A palette and its audit', href: '/helix/theme', label: 'Theme builder' },
       /* Not a tool, and here for the opposite reason to the two above: nothing
          reaches it at all. It is in `routes.ts`, so it is in the sitemap and in
          `llms.txt`, and that was the whole of it: no panel row, no palette
@@ -57,14 +57,14 @@ const DESTINATIONS: Findable[] = [
          the manifest keeps when it records a path and lets the site compose the
          URL. Versioned MDX naming a live route would point every archived page
          at today's site. */
-      { href: '/helix/aura', label: 'Aura, the field and its geometry' },
+      { description: 'The field and its geometry', href: '/helix/aura', label: 'Aura' },
     ],
   },
   {
     group: 'Services',
     items: [
-      { href: '/services', label: 'What you can buy today' },
-      { href: '/contact', label: 'Contact, and what to put in the first message' },
+      { description: 'What you can buy today', href: '/services', label: 'Services' },
+      { description: 'What to put in the first message', href: '/contact', label: 'Contact' },
     ],
   },
   {
@@ -79,7 +79,14 @@ const DESTINATIONS: Findable[] = [
 
 export interface Findable {
   group: string
-  items: { alternate?: string; alternateLabel?: string; href: string; label: string }[]
+  items: {
+    alternate?: string
+    alternateLabel?: string
+    /** A second line under the name, for what the destination actually is. */
+    description?: string
+    href: string
+    label: string
+  }[]
 }
 
 /**
@@ -256,6 +263,7 @@ export function SiteFind({
                 <helix-option
                   alternate={one.alternate}
                   alternate-label={one.alternateLabel}
+                  description={one.description}
                   key={one.href}
                   value={one.href}
                 >

@@ -7,7 +7,7 @@ import { type RouteKind, routes } from '../../content/routes/routes'
 const findable = (kind: RouteKind) =>
   routes()
     .filter((route) => route.kind === kind)
-    .map((route) => ({ href: route.path, label: route.title }))
+    .map((route) => ({ description: route.description, href: route.path, label: route.title }))
 
 /**
  * Header, content column, and footer: everything except the tools.
@@ -43,10 +43,12 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           sitemap and `llms.txt` are built from. A fourth copy of it here would
           have drifted the same way the third one did.
 
-          `Route.description` says in its own comment that it is for `llms.txt`
-          *and for a search result*, which is worth acting on when `Findable`
-          grows somewhere to put it. Today an item is a label and a href, so
-          the title is what a reader matches against. */}
+          **`Route.description` is now the caption**, which is what its own
+          comment always said it was for: `llms.txt` *and a search result*. It
+          waited on `Findable` having somewhere to put it, and `Option` having
+          somewhere to draw it, and as of 25 Aug 2026 both are true. Matching is
+          still on the title, so what somebody types is measured against the
+          name rather than against prose about it. */}
       <SiteNav
         findable={[
           { group: 'Components', items: findable('component') },
