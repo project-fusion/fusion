@@ -1,13 +1,28 @@
-# What the sandbox build does not need.
+# What the site build does not need.
 #
-# The deploy runs from the repo root, because sandbox/ui is a workspace package
-# and its dependencies are built from source. That would otherwise upload the
-# whole company: strategy, the planning documents have no part
-# in building a component sandbox, so they do not leave the machine.
+# The deploy runs from the repo root, because site/ui is a workspace package and
+# its dependencies are built from source. That would otherwise upload the whole
+# company: strategy, the planning documents had no part in
+# building a component gallery, so they did not leave the machine.
+#
 # Leading slash matters: `docs/` is a gitignore-style pattern and would also
 # match `cortex/docs` and `helix/docs`, which are workspace members. Excluding
 # those breaks `bun install` before the build starts.
-/docs/
+#
+# **Amended 25 Aug 2026, and the old rule had started doing the harm it warns
+# about one line up.** `/docs/` was written when that folder held the numbered
+# strategy and nothing else. Two things have changed since: the strategy left
+# with the history rewrite, so the exclusion now protects nothing that exists,
+# and `site/content` became `docs/insights`, so the folder holds
+# `@fusion-io/insights`, a workspace member the site depends on. Excluding it
+# failed `bun install` exactly as this comment predicted for the nested ones.
+#
+# So the pattern names the files rather than the folder. The three markdown
+# documents left at the top of `docs/` are the queue and two generated
+# references, none of them read by anything on the build path and all three
+# repository-internal, which `site/ui/app/helix/tokens.json/route.ts` says of
+# the token reference in as many words.
+/docs/*.md
 
 # Build output and scratch, rebuilt on Vercel anyway.
 .claude/
