@@ -41,7 +41,8 @@
 //! solved lightness      0 of 405 differ
 //! search emitted hex    0 of 405 differ
 //! perceptual distance   0 of 240 differ
-//! parsed hex            6 of  45 differ, worst by 5.55e-17
+//! parsed hex            6 of  45 differ, worst by 5.55e-17 (macOS)
+//!                       7 of  45 differ, worst by 8.53e-14 (Linux)
 //! ```
 //!
 //! So everything is asserted to the bit except the three components
@@ -85,11 +86,21 @@ use crate::oklch::{
 const EXACT: f64 = 0.0;
 
 /// The one place two libms genuinely part company: `hex_to_oklch` goes through
-/// `cbrt` and `atan2`, and 6 of 45 components come back a last place out, by at
-/// most 5.55e-17. Eleven orders below the byte those components are rounded
-/// into, and the exact hex assertions are what would catch it if it ever reached
-/// one.
-const PARSE_TOLERANCE: f64 = 1e-15;
+/// `cbrt` and `atan2`, and a few of 45 components come back a last place out.
+///
+/// **How far out depends on the libm, and 1e-15 was measured on one of them.**
+/// macOS gives 6 of 45, worst by 5.55e-17. Linux gives 7 of 45, worst by
+/// 8.53e-14, about fifteen hundred times further, and the tolerance written
+/// from the macOS figure failed there every time. Nobody saw it because
+/// `verify` had never completed in CI, which is 261.
+///
+/// 1e-12 covers both with room, and is the same figure `check-wasm.mjs` already
+/// carries for the same reason: `wasm32` takes Rust's own libm rather than the
+/// host's, so it is a third answer to the same three functions. Still nine
+/// orders below the byte those components are rounded into, and every other
+/// assertion here stays exact, so a regression in the solver is still visible
+/// rather than absorbed.
+const PARSE_TOLERANCE: f64 = 1e-12;
 
 fn oracle() -> Value {
     serde_json::from_str(include_str!("oracle.json")).expect("oracle.json is valid JSON")

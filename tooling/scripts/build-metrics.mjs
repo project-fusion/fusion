@@ -745,10 +745,28 @@ const output = join(ROOT, OUTPUT)
 if (check) {
   const existing = existsSync(output) ? readFileSync(output, 'utf8') : ''
   if (existing !== written) {
+    /* **Which lines, not just that some line.** Reporting only staleness costs a
+       round trip to find out what moved, and on a runner that round trip is the
+       whole build again: 25 Aug 2026 this failed in CI four times without ever
+       saying by how much, while the same command passed on the machine reading
+       the report. A number that differs by platform and a number that differs
+       because somebody edited a component look identical until you see them. */
+    const before = existing.split('\n')
+    const after = written.split('\n')
+    const moved = after
+      .map((line, index) => [before[index], line])
+      .filter(([was, now]) => was !== now)
+
     console.error(
       `${OUTPUT} is behind the packages it measures. Run \`bun run metrics\` and commit the result.\n` +
         `If the only difference is the numbers, check the bundler first: this run used Bun ${Bun.version}, ` +
-        'and the pinned version is the one in `packageManager`.',
+        'and the pinned version is the one in `packageManager`.\n\n' +
+        `${moved.length} line${moved.length === 1 ? '' : 's'} differ:\n` +
+        moved
+          .slice(0, 20)
+          .map(([was, now]) => `  - ${was ?? '(absent)'}\n  + ${now}`)
+          .join('\n') +
+        (moved.length > 20 ? `\n  ... and ${moved.length - 20} more` : ''),
     )
     process.exit(1)
   }
