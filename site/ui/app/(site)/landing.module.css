@@ -310,6 +310,30 @@
   position: absolute;
 }
 
+/* **A percentage ellipse over a phone covers everything there is to see.**
+ *
+ * The scrim is 62% of the width, which on a desktop leaves the outer thirds of
+ * the field lit and reads as light around a claim. At 375 those thirds are
+ * 71px each, so the core and its falloff take the whole visible width and what
+ * is left of the aura is the strip behind the masthead. Reported as the aura
+ * barely showing on a phone, and it is the scrim rather than the light: hiding
+ * this element alone brings the field back at the same width.
+ *
+ * **The core was also narrower than the line it protects.** 62% of 375 is 232px
+ * against a 327px measure, so the ends of every heading sat outside the darkest
+ * part while the middle of the field paid for it. Wider and weaker is the trade
+ * that answers both: the whole line gets the same ground, and less of it. */
+@media (width < 48rem) {
+  .reelScrim {
+    background: radial-gradient(
+      ellipse 92% 24% at 50% 27%,
+      color-mix(in srgb, var(--helix-color-background) 46%, transparent) 0%,
+      color-mix(in srgb, var(--helix-color-background) 24%, transparent) 58%,
+      color-mix(in srgb, var(--helix-color-background) 0%, transparent) 100%
+    );
+  }
+}
+
 /* Above the light. Positioned, and that is the whole of the stacking:
    positioned elements with no `z-index` stack in tree order, and the order in
    the markup is already aura, scrim, words. */
