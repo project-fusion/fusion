@@ -50,6 +50,31 @@ jobs:
         with:
           fetch-depth: 0
 
+      # TEMPORARY, remove once the federation rule is confirmed. Prints the
+      # claims this run actually presents so the rule is written against a
+      # measured subject rather than a guessed one. The token itself is never
+      # printed; these claims are public facts about the run.
+      - name: Report the OIDC subject
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const token = await core.getIDToken('https://api.anthropic.com')
+            const claims = JSON.parse(
+              Buffer.from(token.split('.')[1], 'base64url').toString(),
+            )
+            for (const key of [
+              'aud',
+              'event_name',
+              'ref',
+              'repository',
+              'repository_id',
+              'repository_owner',
+              'repository_owner_id',
+              'sub',
+            ]) {
+              core.info(`${key} = ${claims[key]}`)
+            }
+
       # **There is no API key, and the four identifiers below are not secrets.**
       # Workload identity federation exchanges the run's own GitHub OIDC token
       # for an Anthropic token that lives ten minutes, so the reviewer
