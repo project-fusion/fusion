@@ -3,6 +3,24 @@
   // Read by `tooling/scripts/version.mjs`, which hands the resolved release
   // version back to the workflow that asked for it. Declared so the lint that
   // watches for undeclared environment access stays meaningful.
+  // **The platform is part of the hash, because turbo does not put it there and
+  // the artifacts differ by it.** Measured 25 Aug 2026, the day the remote cache
+  // started working: CI restored a build this laptop had written, and
+  // `check:metrics` then reported `@helix-io/theme` at 566,424 bytes over 16
+  // files where a Linux build produces 465,772 over 8. A check whose answer
+  // depends on which machine warmed the cache is not a check.
+  //
+  // `RUNNER_OS` and `RUNNER_ARCH` are set by GitHub Actions and unset on a
+  // desk, so the two populations never share an entry. What matters is kept:
+  // every job in a run is Linux, so the six check shards and four browser
+  // shards still restore each other's build, which is where the saving was.
+  // Nothing is lost but a laptop feeding a runner, which is the thing that
+  // broke.
+  //
+  // A first-class platform key would be better than borrowing two environment
+  // variables from one CI provider. Turborepo has none, so this is the idiom
+  // rather than a preference.
+  "globalEnv": ["RUNNER_ARCH", "RUNNER_OS"],
   "globalPassThroughEnv": ["GITHUB_OUTPUT", "NODE_AUTH_TOKEN"],
   "tasks": {
     // `cem analyze` writes three files and this used to claim one. The manifest
