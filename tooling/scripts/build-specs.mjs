@@ -7,7 +7,8 @@
  * is the whole of the difference: no rewriting, no second suite to keep in
  * step, and a spec that is deleted stops being reported the same day.
  *
- * One `Bun.build` for every family, each entry self-contained.
+ * Two `Bun.build` calls: one shared runtime, and one bundle per family that
+ * imports it rather than inlining it.
  *
  * **Splitting was on and had to come off.** It emitted Lit and anything two
  * families shared once instead of into every bundle, which is the right instinct
@@ -20,15 +21,26 @@
  * runs. Measured: 218 chunks and a passing suite, then two more spec files took
  * it to 450 chunks and all 88 families failed at load.
  *
- * The cost is disk and not download. 2.1 MB becomes 22 MB across 88 entries,
- * and the sandbox fetches one family: about 250 KB, which is roughly what an
- * entry plus the shared chunks it reached came to anyway. A build artifact that
- * runs is worth ten times the bytes of one that does not.
+ * **So the shared parts are shared by being external, not by being chunked.**
+ * `RUNTIME` below is built once with splitting on, and every family resolves
+ * those specifiers to a URL instead of inlining them. The cycle above cannot
+ * reach it: it is a fact about Helix's two tiers, and the runtime carries
+ * neither. What it carries is Lit and the icon set, and both were in all 88
+ * bundles. Measured: 14,674 KB became 9,350 KB and a 65 KB runtime, and a
+ * family that was 132 KB is 71 KB against a runtime the next family already
+ * has.
+ *
+ * **The duplication that mattered was not the bytes.** Two families opened in
+ * one sandbox session were two Lit instances in one document, so `unsafeSVG`
+ * from the first was a directive the second's `render` did not recognize, and
+ * `helix-icon` was defined by whichever family ran first while the other's specs
+ * held a different class of the same name. `helix/core`'s `customElement` warns
+ * about exactly this and cannot fix it. One runtime is the fix.
  *
  * Run with bun, not node: `Bun.build` is the bundler.
  */
 
-import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -52,6 +64,27 @@ const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/styled/src'
 const harness = join(root, 'helix/testing/src/browser.ts')
 const entries = join(root, '.local/spec-entries')
 const out = join(root, 'site/ui/public/specs')
+
+/**
+ * What every family imports instead of inlining, and the file each one gets.
+ *
+ * Keyed by specifier so the plugin below can refuse anything absent: a lit
+ * subpath nobody listed would otherwise be inlined quietly, which is a second
+ * Lit in the document and the exact fault this exists to remove.
+ *
+ * One entry per specifier rather than one file re-exporting all of them,
+ * because `lit` and `lit/static-html.js` both export `html` and they are not
+ * the same binding. A single flat module would have to drop one of them.
+ */
+const RUNTIME = {
+  '@helix-io/icons': 'helix-icons',
+  lit: 'lit',
+  'lit/decorators.js': 'lit-decorators',
+  'lit/directives/style-map.js': 'lit-style-map',
+  'lit/directives/unsafe-html.js': 'lit-unsafe-html',
+  'lit/directives/unsafe-svg.js': 'lit-unsafe-svg',
+  'lit/static-html.js': 'lit-static-html',
+}
 
 /** Every family holding at least one DOM spec, with the specs it holds. */
 const families = async () => {
@@ -80,6 +113,30 @@ const families = async () => {
   return found
 }
 
+/**
+ * Points the shared specifiers at the built runtime, as a relative URL.
+ *
+ * Relative and not absolute, because the two places these bundles load from
+ * disagree about the prefix: the sandbox serves them under `/specs/` and
+ * `run-browser-specs.mjs` serves the same directory at its root. `./runtime/x.js`
+ * is correct from both; `/specs/runtime/x.js` is correct from one.
+ */
+const shareRuntime = {
+  name: 'shared-runtime',
+  setup(build) {
+    build.onResolve({ filter: /^(@helix-io\/icons|lit(\/.*)?)$/ }, ({ path }) => {
+      const name = RUNTIME[path]
+      if (!name) {
+        throw new Error(
+          `A spec reaches \`${path}\`, which the shared runtime does not carry. Add it to RUNTIME, ` +
+            'or it is inlined into every family that imports it and the document holds two Lits.',
+        )
+      }
+      return { external: true, path: `./runtime/${name}.js` }
+    })
+  },
+}
+
 /** Points the spec harness imports at the browser one. */
 const useBrowserHarness = {
   name: 'browser-spec-harness',
@@ -96,26 +153,38 @@ await rm(out, { force: true, recursive: true })
 await mkdir(entries, { recursive: true })
 
 /**
- * Lit's two unsafe directives, named by every entry so they share one chunk.
+ * The shared runtime, built before the families that import it.
  *
- * `unsafe-svg` extends `unsafe-html`, and splitting groups a module by which
- * entries reach it: nearly every family reaches `unsafe-svg`, through the icons,
- * and far fewer reach `unsafe-html`. So the two landed in different chunks with
- * the subclass in the shared one, and the chunks imported each other, because
- * the subclass needs its base and the base needs Lit's directive machinery back
- * out of the shared chunk.
- *
- * An `extends` clause is evaluated the moment its module runs, so neither chunk
- * could go first: `Cannot access 'JZ' before initialization`, on 66 of 74
- * families, which is every family that reaches the cycle at all. Naming both
- * here makes them reachable from every entry, so they are grouped together and
- * the edge between them stops crossing a chunk boundary.
- *
- * Imported for the grouping rather than for the bindings, which is why nothing
- * is named: this is a statement about chunking, and deleting it puts the cycle
- * back.
+ * Splitting is on here and off below, and the difference is what each build
+ * holds. This one holds libraries: `lit/directives/unsafe-svg.js` extends
+ * `unsafe-html`, and grouping them is the whole reason splitting is safe to
+ * ask for, since both are reachable from every entry and land together. The
+ * family build holds Helix's two tiers, where the same grouping cannot be
+ * arranged, so it stays off there.
  */
-const SHARED = "import 'lit/directives/unsafe-html.js'\nimport 'lit/directives/unsafe-svg.js'\n"
+const runtimeEntries = join(entries, 'runtime')
+await mkdir(runtimeEntries, { recursive: true })
+await Promise.all(
+  Object.entries(RUNTIME).map(([specifier, name]) =>
+    writeFile(join(runtimeEntries, `${name}.ts`), `export * from '${specifier}'\n`),
+  ),
+)
+
+const runtime = await Bun.build({
+  entrypoints: Object.values(RUNTIME).map((name) => join(runtimeEntries, `${name}.ts`)),
+  minify: true,
+  naming: { chunk: '[name]-[hash].[ext]', entry: '[name].[ext]' },
+  outdir: join(out, 'runtime'),
+  splitting: true,
+  target: 'browser',
+})
+
+if (!runtime.success) {
+  for (const log of runtime.logs) {
+    console.error(log)
+  }
+  process.exit(1)
+}
 
 const written = []
 for (const [family, specs] of found) {
@@ -127,7 +196,7 @@ for (const [family, specs] of found) {
   // it as well.
   await writeFile(
     file,
-    `${SHARED}${imports.join('\n')}\nimport { claim } from '${relative(entries, harness).replaceAll('\\', '/')}'\nexport const run = claim()\n`,
+    `${imports.join('\n')}\nimport { claim } from '${relative(entries, harness).replaceAll('\\', '/')}'\nexport const run = claim()\n`,
   )
   written.push(file)
 }
@@ -139,7 +208,7 @@ const result = await Bun.build({
   // is not something the served URL should carry.
   naming: { chunk: '[name]-[hash].[ext]', entry: '[name].[ext]' },
   outdir: out,
-  plugins: [useBrowserHarness],
+  plugins: [shareRuntime, useBrowserHarness],
   /* Off, for the reason the header gives: an entry holding both tiers of a
      family puts a subclass and its base in different chunks and the cycle is
      unresolvable. `SHARED` below fixed the same fault for one pair of Lit
@@ -156,6 +225,46 @@ if (!result.success) {
   process.exit(1)
 }
 
+/**
+ * The external specifiers, pointed at the runtime files after the fact.
+ *
+ * `shareRuntime` returns a path and Bun keeps the specifier: an external import
+ * is emitted verbatim as `from"lit"`, which is a bare specifier and a browser
+ * will not resolve one without an import map. esbuild honors the returned path
+ * here and Bun does not, so the rewrite happens where the limitation is rather
+ * than in the two documents that load these bundles.
+ *
+ * An import map was the other option and is worse in the place it has to go.
+ * One of the two hosts is a Next route, so the map would have to be in the
+ * document before Next's own module scripts trigger a load, and a map that
+ * arrives late is a hard error rather than a fallback. This is a string
+ * replacement over minified output, which is only safe because `from"` and
+ * `import"` appear in import statements and nowhere else, and because the
+ * assertion below fails the build if any specifier survives.
+ */
+const rewrites = Object.entries(RUNTIME).flatMap(([specifier, name]) => [
+  [`from"${specifier}"`, `from"./runtime/${name}.js"`],
+  [`import"${specifier}"`, `import"./runtime/${name}.js"`],
+])
+
+for (const file of await readdir(out)) {
+  if (!file.endsWith('.js')) {
+    continue
+  }
+  const path = join(out, file)
+  let text = await readFile(path, 'utf8')
+  for (const [before, after] of rewrites) {
+    text = text.replaceAll(before, after)
+  }
+  const stranded = Object.keys(RUNTIME).filter(
+    (specifier) => text.includes(`from"${specifier}"`) || text.includes(`import"${specifier}"`),
+  )
+  if (stranded.length > 0) {
+    console.error(`specs: ${file} still imports ${stranded.join(', ')} by bare specifier`)
+    process.exit(1)
+  }
+  await writeFile(path, text)
+}
 await rm(entries, { force: true, recursive: true })
 
 /**
@@ -174,6 +283,8 @@ await writeFile(
 
 const bytes = result.outputs.reduce((total, output) => total + output.size, 0)
 const specCount = [...found.values()].reduce((total, specs) => total + specs.length, 0)
+const runtimeBytes = runtime.outputs.reduce((total, output) => total + output.size, 0)
 console.log(
-  `specs: ${found.size} families, ${specCount} files, ${result.outputs.length} chunks, ${Math.round(bytes / 1024)} KB`,
+  `specs: ${found.size} families, ${specCount} files, ${result.outputs.length} chunks, ` +
+    `${Math.round(bytes / 1024)} KB, plus a ${Math.round(runtimeBytes / 1024)} KB shared runtime`,
 )
