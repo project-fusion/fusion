@@ -1,4 +1,7 @@
-# Fusion
+<div align="center">
+  <img src=".github/fusion-logo.svg" width="88" alt="Fusion" />
+  <h1>Fusion Development Group</h1>
+</div>
 
 **Fusion Development Group, LLC.** Developing for humanity.
 
