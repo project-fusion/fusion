@@ -425,6 +425,72 @@ export class HelixHeadlessCarousel extends HelixElement {
   }
 
   /**
+   * The slide the track is nearest to, or undefined when there is no track.
+   *
+   * Shared by the two readers of the scroll position, which want the same
+   * arithmetic and disagree about what to do with it: one commits where a drag
+   * settled, the other follows it while it is still moving.
+   *
+   * Only the leading edges a window can actually rest on. Past the last
+   * position every remaining slide is on screen already, and taking the nearest
+   * of *those* to the scroller's edge reported a place the reader could not get
+   * back to: dragged fully right, a four-across six reported the sixth slide
+   * and the dots jumped to an indicator that no longer existed.
+   */
+  private nearest(): number | undefined {
+    const track = this.renderRoot.querySelector<HTMLElement>('[part="track"]')
+    if (!track) {
+      return undefined
+    }
+    const bleed = this.bleed(track)
+    const at = this.orientation === 'vertical' ? track.scrollTop : track.scrollLeft
+    return this.slides.slice(0, this.positions).reduce(
+      (best, slide, index) => {
+        const distance = Math.abs(this.edgeOf(slide, track, bleed) - at)
+        return distance < best.distance ? { distance, index } : best
+      },
+      { distance: Number.POSITIVE_INFINITY, index: this.index },
+    ).index
+  }
+
+  /**
+   * Follows the track while a reader is still dragging it.
+   *
+   * **`scrollend` is the only honest place to commit an index and much too late
+   * to show one.** It fires once momentum has fully settled, which on iOS is
+   * most of a second after the finger has left the glass, so the dots sat on
+   * the old slide for the whole of the coast and then jumped. Reported exactly
+   * that way, as the delay on the indicator being too great.
+   *
+   * So showing and committing are separated. This moves the marker and nothing
+   * else: no state is written and no event is dispatched, because neither is
+   * true yet. A drag in flight is not a reader having chosen, `handleScroll`
+   * still decides that, and a consumer holding `index` still hears once.
+   *
+   * **The marker only, and not `aria-current` or the roving `tabindex`.** Those
+   * describe where the reader *is*, which is a question with one answer per
+   * settled position; moving them every frame of a drag would churn the
+   * accessibility tree to report a place nobody has arrived at.
+   *
+   * Coalesced to a frame, a scroll firing far more often than a screen
+   * refreshes, and skipped while we are settling a scroll of our own: a click
+   * has already moved the index and the track is following it, which is the
+   * precedence `handleScroll` documents at length.
+   */
+  private readonly handleTrackScroll = (): void => {
+    if (this.settling || this.scrollFrame) {
+      return
+    }
+    this.scrollFrame = requestAnimationFrame(() => {
+      this.scrollFrame = 0
+      const nearest = this.nearest()
+      if (nearest !== undefined && nearest !== this.showing) {
+        this.showing = nearest
+      }
+    })
+  }
+
+  /**
    * Reads where a reader's drag settled, and only a reader's.
    *
    * **The scroll we issued ourselves ends with a `scrollend` too, and taking it
@@ -446,34 +512,21 @@ export class HelixHeadlessCarousel extends HelixElement {
       this.settling = false
       return
     }
-    const track = this.renderRoot.querySelector<HTMLElement>('[part="track"]')
-    if (!track) {
+    /* The marker goes back to following the committed index, whatever this
+       reading turns out to be: the drag is over, so there is no longer a
+       position of its own to show. */
+    this.showing = undefined
+    const nearest = this.nearest()
+    if (nearest === undefined) {
       return
     }
-    // The nearest slide to the scroller's leading edge, so a drag that settles
-    // between two reports the one it settled on.
-    /* Only the leading edges a window can actually rest on. Past the last
-       position every remaining slide is on screen already, and taking the
-       nearest of *those* to the scroller's edge reported a place the reader
-       could not get back to: dragged fully right, a four-across six reported
-       the sixth slide and the dots jumped to an indicator that no longer
-       existed. */
-    const bleed = this.bleed(track)
-    const at = this.orientation === 'vertical' ? track.scrollTop : track.scrollLeft
-    const nearest = this.slides.slice(0, this.positions).reduce(
-      (best, slide, index) => {
-        const distance = Math.abs(this.edgeOf(slide, track, bleed) - at)
-        return distance < best.distance ? { distance, index } : best
-      },
-      { distance: Number.POSITIVE_INFINITY, index: this.index },
-    )
     /* Announced after the fact, and deliberately, where `goTo` announces
        before. The reader has already dragged the track here: there is nothing
        to refuse, and `preventDefault()` could not un-drag it. This is the case
        the controlled-change helper's own documentation distinguishes, a native
        control that has already moved, and putting it on that path would offer a
        refusal that cannot be honoured. */
-    if (nearest.index === this.index) {
+    if (nearest === this.index) {
       return
     }
     /* Announced whoever owns the state, written only if we do. `goTo` has this
@@ -481,11 +534,25 @@ export class HelixHeadlessCarousel extends HelixElement {
        overwritten by every drag: the one thing controlled mode promises is that
        nothing but them assigns it. */
     if (!this.indexIsControlled) {
-      this.indexState = nearest.index
+      this.indexState = nearest
       this.requestUpdate('index')
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: String(nearest.index) }))
+    this.dispatchEvent(new HelixSelectEvent({ value: String(nearest) }))
   }
+
+  /**
+   * Where the track is right now, while a drag is still running.
+   *
+   * Separate from `index`, which is where the reader has *arrived*. Undefined
+   * whenever the two would agree, so the marker falls back to the committed
+   * index the moment a drag settles and nothing has to keep them in step. See
+   * `handleTrackScroll` for why they are not one value.
+   */
+  @state()
+  private showing: number | undefined
+
+  /** The pending frame for the above, so a burst of scrolls costs one reading. */
+  private scrollFrame = 0
 
   /**
    * Whether the reader has stopped it, as opposed to something pausing it.
@@ -506,6 +573,10 @@ export class HelixHeadlessCarousel extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    if (this.scrollFrame) {
+      cancelAnimationFrame(this.scrollFrame)
+      this.scrollFrame = 0
+    }
     this.removeEventListener('focusin', this.pause)
     this.removeEventListener('pointerenter', this.pause)
     clearInterval(this.timer)
@@ -629,6 +700,7 @@ export class HelixHeadlessCarousel extends HelixElement {
       <div
         data-scroller
         part="track"
+        @scroll=${this.handleTrackScroll}
         @scrollend=${this.handleScroll}
         @pointerdown=${this.handleTake}
         @touchstart=${this.handleTake}
@@ -661,7 +733,7 @@ export class HelixHeadlessCarousel extends HelixElement {
                   aria-label=${`Slide ${at + 1}`}
                   aria-current=${at === this.index ? 'true' : nothing}
                   tabindex=${at === this.index ? '0' : '-1'}
-                  ?data-current=${at === this.index}
+                  ?data-current=${at === (this.showing ?? this.index)}
                   @keydown=${this.handleIndicatorKeydown}
                   @click=${() => this.goTo(at)}
                 ></button>`,

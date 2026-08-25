@@ -13,7 +13,19 @@
   box-sizing: border-box;
 }
 
+/* **The tap highlight is a grey rectangle iOS paints over whatever you touch**,
+ * ignoring the border radius under it, and it fires on the first touch of a
+ * gesture rather than on a tap. Reported from a carousel: swiping the slides
+ * lit up the card the finger started on, which reads as having pressed
+ * something you were only dragging past.
+ *
+ * Turned off at the document rather than per component, because it is a
+ * platform default that arrives on every interactive surface at once and no
+ * component can see it coming. What replaces it is each component's own press
+ * state, which is drawn in the component's own shape and stops when a scroll
+ * takes the gesture over. */
 html {
+  -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }

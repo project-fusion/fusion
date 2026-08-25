@@ -5139,11 +5139,48 @@
               "description": "Owns the timer, from the state rather than from the call site.\n\n`start()` and `stop()` each held the interval and `connectedCallback`\nstarted one, which the rules forbid: a DOM move re-ran connect and restarted\nrotation the reader had stopped, and the server, which never runs connect at\nall, rendered the control saying the opposite of what it would do. The\nstate is what is declared and the timer follows it, which also means one\nplace clears it."
             },
             {
+              "kind": "method",
+              "name": "nearest",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number | undefined"
+                }
+              },
+              "description": "The slide the track is nearest to, or undefined when there is no track.\n\nShared by the two readers of the scroll position, which want the same\narithmetic and disagree about what to do with it: one commits where a drag\nsettled, the other follows it while it is still moving.\n\nOnly the leading edges a window can actually rest on. Past the last\nposition every remaining slide is on screen already, and taking the nearest\nof *those* to the scroller's edge reported a place the reader could not get\nback to: dragged fully right, a four-across six reported the sixth slide\nand the dots jumped to an indicator that no longer existed."
+            },
+            {
+              "kind": "field",
+              "name": "handleTrackScroll",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Follows the track while a reader is still dragging it.\n\n**`scrollend` is the only honest place to commit an index and much too late\nto show one.** It fires once momentum has fully settled, which on iOS is\nmost of a second after the finger has left the glass, so the dots sat on\nthe old slide for the whole of the coast and then jumped. Reported exactly\nthat way, as the delay on the indicator being too great.\n\nSo showing and committing are separated. This moves the marker and nothing\nelse: no state is written and no event is dispatched, because neither is\ntrue yet. A drag in flight is not a reader having chosen, `handleScroll`\nstill decides that, and a consumer holding `index` still hears once.\n\n**The marker only, and not `aria-current` or the roving `tabindex`.** Those\ndescribe where the reader *is*, which is a question with one answer per\nsettled position; moving them every frame of a drag would churn the\naccessibility tree to report a place nobody has arrived at.\n\nCoalesced to a frame, a scroll firing far more often than a screen\nrefreshes, and skipped while we are settling a scroll of our own: a click\nhas already moved the index and the track is following it, which is the\nprecedence `handleScroll` documents at length."
+            },
+            {
               "kind": "field",
               "name": "handleScroll",
               "privacy": "private",
               "readonly": true,
               "description": "Reads where a reader's drag settled, and only a reader's.\n\n**The scroll we issued ourselves ends with a `scrollend` too, and taking it\nas a reading is what makes the dots jump back.** This ran on every one, so\nthe index a reader had just chosen was overwritten by whichever slide\nhappened to be nearest the leading edge at the moment the animation\nfinished. Any disagreement there is enough: a snap settling a pixel short of\na midpoint, a target clamped by the scroller's own maximum, a fractional\nlayout, or a smooth scroll cut off by the next click. The component asked\nfor slide four, the pixels said three, and the pixels won.\n\nWhich is the wrong precedence in one direction only. A drag is the reader\nmoving the track and the index has to follow it; a click is the reader\nmoving the index and the track has to follow *that*. One `scrollend` cannot\ntell those apart, so the flag does."
+            },
+            {
+              "kind": "field",
+              "name": "showing",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "description": "Where the track is right now, while a drag is still running.\n\nSeparate from `index`, which is where the reader has *arrived*. Undefined\nwhenever the two would agree, so the marker falls back to the committed\nindex the moment a drag settles and nothing has to keep them in step. See\n`handleTrackScroll` for why they are not one value."
+            },
+            {
+              "kind": "field",
+              "name": "scrollFrame",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "The pending frame for the above, so a burst of scrolls costs one reading."
             },
             {
               "kind": "field",

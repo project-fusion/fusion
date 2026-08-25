@@ -287,6 +287,57 @@ describe('carousel settling', () => {
     track.dispatchEvent(new Event('scrollend'))
   }
 
+  /** One animation frame, which is what the marker waits for. */
+  const frame = (): Promise<void> =>
+    new Promise((done) => {
+      requestAnimationFrame(() => done())
+    })
+
+  test('the marker follows a drag in flight while the index waits for it to settle', async () => {
+    /* `scrollend` is the only honest place to commit an index and much too late
+       to show one: it fires once momentum has fully settled, which on iOS is
+       most of a second after the finger has left the glass. The dots sat on the
+       old slide for the whole of the coast and then jumped.
+
+       So a scroll with no `scrollend` after it is a drag still running, and the
+       three answers here are deliberately different: the marker has moved,
+       because that is where the track is; the index has not, because the reader
+       has not arrived anywhere yet; and `aria-current` has not, because moving
+       it every frame would churn the accessibility tree to report a place
+       nobody has reached. */
+    const { host, track } = await scrolling('default-index="0"')
+    track.scrollLeft = 200
+    track.dispatchEvent(new Event('scroll'))
+    await frame()
+    await host.updateComplete
+    const dots = [
+      ...(part(host, 'indicators') as HTMLElement).querySelectorAll('[part="indicator"]'),
+    ]
+    expect({
+      announced: dots.findIndex((dot) => dot.getAttribute('aria-current') === 'true'),
+      index: host.index,
+      marker: dots.findIndex((dot) => dot.hasAttribute('data-current')),
+    }).toEqual({ announced: 0, index: 0, marker: 2 })
+  })
+
+  test('the marker gives the position back to the index once the drag settles', async () => {
+    // And the committed index is what it lands on, so the two agree again with
+    // nothing keeping them in step.
+    const { host, track } = await scrolling('default-index="0"')
+    track.scrollLeft = 200
+    track.dispatchEvent(new Event('scroll'))
+    await frame()
+    settle(track, 300)
+    await host.updateComplete
+    const dots = [
+      ...(part(host, 'indicators') as HTMLElement).querySelectorAll('[part="indicator"]'),
+    ]
+    expect({
+      index: host.index,
+      marker: dots.findIndex((dot) => dot.hasAttribute('data-current')),
+    }).toEqual({ index: 3, marker: 3 })
+  })
+
   test('a stray scrollend after a move of ours does not drag the index back', async () => {
     // The flip-back. Our own smooth scroll ends with a `scrollend` too, and
     // reading it as a reader's drag lets whichever slide happens to be nearest
