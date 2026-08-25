@@ -2074,8 +2074,8 @@ column is what was removed rather than part of what remains.
 | \`@helix-io/headless\` | 7,420,644 | 390 | 618,137 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 63,768 | 11 | 19,847 | none |
 | \`@helix-io/styles\` | 79,699 | 5 | 0 | none |
-| \`@helix-io/theme\` | 566,424 | 16 | 47,856 | none |
-| \`@helix-io/styled\` | 8,156,181 | 675 | 273,667 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/theme\` | 465,772 | 8 | 4,793 | none |
+| \`@helix-io/styled\` | 8,155,835 | 673 | 273,310 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 
