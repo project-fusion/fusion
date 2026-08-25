@@ -21,9 +21,12 @@
 # than here, so the two do not both review the same diff. Nothing in this file
 # turns it on or off.
 #
-# Forks are skipped rather than failed: a `pull_request` run from a fork gets no
-# secrets, so the action would error on a missing key and report as a broken
-# review instead of an absent one.
+# Forks are skipped rather than failed, and since the move to federated auth the
+# reason is authentication rather than an absent secret. See the guard's own
+# comment on the job: the federated subject carries nothing about who opened the
+# pull request, so the `if:` is what scopes the workspace's budget to this
+# repository's own branches. It is not dead weight left over from a key that no
+# longer exists.
 name: review
 
 on:
@@ -50,9 +53,32 @@ jobs:
         with:
           fetch-depth: 0
 
+      # **There is no API key, and the four identifiers below are not secrets.**
+      # Workload identity federation exchanges the run's own GitHub OIDC token
+      # for an Anthropic token that lives ten minutes, so the reviewer
+      # authenticates without this repository storing a credential that could
+      # leak or need rotating. `id-token: write` above is what permits the
+      # exchange; the action fetches the token itself. This is the same
+      # mechanism npm trusted publishing uses to publish, which leaves the
+      # repository with no long-lived credential of any kind.
+      #
+      # **Which makes the fork guard on this job load-bearing for auth, not
+      # just for cost.** Measured off a live run rather than assumed, the
+      # subject is
+      # `repo:project-fusion@50857512/fusion@1345601099:pull_request`: GitHub
+      # issues the immutable form, embedding the owner and repository ids, and
+      # three rules written against the documented `repo:owner/repo:` shape
+      # were denied before anyone read the token. It carries nothing about who
+      # opened the pull request. Without `head.repo.full_name == github.repository` above,
+      # anyone who can open one against this repository could spend the
+      # workspace's budget. The workspace carries a limit for the same reason,
+      # `continue-on-error` meaning an overrun here fails invisibly.
       - uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_federation_rule_id: fdrl_01QpMYFZydwuKsUrQ2YFZtjV
+          anthropic_organization_id: d8035737-e5ec-42ee-903b-e24fe72de4d7
+          anthropic_service_account_id: svac_01KZ8JktTjLUiuDVoF3Aq837
+          anthropic_workspace_id: wrkspc_017UiVfcccArL54cKMJ4khbA
           github_token: ${{ secrets.GITHUB_TOKEN }}
           track_progress: true
           use_sticky_comment: true
