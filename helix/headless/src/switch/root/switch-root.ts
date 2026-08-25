@@ -44,6 +44,8 @@ import { property } from 'lit/decorators.js'
  * @csspart control - The input.
  * @csspart thumb - The part that moves.
  * @csspart label - The words beside it.
+ * @csspart hint - Help under the control, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-headless-switch')
 export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(HelixFormElement)) {

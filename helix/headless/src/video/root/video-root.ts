@@ -196,6 +196,10 @@ const SKIP_SECONDS = 10
  * @csspart overflow-title - The name of the submenu that is showing.
  * @csspart captions-menu-surface - The floating panel the menu is drawn on.
  * @csspart overflow-surface - The floating panel the menu is drawn on.
+ * @csspart captions-menu-empty - Shown when there are no items to show.
+ * @csspart captions-menu-loading - Shown while the items are still on their way.
+ * @csspart overflow-empty - Shown when there are no items to show.
+ * @csspart overflow-loading - Shown while the items are still on their way.
  *
  * @event {HelixNextEvent} helix-next - Fired when the reader asks for the next item.
  * @event {HelixPreviousEvent} helix-previous - Fired when they ask for the previous one.
@@ -1314,8 +1318,9 @@ export class HelixHeadlessVideo extends HelixElement {
       </button>`
     }
     return html`<${this.tag('menu')} part="captions-menu"
-    exportparts="back: captions-menu-back, back-mark: captions-menu-back-mark, header: captions-menu-header,
-      surface: captions-menu-surface, title: captions-menu-title" label="Subtitles" placement="top-end">
+    exportparts="back: captions-menu-back, back-mark: captions-menu-back-mark, empty: captions-menu-empty,
+      header: captions-menu-header, loading: captions-menu-loading, surface: captions-menu-surface,
+      title: captions-menu-title" label="Subtitles" placement="top-end">
       <button part="captions" slot="trigger" type="button" aria-label="Subtitles">
         ${drawIcon(closedCaptioning)}
       </button>
@@ -1475,8 +1480,9 @@ export class HelixHeadlessVideo extends HelixElement {
         this.overflow.length === 0
           ? nothing
           : html`<${this.tag('menu')} part="overflow"
-          exportparts="back: overflow-back, back-mark: overflow-back-mark, header: overflow-header,
-            surface: overflow-surface, title: overflow-title" label="More controls" placement="top-end">
+          exportparts="back: overflow-back, back-mark: overflow-back-mark, empty: overflow-empty,
+            header: overflow-header, loading: overflow-loading, surface: overflow-surface,
+            title: overflow-title" label="More controls" placement="top-end">
               <button part="more" slot="trigger" type="button" aria-label="More controls">
                 ${drawIcon(dotsThreeVertical)}
               </button>

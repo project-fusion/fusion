@@ -67,6 +67,21 @@ helix-headless-rating::part(option) {
   padding: 0.25rem 0.5rem;
 }
 
+helix-headless-rating::part(label) {
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+helix-headless-rating::part(hint) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
+helix-headless-rating::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

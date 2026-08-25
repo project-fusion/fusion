@@ -67,6 +67,7 @@ import '../../listbox/index.js'
  * @csspart listbox-label - The question, over the list.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The field itself.
+ * @csspart listbox-loading - Shown while the options are still on their way.
  */
 @customElement('helix-headless-select')
 export class HelixHeadlessSelect extends MixinControllerOpen(
@@ -298,7 +299,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       part="listbox"
       exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
         filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
-        label: listbox-label, search: listbox-search, search-field: listbox-search-field"
+        label: listbox-label, loading: listbox-loading, search: listbox-search,
+        search-field: listbox-search-field"
       .value=${this.value}
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}

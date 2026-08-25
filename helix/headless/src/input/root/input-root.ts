@@ -79,6 +79,9 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @csspart clear - The button that empties the field.
  * @csspart icon - A glyph this component draws.
  * @csspart reveal - The button that shows and hides a password.
+ * @csspart label - The question, over the field.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-headless-input')
 export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {

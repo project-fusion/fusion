@@ -32,6 +32,8 @@ import type { HelixHeadlessTableColumn } from '../column/table-column.js'
  *
  * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
  * @csspart table - The grid.
+ * @csspart empty - Shown when there are no rows to show.
+ * @csspart loading - Shown while the rows are still on their way.
  *
  * @cssproperty --table-columns - Track list for the columns.
  *

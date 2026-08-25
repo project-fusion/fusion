@@ -56,6 +56,21 @@ helix-headless-toggle-group::part(track) {
   inline-size: 100%;
 }
 
+helix-headless-toggle-group::part(label) {
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+helix-headless-toggle-group::part(hint) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
+helix-headless-toggle-group::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
 helix-headless-toggle::part(item) {
   background-color: transparent;
   border: 0;

@@ -40,6 +40,8 @@ import { property } from 'lit/decorators.js'
  * @csspart control - The input.
  * @csspart label - The label beside it.
  * @csspart mark - The tick, or the dash when the box is indeterminate.
+ * @csspart hint - Help under the control, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-headless-checkbox')
 export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {

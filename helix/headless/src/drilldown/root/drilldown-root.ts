@@ -51,6 +51,8 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @csspart header - The bar above a page, holding the way back and its name.
  * @csspart page - The region the rows are in.
  * @csspart title - The name of the page showing.
+ * @csspart empty - Shown when there are no entries to show.
+ * @csspart loading - Shown while the entries are still on their way.
  */
 @customElement('helix-headless-drilldown')
 export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {

@@ -841,6 +841,31 @@ hundred lines away was the only thing making it look rendered. Same shape as thi
 file's older note about a JSDoc that quotes markup, and worth assuming of any new
 check that reads a template.
 
+**`check:parts` resolves the whole render chain in both directions**, and read
+the class's own markup in one of them until 24 Aug 2026. One direction inherited
+and the other did not, which leaves exactly one gap and it is the expensive one:
+a part rendered by a *base* that nobody in the chain documents is invisible to
+both halves, the subclass never rendering it and the base documenting nothing to
+be checked against. Sixty parts sat there. `MixinField` writes `label`, `hint`
+and `feedback` on eighteen form controls and eight documented them; `MixinCollection`
+writes `empty` and `loading` on five families, all five style both, and nine of
+the ten pairs were published to nobody.
+
+**A mixin's parts are documented on each component, and declaring them once on
+the mixin does not work.** The analyzer reads `@csspart` off a custom element
+class, so a class-level tag on a mixin reaches the manifest as nothing at all,
+on the mixin's JSDoc and on its inner class alike. Measured both ways, and the
+inner-class version is the dangerous one: `check:parts` resolves docs through
+`extends` itself, so it goes green while every API page stays exactly as wrong
+as before. Members are the opposite and do inherit, which is what the note above
+about the inner class is about, and the two cases look identical from the source.
+
+**Publishing a part obliges every component that composes it.** These two checks
+are one contract, so documenting the mixin parts made `check:exportparts` fail on
+fourteen compositions that had been forwarding a complete surface the day before.
+That is the contract working rather than a regression, and it is the reason the
+forwarding is generated rather than typed.
+
 **Words that name a position draw from a registry; words that name a thing do
 not.** `check:vocabulary` holds the first set to one spelling each: `box`,
 `container`, `content`, `panel`, `surface`, `viewport`. A `thumb`, a `terminus`,

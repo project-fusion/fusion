@@ -44,6 +44,8 @@ const KEYS = new Set([
 
  *
  * @csspart tree - The tree container.
+ * @csspart empty - Shown when there are no rows to show.
+ * @csspart loading - Shown while the rows are still on their way.
  *
  * @event {HelixChangeEvent} helix-change - Fired before the current node moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.

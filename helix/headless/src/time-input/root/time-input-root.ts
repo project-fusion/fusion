@@ -65,8 +65,6 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart picker - The list inside it.
  * @csspart picker-column - One of them.
  * @csspart picker-columns - The row of columns, in `wheels`.
- * @csspart picker-empty - What it says when nothing matches, forwarded from the listbox.
- * @csspart picker-items - The scrolling column inside it, forwarded from the listbox.
  * @csspart picker-list - The listbox holding the times, in `list`.
  * @csspart picker-option - One time in it. Carries `data-between` inside a range.
  * @csspart time-dismiss - The remove button, when `dismissible`.
@@ -92,6 +90,11 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart picker-list-search-field - The field itself.
  * @csspart picker-option-item - The row.
  * @csspart picker-option-label - The words.
+ * @csspart label - The question, over the field.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
+ * @csspart picker-column-loading - Shown while the options are still on their way.
+ * @csspart picker-list-loading - Shown while the options are still on their way.
  */
 @customElement('helix-headless-time-input')
 export class HelixHeadlessTimeInput extends MixinControllerOpen(
@@ -488,13 +491,14 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
         column-feedback: picker-column-feedback, column-filter-icon: picker-column-filter-icon,
         column-filter-mark: picker-column-filter-mark, column-hint: picker-column-hint,
         column-items: picker-column-items, column-label: picker-column-label,
-        column-search: picker-column-search, column-search-field: picker-column-search-field,
-        columns: picker-columns, empty: picker-empty, items: picker-items, list: picker-list,
+        column-loading: picker-column-loading, column-search: picker-column-search,
+        column-search-field: picker-column-search-field, columns: picker-columns, list: picker-list,
         list-empty: picker-list-empty, list-feedback: picker-list-feedback,
         list-filter-icon: picker-list-filter-icon, list-filter-mark: picker-list-filter-mark,
         list-hint: picker-list-hint, list-items: picker-list-items, list-label: picker-list-label,
-        list-search: picker-list-search, list-search-field: picker-list-search-field,
-        option: picker-option, option-item: picker-option-item, option-label: picker-option-label"
+        list-loading: picker-list-loading, list-search: picker-list-search,
+        list-search-field: picker-list-search-field, option: picker-option,
+        option-item: picker-option-item, option-label: picker-option-label"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
       appearance=${this.variant ?? nothing}

@@ -83,6 +83,21 @@ helix-headless-file-input::part(size-dismiss-mark) {
   inline-size: 1em;
 }
 
+helix-headless-file-input::part(label) {
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+helix-headless-file-input::part(hint) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
+helix-headless-file-input::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

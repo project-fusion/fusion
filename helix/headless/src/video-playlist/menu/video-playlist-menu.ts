@@ -70,6 +70,8 @@ const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
  * @csspart menu-header - The bar above a submenu, holding the way back and its name.
  * @csspart menu-title - The name of the submenu that is showing.
  * @csspart menu-surface - The floating panel the menu is drawn on.
+ * @csspart menu-empty - Shown when there are no items to show.
+ * @csspart menu-loading - Shown while the items are still on their way.
  *
  * @slot trigger - Replaces the button that opens the menu.
  *
@@ -195,8 +197,8 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   protected renderMenu(): TemplateResult {
     const active = this.playlist?.active
     return html`<${this.tag('menu')} part="menu"
-    exportparts="back: menu-back, back-mark: menu-back-mark, header: menu-header, surface: menu-surface,
-      title: menu-title" label=${this.label} placement=${this.placement}>
+    exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
+      loading: menu-loading, surface: menu-surface, title: menu-title" label=${this.label} placement=${this.placement}>
       <slot name="trigger" slot="trigger">
         <button part="trigger" type="button" aria-label=${this.label}>${drawIcon(list)}</button>
       </slot>

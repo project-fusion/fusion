@@ -55,6 +55,9 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * @csspart track - The bar the items sit in.
  * @csspart divider - The rule after an inline label, separating it from the items.
  * @csspart indicator - The moving marker behind the selected item.
+ * @csspart label - The question, over the row.
+ * @csspart hint - Help under the row, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
  *
  * @event {HelixChangeEvent} helix-change - Fired before the answer moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here.

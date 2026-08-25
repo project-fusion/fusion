@@ -71,6 +71,9 @@ import { property } from 'lit/decorators.js'
  * @csspart marker - One mark.
  * @csspart marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart output - The current value, shown beside it.
+ * @csspart label - The question, over the track.
+ * @csspart hint - Help under the track, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
  *
  * @cssproperty --slider-fraction - The value as a fraction of the range, 0 to 1.
  * @cssproperty --slider-from - Where the filled span starts, as a percentage of the track.

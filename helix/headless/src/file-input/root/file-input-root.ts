@@ -122,6 +122,9 @@ const kind = (file: File): string => {
  * @csspart size-dismiss - The remove button, when `dismissible`.
  * @csspart size-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart size-prefix - The category before the label.
+ * @csspart label - The question, over the field.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-headless-file-input')
 export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {

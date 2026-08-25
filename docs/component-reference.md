@@ -972,6 +972,8 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `control` | The input. |
 | `label` | The label beside it. |
 | `mark` | The tick, or the dash when the box is indeterminate. |
+| `hint` | Help under the control, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -1238,6 +1240,12 @@ pads its own lower rows.
 | `picker-channel-output` | The current value, shown beside it. |
 | `picker-eyedropper-button` | The inner control. |
 | `picker-format-button` | The inner control. |
+| `label` | The question, over the field. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
+| `picker-channel-feedback` | What is wrong with it. |
+| `picker-channel-hint` | Help under the track, while nothing is wrong. |
+| `picker-channel-label` | The question, over the track. |
 
 #### Custom properties
 
@@ -1349,6 +1357,9 @@ brought its own card would be a card inside a card there.
 | `channel-output` | The current value, shown beside it. |
 | `eyedropper-button` | The inner control. |
 | `format-button` | The inner control. |
+| `channel-feedback` | What is wrong with it. |
+| `channel-hint` | Help under the track, while nothing is wrong. |
+| `channel-label` | The question, over the track. |
 
 #### Custom properties
 
@@ -1458,7 +1469,11 @@ Input, Color Input and Date Input all take.
 | `listbox-search-field` | The field itself. |
 | `tag-dismiss` | The remove button, when `dismissible`. |
 | `tag-dismiss-mark` | The glyph on the dismiss control, where none is slotted. |
-| `tag-prefix` | The category before the label. from the listbox. |
+| `tag-prefix` | The category before the label. |
+| `label` | The question, over the field. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
+| `listbox-loading` | Shown while the options are still on their way. from the listbox. |
 
 #### Custom properties
 
@@ -1534,6 +1549,7 @@ otherwise walk up and down the screen under the words being typed.
 | `listbox-label` | The question, over the list. |
 | `listbox-search` | The region holding the field that narrows the list. |
 | `listbox-search-field` | The field itself. |
+| `listbox-loading` | Shown while the options are still on their way. |
 
 #### Custom properties
 
@@ -1712,6 +1728,9 @@ whatever holds it.
 | `picker-previous-mark` | The glyph on the previous month control. |
 | `picker-week` | One row of days. |
 | `picker-weekday` | A column header naming a day of the week. |
+| `label` | The question, over the field. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -2119,6 +2138,8 @@ from: the page arriving was not in the DOM a frame ago. Under
 | `header` | The bar above a page, holding the way back and its name. |
 | `page` | The region the rows are in. |
 | `title` | The name of the page showing. |
+| `empty` | Shown when there are no entries to show. |
+| `loading` | Shown while the entries are still on their way. |
 
 #### Custom properties
 
@@ -2304,6 +2325,9 @@ invisible.
 | `size-dismiss` | The remove button, when `dismissible`. |
 | `size-dismiss-mark` | The glyph on the dismiss control, where none is slotted. |
 | `size-prefix` | The category before the label. |
+| `label` | The question, over the field. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -2616,6 +2640,9 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `clear` | The button that empties the field. |
 | `icon` | A glyph this component draws. |
 | `reveal` | The button that shows and hides a password. |
+| `label` | The question, over the field. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -2934,6 +2961,7 @@ list moves under the reader rather than the reader moving to find it.
 | `label` | The question, over the list. |
 | `search` | The region holding the field that narrows the list. |
 | `search-field` | The field itself. |
+| `loading` | Shown while the options are still on their way. |
 
 #### Custom properties
 
@@ -3109,6 +3137,8 @@ one panel and reads the same on a phone as on a desk.
 | `header` | The bar above a submenu, holding the way back and its name. |
 | `surface` | The floating panel the menu is drawn on. |
 | `title` | The name of the submenu that is showing. |
+| `empty` | Shown when there are no items to show. |
+| `loading` | Shown while the items are still on their way. |
 
 #### Custom properties
 
@@ -3388,6 +3418,8 @@ three times as long to cross.
 | `decrement-mark` | The glyph on the step down control. |
 | `increment-mark` | The glyph on the step up control. |
 | `label` | The name over the field, which is also the scrub grip. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 ## Option
 
@@ -3743,6 +3775,9 @@ breathe as a code is typed into it.
 | --- | --- |
 | `field` | The row of boxes. |
 | `cell` | One box. |
+| `label` | The question, over the boxes. |
+| `hint` | Help under the boxes, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -4160,6 +4195,9 @@ Everything about what the score is and how it is chosen is the base class.
 | `mark` | One mark, in either layer. |
 | `option` | One place a reader can press, which is one step. |
 | `value` | The score written out, under `show-value`. |
+| `label` | The question, over the marks. |
+| `hint` | Help under the marks, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -4659,6 +4697,7 @@ from the field it came out of.
 | `listbox-label` | The question, over the list. |
 | `listbox-search` | The region holding the field that narrows the list. |
 | `listbox-search-field` | The field itself. |
+| `listbox-loading` | Shown while the options are still on their way. |
 
 #### Custom properties
 
@@ -4769,6 +4808,9 @@ the thumb being dragged.
 | `marker` | One mark. |
 | `marker-label` | The value a mark stands at, when `marker-labels` is set. |
 | `output` | The current value, shown beside it. |
+| `label` | The question, over the track. |
+| `hint` | Help under the track, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -5308,6 +5350,8 @@ consumer has to keep.
 | `control` | The input. |
 | `thumb` | The part that moves. |
 | `label` | The words beside it. |
+| `hint` | Help under the control, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -5354,6 +5398,8 @@ decorating none of it.
 | --- | --- |
 | `table` | The grid. |
 | `head` | The row the column headings sit in. `display: contents`, so it takes no space. |
+| `empty` | Shown when there are no rows to show. |
+| `loading` | Shown while the rows are still on their way. |
 
 #### Custom properties
 
@@ -5731,6 +5777,9 @@ dragged wider than the form holding it is a field that breaks the layout.
 | --- | --- |
 | `field` | The box holding the control. |
 | `control` | The textarea itself. |
+| `label` | The question, over the field. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -5826,8 +5875,6 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `picker` | The list inside it. |
 | `picker-column` | One of them. |
 | `picker-columns` | The row of columns, in `wheels`. |
-| `picker-empty` | What it says when nothing matches, forwarded from the listbox. |
-| `picker-items` | The scrolling column inside it, forwarded from the listbox. |
 | `picker-list` | The listbox holding the times, in `list`. |
 | `picker-option` | One time in it. Carries `data-between` inside a range. |
 | `time-dismiss` | The remove button, when `dismissible`. |
@@ -5853,6 +5900,11 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `picker-list-search-field` | The field itself. |
 | `picker-option-item` | The row. |
 | `picker-option-label` | The words. |
+| `label` | The question, over the field. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
+| `picker-column-loading` | Shown while the options are still on their way. |
+| `picker-list-loading` | Shown while the options are still on their way. |
 
 #### Custom properties
 
@@ -5946,6 +5998,8 @@ card would be a card inside a card there.
 | `list-search-field` | The field itself. |
 | `option-item` | The row. |
 | `option-label` | The words. |
+| `column-loading` | Shown while the options are still on their way. |
+| `list-loading` | Shown while the options are still on their way. |
 
 #### Custom properties
 
@@ -6259,6 +6313,9 @@ corner radius, which is worse than the exception.
 | `row` | The line the track sits on, with whatever flanks it. |
 | `track` | The bar the items sit in. |
 | `divider` | The rule after an inline label, separating it from the items. |
+| `label` | The question, over the row. |
+| `hint` | Help under the row, while nothing is wrong. |
+| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -6545,6 +6602,8 @@ to it is one more thing between the reader and the label.
 | Part | Description |
 | --- | --- |
 | `tree` | The tree container. |
+| `empty` | Shown when there are no rows to show. |
+| `loading` | Shown while the rows are still on their way. |
 
 #### Custom properties
 
@@ -6815,6 +6874,10 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `overflow-title` | The name of the submenu that is showing. |
 | `captions-menu-surface` | The floating panel the menu is drawn on. |
 | `overflow-surface` | The floating panel the menu is drawn on. |
+| `captions-menu-empty` | Shown when there are no items to show. |
+| `captions-menu-loading` | Shown while the items are still on their way. |
+| `overflow-empty` | Shown when there are no items to show. |
+| `overflow-loading` | Shown while the items are still on their way. |
 
 #### Custom properties
 
@@ -6992,6 +7055,8 @@ not.
 | `menu-header` | The bar above a submenu, holding the way back and its name. |
 | `menu-title` | The name of the submenu that is showing. |
 | `menu-surface` | The floating panel the menu is drawn on. |
+| `menu-empty` | Shown when there are no items to show. |
+| `menu-loading` | Shown while the items are still on their way. |
 
 #### Custom properties
 

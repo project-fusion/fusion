@@ -6084,6 +6084,14 @@
             {
               "description": "The tick, or the dash when the box is indeterminate.",
               "name": "mark"
+            },
+            {
+              "description": "Help under the control, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "slots": [
@@ -7602,6 +7610,30 @@
             {
               "description": "The inner control.",
               "name": "picker-format-button"
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "picker-channel-feedback"
+            },
+            {
+              "description": "Help under the track, while nothing is wrong.",
+              "name": "picker-channel-hint"
+            },
+            {
+              "description": "The question, over the track.",
+              "name": "picker-channel-label"
             }
           ],
           "slots": [
@@ -9142,6 +9174,18 @@
             {
               "description": "The inner control.",
               "name": "format-button"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "channel-feedback"
+            },
+            {
+              "description": "Help under the track, while nothing is wrong.",
+              "name": "channel-hint"
+            },
+            {
+              "description": "The question, over the track.",
+              "name": "channel-label"
             }
           ],
           "members": [
@@ -10124,8 +10168,24 @@
               "name": "tag-dismiss-mark"
             },
             {
-              "description": "The category before the label. from the listbox.",
+              "description": "The category before the label.",
               "name": "tag-prefix"
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
+            },
+            {
+              "description": "Shown while the options are still on their way. from the listbox.",
+              "name": "listbox-loading"
             }
           ],
           "slots": [
@@ -11631,6 +11691,10 @@
             {
               "description": "The field itself.",
               "name": "listbox-search-field"
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "listbox-loading"
             }
           ],
           "slots": [
@@ -12973,6 +13037,18 @@
             {
               "description": "A column header naming a day of the week.",
               "name": "picker-weekday"
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "slots": [
@@ -17584,6 +17660,14 @@
             {
               "description": "The name of the page showing.",
               "name": "title"
+            },
+            {
+              "description": "Shown when there are no entries to show.",
+              "name": "empty"
+            },
+            {
+              "description": "Shown while the entries are still on their way.",
+              "name": "loading"
             }
           ],
           "slots": [
@@ -18400,6 +18484,18 @@
             {
               "description": "The category before the label.",
               "name": "size-prefix"
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "slots": [
@@ -21217,6 +21313,18 @@
             {
               "description": "The button that shows and hides a password.",
               "name": "reveal"
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "slots": [
@@ -23982,6 +24090,10 @@
             {
               "description": "The field itself.",
               "name": "search-field"
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "loading"
             }
           ],
           "slots": [
@@ -26758,6 +26870,14 @@
             {
               "description": "The name of the submenu that is showing.",
               "name": "title"
+            },
+            {
+              "description": "Shown when there are no items to show.",
+              "name": "empty"
+            },
+            {
+              "description": "Shown while the items are still on their way.",
+              "name": "loading"
             }
           ],
           "slots": [
@@ -28313,6 +28433,14 @@
             {
               "description": "The name over the field, which is also the scrub grip.",
               "name": "label"
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "slots": [
@@ -32016,6 +32144,18 @@
             {
               "description": "One box.",
               "name": "cell"
+            },
+            {
+              "description": "The question, over the boxes.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the boxes, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "members": [
@@ -35709,6 +35849,18 @@
             {
               "description": "The score written out, under `show-value`.",
               "name": "value"
+            },
+            {
+              "description": "The question, over the marks.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the marks, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "members": [
@@ -37151,6 +37303,10 @@
             {
               "description": "The field itself.",
               "name": "listbox-search-field"
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "listbox-loading"
             }
           ],
           "slots": [
@@ -38570,6 +38726,18 @@
             {
               "description": "The current value, shown beside it.",
               "name": "output"
+            },
+            {
+              "description": "The question, over the track.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the track, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "members": [
@@ -42886,6 +43054,14 @@
             {
               "description": "The words beside it.",
               "name": "label"
+            },
+            {
+              "description": "Help under the control, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "slots": [
@@ -44197,6 +44373,14 @@
             {
               "description": "The grid.",
               "name": "table"
+            },
+            {
+              "description": "Shown when there are no rows to show.",
+              "name": "empty"
+            },
+            {
+              "description": "Shown while the rows are still on their way.",
+              "name": "loading"
             }
           ],
           "slots": [
@@ -46133,6 +46317,18 @@
             {
               "description": "The textarea itself.",
               "name": "control"
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "members": [
@@ -47209,14 +47405,6 @@
               "name": "picker-columns"
             },
             {
-              "description": "What it says when nothing matches, forwarded from the listbox.",
-              "name": "picker-empty"
-            },
-            {
-              "description": "The scrolling column inside it, forwarded from the listbox.",
-              "name": "picker-items"
-            },
-            {
               "description": "The listbox holding the times, in `list`.",
               "name": "picker-list"
             },
@@ -47315,6 +47503,26 @@
             {
               "description": "The words.",
               "name": "picker-option-label"
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "picker-column-loading"
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "picker-list-loading"
             }
           ],
           "slots": [
@@ -48918,6 +49126,14 @@
             {
               "description": "The words.",
               "name": "option-label"
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "column-loading"
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "list-loading"
             }
           ],
           "members": [
@@ -51116,6 +51332,18 @@
             {
               "description": "The moving marker behind the selected item.",
               "name": "indicator"
+            },
+            {
+              "description": "The question, over the row.",
+              "name": "label"
+            },
+            {
+              "description": "Help under the row, while nothing is wrong.",
+              "name": "hint"
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback"
             }
           ],
           "slots": [
@@ -55025,6 +55253,14 @@
             {
               "description": "The tree container.",
               "name": "tree"
+            },
+            {
+              "description": "Shown when there are no rows to show.",
+              "name": "empty"
+            },
+            {
+              "description": "Shown while the rows are still on their way.",
+              "name": "loading"
             }
           ],
           "slots": [
@@ -56289,6 +56525,14 @@
             {
               "description": "The floating panel the menu is drawn on.",
               "name": "menu-surface"
+            },
+            {
+              "description": "Shown when there are no items to show.",
+              "name": "menu-empty"
+            },
+            {
+              "description": "Shown while the items are still on their way.",
+              "name": "menu-loading"
             }
           ],
           "slots": [
@@ -57218,6 +57462,22 @@
             {
               "description": "The floating panel the menu is drawn on.",
               "name": "overflow-surface"
+            },
+            {
+              "description": "Shown when there are no items to show.",
+              "name": "captions-menu-empty"
+            },
+            {
+              "description": "Shown while the items are still on their way.",
+              "name": "captions-menu-loading"
+            },
+            {
+              "description": "Shown when there are no items to show.",
+              "name": "overflow-empty"
+            },
+            {
+              "description": "Shown while the items are still on their way.",
+              "name": "overflow-loading"
             }
           ],
           "slots": [

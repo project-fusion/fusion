@@ -65,6 +65,9 @@ import { property, state } from 'lit/decorators.js'
  * @csspart mark - One mark, in either layer.
  * @csspart option - One place a reader can press, which is one step.
  * @csspart value - The score written out, under `show-value`.
+ * @csspart label - The question, over the marks.
+ * @csspart hint - Help under the marks, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
  *
  * @cssproperty --rating-full - How many marks are wholly filled.
  * @cssproperty --rating-part - How much of the next mark is filled, 0 to 1.

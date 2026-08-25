@@ -58,6 +58,11 @@ export declare class CollectionElement {
  *
  * Listbox had `empty-text` and nothing else, and Combobox forwarded it. Both
  * keep the name, so nothing a consumer wrote has moved.
+ *
+ *
+ * **`empty` and `loading` are documented on each of the five families that
+ * apply this, rather than here.** See `MixinField` for why a class-level tag on
+ * a mixin reaches no manifest.
  */
 export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
   class Collection extends Base {

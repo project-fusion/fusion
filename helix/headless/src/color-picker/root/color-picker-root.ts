@@ -122,6 +122,9 @@ interface EyeDropperConstructor {
  * @csspart channel-output - The current value, shown beside it.
  * @csspart eyedropper-button - The inner control.
  * @csspart format-button - The inner control.
+ * @csspart channel-feedback - What is wrong with it.
+ * @csspart channel-hint - Help under the track, while nothing is wrong.
+ * @csspart channel-label - The question, over the track.
  *
  * @cssproperty --color-picker-brightness - The chosen brightness, 0 to 100, as a percentage.
  * @cssproperty --color-picker-hue - The chosen hue, 0 to 360, unitless.
@@ -401,7 +404,8 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   ): TemplateResult {
     return html`<${this.tag('slider')}
       part="channel"
-      exportparts="control: channel-control, field: channel-field, marker: channel-marker,
+      exportparts="control: channel-control, feedback: channel-feedback, field: channel-field,
+        hint: channel-hint, label: channel-label, marker: channel-marker,
         marker-label: channel-marker-label, markers: channel-markers, output: channel-output"
       data-channel=${channel}
       label=${label}

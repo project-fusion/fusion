@@ -70,6 +70,16 @@ helix-headless-number-input::part(label) {
   font-weight: 600;
 }
 
+helix-headless-number-input::part(hint) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
+helix-headless-number-input::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

@@ -105,6 +105,9 @@ const dates = (value: string): string[] =>
  * @csspart picker-previous-mark - The glyph on the previous month control.
  * @csspart picker-week - One row of days.
  * @csspart picker-weekday - A column header naming a day of the week.
+ * @csspart label - The question, over the field.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-headless-date-input')
 export class HelixHeadlessDateInput extends MixinControllerOpen(

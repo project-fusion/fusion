@@ -92,6 +92,12 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @csspart picker-channel-output - The current value, shown beside it.
  * @csspart picker-eyedropper-button - The inner control.
  * @csspart picker-format-button - The inner control.
+ * @csspart label - The question, over the field.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
+ * @csspart picker-channel-feedback - What is wrong with it.
+ * @csspart picker-channel-hint - Help under the track, while nothing is wrong.
+ * @csspart picker-channel-label - The question, over the track.
  *
  * @cssproperty --color-input-swatch - The chosen color, to paint over the transparency check.
  */
@@ -375,12 +381,14 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
     return html`<${this.tag('color-picker')}
       part="picker"
       exportparts="actions: picker-actions, channel: picker-channel, channel-control: picker-channel-control,
-        channel-field: picker-channel-field, channel-marker: picker-channel-marker,
-        channel-marker-label: picker-channel-marker-label, channel-markers: picker-channel-markers,
-        channel-output: picker-channel-output, channels: picker-channels, controls: picker-controls,
-        eyedropper: picker-eyedropper, eyedropper-button: picker-eyedropper-button,
-        footer: picker-footer, format: picker-format, format-button: picker-format-button,
-        grid: picker-grid, grid-brightness: picker-grid-brightness, grid-handle: picker-grid-handle,
+        channel-feedback: picker-channel-feedback, channel-field: picker-channel-field,
+        channel-hint: picker-channel-hint, channel-label: picker-channel-label,
+        channel-marker: picker-channel-marker, channel-marker-label: picker-channel-marker-label,
+        channel-markers: picker-channel-markers, channel-output: picker-channel-output,
+        channels: picker-channels, controls: picker-controls, eyedropper: picker-eyedropper,
+        eyedropper-button: picker-eyedropper-button, footer: picker-footer, format: picker-format,
+        format-button: picker-format-button, grid: picker-grid,
+        grid-brightness: picker-grid-brightness, grid-handle: picker-grid-handle,
         grid-saturation: picker-grid-saturation, icon: picker-icon, sample: picker-sample,
         swatch: picker-swatch, swatches: picker-swatches, value: picker-value"
       ?invalid=${this.resolvedFeedback !== ''}

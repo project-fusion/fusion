@@ -65,6 +65,21 @@ helix-headless-input::part(icon) {
   inline-size: 1em;
 }
 
+helix-headless-input::part(label) {
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+helix-headless-input::part(hint) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
+helix-headless-input::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

@@ -185,6 +185,7 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @csspart label - The question, over the list.
  * @csspart search - The region holding the field that narrows the list.
  * @csspart search-field - The field itself.
+ * @csspart loading - Shown while the options are still on their way.
  */
 @customElement('helix-headless-listbox')
 export class HelixHeadlessListbox extends MixinCollection(

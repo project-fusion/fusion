@@ -125,6 +125,8 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart list-search-field - The field itself.
  * @csspart option-item - The row.
  * @csspart option-label - The words.
+ * @csspart column-loading - Shown while the options are still on their way.
+ * @csspart list-loading - Shown while the options are still on their way.
  */
 @customElement('helix-headless-time-picker')
 export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormElement) {
@@ -512,7 +514,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       data-column=${part}
       exportparts="empty: column-empty, feedback: column-feedback, filter-icon: column-filter-icon,
         filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
-        search: column-search, search-field: column-search-field"
+        loading: column-loading, search: column-search, search-field: column-search-field"
       aria-label=${label}
       ?disabled=${this.isDisabled}
       .value=${value}
@@ -590,7 +592,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       part="list"
       exportparts="empty: list-empty, feedback: list-feedback, filter-icon: list-filter-icon,
         filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,
-        search: list-search, search-field: list-search-field"
+        loading: list-loading, search: list-search, search-field: list-search-field"
       aria-label=${this.label}
       data-unset=${this.value === '' ? '' : nothing}
       ?disabled=${this.isDisabled}

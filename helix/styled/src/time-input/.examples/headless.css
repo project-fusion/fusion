@@ -84,6 +84,21 @@ helix-headless-time-input::part(picker-list-filter-mark) {
   inline-size: 1em;
 }
 
+helix-headless-time-input::part(label) {
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+helix-headless-time-input::part(hint) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
+helix-headless-time-input::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

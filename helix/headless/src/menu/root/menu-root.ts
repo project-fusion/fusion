@@ -55,6 +55,8 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @csspart header - The bar above a submenu, holding the way back and its name.
  * @csspart surface - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
+ * @csspart empty - Shown when there are no items to show.
+ * @csspart loading - Shown while the items are still on their way.
  */
 @customElement('helix-headless-menu')
 export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {

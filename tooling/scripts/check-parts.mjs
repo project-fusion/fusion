@@ -181,7 +181,26 @@ for (const [name, entry] of components) {
   if (entry.documented.length === 0) {
     continue
   }
-  for (const part of new Set(entry.rendered)) {
+  /* **The whole render chain, not the class's own markup.** This read
+     `entry.rendered` and so asked only what the file in front of it wrote, while
+     the other direction above has always resolved through `extends`. One
+     direction inherited and the other did not, which leaves exactly one gap and
+     it is the expensive one: a part rendered by a *base* that nobody in the
+     chain documents is invisible to both halves. The subclass never renders it,
+     so this loop never saw it; the base documents nothing, so the guard below
+     skips the base entirely.
+
+     `MixinCollection` sat in that gap. It writes `part="loading"` and
+     `part="empty"`, five families apply it, all five style both in their
+     stylesheets, and nine of the ten pairs were published to nobody. Working,
+     styled, and undocumented, which is the exact thing this check exists to
+     refuse.
+
+     Reported on the class that publishes a surface rather than on the base,
+     which is what the guard below already arranges: a mixin documenting nothing
+     is skipped, so this says it once per component that has an API page for it
+     to be missing from. */
+  for (const part of rendered) {
     if (!documented.has(part)) {
       problems.push(
         `${entry.path}: ${name} renders \`part="${part}"\` and no \`@csspart\` declares it. ` +

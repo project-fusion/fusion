@@ -16577,6 +16577,8 @@ export type CustomElements = {
    * - `control`: The input.
    * - `label`: The label beside it.
    * - `mark`: The tick, or the dash when the box is indeterminate.
+   * - `hint`: Help under the control, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-checkbox": Partial<
     HelixCheckboxProps & BaseProps<HelixCheckbox> & BaseEvents
@@ -16905,6 +16907,12 @@ export type CustomElements = {
    * - `picker-channel-output`: The current value, shown beside it.
    * - `picker-eyedropper-button`: The inner control.
    * - `picker-format-button`: The inner control.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
+   * - `picker-channel-feedback`: What is wrong with it.
+   * - `picker-channel-hint`: Help under the track, while nothing is wrong.
+   * - `picker-channel-label`: The question, over the track.
    */
   "helix-color-input": Partial<
     HelixColorInputProps & BaseProps<HelixColorInput> & BaseEvents
@@ -17118,6 +17126,9 @@ export type CustomElements = {
    * - `channel-output`: The current value, shown beside it.
    * - `eyedropper-button`: The inner control.
    * - `format-button`: The inner control.
+   * - `channel-feedback`: What is wrong with it.
+   * - `channel-hint`: Help under the track, while nothing is wrong.
+   * - `channel-label`: The question, over the track.
    */
   "helix-color-picker": Partial<
     HelixColorPickerProps & BaseProps<HelixColorPicker> & BaseEvents
@@ -17358,7 +17369,11 @@ export type CustomElements = {
    * - `listbox-search-field`: The field itself.
    * - `tag-dismiss`: The remove button, when `dismissible`.
    * - `tag-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
-   * - `tag-prefix`: The category before the label. from the listbox.
+   * - `tag-prefix`: The category before the label.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
+   * - `listbox-loading`: Shown while the options are still on their way. from the listbox.
    */
   "helix-combobox": Partial<
     HelixComboboxProps & BaseProps<HelixCombobox> & BaseEvents
@@ -17458,6 +17473,7 @@ export type CustomElements = {
    * - `listbox-label`: The question, over the list.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
+   * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-command": Partial<
     HelixCommandProps & BaseProps<HelixCommand> & BaseEvents
@@ -17882,6 +17898,9 @@ export type CustomElements = {
    * - `picker-previous-mark`: The glyph on the previous month control.
    * - `picker-week`: One row of days.
    * - `picker-weekday`: A column header naming a day of the week.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-date-input": Partial<
     HelixDateInputProps & BaseProps<HelixDateInput> & BaseEvents
@@ -18616,6 +18635,8 @@ export type CustomElements = {
    * - `header`: The bar above a page, holding the way back and its name.
    * - `page`: The region the rows are in.
    * - `title`: The name of the page showing.
+   * - `empty`: Shown when there are no entries to show.
+   * - `loading`: Shown while the entries are still on their way.
    */
   "helix-drilldown": Partial<
     HelixDrilldownProps & BaseProps<HelixDrilldown> & BaseEvents
@@ -18814,6 +18835,9 @@ export type CustomElements = {
    * - `size-dismiss`: The remove button, when `dismissible`.
    * - `size-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `size-prefix`: The category before the label.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-file-input": Partial<
     HelixFileInputProps & BaseProps<HelixFileInput> & BaseEvents
@@ -19365,6 +19389,9 @@ export type CustomElements = {
    * - `clear`: The button that empties the field.
    * - `icon`: A glyph this component draws.
    * - `reveal`: The button that shows and hides a password.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-input": Partial<HelixInputProps & BaseProps<HelixInput> & BaseEvents> & HelixInputControlled;
 
@@ -19954,6 +19981,7 @@ export type CustomElements = {
    * - `label`: The question, over the list.
    * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
+   * - `loading`: Shown while the options are still on their way.
    */
   "helix-listbox": Partial<
     HelixListboxProps & BaseProps<HelixListbox> & BaseEvents
@@ -20353,6 +20381,8 @@ export type CustomElements = {
    * - `header`: The bar above a submenu, holding the way back and its name.
    * - `surface`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
+   * - `empty`: Shown when there are no items to show.
+   * - `loading`: Shown while the items are still on their way.
    */
   "helix-menu": Partial<HelixMenuProps & BaseProps<HelixMenu> & BaseEvents> & HelixMenuControlled;
 
@@ -20703,6 +20733,8 @@ export type CustomElements = {
    * - `decrement-mark`: The glyph on the step down control.
    * - `increment-mark`: The glyph on the step up control.
    * - `label`: The name over the field, which is also the scrub grip.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-number-input": Partial<
     HelixNumberInputProps & BaseProps<HelixNumberInput> & BaseEvents
@@ -21299,6 +21331,9 @@ export type CustomElements = {
    *
    * - `field`: The row of boxes.
    * - `cell`: One box.
+   * - `label`: The question, over the boxes.
+   * - `hint`: Help under the boxes, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-pin-input": Partial<
     HelixPinInputProps & BaseProps<HelixPinInput> & BaseEvents
@@ -22034,6 +22069,9 @@ export type CustomElements = {
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
    * - `value`: The score written out, under `show-value`.
+   * - `label`: The question, over the marks.
+   * - `hint`: Help under the marks, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-rating": Partial<
     HelixRatingProps & BaseProps<HelixRating> & BaseEvents
@@ -22707,6 +22745,7 @@ export type CustomElements = {
    * - `listbox-label`: The question, over the list.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
+   * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-select": Partial<
     HelixSelectProps & BaseProps<HelixSelect> & BaseEvents
@@ -22927,6 +22966,9 @@ export type CustomElements = {
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `output`: The current value, shown beside it.
+   * - `label`: The question, over the track.
+   * - `hint`: Help under the track, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-slider": Partial<
     HelixSliderProps & BaseProps<HelixSlider> & BaseEvents
@@ -23769,6 +23811,8 @@ export type CustomElements = {
    * - `control`: The input.
    * - `thumb`: The part that moves.
    * - `label`: The words beside it.
+   * - `hint`: Help under the control, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-switch": Partial<
     HelixSwitchProps & BaseProps<HelixSwitch> & BaseEvents
@@ -23876,6 +23920,8 @@ export type CustomElements = {
    *
    * - `table`: The grid.
    * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
+   * - `empty`: Shown when there are no rows to show.
+   * - `loading`: Shown while the rows are still on their way.
    */
   "helix-table": Partial<HelixTableProps & BaseProps<HelixTable> & BaseEvents>;
 
@@ -24351,6 +24397,9 @@ export type CustomElements = {
    *
    * - `field`: The box holding the control.
    * - `control`: The textarea itself.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-textarea": Partial<
     HelixTextareaProps & BaseProps<HelixTextarea> & BaseEvents
@@ -24578,8 +24627,6 @@ export type CustomElements = {
    * - `picker`: The list inside it.
    * - `picker-column`: One of them.
    * - `picker-columns`: The row of columns, in `wheels`.
-   * - `picker-empty`: What it says when nothing matches, forwarded from the listbox.
-   * - `picker-items`: The scrolling column inside it, forwarded from the listbox.
    * - `picker-list`: The listbox holding the times, in `list`.
    * - `picker-option`: One time in it. Carries `data-between` inside a range.
    * - `time-dismiss`: The remove button, when `dismissible`.
@@ -24605,6 +24652,11 @@ export type CustomElements = {
    * - `picker-list-search-field`: The field itself.
    * - `picker-option-item`: The row.
    * - `picker-option-label`: The words.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
+   * - `picker-column-loading`: Shown while the options are still on their way.
+   * - `picker-list-loading`: Shown while the options are still on their way.
    */
   "helix-time-input": Partial<
     HelixTimeInputProps & BaseProps<HelixTimeInput> & BaseEvents
@@ -24850,6 +24902,8 @@ export type CustomElements = {
    * - `list-search-field`: The field itself.
    * - `option-item`: The row.
    * - `option-label`: The words.
+   * - `column-loading`: Shown while the options are still on their way.
+   * - `list-loading`: Shown while the options are still on their way.
    */
   "helix-time-picker": Partial<
     HelixTimePickerProps & BaseProps<HelixTimePicker> & BaseEvents
@@ -25245,6 +25299,9 @@ export type CustomElements = {
    * - `row`: The line the track sits on, with whatever flanks it.
    * - `track`: The bar the items sit in.
    * - `divider`: The rule after an inline label, separating it from the items.
+   * - `label`: The question, over the row.
+   * - `hint`: Help under the row, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-toggle-group": Partial<
     HelixToggleGroupProps & BaseProps<HelixToggleGroup> & BaseEvents
@@ -25889,6 +25946,8 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `tree`: The tree container.
+   * - `empty`: Shown when there are no rows to show.
+   * - `loading`: Shown while the rows are still on their way.
    */
   "helix-tree": Partial<HelixTreeProps & BaseProps<HelixTree> & BaseEvents>;
 
@@ -26093,6 +26152,8 @@ export type CustomElements = {
    * - `menu-header`: The bar above a submenu, holding the way back and its name.
    * - `menu-title`: The name of the submenu that is showing.
    * - `menu-surface`: The floating panel the menu is drawn on.
+   * - `menu-empty`: Shown when there are no items to show.
+   * - `menu-loading`: Shown while the items are still on their way.
    */
   "helix-video-playlist-menu": Partial<
     HelixVideoPlaylistMenuProps & BaseProps<HelixVideoPlaylistMenu> & BaseEvents
@@ -26362,6 +26423,10 @@ export type CustomElements = {
    * - `overflow-title`: The name of the submenu that is showing.
    * - `captions-menu-surface`: The floating panel the menu is drawn on.
    * - `overflow-surface`: The floating panel the menu is drawn on.
+   * - `captions-menu-empty`: Shown when there are no items to show.
+   * - `captions-menu-loading`: Shown while the items are still on their way.
+   * - `overflow-empty`: Shown when there are no items to show.
+   * - `overflow-loading`: Shown while the items are still on their way.
    */
   "helix-video": Partial<HelixVideoProps & BaseProps<HelixVideo> & BaseEvents>;
 
@@ -28294,6 +28359,8 @@ export type CustomElementsSolidJs = {
    * - `control`: The input.
    * - `label`: The label beside it.
    * - `mark`: The tick, or the dash when the box is indeterminate.
+   * - `hint`: Help under the control, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-checkbox": Partial<
     HelixCheckboxProps &
@@ -28630,6 +28697,12 @@ export type CustomElementsSolidJs = {
    * - `picker-channel-output`: The current value, shown beside it.
    * - `picker-eyedropper-button`: The inner control.
    * - `picker-format-button`: The inner control.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
+   * - `picker-channel-feedback`: What is wrong with it.
+   * - `picker-channel-hint`: Help under the track, while nothing is wrong.
+   * - `picker-channel-label`: The question, over the track.
    */
   "helix-color-input": Partial<
     HelixColorInputProps &
@@ -28846,6 +28919,9 @@ export type CustomElementsSolidJs = {
    * - `channel-output`: The current value, shown beside it.
    * - `eyedropper-button`: The inner control.
    * - `format-button`: The inner control.
+   * - `channel-feedback`: What is wrong with it.
+   * - `channel-hint`: Help under the track, while nothing is wrong.
+   * - `channel-label`: The question, over the track.
    */
   "helix-color-picker": Partial<
     HelixColorPickerProps &
@@ -29089,7 +29165,11 @@ export type CustomElementsSolidJs = {
    * - `listbox-search-field`: The field itself.
    * - `tag-dismiss`: The remove button, when `dismissible`.
    * - `tag-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
-   * - `tag-prefix`: The category before the label. from the listbox.
+   * - `tag-prefix`: The category before the label.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
+   * - `listbox-loading`: Shown while the options are still on their way. from the listbox.
    */
   "helix-combobox": Partial<
     HelixComboboxProps &
@@ -29192,6 +29272,7 @@ export type CustomElementsSolidJs = {
    * - `listbox-label`: The question, over the list.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
+   * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-command": Partial<
     HelixCommandProps &
@@ -29622,6 +29703,9 @@ export type CustomElementsSolidJs = {
    * - `picker-previous-mark`: The glyph on the previous month control.
    * - `picker-week`: One row of days.
    * - `picker-weekday`: A column header naming a day of the week.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-date-input": Partial<
     HelixDateInputProps &
@@ -30377,6 +30461,8 @@ export type CustomElementsSolidJs = {
    * - `header`: The bar above a page, holding the way back and its name.
    * - `page`: The region the rows are in.
    * - `title`: The name of the page showing.
+   * - `empty`: Shown when there are no entries to show.
+   * - `loading`: Shown while the entries are still on their way.
    */
   "helix-drilldown": Partial<
     HelixDrilldownProps &
@@ -30583,6 +30669,9 @@ export type CustomElementsSolidJs = {
    * - `size-dismiss`: The remove button, when `dismissible`.
    * - `size-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `size-prefix`: The category before the label.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-file-input": Partial<
     HelixFileInputProps &
@@ -31151,6 +31240,9 @@ export type CustomElementsSolidJs = {
    * - `clear`: The button that empties the field.
    * - `icon`: A glyph this component draws.
    * - `reveal`: The button that shows and hides a password.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-input": Partial<
     HelixInputProps &
@@ -31758,6 +31850,7 @@ export type CustomElementsSolidJs = {
    * - `label`: The question, over the list.
    * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
+   * - `loading`: Shown while the options are still on their way.
    */
   "helix-listbox": Partial<
     HelixListboxProps &
@@ -32169,6 +32262,8 @@ export type CustomElementsSolidJs = {
    * - `header`: The bar above a submenu, holding the way back and its name.
    * - `surface`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
+   * - `empty`: Shown when there are no items to show.
+   * - `loading`: Shown while the items are still on their way.
    */
   "helix-menu": Partial<
     HelixMenuProps & HelixMenuSolidJsProps & BaseProps<HelixMenu> & BaseEvents
@@ -32529,6 +32624,8 @@ export type CustomElementsSolidJs = {
    * - `decrement-mark`: The glyph on the step down control.
    * - `increment-mark`: The glyph on the step up control.
    * - `label`: The name over the field, which is also the scrub grip.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-number-input": Partial<
     HelixNumberInputProps &
@@ -33146,6 +33243,9 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The row of boxes.
    * - `cell`: One box.
+   * - `label`: The question, over the boxes.
+   * - `hint`: Help under the boxes, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-pin-input": Partial<
     HelixPinInputProps &
@@ -33906,6 +34006,9 @@ export type CustomElementsSolidJs = {
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
    * - `value`: The score written out, under `show-value`.
+   * - `label`: The question, over the marks.
+   * - `hint`: Help under the marks, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-rating": Partial<
     HelixRatingProps &
@@ -34603,6 +34706,7 @@ export type CustomElementsSolidJs = {
    * - `listbox-label`: The question, over the list.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
+   * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-select": Partial<
     HelixSelectProps &
@@ -34829,6 +34933,9 @@ export type CustomElementsSolidJs = {
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `output`: The current value, shown beside it.
+   * - `label`: The question, over the track.
+   * - `hint`: Help under the track, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-slider": Partial<
     HelixSliderProps &
@@ -35698,6 +35805,8 @@ export type CustomElementsSolidJs = {
    * - `control`: The input.
    * - `thumb`: The part that moves.
    * - `label`: The words beside it.
+   * - `hint`: Help under the control, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-switch": Partial<
     HelixSwitchProps &
@@ -35814,6 +35923,8 @@ export type CustomElementsSolidJs = {
    *
    * - `table`: The grid.
    * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
+   * - `empty`: Shown when there are no rows to show.
+   * - `loading`: Shown while the rows are still on their way.
    */
   "helix-table": Partial<
     HelixTableProps &
@@ -36309,6 +36420,9 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The box holding the control.
    * - `control`: The textarea itself.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-textarea": Partial<
     HelixTextareaProps &
@@ -36539,8 +36653,6 @@ export type CustomElementsSolidJs = {
    * - `picker`: The list inside it.
    * - `picker-column`: One of them.
    * - `picker-columns`: The row of columns, in `wheels`.
-   * - `picker-empty`: What it says when nothing matches, forwarded from the listbox.
-   * - `picker-items`: The scrolling column inside it, forwarded from the listbox.
    * - `picker-list`: The listbox holding the times, in `list`.
    * - `picker-option`: One time in it. Carries `data-between` inside a range.
    * - `time-dismiss`: The remove button, when `dismissible`.
@@ -36566,6 +36678,11 @@ export type CustomElementsSolidJs = {
    * - `picker-list-search-field`: The field itself.
    * - `picker-option-item`: The row.
    * - `picker-option-label`: The words.
+   * - `label`: The question, over the field.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
+   * - `picker-column-loading`: Shown while the options are still on their way.
+   * - `picker-list-loading`: Shown while the options are still on their way.
    */
   "helix-time-input": Partial<
     HelixTimeInputProps &
@@ -36814,6 +36931,8 @@ export type CustomElementsSolidJs = {
    * - `list-search-field`: The field itself.
    * - `option-item`: The row.
    * - `option-label`: The words.
+   * - `column-loading`: Shown while the options are still on their way.
+   * - `list-loading`: Shown while the options are still on their way.
    */
   "helix-time-picker": Partial<
     HelixTimePickerProps &
@@ -37226,6 +37345,9 @@ export type CustomElementsSolidJs = {
    * - `row`: The line the track sits on, with whatever flanks it.
    * - `track`: The bar the items sit in.
    * - `divider`: The rule after an inline label, separating it from the items.
+   * - `label`: The question, over the row.
+   * - `hint`: Help under the row, while nothing is wrong.
+   * - `feedback`: What is wrong with it.
    */
   "helix-toggle-group": Partial<
     HelixToggleGroupProps &
@@ -37890,6 +38012,8 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `tree`: The tree container.
+   * - `empty`: Shown when there are no rows to show.
+   * - `loading`: Shown while the rows are still on their way.
    */
   "helix-tree": Partial<
     HelixTreeProps & HelixTreeSolidJsProps & BaseProps<HelixTree> & BaseEvents
@@ -38104,6 +38228,8 @@ export type CustomElementsSolidJs = {
    * - `menu-header`: The bar above a submenu, holding the way back and its name.
    * - `menu-title`: The name of the submenu that is showing.
    * - `menu-surface`: The floating panel the menu is drawn on.
+   * - `menu-empty`: Shown when there are no items to show.
+   * - `menu-loading`: Shown while the items are still on their way.
    */
   "helix-video-playlist-menu": Partial<
     HelixVideoPlaylistMenuProps &
@@ -38379,6 +38505,10 @@ export type CustomElementsSolidJs = {
    * - `overflow-title`: The name of the submenu that is showing.
    * - `captions-menu-surface`: The floating panel the menu is drawn on.
    * - `overflow-surface`: The floating panel the menu is drawn on.
+   * - `captions-menu-empty`: Shown when there are no items to show.
+   * - `captions-menu-loading`: Shown while the items are still on their way.
+   * - `overflow-empty`: Shown when there are no items to show.
+   * - `overflow-loading`: Shown while the items are still on their way.
    */
   "helix-video": Partial<
     HelixVideoProps &

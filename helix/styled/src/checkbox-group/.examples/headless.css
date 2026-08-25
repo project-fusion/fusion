@@ -85,6 +85,16 @@ helix-headless-checkbox::part(mark) {
   inline-size: 1em;
 }
 
+helix-headless-checkbox::part(hint) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
+helix-headless-checkbox::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

@@ -81,6 +81,7 @@ const parse = (hotkey: string) => {
  * @csspart listbox-label - The question, over the list.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The field itself.
+ * @csspart listbox-loading - Shown while the options are still on their way.
  *
  * @event {HelixSelectEvent} helix-select - Fired when a command is chosen.
  * @event {HelixOpenEvent} helix-open - Fired when the palette opens.
@@ -318,7 +319,8 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         part="listbox"
       exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
         filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
-        label: listbox-label, search: listbox-search, search-field: listbox-search-field"
+        label: listbox-label, loading: listbox-loading, search: listbox-search,
+        search-field: listbox-search-field"
         aria-label=${this.label}
         empty-text=${this.emptyText}
         filter-label=${this.placeholder}

@@ -39,6 +39,9 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart field - The box holding the control.
  * @csspart control - The textarea itself.
+ * @csspart label - The question, over the field.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-headless-textarea')
 export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {

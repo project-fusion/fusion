@@ -141,6 +141,10 @@ const isInsertion = (event: Event): boolean =>
  * @csspart tag-dismiss - The remove button, when `dismissible`.
  * @csspart tag-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart tag-prefix - The category before the label.
+ * @csspart label - The question, over the field.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart feedback - What is wrong with it.
+ * @csspart listbox-loading - Shown while the options are still on their way.
  * from the listbox.
  *
  * @event {HelixChangeEvent} helix-change - Fired when the chosen option changes.
@@ -659,7 +663,8 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       id="listbox"
       exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
         filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
-        label: listbox-label, search: listbox-search, search-field: listbox-search-field"
+        label: listbox-label, loading: listbox-loading, search: listbox-search,
+        search-field: listbox-search-field"
       aria-label=${this.listLabel}
       empty-text=${this.emptyText}
       loading-text=${this.loadingText}

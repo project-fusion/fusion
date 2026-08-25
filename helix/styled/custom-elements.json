@@ -10524,6 +10524,22 @@
                 "name": "HelixHeadlessCheckbox",
                 "module": "src/checkbox/root/checkbox-root.ts"
               }
+            },
+            {
+              "description": "Help under the control, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCheckbox",
+                "module": "src/checkbox/root/checkbox-root.ts"
+              }
             }
           ],
           "events": [
@@ -12865,6 +12881,54 @@
                 "name": "HelixHeadlessColorInput",
                 "module": "src/color-input/root/color-input-root.ts"
               }
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "picker-channel-feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the track, while nothing is wrong.",
+              "name": "picker-channel-hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the track.",
+              "name": "picker-channel-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
             }
           ],
           "events": [
@@ -14187,6 +14251,30 @@
             {
               "description": "The inner control.",
               "name": "format-button",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "channel-feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "Help under the track, while nothing is wrong.",
+              "name": "channel-hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the track.",
+              "name": "channel-label",
               "inheritedFrom": {
                 "name": "HelixHeadlessColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -16104,8 +16192,40 @@
               }
             },
             {
-              "description": "The category before the label. from the listbox.",
+              "description": "The category before the label.",
               "name": "tag-prefix",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the options are still on their way. from the listbox.",
+              "name": "listbox-loading",
               "inheritedFrom": {
                 "name": "HelixHeadlessCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -16845,6 +16965,14 @@
             {
               "description": "The field itself.",
               "name": "listbox-search-field",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "listbox-loading",
               "inheritedFrom": {
                 "name": "HelixHeadlessCommand",
                 "module": "src/command/root/command-root.ts"
@@ -19668,6 +19796,30 @@
             {
               "description": "A column header naming a day of the week.",
               "name": "picker-weekday",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
               "inheritedFrom": {
                 "name": "HelixHeadlessDateInput",
                 "module": "src/date-input/root/date-input-root.ts"
@@ -24579,6 +24731,22 @@
                 "name": "HelixHeadlessDrilldown",
                 "module": "src/drilldown/root/drilldown-root.ts"
               }
+            },
+            {
+              "description": "Shown when there are no entries to show.",
+              "name": "empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDrilldown",
+                "module": "src/drilldown/root/drilldown-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the entries are still on their way.",
+              "name": "loading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDrilldown",
+                "module": "src/drilldown/root/drilldown-root.ts"
+              }
             }
           ],
           "events": [
@@ -26154,6 +26322,30 @@
             {
               "description": "The category before the label.",
               "name": "size-prefix",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
               "inheritedFrom": {
                 "name": "HelixHeadlessFileInput",
                 "module": "src/file-input/root/file-input-root.ts"
@@ -30492,6 +30684,30 @@
                 "name": "HelixHeadlessInput",
                 "module": "src/input/root/input-root.ts"
               }
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessInput",
+                "module": "src/input/root/input-root.ts"
+              }
             }
           ],
           "events": [
@@ -34433,6 +34649,14 @@
                 "name": "HelixHeadlessListbox",
                 "module": "src/listbox/root/listbox-root.ts"
               }
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "loading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
             }
           ],
           "events": [
@@ -37255,6 +37479,22 @@
                 "name": "HelixHeadlessMenu",
                 "module": "src/menu/root/menu-root.ts"
               }
+            },
+            {
+              "description": "Shown when there are no items to show.",
+              "name": "empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the items are still on their way.",
+              "name": "loading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
             }
           ],
           "events": [
@@ -38624,6 +38864,22 @@
             {
               "description": "The name over the field, which is also the scrub grip.",
               "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNumberInput",
+                "module": "src/number-input/root/number-input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNumberInput",
+                "module": "src/number-input/root/number-input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
               "inheritedFrom": {
                 "name": "HelixHeadlessNumberInput",
                 "module": "src/number-input/root/number-input-root.ts"
@@ -43405,6 +43661,30 @@
             {
               "description": "One box.",
               "name": "cell",
+              "inheritedFrom": {
+                "name": "HelixHeadlessPinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the boxes.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessPinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the boxes, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessPinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
               "inheritedFrom": {
                 "name": "HelixHeadlessPinInput",
                 "module": "src/pin-input/root/pin-input-root.ts"
@@ -49288,6 +49568,30 @@
                 "name": "HelixHeadlessRating",
                 "module": "src/rating/root/rating-root.ts"
               }
+            },
+            {
+              "description": "The question, over the marks.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "description": "Help under the marks, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
             }
           ],
           "events": [
@@ -53386,6 +53690,14 @@
                 "name": "HelixHeadlessSelect",
                 "module": "src/select/root/select-root.ts"
               }
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "listbox-loading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
             }
           ],
           "events": [
@@ -55024,6 +55336,30 @@
             {
               "description": "The current value, shown beside it.",
               "name": "output",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the track.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "description": "Help under the track, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
               "inheritedFrom": {
                 "name": "HelixHeadlessSlider",
                 "module": "src/slider/root/slider-root.ts"
@@ -60418,6 +60754,22 @@
                 "name": "HelixHeadlessSwitch",
                 "module": "src/switch/root/switch-root.ts"
               }
+            },
+            {
+              "description": "Help under the control, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSwitch",
+                "module": "src/switch/root/switch-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSwitch",
+                "module": "src/switch/root/switch-root.ts"
+              }
             }
           ],
           "events": [
@@ -61020,6 +61372,22 @@
             {
               "description": "The row the column headings sit in. `display: contents`, so it takes no space.",
               "name": "head",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "description": "Shown when there are no rows to show.",
+              "name": "empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTable",
+                "module": "src/table/root/table-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the rows are still on their way.",
+              "name": "loading",
               "inheritedFrom": {
                 "name": "HelixHeadlessTable",
                 "module": "src/table/root/table-root.ts"
@@ -64767,6 +65135,30 @@
                 "name": "HelixHeadlessTextarea",
                 "module": "src/textarea/root/textarea-root.ts"
               }
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
             }
           ],
           "events": [
@@ -66531,22 +66923,6 @@
               }
             },
             {
-              "description": "What it says when nothing matches, forwarded from the listbox.",
-              "name": "picker-empty",
-              "inheritedFrom": {
-                "name": "HelixHeadlessTimeInput",
-                "module": "src/time-input/root/time-input-root.ts"
-              }
-            },
-            {
-              "description": "The scrolling column inside it, forwarded from the listbox.",
-              "name": "picker-items",
-              "inheritedFrom": {
-                "name": "HelixHeadlessTimeInput",
-                "module": "src/time-input/root/time-input-root.ts"
-              }
-            },
-            {
               "description": "The listbox holding the times, in `list`.",
               "name": "picker-list",
               "inheritedFrom": {
@@ -66741,6 +67117,46 @@
             {
               "description": "The words.",
               "name": "picker-option-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the field.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "Help under the field, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "picker-column-loading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "picker-list-loading",
               "inheritedFrom": {
                 "name": "HelixHeadlessTimeInput",
                 "module": "src/time-input/root/time-input-root.ts"
@@ -68133,6 +68549,22 @@
             {
               "description": "The words.",
               "name": "option-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "column-loading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the options are still on their way.",
+              "name": "list-loading",
               "inheritedFrom": {
                 "name": "HelixHeadlessTimePicker",
                 "module": "src/time-picker/root/time-picker-root.ts"
@@ -69825,6 +70257,30 @@
             {
               "description": "The rule after an inline label, separating it from the items.",
               "name": "divider",
+              "inheritedFrom": {
+                "name": "HelixHeadlessToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "description": "The question, over the row.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "description": "Help under the row, while nothing is wrong.",
+              "name": "hint",
+              "inheritedFrom": {
+                "name": "HelixHeadlessToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "description": "What is wrong with it.",
+              "name": "feedback",
               "inheritedFrom": {
                 "name": "HelixHeadlessToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"
@@ -74895,6 +75351,22 @@
                 "name": "HelixHeadlessTree",
                 "module": "src/tree/root/tree-root.ts"
               }
+            },
+            {
+              "description": "Shown when there are no rows to show.",
+              "name": "empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the rows are still on their way.",
+              "name": "loading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
             }
           ],
           "slots": [
@@ -76793,6 +77265,22 @@
             {
               "description": "The floating panel the menu is drawn on.",
               "name": "menu-surface",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "Shown when there are no items to show.",
+              "name": "menu-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
+              "description": "Shown while the items are still on their way.",
+              "name": "menu-loading",
               "inheritedFrom": {
                 "name": "HelixHeadlessVideoPlaylistMenu",
                 "module": "src/video-playlist/menu/video-playlist-menu.ts"
@@ -79373,6 +79861,38 @@
             {
               "description": "The floating panel the menu is drawn on.",
               "name": "overflow-surface",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Shown when there are no items to show.",
+              "name": "captions-menu-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the items are still on their way.",
+              "name": "captions-menu-loading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Shown when there are no items to show.",
+              "name": "overflow-empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the items are still on their way.",
+              "name": "overflow-loading",
               "inheritedFrom": {
                 "name": "HelixHeadlessVideo",
                 "module": "src/video/root/video-root.ts"

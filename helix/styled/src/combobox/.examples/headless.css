@@ -79,6 +79,21 @@ helix-headless-combobox::part(tag-dismiss-mark) {
   inline-size: 1em;
 }
 
+helix-headless-combobox::part(label) {
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+helix-headless-combobox::part(hint) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
+helix-headless-combobox::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.875em;
+}
+
 helix-headless-option::part(item) {
   background-color: transparent;
   border: 0;
