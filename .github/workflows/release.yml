@@ -26,15 +26,21 @@
 # pushed after promotion and says a release happened. Version computation reads
 # both, so a number is never handed out twice; everything else reads only the
 # second.
-# **`vars.PUBLISHING` has three states, and they are ordered by how much they
-# permit.** Unset, nothing publishes anywhere. `experimental`, previews and
+# **`vars.PUBLISHING` has four states, and they are ordered by how much they
+# permit.** `off` and unset both publish nothing. `experimental`, previews and
 # staging publish but nothing is ever promoted, so a version exists at a dist-tag
 # a consumer has to ask for by name and `latest` does not move. `on`, the whole
 # pipeline runs and `latest` follows main.
 #
 # A single ordered variable rather than one flag per workflow, because two flags
 # can disagree and somebody has to remember which of the four combinations is
-# meant. Three states have one meaning each and a reader can hold them in order.
+# meant. These have one meaning each and a reader can hold them in order.
+#
+# **`off` exists because absent is ambiguous.** Unset means the same thing, and it
+# also means "nobody has set this yet" and "somebody deleted it": moving the
+# repository in Aug 2026 emptied every variable, and nothing distinguished a
+# pipeline deliberately held from one whose switch had been lost. `off` is the
+# state that says a person decided.
 #
 # **Publishing is switched off, deliberately, and this is the switch.**
 #

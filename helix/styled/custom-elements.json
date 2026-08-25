@@ -2192,6 +2192,14 @@
             },
             {
               "kind": "field",
+              "name": "CAPPED",
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "description": "The shortest gap between two painted frames, for a field nobody points at.\n\n**A drifting field does not need the display's rate and a pointer does.**\n`tick` advances on `(now - this.last) / 1000`, so motion is wall-clock: at\nhalf the frames the field moves the same distance in the same time, sampled\nmore coarsely. `delta` is already clamped at 0.05, which is a floor of 20\nframes a second, and 30 sits inside that with room. A cap at 15 would land\non the clamp and the field would genuinely drag, which is the failure that\nwould be misdiagnosed as choppiness.\n\n**`interactive` is the exception and it is the whole exception.** The\nelement eases `presence` toward the pointer on a 50ms rise constant, so at\n33ms a frame the entire response is one or two samples and the follow reads\nas a lag rather than a lightness. Every field on the landing page leaves\n`interactive` unset; the only one that sets it is the lab on\n`/helix/aura`, where it is a toggle a reader chose. So the cap applies where\nnothing is being followed and lifts where something is.\n\n**Measured before it was capped, because the cost had changed.** 252 was\nfiled against one field on the first two screens. It is three now, one per\ntransparent run of the page, and with the frame limiter off they drew 2,654\ntimes in three seconds against 1,276 for one: the work scales with the count\nbecause each instance draws once per callback. Capping the two that nobody\npoints at is most of that back."
+            },
+            {
+              "kind": "field",
               "name": "tick",
               "privacy": "private",
               "readonly": true

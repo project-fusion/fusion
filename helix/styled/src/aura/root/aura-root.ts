@@ -594,9 +594,44 @@ export class HelixAura extends HelixElement {
     this.paint()
   }
 
+  /**
+   * The shortest gap between two painted frames, for a field nobody points at.
+   *
+   * **A drifting field does not need the display's rate and a pointer does.**
+   * `tick` advances on `(now - this.last) / 1000`, so motion is wall-clock: at
+   * half the frames the field moves the same distance in the same time, sampled
+   * more coarsely. `delta` is already clamped at 0.05, which is a floor of 20
+   * frames a second, and 30 sits inside that with room. A cap at 15 would land
+   * on the clamp and the field would genuinely drag, which is the failure that
+   * would be misdiagnosed as choppiness.
+   *
+   * **`interactive` is the exception and it is the whole exception.** The
+   * element eases `presence` toward the pointer on a 50ms rise constant, so at
+   * 33ms a frame the entire response is one or two samples and the follow reads
+   * as a lag rather than a lightness. Every field on the landing page leaves
+   * `interactive` unset; the only one that sets it is the lab on
+   * `/helix/aura`, where it is a toggle a reader chose. So the cap applies where
+   * nothing is being followed and lifts where something is.
+   *
+   * **Measured before it was capped, because the cost had changed.** 252 was
+   * filed against one field on the first two screens. It is three now, one per
+   * transparent run of the page, and with the frame limiter off they drew 2,654
+   * times in three seconds against 1,276 for one: the work scales with the count
+   * because each instance draws once per callback. Capping the two that nobody
+   * points at is most of that back.
+   */
+  private static readonly CAPPED = 1000 / 30
+
   private readonly tick = (now: number): void => {
     if (!this.last) {
       this.last = now
+    }
+    /* Skipped rather than rescheduled on a timer: `requestAnimationFrame` is
+       what pauses in a background tab and what matches the display, and a
+       `setTimeout` loop would give up both to save the same work. */
+    if (!this.interactive && now - this.last < HelixAura.CAPPED) {
+      this.frame = requestAnimationFrame(this.tick)
+      return
     }
     /* Clamped: a tab returning from the background delivers one enormous delta,
        and the field would teleport to wherever the pointer had gone. */
