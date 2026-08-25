@@ -46,14 +46,23 @@ export class HelixLineChart extends HelixHeadlessLineChart {
    * translucent line takes its color from whatever it crosses, which on a chart
    * with several is the whole risk.
    *
-   * **`outlined` is refused and `area` is why.** On a column, `outlined` is the
-   * edge without the loud fill; the line chart's version of that is the line
-   * without its wash, and `area` already says exactly that. A second spelling
-   * would be the drift this axis exists to prevent, so it defers to the property
-   * that got there first.
+   * `outlined` thins the wash and leaves the line at full weight, so the boundary
+   * carries the reading, which is the trade `BarChart` makes on a column. `solid`
+   * takes the wash to full strength and the fill carries it instead.
+   *
+   * **This refused `outlined` until 25 Aug 2026, and `area` was the reason
+   * given**: on a column `outlined` is the edge without the loud fill, the line
+   * chart's version of that is the line without its wash, and `area` already says
+   * exactly that. `area` is unchanged and still says it. What the argument
+   * conflated is existence with weight: `area` decides whether a wash is drawn,
+   * which is structural and belongs to the tier below, and emphasis decides which
+   * of the two marks is carrying the reading. Both ends need a wash present and
+   * neither can summon one.
+   *
+   * `ghost` would be a chart with no lines.
    */
   @property({ reflect: true })
-  emphasis?: 'subtle'
+  emphasis?: 'outlined' | 'solid' | 'subtle'
 
   /**
    * What the lines are made of.

@@ -107,6 +107,7 @@ const THICKNESS: Record<string, number> = {
  * @csspart tooltip-name - A column's name inside the tooltip.
  * @csspart tooltip-value - A column's value inside the tooltip.
  * @csspart segment - One slice.
+ * @csspart segment-edge - One slice as a closed shape, for a boundary to trace.
  * @csspart track - The ring the slices are drawn on.
  *
  * @slot - Goes in the middle of the ring. A total, usually.
@@ -314,6 +315,90 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
       r=${this.radius}
       stroke-dasharray="${length} ${GAP}"
       stroke-dashoffset=${-share.start * circumference * this.span}
+    />
+    ${this.renderEdge(share, index)}`
+  }
+
+  /**
+   * The same slice again, as a shape with an inside.
+   *
+   * **A stroked arc has no boundary to draw, which is why this exists.** The
+   * segment above is a dash on a circle: the mark *is* the edge, so there is
+   * nothing for an outline to trace and nothing within it to fade. Anything
+   * wanting those two separately needs the slice as a closed path, and this is
+   * it: the outer arc, a step inward, the inner arc back, closed.
+   *
+   * **Rendered always and painted only sometimes**, which is what keeps this on
+   * this tier. Whether a boundary is drawn is a styled question and the answer
+   * lives in a stylesheet; whether the geometry a boundary would need exists at
+   * all is structural, and a component cannot conjure a shape from CSS. So the
+   * path is here for every donut and is `fill: none; stroke: none` until
+   * something asks for it.
+   *
+   * **Not a replacement for the dash, which was the first plan.** The dash
+   * carries three jobs and only one of them is the shape: a share growing is a
+   * `stroke-dasharray` interpolating with no reflow, and `@starting-style` on
+   * that same property is the whole reason the ring sweeps in rather than
+   * appearing. A `d` cannot do either. CSS interpolates one only between paths
+   * of identical command structure, and the large-arc flag flips the moment a
+   * slice crosses a half turn, so a growing slice would pop partway through the
+   * transition it was meant to smooth. Both animations stay on the dash and this
+   * path follows it.
+   *
+   * The turn to twelve o'clock is arithmetic here rather than the rotation the
+   * stylesheet gives the circles. That rule uses `transform-box: fill-box`, so
+   * it spins each element about its own bounding box, which is the ring's center
+   * for a circle and is not for a sector.
+   */
+  protected renderEdge(share: { fraction: number; start: number }, index: number): TemplateResult {
+    const turn = 2 * Math.PI * this.span
+    const from = share.start * turn - Math.PI / 2
+    const to = (share.start + share.fraction) * turn - Math.PI / 2
+    const outer = EDGE
+    const inner = EDGE - this.thickness
+    const at = (radius: number, angle: number): string =>
+      `${(CENTER + Math.cos(angle) * radius).toFixed(3)} ${(CENTER + Math.sin(angle) * radius).toFixed(3)}`
+    const wide = to - from > Math.PI ? 1 : 0
+    /* A slice that is the whole ring starts and ends at one point, and an arc
+       between a point and itself draws nothing. Split at the halfway angle so
+       each half is a real arc. */
+    const full = to - from >= 2 * Math.PI - 1e-6
+    const mid = from + (to - from) / 2
+    const outward = full
+      ? `A ${outer} ${outer} 0 0 1 ${at(outer, mid)} A ${outer} ${outer} 0 0 1 ${at(outer, to)}`
+      : `A ${outer} ${outer} 0 ${wide} 1 ${at(outer, to)}`
+    /* A pie has no inner arc: the radius solves to zero and the two ends meet at
+       the middle, so the step back is a line to the center and not an arc of no
+       size. */
+    const homeward =
+      inner <= 0
+        ? `L ${CENTER} ${CENTER}`
+        : full
+          ? `L ${at(inner, to)} A ${inner} ${inner} 0 0 0 ${at(inner, mid)} A ${inner} ${inner} 0 0 0 ${at(inner, from)}`
+          : `L ${at(inner, to)} A ${inner} ${inner} 0 ${wide} 0 ${at(inner, from)}`
+    const shape = `M ${at(outer, from)} ${outward} ${homeward} Z`
+    /* **Clipped to itself, because a stroke straddles the line it is drawn on.**
+       Half of it falls outside the wedge: past the fill on both arcs, and across
+       the seam into the neighbour on both radial sides, where that neighbour is
+       drawing the same line from the other direction and the two overlap. Seen
+       as a doubled edge at every join and a halo around the ring.
+
+       Clipping to the same path keeps the inner half and drops the outer, so an
+       edge stays inside the slice it belongs to and two adjacent edges meet
+       exactly. The clip is the shape itself, so it costs no second geometry and
+       cannot drift from it.
+
+       Ids are scoped to the shadow root, so an index is enough to keep them
+       apart, and two donuts on a page cannot collide. */
+    const clip = `helix-donut-edge-${index}`
+    return svg`<clipPath id=${clip}><path d=${shape} /></clipPath>
+    <path
+      clip-path="url(#${clip})"
+      d=${shape}
+      data-active=${this.pointer.at === index ? '' : nothing}
+      data-series=${seriesIndex(index)}
+      part="segment-edge"
+      style="--chart-series: var(--chart-series-${seriesIndex(index)})"
     />`
   }
   /**

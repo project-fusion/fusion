@@ -1,0 +1,19 @@
+/* **The second series takes the palette's green rather than its red.**
+ *
+ * The two lines here are one measurement at two percentiles, and the default
+ * pair puts them at opposite ends of the wheel: series 1 sits on the brand hue
+ * and series 2 is 135 degrees round it, which resolves to a red. Two readings of
+ * the same thing read as two unrelated things at that distance, and a red one
+ * reads as a warning besides, which p95 latency is not on its own.
+ *
+ * The green is the palette's own, `--helix-color-series-3`, not a color picked
+ * for the example: a chart borrowing an ink from outside the series ramp is the
+ * one thing a series ramp exists to prevent, and it would drift the moment the
+ * brand seed moves. Reassigning within the ramp keeps every contrast the ramp
+ * was solved for.
+ *
+ * On the chart rather than a wrapper, because what is being shown is four
+ * weights of one chart and a container class would suggest the grouping matters. */
+helix-line-chart {
+  --chart-series-2: var(--helix-color-series-3);
+}

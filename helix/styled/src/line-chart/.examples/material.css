@@ -1,0 +1,35 @@
+/* **A panel rather than an accent band**, for the reason `BarChart`'s material
+   example gives: a chart's own inks are solved against the page surfaces, so
+   standing one on a colored ground puts every label on a surface nothing
+   measured it for.
+
+   What glass is for here is the gridlines reading *through* the wash, so the
+   rules stay continuous across the plot instead of stopping under each series.
+   That is the test rather than the tint: an opaque wash hides the very rules a
+   reader measures the line against. The two charts share one table, so what
+   changes across the pair is the material and nothing else. */
+.panel {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  padding: var(--helix-space-lg);
+}
+
+.panel figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+  margin: 0;
+}
+
+.panel figcaption {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-wide);
+  text-transform: uppercase;
+}

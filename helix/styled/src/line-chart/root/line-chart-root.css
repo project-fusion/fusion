@@ -387,13 +387,32 @@
   }
 }
 
-/* **Emphasis, and only `subtle`, because the other two are already spoken for.**
-   `outlined` on a column means the edge without the loud fill, and the line
-   chart's version of that is the line without its wash. It already has one, and
-   it is `area`: a boolean the consumer writes, older than this axis and named
-   for what it does. A second way to say it would be exactly the drift the axis
-   registry exists to prevent, so this axis defers to the property that got there
-   first. `ghost` would be a chart with no lines.
+/* **Emphasis, and it takes three values now.** *Rewritten 25 Aug 2026.* The note
+   here read "only `subtle`, because the other two are already spoken for", on the
+   grounds that `outlined` means the line without its wash and `area` already says
+   that. That is still true of `area` and `area` is unchanged: it stays the
+   boolean that decides whether a wash is drawn at all, on the tier below, because
+   whether a shape exists is structural and a stylesheet cannot conjure one.
+
+   What the note conflated is existence with weight. `area` says whether there is
+   a wash; emphasis says which of the two marks is carrying the reading. Both ends
+   need a wash to be present and neither can summon one, so this axis does not
+   duplicate `area` and cannot replace it.
+
+   `outlined` fades the wash further and leaves the line at full weight, so the
+   boundary is the mark, which is the same trade `BarChart` makes on a column.
+   `solid` takes the wash to full strength and the fill becomes the mark. `subtle`
+   quietens both. `solid` is written out rather than left to the base rule here,
+   unlike the other families, because the resting wash is deliberately faint and
+   a reader asking for solid is asking for the departure rather than the default.
+
+   The line is left alone at both ends rather than darkened, which was the first
+   idea and is the one `BarChart` already measured and rejected: a darkened edge
+   reads against its fill and not against the page, 1.35 on the page in dark mode.
+   A line chart's mark sits on the page, so it would be the worse half of that
+   trade. Weight moves instead, and the color stays the series'.
+
+   `ghost` would be a chart with no lines.
 
    `subtle` mixes toward the page rather than lowering opacity, so a quiet series
    does not change color depending on what is drawn under it, which on a chart
@@ -405,6 +424,18 @@
 
 :host([emphasis="subtle"]) [part="area"] {
   fill: color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background));
+}
+
+/* The two ends of the axis, both written against the wash's own hook so they
+   compose with the theme's material policy rather than fighting it: the value
+   below is multiplied by `--helix-material-opacity` in the base rule, so a glass
+   theme thins a solid area exactly as it thins a resting one. */
+:host([emphasis="outlined"]) {
+  --line-chart-area-opacity: 0.08;
+}
+
+:host([emphasis="solid"]) {
+  --line-chart-area-opacity: 1;
 }
 
 /* **Glass, for the reason `BarChart` gives: the gridlines read through.** That

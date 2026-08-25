@@ -226,3 +226,34 @@
 :host([emphasis="subtle"]) {
   color: color-mix(in oklab, var(--_sparkline-ink) 40%, var(--helix-color-background));
 }
+
+/* **The other two ends, and each plot answers them in its own shape.** A
+   sparkline is three marks behind one property, so emphasis cannot be a single
+   declaration the way `subtle` is: quietening ink works whatever is drawn, and
+   the difference between a boundary and a fill does not exist until you know
+   which of the three you are looking at.
+
+   So this follows the family each plot belongs to. A bar plot answers like
+   `BarChart`: `outlined` keeps the column, fades it toward the page and holds
+   the edge in the series' color. A line or area plot answers like `LineChart`:
+   `outlined` thins the wash and leaves the line carrying the reading, `solid`
+   takes the wash to full and lets the fill carry it. `solid` on bars is the
+   resting column and selects nothing, per the rule that a resting value lands on
+   the base.
+
+   `ghost` stays refused for the reason the other charts give: a sparkline with
+   no mark is an empty box where a figure was promised. */
+:host([emphasis="outlined"]) [part="bar"] {
+  fill: color-mix(in oklab, var(--_sparkline-ink) 55%, var(--helix-color-background));
+  stroke: var(--_sparkline-ink);
+  stroke-width: var(--sparkline-bar-stroke, 1);
+  vector-effect: non-scaling-stroke;
+}
+
+:host([emphasis="outlined"]) [part="area"] {
+  opacity: var(--sparkline-area-opacity, 0.35);
+}
+
+:host([emphasis="solid"]) [part="area"] {
+  opacity: 1;
+}

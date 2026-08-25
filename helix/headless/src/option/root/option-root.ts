@@ -1,5 +1,5 @@
 import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
-import { html, type TemplateResult } from 'lit'
+import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -39,13 +39,41 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart item - The row.
  *
+ * @csspart text - The words and the caption under them, as one column.
+ *
  * @csspart label - The words.
+ *
+ * @csspart description - The caption under the words, when there is one.
  */
 @customElement('helix-headless-option')
 export class HelixHeadlessOption extends HelixElement {
   /** Whether this choice can be made. */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * A second line under the words, for what the choice actually is.
+   *
+   * A palette row reads better as a name and a caption than as one sentence
+   * carrying both: "Helix" and "the design system" are two facts, and a comma
+   * between them makes a reader parse the punctuation to find where the name
+   * ends. Matching still reads the label, so what somebody types is matched
+   * against the name rather than against prose about it.
+   *
+   * **A property and not a slot, which is the departure worth explaining.** The
+   * area rules say a content property is its slot's fallback, and that holds for
+   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+   * usually absent, and a wrapped slot generates a box whether or not it is
+   * filled, so every option without a caption would carry an empty line. The
+   * detection that would avoid it does not exist, `:host(:has())` being invalid
+   * and the server having no children to inspect. A property is known at render
+   * time, so the component can decline to draw the box at all.
+   *
+   * It does not reflect, per the rule that payload state stays off the host: a
+   * string is not a fact a selector needs.
+   */
+  @property()
+  description?: string
 
   /** Whether this is the option the keyboard is on. Written by the listbox. */
   @property({ attribute: 'data-active', reflect: true, type: Boolean })
@@ -129,7 +157,10 @@ export class HelixHeadlessOption extends HelixElement {
        chooses by calling `select()` or by pressing a key. */
     return html`<div part="item" @click=${() => this.select()}>
       <slot name="start"></slot>
-      <span part="label"><slot></slot></span>
+      <span part="text">
+        <span part="label"><slot></slot></span>
+        ${this.description ? html`<span part="description">${this.description}</span>` : nothing}
+      </span>
       <slot name="end"></slot>
     </div>`
   }

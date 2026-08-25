@@ -10,11 +10,19 @@
  * palette a reader has used opens. A centered one moves: the list grows and
  * shrinks as the filter narrows it, and a box centered on the viewport walks up
  * and down the screen under the words being typed, taking the field with it.
- * Pinned at the top, only the bottom edge moves and the field stays still. */
+ * Pinned at the top, only the bottom edge moves and the field stays still.
+ *
+ * **A fifth of the window down, raised from an eighth on 25 Aug 2026.** At 12vh
+ * the panel opened 84 pixels from the top of a 700 pixel laptop viewport, close
+ * enough to the edge that it read as hanging off the browser chrome rather than
+ * floating over the page. A fifth clears it on a short window and still sits
+ * inside the upper third on a tall one, which is where a palette belongs: high
+ * enough that the list grows downward into empty space, low enough to look
+ * placed rather than pinned. */
 helix-dialog::part(dialog) {
   align-self: start;
   inline-size: min(var(--command-size, 40rem), calc(100vw - var(--helix-space-xl) * 2));
-  margin-block-start: 12vh;
+  margin-block-start: 20vh;
   padding: var(--helix-space-none);
 }
 
@@ -56,6 +64,17 @@ helix-listbox::part(items) {
   background-color: transparent;
   border: none;
   max-block-size: var(--command-list-size, 22rem);
+
+  /* **More air than a listbox gives itself, because of what is under it.**
+     `Listbox` pads its scrollport by `space-2xs`, which is enough to hold the
+     first and last rows off the frame of a box that ends in nothing. This one
+     ends in a footer with a rule across it, so the last row landed against that
+     rule with about two pixels between them and read as cut off rather than
+     finished. A step up gives the list a floor to sit on.
+
+     Both ends rather than the bottom alone: the top meets the field's own rule
+     and the same argument applies there the moment the list is scrolled. */
+  padding-block: var(--helix-space-xs);
 }
 
 /* The field reads as the top of the panel rather than as a control inside it:

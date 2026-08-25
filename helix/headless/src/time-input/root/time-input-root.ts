@@ -88,8 +88,10 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart picker-list-label - The question, over the list.
  * @csspart picker-list-search - The region holding the field that narrows the list.
  * @csspart picker-list-search-field - The field itself.
+ * @csspart picker-option-description - The caption under the words, when there is one.
  * @csspart picker-option-item - The row.
  * @csspart picker-option-label - The words.
+ * @csspart picker-option-text - The words and the caption, as one column.
  * @csspart label - The question, over the field.
  * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart feedback - What is wrong with it.
@@ -498,7 +500,8 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
         list-hint: picker-list-hint, list-items: picker-list-items, list-label: picker-list-label,
         list-loading: picker-list-loading, list-search: picker-list-search,
         list-search-field: picker-list-search-field, option: picker-option,
-        option-item: picker-option-item, option-label: picker-option-label"
+        option-description: picker-option-description, option-item: picker-option-item,
+        option-label: picker-option-label, option-text: picker-option-text"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
       appearance=${this.variant ?? nothing}

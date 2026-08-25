@@ -35,6 +35,7 @@ import '../../tooltip/index.js'
  * @aliases Pie Chart, Ring Chart, Share Chart
  * @documentation https://helix.fusion.dev/components/donut-chart
  *
+ * @cssproperty --donut-chart-edge-stroke - Thickness of the slice boundary under `outlined`.
  * @cssproperty --donut-chart-size - Width and height of the ring.
  * @cssproperty --donut-chart-track-color - Color of the ring under the slices.
  */
@@ -43,17 +44,30 @@ export class HelixDonutChart extends HelixHeadlessDonutChart {
   /**
    * How much ink the slices claim.
    *
-   * `subtle` is the ring as a wash of its own colors: still readable, no longer
-   * the loudest thing beside the number it is explaining.
+   * `solid` is the resting arrangement and selects nothing: a slice at full
+   * strength is what the base rule already draws. `subtle` is the ring as a wash
+   * of its own colors, still readable and no longer the loudest thing beside the
+   * number it is explaining. `outlined` keeps the slice and fades it toward the
+   * page, leaving a boundary in the series' own color, which is the same trade
+   * `BarChart` makes on a column.
    *
-   * **One value and not three, because a slice is a stroke.** The mark *is* the
-   * edge here, so there is nothing inside it for `outlined` to fade: `BarChart`
-   * earns that value by keeping a column's area and fading it toward the page,
-   * and a donut would have to be drawn as filled paths rather than arcs to do the
-   * same. That is changing what a donut is to satisfy a word.
+   * **This took three values on 25 Aug 2026, and the note it replaces argued it
+   * could not.** That note was right about the mark: a slice is a stroke on a
+   * ring, the edge *is* the mark, and there is nothing within it to fade. It
+   * concluded that `outlined` would mean drawing slices as filled paths instead
+   * of arcs, and called that changing what a donut is to satisfy a word.
+   *
+   * What it did not weigh is that the two can both be there. The arc still draws
+   * the slice and still carries the animation, and a closed path traces the same
+   * wedge beside it for anything that needs a boundary. Nothing about the donut
+   * changed; something was added next to it. See `renderEdge` on the tier below
+   * for why the dash could not simply be replaced.
+   *
+   * The value that stays refused is `ghost`, which on a ring is a chart with no
+   * slices.
    */
   @property({ reflect: true })
-  emphasis?: 'subtle'
+  emphasis?: 'outlined' | 'solid' | 'subtle'
 
   /**
    * What the ring is made of.

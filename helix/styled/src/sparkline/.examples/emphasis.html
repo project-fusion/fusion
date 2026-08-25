@@ -1,21 +1,44 @@
-<!-- @summary One row being read, and two that are context. -->
+<!-- @summary Each weight against each plot, since a boundary and a fill mean different things per shape. -->
 
 <helix-flex
   direction="column"
   gap="sm"
 >
   <helix-sparkline
-    label="Signups"
+    label="Line, full strength"
     values="4 9 6 11 8 14 12 18"
   ></helix-sparkline>
   <helix-sparkline
     emphasis="subtle"
-    label="Sessions"
-    values="12 10 13 9 14 11 15 13"
+    label="Line, as context"
+    values="4 9 6 11 8 14 12 18"
   ></helix-sparkline>
   <helix-sparkline
-    emphasis="subtle"
-    label="Errors"
-    values="3 2 4 2 3 1 2 2"
+    label="Area, full strength"
+    plot="area"
+    values="4 9 6 11 8 14 12 18"
+  ></helix-sparkline>
+  <helix-sparkline
+    emphasis="outlined"
+    label="Area, the line carrying it"
+    plot="area"
+    values="4 9 6 11 8 14 12 18"
+  ></helix-sparkline>
+  <helix-sparkline
+    emphasis="solid"
+    label="Area, the fill carrying it"
+    plot="area"
+    values="4 9 6 11 8 14 12 18"
+  ></helix-sparkline>
+  <helix-sparkline
+    label="Bars, full strength"
+    plot="bar"
+    values="4 9 6 11 8 14 12 18"
+  ></helix-sparkline>
+  <helix-sparkline
+    emphasis="outlined"
+    label="Bars, edged"
+    plot="bar"
+    values="4 9 6 11 8 14 12 18"
   ></helix-sparkline>
 </helix-flex>

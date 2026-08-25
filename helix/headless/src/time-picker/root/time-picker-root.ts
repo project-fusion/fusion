@@ -123,8 +123,10 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart list-label - The question, over the list.
  * @csspart list-search - The region holding the field that narrows the list.
  * @csspart list-search-field - The field itself.
+ * @csspart option-description - The caption under the words, when there is one.
  * @csspart option-item - The row.
  * @csspart option-label - The words.
+ * @csspart option-text - The words and the caption, as one column.
  * @csspart column-loading - Shown while the options are still on their way.
  * @csspart list-loading - Shown while the options are still on their way.
  */
@@ -526,7 +528,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       ${values.map(
         (one) =>
           html`<${this.tag('option')} part="option"
-          exportparts="item: option-item, label: option-label" value=${one} ?disabled=${barred(one)}
+          exportparts="description: option-description, item: option-item, label: option-label, text: option-text" value=${one} ?disabled=${barred(one)}
             >${written(one)}</${this.tag('option')}
           >`,
       )}
@@ -604,7 +606,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
         const at = fromMinutes(minutes)
         return html`<${this.tag('option')}
           part="option"
-      exportparts="item: option-item, label: option-label"
+      exportparts="description: option-description, item: option-item, label: option-label, text: option-text"
           value=${at}
           ?disabled=${this.barred(at)}
           data-between=${this.between(at) ? '' : nothing}

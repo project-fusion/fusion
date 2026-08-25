@@ -1,4 +1,8 @@
-<!-- @summary The same readings at full strength and as context. -->
+<!-- @summary Four weights of the same readings, from the line carrying them to the wash. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
 
 <helix-flex
   direction="column"
@@ -41,6 +45,16 @@
   </table>
   <helix-line-chart
     area
+    for="latency"
+  ></helix-line-chart>
+  <helix-line-chart
+    area
+    emphasis="outlined"
+    for="latency"
+  ></helix-line-chart>
+  <helix-line-chart
+    area
+    emphasis="solid"
     for="latency"
   ></helix-line-chart>
   <helix-line-chart

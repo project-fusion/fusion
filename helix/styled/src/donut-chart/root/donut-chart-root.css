@@ -341,8 +341,36 @@
   stroke-width: calc(var(--donut-chart-stroke) * 1.18);
 }
 
+/* **Under `outlined` the slice fills in instead of growing.**
+ *
+ * Two reasons, and the second is the one that forces it. Recolouring is what the
+ * rule above refuses, because a slice already in the series' color has nothing
+ * to gain and a legend beside it to disagree with. An outlined slice is not in
+ * that color: it is faded toward the track, so filling it in on hover *restores*
+ * the agreement rather than breaking it, and the legend is the thing it comes
+ * back to.
+ *
+ * And it cannot grow. The boundary is a path clipped to fixed radii, `EDGE` and
+ * `EDGE - thickness`, so a stroke thickened past them spills outside its own
+ * outline: the fill would cross the edge that is drawn to contain it, which is
+ * the artifact this whole treatment exists to avoid. The width is pinned back to
+ * the resting one for that reason, not as a matter of taste.
+ *
+ * The outline stays where it is and the fill arrives underneath it in the same
+ * color, so the two merge and the slice reads solid, which is what a slice being
+ * asked about should read as. */
+:host([emphasis="outlined"]) [part="segment"][data-active] {
+  stroke: var(--chart-series);
+  stroke-width: var(--donut-chart-stroke);
+}
+
+/* `stroke` joins the width so an outlined slice fills in rather than snapping.
+   It costs the other emphases nothing: their stroke does not move on hover, so
+   there is nothing for the transition to run. */
 [part="segment"] {
-  transition: stroke-width var(--helix-duration-fast) var(--helix-easing-decelerate);
+  transition:
+    stroke var(--helix-duration-fast) var(--helix-easing-decelerate),
+    stroke-width var(--helix-duration-fast) var(--helix-easing-decelerate);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -497,14 +525,25 @@
   }
 }
 
-/* **Emphasis, and it takes one value rather than three.** A slice is a *stroke*
-   on a ring: the mark is the edge, and there is nothing inside it to fade. That
-   is what refuses `outlined` here, and it is the one place this sweep parts
-   company with the row that asked for it, which reasoned from the bar's shape.
-   `BarChart` can keep the area and fade it toward the page because a column has
-   an area; making a donut do the same would mean drawing each slice as a filled
-   path rather than an arc, which is changing what a donut is in order to satisfy
-   a word.
+/* **Emphasis, and it takes three values now.** *Rewritten 25 Aug 2026, and the
+   note it replaces refused `outlined` outright.* That note was right about the
+   mark and wrong about the conclusion. A slice is a stroke on a ring, the edge
+   *is* the mark, and there is genuinely nothing within it to fade, so it read
+   that as `outlined` requiring slices to be filled paths instead of arcs, and
+   called that changing what a donut is to satisfy a word.
+
+   The step it missed is that both shapes can be present. The arc still draws the
+   slice and still carries the animation; a closed path traces the same wedge
+   beside it, `part="segment-edge"`, and is `stroke: none` until something asks.
+   The donut is unchanged and a second geometry sits next to it. `renderEdge` on
+   the tier below carries why the dash could not simply be swapped: it is doing
+   the value transition and the arrival sweep as well as the shape, and a `d`
+   interpolates only between paths of one command structure, which a slice
+   crossing a half turn is not.
+
+   `solid` writes out the resting arrangement and selects nothing, per the rule
+   that a resting value lands on the base. `ghost` stays refused: on a ring it is
+   a chart with no slices.
 
    `subtle` is real and needs no new geometry: the ring is still a ring and stops
    being the loudest thing in the region, which is what a donut beside the number
@@ -517,6 +556,39 @@
     var(--chart-series) 30%,
     var(--donut-chart-track-color, var(--helix-color-surface-sunken))
   );
+}
+
+/* **The boundary, drawn only when it is asked for.** The path is in the markup
+   for every donut, because geometry is structural and a stylesheet cannot make a
+   shape, but it paints nothing until this rule. `fill` stays `none` throughout:
+   the arc behind it is already the slice's area, and filling the wedge as well
+   would lay two copies of the same ink on one another and darken every slice by
+   its own opacity.
+
+   **The same trade `BarChart` makes**, which is the point of doing it: the area
+   fades toward the page and the edge holds the series' own color, so the two
+   families answer `outlined` the same way and a reader who learns it on columns
+   has learned it here. Mixed toward the track rather than the background, for
+   the reason `subtle` gives immediately above: a slice sits on the track, and
+   fading toward anything else makes its color depend on what the track is. */
+[part="segment-edge"] {
+  fill: none;
+  stroke: none;
+}
+
+:host([emphasis="outlined"]) [part="segment"] {
+  stroke: color-mix(
+    in oklab,
+    var(--chart-series) 55%,
+    var(--donut-chart-track-color, var(--helix-color-surface-sunken))
+  );
+}
+
+:host([emphasis="outlined"]) [part="segment-edge"] {
+  stroke: var(--chart-series);
+  /* Doubled, because the clip keeps the inner half only: the declared
+     width is what is drawn and half of it is what shows. */
+  stroke-width: var(--donut-chart-edge-stroke, 3);
 }
 
 /* **Glass, so a ring on a glass card is in the same substance as the card.**

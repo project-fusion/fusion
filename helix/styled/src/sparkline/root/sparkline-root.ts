@@ -39,6 +39,7 @@ import { styles } from './sparkline-root.css.js'
  * @cssproperty --chart-terminus-size - Size of the mark on the last reading.
  * @cssproperty --sparkline-area-opacity - How much of the line's color the wash takes where it meets the line.
  * @cssproperty --sparkline-bar-radius - Corner radius on a column, under `plot="bar"`.
+ * @cssproperty --sparkline-bar-stroke - Thickness of a column's edge under `outlined`.
  * @cssproperty --sparkline-block-size - Height of the drawing.
  * @cssproperty --sparkline-color - Color of the line, the wash, the columns and the mark.
  * @cssproperty --sparkline-inline-size - Width of the drawing.
@@ -57,14 +58,23 @@ export class HelixSparkline extends HelixHeadlessSparkline {
    * color, and the terminus fills it. So one declaration quietens all of them,
    * and a consumer's `--sparkline-color` is quietened rather than replaced.
    *
-   * **One value, and no `material` at all.** `outlined` needs a fill to remove
-   * and this is a stroke; `ghost` is an empty cell. Glass exists so what is
-   * behind a mark reads through it, and at the size a sparkline draws there is
-   * nothing behind it a reader could resolve, so the axis would render a
-   * difference nobody can see.
+   * **The other two follow whichever plot is drawn**, because a sparkline is
+   * three marks behind one property and the difference between a boundary and a
+   * fill does not exist until you know which. A `bar` plot answers like
+   * `BarChart`, an `area` or `line` plot like `LineChart`. `solid` on bars is the
+   * resting column and selects nothing.
+   *
+   * **`outlined` was refused here until 25 Aug 2026**, on the grounds that it
+   * needs a fill to remove and this is a stroke. That is true of the line and not
+   * of the other two plots, which is what the argument missed: a bar has an area
+   * and an area plot is one.
+   *
+   * `ghost` is still an empty cell, and there is still no `material`. Glass
+   * exists so what is behind a mark reads through it, and at the size a sparkline
+   * draws there is nothing behind it a reader could resolve.
    */
   @property({ reflect: true })
-  emphasis?: 'subtle'
+  emphasis?: 'outlined' | 'solid' | 'subtle'
 
   static override styles: CSSResultGroup = [terminusStyles, styles]
 
