@@ -131,6 +131,17 @@ describe('a megamenu opening on hover', () => {
     await settle(200)
     await host.updateComplete
     expect(host.open).toBe(true)
+
+    /* Closed before leaving, because `showing` is module state and the only
+       thing that clears it is `disconnectedCallback`. A test that leaves its
+       panel up hands the next one a page where another megamenu is the one
+       showing, which changes the open delay from 120ms to 0 for whoever comes
+       next. That is the cross-test coupling that made the touch test below
+       fail on a runner and pass on every desk. */
+    host.dispatchEvent(pointer('pointerleave', 'mouse'))
+    await settle(300)
+    await host.updateComplete
+    expect(host.open).toBe(false)
   })
 
   test('and a touch does not open it, because a tap has to', async () => {
@@ -138,6 +149,11 @@ describe('a megamenu opening on hover', () => {
        panel and let the click behind it close the panel again, so a tap would
        do nothing at all: the commonest way a hover nav is unusable on a phone. */
     const host = await section()
+    /* Asserted before acting, so a page left dirty by something else fails
+       here saying so, rather than at the assertion below saying a touch
+       opened a panel it never touched. */
+    expect(host.open).toBe(false)
+
     host.dispatchEvent(pointer('pointerenter', 'touch'))
     await settle(200)
     await host.updateComplete

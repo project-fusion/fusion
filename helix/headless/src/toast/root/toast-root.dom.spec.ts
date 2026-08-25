@@ -15,6 +15,36 @@ type Item = HTMLElement & {
   updateComplete: Promise<boolean>
 }
 
+/**
+ * How long to wait on a 40ms clock before calling it stopped.
+ *
+ * **A fixed sleep of 250ms was six times the duration and still lost.** These
+ * two failed on runners and nowhere else, and a margin chosen against a laptop
+ * is not a margin: a loaded runner throttles timers, and the clock these assert
+ * is also one hover or focus away from being held deliberately. Waiting on the
+ * outcome rather than on a stopwatch costs nothing when it passes, which is
+ * almost always, and stops guessing at a number that has already been wrong.
+ */
+const LATEST = 2000
+
+/** Polls to the outcome rather than sleeping at it. */
+const closes = async (found: Item): Promise<void> => {
+  const until = Date.now() + LATEST
+  while (Date.now() < until && found.open) {
+    await new Promise((done) => setTimeout(done, 20))
+  }
+  await found.updateComplete
+}
+
+/**
+ * What was holding the clock, for when one of these does fail. A boolean says
+ * the timer did not fire and nothing else; `data-paused` says whether it was
+ * stopped on purpose, which is the difference between a slow runner and a
+ * component that pauses when it should not.
+ */
+const why = (found: Item): string =>
+  `open=${found.open} data-paused=${found.hasAttribute('data-paused')}`
+
 const region = async (items = ''): Promise<HTMLElement> =>
   (await mount(
     `<helix-headless-toast label="Notifications">${items}</helix-headless-toast>`,
@@ -107,8 +137,7 @@ describe('toast item', () => {
 
   test('a timer that runs out hides it, which is what a duration is for', async () => {
     const found = await item('duration="40"')
-    await new Promise((done) => setTimeout(done, 250))
-    await found.updateComplete
+    await closes(found)
     expect(found.open).toBe(false)
   })
 
@@ -132,9 +161,9 @@ describe('toast item', () => {
     const found = await item('duration="40"')
     const asked = await new Promise<boolean>((done) => {
       found.addEventListener('helix-dismiss', () => done(true))
-      setTimeout(() => done(false), 300)
+      setTimeout(() => done(false), LATEST)
     })
-    expect(asked).toBe(true)
+    expect(asked, why(found)).toBe(true)
   })
 
   test('the clock stops while it is being read, and goes on from there', async () => {
