@@ -61,7 +61,7 @@ if (hasLayout()) {
     }
 
     const panelBox = (host: Section): DOMRect =>
-      (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      (part(host, 'surface') as HTMLElement).getBoundingClientRect()
 
     for (const variant of ['card', 'full']) {
       test(`takes no box when it is ${variant}`, async () => {
@@ -77,7 +77,7 @@ if (hasLayout()) {
            measured on the update that closed it the panel is still 900 by 85
            with three transitions in flight. Waiting on the animations rather
            than on a duration, which would be a number kept beside a token. */
-        await settled(part(host, 'panel'))
+        await settled(part(host, 'surface'))
         expect(host.open).toBe(false)
         /* The band was 1280 by 267 here, and `open` was already false.
            `:host([variant="full"]) [part="surface"]` is (0,3,0) and the guard
@@ -122,13 +122,13 @@ if (hasLayout()) {
          positioned panel and the second re-anchors it entirely. `popover` is
          what escapes both, and nothing else does. */
       const host = await opened()
-      const panel = part(host, 'panel') as HTMLElement
+      const panel = part(host, 'surface') as HTMLElement
       expect(panel.matches(':popover-open')).toBe(true)
     })
 
     test('and hangs under the trigger rather than off the page', async () => {
       const host = await opened()
-      const panel = (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      const panel = (part(host, 'surface') as HTMLElement).getBoundingClientRect()
       const trigger = (part(host, 'trigger') as HTMLElement).getBoundingClientRect()
       expect(panel.width).toBeGreaterThan(0)
       expect(panel.top).toBeGreaterThanOrEqual(trigger.bottom - 1)
@@ -143,7 +143,7 @@ if (hasLayout()) {
          hidden, which makes every `vw` in this stylesheet nought and the whole
          measurement a fiction. */
       const host = await opened()
-      const panel = (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      const panel = (part(host, 'surface') as HTMLElement).getBoundingClientRect()
       expect(panel.width).toBeGreaterThan(400)
       const rows = [...host.querySelectorAll('[data-megamenu-item]')]
       for (const row of rows) {
@@ -169,7 +169,7 @@ if (hasLayout()) {
       await host.updateComplete
       await new Promise((done) => requestAnimationFrame(() => done(null)))
 
-      const panel = (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      const panel = (part(host, 'surface') as HTMLElement).getBoundingClientRect()
       const trigger = (part(host, 'trigger') as HTMLElement).getBoundingClientRect()
       expect(Math.round(panel.left)).toBe(0)
       expect(Math.round(panel.width)).toBe(document.documentElement.clientWidth)
@@ -254,7 +254,7 @@ if (hasLayout()) {
       await host.updateComplete
       await new Promise((done) => requestAnimationFrame(() => done(null)))
 
-      const panel = (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      const panel = (part(host, 'surface') as HTMLElement).getBoundingClientRect()
       expect(Math.round(panel.width)).toBe(document.documentElement.clientWidth)
 
       /* Stacked, which is one column: every group starts on the same edge, and
@@ -284,7 +284,7 @@ if (hasLayout()) {
       expect(host.hasAttribute('data-narrow')).toBe(false)
       ;(part(host, 'trigger') as HTMLElement).click()
       await host.updateComplete
-      const panel = (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      const panel = (part(host, 'surface') as HTMLElement).getBoundingClientRect()
       expect(Math.round(panel.width)).toBeLessThan(document.documentElement.clientWidth)
     })
 
@@ -415,7 +415,7 @@ if (hasLayout()) {
       await host.updateComplete
       await new Promise((done) => requestAnimationFrame(() => done(null)))
 
-      const panel = part(host, 'panel') as HTMLElement
+      const panel = part(host, 'surface') as HTMLElement
       expect(panel.scrollWidth).toBeLessThanOrEqual(Math.ceil(panel.getBoundingClientRect().width))
 
       /* On more than one row, and in the same tracks: a group left alone on a
