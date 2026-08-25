@@ -12,7 +12,7 @@
     "frame": "bun ../../tooling/scripts/build-frame.mjs",
     "specs": "bun ../../tooling/scripts/build-specs.mjs",
     "start": "next start --port 3000",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "bun run wasm && tsc -p tsconfig.json --noEmit",
     "wasm": "node ../../tooling/scripts/build-wasm.mjs"
   },
   "dependencies": {
