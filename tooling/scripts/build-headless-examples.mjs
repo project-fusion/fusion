@@ -12,7 +12,7 @@
  * is exactly the point.
  *
  * **The markup is derived and machine-checked, which is what makes deriving it
- * safe.** Each `headless.html` comes from the styled `default.html` beside it, so
+ * safe.** Each `headless.html` comes from the styled `preview.html` beside it, so
  * copy and labels match and a reader switching tiers sees the same example
  * twice rather than two different ones. `check:examples` reads both manifests,
  * so a tag or attribute that does not exist on this tier fails the build: it
@@ -904,7 +904,7 @@ helix-headless-rating::part(fill) {
      `table` names its own columns in `--table-template` and nothing read it, so
      the cells fell into the flow and every heading ran into the next:
      "ServiceRegionStatus" across the top and the rows under it out of step. */
-  /* The example's own layout, which the styled twin keeps in `default.css` and
+  /* The example's own layout, which the styled twin keeps in `preview.css` and
      this generator does not carry across.
    
      A skeleton has no size of its own, deliberately: it is a placeholder for
@@ -1402,7 +1402,7 @@ ${rules.length > 0 ? `\n${rules.join('\n\n')}\n` : ''}`
 const families = readdirSync('helix/styled/src', { withFileTypes: true })
   .filter((e) => e.isDirectory())
   .map((e) => e.name)
-  .filter((f) => existsSync(`helix/styled/src/${f}/.examples/default.html`))
+  .filter((f) => existsSync(`helix/styled/src/${f}/.examples/preview.html`))
   .filter((f) => existsSync(`helix/headless/src/${f}`))
 
 const only = process.argv.slice(2).filter((argument) => !argument.startsWith('--'))
@@ -1419,7 +1419,7 @@ for (const slug of wanted) {
   if (HAND_WRITTEN.has(slug) && only.length === 0) {
     continue
   }
-  const source = readFileSync(`helix/styled/src/${slug}/.examples/default.html`, 'utf8')
+  const source = readFileSync(`helix/styled/src/${slug}/.examples/preview.html`, 'utf8')
   const body = detoken(
     rebase(delayout(detext(strip(source.replace(/<!--[\s\S]*?-->\s*/, ''))))),
     slug,
@@ -1434,7 +1434,7 @@ for (const slug of wanted) {
   const linked = body.replace(/<link\b[^>]*rel=["']stylesheet["'][^>]*>\s*/gi, '')
   const html =
     format(`<!-- @summary The same ${displayName(slug).toLowerCase()} on the headless tier, with every rule written by hand. -->
-<!-- Generated from \`default.html\` beside it by \`bun run examples:headless\`. Do not edit.
+<!-- Generated from \`preview.html\` beside it by \`bun run examples:headless\`. Do not edit.
      It lives in the styled package because that is where it is derived from: the two
      examples show the same content on both tiers, which is only checkable while they
      sit together. \`helix/headless\` holds no examples of its own. See 275. -->

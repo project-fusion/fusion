@@ -47,7 +47,7 @@ const manifest: HelixManifest = {
 const examples: ExampleSource[] = [
   { css: '', family: 'pagination', html: '<helix-pagination></helix-pagination>', slug: 'compact' },
   { css: '', family: 'pagination', html: '<helix-pagination></helix-pagination>', slug: 'window' },
-  { css: '', family: 'pagination', html: '<helix-pagination></helix-pagination>', slug: 'default' },
+  { css: '', family: 'pagination', html: '<helix-pagination></helix-pagination>', slug: 'preview' },
   {
     css: '',
     family: 'pagination',
@@ -60,7 +60,7 @@ const examples: ExampleSource[] = [
     html: '<helix-headless-pagination></helix-headless-pagination>',
     slug: 'headless',
   },
-  { css: '', family: 'qr-code', html: '<helix-qr-code></helix-qr-code>', slug: 'default' },
+  { css: '', family: 'qr-code', html: '<helix-qr-code></helix-qr-code>', slug: 'preview' },
 ]
 
 describe('catalog', () => {
@@ -119,9 +119,9 @@ describe('examples', () => {
   // Sorted by slug, not by filename. Comparing `compact-counts.html` against
   // `compact.html` puts the longer name first, because `-` precedes `.`, which
   // is a list ordered by an extension no reader sees.
-  test('default leads, then alphabetical by slug', () => {
+  test('the canonical example leads, then alphabetical by slug', () => {
     expect(pagination?.examples.map((example) => example.slug)).toEqual([
-      'default',
+      'preview',
       'headless',
       'compact',
       'compact-counts',

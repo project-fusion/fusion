@@ -780,7 +780,7 @@
             "examples": [
               {
                 "description": "Sections that open one at a time or together, with the first already open.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The mark at the end of the row, for a list read as a table of contents.",
@@ -1113,7 +1113,7 @@
             "examples": [
               {
                 "description": "A dismissible bar across the top of a page, tone and all.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same announcement on the headless tier, with every rule written by hand.",
@@ -1625,7 +1625,7 @@
             "examples": [
               {
                 "description": "A brand, a navigation, and actions on the right.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Blurred over what scrolls beneath it.",
@@ -2554,7 +2554,7 @@
             "examples": [
               {
                 "description": "A braided shaft of light, sized by the box it is put in.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Curtains on a drifting horizon, the one shape that is a landscape.",
@@ -3372,7 +3372,7 @@
             "examples": [
               {
                 "description": "Initials derived from a name, which is the fallback every avatar has.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A source that fails, falling back to initials rather than a broken image.",
@@ -3761,7 +3761,7 @@
             "examples": [
               {
                 "description": "A count over the thing it counts.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The badge drawn as a count, a dot, and a standalone tag.",
@@ -4721,7 +4721,7 @@
             "examples": [
               {
                 "description": "Revenue by quarter, read from the table beside it. The cell text is what a reader sees and data-value is the number.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Columns drawn with an edge of their own color, for a dense chart or a busy ground.",
@@ -5168,7 +5168,7 @@
             "examples": [
               {
                 "description": "A quotation with its source cited.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same blockquote on the headless tier, with every rule written by hand.",
@@ -5835,7 +5835,7 @@
             "examples": [
               {
                 "description": "The path to the current page, the last crumb being where the reader is.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same breadcrumbs on the headless tier, with every rule written by hand.",
@@ -6116,7 +6116,7 @@
             "examples": [
               {
                 "description": "Buttons joined into one control, sharing their edges.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same button group on the headless tier, with every rule written by hand.",
@@ -6838,7 +6838,7 @@
             "examples": [
               {
                 "description": "The appearances and tones together, showing which two axes a button has.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A second emphasis, derived from the brand rather than picked beside it.",
@@ -7182,7 +7182,7 @@
             "examples": [
               {
                 "description": "A note set apart from the prose around it.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same callout on the headless tier, with every rule written by hand.",
@@ -7563,7 +7563,7 @@
             "examples": [
               {
                 "description": "A heading, some prose, and a footer, in the resting appearance.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Lifted off the page with a shadow rather than an outline.",
@@ -8411,7 +8411,7 @@
             "examples": [
               {
                 "description": "Slides with controls and indicators, one at a time.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A carousel the page owns, so the slide it shows can be driven from elsewhere.",
@@ -9351,7 +9351,7 @@
             "examples": [
               {
                 "description": "Several checkboxes under one label, each submitting itself.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A whole group disabled, and one member disabled inside a live group.",
@@ -10447,7 +10447,7 @@
             "examples": [
               {
                 "description": "One checkbox with a label and a hint under it.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Checkboxes drawn as cards, for options that need room to explain themselves.",
@@ -10829,7 +10829,7 @@
             "examples": [
               {
                 "description": "A named block of code with a copy button over it.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A block with no name and nothing to copy, which draws no header.",
@@ -11164,7 +11164,7 @@
             "examples": [
               {
                 "description": "A fragment of code inside a line of prose.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same code on the headless tier, with every rule written by hand.",
@@ -12353,7 +12353,7 @@
             "examples": [
               {
                 "description": "A field with a swatch that opens a picker.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A color with an opacity, in a syntax that can carry one.",
@@ -13893,7 +13893,7 @@
             "examples": [
               {
                 "description": "The area, the hue rail, and the value in a field.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The picker with no syntax control, for where the format is decided already.",
@@ -15684,7 +15684,7 @@
             "examples": [
               {
                 "description": "Type to narrow a list, and choose from what is left.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Opening with a value already chosen, which is what an edit form does.",
@@ -16761,7 +16761,7 @@
             "examples": [
               {
                 "description": "A command palette open, with its list already filtered by what is typed.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same command on the headless tier, with every rule written by hand.",
@@ -17694,7 +17694,7 @@
             "examples": [
               {
                 "description": "A button that copies a string and confirms it for a moment.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same copy button on the headless tier, with every rule written by hand.",
@@ -19262,7 +19262,7 @@
             "examples": [
               {
                 "description": "A field that takes a typed date or one from the calendar it opens.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A date within a window, with weekends refused.",
@@ -20938,7 +20938,7 @@
             "examples": [
               {
                 "description": "A month, with a day already chosen.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A calendar that only goes as far as it is allowed.",
@@ -21912,7 +21912,7 @@
             "examples": [
               {
                 "description": "A dialog opened by a button, with actions in its footer.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A dialog whose content sits centered, for a short confirmation.",
@@ -22295,7 +22295,7 @@
             "examples": [
               {
                 "description": "A rule between two blocks of prose.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same divider on the headless tier, with every rule written by hand.",
@@ -22932,7 +22932,7 @@
             "examples": [
               {
                 "description": "Sessions by source as a ring, read from the table beside it.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same shares over a half circle, with the total in the opening.",
@@ -23678,7 +23678,7 @@
             "examples": [
               {
                 "description": "A panel from the edge, opened by a button.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same drawer on the headless tier, with every rule written by hand.",
@@ -24611,7 +24611,7 @@
             "examples": [
               {
                 "description": "A menu that replaces itself rather than opening sideways, for a narrow screen.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same drilldown on the headless tier, with every rule written by hand.",
@@ -24987,7 +24987,7 @@
             "examples": [
               {
                 "description": "Nothing to show, with a heading, an explanation and a way forward.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same empty on the headless tier, with every rule written by hand.",
@@ -25980,7 +25980,7 @@
             "examples": [
               {
                 "description": "A drop zone that also takes a click, accepting several files.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Disabled, which is a drop zone that refuses a drop.",
@@ -26691,7 +26691,7 @@
             "examples": [
               {
                 "description": "A row with a gap and its items centered.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A column with a gap, which is most of what a page needs.",
@@ -26992,7 +26992,7 @@
             "examples": [
               {
                 "description": "Columns that fit themselves to the width, no count given.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Rows whose items sit on one line rather than stretching to the tallest.",
@@ -27718,7 +27718,7 @@
             "examples": [
               {
                 "description": "A button that is a glyph, with the label read rather than shown.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Every fill against every tone.",
@@ -27999,7 +27999,7 @@
             "examples": [
               {
                 "description": "One glyph at the resting size.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same icon on the headless tier, with every rule written by hand.",
@@ -28527,7 +28527,7 @@
             "examples": [
               {
                 "description": "A picture with an aspect ratio held and its corners rounded.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A picture that never arrives says so, rather than leaving a hole.",
@@ -30362,7 +30362,7 @@
             "examples": [
               {
                 "description": "A text field with a label, a placeholder and a hint.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A field with a control to empty it.",
@@ -30949,7 +30949,7 @@
             "examples": [
               {
                 "description": "A key, and a chord of keys, as a reader would see them written.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same kbd on the headless tier, with every rule written by hand.",
@@ -31381,7 +31381,7 @@
             "examples": [
               {
                 "description": "One entry per data column, named by the header row. The table is in the page and clipped, which is where a chart reads it from.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same element reading rows instead of columns, which is what a donut needs and a bar chart does not.",
@@ -32200,7 +32200,7 @@
             "examples": [
               {
                 "description": "Sessions a month, read from the table beside it. The cell text is what a reader sees and data-value is the number.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A wash under the line, for one series read as a quantity rather than a shape.",
@@ -32984,7 +32984,7 @@
             "examples": [
               {
                 "description": "Rows with rules between them.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same list on the headless tier, with every rule written by hand.",
@@ -34316,7 +34316,7 @@
             "examples": [
               {
                 "description": "A list to choose one from, always open.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The filter text owned by the page, for a list narrowed from a box outside it.",
@@ -34967,7 +34967,7 @@
             "examples": [
               {
                 "description": "A spinner with a label read aloud rather than shown.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same loader on the headless tier, with every rule written by hand.",
@@ -35760,7 +35760,7 @@
             "examples": [
               {
                 "description": "A navigation whose items open a full-width panel of columns.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A band from edge to edge, for a panel too wide to hang off one word.",
@@ -37292,7 +37292,7 @@
             "examples": [
               {
                 "description": "A menu with items, a submenu, and a separator.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same menu on the headless tier, with every rule written by hand.",
@@ -38277,7 +38277,7 @@
             "examples": [
               {
                 "description": "A measurement in a known range, with its value shown.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A reading inside its good band, drawn as good.",
@@ -38700,7 +38700,7 @@
             "examples": [
               {
                 "description": "Links with the current page marked, and a mark that travels.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same navigation on the headless tier, with every rule written by hand.",
@@ -39980,7 +39980,7 @@
             "examples": [
               {
                 "description": "A number with buttons to step it.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A number in a range, and a number with a step.",
@@ -40840,7 +40840,7 @@
             "examples": [
               {
                 "description": "One option, chosen, as a listbox or select holds it.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Options under headings, for a list long enough to need them.",
@@ -41485,7 +41485,7 @@
             "examples": [
               {
                 "description": "Headings on a page, with the one in view marked as the page scrolls.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same outline on the headless tier, with every rule written by hand.",
@@ -42489,7 +42489,7 @@
             "examples": [
               {
                 "description": "Numbered pages with the current one marked.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Large counts written short, so a summary does not wrap at page nine hundred.",
@@ -44644,7 +44644,7 @@
             "examples": [
               {
                 "description": "A code across separate boxes, one character each.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The boxes advance as you type, and the last one completes the code.",
@@ -45444,7 +45444,7 @@
             "examples": [
               {
                 "description": "A panel anchored to what opened it.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A popover opened by a button through the command attributes.",
@@ -45979,7 +45979,7 @@
             "examples": [
               {
                 "description": "How far along a task is, with the number shown.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A bar that says its own number, in words the reader chose.",
@@ -46353,7 +46353,7 @@
             "examples": [
               {
                 "description": "A URL as a code.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A code in a brand color, over a ground that keeps it scannable.",
@@ -46699,7 +46699,7 @@
             "examples": [
               {
                 "description": "A pulled quotation with its attribution.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same quote on the headless tier, with every rule written by hand.",
@@ -48109,7 +48109,7 @@
             "examples": [
               {
                 "description": "One answer from several, with a hint under the question.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Radios drawn as cards, for choices that need room to explain themselves.",
@@ -49489,7 +49489,7 @@
             "examples": [
               {
                 "description": "A score out of five, set by pointer or by arrow key.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A level rather than a judgment, which is what a plain circle says.",
@@ -50719,7 +50719,7 @@
             "examples": [
               {
                 "description": "Source beside a preview, with a toolbar over both and a status bar under them.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The real preview frame, which runs what it is given inside a sandboxed document.",
@@ -52171,7 +52171,7 @@
             "examples": [
               {
                 "description": "A box that scrolls, with the overflow faded at whichever edge has more.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same scroll area on the headless tier, with every rule written by hand.",
@@ -53273,7 +53273,7 @@
             "examples": [
               {
                 "description": "A native select with a label and a hint.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Disabled, and one option disabled inside a live select.",
@@ -53977,7 +53977,7 @@
             "examples": [
               {
                 "description": "The shape of content that has not arrived, in text, circle and block.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same skeleton on the headless tier, with every rule written by hand.",
@@ -55053,7 +55053,7 @@
             "examples": [
               {
                 "description": "A value along a track, with the number shown.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Disabled, with the handle still showing where the value is.",
@@ -55863,7 +55863,7 @@
             "examples": [
               {
                 "description": "Three series in one line each, the mark on where every one of them ended.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same seven readings drawn three ways, and each says something different about what happened between them.",
@@ -56838,7 +56838,7 @@
             "examples": [
               {
                 "description": "A floating action button, and the few actions it fans out.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same speed dial on the headless tier, with every rule written by hand.",
@@ -58166,7 +58166,7 @@
             "examples": [
               {
                 "description": "Two panes and a divider a pointer or an arrow key can move.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Where the divider may go, how far each nudge moves it, and a pane folded away.",
@@ -58708,7 +58708,7 @@
             "examples": [
               {
                 "description": "Figures in a row with rules between them.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A figure with a trend beside it, up, down and flat.",
@@ -59204,7 +59204,7 @@
             "examples": [
               {
                 "description": "A sequence with each step named and its state shown.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A sequence with the third step current, so before and after both show.",
@@ -60571,7 +60571,7 @@
             "examples": [
               {
                 "description": "A setting that takes effect as it is switched, rather than on submit.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Disabled on and disabled off, since the two look different.",
@@ -61759,7 +61759,7 @@
             "examples": [
               {
                 "description": "Rows and columns with a caption naming what they are.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The track sizes written once on the table, rather than one width per column.",
@@ -62830,7 +62830,7 @@
             "examples": [
               {
                 "description": "Panels behind tabs, with a mark that travels between them.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A strip the page owns, answering the event and assigning `active`.",
@@ -63671,7 +63671,7 @@
             "examples": [
               {
                 "description": "A label with a meaning, in each tone.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The tag filled, outlined and subtle.",
@@ -63960,7 +63960,7 @@
             "examples": [
               {
                 "description": "A paragraph and the elements prose is made of.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The text scale from the largest display size down to the smallest.",
@@ -64911,7 +64911,7 @@
             "examples": [
               {
                 "description": "A multi-line field with a label and a hint.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A box that grows with what is typed into it rather than scrolling.",
@@ -66526,7 +66526,7 @@
             "examples": [
               {
                 "description": "A field that takes a typed time or one from the wheels it opens.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A time inside a window, moving in named steps.",
@@ -68166,7 +68166,7 @@
             "examples": [
               {
                 "description": "Hours and minutes, with a time already chosen.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Working hours only, at half-hour steps.",
@@ -69156,7 +69156,7 @@
             "examples": [
               {
                 "description": "Events down a line, each with its own mark and time.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same timeline on the headless tier, with every rule written by hand.",
@@ -70106,7 +70106,7 @@
             "examples": [
               {
                 "description": "A message over the page, in the corner it was told to appear.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "Several toasts stacking as they arrive.",
@@ -71557,7 +71557,7 @@
             "examples": [
               {
                 "description": "Buttons where one stays pressed, which is a choice rather than an action.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A whole group disabled, and one member disabled inside a live group.",
@@ -72008,7 +72008,7 @@
             "examples": [
               {
                 "description": "Controls in a row that arrow keys move between as one stop.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same toolbar on the headless tier, with every rule written by hand.",
@@ -73002,7 +73002,7 @@
             "examples": [
               {
                 "description": "A word of explanation on hover and on focus.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A tooltip that describes its target rather than naming it.",
@@ -73677,7 +73677,7 @@
             "examples": [
               {
                 "description": "Four stops across an app shell, each holding a card.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same tour on the headless tier, with every rule written by hand.",
@@ -76039,7 +76039,7 @@
             "examples": [
               {
                 "description": "Nested nodes that open and close, with one marked current.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The branch marker at either end of the row.",
@@ -76302,7 +76302,7 @@
             "examples": [
               {
                 "description": "Four figures and all four ways a movement can land, two of them down.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same trend on the headless tier, with every rule written by hand.",
@@ -77766,7 +77766,7 @@
             "examples": [
               {
                 "description": "Clips and the one player they take turns in.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The list beside the player rather than under it.",
@@ -79424,7 +79424,7 @@
             "examples": [
               {
                 "description": "A clip with a poster and the controls this library draws.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "A loop with no sound, which is the one video allowed to start on its own.",
@@ -80287,7 +80287,7 @@
             "examples": [
               {
                 "description": "Two thousand rows as JSON, of which only the visible ones exist.",
-                "slug": "default"
+                "slug": "preview"
               },
               {
                 "description": "The same virtual list on the headless tier, with every rule written by hand.",

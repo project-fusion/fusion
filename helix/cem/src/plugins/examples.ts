@@ -75,7 +75,7 @@ export const examples = (): Plugin => ({
          CI, which is a manifest that changes without anything changing. */
       const found = readdirSync(dir)
         .filter((file) => file.endsWith('.html'))
-        .sort((a, b) => (a === 'default.html' ? -1 : b === 'default.html' ? 1 : a.localeCompare(b)))
+        .sort((a, b) => (a === 'preview.html' ? -1 : b === 'preview.html' ? 1 : a.localeCompare(b)))
         .map((file) => {
           const slug = file.replace(/\.html$/, '')
           const summary = SUMMARY.exec(readFileSync(join(dir, file), 'utf8'))?.[1]

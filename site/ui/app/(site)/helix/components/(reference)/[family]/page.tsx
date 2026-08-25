@@ -119,7 +119,7 @@ const byName = <T extends { name: string }>(rows: T[]): T[] =>
 /**
  * Examples alphabetically, with the headline held at the top.
  *
- * `default.html` is the family's canonical example rather than one of its
+ * `preview.html` is the family's canonical example rather than one of its
  * variants, which is why it reads as "Preview" and why both the plugin and the
  * catalog already put it first. Sorting the column flat would file it under P
  * among the variants it is meant to introduce, so the pin survives the sort and
@@ -694,7 +694,7 @@ export default async function FamilyDocs({
 
           <helix-flex direction="column" gap="md" id="preview">
             <helix-text as="h2">Preview</helix-text>
-            {/* The family's headline example, which is `default.html` and is
+            {/* The family's headline example, which is `preview.html` and is
                 first in the list by construction. A family with no examples
                 shows nothing rather than an empty frame. */}
             {headline ? (

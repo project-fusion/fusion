@@ -1554,7 +1554,7 @@
       "tag": "helix-video-playlist"
     },
     {
-      "answer": "accordion/default",
+      "answer": "accordion/preview",
       "id": "example-222",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Sections that open one at a time or together, with the first already open.\"",
@@ -1596,7 +1596,7 @@
       "tag": "helix-accordion"
     },
     {
-      "answer": "announcement/default",
+      "answer": "announcement/preview",
       "id": "example-228",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A dismissible bar across the top of a page, tone and all.\"",
@@ -1624,7 +1624,7 @@
       "tag": "helix-announcement"
     },
     {
-      "answer": "app-header/default",
+      "answer": "app-header/preview",
       "id": "example-232",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A brand, a navigation, and actions on the right.\"",
@@ -1673,7 +1673,7 @@
       "tag": "helix-app-header"
     },
     {
-      "answer": "aura/default",
+      "answer": "aura/preview",
       "id": "example-239",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A braided shaft of light, sized by the box it is put in.\"",
@@ -1778,7 +1778,7 @@
       "tag": "helix-aura"
     },
     {
-      "answer": "avatar/default",
+      "answer": "avatar/preview",
       "id": "example-254",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Initials derived from a name, which is the fallback every avatar has.\"",
@@ -1820,7 +1820,7 @@
       "tag": "helix-avatar"
     },
     {
-      "answer": "badge/default",
+      "answer": "badge/preview",
       "id": "example-260",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A count over the thing it counts.\"",
@@ -1855,7 +1855,7 @@
       "tag": "helix-badge"
     },
     {
-      "answer": "bar-chart/default",
+      "answer": "bar-chart/preview",
       "id": "example-265",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Revenue by quarter, read from the table beside it. The cell text is what a reader sees and data-value is the number.\"",
@@ -1925,7 +1925,7 @@
       "tag": "helix-bar-chart"
     },
     {
-      "answer": "blockquote/default",
+      "answer": "blockquote/preview",
       "id": "example-275",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A quotation with its source cited.\"",
@@ -1939,7 +1939,7 @@
       "tag": "helix-blockquote"
     },
     {
-      "answer": "breadcrumbs/default",
+      "answer": "breadcrumbs/preview",
       "id": "example-277",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The path to the current page, the last crumb being where the reader is.\"",
@@ -1967,7 +1967,7 @@
       "tag": "helix-breadcrumbs"
     },
     {
-      "answer": "button-group/default",
+      "answer": "button-group/preview",
       "id": "example-281",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Buttons joined into one control, sharing their edges.\"",
@@ -1995,7 +1995,7 @@
       "tag": "helix-button-group"
     },
     {
-      "answer": "button/default",
+      "answer": "button/preview",
       "id": "example-285",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The appearances and tones together, showing which two axes a button has.\"",
@@ -2058,7 +2058,7 @@
       "tag": "helix-button"
     },
     {
-      "answer": "callout/default",
+      "answer": "callout/preview",
       "id": "example-294",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A note set apart from the prose around it.\"",
@@ -2072,7 +2072,7 @@
       "tag": "helix-callout"
     },
     {
-      "answer": "card/default",
+      "answer": "card/preview",
       "id": "example-296",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A heading, some prose, and a footer, in the resting appearance.\"",
@@ -2142,7 +2142,7 @@
       "tag": "helix-card"
     },
     {
-      "answer": "carousel/default",
+      "answer": "carousel/preview",
       "id": "example-306",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Slides with controls and indicators, one at a time.\"",
@@ -2205,7 +2205,7 @@
       "tag": "helix-carousel"
     },
     {
-      "answer": "checkbox-group/default",
+      "answer": "checkbox-group/preview",
       "id": "example-315",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Several checkboxes under one label, each submitting itself.\"",
@@ -2240,7 +2240,7 @@
       "tag": "helix-checkbox-group"
     },
     {
-      "answer": "checkbox/default",
+      "answer": "checkbox/preview",
       "id": "example-320",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"One checkbox with a label and a hint under it.\"",
@@ -2289,7 +2289,7 @@
       "tag": "helix-checkbox"
     },
     {
-      "answer": "code-block/default",
+      "answer": "code-block/preview",
       "id": "example-327",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A named block of code with a copy button over it.\"",
@@ -2310,7 +2310,7 @@
       "tag": "helix-code-block"
     },
     {
-      "answer": "code/default",
+      "answer": "code/preview",
       "id": "example-330",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A fragment of code inside a line of prose.\"",
@@ -2324,7 +2324,7 @@
       "tag": "helix-code"
     },
     {
-      "answer": "color-input/default",
+      "answer": "color-input/preview",
       "id": "example-332",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A field with a swatch that opens a picker.\"",
@@ -2380,7 +2380,7 @@
       "tag": "helix-color-input"
     },
     {
-      "answer": "color-picker/default",
+      "answer": "color-picker/preview",
       "id": "example-340",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The area, the hue rail, and the value in a field.\"",
@@ -2436,7 +2436,7 @@
       "tag": "helix-color-picker"
     },
     {
-      "answer": "combobox/default",
+      "answer": "combobox/preview",
       "id": "example-348",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Type to narrow a list, and choose from what is left.\"",
@@ -2513,7 +2513,7 @@
       "tag": "helix-combobox"
     },
     {
-      "answer": "command/default",
+      "answer": "command/preview",
       "id": "example-359",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A command palette open, with its list already filtered by what is typed.\"",
@@ -2548,7 +2548,7 @@
       "tag": "helix-command"
     },
     {
-      "answer": "copy-button/default",
+      "answer": "copy-button/preview",
       "id": "example-364",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A button that copies a string and confirms it for a moment.\"",
@@ -2562,7 +2562,7 @@
       "tag": "helix-copy-button"
     },
     {
-      "answer": "date-input/default",
+      "answer": "date-input/preview",
       "id": "example-366",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A field that takes a typed date or one from the calendar it opens.\"",
@@ -2625,7 +2625,7 @@
       "tag": "helix-date-input"
     },
     {
-      "answer": "date-picker/default",
+      "answer": "date-picker/preview",
       "id": "example-375",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A month, with a day already chosen.\"",
@@ -2688,7 +2688,7 @@
       "tag": "helix-date-picker"
     },
     {
-      "answer": "dialog/default",
+      "answer": "dialog/preview",
       "id": "example-384",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A dialog opened by a button, with actions in its footer.\"",
@@ -2737,7 +2737,7 @@
       "tag": "helix-dialog"
     },
     {
-      "answer": "divider/default",
+      "answer": "divider/preview",
       "id": "example-391",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A rule between two blocks of prose.\"",
@@ -2772,7 +2772,7 @@
       "tag": "helix-divider"
     },
     {
-      "answer": "donut-chart/default",
+      "answer": "donut-chart/preview",
       "id": "example-396",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Sessions by source as a ring, read from the table beside it.\"",
@@ -2835,7 +2835,7 @@
       "tag": "helix-donut-chart"
     },
     {
-      "answer": "drawer/default",
+      "answer": "drawer/preview",
       "id": "example-405",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A panel from the edge, opened by a button.\"",
@@ -2870,7 +2870,7 @@
       "tag": "helix-drawer"
     },
     {
-      "answer": "drilldown/default",
+      "answer": "drilldown/preview",
       "id": "example-410",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A menu that replaces itself rather than opening sideways, for a narrow screen.\"",
@@ -2884,7 +2884,7 @@
       "tag": "helix-drilldown"
     },
     {
-      "answer": "empty/default",
+      "answer": "empty/preview",
       "id": "example-412",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Nothing to show, with a heading, an explanation and a way forward.\"",
@@ -2905,7 +2905,7 @@
       "tag": "helix-empty"
     },
     {
-      "answer": "file-input/default",
+      "answer": "file-input/preview",
       "id": "example-415",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A drop zone that also takes a click, accepting several files.\"",
@@ -2947,7 +2947,7 @@
       "tag": "helix-file-input"
     },
     {
-      "answer": "flex/default",
+      "answer": "flex/preview",
       "id": "example-421",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A row with a gap and its items centered.\"",
@@ -2968,7 +2968,7 @@
       "tag": "helix-flex"
     },
     {
-      "answer": "grid/default",
+      "answer": "grid/preview",
       "id": "example-424",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Columns that fit themselves to the width, no count given.\"",
@@ -2989,7 +2989,7 @@
       "tag": "helix-grid"
     },
     {
-      "answer": "icon-button/default",
+      "answer": "icon-button/preview",
       "id": "example-427",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A button that is a glyph, with the label read rather than shown.\"",
@@ -3017,7 +3017,7 @@
       "tag": "helix-icon-button"
     },
     {
-      "answer": "icon/default",
+      "answer": "icon/preview",
       "id": "example-431",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"One glyph at the resting size.\"",
@@ -3038,7 +3038,7 @@
       "tag": "helix-icon"
     },
     {
-      "answer": "image/default",
+      "answer": "image/preview",
       "id": "example-434",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A picture with an aspect ratio held and its corners rounded.\"",
@@ -3073,7 +3073,7 @@
       "tag": "helix-image"
     },
     {
-      "answer": "input/default",
+      "answer": "input/preview",
       "id": "example-439",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A text field with a label, a placeholder and a hint.\"",
@@ -3129,7 +3129,7 @@
       "tag": "helix-input"
     },
     {
-      "answer": "kbd/default",
+      "answer": "kbd/preview",
       "id": "example-447",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A key, and a chord of keys, as a reader would see them written.\"",
@@ -3143,7 +3143,7 @@
       "tag": "helix-kbd"
     },
     {
-      "answer": "legend/default",
+      "answer": "legend/preview",
       "id": "example-449",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"One entry per data column, named by the header row. The table is in the page and clipped, which is where a chart reads it from.\"",
@@ -3178,7 +3178,7 @@
       "tag": "helix-legend"
     },
     {
-      "answer": "line-chart/default",
+      "answer": "line-chart/preview",
       "id": "example-454",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Sessions a month, read from the table beside it. The cell text is what a reader sees and data-value is the number.\"",
@@ -3241,7 +3241,7 @@
       "tag": "helix-line-chart"
     },
     {
-      "answer": "list/default",
+      "answer": "list/preview",
       "id": "example-463",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Rows with rules between them.\"",
@@ -3269,7 +3269,7 @@
       "tag": "helix-list"
     },
     {
-      "answer": "listbox/default",
+      "answer": "listbox/preview",
       "id": "example-467",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A list to choose one from, always open.\"",
@@ -3325,7 +3325,7 @@
       "tag": "helix-listbox"
     },
     {
-      "answer": "loader/default",
+      "answer": "loader/preview",
       "id": "example-475",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A spinner with a label read aloud rather than shown.\"",
@@ -3360,7 +3360,7 @@
       "tag": "helix-loader"
     },
     {
-      "answer": "megamenu/default",
+      "answer": "megamenu/preview",
       "id": "example-480",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A navigation whose items open a full-width panel of columns.\"",
@@ -3388,7 +3388,7 @@
       "tag": "helix-megamenu"
     },
     {
-      "answer": "menu/default",
+      "answer": "menu/preview",
       "id": "example-484",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A menu with items, a submenu, and a separator.\"",
@@ -3416,7 +3416,7 @@
       "tag": "helix-menu"
     },
     {
-      "answer": "meter/default",
+      "answer": "meter/preview",
       "id": "example-488",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A measurement in a known range, with its value shown.\"",
@@ -3479,7 +3479,7 @@
       "tag": "helix-meter"
     },
     {
-      "answer": "navigation/default",
+      "answer": "navigation/preview",
       "id": "example-497",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Links with the current page marked, and a mark that travels.\"",
@@ -3493,7 +3493,7 @@
       "tag": "helix-navigation"
     },
     {
-      "answer": "number-input/default",
+      "answer": "number-input/preview",
       "id": "example-499",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A number with buttons to step it.\"",
@@ -3549,7 +3549,7 @@
       "tag": "helix-number-input"
     },
     {
-      "answer": "option/default",
+      "answer": "option/preview",
       "id": "example-507",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"One option, chosen, as a listbox or select holds it.\"",
@@ -3570,7 +3570,7 @@
       "tag": "helix-option"
     },
     {
-      "answer": "outline/default",
+      "answer": "outline/preview",
       "id": "example-510",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Headings on a page, with the one in view marked as the page scrolls.\"",
@@ -3591,7 +3591,7 @@
       "tag": "helix-outline"
     },
     {
-      "answer": "pagination/default",
+      "answer": "pagination/preview",
       "id": "example-513",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Numbered pages with the current one marked.\"",
@@ -3640,7 +3640,7 @@
       "tag": "helix-pagination"
     },
     {
-      "answer": "pin-input/default",
+      "answer": "pin-input/preview",
       "id": "example-520",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A code across separate boxes, one character each.\"",
@@ -3696,7 +3696,7 @@
       "tag": "helix-pin-input"
     },
     {
-      "answer": "popover/default",
+      "answer": "popover/preview",
       "id": "example-528",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A panel anchored to what opened it.\"",
@@ -3731,7 +3731,7 @@
       "tag": "helix-popover"
     },
     {
-      "answer": "progress/default",
+      "answer": "progress/preview",
       "id": "example-533",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"How far along a task is, with the number shown.\"",
@@ -3773,7 +3773,7 @@
       "tag": "helix-progress"
     },
     {
-      "answer": "qr-code/default",
+      "answer": "qr-code/preview",
       "id": "example-539",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A URL as a code.\"",
@@ -3829,7 +3829,7 @@
       "tag": "helix-qr-code"
     },
     {
-      "answer": "quote/default",
+      "answer": "quote/preview",
       "id": "example-547",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A pulled quotation with its attribution.\"",
@@ -3843,7 +3843,7 @@
       "tag": "helix-quote"
     },
     {
-      "answer": "radio/default",
+      "answer": "radio/preview",
       "id": "example-549",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"One answer from several, with a hint under the question.\"",
@@ -3899,7 +3899,7 @@
       "tag": "helix-radio"
     },
     {
-      "answer": "rating/default",
+      "answer": "rating/preview",
       "id": "example-557",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A score out of five, set by pointer or by arrow key.\"",
@@ -3962,7 +3962,7 @@
       "tag": "helix-rating"
     },
     {
-      "answer": "sandbox/default",
+      "answer": "sandbox/preview",
       "id": "example-566",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Source beside a preview, with a toolbar over both and a status bar under them.\"",
@@ -3997,7 +3997,7 @@
       "tag": "helix-sandbox"
     },
     {
-      "answer": "scroll-area/default",
+      "answer": "scroll-area/preview",
       "id": "example-571",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A box that scrolls, with the overflow faded at whichever edge has more.\"",
@@ -4025,7 +4025,7 @@
       "tag": "helix-scroll-area"
     },
     {
-      "answer": "select/default",
+      "answer": "select/preview",
       "id": "example-575",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A native select with a label and a hint.\"",
@@ -4074,7 +4074,7 @@
       "tag": "helix-select"
     },
     {
-      "answer": "skeleton/default",
+      "answer": "skeleton/preview",
       "id": "example-582",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"The shape of content that has not arrived, in text, circle and block.\"",
@@ -4088,7 +4088,7 @@
       "tag": "helix-skeleton"
     },
     {
-      "answer": "slider/default",
+      "answer": "slider/preview",
       "id": "example-584",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A value along a track, with the number shown.\"",
@@ -4151,7 +4151,7 @@
       "tag": "helix-slider"
     },
     {
-      "answer": "sparkline/default",
+      "answer": "sparkline/preview",
       "id": "example-593",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Three series in one line each, the mark on where every one of them ended.\"",
@@ -4207,7 +4207,7 @@
       "tag": "helix-sparkline"
     },
     {
-      "answer": "speed-dial/default",
+      "answer": "speed-dial/preview",
       "id": "example-601",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A floating action button, and the few actions it fans out.\"",
@@ -4228,7 +4228,7 @@
       "tag": "helix-speed-dial"
     },
     {
-      "answer": "splitter/default",
+      "answer": "splitter/preview",
       "id": "example-604",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Two panes and a divider a pointer or an arrow key can move.\"",
@@ -4298,7 +4298,7 @@
       "tag": "helix-splitter"
     },
     {
-      "answer": "stat/default",
+      "answer": "stat/preview",
       "id": "example-614",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Figures in a row with rules between them.\"",
@@ -4319,7 +4319,7 @@
       "tag": "helix-stat"
     },
     {
-      "answer": "steps/default",
+      "answer": "steps/preview",
       "id": "example-617",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A sequence with each step named and its state shown.\"",
@@ -4368,7 +4368,7 @@
       "tag": "helix-steps"
     },
     {
-      "answer": "switch/default",
+      "answer": "switch/preview",
       "id": "example-624",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A setting that takes effect as it is switched, rather than on submit.\"",
@@ -4403,7 +4403,7 @@
       "tag": "helix-switch"
     },
     {
-      "answer": "table/default",
+      "answer": "table/preview",
       "id": "example-629",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Rows and columns with a caption naming what they are.\"",
@@ -4424,7 +4424,7 @@
       "tag": "helix-table"
     },
     {
-      "answer": "tabs/default",
+      "answer": "tabs/preview",
       "id": "example-632",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Panels behind tabs, with a mark that travels between them.\"",
@@ -4466,7 +4466,7 @@
       "tag": "helix-tabs"
     },
     {
-      "answer": "tag/default",
+      "answer": "tag/preview",
       "id": "example-638",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A label with a meaning, in each tone.\"",
@@ -4501,7 +4501,7 @@
       "tag": "helix-tag"
     },
     {
-      "answer": "text/default",
+      "answer": "text/preview",
       "id": "example-643",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A paragraph and the elements prose is made of.\"",
@@ -4522,7 +4522,7 @@
       "tag": "helix-text"
     },
     {
-      "answer": "textarea/default",
+      "answer": "textarea/preview",
       "id": "example-646",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A multi-line field with a label and a hint.\"",
@@ -4571,7 +4571,7 @@
       "tag": "helix-textarea"
     },
     {
-      "answer": "time-input/default",
+      "answer": "time-input/preview",
       "id": "example-653",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A field that takes a typed time or one from the wheels it opens.\"",
@@ -4627,7 +4627,7 @@
       "tag": "helix-time-input"
     },
     {
-      "answer": "time-picker/default",
+      "answer": "time-picker/preview",
       "id": "example-661",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Hours and minutes, with a time already chosen.\"",
@@ -4683,7 +4683,7 @@
       "tag": "helix-time-picker"
     },
     {
-      "answer": "timeline/default",
+      "answer": "timeline/preview",
       "id": "example-669",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Events down a line, each with its own mark and time.\"",
@@ -4697,7 +4697,7 @@
       "tag": "helix-timeline"
     },
     {
-      "answer": "toast/default",
+      "answer": "toast/preview",
       "id": "example-671",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A message over the page, in the corner it was told to appear.\"",
@@ -4732,7 +4732,7 @@
       "tag": "helix-toast"
     },
     {
-      "answer": "toggle/default",
+      "answer": "toggle/preview",
       "id": "example-676",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Buttons where one stays pressed, which is a choice rather than an action.\"",
@@ -4774,7 +4774,7 @@
       "tag": "helix-toggle"
     },
     {
-      "answer": "toolbar/default",
+      "answer": "toolbar/preview",
       "id": "example-682",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Controls in a row that arrow keys move between as one stop.\"",
@@ -4795,7 +4795,7 @@
       "tag": "helix-toolbar"
     },
     {
-      "answer": "tooltip/default",
+      "answer": "tooltip/preview",
       "id": "example-685",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A word of explanation on hover and on focus.\"",
@@ -4851,7 +4851,7 @@
       "tag": "helix-tooltip"
     },
     {
-      "answer": "tour/default",
+      "answer": "tour/preview",
       "id": "example-693",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Four stops across an app shell, each holding a card.\"",
@@ -4886,7 +4886,7 @@
       "tag": "helix-tour"
     },
     {
-      "answer": "tree/default",
+      "answer": "tree/preview",
       "id": "example-698",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Nested nodes that open and close, with one marked current.\"",
@@ -4928,7 +4928,7 @@
       "tag": "helix-tree"
     },
     {
-      "answer": "trend/default",
+      "answer": "trend/preview",
       "id": "example-704",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Four figures and all four ways a movement can land, two of them down.\"",
@@ -4949,7 +4949,7 @@
       "tag": "helix-trend"
     },
     {
-      "answer": "video-playlist/default",
+      "answer": "video-playlist/preview",
       "id": "example-707",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Clips and the one player they take turns in.\"",
@@ -4991,7 +4991,7 @@
       "tag": "helix-video-playlist"
     },
     {
-      "answer": "video/default",
+      "answer": "video/preview",
       "id": "example-713",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"A clip with a poster and the controls this library draws.\"",
@@ -5096,7 +5096,7 @@
       "tag": "helix-video"
     },
     {
-      "answer": "virtual-list/default",
+      "answer": "virtual-list/preview",
       "id": "example-728",
       "kind": "example",
       "prompt": "Which Helix example shows this? \"Two thousand rows as JSON, of which only the visible ones exist.\"",

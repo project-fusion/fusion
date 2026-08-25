@@ -182,6 +182,14 @@ both directions, so the day the flag changes is the day the workflow has to.
   unpublished one, and every published package agrees on visibility.
 - **CLI binaries drop `-cli`**: the crate `cortex-cli` ships `cortex`.
 
+## Commits
+
+- **No `Co-Authored-By` trailer.** Claude Code adds one by default; `.claude/settings.json`
+  sets `includeCoAuthoredBy: false` to stop it. The setting covers this tool and
+  this checkout, so the rule is written here too: authorship of a commit is
+  whoever is accountable for it, and a trailer naming a tool records which
+  keyboard was used rather than who decided anything.
+
 ## Code style
 
 - **No em dashes** in code, docs, comments, or copy. Use periods, colons,

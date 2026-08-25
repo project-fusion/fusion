@@ -21,6 +21,18 @@ import { place } from './reference.js'
 /* The headless twin's slug, and the suffix every other one carries. Named
    because the sort and the label both ask, and a tier that has been renamed
    once can be renamed again. */
+/**
+ * The canonical example's slug, named once because three places knew it.
+ *
+ * The tier pairing, the first-position pin and the label all had it written
+ * out, and renaming `default` to `preview` broke each of them separately: the
+ * pin because the old name sorted early by accident, the pairing because a twin
+ * mirrors this one, the label because it reads from the name. A fact three
+ * places hold is a fact that drifts, which the comment on the sort below
+ * already records happening once when the tier was called `base`.
+ */
+const CANONICAL = 'preview'
+
 const HEADLESS = 'headless'
 const HEADLESS_SUFFIX = /\.headless$/
 
@@ -287,36 +299,39 @@ const examplesOf = (
          alphabet. */
       .sort((a, b) => {
         const pairOf = (slug: string) =>
-          slug === HEADLESS ? 'default' : slug.replace(HEADLESS_SUFFIX, '')
+          slug === HEADLESS ? CANONICAL : slug.replace(HEADLESS_SUFFIX, '')
         const twin = (slug: string) => (slug === HEADLESS || HEADLESS_SUFFIX.test(slug) ? 1 : 0)
         const left = pairOf(a.slug)
         const right = pairOf(b.slug)
         if (left !== right) {
-          return left === 'default' ? -1 : right === 'default' ? 1 : left.localeCompare(right)
+          return left === CANONICAL ? -1 : right === CANONICAL ? 1 : left.localeCompare(right)
         }
         return twin(a.slug) - twin(b.slug)
       })
       .map((source) => {
-        /* Which styled example this one is the headless twin of. `base` is the
-         twin of `default`, and `<name>.base` of `<name>`. */
+        /* Which styled example this one is the headless twin of. `headless` is
+         the twin of `preview`, and `<name>.headless` of `<name>`. Both names
+         have moved: the tier was `base` and the canonical example was
+         `default`, and this line is the one place that has to know the pairing
+         because a headless example is not named for itself. */
         const mirrored =
-          source.slug === HEADLESS ? 'default' : source.slug.replace(HEADLESS_SUFFIX, '')
+          source.slug === HEADLESS ? CANONICAL : source.slug.replace(HEADLESS_SUFFIX, '')
         return {
           css: source.css,
           description: described.get(source.slug) ?? '',
           html: source.html,
-          /* The canonical example reads as "Preview": it is the component's
-           headline, not a named variant sitting beside the others.
+          /* **The label is the file's name, with no special case left.** The
+           canonical example was called `default` and read as "Preview", a
+           translation that existed only because the name did not say what the
+           file was: it is the component's headline, not a named variant sitting
+           beside the others. Renamed, `startCase` gives "Preview" on its own.
 
            **A headless example takes the name of the one it mirrors**, so the two
            tiers show the same list rather than a list that changes its labels
-           when a reader changes a preference. `headless.html` is the headless
-           twin of `default.html` and reads "Preview" like it; a later
-           `cards.headless.html` would read "Cards". Only one of a pair is ever on
-           screen, the tier deciding which, so there is nothing to disambiguate
-           and a differing name would be the only thing suggesting they are
-           different examples. */
-          label: mirrored === 'default' ? 'Preview' : startCase(mirrored),
+           when a reader changes a preference. Only one of a pair is ever on
+           screen, the tier deciding which, so a differing name would be the only
+           thing suggesting they are different examples. */
+          label: startCase(mirrored),
           slug: source.slug,
           tier: (source.html.includes('<helix-headless-') ? 'headless' : 'styled') as
             | 'headless'
