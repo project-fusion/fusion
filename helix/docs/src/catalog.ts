@@ -106,9 +106,13 @@ export interface Example {
    * Which tier the example shows, read from what it renders.
    *
    * Off the markup rather than off the filename, the same test `check:tokens`
-   * uses to know a headless example's stylesheet may write raw values: an example
-   * is a base one when it renders a `helix-headless-` element. A `headless.html`
-   * convention would be a second place to remember, and this is the fact.
+   * uses to know a headless example's stylesheet may write raw values: an
+   * example is a headless one when it renders a `helix-headless-` element.
+   * When this was written the file was called `headless.html` and the name
+   * could have answered, which is why the comment argued against relying on
+   * it. Both tiers call theirs `preview.html` now, the package directory
+   * carrying the tier, so the name cannot answer and this is the only fact
+   * available. The word `base` was the tier's old name and is gone with it.
    */
   tier: 'headless' | 'styled'
 }

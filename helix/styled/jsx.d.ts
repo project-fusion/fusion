@@ -2215,6 +2215,30 @@ comes from the page and height does not, so the styled tier gives it
 `--carousel-block-size` and a consumer sets that to whatever the slides
 want. */
   orientation?: HelixCarousel["orientation"];
+  /** Whether the previous and next controls are shown.
+
+`auto`, which is the resting behavior and what an absent attribute means,
+shows them wherever the pointer can hover and hides them where it cannot.
+`always` keeps them on every device, and `none` never renders them at all.
+
+**Pointer and not width, which is the distinction this exists to make.** A
+375px window on a desktop still has a mouse and still wants the arrows; a
+tablet at 1024 has neither. `.claude/rules/helix.md` forbids a component
+asking about the viewport, because the viewport is not the component's box,
+and that objection does not reach `hover` and `pointer`: those describe the
+input device, and the answer is the same whether this carousel is 300px in
+a sidebar or runs the width of the page.
+
+**Safe to hide because the arrows are not the keyboard's way in.** The
+indicators carry a roving `tabindex` and handle the arrow keys, so every
+slide is still reachable with the controls gone. Hiding a control that was
+the only route to something would be a different change under this name.
+
+**The rotation control is never hidden by this**, which is a decision
+rather than a limit of scope: content that moves on its own has to offer a
+way to stop it, so an autoplaying carousel keeps its pause control on a
+touch device exactly as it does on a desktop. */
+  controls?: HelixCarousel["controls"];
   /** Slide to start on, where nothing declared one. */
   "default-index"?: HelixCarousel["defaultIndex"];
   /** Slide to start on, where nothing declared one. */
@@ -2432,6 +2456,30 @@ comes from the page and height does not, so the styled tier gives it
 `--carousel-block-size` and a consumer sets that to whatever the slides
 want. */
   "prop:orientation"?: HelixCarousel["orientation"];
+  /** Whether the previous and next controls are shown.
+
+`auto`, which is the resting behavior and what an absent attribute means,
+shows them wherever the pointer can hover and hides them where it cannot.
+`always` keeps them on every device, and `none` never renders them at all.
+
+**Pointer and not width, which is the distinction this exists to make.** A
+375px window on a desktop still has a mouse and still wants the arrows; a
+tablet at 1024 has neither. `.claude/rules/helix.md` forbids a component
+asking about the viewport, because the viewport is not the component's box,
+and that objection does not reach `hover` and `pointer`: those describe the
+input device, and the answer is the same whether this carousel is 300px in
+a sidebar or runs the width of the page.
+
+**Safe to hide because the arrows are not the keyboard's way in.** The
+indicators carry a roving `tabindex` and handle the arrow keys, so every
+slide is still reachable with the controls gone. Hiding a control that was
+the only route to something would be a different change under this name.
+
+**The rotation control is never hidden by this**, which is a decision
+rather than a limit of scope: content that moves on its own has to offer a
+way to stop it, so an autoplaying carousel keeps its pause control on a
+touch device exactly as it does on a desktop. */
+  "prop:controls"?: HelixCarousel["controls"];
   /** Slide to start on, where nothing declared one. */
   "attr:default-index"?: HelixCarousel["defaultIndex"];
   /** Slide to start on, where nothing declared one. */
@@ -4885,14 +4933,27 @@ here has to be. */
 export type HelixDonutChartProps = {
   /** How much ink the slices claim.
 
-`subtle` is the ring as a wash of its own colors: still readable, no longer
-the loudest thing beside the number it is explaining.
+`solid` is the resting arrangement and selects nothing: a slice at full
+strength is what the base rule already draws. `subtle` is the ring as a wash
+of its own colors, still readable and no longer the loudest thing beside the
+number it is explaining. `outlined` keeps the slice and fades it toward the
+page, leaving a boundary in the series' own color, which is the same trade
+`BarChart` makes on a column.
 
-**One value and not three, because a slice is a stroke.** The mark *is* the
-edge here, so there is nothing inside it for `outlined` to fade: `BarChart`
-earns that value by keeping a column's area and fading it toward the page,
-and a donut would have to be drawn as filled paths rather than arcs to do the
-same. That is changing what a donut is to satisfy a word. */
+**This took three values on 25 Aug 2026, and the note it replaces argued it
+could not.** That note was right about the mark: a slice is a stroke on a
+ring, the edge *is* the mark, and there is nothing within it to fade. It
+concluded that `outlined` would mean drawing slices as filled paths instead
+of arcs, and called that changing what a donut is to satisfy a word.
+
+What it did not weigh is that the two can both be there. The arc still draws
+the slice and still carries the animation, and a closed path traces the same
+wedge beside it for anything that needs a boundary. Nothing about the donut
+changed; something was added next to it. See `renderEdge` on the tier below
+for why the dash could not simply be replaced.
+
+The value that stays refused is `ghost`, which on a ring is a chart with no
+slices. */
   emphasis?: HelixDonutChart["emphasis"];
   /** What the ring is made of.
 
@@ -4963,14 +5024,27 @@ the circle is not drawn. */
 export type HelixDonutChartSolidJsProps = {
   /** How much ink the slices claim.
 
-`subtle` is the ring as a wash of its own colors: still readable, no longer
-the loudest thing beside the number it is explaining.
+`solid` is the resting arrangement and selects nothing: a slice at full
+strength is what the base rule already draws. `subtle` is the ring as a wash
+of its own colors, still readable and no longer the loudest thing beside the
+number it is explaining. `outlined` keeps the slice and fades it toward the
+page, leaving a boundary in the series' own color, which is the same trade
+`BarChart` makes on a column.
 
-**One value and not three, because a slice is a stroke.** The mark *is* the
-edge here, so there is nothing inside it for `outlined` to fade: `BarChart`
-earns that value by keeping a column's area and fading it toward the page,
-and a donut would have to be drawn as filled paths rather than arcs to do the
-same. That is changing what a donut is to satisfy a word. */
+**This took three values on 25 Aug 2026, and the note it replaces argued it
+could not.** That note was right about the mark: a slice is a stroke on a
+ring, the edge *is* the mark, and there is nothing within it to fade. It
+concluded that `outlined` would mean drawing slices as filled paths instead
+of arcs, and called that changing what a donut is to satisfy a word.
+
+What it did not weigh is that the two can both be there. The arc still draws
+the slice and still carries the animation, and a closed path traces the same
+wedge beside it for anything that needs a boundary. Nothing about the donut
+changed; something was added next to it. See `renderEdge` on the tier below
+for why the dash could not simply be replaced.
+
+The value that stays refused is `ghost`, which on a ring is a chart with no
+slices. */
   "prop:emphasis"?: HelixDonutChart["emphasis"];
   /** What the ring is made of.
 
@@ -6375,11 +6449,20 @@ legible without competing. Toward the page rather than translucent, because a
 translucent line takes its color from whatever it crosses, which on a chart
 with several is the whole risk.
 
-**`outlined` is refused and `area` is why.** On a column, `outlined` is the
-edge without the loud fill; the line chart's version of that is the line
-without its wash, and `area` already says exactly that. A second spelling
-would be the drift this axis exists to prevent, so it defers to the property
-that got there first. */
+`outlined` thins the wash and leaves the line at full weight, so the boundary
+carries the reading, which is the trade `BarChart` makes on a column. `solid`
+takes the wash to full strength and the fill carries it instead.
+
+**This refused `outlined` until 25 Aug 2026, and `area` was the reason
+given**: on a column `outlined` is the edge without the loud fill, the line
+chart's version of that is the line without its wash, and `area` already says
+exactly that. `area` is unchanged and still says it. What the argument
+conflated is existence with weight: `area` decides whether a wash is drawn,
+which is structural and belongs to the tier below, and emphasis decides which
+of the two marks is carrying the reading. Both ends need a wash present and
+neither can summon one.
+
+`ghost` would be a chart with no lines. */
   emphasis?: HelixLineChart["emphasis"];
   /** What the lines are made of.
 
@@ -6471,11 +6554,20 @@ legible without competing. Toward the page rather than translucent, because a
 translucent line takes its color from whatever it crosses, which on a chart
 with several is the whole risk.
 
-**`outlined` is refused and `area` is why.** On a column, `outlined` is the
-edge without the loud fill; the line chart's version of that is the line
-without its wash, and `area` already says exactly that. A second spelling
-would be the drift this axis exists to prevent, so it defers to the property
-that got there first. */
+`outlined` thins the wash and leaves the line at full weight, so the boundary
+carries the reading, which is the trade `BarChart` makes on a column. `solid`
+takes the wash to full strength and the fill carries it instead.
+
+**This refused `outlined` until 25 Aug 2026, and `area` was the reason
+given**: on a column `outlined` is the edge without the loud fill, the line
+chart's version of that is the line without its wash, and `area` already says
+exactly that. `area` is unchanged and still says it. What the argument
+conflated is existence with weight: `area` decides whether a wash is drawn,
+which is structural and belongs to the tier below, and emphasis decides which
+of the two marks is carrying the reading. Both ends need a wash present and
+neither can summon one.
+
+`ghost` would be a chart with no lines. */
   "prop:emphasis"?: HelixLineChart["emphasis"];
   /** What the lines are made of.
 
@@ -7868,6 +7960,26 @@ export type HelixOptionHelixSelectElementEvent =
 export type HelixOptionProps = {
   /** Whether this choice can be made. */
   disabled?: HelixOption["disabled"];
+  /** A second line under the words, for what the choice actually is.
+
+A palette row reads better as a name and a caption than as one sentence
+carrying both: "Helix" and "the design system" are two facts, and a comma
+between them makes a reader parse the punctuation to find where the name
+ends. Matching still reads the label, so what somebody types is matched
+against the name rather than against prose about it.
+
+**A property and not a slot, which is the departure worth explaining.** The
+area rules say a content property is its slot's fallback, and that holds for
+a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+usually absent, and a wrapped slot generates a box whether or not it is
+filled, so every option without a caption would carry an empty line. The
+detection that would avoid it does not exist, `:host(:has())` being invalid
+and the server having no children to inspect. A property is known at render
+time, so the component can decline to draw the box at all.
+
+It does not reflect, per the rule that payload state stays off the host: a
+string is not a fact a selector needs. */
+  description?: HelixOption["description"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
   "data-active"?: HelixOption["active"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
@@ -7916,6 +8028,26 @@ fact about what pressing a key would do, which is what a description is. */
 export type HelixOptionSolidJsProps = {
   /** Whether this choice can be made. */
   "prop:disabled"?: HelixOption["disabled"];
+  /** A second line under the words, for what the choice actually is.
+
+A palette row reads better as a name and a caption than as one sentence
+carrying both: "Helix" and "the design system" are two facts, and a comma
+between them makes a reader parse the punctuation to find where the name
+ends. Matching still reads the label, so what somebody types is matched
+against the name rather than against prose about it.
+
+**A property and not a slot, which is the departure worth explaining.** The
+area rules say a content property is its slot's fallback, and that holds for
+a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+usually absent, and a wrapped slot generates a box whether or not it is
+filled, so every option without a caption would carry an empty line. The
+detection that would avoid it does not exist, `:host(:has())` being invalid
+and the server having no children to inspect. A property is known at render
+time, so the component can decline to draw the box at all.
+
+It does not reflect, per the rule that payload state stays off the host: a
+string is not a fact a selector needs. */
+  "prop:description"?: HelixOption["description"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
   "bool:data-active"?: HelixOption["active"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
@@ -10541,11 +10673,20 @@ line strokes it, both gradient stops take it so the wash is the line's own
 color, and the terminus fills it. So one declaration quietens all of them,
 and a consumer's `--sparkline-color` is quietened rather than replaced.
 
-**One value, and no `material` at all.** `outlined` needs a fill to remove
-and this is a stroke; `ghost` is an empty cell. Glass exists so what is
-behind a mark reads through it, and at the size a sparkline draws there is
-nothing behind it a reader could resolve, so the axis would render a
-difference nobody can see. */
+**The other two follow whichever plot is drawn**, because a sparkline is
+three marks behind one property and the difference between a boundary and a
+fill does not exist until you know which. A `bar` plot answers like
+`BarChart`, an `area` or `line` plot like `LineChart`. `solid` on bars is the
+resting column and selects nothing.
+
+**`outlined` was refused here until 25 Aug 2026**, on the grounds that it
+needs a fill to remove and this is a stroke. That is true of the line and not
+of the other two plots, which is what the argument missed: a bar has an area
+and an area plot is one.
+
+`ghost` is still an empty cell, and there is still no `material`. Glass
+exists so what is behind a mark reads through it, and at the size a sparkline
+draws there is nothing behind it a reader could resolve. */
   emphasis?: HelixSparkline["emphasis"];
   /** How heavy the line is drawn.
 
@@ -10668,11 +10809,20 @@ line strokes it, both gradient stops take it so the wash is the line's own
 color, and the terminus fills it. So one declaration quietens all of them,
 and a consumer's `--sparkline-color` is quietened rather than replaced.
 
-**One value, and no `material` at all.** `outlined` needs a fill to remove
-and this is a stroke; `ghost` is an empty cell. Glass exists so what is
-behind a mark reads through it, and at the size a sparkline draws there is
-nothing behind it a reader could resolve, so the axis would render a
-difference nobody can see. */
+**The other two follow whichever plot is drawn**, because a sparkline is
+three marks behind one property and the difference between a boundary and a
+fill does not exist until you know which. A `bar` plot answers like
+`BarChart`, an `area` or `line` plot like `LineChart`. `solid` on bars is the
+resting column and selects nothing.
+
+**`outlined` was refused here until 25 Aug 2026**, on the grounds that it
+needs a fill to remove and this is a stroke. That is true of the line and not
+of the other two plots, which is what the argument missed: a bar has an area
+and an area plot is one.
+
+`ghost` is still an empty cell, and there is still no `material`. Glass
+exists so what is behind a mark reads through it, and at the size a sparkline
+draws there is nothing behind it a reader could resolve. */
   "prop:emphasis"?: HelixSparkline["emphasis"];
   /** How heavy the line is drawn.
 
@@ -11486,9 +11636,28 @@ export type HelixTableColumnProps = {
 
 A single track value, so anything valid in `grid-template-columns` works:
 `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
-left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
-`1fr` track keeps an automatic minimum and refuses to shrink under a long
-cell, so one unbreakable value pushes the table past its container. */
+left over equally, as `minmax(max-content, 1fr)`.
+
+**The floor was `0` and that is what broke a narrow table.** A zero floor
+lets a track shrink under its own content, so at 375 the columns were
+squeezed to 75px and `eu-central-1` wrapped across lines, which reads as
+corrupt data rather than as a table that ran out of room. The zero was
+chosen to stop one long value pushing the table past its container, and
+that was the right worry with nowhere for the overflow to go.
+
+Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+long value pushes past the container as the old comment feared, and the
+table scrolls instead of the value being destroyed. Measured at 375: tracks
+of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
+does not move.
+
+**`max-content` and not `min-content`, because a hyphen is a wrap
+opportunity.** A `min-content` floor still broke `eu-central-1` at its
+hyphens, which is the whole of the reported fault. The cost is that a
+column of prose asks for its longest paragraph on one line, so a column
+holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
+back into wrapping. A headless consumer owns the overflow either way, that
+being paint, and gets the honest track list. */
   width?: HelixTableColumn["width"];
 };
 
@@ -11497,9 +11666,28 @@ export type HelixTableColumnSolidJsProps = {
 
 A single track value, so anything valid in `grid-template-columns` works:
 `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
-left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
-`1fr` track keeps an automatic minimum and refuses to shrink under a long
-cell, so one unbreakable value pushes the table past its container. */
+left over equally, as `minmax(max-content, 1fr)`.
+
+**The floor was `0` and that is what broke a narrow table.** A zero floor
+lets a track shrink under its own content, so at 375 the columns were
+squeezed to 75px and `eu-central-1` wrapped across lines, which reads as
+corrupt data rather than as a table that ran out of room. The zero was
+chosen to stop one long value pushing the table past its container, and
+that was the right worry with nowhere for the overflow to go.
+
+Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+long value pushes past the container as the old comment feared, and the
+table scrolls instead of the value being destroyed. Measured at 375: tracks
+of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
+does not move.
+
+**`max-content` and not `min-content`, because a hyphen is a wrap
+opportunity.** A `min-content` floor still broke `eu-central-1` at its
+hyphens, which is the whole of the reported fault. The cost is that a
+column of prose asks for its longest paragraph on one line, so a column
+holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
+back into wrapping. A headless consumer owns the overflow either way, that
+being paint, and gets the honest track list. */
   "prop:width"?: HelixTableColumn["width"];
 
   /** Set the innerHTML of the element */
@@ -16218,6 +16406,29 @@ export type CustomElements = {
    * comes from the page and height does not, so the styled tier gives it
    * `--carousel-block-size` and a consumer sets that to whatever the slides
    * want.
+   * - `controls`: Whether the previous and next controls are shown.
+   *
+   * `auto`, which is the resting behavior and what an absent attribute means,
+   * shows them wherever the pointer can hover and hides them where it cannot.
+   * `always` keeps them on every device, and `none` never renders them at all.
+   *
+   * **Pointer and not width, which is the distinction this exists to make.** A
+   * 375px window on a desktop still has a mouse and still wants the arrows; a
+   * tablet at 1024 has neither. `.claude/rules/helix.md` forbids a component
+   * asking about the viewport, because the viewport is not the component's box,
+   * and that objection does not reach `hover` and `pointer`: those describe the
+   * input device, and the answer is the same whether this carousel is 300px in
+   * a sidebar or runs the width of the page.
+   *
+   * **Safe to hide because the arrows are not the keyboard's way in.** The
+   * indicators carry a roving `tabindex` and handle the arrow keys, so every
+   * slide is still reachable with the controls gone. Hiding a control that was
+   * the only route to something would be a different change under this name.
+   *
+   * **The rotation control is never hidden by this**, which is a decision
+   * rather than a limit of scope: content that moves on its own has to offer a
+   * way to stop it, so an autoplaying carousel keeps its pause control on a
+   * touch device exactly as it does on a desktop.
    * - `default-index`/`defaultIndex`: Slide to start on, where nothing declared one.
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
@@ -18268,14 +18479,27 @@ export type CustomElements = {
    *
    * - `emphasis`: How much ink the slices claim.
    *
-   * `subtle` is the ring as a wash of its own colors: still readable, no longer
-   * the loudest thing beside the number it is explaining.
+   * `solid` is the resting arrangement and selects nothing: a slice at full
+   * strength is what the base rule already draws. `subtle` is the ring as a wash
+   * of its own colors, still readable and no longer the loudest thing beside the
+   * number it is explaining. `outlined` keeps the slice and fades it toward the
+   * page, leaving a boundary in the series' own color, which is the same trade
+   * `BarChart` makes on a column.
    *
-   * **One value and not three, because a slice is a stroke.** The mark *is* the
-   * edge here, so there is nothing inside it for `outlined` to fade: `BarChart`
-   * earns that value by keeping a column's area and fading it toward the page,
-   * and a donut would have to be drawn as filled paths rather than arcs to do the
-   * same. That is changing what a donut is to satisfy a word.
+   * **This took three values on 25 Aug 2026, and the note it replaces argued it
+   * could not.** That note was right about the mark: a slice is a stroke on a
+   * ring, the edge *is* the mark, and there is nothing within it to fade. It
+   * concluded that `outlined` would mean drawing slices as filled paths instead
+   * of arcs, and called that changing what a donut is to satisfy a word.
+   *
+   * What it did not weigh is that the two can both be there. The arc still draws
+   * the slice and still carries the animation, and a closed path traces the same
+   * wedge beside it for anything that needs a boundary. Nothing about the donut
+   * changed; something was added next to it. See `renderEdge` on the tier below
+   * for why the dash could not simply be replaced.
+   *
+   * The value that stays refused is `ghost`, which on a ring is a chart with no
+   * slices.
    * - `material`: What the ring is made of.
    *
    * `glass` lets the page read through the slices, for a chart sitting on a
@@ -18366,6 +18590,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--donut-chart-edge-stroke`: Thickness of the slice boundary under `outlined`. (default: `undefined`)
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
    * - `--donut-chart-track-color`: Color of the ring under the slices. (default: `undefined`)
    * - `--donut-chart-stroke`: How thick the ring is drawn, derived from `hole`. (default: `undefined`)
@@ -18384,6 +18609,7 @@ export type CustomElements = {
    * - `tooltip-name`: A column's name inside the tooltip.
    * - `tooltip-value`: A column's value inside the tooltip.
    * - `segment`: One slice.
+   * - `segment-edge`: One slice as a closed shape, for a boundary to trace.
    * - `track`: The ring the slices are drawn on.
    */
   "helix-donut-chart": Partial<
@@ -19544,11 +19770,20 @@ export type CustomElements = {
    * translucent line takes its color from whatever it crosses, which on a chart
    * with several is the whole risk.
    *
-   * **`outlined` is refused and `area` is why.** On a column, `outlined` is the
-   * edge without the loud fill; the line chart's version of that is the line
-   * without its wash, and `area` already says exactly that. A second spelling
-   * would be the drift this axis exists to prevent, so it defers to the property
-   * that got there first.
+   * `outlined` thins the wash and leaves the line at full weight, so the boundary
+   * carries the reading, which is the trade `BarChart` makes on a column. `solid`
+   * takes the wash to full strength and the fill carries it instead.
+   *
+   * **This refused `outlined` until 25 Aug 2026, and `area` was the reason
+   * given**: on a column `outlined` is the edge without the loud fill, the line
+   * chart's version of that is the line without its wash, and `area` already says
+   * exactly that. `area` is unchanged and still says it. What the argument
+   * conflated is existence with weight: `area` decides whether a wash is drawn,
+   * which is structural and belongs to the tier below, and emphasis decides which
+   * of the two marks is carrying the reading. Both ends need a wash present and
+   * neither can summon one.
+   *
+   * `ghost` would be a chart with no lines.
    * - `material`: What the lines are made of.
    *
    * `glass` lets the gridlines read through them, which is what translucency is
@@ -20780,6 +21015,25 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `disabled`: Whether this choice can be made.
+   * - `description`: A second line under the words, for what the choice actually is.
+   *
+   * A palette row reads better as a name and a caption than as one sentence
+   * carrying both: "Helix" and "the design system" are two facts, and a comma
+   * between them makes a reader parse the punctuation to find where the name
+   * ends. Matching still reads the label, so what somebody types is matched
+   * against the name rather than against prose about it.
+   *
+   * **A property and not a slot, which is the departure worth explaining.** The
+   * area rules say a content property is its slot's fallback, and that holds for
+   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+   * usually absent, and a wrapped slot generates a box whether or not it is
+   * filled, so every option without a caption would carry an empty line. The
+   * detection that would avoid it does not exist, `:host(:has())` being invalid
+   * and the server having no children to inspect. A property is known at render
+   * time, so the component can decline to draw the box at all.
+   *
+   * It does not reflect, per the rule that payload state stays off the host: a
+   * string is not a fact a selector needs.
    * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
    * - `selected`: Whether this choice is currently chosen. Written by the listbox.
    * - `value`: Identifies this choice, and is what a form submits.
@@ -20845,7 +21099,9 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The row.
+   * - `text`: The words and the caption under them, as one column.
    * - `label`: The words.
+   * - `description`: The caption under the words, when there is one.
    */
   "helix-option": Partial<
     HelixOptionProps & BaseProps<HelixOption> & BaseEvents
@@ -23008,11 +23264,20 @@ export type CustomElements = {
    * color, and the terminus fills it. So one declaration quietens all of them,
    * and a consumer's `--sparkline-color` is quietened rather than replaced.
    *
-   * **One value, and no `material` at all.** `outlined` needs a fill to remove
-   * and this is a stroke; `ghost` is an empty cell. Glass exists so what is
-   * behind a mark reads through it, and at the size a sparkline draws there is
-   * nothing behind it a reader could resolve, so the axis would render a
-   * difference nobody can see.
+   * **The other two follow whichever plot is drawn**, because a sparkline is
+   * three marks behind one property and the difference between a boundary and a
+   * fill does not exist until you know which. A `bar` plot answers like
+   * `BarChart`, an `area` or `line` plot like `LineChart`. `solid` on bars is the
+   * resting column and selects nothing.
+   *
+   * **`outlined` was refused here until 25 Aug 2026**, on the grounds that it
+   * needs a fill to remove and this is a stroke. That is true of the line and not
+   * of the other two plots, which is what the argument missed: a bar has an area
+   * and an area plot is one.
+   *
+   * `ghost` is still an empty cell, and there is still no `material`. Glass
+   * exists so what is behind a mark reads through it, and at the size a sparkline
+   * draws there is nothing behind it a reader could resolve.
    * - `weight`: How heavy the line is drawn.
    *
    * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
@@ -23123,6 +23388,7 @@ export type CustomElements = {
    * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
    * - `--sparkline-area-opacity`: How much of the line's color the wash takes where it meets the line. (default: `undefined`)
    * - `--sparkline-bar-radius`: Corner radius on a column, under `plot="bar"`. (default: `undefined`)
+   * - `--sparkline-bar-stroke`: Thickness of a column's edge under `outlined`. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
    * - `--sparkline-color`: Color of the line, the wash, the columns and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
@@ -23852,9 +24118,28 @@ export type CustomElements = {
    *
    * A single track value, so anything valid in `grid-template-columns` works:
    * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
-   * left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
-   * `1fr` track keeps an automatic minimum and refuses to shrink under a long
-   * cell, so one unbreakable value pushes the table past its container.
+   * left over equally, as `minmax(max-content, 1fr)`.
+   *
+   * **The floor was `0` and that is what broke a narrow table.** A zero floor
+   * lets a track shrink under its own content, so at 375 the columns were
+   * squeezed to 75px and `eu-central-1` wrapped across lines, which reads as
+   * corrupt data rather than as a table that ran out of room. The zero was
+   * chosen to stop one long value pushing the table past its container, and
+   * that was the right worry with nowhere for the overflow to go.
+   *
+   * Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+   * long value pushes past the container as the old comment feared, and the
+   * table scrolls instead of the value being destroyed. Measured at 375: tracks
+   * of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
+   * does not move.
+   *
+   * **`max-content` and not `min-content`, because a hyphen is a wrap
+   * opportunity.** A `min-content` floor still broke `eu-central-1` at its
+   * hyphens, which is the whole of the reported fault. The cost is that a
+   * column of prose asks for its longest paragraph on one line, so a column
+   * holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
+   * back into wrapping. A headless consumer owns the overflow either way, that
+   * being paint, and gets the honest track list.
    * - `track`: The track this column contributes, resolved. (property only) (readonly)
    *
    * ## Slots
@@ -24650,8 +24935,10 @@ export type CustomElements = {
    * - `picker-list-label`: The question, over the list.
    * - `picker-list-search`: The region holding the field that narrows the list.
    * - `picker-list-search-field`: The field itself.
+   * - `picker-option-description`: The caption under the words, when there is one.
    * - `picker-option-item`: The row.
    * - `picker-option-label`: The words.
+   * - `picker-option-text`: The words and the caption, as one column.
    * - `label`: The question, over the field.
    * - `hint`: Help under the field, while nothing is wrong.
    * - `feedback`: What is wrong with it.
@@ -24900,8 +25187,10 @@ export type CustomElements = {
    * - `list-label`: The question, over the list.
    * - `list-search`: The region holding the field that narrows the list.
    * - `list-search-field`: The field itself.
+   * - `option-description`: The caption under the words, when there is one.
    * - `option-item`: The row.
    * - `option-label`: The words.
+   * - `option-text`: The words and the caption, as one column.
    * - `column-loading`: Shown while the options are still on their way.
    * - `list-loading`: Shown while the options are still on their way.
    */
@@ -27994,6 +28283,29 @@ export type CustomElementsSolidJs = {
    * comes from the page and height does not, so the styled tier gives it
    * `--carousel-block-size` and a consumer sets that to whatever the slides
    * want.
+   * - `controls`: Whether the previous and next controls are shown.
+   *
+   * `auto`, which is the resting behavior and what an absent attribute means,
+   * shows them wherever the pointer can hover and hides them where it cannot.
+   * `always` keeps them on every device, and `none` never renders them at all.
+   *
+   * **Pointer and not width, which is the distinction this exists to make.** A
+   * 375px window on a desktop still has a mouse and still wants the arrows; a
+   * tablet at 1024 has neither. `.claude/rules/helix.md` forbids a component
+   * asking about the viewport, because the viewport is not the component's box,
+   * and that objection does not reach `hover` and `pointer`: those describe the
+   * input device, and the answer is the same whether this carousel is 300px in
+   * a sidebar or runs the width of the page.
+   *
+   * **Safe to hide because the arrows are not the keyboard's way in.** The
+   * indicators carry a roving `tabindex` and handle the arrow keys, so every
+   * slide is still reachable with the controls gone. Hiding a control that was
+   * the only route to something would be a different change under this name.
+   *
+   * **The rotation control is never hidden by this**, which is a decision
+   * rather than a limit of scope: content that moves on its own has to offer a
+   * way to stop it, so an autoplaying carousel keeps its pause control on a
+   * touch device exactly as it does on a desktop.
    * - `default-index`/`defaultIndex`: Slide to start on, where nothing declared one.
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
@@ -30085,14 +30397,27 @@ export type CustomElementsSolidJs = {
    *
    * - `emphasis`: How much ink the slices claim.
    *
-   * `subtle` is the ring as a wash of its own colors: still readable, no longer
-   * the loudest thing beside the number it is explaining.
+   * `solid` is the resting arrangement and selects nothing: a slice at full
+   * strength is what the base rule already draws. `subtle` is the ring as a wash
+   * of its own colors, still readable and no longer the loudest thing beside the
+   * number it is explaining. `outlined` keeps the slice and fades it toward the
+   * page, leaving a boundary in the series' own color, which is the same trade
+   * `BarChart` makes on a column.
    *
-   * **One value and not three, because a slice is a stroke.** The mark *is* the
-   * edge here, so there is nothing inside it for `outlined` to fade: `BarChart`
-   * earns that value by keeping a column's area and fading it toward the page,
-   * and a donut would have to be drawn as filled paths rather than arcs to do the
-   * same. That is changing what a donut is to satisfy a word.
+   * **This took three values on 25 Aug 2026, and the note it replaces argued it
+   * could not.** That note was right about the mark: a slice is a stroke on a
+   * ring, the edge *is* the mark, and there is nothing within it to fade. It
+   * concluded that `outlined` would mean drawing slices as filled paths instead
+   * of arcs, and called that changing what a donut is to satisfy a word.
+   *
+   * What it did not weigh is that the two can both be there. The arc still draws
+   * the slice and still carries the animation, and a closed path traces the same
+   * wedge beside it for anything that needs a boundary. Nothing about the donut
+   * changed; something was added next to it. See `renderEdge` on the tier below
+   * for why the dash could not simply be replaced.
+   *
+   * The value that stays refused is `ghost`, which on a ring is a chart with no
+   * slices.
    * - `material`: What the ring is made of.
    *
    * `glass` lets the page read through the slices, for a chart sitting on a
@@ -30183,6 +30508,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--donut-chart-edge-stroke`: Thickness of the slice boundary under `outlined`. (default: `undefined`)
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
    * - `--donut-chart-track-color`: Color of the ring under the slices. (default: `undefined`)
    * - `--donut-chart-stroke`: How thick the ring is drawn, derived from `hole`. (default: `undefined`)
@@ -30201,6 +30527,7 @@ export type CustomElementsSolidJs = {
    * - `tooltip-name`: A column's name inside the tooltip.
    * - `tooltip-value`: A column's value inside the tooltip.
    * - `segment`: One slice.
+   * - `segment-edge`: One slice as a closed shape, for a boundary to trace.
    * - `track`: The ring the slices are drawn on.
    */
   "helix-donut-chart": Partial<
@@ -31405,11 +31732,20 @@ export type CustomElementsSolidJs = {
    * translucent line takes its color from whatever it crosses, which on a chart
    * with several is the whole risk.
    *
-   * **`outlined` is refused and `area` is why.** On a column, `outlined` is the
-   * edge without the loud fill; the line chart's version of that is the line
-   * without its wash, and `area` already says exactly that. A second spelling
-   * would be the drift this axis exists to prevent, so it defers to the property
-   * that got there first.
+   * `outlined` thins the wash and leaves the line at full weight, so the boundary
+   * carries the reading, which is the trade `BarChart` makes on a column. `solid`
+   * takes the wash to full strength and the fill carries it instead.
+   *
+   * **This refused `outlined` until 25 Aug 2026, and `area` was the reason
+   * given**: on a column `outlined` is the edge without the loud fill, the line
+   * chart's version of that is the line without its wash, and `area` already says
+   * exactly that. `area` is unchanged and still says it. What the argument
+   * conflated is existence with weight: `area` decides whether a wash is drawn,
+   * which is structural and belongs to the tier below, and emphasis decides which
+   * of the two marks is carrying the reading. Both ends need a wash present and
+   * neither can summon one.
+   *
+   * `ghost` would be a chart with no lines.
    * - `material`: What the lines are made of.
    *
    * `glass` lets the gridlines read through them, which is what translucency is
@@ -32677,6 +33013,25 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `disabled`: Whether this choice can be made.
+   * - `description`: A second line under the words, for what the choice actually is.
+   *
+   * A palette row reads better as a name and a caption than as one sentence
+   * carrying both: "Helix" and "the design system" are two facts, and a comma
+   * between them makes a reader parse the punctuation to find where the name
+   * ends. Matching still reads the label, so what somebody types is matched
+   * against the name rather than against prose about it.
+   *
+   * **A property and not a slot, which is the departure worth explaining.** The
+   * area rules say a content property is its slot's fallback, and that holds for
+   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+   * usually absent, and a wrapped slot generates a box whether or not it is
+   * filled, so every option without a caption would carry an empty line. The
+   * detection that would avoid it does not exist, `:host(:has())` being invalid
+   * and the server having no children to inspect. A property is known at render
+   * time, so the component can decline to draw the box at all.
+   *
+   * It does not reflect, per the rule that payload state stays off the host: a
+   * string is not a fact a selector needs.
    * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
    * - `selected`: Whether this choice is currently chosen. Written by the listbox.
    * - `value`: Identifies this choice, and is what a form submits.
@@ -32742,7 +33097,9 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The row.
+   * - `text`: The words and the caption under them, as one column.
    * - `label`: The words.
+   * - `description`: The caption under the words, when there is one.
    */
   "helix-option": Partial<
     HelixOptionProps &
@@ -34978,11 +35335,20 @@ export type CustomElementsSolidJs = {
    * color, and the terminus fills it. So one declaration quietens all of them,
    * and a consumer's `--sparkline-color` is quietened rather than replaced.
    *
-   * **One value, and no `material` at all.** `outlined` needs a fill to remove
-   * and this is a stroke; `ghost` is an empty cell. Glass exists so what is
-   * behind a mark reads through it, and at the size a sparkline draws there is
-   * nothing behind it a reader could resolve, so the axis would render a
-   * difference nobody can see.
+   * **The other two follow whichever plot is drawn**, because a sparkline is
+   * three marks behind one property and the difference between a boundary and a
+   * fill does not exist until you know which. A `bar` plot answers like
+   * `BarChart`, an `area` or `line` plot like `LineChart`. `solid` on bars is the
+   * resting column and selects nothing.
+   *
+   * **`outlined` was refused here until 25 Aug 2026**, on the grounds that it
+   * needs a fill to remove and this is a stroke. That is true of the line and not
+   * of the other two plots, which is what the argument missed: a bar has an area
+   * and an area plot is one.
+   *
+   * `ghost` is still an empty cell, and there is still no `material`. Glass
+   * exists so what is behind a mark reads through it, and at the size a sparkline
+   * draws there is nothing behind it a reader could resolve.
    * - `weight`: How heavy the line is drawn.
    *
    * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
@@ -35093,6 +35459,7 @@ export type CustomElementsSolidJs = {
    * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
    * - `--sparkline-area-opacity`: How much of the line's color the wash takes where it meets the line. (default: `undefined`)
    * - `--sparkline-bar-radius`: Corner radius on a column, under `plot="bar"`. (default: `undefined`)
+   * - `--sparkline-bar-stroke`: Thickness of a column's edge under `outlined`. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
    * - `--sparkline-color`: Color of the line, the wash, the columns and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
@@ -35852,9 +36219,28 @@ export type CustomElementsSolidJs = {
    *
    * A single track value, so anything valid in `grid-template-columns` works:
    * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
-   * left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
-   * `1fr` track keeps an automatic minimum and refuses to shrink under a long
-   * cell, so one unbreakable value pushes the table past its container.
+   * left over equally, as `minmax(max-content, 1fr)`.
+   *
+   * **The floor was `0` and that is what broke a narrow table.** A zero floor
+   * lets a track shrink under its own content, so at 375 the columns were
+   * squeezed to 75px and `eu-central-1` wrapped across lines, which reads as
+   * corrupt data rather than as a table that ran out of room. The zero was
+   * chosen to stop one long value pushing the table past its container, and
+   * that was the right worry with nowhere for the overflow to go.
+   *
+   * Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+   * long value pushes past the container as the old comment feared, and the
+   * table scrolls instead of the value being destroyed. Measured at 375: tracks
+   * of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
+   * does not move.
+   *
+   * **`max-content` and not `min-content`, because a hyphen is a wrap
+   * opportunity.** A `min-content` floor still broke `eu-central-1` at its
+   * hyphens, which is the whole of the reported fault. The cost is that a
+   * column of prose asks for its longest paragraph on one line, so a column
+   * holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
+   * back into wrapping. A headless consumer owns the overflow either way, that
+   * being paint, and gets the honest track list.
    * - `track`: The track this column contributes, resolved. (property only) (readonly)
    *
    * ## Slots
@@ -36676,8 +37062,10 @@ export type CustomElementsSolidJs = {
    * - `picker-list-label`: The question, over the list.
    * - `picker-list-search`: The region holding the field that narrows the list.
    * - `picker-list-search-field`: The field itself.
+   * - `picker-option-description`: The caption under the words, when there is one.
    * - `picker-option-item`: The row.
    * - `picker-option-label`: The words.
+   * - `picker-option-text`: The words and the caption, as one column.
    * - `label`: The question, over the field.
    * - `hint`: Help under the field, while nothing is wrong.
    * - `feedback`: What is wrong with it.
@@ -36929,8 +37317,10 @@ export type CustomElementsSolidJs = {
    * - `list-label`: The question, over the list.
    * - `list-search`: The region holding the field that narrows the list.
    * - `list-search-field`: The field itself.
+   * - `option-description`: The caption under the words, when there is one.
    * - `option-item`: The row.
    * - `option-label`: The words.
+   * - `option-text`: The words and the caption, as one column.
    * - `column-loading`: Shown while the options are still on their way.
    * - `list-loading`: Shown while the options are still on their way.
    */
@@ -38791,6 +39181,8 @@ export type CustomCssProperties = {
   "--divider-length"?: string;
   /** How heavy the rule is. */
   "--divider-thickness"?: string;
+  /** Thickness of the slice boundary under `outlined`. */
+  "--donut-chart-edge-stroke"?: string;
   /** Width and height of the ring. */
   "--donut-chart-size"?: string;
   /** Color of the ring under the slices. */
@@ -39127,6 +39519,8 @@ export type CustomCssProperties = {
   "--sparkline-area-opacity"?: string;
   /** Corner radius on a column, under `plot="bar"`. */
   "--sparkline-bar-radius"?: string;
+  /** Thickness of a column's edge under `outlined`. */
+  "--sparkline-bar-stroke"?: string;
   /** Height of the drawing. */
   "--sparkline-block-size"?: string;
   /** Color of the line, the wash, the columns and the mark. */

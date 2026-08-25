@@ -7727,6 +7727,20 @@
             },
             {
               "kind": "field",
+              "name": "controls",
+              "type": {
+                "text": "'always' | 'auto' | 'none' | undefined"
+              },
+              "description": "Whether the previous and next controls are shown.\n\n`auto`, which is the resting behavior and what an absent attribute means,\nshows them wherever the pointer can hover and hides them where it cannot.\n`always` keeps them on every device, and `none` never renders them at all.\n\n**Pointer and not width, which is the distinction this exists to make.** A\n375px window on a desktop still has a mouse and still wants the arrows; a\ntablet at 1024 has neither. `.claude/rules/helix.md` forbids a component\nasking about the viewport, because the viewport is not the component's box,\nand that objection does not reach `hover` and `pointer`: those describe the\ninput device, and the answer is the same whether this carousel is 300px in\na sidebar or runs the width of the page.\n\n**Safe to hide because the arrows are not the keyboard's way in.** The\nindicators carry a roving `tabindex` and handle the arrow keys, so every\nslide is still reachable with the controls gone. Hiding a control that was\nthe only route to something would be a different change under this name.\n\n**The rotation control is never hidden by this**, which is a decision\nrather than a limit of scope: content that moves on its own has to offer a\nway to stop it, so an autoplaying carousel keeps its pause control on a\ntouch device exactly as it does on a desktop.",
+              "attribute": "controls",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "defaultIndex",
               "type": {
                 "text": "number"
@@ -8272,6 +8286,18 @@
               },
               "description": "Which way the track runs.\n\nBehavior rather than presentation, which is why it is here: the scroll\nposition and the nearest-slide arithmetic are both single-axis, and a\nstyled-tier attribute cannot change which one they read. Two sites branch\non it, `scrollTo` and the drag settle, and nothing else in the component\nknows about the axis at all.\n\nA vertical track needs a height, which a horizontal one does not: width\ncomes from the page and height does not, so the styled tier gives it\n`--carousel-block-size` and a consumer sets that to whatever the slides\nwant.",
               "fieldName": "orientation",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "name": "controls",
+              "type": {
+                "text": "'always' | 'auto' | 'none' | undefined"
+              },
+              "description": "Whether the previous and next controls are shown.\n\n`auto`, which is the resting behavior and what an absent attribute means,\nshows them wherever the pointer can hover and hides them where it cannot.\n`always` keeps them on every device, and `none` never renders them at all.\n\n**Pointer and not width, which is the distinction this exists to make.** A\n375px window on a desktop still has a mouse and still wants the arrows; a\ntablet at 1024 has neither. `.claude/rules/helix.md` forbids a component\nasking about the viewport, because the viewport is not the component's box,\nand that objection does not reach `hover` and `pointer`: those describe the\ninput device, and the answer is the same whether this carousel is 300px in\na sidebar or runs the width of the page.\n\n**Safe to hide because the arrows are not the keyboard's way in.** The\nindicators carry a roving `tabindex` and handle the arrow keys, so every\nslide is still reachable with the controls gone. Hiding a control that was\nthe only route to something would be a different change under this name.\n\n**The rotation control is never hidden by this**, which is a decision\nrather than a limit of scope: content that moves on its own has to offer a\nway to stop it, so an autoplaying carousel keeps its pause control on a\ntouch device exactly as it does on a desktop.",
+              "fieldName": "controls",
               "inheritedFrom": {
                 "name": "HelixHeadlessCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -22319,6 +22345,10 @@
           "name": "HelixDonutChart",
           "cssProperties": [
             {
+              "description": "Thickness of the slice boundary under `outlined`.",
+              "name": "--donut-chart-edge-stroke"
+            },
+            {
               "description": "Width and height of the ring.",
               "name": "--donut-chart-size"
             },
@@ -22340,9 +22370,9 @@
               "kind": "field",
               "name": "emphasis",
               "type": {
-                "text": "'subtle' | undefined"
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much ink the slices claim.\n\n`subtle` is the ring as a wash of its own colors: still readable, no longer\nthe loudest thing beside the number it is explaining.\n\n**One value and not three, because a slice is a stroke.** The mark *is* the\nedge here, so there is nothing inside it for `outlined` to fade: `BarChart`\nearns that value by keeping a column's area and fading it toward the page,\nand a donut would have to be drawn as filled paths rather than arcs to do the\nsame. That is changing what a donut is to satisfy a word.",
+              "description": "How much ink the slices claim.\n\n`solid` is the resting arrangement and selects nothing: a slice at full\nstrength is what the base rule already draws. `subtle` is the ring as a wash\nof its own colors, still readable and no longer the loudest thing beside the\nnumber it is explaining. `outlined` keeps the slice and fades it toward the\npage, leaving a boundary in the series' own color, which is the same trade\n`BarChart` makes on a column.\n\n**This took three values on 25 Aug 2026, and the note it replaces argued it\ncould not.** That note was right about the mark: a slice is a stroke on a\nring, the edge *is* the mark, and there is nothing within it to fade. It\nconcluded that `outlined` would mean drawing slices as filled paths instead\nof arcs, and called that changing what a donut is to satisfy a word.\n\nWhat it did not weigh is that the two can both be there. The arc still draws\nthe slice and still carries the animation, and a closed path traces the same\nwedge beside it for anything that needs a boundary. Nothing about the donut\nchanged; something was added next to it. See `renderEdge` on the tier below\nfor why the dash could not simply be replaced.\n\nThe value that stays refused is `ghost`, which on a ring is a chart with no\nslices.",
               "attribute": "emphasis",
               "reflects": true
             },
@@ -22616,6 +22646,35 @@
             },
             {
               "kind": "method",
+              "name": "renderEdge",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "share",
+                  "type": {
+                    "text": "{ fraction: number; start: number }"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "The same slice again, as a shape with an inside.\n\n**A stroked arc has no boundary to draw, which is why this exists.** The\nsegment above is a dash on a circle: the mark *is* the edge, so there is\nnothing for an outline to trace and nothing within it to fade. Anything\nwanting those two separately needs the slice as a closed path, and this is\nit: the outer arc, a step inward, the inner arc back, closed.\n\n**Rendered always and painted only sometimes**, which is what keeps this on\nthis tier. Whether a boundary is drawn is a styled question and the answer\nlives in a stylesheet; whether the geometry a boundary would need exists at\nall is structural, and a component cannot conjure a shape from CSS. So the\npath is here for every donut and is `fill: none; stroke: none` until\nsomething asks for it.\n\n**Not a replacement for the dash, which was the first plan.** The dash\ncarries three jobs and only one of them is the shape: a share growing is a\n`stroke-dasharray` interpolating with no reflow, and `@starting-style` on\nthat same property is the whole reason the ring sweeps in rather than\nappearing. A `d` cannot do either. CSS interpolates one only between paths\nof identical command structure, and the large-arc flag flips the moment a\nslice crosses a half turn, so a growing slice would pop partway through the\ntransition it was meant to smooth. Both animations stay on the dash and this\npath follows it.\n\nThe turn to twelve o'clock is arithmetic here rather than the rotation the\nstylesheet gives the circles. That rule uses `transform-box: fill-box`, so\nit spins each element about its own bounding box, which is the ring's center\nfor a circle and is not for a sector.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "renderTooltip",
               "privacy": "protected",
               "return": {
@@ -22740,9 +22799,9 @@
             {
               "name": "emphasis",
               "type": {
-                "text": "'subtle' | undefined"
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much ink the slices claim.\n\n`subtle` is the ring as a wash of its own colors: still readable, no longer\nthe loudest thing beside the number it is explaining.\n\n**One value and not three, because a slice is a stroke.** The mark *is* the\nedge here, so there is nothing inside it for `outlined` to fade: `BarChart`\nearns that value by keeping a column's area and fading it toward the page,\nand a donut would have to be drawn as filled paths rather than arcs to do the\nsame. That is changing what a donut is to satisfy a word.",
+              "description": "How much ink the slices claim.\n\n`solid` is the resting arrangement and selects nothing: a slice at full\nstrength is what the base rule already draws. `subtle` is the ring as a wash\nof its own colors, still readable and no longer the loudest thing beside the\nnumber it is explaining. `outlined` keeps the slice and fades it toward the\npage, leaving a boundary in the series' own color, which is the same trade\n`BarChart` makes on a column.\n\n**This took three values on 25 Aug 2026, and the note it replaces argued it\ncould not.** That note was right about the mark: a slice is a stroke on a\nring, the edge *is* the mark, and there is nothing within it to fade. It\nconcluded that `outlined` would mean drawing slices as filled paths instead\nof arcs, and called that changing what a donut is to satisfy a word.\n\nWhat it did not weigh is that the two can both be there. The arc still draws\nthe slice and still carries the animation, and a closed path traces the same\nwedge beside it for anything that needs a boundary. Nothing about the donut\nchanged; something was added next to it. See `renderEdge` on the tier below\nfor why the dash could not simply be replaced.\n\nThe value that stays refused is `ghost`, which on a ring is a chart with no\nslices.",
               "fieldName": "emphasis"
             },
             {
@@ -22835,8 +22894,12 @@
                 "slug": "arc"
               },
               {
-                "description": "A ring that is context, said quietly beside one that is being read.",
+                "description": "The three weights a ring can carry, from full strength to a wash.",
                 "slug": "emphasis"
+              },
+              {
+                "description": "The same ring opaque and as glass, over a ground that shows the difference.",
+                "slug": "material"
               },
               {
                 "description": "The hole closed, which is a pie: the same drawing with its ring spanning the whole radius.",
@@ -22949,6 +23012,14 @@
             {
               "description": "One slice.",
               "name": "segment",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "description": "One slice as a closed shape, for a boundary to trace.",
+              "name": "segment-edge",
               "inheritedFrom": {
                 "name": "HelixHeadlessDonutChart",
                 "module": "src/donut-chart/root/donut-chart-root.ts"
@@ -31387,9 +31458,9 @@
               "kind": "field",
               "name": "emphasis",
               "type": {
-                "text": "'subtle' | undefined"
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much ink the lines claim.\n\n`subtle` mixes each series toward the page, so a chart that is context stays\nlegible without competing. Toward the page rather than translucent, because a\ntranslucent line takes its color from whatever it crosses, which on a chart\nwith several is the whole risk.\n\n**`outlined` is refused and `area` is why.** On a column, `outlined` is the\nedge without the loud fill; the line chart's version of that is the line\nwithout its wash, and `area` already says exactly that. A second spelling\nwould be the drift this axis exists to prevent, so it defers to the property\nthat got there first.",
+              "description": "How much ink the lines claim.\n\n`subtle` mixes each series toward the page, so a chart that is context stays\nlegible without competing. Toward the page rather than translucent, because a\ntranslucent line takes its color from whatever it crosses, which on a chart\nwith several is the whole risk.\n\n`outlined` thins the wash and leaves the line at full weight, so the boundary\ncarries the reading, which is the trade `BarChart` makes on a column. `solid`\ntakes the wash to full strength and the fill carries it instead.\n\n**This refused `outlined` until 25 Aug 2026, and `area` was the reason\ngiven**: on a column `outlined` is the edge without the loud fill, the line\nchart's version of that is the line without its wash, and `area` already says\nexactly that. `area` is unchanged and still says it. What the argument\nconflated is existence with weight: `area` decides whether a wash is drawn,\nwhich is structural and belongs to the tier below, and emphasis decides which\nof the two marks is carrying the reading. Both ends need a wash present and\nneither can summon one.\n\n`ghost` would be a chart with no lines.",
               "attribute": "emphasis",
               "reflects": true
             },
@@ -31938,9 +32009,9 @@
             {
               "name": "emphasis",
               "type": {
-                "text": "'subtle' | undefined"
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much ink the lines claim.\n\n`subtle` mixes each series toward the page, so a chart that is context stays\nlegible without competing. Toward the page rather than translucent, because a\ntranslucent line takes its color from whatever it crosses, which on a chart\nwith several is the whole risk.\n\n**`outlined` is refused and `area` is why.** On a column, `outlined` is the\nedge without the loud fill; the line chart's version of that is the line\nwithout its wash, and `area` already says exactly that. A second spelling\nwould be the drift this axis exists to prevent, so it defers to the property\nthat got there first.",
+              "description": "How much ink the lines claim.\n\n`subtle` mixes each series toward the page, so a chart that is context stays\nlegible without competing. Toward the page rather than translucent, because a\ntranslucent line takes its color from whatever it crosses, which on a chart\nwith several is the whole risk.\n\n`outlined` thins the wash and leaves the line at full weight, so the boundary\ncarries the reading, which is the trade `BarChart` makes on a column. `solid`\ntakes the wash to full strength and the fill carries it instead.\n\n**This refused `outlined` until 25 Aug 2026, and `area` was the reason\ngiven**: on a column `outlined` is the edge without the loud fill, the line\nchart's version of that is the line without its wash, and `area` already says\nexactly that. `area` is unchanged and still says it. What the argument\nconflated is existence with weight: `area` decides whether a wash is drawn,\nwhich is structural and belongs to the tier below, and emphasis decides which\nof the two marks is carrying the reading. Both ends need a wash present and\nneither can summon one.\n\n`ghost` would be a chart with no lines.",
               "fieldName": "emphasis"
             },
             {
@@ -32063,12 +32134,16 @@
                 "slug": "curves"
               },
               {
-                "description": "The same readings at full strength and as context.",
+                "description": "Four weights of the same readings, from the line carrying them to the wash.",
                 "slug": "emphasis"
               },
               {
                 "description": "Open incidents, where the distance from none is the reading: its own range turns a quiet year into a collapse.",
                 "slug": "from-zero"
+              },
+              {
+                "description": "The same wash opaque and as glass, with gridlines under it to read through.",
+                "slug": "material"
               },
               {
                 "description": "Two series on one scale, with a legend mapping the same palette.",
@@ -40429,6 +40504,19 @@
             },
             {
               "kind": "field",
+              "name": "description",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "A second line under the words, for what the choice actually is.\n\nA palette row reads better as a name and a caption than as one sentence\ncarrying both: \"Helix\" and \"the design system\" are two facts, and a comma\nbetween them makes a reader parse the punctuation to find where the name\nends. Matching still reads the label, so what somebody types is matched\nagainst the name rather than against prose about it.\n\n**A property and not a slot, which is the departure worth explaining.** The\narea rules say a content property is its slot's fallback, and that holds for\na region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is\nusually absent, and a wrapped slot generates a box whether or not it is\nfilled, so every option without a caption would carry an empty line. The\ndetection that would avoid it does not exist, `:host(:has())` being invalid\nand the server having no children to inspect. A property is known at render\ntime, so the component can decline to draw the box at all.\n\nIt does not reflect, per the rule that payload state stays off the host: a\nstring is not a fact a selector needs.",
+              "attribute": "description",
+              "inheritedFrom": {
+                "name": "HelixHeadlessOption",
+                "module": "src/option/root/option-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "active",
               "type": {
                 "text": "boolean"
@@ -40703,8 +40791,24 @@
               }
             },
             {
+              "description": "The words and the caption under them, as one column.",
+              "name": "text",
+              "inheritedFrom": {
+                "name": "HelixHeadlessOption",
+                "module": "src/option/root/option-root.ts"
+              }
+            },
+            {
               "description": "The words.",
               "name": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessOption",
+                "module": "src/option/root/option-root.ts"
+              }
+            },
+            {
+              "description": "The caption under the words, when there is one.",
+              "name": "description",
               "inheritedFrom": {
                 "name": "HelixHeadlessOption",
                 "module": "src/option/root/option-root.ts"
@@ -40720,6 +40824,18 @@
               "default": "false",
               "description": "Whether this choice can be made.",
               "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixHeadlessOption",
+                "module": "src/option/root/option-root.ts"
+              }
+            },
+            {
+              "name": "description",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "A second line under the words, for what the choice actually is.\n\nA palette row reads better as a name and a caption than as one sentence\ncarrying both: \"Helix\" and \"the design system\" are two facts, and a comma\nbetween them makes a reader parse the punctuation to find where the name\nends. Matching still reads the label, so what somebody types is matched\nagainst the name rather than against prose about it.\n\n**A property and not a slot, which is the departure worth explaining.** The\narea rules say a content property is its slot's fallback, and that holds for\na region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is\nusually absent, and a wrapped slot generates a box whether or not it is\nfilled, so every option without a caption would carry an empty line. The\ndetection that would avoid it does not exist, `:host(:has())` being invalid\nand the server having no children to inspect. A property is known at render\ntime, so the component can decline to draw the box at all.\n\nIt does not reflect, per the rule that payload state stays off the host: a\nstring is not a fact a selector needs.",
+              "fieldName": "description",
               "inheritedFrom": {
                 "name": "HelixHeadlessOption",
                 "module": "src/option/root/option-root.ts"
@@ -55244,6 +55360,10 @@
               "name": "--sparkline-bar-radius"
             },
             {
+              "description": "Thickness of a column's edge under `outlined`.",
+              "name": "--sparkline-bar-stroke"
+            },
+            {
               "description": "Height of the drawing.",
               "name": "--sparkline-block-size"
             },
@@ -55281,9 +55401,9 @@
               "kind": "field",
               "name": "emphasis",
               "type": {
-                "text": "'subtle' | undefined"
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much ink the drawing claims.\n\n`subtle` mixes the drawing toward the page. The case is a table where one row\nis being read and the rest are context.\n\nIt moves the host's `color`, which is what every mark here is drawn in: the\nline strokes it, both gradient stops take it so the wash is the line's own\ncolor, and the terminus fills it. So one declaration quietens all of them,\nand a consumer's `--sparkline-color` is quietened rather than replaced.\n\n**One value, and no `material` at all.** `outlined` needs a fill to remove\nand this is a stroke; `ghost` is an empty cell. Glass exists so what is\nbehind a mark reads through it, and at the size a sparkline draws there is\nnothing behind it a reader could resolve, so the axis would render a\ndifference nobody can see.",
+              "description": "How much ink the drawing claims.\n\n`subtle` mixes the drawing toward the page. The case is a table where one row\nis being read and the rest are context.\n\nIt moves the host's `color`, which is what every mark here is drawn in: the\nline strokes it, both gradient stops take it so the wash is the line's own\ncolor, and the terminus fills it. So one declaration quietens all of them,\nand a consumer's `--sparkline-color` is quietened rather than replaced.\n\n**The other two follow whichever plot is drawn**, because a sparkline is\nthree marks behind one property and the difference between a boundary and a\nfill does not exist until you know which. A `bar` plot answers like\n`BarChart`, an `area` or `line` plot like `LineChart`. `solid` on bars is the\nresting column and selects nothing.\n\n**`outlined` was refused here until 25 Aug 2026**, on the grounds that it\nneeds a fill to remove and this is a stroke. That is true of the line and not\nof the other two plots, which is what the argument missed: a bar has an area\nand an area plot is one.\n\n`ghost` is still an empty cell, and there is still no `material`. Glass\nexists so what is behind a mark reads through it, and at the size a sparkline\ndraws there is nothing behind it a reader could resolve.",
               "attribute": "emphasis",
               "reflects": true
             },
@@ -55514,9 +55634,9 @@
             {
               "name": "emphasis",
               "type": {
-                "text": "'subtle' | undefined"
+                "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much ink the drawing claims.\n\n`subtle` mixes the drawing toward the page. The case is a table where one row\nis being read and the rest are context.\n\nIt moves the host's `color`, which is what every mark here is drawn in: the\nline strokes it, both gradient stops take it so the wash is the line's own\ncolor, and the terminus fills it. So one declaration quietens all of them,\nand a consumer's `--sparkline-color` is quietened rather than replaced.\n\n**One value, and no `material` at all.** `outlined` needs a fill to remove\nand this is a stroke; `ghost` is an empty cell. Glass exists so what is\nbehind a mark reads through it, and at the size a sparkline draws there is\nnothing behind it a reader could resolve, so the axis would render a\ndifference nobody can see.",
+              "description": "How much ink the drawing claims.\n\n`subtle` mixes the drawing toward the page. The case is a table where one row\nis being read and the rest are context.\n\nIt moves the host's `color`, which is what every mark here is drawn in: the\nline strokes it, both gradient stops take it so the wash is the line's own\ncolor, and the terminus fills it. So one declaration quietens all of them,\nand a consumer's `--sparkline-color` is quietened rather than replaced.\n\n**The other two follow whichever plot is drawn**, because a sparkline is\nthree marks behind one property and the difference between a boundary and a\nfill does not exist until you know which. A `bar` plot answers like\n`BarChart`, an `area` or `line` plot like `LineChart`. `solid` on bars is the\nresting column and selects nothing.\n\n**`outlined` was refused here until 25 Aug 2026**, on the grounds that it\nneeds a fill to remove and this is a stroke. That is true of the line and not\nof the other two plots, which is what the argument missed: a bar has an area\nand an area plot is one.\n\n`ghost` is still an empty cell, and there is still no `material`. Glass\nexists so what is behind a mark reads through it, and at the size a sparkline\ndraws there is nothing behind it a reader could resolve.",
               "fieldName": "emphasis"
             },
             {
@@ -55630,7 +55750,7 @@
                 "slug": "curves"
               },
               {
-                "description": "One row being read, and two that are context.",
+                "description": "Each weight against each plot, since a boundary and a fill mean different things per shape.",
                 "slug": "emphasis"
               },
               {
@@ -60815,7 +60935,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The track this column takes, as CSS.\n\nA single track value, so anything valid in `grid-template-columns` works:\n`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is\nleft over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare\n`1fr` track keeps an automatic minimum and refuses to shrink under a long\ncell, so one unbreakable value pushes the table past its container.",
+              "description": "The track this column takes, as CSS.\n\nA single track value, so anything valid in `grid-template-columns` works:\n`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is\nleft over equally, as `minmax(max-content, 1fr)`.\n\n**The floor was `0` and that is what broke a narrow table.** A zero floor\nlets a track shrink under its own content, so at 375 the columns were\nsqueezed to 75px and `eu-central-1` wrapped across lines, which reads as\ncorrupt data rather than as a table that ran out of room. The zero was\nchosen to stop one long value pushing the table past its container, and\nthat was the right worry with nowhere for the overflow to go.\n\nSomewhere now exists: `@helix-io/styled` scrolls the table's own box. So a\nlong value pushes past the container as the old comment feared, and the\ntable scrolls instead of the value being destroyed. Measured at 375: tracks\nof 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page\ndoes not move.\n\n**`max-content` and not `min-content`, because a hyphen is a wrap\nopportunity.** A `min-content` floor still broke `eu-central-1` at its\nhyphens, which is the whole of the reported fault. The cost is that a\ncolumn of prose asks for its longest paragraph on one line, so a column\nholding sentences rather than values wants `width=\"minmax(0, 1fr)\"` to opt\nback into wrapping. A headless consumer owns the overflow either way, that\nbeing paint, and gets the honest track list.",
               "attribute": "width",
               "inheritedFrom": {
                 "name": "HelixHeadlessTableColumn",
@@ -60988,7 +61108,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The track this column takes, as CSS.\n\nA single track value, so anything valid in `grid-template-columns` works:\n`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is\nleft over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare\n`1fr` track keeps an automatic minimum and refuses to shrink under a long\ncell, so one unbreakable value pushes the table past its container.",
+              "description": "The track this column takes, as CSS.\n\nA single track value, so anything valid in `grid-template-columns` works:\n`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is\nleft over equally, as `minmax(max-content, 1fr)`.\n\n**The floor was `0` and that is what broke a narrow table.** A zero floor\nlets a track shrink under its own content, so at 375 the columns were\nsqueezed to 75px and `eu-central-1` wrapped across lines, which reads as\ncorrupt data rather than as a table that ran out of room. The zero was\nchosen to stop one long value pushing the table past its container, and\nthat was the right worry with nowhere for the overflow to go.\n\nSomewhere now exists: `@helix-io/styled` scrolls the table's own box. So a\nlong value pushes past the container as the old comment feared, and the\ntable scrolls instead of the value being destroyed. Measured at 375: tracks\nof 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page\ndoes not move.\n\n**`max-content` and not `min-content`, because a hyphen is a wrap\nopportunity.** A `min-content` floor still broke `eu-central-1` at its\nhyphens, which is the whole of the reported fault. The cost is that a\ncolumn of prose asks for its longest paragraph on one line, so a column\nholding sentences rather than values wants `width=\"minmax(0, 1fr)\"` to opt\nback into wrapping. A headless consumer owns the overflow either way, that\nbeing paint, and gets the honest track list.",
               "fieldName": "width",
               "inheritedFrom": {
                 "name": "HelixHeadlessTableColumn",
@@ -66831,6 +66951,14 @@
               }
             },
             {
+              "description": "The caption under the words, when there is one.",
+              "name": "picker-option-description",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
               "description": "The row.",
               "name": "picker-option-item",
               "inheritedFrom": {
@@ -66841,6 +66969,14 @@
             {
               "description": "The words.",
               "name": "picker-option-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The words and the caption, as one column.",
+              "name": "picker-option-text",
               "inheritedFrom": {
                 "name": "HelixHeadlessTimeInput",
                 "module": "src/time-input/root/time-input-root.ts"
@@ -68259,6 +68395,14 @@
               }
             },
             {
+              "description": "The caption under the words, when there is one.",
+              "name": "option-description",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
               "description": "The row.",
               "name": "option-item",
               "inheritedFrom": {
@@ -68269,6 +68413,14 @@
             {
               "description": "The words.",
               "name": "option-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "description": "The words and the caption, as one column.",
+              "name": "option-text",
               "inheritedFrom": {
                 "name": "HelixHeadlessTimePicker",
                 "module": "src/time-picker/root/time-picker-root.ts"

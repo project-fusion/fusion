@@ -849,6 +849,7 @@ which is what a run of cards wants rather than a run of full-width panels.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `autoplay` | `autoplay` | `boolean` | `false` | `HelixHeadlessCarousel` | Whether the carousel advances on its own. |
+| `controls` | `controls` | `'always' \| 'auto' \| 'none' \| undefined` | - | `HelixHeadlessCarousel` | Whether the previous and next controls are shown. |
 | `controlsAlign` | `controls-align` | `'center' \| 'end' \| 'start' \| undefined` | - | - | Where along that side the arrows sit. See `indicatorAlign`. |
 | `controlsPlacement` | `controls-placement` | `'block-end' \| 'block-start' \| 'inline-end' \| 'inline-start' \| 'overlay' \| undefined` | - | - | Which side of the slides the arrows sit on. |
 | `defaultIndex` | `default-index` | `number` | `0` | `HelixHeadlessCarousel` | Slide to start on, where nothing declared one. |
@@ -1974,7 +1975,7 @@ larger than the default.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the slices claim. |
+| `emphasis` | `emphasis` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much ink the slices claim. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `hole` | `hole` | `'large' \| 'none' \| 'small' \| undefined` | - | `HelixHeadlessDonutChart` | How much is left open in the middle. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
@@ -2006,12 +2007,14 @@ larger than the default.
 | `tooltip-name` | A column's name inside the tooltip. |
 | `tooltip-value` | A column's value inside the tooltip. |
 | `segment` | One slice. |
+| `segment-edge` | One slice as a closed shape, for a boundary to trace. |
 | `track` | The ring the slices are drawn on. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
+| `--donut-chart-edge-stroke` | Thickness of the slice boundary under `outlined`. |
 | `--donut-chart-size` | Width and height of the ring. |
 | `--donut-chart-track-color` | Color of the ring under the slices. |
 | `--donut-chart-stroke` | How thick the ring is drawn, derived from `hole`. |
@@ -2759,7 +2762,7 @@ answers for a shape.
 | --- | --- | --- | --- | --- | --- |
 | `area` | `area` | `boolean` | `false` | `HelixHeadlessLineChart` | Whether a wash is drawn under each line. |
 | `curve` | `curve` | `Curve \| undefined` | - | `HelixHeadlessLineChart` | How the line gets from one reading to the next. |
-| `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the lines claim. |
+| `emphasis` | `emphasis` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much ink the lines claim. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixHeadlessLineChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
@@ -3441,6 +3444,7 @@ picked from what they are looking at.
 | `active` | `data-active` | `boolean` | `false` | `HelixHeadlessOption` | Whether this is the option the keyboard is on. Written by the listbox. |
 | `alternate` | `alternate` | `string` | `''` | `HelixHeadlessOption` | A second destination for this row, taken with the modifier held. |
 | `alternateLabel` | `alternate-label` | `string` | `''` | `HelixHeadlessOption` | What the second destination is, for a reader who cannot see the footer. |
+| `description` | `description` | `string \| undefined` | - | `HelixHeadlessOption` | A second line under the words, for what the choice actually is. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessOption` | Whether this choice can be made. |
 | `selected` | `selected` | `boolean` | `false` | `HelixHeadlessOption` | Whether this choice is currently chosen. Written by the listbox. |
 | `text` | - | `string` | - | `HelixHeadlessOption` | The words, for a listbox that has to match text against them. |
@@ -3471,7 +3475,9 @@ picked from what they are looking at.
 | Part | Description |
 | --- | --- |
 | `item` | The row. |
+| `text` | The words and the caption under them, as one column. |
 | `label` | The words. |
+| `description` | The caption under the words, when there is one. |
 
 #### Custom properties
 
@@ -4864,7 +4870,7 @@ keeps it out of every other reason it might want to be bigger.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `curve` | `curve` | `Curve \| undefined` | - | `HelixHeadlessSparkline` | How the line gets from one reading to the next. |
-| `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the drawing claims. |
+| `emphasis` | `emphasis` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much ink the drawing claims. |
 | `for` | `for` | `string` | `''` | `HelixHeadlessSparkline` | The id of a table to read instead, when there is one behind the line. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessSparkline` | What the line says, in a sentence. |
 | `plot` | `plot` | `'area' \| 'bar' \| 'line' \| undefined` | - | `HelixHeadlessSparkline` | What the readings are drawn as. |
@@ -4892,6 +4898,7 @@ keeps it out of every other reason it might want to be bigger.
 | `--chart-terminus-size` | Size of the mark on the last reading. |
 | `--sparkline-area-opacity` | How much of the line's color the wash takes where it meets the line. |
 | `--sparkline-bar-radius` | Corner radius on a column, under `plot="bar"`. |
+| `--sparkline-bar-stroke` | Thickness of a column's edge under `outlined`. |
 | `--sparkline-block-size` | Height of the drawing. |
 | `--sparkline-color` | Color of the line, the wash, the columns and the mark. |
 | `--sparkline-inline-size` | Width of the drawing. |
@@ -5898,8 +5905,10 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `picker-list-label` | The question, over the list. |
 | `picker-list-search` | The region holding the field that narrows the list. |
 | `picker-list-search-field` | The field itself. |
+| `picker-option-description` | The caption under the words, when there is one. |
 | `picker-option-item` | The row. |
 | `picker-option-label` | The words. |
+| `picker-option-text` | The words and the caption, as one column. |
 | `label` | The question, over the field. |
 | `hint` | Help under the field, while nothing is wrong. |
 | `feedback` | What is wrong with it. |
@@ -5996,8 +6005,10 @@ card would be a card inside a card there.
 | `list-label` | The question, over the list. |
 | `list-search` | The region holding the field that narrows the list. |
 | `list-search-field` | The field itself. |
+| `option-description` | The caption under the words, when there is one. |
 | `option-item` | The row. |
 | `option-label` | The words. |
+| `option-text` | The words and the caption, as one column. |
 | `column-loading` | Shown while the options are still on their way. |
 | `list-loading` | Shown while the options are still on their way. |
 

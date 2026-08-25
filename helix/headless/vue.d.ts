@@ -675,6 +675,30 @@ comes from the page and height does not, so the styled tier gives it
 `--carousel-block-size` and a consumer sets that to whatever the slides
 want. */
   orientation?: HelixHeadlessCarousel["orientation"];
+  /** Whether the previous and next controls are shown.
+
+`auto`, which is the resting behavior and what an absent attribute means,
+shows them wherever the pointer can hover and hides them where it cannot.
+`always` keeps them on every device, and `none` never renders them at all.
+
+**Pointer and not width, which is the distinction this exists to make.** A
+375px window on a desktop still has a mouse and still wants the arrows; a
+tablet at 1024 has neither. `.claude/rules/helix.md` forbids a component
+asking about the viewport, because the viewport is not the component's box,
+and that objection does not reach `hover` and `pointer`: those describe the
+input device, and the answer is the same whether this carousel is 300px in
+a sidebar or runs the width of the page.
+
+**Safe to hide because the arrows are not the keyboard's way in.** The
+indicators carry a roving `tabindex` and handle the arrow keys, so every
+slide is still reachable with the controls gone. Hiding a control that was
+the only route to something would be a different change under this name.
+
+**The rotation control is never hidden by this**, which is a decision
+rather than a limit of scope: content that moves on its own has to offer a
+way to stop it, so an autoplaying carousel keeps its pause control on a
+touch device exactly as it does on a desktop. */
+  controls?: HelixHeadlessCarousel["controls"];
   /** Slide to start on, where nothing declared one. */
   "default-index"?: HelixHeadlessCarousel["defaultIndex"];
   /** Slide to start on, where nothing declared one. */
@@ -3292,6 +3316,26 @@ export type HelixHeadlessOptionHelixSelectElementEvent =
 export type HelixHeadlessOptionVueProps = {
   /** Whether this choice can be made. */
   disabled?: HelixHeadlessOption["disabled"];
+  /** A second line under the words, for what the choice actually is.
+
+A palette row reads better as a name and a caption than as one sentence
+carrying both: "Helix" and "the design system" are two facts, and a comma
+between them makes a reader parse the punctuation to find where the name
+ends. Matching still reads the label, so what somebody types is matched
+against the name rather than against prose about it.
+
+**A property and not a slot, which is the departure worth explaining.** The
+area rules say a content property is its slot's fallback, and that holds for
+a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+usually absent, and a wrapped slot generates a box whether or not it is
+filled, so every option without a caption would carry an empty line. The
+detection that would avoid it does not exist, `:host(:has())` being invalid
+and the server having no children to inspect. A property is known at render
+time, so the component can decline to draw the box at all.
+
+It does not reflect, per the rule that payload state stays off the host: a
+string is not a fact a selector needs. */
+  description?: HelixHeadlessOption["description"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
   "data-active"?: HelixHeadlessOption["active"];
   /** Whether this is the option the keyboard is on. Written by the listbox. */
@@ -4824,9 +4868,28 @@ export type HelixHeadlessTableColumnVueProps = {
 
 A single track value, so anything valid in `grid-template-columns` works:
 `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
-left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
-`1fr` track keeps an automatic minimum and refuses to shrink under a long
-cell, so one unbreakable value pushes the table past its container. */
+left over equally, as `minmax(max-content, 1fr)`.
+
+**The floor was `0` and that is what broke a narrow table.** A zero floor
+lets a track shrink under its own content, so at 375 the columns were
+squeezed to 75px and `eu-central-1` wrapped across lines, which reads as
+corrupt data rather than as a table that ran out of room. The zero was
+chosen to stop one long value pushing the table past its container, and
+that was the right worry with nowhere for the overflow to go.
+
+Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+long value pushes past the container as the old comment feared, and the
+table scrolls instead of the value being destroyed. Measured at 375: tracks
+of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
+does not move.
+
+**`max-content` and not `min-content`, because a hyphen is a wrap
+opportunity.** A `min-content` floor still broke `eu-central-1` at its
+hyphens, which is the whole of the reported fault. The cost is that a
+column of prose asks for its longest paragraph on one line, so a column
+holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
+back into wrapping. A headless consumer owns the overflow either way, that
+being paint, and gets the honest track list. */
   width?: HelixHeadlessTableColumn["width"];
 };
 
