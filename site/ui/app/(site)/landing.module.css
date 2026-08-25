@@ -46,6 +46,14 @@
      inside gains a scrollport it can be scrolled within. Nothing here is sticky,
      which is the other thing a clip context would change. */
   overflow: clip;
+
+  /* **The air under the closing card belongs to the reel, not to the card.**
+     Written first as a margin on the card, and a margin put it *outside* the
+     clip: the reel ended at the card's own bottom edge, so the field stopped
+     dead there and the strip above the footer was black with a hard line across
+     it. Padding here keeps the space inside the lit region, so the light carries
+     under the card and fades into the footer instead of stopping at it. */
+  padding-block-end: var(--site-band);
   position: relative;
 }
 
@@ -507,17 +515,17 @@
  * lighter than its ground either way. The old arrangement had it the other way
  * round, the panel sunken and the page plain, which is what a recess is and is
  * why the comments further down still say so. */
-/* **What a full-bleed band has to fix about `data-material="glass"`.**
+/* **The closing call to action, as a card rather than a band.**
  *
- * Two bands wear it, the showcase and the closing call to action, and both need
- * the same two corrections, so this is the shared half rather than the same
- * declarations written twice.
+ * It ran to both window edges and wore `data-material="glass"` with the
+ * corrections a full-bleed surface needs, chief among them no left or right
+ * border, because those two sides were the window rather than an edge of the
+ * object. Capped and centred, all four sides are the object's own, so the border
+ * the material carries is doing the job it exists for: keeping a translucent
+ * surface a shape when it takes its colour from whatever is behind it.
  *
- * **A band running to both window edges has no left or right edge to draw.** The
- * material's border is not decoration: it is what keeps a translucent surface a
- * shape when it takes its color from whatever is behind it. That holds for a card
- * and not for a band whose sides *are* the window, where drawing them puts a box
- * around the page. Top and bottom are real and stay.
+ * The showcase used to share this and no longer does, having lost its grounds
+ * entirely, so this is one element's rule now and named for it.
  *
  * **And glass admits what is behind it, which in light mode is nothing.** The
  * ground is white at 72%, so over a near-white page the band reads *lighter* than
@@ -534,20 +542,33 @@
  * `:not([data-color-mode])` rather than `:not([data-color-mode="dark"])`, since
  * the second also matches a system-dark reader and would take the blur away from
  * the one mode it is for. */
-.glassBand {
+.closingCard {
   background-color: light-dark(
     var(--helix-color-surface-sunken),
     var(--helix-material-translucent)
   );
-  border-inline-width: 0;
+  border-radius: var(--helix-radii-lg);
+  /* **As wide as every other band's content, which is the inset and nothing
+     else.** A fixed cap was the first attempt and it was narrower than the page:
+     the card sat at 64rem while the products, services and insights above it ran
+     to the viewport less `--site-inset`, so the one element meant to close the
+     page was the only one not aligned to it. Deriving the width from the same
+     inset makes the card's edges land on the column every band above already
+     keeps.
+
+     The content inside is inset again by the inner `data-shell`, which is what a
+     card's padding is and is why the text reads narrower than the text above it
+     without the edges disagreeing. */
+  margin-inline: auto;
+  max-inline-size: calc(100% - 2 * var(--site-inset));
 }
 
-[data-color-mode="light"] .glassBand {
+[data-color-mode="light"] .closingCard {
   backdrop-filter: none;
 }
 
 @media (prefers-color-scheme: light) {
-  :root:not([data-color-mode]) .glassBand {
+  :root:not([data-color-mode]) .closingCard {
     backdrop-filter: none;
   }
 }

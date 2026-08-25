@@ -359,16 +359,16 @@ export default function Home() {
           masked rather than cut: a hard edge says the layout ran out, a fade
           says there is more, which there is. */}
       {/* **No ground and no glass on this one.** The band carried
-          `data-material="glass"` and the `.glassBand` corrections that go with a
+          `data-material="glass"` and the full-bleed corrections that go with a
           full-bleed surface, which was the right answer while the stage inside it
           was paper: two grounds wanted the outer one to admit some light. With
           the paper gone the components sit on the field directly, and a
           translucent band over them would be a third layer doing nothing but
           dimming the thing it is there to reveal.
 
-          `.glassBand` stays for the closing call to action, which is still a
-          surface and still wants one. See 222 for the measurement that put a
-          field behind this band in the first place. */}
+          The closing call to action keeps its glass and is a card now rather
+          than a band, so its border has four sides to draw. See 222 for the
+          measurement that put a field behind this band in the first place. */}
       <section className={styles.showcaseBand} data-band data-reveal>
         {/* **No rule between them, and more room instead.** A line is one way
             to say two things are separate and whitespace is the other, and
@@ -508,7 +508,7 @@ export default function Home() {
       {/* The story, last and short. It is why the work compounds rather than
           why anyone should buy it, and a reader who wants it can follow it. */}
       <section
-        className={styles.glassBand}
+        className={styles.closingCard}
         data-band
         data-closing
         data-material="glass"

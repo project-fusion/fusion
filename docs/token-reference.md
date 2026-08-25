@@ -127,7 +127,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-none` | `0` | 32 |
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 118 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 11 |
-| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 5 |
+| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 6 |
 | `--helix-radii-full` | `9999px` | 39 |
 
 ## font
