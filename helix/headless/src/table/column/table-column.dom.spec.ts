@@ -19,16 +19,18 @@ const column = async (attributes = ''): Promise<Column> =>
  * **The table already proves that the tracks add up**, which is what the column
  * replaced a `columns` string to fix: the column is named 14 times in this
  * family's specs. What the column owns alone is the track it contributes when
- * nobody said, and that default is not a detail. A bare `1fr` keeps an automatic
- * minimum and refuses to shrink under a long cell, so one unbreakable value
- * pushes the whole table past its container, and a table-level spec sees a table
- * that renders rather than a table that will fail on somebody's data.
+ * nobody said, and that default is not a detail: it decides whether a table with
+ * more content than room destroys its values or scrolls.
  */
 describe('one table column', () => {
-  /* `minmax(0, 1fr)` rather than `1fr`, which is the difference between a column
-     that shares what is left and a column that grows to fit its longest cell. */
-  test('shares what is left over rather than growing to its longest cell', async () => {
-    expect((await column()).track).toBe('minmax(0, 1fr)')
+  /* The floor is `max-content` and was `0`. A zero floor lets a track shrink
+     under its own content, which at 375 squeezed three columns to 75px and
+     wrapped `eu-central-1` across lines. `min-content` was not enough, a hyphen
+     being a wrap opportunity, so the value still broke. The table scrolls its own
+     box now, so a column asks for its longest cell and the overflow has somewhere
+     to go. */
+  test('grows to fit its longest cell rather than shrinking under it', async () => {
+    expect((await column()).track).toBe('minmax(max-content, 1fr)')
   })
 
   /* Anything valid in a track list works, and the column hands it through

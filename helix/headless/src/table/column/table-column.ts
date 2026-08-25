@@ -41,9 +41,28 @@ export class HelixHeadlessTableColumn extends HelixElement {
    *
    * A single track value, so anything valid in `grid-template-columns` works:
    * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
-   * left over equally, which is `minmax(0, 1fr)` rather than `1fr`: a bare
-   * `1fr` track keeps an automatic minimum and refuses to shrink under a long
-   * cell, so one unbreakable value pushes the table past its container.
+   * left over equally, as `minmax(max-content, 1fr)`.
+   *
+   * **The floor was `0` and that is what broke a narrow table.** A zero floor
+   * lets a track shrink under its own content, so at 375 the columns were
+   * squeezed to 75px and `eu-central-1` wrapped across lines, which reads as
+   * corrupt data rather than as a table that ran out of room. The zero was
+   * chosen to stop one long value pushing the table past its container, and
+   * that was the right worry with nowhere for the overflow to go.
+   *
+   * Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+   * long value pushes past the container as the old comment feared, and the
+   * table scrolls instead of the value being destroyed. Measured at 375: tracks
+   * of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
+   * does not move.
+   *
+   * **`max-content` and not `min-content`, because a hyphen is a wrap
+   * opportunity.** A `min-content` floor still broke `eu-central-1` at its
+   * hyphens, which is the whole of the reported fault. The cost is that a
+   * column of prose asks for its longest paragraph on one line, so a column
+   * holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
+   * back into wrapping. A headless consumer owns the overflow either way, that
+   * being paint, and gets the honest track list.
    */
   @property()
   width = ''
@@ -57,7 +76,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
 
   /** The track this column contributes, resolved. */
   get track(): string {
-    return this.width || 'minmax(0, 1fr)'
+    return this.width || 'minmax(max-content, 1fr)'
   }
 
   protected override willUpdate(changed: PropertyValues): void {

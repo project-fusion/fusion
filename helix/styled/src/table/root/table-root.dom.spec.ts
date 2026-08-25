@@ -74,13 +74,13 @@ describe('table columns', () => {
        column. Held apart they could disagree, and the old shape could not even
        report it: `columns` took CSS, so a wrong value was an invalid track list,
        which a grid ignores in silence. */
-    expect(template(await table())).toContain('12rem minmax(0, 1fr)')
+    expect(template(await table())).toContain('12rem minmax(max-content, 1fr)')
   })
 
   test('a column with no width shares what is left', async () => {
-    // `minmax(0, 1fr)` and not `1fr`: a bare `1fr` keeps an automatic minimum
-    // and refuses to shrink, so one long value pushes the table past its box.
-    expect(template(await table())).toContain('minmax(0, 1fr)')
+    // The floor is `max-content`, so the column asks for its longest cell and the
+    // table scrolls its own box rather than breaking the value to fit.
+    expect(template(await table())).toContain('minmax(max-content, 1fr)')
   })
 
   test('declared columns win over the deprecated string', async () => {
