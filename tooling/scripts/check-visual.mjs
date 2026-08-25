@@ -52,6 +52,26 @@ const root = resolve(import.meta.dirname, '../..')
    it. Both tiers author their own now, under the same name, so this reads the
    one it pictures. */
 const SOURCE = join(root, 'helix/headless/src')
+
+/**
+ * The widths every family is pictured at, and why there are two.
+ *
+ * **One was 640, which is neither a phone nor a desktop**, and 244 named that
+ * as the reason a responsiveness pass would be something somebody did once
+ * rather than something that stayed done. A library with exactly one
+ * viewport-width media query in it, Dialog's, and two families declaring
+ * `container-type` has no policy yet; what it can have first is a picture of
+ * what narrow currently looks like, so a change to it is visible.
+ *
+ * 390 is the width 244 reported its findings at, an iPhone's, and it is where
+ * the splitter keeps a horizontal orientation and cuts its source pane to
+ * 237px. The suffix is empty for the original so the committed baselines stay
+ * valid and only the new width needs taking.
+ */
+const WIDTHS = [
+  { suffix: '', width: 640 },
+  { suffix: '.narrow', width: 390 },
+]
 const FRAME = join(root, 'site/ui/public/sandbox/frame.js')
 
 /* The family is the first argument that is not a flag, rather than the first
@@ -96,7 +116,7 @@ if (families.length === 0) {
    the example links `styles.css` relatively, so both want a real origin. The
    page is assembled here rather than read from a file so nothing has to be
    written into the tree to take a picture of it. */
-const page = (family) => {
+const page = (family, width) => {
   const html = readFileSync(join(SOURCE, family, '.examples/preview.html'), 'utf8')
   return (
     '<!doctype html><meta charset="utf-8"><title>base</title>' +
@@ -105,7 +125,7 @@ const page = (family) => {
        test. `color-scheme` is declared because the base sheets resolve their
        grays through `light-dark()`. */
     '<style>:root{color-scheme:light}' +
-    'body{margin:0;padding:24px;background:#fff;width:640px;box-sizing:border-box}</style>' +
+    `body{margin:0;padding:24px;background:#fff;width:${width}px;box-sizing:border-box}</style>` +
     /* `defer`, which is what `frame.html` ships and is not a detail.
        
        Loaded eagerly the bundle runs mid-parse, so an element upgrades the
@@ -141,14 +161,18 @@ const server = createServer((request, response) => {
     return
   }
   response.writeHead(200, { 'content-type': 'text/html' })
-  response.end(page(family))
+  /* The width rides in the query rather than in a module variable the loop
+     sets, so a request is answered by what it asked for and two widths could
+     be fetched in any order without the page depending on when it was asked. */
+  const width = Number(new URL(request.url ?? '/', 'http://x').searchParams.get('w')) || WIDTHS[0].width
+  response.end(page(family, width))
 })
 
 await new Promise((done) => server.listen(0, '127.0.0.1', done))
 const origin = `http://127.0.0.1:${server.address().port}`
 
 const browser = await chromium.launch()
-const tab = await browser.newPage({ viewport: { height: 800, width: 640 } })
+const tab = await browser.newPage({ viewport: { height: 800, width: WIDTHS[0].width } })
 
 /* Nothing leaves this machine, and that is a correctness rule rather than a
  * courtesy.
@@ -175,75 +199,79 @@ const changed = []
 const written = []
 let compared = 0
 
-for (const family of families) {
-  await tab.goto(`${origin}/${family}/`, { waitUntil: 'load' })
-  /* The tags upgrade when the bundle runs, and a component may render again
-     after that: Lit batches, so the first paint can be the pre-update one.
-     Waiting on the definition and then on the frame after it is what the spec
-     runner does for the same reason. */
-  await tab.evaluate(async () => {
-    await Promise.all(
-      [...document.body.querySelectorAll(':not(:defined)')].map((one) =>
-        customElements.whenDefined(one.localName),
-      ),
-    )
-    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
-    await document.fonts.ready
-  })
+for (const { suffix, width } of WIDTHS) {
+  await tab.setViewportSize({ height: 800, width })
 
-  const shot = await tab.screenshot({ fullPage: true })
-  const baseline = join(SOURCE, family, '.examples/preview.png')
+  for (const family of families) {
+    await tab.goto(`${origin}/${family}/?w=${width}`, { waitUntil: 'load' })
+    /* The tags upgrade when the bundle runs, and a component may render again
+       after that: Lit batches, so the first paint can be the pre-update one.
+       Waiting on the definition and then on the frame after it is what the spec
+       runner does for the same reason. */
+    await tab.evaluate(async () => {
+      await Promise.all(
+        [...document.body.querySelectorAll(':not(:defined)')].map((one) =>
+          customElements.whenDefined(one.localName),
+        ),
+      )
+      await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+      await document.fonts.ready
+    })
 
-  if (update) {
-    mkdirSync(dirname(baseline), { recursive: true })
-    writeFileSync(baseline, shot)
-    written.push(family)
-    continue
-  }
+    const shot = await tab.screenshot({ fullPage: true })
+    const baseline = join(SOURCE, family, `.examples/preview${suffix}.png`)
 
-  /* A missing baseline is a failure and not a chance to write one. Seeding on a
-     bare run is the version of this that passes forever: CI would take its own
-     picture, agree with it, report success and commit nothing, so the check
-     would be green from the day it was added without ever having compared
-     anything. `--update` is the only thing that writes, and what it writes is
-     reviewed as a diff before it counts. */
-  if (!existsSync(baseline)) {
-    changed.push(
-      `${family}: no baseline. Run \`bun run visual:update\` on Linux and commit what it takes, ` +
-        'after looking at it: the first picture is the one every later comparison trusts.',
-    )
-    continue
-  }
+    if (update) {
+      mkdirSync(dirname(baseline), { recursive: true })
+      writeFileSync(baseline, shot)
+      written.push(family)
+      continue
+    }
 
-  const before = PNG.sync.read(readFileSync(baseline))
-  const after = PNG.sync.read(shot)
-  compared += 1
+    /* A missing baseline is a failure and not a chance to write one. Seeding on a
+       bare run is the version of this that passes forever: CI would take its own
+       picture, agree with it, report success and commit nothing, so the check
+       would be green from the day it was added without ever having compared
+       anything. `--update` is the only thing that writes, and what it writes is
+       reviewed as a diff before it counts. */
+    if (!existsSync(baseline)) {
+      changed.push(
+        `${family}: no baseline. Run \`bun run visual:update\` on Linux and commit what it takes, ` +
+          'after looking at it: the first picture is the one every later comparison trusts.',
+      )
+      continue
+    }
 
-  if (before.width !== after.width || before.height !== after.height) {
-    changed.push(
-      `${family}: ${before.width}x${before.height} became ${after.width}x${after.height}. A size ` +
-        'change is a layout change, and no diff image is written because there is nothing to ' +
-        'lay one over.',
-    )
-    continue
-  }
+    const before = PNG.sync.read(readFileSync(baseline))
+    const after = PNG.sync.read(shot)
+    compared += 1
 
-  const diff = new PNG({ height: before.height, width: before.width })
-  /* `threshold` is per-pixel color distance, not a budget of pixels. Zero
-     tolerated pixels, because this only ever compares Linux to Linux and a
-     single moved pixel is the fault it exists to catch. The threshold is off
-     the floor only so a renderer's own dithering does not read as a change. */
-  const moved = pixelmatch(before.data, after.data, diff.data, before.width, before.height, {
-    threshold: 0.1,
-  })
-  if (moved > 0) {
-    const where = join(SOURCE, family, '.examples/preview.diff.png')
-    writeFileSync(where, PNG.sync.write(diff))
-    changed.push(
-      `${family}: ${moved} pixels moved. The marked difference is at ` +
-        `helix/styled/src/${family}/.examples/headless.diff.png. If the change was meant, ` +
-        '`bun run visual:update` takes the new picture and the review is the diff on the baseline.',
-    )
+    if (before.width !== after.width || before.height !== after.height) {
+      changed.push(
+        `${family}: ${before.width}x${before.height} became ${after.width}x${after.height}. A size ` +
+          'change is a layout change, and no diff image is written because there is nothing to ' +
+          'lay one over.',
+      )
+      continue
+    }
+
+    const diff = new PNG({ height: before.height, width: before.width })
+    /* `threshold` is per-pixel color distance, not a budget of pixels. Zero
+       tolerated pixels, because this only ever compares Linux to Linux and a
+       single moved pixel is the fault it exists to catch. The threshold is off
+       the floor only so a renderer's own dithering does not read as a change. */
+    const moved = pixelmatch(before.data, after.data, diff.data, before.width, before.height, {
+      threshold: 0.1,
+    })
+    if (moved > 0) {
+      const where = join(SOURCE, family, `.examples/preview${suffix}.diff.png`)
+      writeFileSync(where, PNG.sync.write(diff))
+      changed.push(
+        `${family}: ${moved} pixels moved. The marked difference is at ` +
+          `helix/styled/src/${family}/.examples/headless.diff.png. If the change was meant, ` +
+          '`bun run visual:update` takes the new picture and the review is the diff on the baseline.',
+      )
+    }
   }
 }
 

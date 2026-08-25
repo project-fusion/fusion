@@ -1273,6 +1273,48 @@ What survived is the naming, which was never about wrappers:
   `style`, ARIA, `slot`, `part` and `data-*` typecheck on a Helix tag without
   being declared per component.
 
+## Responsiveness
+
+**A component cannot know the viewport and must not care.** A `@media` rule
+inside a component gives the desktop branch to a 300px sidebar in a 1400px
+window. Measured 25 Aug 2026: the library has exactly one viewport-width media
+query, Dialog's, which is the defensible one because a modal's box really is the
+viewport. Everything else in here is `@media print` or
+`prefers-reduced-motion`, neither of which is responsiveness.
+
+**Three categories, and the third is the one that gets got wrong.**
+
+- **Its own width.** Anything depending on how much room a component was given
+  belongs inside it, through `container-type: inline-size` and `@container`.
+  Two families declare `container-type` today and nothing uses an `@container`
+  rule, so this is unbuilt rather than settled. `data-density` is the precedent
+  to copy rather than a separate idea: the region tells its contents how tight
+  to be and the component obeys.
+- **The device or the page.** Belongs to the consumer's stylesheet. A component
+  that reaches for it is claiming knowledge it does not have.
+- **Orientation and behavior.** Not style at all. Turning a horizontal splitter
+  vertical changes the drag axis, the arrow keys and `aria-orientation`
+  together, so a CSS-only version looks vertical and behaves horizontal, with
+  the keyboard moving the wrong way and the accessibility tree lying. State
+  cannot come from a media query. It is a component decision driven by a
+  `ResizeObserver`, and it is opted into rather than defaulted on: an
+  `orientation="auto"` value keeps the resting state explicit, which is the rule
+  the reflected properties already follow. Carousel is the same shape, a
+  `per-view` of four being a bug on a narrow container rather than a style.
+
+**What narrow currently looks like, measured at 390 rather than asserted.**
+Splitter keeps its horizontal orientation and renders a titled box, a stray drag
+handle and an untitled second pane. Table overflows instead of scrolling, with
+`us-east-1` broken mid-token and the last column clipped off the edge. Carousel
+collapses to its items inline on one line with no slide framing. None of this is
+a regression; it is what never having a policy looks like.
+
+**`check:visual` renders every family at two widths**, 640 and 390, so a change
+to the narrow rendering is visible. That is the half of this that stays fixed
+without anybody remembering to look. The narrow baselines record the state above
+deliberately: a baseline is what makes a change visible, not a claim that what it
+pictures is good.
+
 ## The sandbox
 
 `@helix-io/styled` ships the sandbox shell and `@helix-io/sandbox` the editor and

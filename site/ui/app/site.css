@@ -21,8 +21,22 @@
   --site-inset: clamp(var(--helix-space-lg), 6vw, 7rem);
 
   /* Space between one idea and the next. Large on purpose: the page is a
-     sequence of single statements, and what separates them is emptiness. */
-  --site-band: clamp(var(--helix-space-3xl), 12vh, 9rem);
+     sequence of single statements, and what separates them is emptiness.
+
+     **Keyed to width, not height, which is what it was and is why a phone got
+     a desktop's rhythm.** `12vh` of an 812px phone is 97px, against 108px on a
+     1440 by 900 desktop, so the narrow screen paid almost the full band while
+     having a third of the room and stacking every section vertically instead of
+     beside each other. Measured 25 Aug 2026 at 375 wide: seven sections at 195px
+     of padding each, 1,365px, seventeen per cent of a 7,778px page, spent on
+     emptiness between statements a reader has to scroll through.
+
+     `7.5vw` holds the desktop figure it already had, 108px at 1440, and lets a
+     phone fall to the 3rem floor. The inset above has always scaled on width for
+     the same reason: horizontal room and vertical rhythm are both facts about how
+     wide the page is, because that is what decides whether things sit beside each
+     other or under one another. */
+  --site-band: clamp(var(--helix-space-2xl), 7.5vw, 9rem);
 
   /* Display type past the component scale's top step.
      Helix stops at `3xl` because that is the largest size a component should
