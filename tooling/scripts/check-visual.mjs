@@ -10,8 +10,8 @@
  * already right. See 148.
  *
  * **The corpus was built for something else and is better for it.** Each
- * `.examples/headless.html` renders one family's headless tier against
- * `headless.css`, a hand-written sheet with no token, no theme and a fixed
+ * `.examples/preview.html` renders one family's headless tier against
+ * `preview.css`, a hand-written sheet with no token, no theme and a fixed
  * seven-value gray ramp. That is the determinism a screenshot comparison needs,
  * and the styled tier cannot offer it while theming is in flight: a seed change
  * would redraw all eighty-three baselines and say nothing about any component.
@@ -25,7 +25,7 @@
  * on Linux, and on anything else it says so and exits clean. To refresh them
  * from a Mac, run this in the same container CI uses.
  *
- * Baselines live beside the example they picture, `\`.examples/headless.png\``, which
+ * Baselines live beside the example they picture, `\`.examples/preview.png\``, which
  * `check:examples` ignores because it reads only `.html` and `.css`.
  *
  * ```
@@ -34,7 +34,7 @@
  * bun run visual:update             rewrite the baselines
  * ```
  *
- * A failure writes `headless.diff.png` beside the baseline, the changed pixels
+ * A failure writes `preview.diff.png` beside the baseline, the changed pixels
  * marked, and leaves it there to be looked at. It is gitignored: what belongs in
  * the history is the baseline a reviewer approved, not the artifact of a run.
  */
@@ -46,7 +46,12 @@ import { chromium } from 'playwright'
 import { PNG } from 'pngjs'
 
 const root = resolve(import.meta.dirname, '../..')
-const SOURCE = join(root, 'helix/styled/src')
+/* **The headless package, because that is where its examples live now.** They
+   were filed under `helix/styled/src` and generated from the styled example
+   beside them, which made the base tier's evidence a function of the tier above
+   it. Both tiers author their own now, under the same name, so this reads the
+   one it pictures. */
+const SOURCE = join(root, 'helix/headless/src')
 const FRAME = join(root, 'site/ui/public/sandbox/frame.js')
 
 /* The family is the first argument that is not a flag, rather than the first
@@ -74,7 +79,7 @@ if (!existsSync(FRAME)) {
 
 const families = readdirSync(SOURCE, { withFileTypes: true })
   .filter(
-    (one) => one.isDirectory() && existsSync(join(SOURCE, one.name, '.examples/headless.html')),
+    (one) => one.isDirectory() && existsSync(join(SOURCE, one.name, '.examples/preview.html')),
   )
   .map((one) => one.name)
   .filter((name) => only === undefined || name === only)
@@ -92,7 +97,7 @@ if (families.length === 0) {
    page is assembled here rather than read from a file so nothing has to be
    written into the tree to take a picture of it. */
 const page = (family) => {
-  const html = readFileSync(join(SOURCE, family, '.examples/headless.html'), 'utf8')
+  const html = readFileSync(join(SOURCE, family, '.examples/preview.html'), 'utf8')
   return (
     '<!doctype html><meta charset="utf-8"><title>base</title>' +
     /* A fixed ground and a fixed inset, so a component that draws to its own
@@ -130,7 +135,7 @@ const server = createServer((request, response) => {
   }
   const [, family, sheet] = example
   if (sheet !== undefined) {
-    const file = join(SOURCE, family, '.examples/headless.css')
+    const file = join(SOURCE, family, '.examples/preview.css')
     response.writeHead(200, { 'content-type': TYPES['.css'] })
     response.end(existsSync(file) ? readFileSync(file) : '')
     return
@@ -187,7 +192,7 @@ for (const family of families) {
   })
 
   const shot = await tab.screenshot({ fullPage: true })
-  const baseline = join(SOURCE, family, '.examples/headless.png')
+  const baseline = join(SOURCE, family, '.examples/preview.png')
 
   if (update) {
     mkdirSync(dirname(baseline), { recursive: true })
@@ -232,7 +237,7 @@ for (const family of families) {
     threshold: 0.1,
   })
   if (moved > 0) {
-    const where = join(SOURCE, family, '.examples/headless.diff.png')
+    const where = join(SOURCE, family, '.examples/preview.diff.png')
     writeFileSync(where, PNG.sync.write(diff))
     changed.push(
       `${family}: ${moved} pixels moved. The marked difference is at ` +

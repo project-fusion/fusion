@@ -264,7 +264,7 @@ jobs:
         run: ${{ matrix.run }}
 
       # **The pictures, when it fails, because nothing else can show them.**
-      # `check:visual` marks the changed pixels into `headless.diff.png` beside
+      # `check:visual` marks the changed pixels into `preview.diff.png` beside
       # each baseline and those files die with the runner, so a reviewer got a
       # pixel count and no way to see what moved. `if-no-files-found: ignore`
       # because only the visual shard ever writes one.
@@ -273,4 +273,4 @@ jobs:
         with:
           if-no-files-found: ignore
           name: visual-diffs-${{ matrix.task }}
-          path: helix/styled/src/*/.examples/headless.diff.png
+          path: helix/headless/src/*/.examples/preview.diff.png

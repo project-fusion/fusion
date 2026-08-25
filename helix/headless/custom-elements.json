@@ -625,6 +625,12 @@
             "tier": "headless",
             "group": "BaseAccordion",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same accordion on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/accordion"
           },
           "tagName": "helix-headless-accordion",
@@ -978,6 +984,12 @@
             "tier": "headless",
             "group": "BaseAnnouncement",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same announcement on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/announcement"
           },
           "tagName": "helix-headless-announcement",
@@ -1222,6 +1234,12 @@
             "tier": "headless",
             "group": "BaseAppHeader",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same app header on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/app-header"
           },
           "tagName": "helix-headless-app-header",
@@ -1768,6 +1786,12 @@
             "tier": "headless",
             "group": "BaseAvatar",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same avatar on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/avatar"
           },
           "tagName": "helix-headless-avatar",
@@ -2041,6 +2065,12 @@
             "tier": "headless",
             "group": "BaseBadge",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same badge on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/badge"
           },
           "tagName": "helix-headless-badge",
@@ -2803,6 +2833,12 @@
             "tier": "headless",
             "group": "BaseBarChart",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same bar chart on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/bar-chart"
           },
           "tagName": "helix-headless-bar-chart",
@@ -3031,6 +3067,12 @@
             "tier": "headless",
             "group": "BaseBlockquote",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same blockquote on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/blockquote"
           },
           "tagName": "helix-headless-blockquote",
@@ -3505,6 +3547,12 @@
             "tier": "headless",
             "group": "BaseBreadcrumbs",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same breadcrumbs on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/breadcrumbs"
           },
           "tagName": "helix-headless-breadcrumbs",
@@ -3707,6 +3755,12 @@
             "tier": "headless",
             "group": "BaseButtonGroup",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same button group on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/button-group"
           },
           "tagName": "helix-headless-button-group",
@@ -4209,6 +4263,12 @@
             "tier": "headless",
             "group": "BaseButton",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same button on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/button"
           },
           "tagName": "helix-headless-button",
@@ -4459,6 +4519,12 @@
             "tier": "headless",
             "group": "BaseCallout",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same callout on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/callout"
           },
           "tagName": "helix-headless-callout",
@@ -4672,6 +4738,12 @@
             "tier": "headless",
             "group": "BaseCard",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same card on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/card"
           },
           "tagName": "helix-headless-card",
@@ -5286,6 +5358,12 @@
             "tier": "headless",
             "group": "BaseCarousel",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same carousel on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/carousel"
           },
           "tagName": "helix-headless-carousel",
@@ -6014,6 +6092,12 @@
             "tier": "headless",
             "group": "BaseCheckboxGroup",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same checkbox group on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/checkbox-group"
           },
           "tagName": "helix-headless-checkbox-group",
@@ -6962,6 +7046,12 @@
             "tier": "headless",
             "group": "BaseCheckbox",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same checkbox on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/checkbox"
           },
           "tagName": "helix-headless-checkbox",
@@ -7247,6 +7337,12 @@
             "tier": "headless",
             "group": "BaseCodeBlock",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same code block on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/code-block"
           },
           "tagName": "helix-headless-code-block",
@@ -7434,6 +7530,12 @@
             "tier": "headless",
             "group": "BaseCode",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same code on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/code"
           },
           "tagName": "helix-headless-code",
@@ -8852,6 +8954,12 @@
             "tier": "headless",
             "group": "BaseColorInput",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same color input on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/color-input"
           },
           "tagName": "helix-headless-color-input",
@@ -10036,6 +10144,12 @@
             "tier": "headless",
             "group": "BaseColorPicker",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same color picker on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/color-picker"
           },
           "tagName": "helix-headless-color-picker",
@@ -11593,6 +11707,12 @@
             "tier": "headless",
             "group": "BaseCombobox",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same combobox on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/combobox"
           },
           "tagName": "helix-headless-combobox",
@@ -12151,6 +12271,12 @@
             "tier": "headless",
             "group": "BaseCommand",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same command on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/command"
           },
           "tagName": "helix-headless-command",
@@ -12891,6 +13017,12 @@
             "tier": "headless",
             "group": "BaseCopyButton",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same copy button on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/copy-button"
           },
           "tagName": "helix-headless-copy-button",
@@ -14456,6 +14588,12 @@
             "tier": "headless",
             "group": "BaseDateInput",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same date input on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/date-input"
           },
           "tagName": "helix-headless-date-input",
@@ -15590,6 +15728,12 @@
             "tier": "headless",
             "group": "BaseDatePicker",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same date picker on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/date-picker"
           },
           "tagName": "helix-headless-date-picker",
@@ -16071,6 +16215,12 @@
             "tier": "headless",
             "group": "BaseDialog",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same dialog on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/dialog"
           },
           "tagName": "helix-headless-dialog",
@@ -16313,6 +16463,12 @@
             "tier": "headless",
             "group": "BaseDivider",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same divider on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/divider"
           },
           "tagName": "helix-headless-divider",
@@ -16830,6 +16986,12 @@
             "tier": "headless",
             "group": "BaseDonutChart",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same donut chart on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/donut-chart"
           },
           "tagName": "helix-headless-donut-chart",
@@ -17292,6 +17454,12 @@
             "tier": "headless",
             "group": "BaseDrawer",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same drawer on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/drawer"
           },
           "tagName": "helix-headless-drawer",
@@ -18146,6 +18314,12 @@
             "tier": "headless",
             "group": "BaseDrilldown",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same drilldown on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/drilldown"
           },
           "tagName": "helix-headless-drilldown",
@@ -18362,6 +18536,12 @@
             "tier": "headless",
             "group": "BaseEmpty",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same empty on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/empty"
           },
           "tagName": "helix-headless-empty",
@@ -19367,6 +19547,12 @@
             "tier": "headless",
             "group": "BaseFileInput",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same file input on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/file-input"
           },
           "tagName": "helix-headless-file-input",
@@ -19470,6 +19656,12 @@
             "tier": "headless",
             "group": "BaseIconButton",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same icon button on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/icon-button"
           },
           "tagName": "helix-headless-icon-button",
@@ -20170,6 +20362,12 @@
             "tier": "headless",
             "group": "BaseIcon",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same icon on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/icon"
           },
           "tagName": "helix-headless-icon",
@@ -20564,6 +20762,12 @@
             "tier": "headless",
             "group": "BaseImage",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same image on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/image"
           },
           "tagName": "helix-headless-image",
@@ -22414,6 +22618,12 @@
             "tier": "headless",
             "group": "BaseInput",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same input on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/input"
           },
           "tagName": "helix-headless-input",
@@ -22602,6 +22812,12 @@
             "tier": "headless",
             "group": "BaseKbd",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same kbd on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/kbd"
           },
           "tagName": "helix-headless-kbd",
@@ -22852,6 +23068,12 @@
             "tier": "headless",
             "group": "BaseLegend",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same legend on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/legend"
           },
           "tagName": "helix-headless-legend",
@@ -23534,6 +23756,12 @@
             "tier": "headless",
             "group": "BaseLineChart",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same line chart on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/line-chart"
           },
           "tagName": "helix-headless-line-chart",
@@ -24004,6 +24232,12 @@
             "tier": "headless",
             "group": "BaseList",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same list on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/list"
           },
           "tagName": "helix-headless-list",
@@ -25434,6 +25668,12 @@
             "tier": "headless",
             "group": "BaseListbox",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same listbox on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/listbox"
           },
           "tagName": "helix-headless-listbox",
@@ -25655,6 +25895,12 @@
             "tier": "headless",
             "group": "BaseLoader",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same loader on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/loader"
           },
           "tagName": "helix-headless-loader",
@@ -26324,6 +26570,12 @@
             "tier": "headless",
             "group": "BaseMegamenu",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same megamenu on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/megamenu"
           },
           "tagName": "helix-headless-megamenu",
@@ -27588,6 +27840,12 @@
             "tier": "headless",
             "group": "BaseMenu",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same menu on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/menu"
           },
           "tagName": "helix-headless-menu",
@@ -28098,6 +28356,12 @@
             "tier": "headless",
             "group": "BaseMeter",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same meter on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/meter"
           },
           "tagName": "helix-headless-meter",
@@ -28355,6 +28619,12 @@
             "tier": "headless",
             "group": "BaseNavigation",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same navigation on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/navigation"
           },
           "tagName": "helix-headless-navigation",
@@ -29613,6 +29883,12 @@
             "tier": "headless",
             "group": "BaseNumberInput",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same number input on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/number-input"
           },
           "tagName": "helix-headless-number-input",
@@ -30170,6 +30446,12 @@
             "tier": "headless",
             "group": "BaseOption",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same option on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/option"
           },
           "tagName": "helix-headless-option",
@@ -30604,6 +30886,12 @@
             "tier": "headless",
             "group": "BaseOutline",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same outline on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/outline"
           },
           "tagName": "helix-headless-outline",
@@ -31459,6 +31747,12 @@
             "tier": "headless",
             "group": "BasePagination",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same pagination on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/pagination"
           },
           "tagName": "helix-headless-pagination",
@@ -33207,6 +33501,12 @@
             "tier": "headless",
             "group": "BasePinInput",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same pin input on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/pin-input"
           },
           "tagName": "helix-headless-pin-input",
@@ -33692,6 +33992,12 @@
             "tier": "headless",
             "group": "BasePopover",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same popover on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/popover"
           },
           "tagName": "helix-headless-popover",
@@ -34036,6 +34342,12 @@
             "tier": "headless",
             "group": "BaseProgress",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same progress on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/progress"
           },
           "tagName": "helix-headless-progress",
@@ -34350,6 +34662,12 @@
             "tier": "headless",
             "group": "BaseQrCode",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same qr code on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/qr-code"
           },
           "tagName": "helix-headless-qr-code",
@@ -34558,6 +34876,12 @@
             "tier": "headless",
             "group": "BaseQuote",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same quote on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/quote"
           },
           "tagName": "helix-headless-quote",
@@ -35757,6 +36081,12 @@
             "tier": "headless",
             "group": "BaseRadio",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same radio on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/radio"
           },
           "tagName": "helix-headless-radio",
@@ -36895,6 +37225,12 @@
             "tier": "headless",
             "group": "BaseRating",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same rating on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/rating"
           },
           "tagName": "helix-headless-rating",
@@ -37177,6 +37513,12 @@
             "tier": "headless",
             "group": "BaseScrollArea",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same scroll area on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/scroll-area"
           },
           "tagName": "helix-headless-scroll-area",
@@ -38452,6 +38794,12 @@
             "tier": "headless",
             "group": "BaseSelect",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same select on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/select"
           },
           "tagName": "helix-headless-select",
@@ -38634,6 +38982,12 @@
             "tier": "headless",
             "group": "BaseSkeleton",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same skeleton on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/skeleton"
           },
           "tagName": "helix-headless-skeleton",
@@ -39786,6 +40140,12 @@
             "tier": "headless",
             "group": "BaseSlider",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same slider on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/slider"
           },
           "tagName": "helix-headless-slider",
@@ -40115,6 +40475,12 @@
             "tier": "headless",
             "group": "BaseSparkline",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same sparkline on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/sparkline"
           },
           "tagName": "helix-headless-sparkline",
@@ -40932,6 +41298,12 @@
             "tier": "headless",
             "group": "BaseSpeedDial",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same speed dial on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/speed-dial"
           },
           "tagName": "helix-headless-speed-dial",
@@ -41800,6 +42172,12 @@
             "tier": "headless",
             "group": "BaseSplitter",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same splitter on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/splitter"
           },
           "tagName": "helix-headless-splitter",
@@ -42204,6 +42582,12 @@
             "tier": "headless",
             "group": "BaseStat",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same stat on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/stat"
           },
           "tagName": "helix-headless-stat",
@@ -42646,6 +43030,12 @@
             "tier": "headless",
             "group": "BaseSteps",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same steps on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/steps"
           },
           "tagName": "helix-headless-steps",
@@ -43895,6 +44285,12 @@
             "tier": "headless",
             "group": "BaseSwitch",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same switch on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/switch"
           },
           "tagName": "helix-headless-switch",
@@ -44774,6 +45170,12 @@
             "tier": "headless",
             "group": "BaseTable",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same table on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/table"
           },
           "tagName": "helix-headless-table",
@@ -45688,6 +46090,12 @@
             "tier": "headless",
             "group": "BaseTabs",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same tabs on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/tabs"
           },
           "tagName": "helix-headless-tabs",
@@ -46231,6 +46639,12 @@
             "tier": "headless",
             "group": "BaseTag",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same tag on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/tag"
           },
           "tagName": "helix-headless-tag",
@@ -47313,6 +47727,12 @@
             "tier": "headless",
             "group": "BaseTextarea",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same textarea on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/textarea"
           },
           "tagName": "helix-headless-textarea",
@@ -48901,6 +49321,12 @@
             "tier": "headless",
             "group": "BaseTimeInput",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same time input on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/time-input"
           },
           "tagName": "helix-headless-time-input",
@@ -50046,6 +50472,12 @@
             "tier": "headless",
             "group": "BaseTimePicker",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same time picker on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/time-picker"
           },
           "tagName": "helix-headless-time-picker",
@@ -50539,6 +50971,12 @@
             "tier": "headless",
             "group": "BaseTimeline",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same timeline on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/timeline"
           },
           "tagName": "helix-headless-timeline",
@@ -51281,6 +51719,12 @@
             "tier": "headless",
             "group": "BaseToast",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same toast on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/toast"
           },
           "tagName": "helix-headless-toast",
@@ -52524,6 +52968,12 @@
             "tier": "headless",
             "group": "BaseToggle",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same toggle on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/toggle"
           },
           "tagName": "helix-headless-toggle",
@@ -52831,6 +53281,12 @@
             "tier": "headless",
             "group": "BaseToolbar",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same toolbar on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/toolbar"
           },
           "tagName": "helix-headless-toolbar",
@@ -53597,6 +54053,12 @@
             "tier": "headless",
             "group": "BaseTooltip",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same tooltip on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/tooltip"
           },
           "tagName": "helix-headless-tooltip",
@@ -54168,6 +54630,12 @@
             "tier": "headless",
             "group": "BaseTour",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same tour on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/tour"
           },
           "tagName": "helix-headless-tour",
@@ -55858,6 +56326,12 @@
             "tier": "headless",
             "group": "BaseTree",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same tree on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/tree"
           },
           "tagName": "helix-headless-tree",
@@ -56092,6 +56566,12 @@
             "tier": "headless",
             "group": "BaseTrend",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same trend on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/trend"
           },
           "tagName": "helix-headless-trend",
@@ -57222,6 +57702,12 @@
             "tier": "headless",
             "group": "BaseVideoPlaylist",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same video playlist on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/video-playlist"
           },
           "tagName": "helix-headless-video-playlist",
@@ -58581,6 +59067,12 @@
             "tier": "headless",
             "group": "BaseVideo",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same video on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/video"
           },
           "tagName": "helix-headless-video",
@@ -58863,6 +59355,12 @@
             "tier": "headless",
             "group": "BaseVirtualList",
             "part": "Root",
+            "examples": [
+              {
+                "description": "The same virtual list on the headless tier, with every rule written by hand.",
+                "slug": "preview"
+              }
+            ],
             "source": "helix/headless/src/virtual-list"
           },
           "tagName": "helix-headless-virtual-list",
