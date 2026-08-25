@@ -17,10 +17,18 @@
     "build": {
       "dependsOn": ["^build", "^analyze", "icons", "styles"],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
-      // `wasm/**` is `@helix-io/theme`'s other half: the engine is Rust and this
-      // is what a browser reaches it through, built by the same script the
-      // package's `build` runs. Declared so a cached build restores both.
-      "outputs": ["dist/**", "wasm/**", ".next/**", "!.next/cache/**"]
+      // **`wasm/**` was here and had to go, because a cache hit was deleting
+      // tracked files.** It was declared when `@helix-io/theme`'s build made
+      // the wasm, so restoring it alongside `dist` was right. 273 tracked the
+      // artifact and made that build `tsc` alone, and a declared output turbo
+      // manages: the cached set for `wasm/**` is empty, so every cache hit
+      // replaced four tracked files with nothing. Reproduced on 25 Aug 2026,
+      // `git status` showing all four deleted, and measured in CI first as
+      // `@helix-io/theme` shipping 8 files where the tree holds 16.
+      //
+      // A tracked source is never a task output. `files` still publishes
+      // `wasm`, `check:wasm` still measures it, and nothing builds it here.
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     // The fourth layer is `helix/styled/elements.css` and it was not in `inputs`,
     // so editing any component stylesheet did not invalidate this. `dependsOn`
