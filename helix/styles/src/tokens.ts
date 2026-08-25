@@ -810,18 +810,35 @@ export const TOKENS: Token[] = [
      as one sheet of glass have to *be* one element, painted under both.
 
      **And two translucent layers cannot hand over by fading.** Coverage is not
-     additive: at 72%, which is what `--helix-material-translucent` carries, the
-     pair measured 92% while both were held, 59% crossed halfway, and 45% when
-     the first was released early. Every arrangement passes through a value that
+     additive: measured at the 72% `--helix-material-translucent` carried when
+     this was written, the pair came out 92% while both were held, 59% crossed
+     halfway, and 45% when the first was released early. The token is 60% now,
+     which moves the numbers and not the conclusion: no coverage makes two
+     layers hand over without passing through a value that is neither. Every arrangement passes through a value that
      is neither, so a cross-fade between two glass surfaces reads as a flash. The
      way out is for one of them never to have had any, so there is nothing to
      hand over. */
+  /* **`translucent` admits more: 60% where it was 72%.**
+     The ask was for it to be more see-through rather than a lighter ground, and
+     those are different edits. Lightness would mean a different rung, and
+     `primitives.css` explains why that is the wrong lever: `neutral-900` is dark
+     `surface` *and* light `surface-inverse` *and* this, so moving it drags two
+     unrelated roles, and pointing the material at `neutral-800` makes a glass
+     panel read as a *lifted surface* rather than as glass. The rung is the
+     ground's colour. Coverage is how much of it there is, which is what
+     "translucent" names.
+
+     **`translucent-strong` stays at 88%, and the gap widening is the point.**
+     The two are one optical language at two coverages: `glass` admits what is
+     behind it and `frosted` admits less. Moving both together would keep them
+     the same distance apart and change nothing about the relationship the names
+     describe. */
   ['material-blur-sm', '8px', 'The lightest backdrop blur.'],
   ['material-blur-md', '16px', 'The backdrop blur a modal takes.'],
   ['material-blur-lg', '32px', 'The heaviest backdrop blur.'],
   [
     'material-translucent',
-    'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )',
+    'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 60%, transparent )',
 
     'The translucent ground, for a surface that admits what is behind it.',
   ],
