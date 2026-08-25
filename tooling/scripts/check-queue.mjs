@@ -27,18 +27,53 @@ const lines = text.split('\n')
 
 const problems = []
 const seen = new Map()
+/** Columns in the table currently being read, from its own header row. */
+let width
 
 /* Every row anywhere in the file, so the sweeps share one number space with the
    table above them: they are the same queue and a reader citing #58 does not
    say which section it was in. */
 const row = /^\|\s*(\d+)\s*\|/
+const headerRow = /^\|\s*#\s*\|/
 for (const [index, line] of lines.entries()) {
+  if (line.startsWith('## ')) {
+    width = undefined
+  }
+  if (headerRow.test(line)) {
+    width = line.split('|').length - 2
+  }
   const found = row.exec(line)
   if (!found) {
     continue
   }
   const number = Number(found[1])
   const at = index + 1
+  /* **A row wider than its header loses the surplus, silently.**
+   *
+   * GitHub inserts empty cells when a row has too few and *ignores* the excess
+   * when it has too many, so a row written `| n | done | note | amendment |`
+   * under a three column header renders the note and drops the amendment. It
+   * looks correct in the source and correct on the page, and the part that is
+   * missing is the part that was added last, which is usually the correction.
+   *
+   * Found 25 Aug 2026: 42 rows had grown a cell per amendment and 111 KB of the
+   * file, an eighth of it, had never been rendered. Confirmed against GitHub's
+   * own renderer rather than the spec, both before and after the repair.
+   *
+   * The header is read per table, because the sweeps could take a different
+   * shape later and a number hard coded here would be the second definition
+   * this file already argues against elsewhere. */
+  if (width !== undefined) {
+    const cells = line.split('|').length - 2
+    if (cells > width) {
+      problems.push(
+        `${FILE}:${at}: #${number} has ${cells} cells where the table's header has ` +
+          `${width}. The surplus is dropped when this renders, so ${cells - width} ` +
+          'piece(s) of the row are invisible on GitHub. Fold them into the last ' +
+          'column rather than adding a cell.',
+      )
+    }
+  }
   const first = seen.get(number)
   if (first === undefined) {
     seen.set(number, at)
