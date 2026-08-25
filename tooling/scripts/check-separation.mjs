@@ -36,7 +36,7 @@
  * drawn as shadows. Every one is a control drawing itself rather than a surface
  * separating from a ground, and a policy that flattened them would be a bug
  * wearing a theme. The classification is a judgment, so it lives in the audit
- * and in `docs/plan/22-theming.md` rather than in a regexp here.
+ * and in `plan/22-theming.md` rather than in a regexp here.
  *
  * Run with `bun run check:separation` (also part of `bun run verify`).
  */

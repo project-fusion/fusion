@@ -1,7 +1,7 @@
 # Working in this repo
 
 Fusion Development Group. Strategy lives in [`docs/`](docs/); start with
-[`docs/plan/00-thesis.md`](docs/plan/00-thesis.md).
+[`plan/00-thesis.md`](plan/00-thesis.md).
 
 Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 `.claude/rules/cortex.md` for `cortex/**`. To add a component, use the

@@ -41,8 +41,11 @@ on purpose and are not softened as the company matures.
 
 ## Documents
 
-| Doc | Contents |
-|---|---|
+The strategy is not in this repository. The numbered plan (thesis, planning documents) lives in the internal repository, because this one is public.
+
+What is here is the writing meant to be read: `docs/insights/` is the published
+essays, `docs/19-queue.md` is the work queue, and the two generated references
+beside them are `component-reference.md` and `token-reference.md`.
 
 ## Packages
 

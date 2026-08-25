@@ -14,7 +14,7 @@
  * `bun run check:docs` fails on an empty section rather than rendering a
  * heading with nothing under it.
  *
- * See [`docs/plan/23-helix-docs.md`](../../../docs/plan/23-helix-docs.md) for the
+ * See [`plan/23-helix-docs.md`](plan/23-helix-docs.md) for the
  * navigation this is a subset of.
  */
 

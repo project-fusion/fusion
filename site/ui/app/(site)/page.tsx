@@ -2,7 +2,7 @@
  * The Fusion landing page.
  *
  * Copy comes from the strategy docs rather than being written fresh, so the
- * site and the plan cannot drift: the thesis is `docs/plan/00-thesis.md` and the
+ * site and the plan cannot drift: the thesis is `plan/00-thesis.md` and the
  * constraint is the one in `CLAUDE.md`.
  *
  * One idea per band, each given a screen's worth of room. The page is a

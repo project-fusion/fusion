@@ -13,7 +13,7 @@ import { getFamilies } from '../catalog/catalog'
  * navigation was answering "where am I" and never "what else is there", which is
  * the half a sidebar is actually for.
  *
- * `docs/plan/23-helix-docs.md` has said Components is a section of this navigation
+ * `plan/23-helix-docs.md` has said Components is a section of this navigation
  * since the plan was written. It was the one section nobody built, and the
  * masthead had been compensating by hoisting Components to a product-level
  * destination beside Guides, which said the two were different kinds of thing.
