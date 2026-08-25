@@ -6,13 +6,13 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "bun run wasm && bun run catalog && bun run frame && bun run specs && next build",
+    "build": "bun run catalog && bun run frame && bun run specs && next build",
     "catalog": "bun ../../tooling/scripts/build-catalog.mjs",
     "dev": "bun run wasm && bun run catalog && bun run frame && bun run specs && next dev --port 3000",
     "frame": "bun ../../tooling/scripts/build-frame.mjs",
     "specs": "bun ../../tooling/scripts/build-specs.mjs",
     "start": "next start --port 3000",
-    "typecheck": "bun run wasm && bun run catalog && bun run frame && bun run specs && tsc -p tsconfig.json --noEmit",
+    "typecheck": "bun run catalog && bun run frame && bun run specs && tsc -p tsconfig.json --noEmit",
     "wasm": "node ../../tooling/scripts/build-wasm.mjs"
   },
   "dependencies": {
