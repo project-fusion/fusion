@@ -100,6 +100,34 @@ export class HelixHeadlessCarousel extends HelixElement {
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
 
+  /**
+   * Whether the previous and next controls are shown.
+   *
+   * `auto`, which is the resting behavior and what an absent attribute means,
+   * shows them wherever the pointer can hover and hides them where it cannot.
+   * `always` keeps them on every device, and `none` never renders them at all.
+   *
+   * **Pointer and not width, which is the distinction this exists to make.** A
+   * 375px window on a desktop still has a mouse and still wants the arrows; a
+   * tablet at 1024 has neither. `.claude/rules/helix.md` forbids a component
+   * asking about the viewport, because the viewport is not the component's box,
+   * and that objection does not reach `hover` and `pointer`: those describe the
+   * input device, and the answer is the same whether this carousel is 300px in
+   * a sidebar or runs the width of the page.
+   *
+   * **Safe to hide because the arrows are not the keyboard's way in.** The
+   * indicators carry a roving `tabindex` and handle the arrow keys, so every
+   * slide is still reachable with the controls gone. Hiding a control that was
+   * the only route to something would be a different change under this name.
+   *
+   * **The rotation control is never hidden by this**, which is a decision
+   * rather than a limit of scope: content that moves on its own has to offer a
+   * way to stop it, so an autoplaying carousel keeps its pause control on a
+   * touch device exactly as it does on a desktop.
+   */
+  @property({ reflect: true })
+  controls?: 'always' | 'auto' | 'none'
+
   /** Slide to start on, where nothing declared one. */
   @property({ attribute: 'default-index', type: Number })
   defaultIndex = 0
@@ -569,26 +597,34 @@ export class HelixHeadlessCarousel extends HelixElement {
               </button>`
             : nothing
         }
-        <button
-          part="previous"
-          type="button"
-          aria-label="Previous slide"
-          @click=${() => this.goTo(this.index - 1)}
-        >
-          <svg part="previous-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
-            ${unsafeSVG(caretLeft.content)}
-          </svg>
-        </button>
-        <button
-          part="next"
-          type="button"
-          aria-label="Next slide"
-          @click=${() => this.goTo(this.index + 1)}
-        >
-          <svg part="next-mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
-            ${unsafeSVG(caretRight.content)}
-          </svg>
-        </button>
+        ${
+          /* `none` takes them out of the tree rather than hiding them, so they
+             leave the tab order with them. `auto` renders them and lets the
+             stylesheet answer for the pointer, a question CSS can ask directly
+             and this cannot without watching a media query from script. */
+          this.controls === 'none'
+            ? nothing
+            : html`<button
+                  part="previous"
+                  type="button"
+                  aria-label="Previous slide"
+                  @click=${() => this.goTo(this.index - 1)}
+                >
+                  <svg part="previous-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+                    ${unsafeSVG(caretLeft.content)}
+                  </svg>
+                </button>
+                <button
+                  part="next"
+                  type="button"
+                  aria-label="Next slide"
+                  @click=${() => this.goTo(this.index + 1)}
+                >
+                  <svg part="next-mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+                    ${unsafeSVG(caretRight.content)}
+                  </svg>
+                </button>`
+        }
       </div>
       <div
         data-scroller

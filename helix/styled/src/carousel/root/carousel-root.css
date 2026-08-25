@@ -85,6 +85,39 @@
   --_carousel-controls-along: end;
 }
 
+/* **Where the pointer cannot hover, the track is already the control.**
+ *
+ * A swipe scrolls the slides, so a pair of arrows beside them is a second way
+ * to say one thing, spending a corner of a small screen to do it. The
+ * `controls` property carries the argument for asking about the pointer rather
+ * than the width, and for why the keyboard loses nothing here.
+ *
+ * `:not([controls="always"])` rather than `[controls="auto"]`, because `auto`
+ * is what an absent attribute means and a Lit property reflects on change
+ * rather than at rest: a carousel nobody configured has no attribute to match.
+ *
+ * Written among the defaults and not after them, so `indicator-align` still
+ * beats it. The two are equal specificity, so this is source order deciding. */
+@media (hover: none) and (pointer: coarse) {
+  :host(:not([controls="always"])) [part="previous"],
+  :host(:not([controls="always"])) [part="next"] {
+    display: none;
+  }
+
+  /* Nothing left in the row unless the carousel rotates, and an empty box still
+     takes its gap. The rotation control is the one thing in here a touch device
+     must keep, so whether there is one decides. */
+  :host(:not([controls="always"]):not([autoplay])) [part="controls"] {
+    display: none;
+  }
+
+  /* The dots sat at `start` to be opposite controls that are no longer there,
+     which leaves them on one edge with the rest of the row empty beside them. */
+  :host(:not([controls="always"])) [part="indicators"] {
+    --_carousel-indicators-along: center;
+  }
+}
+
 /* Above the slides. The padding swaps ends with the placement, so the gap is
    always between the chrome and the content rather than on a fixed side. */
 :host([indicator-placement="block-start"]) [part="indicators"] {
