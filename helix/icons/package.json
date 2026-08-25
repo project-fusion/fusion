@@ -25,7 +25,7 @@
   "scripts": {
     "build": "bun run icons && tsc -p tsconfig.json",
     "icons": "node ../../tooling/scripts/build-icons.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "bun run icons && tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@phosphor-icons/core": "^2.1.1"
