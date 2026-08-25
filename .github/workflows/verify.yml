@@ -45,8 +45,16 @@ permissions:
 #
 # Absent the token turbo falls back to its local cache and everything still
 # runs, so this is inert until the secret exists rather than broken without it.
+# **Both the slug and the id, because they are different variables.**
+# `TURBO_TEAM` takes the team's slug and `TURBO_TEAMID` takes its `team_`
+# identifier, and only the first was set. The runner reported "Insufficient
+# permissions to write to remote cache" with 19 misses and no hits, which reads
+# like a token problem and was not one: the token was scoped to the team and
+# Remote Cache was enabled for it. What settled it was the local link file,
+# which holds `{"teamId":"team_..."}` and no slug at all, and works.
 env:
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_TEAMID: ${{ vars.TURBO_TEAMID }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 jobs:
