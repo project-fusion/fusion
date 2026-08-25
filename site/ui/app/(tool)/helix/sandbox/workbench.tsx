@@ -253,8 +253,19 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   /* A hundred is the rail shut, which puts the divider on the trailing edge
      where the splitter draws no line: a boundary needs two sides, and it takes
      that away itself rather than needing the border switched off here. */
+  /** Whether the examples are on screen, as a pane on a wide viewport and as a
+   * drawer on a narrow one. The toggle reads this rather than either state, so
+   * it says the same thing at both widths. */
+  const railShown = narrow ? railOpen : showRail
+
+  /* **Always shut on a narrow viewport, because the rail is not in the splitter
+     there.** It moves to a drawer below, and the `slot="end"` pane is not
+     rendered at all, so a position under a hundred left the divider partway
+     across with nothing on the far side: measured at 375, the whole workbench
+     was squeezed into a 103px start pane with the preview stranded beneath it,
+     which is what 279 was reported as. `showRail` still governs the drawer. */
   const railPosition =
-    showRail && bodyWidth > 0 ? Math.max(0, 100 - (railSize / bodyWidth) * 100) : 100
+    !narrow && showRail && bodyWidth > 0 ? Math.max(0, 100 - (railSize / bodyWidth) * 100) : 100
 
   /* Where a double click on the divider puts it back to, which is the width the
      rail opens at rather than the splitter's own half-and-half. Shut, the
@@ -1067,11 +1078,6 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               set out to end rather than to move. */}
           <SiteFind findable={findable} />
 
-          {narrow && (
-            <helix-button emphasis="ghost" onClick={() => setRailOpen(true)}>
-              Examples
-            </helix-button>
-          )}
           <helix-tooltip content="Preferences" placement="bottom">
             <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
               <helix-icon name="gear"></helix-icon>
@@ -1096,6 +1102,12 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       >
         <div className={styles.workbenchMain} slot="start">
           <helix-sandbox
+            /* **The preview leads on a narrow viewport.** Stacked, the pane a
+               reader came to see should be the one they land on, and the source
+               is what they scroll to when they want to change it. The component
+               already carries this, so it is a value rather than a layout
+               written here. */
+            lead={narrow ? 'preview' : 'source'}
             onhelix-change={(event) => {
               sandboxChanged(event)
               paneEdited(event)
@@ -1231,15 +1243,25 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
                 {/* Beside the settings, because it is the same kind of thing: a
                   switch for a region of the tool rather than anything to do
-                  with the example. */}
+                  with the example.
+
+                  **And it is the only control for the rail at either width.**
+                  On a narrow viewport the rail is a drawer rather than a pane,
+                  and this used to go on calling `setShowRail`, which positions
+                  a pane that is not rendered there: a button that did nothing,
+                  while a second one in the masthead did the work. One control
+                  in one place, saying the same thing at both widths, and the
+                  masthead gets its room back. */}
                 <helix-tooltip
-                  content={showRail ? 'Hide examples' : 'Show examples'}
+                  content={railShown ? 'Hide examples' : 'Show examples'}
                   placement="bottom"
                 >
                   <helix-icon-button
                     class={styles.railToggle}
-                    label={showRail ? 'Hide examples' : 'Show examples'}
-                    onClick={() => setShowRail((open) => !open)}
+                    label={railShown ? 'Hide examples' : 'Show examples'}
+                    onClick={() =>
+                      narrow ? setRailOpen((open) => !open) : setShowRail((open) => !open)
+                    }
                   >
                     <helix-icon name="sidebar-simple"></helix-icon>
                   </helix-icon-button>
@@ -1400,6 +1422,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
       {narrow && (
         <helix-drawer
+          class={styles.examplesDrawerHost}
           label="Examples"
           material="glass"
           onhelix-close={() => setRailOpen(false)}
@@ -1407,7 +1430,10 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           open={railOpen}
           placement="end"
         >
-          {examplesPane}
+          {/* Wrapped, because the pane is two rows and a drawer is one box: the
+              grid is what pins the filter while the tree scrolls under it, and
+              without it the filter scrolled away. */}
+          <div className={styles.examplesDrawer}>{examplesPane}</div>
         </helix-drawer>
       )}
     </>

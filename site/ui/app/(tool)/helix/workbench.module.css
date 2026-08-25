@@ -188,6 +188,40 @@
   padding-inline: var(--helix-space-md);
 }
 
+/* **The drawer needs the rail's grid and none of its chrome.**
+   `examplesPane` is shared: in the rail it is the two rows of `.examplesRail`,
+   the header pinned and the tree scrolling under it. Dropped into a drawer it
+   got neither, so the filter scrolled away with the list, which is the thing
+   the comment above `.examplesRail` says a filter must never do.
+
+   And `.examplesHeader` is dressed to line up with the toolbar strip across the
+   window, a background, a border and a fixed control-lg height. There is no
+   strip in a drawer for it to line up with, so it read as a box floating above
+   the list with a gap over it. */
+/* **The drawer's top padding is `2xl` by default where its sides are `lg`**, which
+   is the room a title needs and this one has none: the label is the accessible
+   name and nothing draws it, so the gap sat above the filter as empty chrome.
+   `--drawer-inset-block-start` is the hook the component documents for exactly
+   this, its own comment saying the site is what sets it. */
+.examplesDrawerHost {
+  --drawer-inset-block-start: var(--helix-space-lg);
+}
+
+.examplesDrawer {
+  block-size: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+.examplesDrawer .examplesHeader {
+  background-color: transparent;
+  block-size: auto;
+  border-block-end: none;
+  padding-block-end: var(--helix-space-xs);
+  padding-inline: var(--helix-space-none);
+}
+
 .examplesScroll {
   min-block-size: 0;
   overflow-y: auto;

@@ -183,6 +183,18 @@ helix-app-header {
   --app-header-inset: var(--helix-space-2xl);
   --app-header-max-inline-size: none;
 }
+/* **Sixteen on a phone, because forty-eight is a desktop's margin.** The inset
+   is `2xl` at every width, which on a 375px screen is a quarter of the bar spent
+   on air either side: measured there, the wordmark and the search field ran into
+   each other with room to spare outside them both. A media query rather than a
+   clamp, and legitimately: this is the site's own chrome deciding what a device
+   gets, which is the consumer's half of the responsiveness policy in
+   `.claude/rules/helix.md` and the half a component may not have. */
+@media (width < 48rem) {
+  helix-app-header {
+    --app-header-inset: var(--helix-space-md);
+  }
+}
 
 /* **The masthead never paints. One sheet does, for both of its jobs.**
  *

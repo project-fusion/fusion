@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixSandboxPreview } from '@helix-io/styled'
+import type { HelixChangeEvent, HelixSandboxPreview } from '@helix-io/styled'
 import { type DerivedTheme, initTheme, type ThemeEngine } from '@helix-io/theme'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
@@ -164,6 +164,54 @@ export function ThemeBuilder({
   useSandboxEditor()
 
   const [prefsOpen, setPrefsOpen] = useState(false)
+
+  /**
+   * Whether the controls are on screen, and how much room they take when they
+   * are.
+   *
+   * **One control at every width, because the answer is the same question.** The
+   * sandbox learned this the hard way: it had a toggle in the toolbar that did
+   * nothing on a phone and a second button in the masthead that did the work.
+   * Here there is one, and what changes with the viewport is how far the pane
+   * opens rather than what the button means.
+   *
+   * **The pane collapses rather than unmounting.** The stage holds an iframe, and
+   * wrapping it in a condition would tear it down and reload it every time a
+   * reader opened the form. That is the same reasoning the sandbox's rail
+   * carries, and it is why this is a splitter position rather than a drawer.
+   */
+  const [controlsShown, setControlsShown] = useState(true)
+  const [narrow, setNarrow] = useState(false)
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 60rem)')
+    const sync = () => {
+      setNarrow(query.matches)
+      /* Shut on arrival at a narrow width: the preview is what a reader came
+         for, and a form over almost all of it is not a first impression. */
+      setControlsShown(!query.matches)
+    }
+    sync()
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
+
+  /* Nearly the whole width on a phone, because a column of labelled fields at a
+     quarter of 375px is the thing 244 measured and called a column rather than a
+     form. A sliver is left so the preview says it is still there. */
+  const controlsPosition = controlsShown ? (narrow ? 88 : 24) : 0
+
+  /* **Declared, so the consumer owns it and answers `helix-change`**, which is
+     the contract the typings state and refuse a `position` without. A reader
+     dragging the separator to the edge has shut the pane, and the toggle has to
+     hear that or it goes on saying "Hide controls" over a pane that is already
+     gone. Two per cent rather than zero, because a drag that lands a pixel short
+     of the edge is still a reader shutting it. */
+  const controlsMoved = (event: HelixChangeEvent) => {
+    if (event.detail.property === 'position') {
+      setControlsShown(Number(event.detail.value) > 2)
+    }
+  }
   const [brand, setBrand] = useState(INITIAL.brand)
   const [scheme, setScheme] = useState(INITIAL.scheme)
   const [contrastTarget, setContrastTarget] = useState(INITIAL.contrastTarget)
@@ -488,7 +536,12 @@ export function ThemeBuilder({
           panel, the toolbar row and the separators a keyboard can move, and all
           of that was going to be rebuilt here badly. What it does not carry is
           file tabs, because a theme has one artifact and not four. */}
-      <helix-splitter className={styles.workbenchBody} default-position={24}>
+      <helix-splitter
+        className={styles.workbenchBody}
+        default-position={24}
+        onhelix-change={controlsMoved}
+        position={controlsPosition}
+      >
         <section className="themeControls" slot="start">
           <helix-flex direction="column" gap="lg">
             <helix-flex direction="column" gap="xs">
@@ -885,12 +938,17 @@ export function ThemeBuilder({
             corner-label="Preview, artifact and audit"
             default-split={PREVIEW_SHARE}
             lead="preview"
+            /* **Stacked on a phone.** Side by side at 375 the
+               sheet pane came out about 130px and every custom property wrapped
+               one word to a line, which is the same measurement 244 made of the
+               sandbox's source pane. Only the axis changes: `lead` above already says
+               preview, at every width, because that is what this tool is for. */
             onhelix-change={(event) => {
               if (event.detail.property === 'split') {
                 setSplit((event.target as HTMLElement & { split: number }).split)
               }
             }}
-            orientation="horizontal"
+            orientation={narrow ? 'vertical' : 'horizontal'}
             panel-label="The audit"
             separator-label="Preview and artifact"
             split={split}
@@ -900,6 +958,22 @@ export function ThemeBuilder({
                 input, so a toolbar of controls here would be a second place to
                 look for the same thing. */}
             <helix-sandbox-toolbar slot="toolbar">
+              {/* **First in the bar above the preview, at every width.** The
+                  controls are the other half of this tool and a reader needs to
+                  get back to them from here, which on a narrow viewport is the
+                  only way back at all. */}
+              <helix-tooltip
+                content={controlsShown ? 'Hide controls' : 'Show controls'}
+                placement="bottom"
+              >
+                <helix-icon-button
+                  label={controlsShown ? 'Hide controls' : 'Show controls'}
+                  onClick={() => setControlsShown((open) => !open)}
+                >
+                  <helix-icon name="sidebar-simple"></helix-icon>
+                </helix-icon-button>
+              </helix-tooltip>
+
               <helix-flex align="center" gap="xs">
                 <helix-tag emphasis="subtle" tone={failures.length > 0 ? 'danger' : 'success'}>
                   {counts.pass ?? 0} pass
