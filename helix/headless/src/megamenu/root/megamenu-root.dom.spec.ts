@@ -33,14 +33,6 @@ const press = (host: Section, pointerType: string, detail = 1): void => {
   trigger(host).dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
 }
 
-/**
- * The `pointerType` the component recorded, folded into the assertion because
- * bun prints the compared value and nothing else. Whether a touch enter was
- * seen as a touch is the whole question this suite asks, and `expected true to
- * be false` cannot answer it.
- */
-const saw = (host: Section): string => String((host as unknown as { pointer?: string }).pointer)
-
 const settle = (ms: number): Promise<void> =>
   new Promise((done) => {
     setTimeout(done, ms)

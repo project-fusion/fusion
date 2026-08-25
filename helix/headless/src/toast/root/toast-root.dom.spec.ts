@@ -24,8 +24,13 @@ type Item = HTMLElement & {
  * is also one hover or focus away from being held deliberately. Waiting on the
  * outcome rather than on a stopwatch costs nothing when it passes, which is
  * almost always, and stops guessing at a number that has already been wrong.
+ *
+ * **Under the harness timeout, which 2000 was not.** `TIMEOUT` in
+ * `@helix-io/testing/browser` is 2000ms, so a poll of exactly that killed the
+ * test before it could assert and printed `timed out after 2000ms` where the
+ * diagnostic should have been. A budget has to leave room to report.
  */
-const LATEST = 2000
+const LATEST = 1200
 
 /** Polls to the outcome rather than sleeping at it. */
 const closes = async (found: Item): Promise<void> => {

@@ -83,7 +83,11 @@ const origin = `http://127.0.0.1:${server.address().port}`
    same shape as a hash, so it was skipped and its specs had never run here.
    Nothing reported it, because a suite covering 87 of 88 families still says
    it passed. */
-const only = process.argv[2]
+/* Positional, so a flag must not be mistaken for a family name: passing
+   `--throttle 4` alone reported "no bundle for `--throttle`". */
+const only = process.argv
+  .slice(2)
+  .find((argument) => !argument.startsWith('--') && !/^\d+$/.test(argument))
 const named = JSON.parse(await readFile(join(specs, 'families.json'), 'utf8'))
 const families = named
   .map((name) => `${name}.js`)
@@ -103,7 +107,10 @@ if (families.length === 0) {
 const STUCK = 60_000
 
 /** How much to divide the CPU by, for reproducing a runner locally. */
-const THROTTLE = Number(process.env.SPECS_THROTTLE ?? 1)
+const THROTTLE = Number(
+  process.argv[process.argv.indexOf('--throttle') + 1] ??
+    (process.argv.includes('--throttle') ? 4 : 1),
+)
 
 const browser = await chromium.launch()
 const crashes = []
@@ -124,14 +131,30 @@ const freshPage = async () => {
      failed only in CI and two rounds of guessing at why cost more than this
      took to write. A GitHub runner is two slow cores; this machine is neither,
      and every timing assertion in here was written against the fast one.
-     `SPECS_THROTTLE=4 bun run specs:browser` divides the CPU by four through
-     the same CDP switch DevTools uses. */
+     `node tooling/scripts/run-browser-specs.mjs --throttle 4` divides the CPU
+     by four through the same CDP switch DevTools uses. A flag rather than an
+     environment variable because nothing else in here reads one. */
   if (THROTTLE > 1) {
     const session = await made.context().newCDPSession(made)
     await session.send('Emulation.setCPUThrottlingRate', { rate: THROTTLE })
   }
 
   await made.goto(origin, { waitUntil: 'load' })
+
+  /* **The pointer starts at 0,0 and specs mount at 0,0.** `mount` assigns
+     `document.body.innerHTML`, so content appears directly under where the
+     browser believes its mouse is, and Chromium fires a trusted `pointerenter`
+     at it. Measured: a megamenu spec dispatching a synthetic touch enter saw
+     `pointerType: 'mouse'` on a runner, opened on hover as it should, and
+     failed an assertion that a touch had not opened it. The component was
+     right and the page was hovering it.
+     Moved to the far corner, which is over `body` and over nothing a spec
+     mounts. */
+  const size = made.viewportSize()
+  if (size) {
+    await made.mouse.move(size.width - 2, size.height - 2)
+  }
+
   return made
 }
 
