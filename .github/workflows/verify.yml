@@ -170,14 +170,60 @@ jobs:
       - run: bun run rs:check
       - run: bun run rs:test
 
-  # A separate job, because it needs a browser and `verify` deliberately does
-  # not: everything in `verify` runs anywhere bun runs. These are the specs
-  # behind `hasLayout()`, which happy-dom skips because it has no boxes, and
-  # they are the ones worth most: a component can render perfect markup in the
-  # wrong place and no DOM without layout will ever say so.
-  browser-specs:
+  # Four jobs, because they need a browser and `verify` deliberately does not:
+  # everything in `verify` runs anywhere bun runs. These are the checks behind
+  # `hasLayout()`, which happy-dom skips because it has no boxes, and they are
+  # the ones worth most: a component can render perfect markup in the wrong
+  # place and no DOM without layout will ever say so.
+  #
+  # **Split because they were 390 seconds in a row behind one build.** Measured
+  # 25 Aug 2026: contrast 87, specs 80, build 78, smoke 75, playwright 26,
+  # visual 15. Nothing here needs anything another one produces, so the only
+  # thing the sequence bought was one build instead of four. In parallel the
+  # wall clock is the build plus the slowest of them.
+  #
+  # **Which is the case for the remote cache rather than against the split.**
+  # Four cold builds cost four times the compute for the same wall clock; four
+  # restores cost almost nothing. Until `TURBO_TOKEN` has Remote Cache write
+  # access, this trades compute for latency knowingly.
+  #
+  # The matrix is written out rather than derived, unlike `checks`: these four
+  # are not in `verify` and there is no list to read. Adding a browser check
+  # means adding it here, which is the drift `run-checks.mjs` exists to avoid
+  # and is unavoidable for a set that lives nowhere else.
+  browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Every ink, measured against the ground it is really painted on. The
+          # stylesheets can only be read for the eleven rules that set an ink
+          # and a ground together; the rest inherit theirs from a host, a part
+          # above them or the page, and only a laid-out document knows. Both
+          # color modes, because the half not on screen is the half that fails.
+          - task: contrast
+            run: bun run check:contrast
+          # The specs themselves.
+          - task: specs
+            run: bun run specs:browser
+          # Every example, rendered. `check:examples` reads them and can tell
+          # you an attribute no component declares; only running one can tell
+          # you it throws on upgrade, names an element registered nowhere, or
+          # lays out to nothing.
+          - task: smoke
+            run: bun run smoke
+          # Every headless example, pixel for pixel against a committed
+          # baseline. This is the one fault class the rest of `verify` cannot
+          # reach: everything else reads source or asserts a fact somebody
+          # thought to assert, and a chevron drawn at 233 pixels breaks nothing
+          # anybody wrote down. Here rather than in `verify` because it wants a
+          # browser and a baseline taken on this runner: the comparison never
+          # crosses platforms, so on a contributor's Mac it says so and exits
+          # clean. See 148.
+          - task: visual
+            run: bun run check:visual
     steps:
       - uses: actions/checkout@v4
 
@@ -191,13 +237,6 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      # **No Rust in this job at all.** It had a toolchain because `bun run
-      # build` reached `helix/theme`, whose build shelled out to `cargo` and
-      # `wasm-bindgen`. Since 273 the wasm is tracked and that package's build
-      # is `tsc` alone, so `turbo run build` never touches cargo here. The four
-      # steps that used to stand here cost 193 seconds, the largest of them
-      # `cargo install wasm-bindgen-cli` at 178, to build nothing this job runs.
-
       # The browser is a 130MB download that changes only when Playwright does,
       # so it is keyed on the lockfile. `--with-deps` still runs: the apt
       # packages are not in this cache, and a headless browser in CI fails on a
@@ -207,49 +246,23 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
           path: ~/.cache/ms-playwright
 
+      # No Rust: since 273 the wasm is tracked and `helix/theme`'s build is
+      # `tsc` alone, so `turbo run build` never touches cargo here.
       - run: bun run build
 
       - run: bunx playwright install --with-deps chromium
 
-      - run: bun run specs:browser
-
-      # Every example, rendered. `check:examples` reads them and can tell you an
-      # attribute no component declares; only running one can tell you it throws
-      # on upgrade, names an element registered nowhere, or lays out to nothing.
-      # The frame bundle it needs was built by `bun run build` above, because
-      # site-ui's own build emits it.
-      - run: bun run smoke
-
-      # Every ink, measured against the ground it is really painted on. The
-      # stylesheets can only be read for the eleven rules that set an ink and a
-      # ground together; the rest inherit theirs from a host, a part above them
-      # or the page, and only a laid-out document knows. Both color modes,
-      # because the half not on screen is the half that fails: every finding
-      # this caught on its first green run was in dark.
-      - run: bun run check:contrast
-
-      # Every headless example, pixel for pixel against a committed baseline. This
-      # is the one fault class the rest of `verify` cannot reach: everything
-      # else reads source or asserts a fact somebody thought to assert, and a
-      # chevron drawn at 233 pixels breaks nothing anybody wrote down. Here
-      # rather than in `verify` because it wants a browser and a baseline taken
-      # on this runner: the comparison never crosses platforms, so on a
-      # contributor's Mac the check says so and exits clean. See 148.
-      - run: bun run check:visual
+      - name: ${{ matrix.task }}
+        run: ${{ matrix.run }}
 
       # **The pictures, when it fails, because nothing else can show them.**
       # `check:visual` marks the changed pixels into `headless.diff.png` beside
       # each baseline and those files die with the runner, so a reviewer got a
-      # pixel count and no way to see what moved. Reviewing 28 retaken baselines
-      # on 25 Aug 2026 meant checking the branch out and opening the images by
-      # hand, which is the step most likely to be skipped on the day a diff
-      # looks obviously fine, and 216 already says that is the day it matters.
-      #
-      # `failure()` rather than `always()`: a green run has nothing to look at,
-      # and an artifact uploaded every time is one nobody opens.
+      # pixel count and no way to see what moved. `if-no-files-found: ignore`
+      # because only the visual shard ever writes one.
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: ignore
-          name: visual-diffs
+          name: visual-diffs-${{ matrix.task }}
           path: helix/styled/src/*/.examples/headless.diff.png
