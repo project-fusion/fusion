@@ -20,26 +20,22 @@
   </g>
   <defs>
     <linearGradient gradientUnits="userSpaceOnUse" id="fusion-grad-bar-top"
-      x1="0" x2="72" y1="10" y2="10"
-      gradientTransform="translate(42.5 28) scale(2.38)">
+      x1="0" x2="72" y1="10" y2="10">
       <stop stop-color="var(--logo-color-from, var(--helix-color-primary))" />
       <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
     </linearGradient>
     <linearGradient gradientUnits="userSpaceOnUse" id="fusion-grad-bar-shadow"
-      x1="27.9766" x2="71.9766" y1="10" y2="10"
-      gradientTransform="translate(42.5 28) scale(2.38)">
+      x1="27.9766" x2="71.9766" y1="10" y2="10">
       <stop stop-color="var(--logo-color-from, var(--helix-color-primary))" />
       <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
     </linearGradient>
     <linearGradient gradientUnits="userSpaceOnUse" id="fusion-grad-c"
-      x1="27.043" x2="27.043" y1="26" y2="83.6826"
-      gradientTransform="translate(42.5 28) scale(2.38)">
+      x1="27.043" x2="27.043" y1="26" y2="83.6826">
       <stop stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
       <stop offset="1" stop-color="var(--logo-color-mid, var(--helix-color-primary-hover))" />
     </linearGradient>
     <linearGradient gradientUnits="userSpaceOnUse" id="fusion-grad-c-highlight"
-      x1="20.1232" x2="20.1232" y1="26" y2="57.6558"
-      gradientTransform="translate(42.5 28) scale(2.38)">
+      x1="20.1232" x2="20.1232" y1="26" y2="57.6558">
       <stop stop-color="var(--logo-color-from, var(--helix-color-primary))" />
       <stop offset="1" stop-color="var(--logo-color-from, var(--helix-color-primary))" stop-opacity="0.2" />
     </linearGradient>
