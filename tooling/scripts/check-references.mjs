@@ -43,7 +43,27 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
+/* The repository root is in the list, and it was the omission that mattered.
+   `CLAUDE.md` linked `plan/00-thesis.md` for a day after the strategy folder left
+   with the rewritten history, so the first link a contributor follows was the one
+   thing here pointing at a file that does not exist, and this check could not see
+   it: every path it scanned was inside a package. A root file is where a reader
+   starts, which makes it the worst place to be unchecked. */
 const ROOTS = ['helix', 'cortex', 'tooling', 'docs', 'site/ui']
+
+/* The repository's own top-level files, checked without descending.
+   `CLAUDE.md` linked `plan/00-thesis.md` for a day after the strategy folder left
+   with the rewritten history, so the first link a contributor follows was the one
+   thing here pointing at a file that does not exist, and this check could not see
+   it: every path it scanned was inside a package. A root file is where a reader
+   starts, which makes it the worst place to be unchecked.
+
+   Listed rather than walked from `.`, because walking the root would scan every
+   package a second time and descend into `target`, which is 2.4GB of Rust build
+   output. */
+const ROOT_FILES = readdirSync('.').filter(
+  (entry) => /\.(md|json|ts|mjs)$/.test(entry) && statSync(entry).isFile(),
+)
 const EXTENSIONS = /\.(css|html|json|md|mjs|rs|toml|ts|tsx|txt)$/
 const SOURCE = /\.(css|mjs|ts|tsx)$/
 const PROSE = /\.mdx?$/
@@ -84,7 +104,12 @@ const walk = (dir) => {
     return
   }
   for (const entry of readdirSync(dir)) {
-    if (entry === 'node_modules' || entry === 'dist' || entry.startsWith('.')) {
+    if (
+      entry === 'node_modules' ||
+      entry === 'dist' ||
+      entry === 'target' ||
+      entry.startsWith('.')
+    ) {
       continue
     }
     const path = join(dir, entry)
@@ -97,6 +122,14 @@ const walk = (dir) => {
     }
   }
 }
+for (const file of ROOT_FILES) {
+  if (SOURCE.test(file) && !file.endsWith('.css.ts')) {
+    files.push(file)
+  } else if (PROSE.test(file)) {
+    prose.push(file)
+  }
+}
+
 for (const root of ROOTS) {
   walk(root)
 }

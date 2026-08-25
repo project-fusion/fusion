@@ -1,7 +1,12 @@
 # Working in this repo
 
-Fusion Development Group. Strategy lives in [`docs/`](docs/); start with
-[`plan/00-thesis.md`](plan/00-thesis.md).
+Fusion Development Group. **The strategy folder is not in this repository.**
+`docs/plan/` was removed when the history was rewritten for the public repository,
+and it lives in the archive alongside the rest of what was taken out. Comments
+here still cite it by name, `plan/00-thesis.md` and `plan/23-helix-docs.md` among
+them, because the reasoning they carry is still why the code is shaped as it is;
+the documents themselves are elsewhere. What remains in [`docs/`](docs/) is the
+queue, the published writing, and two generated references.
 
 Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 `.claude/rules/cortex.md` for `cortex/**`. To add a component, use the
