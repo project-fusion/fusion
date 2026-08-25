@@ -1,11 +1,27 @@
-# One job that runs `bun run verify`, which is the same command the repo tells
-# a person to run. Not a matrix of steps mirroring what `verify` already does:
-# that is a second definition of "correct" to keep in step with the first, and
-# the two drift the first time someone adds a check to one of them.
+# `verify` split across jobs, with the list of checks derived from `verify`.
 #
-# `verify` never writes, which is what makes it safe here. It runs `biome ci`
-# rather than `biome check --write`, so a formatting fault fails the run instead
-# of being silently corrected into a green one.
+# **This file argued against a matrix until 25 Aug 2026, and the objection was
+# right about the thing it was protecting.** It said: "Not a matrix of steps
+# mirroring what `verify` already does: that is a second definition of correct
+# to keep in step with the first, and the two drift the first time someone adds
+# a check to one of them." That is exactly the fault `.claude/rules/helix.md`
+# records elsewhere, a rule and its enforcement in different files with nothing
+# holding them together.
+#
+# What changed is not the argument but the mechanism. `run-checks.mjs` reads the
+# `verify` script and shards it, so the list is not mirrored here: adding a
+# check to `verify` puts it in CI with no second edit, and a step that is
+# neither a check nor one of the dedicated jobs below fails the run rather than
+# being skipped. The drift the comment feared is now impossible rather than
+# merely discouraged.
+#
+# **The reason worth the change is not speed.** `verify` is `a && b && c`, so it
+# reports one failure and stops. Four CI runs went to finding four stale
+# artifacts on 25 Aug 2026, one per run, because each fix revealed the next. A
+# shard runs every check it owns and reports all of them together.
+#
+# `verify` still never writes: `biome ci` rather than `biome check --write`, and
+# every shard ends by asserting the tree is unchanged.
 name: verify
 
 on:
@@ -22,10 +38,41 @@ concurrency:
 permissions:
   contents: read
 
+# **Turborepo's remote cache, and it is what makes the split affordable.** Every
+# task here declares `dependsOn: ^build`, so each job would otherwise rebuild
+# the workspace from cold: `bun run build` alone measured 76 seconds. Shared,
+# the build becomes a restore and the six shards stop paying for it six times.
+#
+# Absent the token turbo falls back to its local cache and everything still
+# runs, so this is inert until the secret exists rather than broken without it.
+env:
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
 jobs:
-  verify:
+  # The shard count lives in one place and the matrix is built from it, so a
+  # matrix of six against `--of 8` cannot silently drop a third of the checks.
+  plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 5
+    outputs:
+      shards: ${{ steps.shards.outputs.shards }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: shards
+        run: echo "shards=$(node tooling/scripts/run-checks.mjs --list --of 6)" >> "$GITHUB_OUTPUT"
+
+  checks:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      # **Never fail fast.** A shard that fails while five are cancelled is the
+      # serial chain again, one failure at a time, which is the whole thing this
+      # split exists to stop.
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.shards) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -39,9 +86,8 @@ jobs:
       # analyze` is a Node CLI, so `bun run analyze` hands it to whatever Node
       # is on `PATH`, and its config is TypeScript. Below 22.18 that config
       # cannot load, the analyzer falls back to a default one and writes a
-      # manifest with every Helix plugin missing, and says it succeeded. This
-      # job set up bun and Rust and never Node, so the floor was whatever the
-      # runner image shipped. `bun run check:node` fails the run if it is not.
+      # manifest with every Helix plugin missing, and says it succeeded.
+      # Every shard runs `analyze`, so every shard needs this floor.
       - uses: actions/setup-node@v6
         with:
           node-version: '22.20.0'
@@ -51,28 +97,7 @@ jobs:
       # machine that pushed.
       - run: bun install --frozen-lockfile
 
-      # From the toolchain file if there is one, else the version the workspace
-      # declares. `clippy` because `verify` runs it; `rustfmt` is not needed,
-      # since `cargo fmt` writes and `verify` does not call it.
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
-
-      - uses: Swatinem/rust-cache@v2
-
-      # **No wasm toolchain here, deliberately, and it is worth saying why it
-      # went.** 261 added `wasm32-unknown-unknown` and a pinned
-      # `wasm-bindgen-cli` because `helix/theme` compiled against an artifact
-      # that was gitignored, so a fresh checkout had to build one. 273 tracked
-      # the artifact instead and made it an input rather than a build step, at
-      # which point nothing in `verify` invokes `cargo build --target wasm32`
-      # and `check:wasm` reads the tracked file. The install stayed anyway and
-      # cost 133 seconds a run, the most expensive step in this workflow, to
-      # produce a binary nothing asked for.
-      #
-      # The toolchain above stays: `rs:check` is clippy and `rs:test` is
-      # `cargo test --workspace`, both on the host.
-      - run: bun run verify
+      - run: node tooling/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of 6
 
       # `verify` is meant not to write, and `analyze` is the one step that can:
       # it regenerates the manifests. A tracked manifest that no longer matches
@@ -81,6 +106,65 @@ jobs:
       # "never writes" rule checkable instead of stated.
       - name: The tree is unchanged by verifying it
         run: git diff --exit-code
+
+  # Its own job because it reads every file regardless of who owns it, so
+  # sharding it would mean six passes over the same tree.
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+      - run: bun install --frozen-lockfile
+      - run: bunx biome ci .
+
+  types:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.20.0'
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.20.0'
+      - run: bun install --frozen-lockfile
+      - run: bun run test
+
+  # Cargo only. No `wasm32` target and no `wasm-bindgen-cli`: 261 added them
+  # because `helix/theme` compiled against a gitignored artifact, 273 tracked
+  # the artifact and made it an input, and the install then cost 133 seconds a
+  # run to build a binary nothing asks for. `clippy` because `rs:check` runs it;
+  # `rustfmt` is not needed, since `cargo fmt` writes and `verify` does not call
+  # it.
+  rust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: bun run rs:check
+      - run: bun run rs:test
 
   # A separate job, because it needs a browser and `verify` deliberately does
   # not: everything in `verify` runs anywhere bun runs. These are the specs
@@ -97,6 +181,10 @@ jobs:
         with:
           bun-version: 1.1.43
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.20.0'
+
       - run: bun install --frozen-lockfile
 
       # **No Rust in this job at all.** It had a toolchain because `bun run
@@ -106,13 +194,15 @@ jobs:
       # steps that used to stand here cost 193 seconds, the largest of them
       # `cargo install wasm-bindgen-cli` at 178, to build nothing this job runs.
 
-      # `--with-deps` installs the shared libraries as well as the browser. A
-      # headless browser in CI fails on a missing `libnss3` far more often than
-      # on anything to do with the tests.
-      # Built first. `specs` bundles from source, and source imports the
-      # generated `.css.ts` files and the other packages' `dist`, neither of
-      # which is tracked. Locally this is invisible because nobody bundles specs
-      # on a tree they have not built.
+      # The browser is a 130MB download that changes only when Playwright does,
+      # so it is keyed on the lockfile. `--with-deps` still runs: the apt
+      # packages are not in this cache, and a headless browser in CI fails on a
+      # missing `libnss3` far more often than on anything to do with the tests.
+      - uses: actions/cache@v4
+        with:
+          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          path: ~/.cache/ms-playwright
+
       - run: bun run build
 
       - run: bunx playwright install --with-deps chromium
