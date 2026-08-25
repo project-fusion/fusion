@@ -60,6 +60,21 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
+      # **The WASM the theme package compiles against, which nothing else
+      # produces.** `helix/theme/src/index.ts` imports `../wasm/fusion_helix_theme.js`,
+      # `helix/theme/wasm/` is gitignored, and `typecheck` reads it. So `verify`
+      # could only ever pass on a machine that had run a build before, and never
+      # on a fresh checkout: green locally, red here, for as long as this
+      # repository has existed at this path. See 261.
+      #
+      # The target and the CLI are separate installs and both are needed:
+      # `cargo` builds the `.wasm` and `wasm-bindgen` turns it into the module
+      # and the typings. Pinned to the crate version in `helix/theme/Cargo.toml`,
+      # because a CLI newer than the crate it is generating for is a schema
+      # mismatch that reports as a link error.
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo install wasm-bindgen-cli --version 0.2.126 --locked
+
       - run: bun run verify
 
       # `verify` is meant not to write, and `analyze` is the one step that can:
@@ -86,6 +101,15 @@ jobs:
           bun-version: 1.1.43
 
       - run: bun install --frozen-lockfile
+
+      # **Rust, because `bun run build` below builds `helix/theme`**, whose build
+      # script shells out to `cargo` and `wasm-bindgen`. This job had no
+      # toolchain at all, so the build failed with a page of `Cannot resolve`
+      # before a single spec ran. See 261.
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo install wasm-bindgen-cli --version 0.2.126 --locked
 
       # `--with-deps` installs the shared libraries as well as the browser. A
       # headless browser in CI fails on a missing `libnss3` far more often than

@@ -24,8 +24,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "node ../../tooling/scripts/build-wasm.mjs && tsc -p tsconfig.json",
-    "test": "cargo test -p helix-theme --manifest-path ../../Cargo.toml",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "test": "cargo test -p fusion-helix-theme --manifest-path ../../Cargo.toml",
+    "typecheck": "node ../../tooling/scripts/build-wasm.mjs && tsc -p tsconfig.json --noEmit"
   },
   "publishConfig": {
     "access": "restricted"
