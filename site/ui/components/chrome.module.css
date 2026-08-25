@@ -301,3 +301,69 @@
   --option-active-color: var(--helix-color-primary-subtle);
   --option-radii: var(--helix-radii-sm);
 }
+
+/* The navigation drawer, which was reading as prose and is a menu.
+ *
+ * Every link in here carried `data-link`, and that recipe is the *prose* one:
+ * primary color, underlined, sized to sit inside a sentence. Applied to a menu
+ * it produced eleven blue underlined phrases stacked down a panel, which is
+ * what a page of links looked like before anybody styled navigation. The
+ * recipe was not wrong, it was answering a different question.
+ *
+ * What a menu wants instead is a row: foreground color so the destination is
+ * the content rather than the fact that it is a link, no underline because
+ * position already says these are navigation, and a box tall enough to hit.
+ * 2.75rem is 44px, which is the smallest comfortable touch target and the one
+ * number in here that is not a token, tokens being about rhythm rather than
+ * about the size of a fingertip. */
+.navMenu {
+  display: grid;
+  gap: var(--helix-space-xl);
+  inline-size: 100%;
+}
+
+.navGroup {
+  display: grid;
+  gap: var(--helix-space-2xs);
+}
+
+/* The label sits over a column of rows that are inset by their own padding, so
+   it takes the same inset or it hangs off the left of everything it names. */
+.navGroupLabel {
+  padding-block-end: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+.navItem {
+  align-items: center;
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-foreground);
+  display: flex;
+  font-size: var(--helix-text-lg);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-sm);
+  /* The whole row is the link and the tag rides its end, so five verticals
+     line their stages up in a column instead of each one starting wherever its
+     own name happened to stop. */
+  justify-content: space-between;
+  min-block-size: 2.75rem;
+  padding-inline: var(--helix-space-sm);
+  text-decoration: none;
+  transition: background-color var(--helix-duration-fast);
+}
+
+.navItem:hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
+/* Where the reader already is, said once. The tone is the link color the rest
+   of the menu deliberately gave up, which is free to use here because exactly
+   one row can carry it. */
+.navItem[aria-current="page"] {
+  color: var(--helix-color-primary);
+}
+
+.navAction {
+  inline-size: 100%;
+  margin-block-start: var(--helix-space-xs);
+}

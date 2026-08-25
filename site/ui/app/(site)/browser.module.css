@@ -42,11 +42,16 @@
  *
  * Set as the variable rather than as `padding-inline`, because `.shell` and
  * `.pageHeroInner` already read it. Overriding the input leaves one rule
- * deciding the inset instead of three restating it. */
+ * deciding the inset instead of three restating it.
+ *
+ * `--site-chrome-inset` and not `space-2xl` directly, because the masthead
+ * stopped being 48 on a phone and this stayed, which put the wordmark at 16 and
+ * the first card at 48. The alignment above is the point and the number is not;
+ * `site.css` holds the number for both. */
 .pageHero,
 .filterBar,
 .gridBand {
-  --site-inset: var(--helix-space-2xl);
+  --site-inset: var(--site-chrome-inset);
 }
 
 /* The page's own color, and it runs up behind the masthead.
@@ -194,6 +199,40 @@
    controls rather than as a pair. */
 .filterControl {
   inline-size: 12rem;
+}
+
+/* **Three fixed controls in a wrapping row, on a phone, is two and an orphan.**
+   12rem is 192px, so a 375px screen fits two of them and drops the third onto a
+   line of its own with two thirds of that line empty. What a reader sees is a
+   layout that ran out of room rather than one that was arranged, and the odd
+   one out is the sort, which is the control least like the other two.
+
+   So the break is made deliberate instead of being left to `wrap`. The two
+   filters split one row and the sort takes the next whole, which is the grouping
+   the markup already has: a pair that narrows the set, and a control that orders
+   what is left. The fixed width comes off here and only here, since the reason
+   for it, two selects agreeing with each other, is met better by both filling
+   half than by both being 192.
+
+   `inline-size` and `flex` rather than a grid, because these are `helix-flex`
+   hosts: a document rule setting `display` on one wins from outside the shadow
+   root where the component cannot answer back, and `check:overruled` fails on
+   exactly that. */
+@media (width < 48rem) {
+  .filterGroup {
+    inline-size: 100%;
+  }
+
+  .filterSort {
+    inline-size: 100%;
+  }
+
+  .filterGroup .filterControl,
+  .filterSort .filterControl {
+    flex: 1 1 0;
+    inline-size: auto;
+    min-inline-size: 0;
+  }
 }
 
 /* Present to a screen reader, absent to everything else.

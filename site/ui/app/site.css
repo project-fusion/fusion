@@ -179,8 +179,38 @@ helix-megamenu {
   --logo-color-to: var(--helix-color-surface-inverse);
 }
 
+/* **One inset for the site's chrome, because a reader sees it as one edge.**
+   The masthead and the bands under it, the hero, the filter bar and the card
+   grid, all line up down the left of the page, and `browser.module.css` says at
+   length why the grid opts out of `--site-inset` to do it. That argument holds
+   at every width and the number does not, so the number lives here and both
+   sides read it.
+
+   **Sixteen on a phone, because forty-eight is a desktop's margin.** At `2xl` a
+   375px screen spends a quarter of the bar on air either side, and the wordmark
+   and the search field ran into each other with room to spare outside them
+   both. A media query rather than a clamp, and legitimately: this is the site's
+   own chrome deciding what a device gets, which is the consumer's half of the
+   responsiveness policy in `.claude/rules/helix.md` and the half a component
+   may not have.
+
+   **Written as one variable after the header alone took the sixteen.** It did,
+   and the grid kept the forty-eight, so the wordmark sat at 16 with the first
+   card at 48: the same two edges disagreeing that the grid's own comment
+   records fixing at 48 and 96. One declaration is what stops the next change to
+   either one reopening it. */
+:root {
+  --site-chrome-inset: var(--helix-space-2xl);
+}
+
+@media (width < 48rem) {
+  :root {
+    --site-chrome-inset: var(--helix-space-md);
+  }
+}
+
 helix-app-header {
-  --app-header-inset: var(--helix-space-2xl);
+  --app-header-inset: var(--site-chrome-inset);
   --app-header-max-inline-size: none;
 }
 /* **Sixteen on a phone, because forty-eight is a desktop's margin.** The inset
@@ -193,6 +223,32 @@ helix-app-header {
 @media (width < 48rem) {
   helix-app-header {
     --app-header-inset: var(--helix-space-md);
+  }
+}
+
+/* **The hero's button pair is 400px of fixed width in a 375px window.**
+   `data-button-width="standard"` pins each half to `--helix-size-button`, twelve
+   and a half rem, which is what makes the two halves equal rather than sized by
+   how long their words are. Two of them do not fit a phone: measured on the
+   components page, the group reached 387 in a 375 viewport and the page scrolled
+   sideways by twelve pixels.
+
+   The group goes full width and the halves share it, so they stay equal, which
+   is the property the fixed width was there for. Shrinking the token instead
+   would have kept a pair of small buttons floating in the middle of the bar. */
+@media (width < 48rem) {
+  /* Width only. The host is already `inline-flex` and setting `display` here
+     would overrule it from the document, where a component cannot answer back:
+     `check:overruled` fails on exactly that. */
+  .pageHeroActions helix-button-group {
+    inline-size: 100%;
+  }
+
+  .pageHeroActions helix-button-group > * {
+    --helix-size-button: 100%;
+
+    flex: 1 1 0;
+    min-inline-size: 0;
   }
 }
 

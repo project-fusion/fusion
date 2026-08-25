@@ -36,7 +36,14 @@ export default function Page() {
         <helix-text as="h2" variant="title">
           What is inside it
         </helix-text>
-        <helix-grid columns={3} gap="lg">
+        {/* **`min` rather than a fixed three**, which at 375 gave three columns
+            of about 130px with every word on its own line and the third clipped
+            off the edge. `min` is the grid's own auto behavior and it is pure
+            CSS: `repeat(auto-fit, minmax(min(18rem, 100%), 1fr))` wraps on its
+            own container, needs no measurement of the viewport and no state, so
+            it works in server-rendered markup with no JavaScript. `columns`
+            stays as the ceiling for a wide screen. */}
+        <helix-grid columns={3} gap="lg" min="18rem">
           {CORTEX_MODULES.map((module) => (
             <helix-card key={module.title} separation="outlined">
               <helix-flex align="center" gap="sm" justify="between" slot="header">

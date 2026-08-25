@@ -202,7 +202,7 @@ export function InsightBrowser({
           justify="between"
           wrap
         >
-          <helix-flex gap="sm" wrap>
+          <helix-flex className={browser.filterGroup} gap="sm" wrap>
             <helix-select
               className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={topic}
@@ -249,7 +249,7 @@ export function InsightBrowser({
               </helix-select>
             )}
           </helix-flex>
-          <helix-flex align="center" gap="sm">
+          <helix-flex align="center" className={browser.filterSort} gap="sm">
             {/* The count is announced and not shown. Filtering is a change
                 nothing else reports, so a reader who cannot see the grid shrink
                 needs to be told; a reader who can see it is being told twice. */}

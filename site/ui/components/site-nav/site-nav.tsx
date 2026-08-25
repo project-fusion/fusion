@@ -350,15 +350,15 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
         open={open}
         placement="end"
       >
-        <helix-flex align="start" direction="column" gap="xl">
-          <helix-flex align="start" direction="column" gap="sm">
-            <helix-text tone="subtle" variant="label">
+        <div className={styles.navMenu}>
+          <div className={styles.navGroup}>
+            <helix-text className={styles.navGroupLabel} tone="subtle" variant="label">
               Products
             </helix-text>
             {PRODUCTS.map((product) => (
               <a
-                data-link
-                data-link-size="lg"
+                aria-current={pathname === product.href ? 'page' : undefined}
+                className={styles.navItem}
                 href={product.href}
                 key={product.name}
                 onClick={() => setOpen(false)}
@@ -366,27 +366,36 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                 {product.name}
               </a>
             ))}
-          </helix-flex>
+          </div>
 
-          <helix-flex align="start" direction="column" gap="sm">
-            <helix-text tone="subtle" variant="label">
+          <div className={styles.navGroup}>
+            <helix-text className={styles.navGroupLabel} tone="subtle" variant="label">
               Verticals
             </helix-text>
+            {/* The row is the link and the tag sits inside it, so the whole
+                44px band is the target and the stages line up at the end. Held
+                apart, each tag started wherever its own name stopped. */}
             {VERTICALS.map((vertical) => (
-              <helix-flex align="center" data-density="sm" gap="sm" key={vertical.href}>
-                <a data-link href={vertical.href} onClick={() => setOpen(false)}>
-                  {vertical.name}
-                </a>
-                <helix-tag tone={stageAppearance(vertical.stage)}>{vertical.stage}</helix-tag>
-              </helix-flex>
+              <a
+                aria-current={pathname === vertical.href ? 'page' : undefined}
+                className={styles.navItem}
+                href={vertical.href}
+                key={vertical.href}
+                onClick={() => setOpen(false)}
+              >
+                {vertical.name}
+                <helix-tag data-density="sm" tone={stageAppearance(vertical.stage)}>
+                  {vertical.stage}
+                </helix-tag>
+              </a>
             ))}
-          </helix-flex>
+          </div>
 
-          <helix-flex align="start" direction="column" gap="sm">
+          <div className={styles.navGroup}>
             {SECTIONS.map((section) => (
               <a
-                data-link
-                data-link-size="lg"
+                aria-current={pathname === section.href ? 'page' : undefined}
+                className={styles.navItem}
                 href={section.href}
                 key={section.href}
                 onClick={() => setOpen(false)}
@@ -394,9 +403,10 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                 {section.label}
               </a>
             ))}
-          </helix-flex>
+          </div>
 
           <a
+            className={styles.navAction}
             data-button="solid"
             data-button-tone="primary"
             data-density="lg"
@@ -404,7 +414,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           >
             Get in touch
           </a>
-        </helix-flex>
+        </div>
       </helix-drawer>
     </>
   )
