@@ -611,22 +611,25 @@
  * because an overlay needs the color behind it and this panel is not the
  * page's color. */
 .showcaseStage {
-  /* **The page's own ground, lifted rather than sunk.**
+  /* **No paper under the components, and no ground behind them.**
    *
-   * `surface-sunken` is a step *away* from the background, which on a dark page
-   * is a shade of near-black and reads as depth. In the light theme the page is
-   * white and there is nothing above it to step into, so the same token came
-   * out as a gray panel with a rule around it: the showcase looked like a
-   * screenshot pasted onto the page rather than part of it.
+   * This was a `surface` panel with `shadow-lg` and a radius, sitting on a band
+   * filled with `surface-sunken`: two grounds stacked under a demo whose whole
+   * claim is that the controls are real. A panel with a shadow says "a picture
+   * of an interface". The controls beside the copy *are* the interface, and the
+   * paper was the one thing on the page still arguing otherwise.
    *
-   * `surface` is white in the light theme and the raised step in the dark, so
-   * one token gives the right answer in both, and a shadow does the separating
-   * a border was doing. A shadow is the honest device here anyway: the panel is
-   * a thing sitting on the page, and a rule says "edge" where a shadow says
-   * "above". */
-  background-color: var(--helix-color-surface);
-  border-radius: var(--helix-radii-lg);
-  box-shadow: var(--helix-shadow-lg);
+   * It also fought the field. The band sits inside the reel, so there is an
+   * aura behind it now, and an opaque stage was the surface hiding the thing
+   * three fields exist to draw. Off the page, the components sit on the light
+   * directly.
+   *
+   * The earlier note here argued `surface` over `surface-sunken`, that a shadow
+   * separates where a rule only edges. That was the right call between two
+   * grounds and the wrong question: what was needed was neither.
+   *
+   * The mask, the padding and the overflow stay. Those are about the stage being
+   * a window onto content twice its height, which is still true. */
   /* Same rule again one level down: the stage is a grid item too, and its
      contents are twice the height of the region it sits in. */
   min-block-size: 0;

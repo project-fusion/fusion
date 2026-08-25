@@ -27,7 +27,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 72 |
-| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 31 |
+| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 30 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 18 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 23 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 48 |
@@ -127,7 +127,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-none` | `0` | 32 |
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 118 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 11 |
-| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 6 |
+| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 5 |
 | `--helix-radii-full` | `9999px` | 39 |
 
 ## font
@@ -206,7 +206,7 @@ Elevation.
 | `--helix-shadow-none` | `none` | 2 |
 | `--helix-shadow-sm` | `0 1px 2px var(--_helix-shadow-ink-sm)` | 8 |
 | `--helix-shadow-md` | `0 4px 12px var(--_helix-shadow-ink-md)` | 12 |
-| `--helix-shadow-lg` | `0 12px 32px var(--_helix-shadow-ink-lg)` | 7 |
+| `--helix-shadow-lg` | `0 12px 32px var(--_helix-shadow-ink-lg)` | 6 |
 | `--helix-shadow-surface` | `var(--helix-shadow-none)` | 1 |
 | `--helix-shadow-floating` | `var(--helix-shadow-lg)` | 12 |
 

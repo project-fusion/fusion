@@ -358,12 +358,18 @@ export default function Home() {
           the whole panel reads as a thing being looked into. What overflows is
           masked rather than cut: a hard edge says the layout ran out, a fade
           says there is more, which there is. */}
-      <section
-        className={`${styles.showcaseBand} ${styles.glassBand}`}
-        data-band
-        data-material="glass"
-        data-reveal
-      >
+      {/* **No ground and no glass on this one.** The band carried
+          `data-material="glass"` and the `.glassBand` corrections that go with a
+          full-bleed surface, which was the right answer while the stage inside it
+          was paper: two grounds wanted the outer one to admit some light. With
+          the paper gone the components sit on the field directly, and a
+          translucent band over them would be a third layer doing nothing but
+          dimming the thing it is there to reveal.
+
+          `.glassBand` stays for the closing call to action, which is still a
+          surface and still wants one. See 222 for the measurement that put a
+          field behind this band in the first place. */}
+      <section className={styles.showcaseBand} data-band data-reveal>
         {/* **No rule between them, and more room instead.** A line is one way
             to say two things are separate and whitespace is the other, and
             whitespace does not have to be looked past. The splitter that was
