@@ -21,9 +21,12 @@
 # than here, so the two do not both review the same diff. Nothing in this file
 # turns it on or off.
 #
-# Forks are skipped rather than failed: a `pull_request` run from a fork gets no
-# secrets, so the action would error on a missing key and report as a broken
-# review instead of an absent one.
+# Forks are skipped rather than failed, and since the move to federated auth the
+# reason is authentication rather than an absent secret. See the guard's own
+# comment on the job: the federated subject carries nothing about who opened the
+# pull request, so the `if:` is what scopes the workspace's budget to this
+# repository's own branches. It is not dead weight left over from a key that no
+# longer exists.
 name: review
 
 on:
@@ -50,31 +53,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # TEMPORARY, remove once the federation rule is confirmed. Prints the
-      # claims this run actually presents so the rule is written against a
-      # measured subject rather than a guessed one. The token itself is never
-      # printed; these claims are public facts about the run.
-      - name: Report the OIDC subject
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const token = await core.getIDToken('https://api.anthropic.com')
-            const claims = JSON.parse(
-              Buffer.from(token.split('.')[1], 'base64url').toString(),
-            )
-            for (const key of [
-              'aud',
-              'event_name',
-              'ref',
-              'repository',
-              'repository_id',
-              'repository_owner',
-              'repository_owner_id',
-              'sub',
-            ]) {
-              core.info(`${key} = ${claims[key]}`)
-            }
-
       # **There is no API key, and the four identifiers below are not secrets.**
       # Workload identity federation exchanges the run's own GitHub OIDC token
       # for an Anthropic token that lives ten minutes, so the reviewer
@@ -85,10 +63,13 @@ jobs:
       # repository with no long-lived credential of any kind.
       #
       # **Which makes the fork guard on this job load-bearing for auth, not
-      # just for cost.** The federation rule matches
-      # `repo:project-fusion/fusion:pull_request`, the subject a pull request
-      # run presents, and that subject says nothing about who opened the pull
-      # request. Without `head.repo.full_name == github.repository` above,
+      # just for cost.** Measured off a live run rather than assumed, the
+      # subject is
+      # `repo:project-fusion@50857512/fusion@1345601099:pull_request`: GitHub
+      # issues the immutable form, embedding the owner and repository ids, and
+      # three rules written against the documented `repo:owner/repo:` shape
+      # were denied before anyone read the token. It carries nothing about who
+      # opened the pull request. Without `head.repo.full_name == github.repository` above,
       # anyone who can open one against this repository could spend the
       # workspace's budget. The workspace carries a limit for the same reason,
       # `continue-on-error` meaning an overrun here fails invisibly.
@@ -99,11 +80,6 @@ jobs:
           anthropic_service_account_id: svac_01KZ8JktTjLUiuDVoF3Aq837
           anthropic_workspace_id: wrkspc_017UiVfcccArL54cKMJ4khbA
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # TEMPORARY with the subject step above. The action hides the
-          # SDK's output, so a failed token exchange and a failed API call
-          # look identical from the log: one turn, zero cost, no model
-          # usage. This prints what actually came back.
-          show_full_output: true
           track_progress: true
           use_sticky_comment: true
           claude_args: --model claude-opus-5
