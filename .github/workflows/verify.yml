@@ -134,9 +134,25 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
 
-  unit:
+  # **One job for all three, because `bun run test` is partly Rust.**
+  # `@helix-io/theme`'s `test` script is `cargo test -p fusion-helix-theme`, so
+  # `turbo run test` needs a toolchain: split out on its own it failed with
+  # cargo's exit 101. Run beside `rs:check` and `rs:test` they share one cargo
+  # cache and one compile, where two jobs would each pay for their own.
+  #
+  # Every one of them is invoked through `bun run`, so bun is needed even for
+  # the cargo steps. Omitted once, and `rs:check` failed with `bun: command not
+  # found` in ten seconds.
+  #
+  # No `wasm32` target and no `wasm-bindgen-cli`: 261 added them because
+  # `helix/theme` compiled against a gitignored artifact, 273 tracked the
+  # artifact and made it an input, and the install then cost 133 seconds a run
+  # to build a binary nothing asks for. `clippy` because `rs:check` runs it;
+  # `rustfmt` is not needed, since `cargo fmt` writes and `verify` does not
+  # call it.
+  tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -146,23 +162,11 @@ jobs:
         with:
           node-version: '22.20.0'
       - run: bun install --frozen-lockfile
-      - run: bun run test
-
-  # Cargo only. No `wasm32` target and no `wasm-bindgen-cli`: 261 added them
-  # because `helix/theme` compiled against a gitignored artifact, 273 tracked
-  # the artifact and made it an input, and the install then cost 133 seconds a
-  # run to build a binary nothing asks for. `clippy` because `rs:check` runs it;
-  # `rustfmt` is not needed, since `cargo fmt` writes and `verify` does not call
-  # it.
-  rust:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
+      - run: bun run test
       - run: bun run rs:check
       - run: bun run rs:test
 

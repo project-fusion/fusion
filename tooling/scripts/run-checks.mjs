@@ -48,10 +48,22 @@ const DEDICATED = new Set([
 ])
 
 /**
- * Generators whose output the later checks read. Every shard runs these before
- * its own work, in `verify`'s order.
+ * What the checks read, built before any of them run, in `verify`'s order.
+ *
+ * **`build` is here because `catalog` does not reach everything.** `catalog` is
+ * a `site/ui` task and turbo builds what that package depends on, which is not
+ * the whole workspace: `@helix-io/headless` is not one of its dependencies, and
+ * `check:metrics` measures `helix/headless/dist`. Shards without a full build
+ * measured a dist nobody had produced, which passed on a machine where an
+ * earlier build had left one and failed on a runner. That is the same fault
+ * 273 fixed in three package scripts, arriving once more through turbo's graph
+ * rather than through a missing script.
+ *
+ * All three are cached tasks, so with a warm remote cache they cost a restore.
+ * Without one every shard pays the build, which is why the remote cache is a
+ * precondition for this split rather than a refinement of it.
  */
-const PREREQUISITES = ['bun run analyze', 'bun run catalog']
+const PREREQUISITES = ['bun run build', 'bun run analyze', 'bun run catalog']
 
 const steps = readVerify()
 const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.includes(step))
