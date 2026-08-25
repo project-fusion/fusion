@@ -73,7 +73,7 @@ export interface Product {
    * expects this, and its row grid keeps the mark's column at `auto`, so a row
    * with nothing in it starts where the heading does.
    *
-   * These are the first bespoke product marks to ship. `adcce07c` removed three
+   * These are the first bespoke product marks to ship. `982eedbc` removed three
    * earlier attempts because each was a pictogram of the product's metaphor
    * standing beside a parent that is a geometric monogram. These are monograms
    * in the parent's construction: one rounded body with material removed, two

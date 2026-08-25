@@ -22,7 +22,7 @@
      and would shrink whenever the density did.
 
      `control-lg`, so forty-eight. The comment said `control-md` and "forty is
-     the figure" for as long as the rule said `control-lg`: `075a6d5` raised the
+     the figure" for as long as the rule said `control-lg`: `9b5c683` raised the
      bars to 48 on purpose and left the sentence describing the value before
      it. */
   block-size: var(--sandbox-toolbar-size, var(--helix-size-control-lg));

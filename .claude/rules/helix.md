@@ -942,8 +942,8 @@ and prefixed**:
 ```
 
 *Corrected 17 Aug 2026. This section described PascalCase names (`OpenChange`)
-for one day and the code has never carried them since. `f8c7365` made that
-change at 00:35 and rewrote this file; `db172f2` reversed it at 23:07 the same
+for one day and the code has never carried them since. `b40fffe` made that
+change at 00:35 and rewrote this file; `2b785c4` reversed it at 23:07 the same
 day and did not, so the rule outlived the decision by four days of work against
 it. `check:events` and `helix-convention-lint` both enforce
 `/^helix-[a-z][a-z0-9-]*$/`, which is what the sixty-six shipped events answer

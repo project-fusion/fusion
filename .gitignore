@@ -19,7 +19,7 @@ out/
 .env.*
 !.env.template
 
-# OS / editor. `.vscode/settings.json` was tracked from 2812a45f, where it
+# OS / editor. `.vscode/settings.json` was tracked from 7113adb7, where it
 # arrived beside a component port rather than by decision. Its only content
 # was a `files.exclude` map restating this file as an editor view
 # preference, and the editor rewrites it, so it was churn nobody read.

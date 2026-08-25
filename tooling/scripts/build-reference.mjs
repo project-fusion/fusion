@@ -5,7 +5,7 @@
  * **Unnumbered, and that is the point of the name.** It sat at
  * `11-component-reference.md`, taking a slot in the 00 to 99 strategy sequence
  * because that is where prose about this repository already lived, and it
- * arrived there in `2812a45f` beside a List port rather than by decision. A
+ * arrived there in `7113adb7` beside a List port rather than by decision. A
  * sequence number is a reading order for documents somebody wrote; this one is
  * written by a script and nobody reads it in order. `docs/` is still the right
  * folder: it is repository-internal, which is exactly what this is, and moving

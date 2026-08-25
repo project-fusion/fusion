@@ -123,7 +123,7 @@ const auditUnanswered = <T>(host: EventTarget, label: string, next: T, before: T
  * `addEventListener('CheckedChange', …)` with it, an event nothing dispatches,
  * so no consumer writing JSX could reach one. The justification written beside
  * them was that the generated React wrapper assigned them instead, and that
- * package was deleted in `6bc8502`, which left four documented properties that
+ * package was deleted in `46f5f7f`, which left four documented properties that
  * only a consumer holding a reference could use. `helix-change` reaches every
  * consumer in every framework, hydration included.
  */
