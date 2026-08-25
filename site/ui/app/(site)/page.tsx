@@ -21,6 +21,7 @@ import { pageMetadata } from '@/utils/metadata/metadata'
 import { INSIGHTS } from '../../content/insights'
 import { HeroCopy } from './hero-copy'
 import { InsightCard } from './insight-card'
+import { InsightReel } from './insight-reel'
 import styles from './landing.module.css'
 import { Showcase } from './showcase'
 
@@ -497,11 +498,11 @@ export default function Home() {
               quarter of the shell, which is why its summary is clamped: a
               three-line teaser under a title is a card, and an unclamped
               paragraph at that width is a column. */}
-          <helix-carousel class="insightReel" label="Insights" loop per-view={4}>
+          <InsightReel>
             {INSIGHTS.map((insight) => (
               <InsightCard insight={insight} key={insight.slug} />
             ))}
-          </helix-carousel>
+          </InsightReel>
         </helix-flex>
       </section>
 
