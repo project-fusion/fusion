@@ -127,7 +127,6 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
             the group was named twice, once visibly and once through
             `aria-label`. */}
         <helix-toggle-group
-          hint="System keeps following your device."
           label="Color mode"
           onhelix-change={(event) => choose(event.detail.value as ColorMode)}
           value={mode}
@@ -137,13 +136,13 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           <helix-toggle value="dark">Dark</helix-toggle>
         </helix-toggle-group>
 
-        {/* Base first, styled second, which is the order the tiers are in: styled
-            extends base, so reading left to right is reading outward. The
-            default is unchanged and is still styled, that being the tier almost
-            everyone consumes; where a control sits in a row and which of its
-            values is the resting one are different questions. */}
+        {/* Headless first, styled second, which is the order the tiers are in:
+            styled extends headless, so reading left to right is reading
+            outward. The default is unchanged and is still styled, that being
+            the tier almost everyone consumes; where a control sits in a row and
+            which of its values is the resting one are different questions. */}
         <helix-toggle-group
-          hint="Styled extends base, so it shows more."
+          hint="Styled extends headless, so it shows more."
           label="API reference"
           onhelix-change={(event) => chooseTier(event.detail.value as ApiTier)}
           value={tier}
