@@ -114,8 +114,8 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-md` | `var(--_helix-scale-4)` | 82 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 71 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 35 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 43 |
-| `--helix-space-3xl` | `var(--_helix-scale-16)` | 7 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 44 |
+| `--helix-space-3xl` | `var(--_helix-scale-16)` | 6 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
 
 ## radii

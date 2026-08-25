@@ -164,7 +164,8 @@ const server = createServer((request, response) => {
   /* The width rides in the query rather than in a module variable the loop
      sets, so a request is answered by what it asked for and two widths could
      be fetched in any order without the page depending on when it was asked. */
-  const width = Number(new URL(request.url ?? '/', 'http://x').searchParams.get('w')) || WIDTHS[0].width
+  const width =
+    Number(new URL(request.url ?? '/', 'http://x').searchParams.get('w')) || WIDTHS[0].width
   response.end(page(family, width))
 })
 
