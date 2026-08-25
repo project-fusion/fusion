@@ -107,7 +107,7 @@
     "tokens:build": "bun tooling/scripts/build-token-layer.mjs",
     "check:tokens-layer": "bun tooling/scripts/build-token-layer.mjs --check",
     "wasm": "node tooling/scripts/build-wasm.mjs",
-    "check:wasm": "bun run wasm && node tooling/scripts/check-wasm.mjs",
+    "check:wasm": "node tooling/scripts/check-wasm.mjs",
     "check:attributes": "node tooling/scripts/check-attributes.mjs",
     "eval": "node tooling/scripts/run-eval.mjs",
     "eval:build": "node tooling/scripts/build-eval.mjs",

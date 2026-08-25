@@ -77,5 +77,19 @@ site/ui/public/helix/docs/
 site/ui/public/helix/*.md
 site/ui/public/*.md
 site/ui/public/insights/
-helix/theme/wasm/
-site/ui/public/helix/theme.wasm
+# **The wasm is tracked, and it is the only binary here that is.** Every other
+# generated artifact in this repository is committed and held to its generator by
+# a check: `custom-elements.json`, `tokens.css`, `jsx.d.ts`. This one was ignored
+# instead, which put a Rust toolchain on the critical path of anything that
+# builds the site. CI could be given one. Vercel's build image cannot, and the
+# site reads `public/helix/theme.wasm` from disk at build time, so a deploy that
+# has to compile Rust first is a deploy that fails on a platform we do not
+# control. Tracked, it is 419K that nothing has to rebuild.
+#
+# `check:wasm` is what keeps it honest, and it reads this artifact rather than
+# building a fresh one first, so the file measured is the file that ships. It
+# derives all seventeen themes through the tracked binary and holds them to
+# `oracle.json`, which carries them as the TypeScript derives them. `cargo test`
+# holds the host build to the same oracle. So the drift that tracking a binary
+# invites, a derivation that moves while the committed artifact does not, fails
+# here the moment the oracle is re-blessed.

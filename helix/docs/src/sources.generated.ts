@@ -1762,7 +1762,7 @@ repository does that. The per-component tables are what a page pays.
 | \`@helix-io/core\` | 124,848 | 41,397 | 35,764 | Element base class, mixins, decorators, floating positioning. |
 | \`@helix-io/headless\` | 448,382 | 114,676 | 90,462 | Every headless family, which is what the barrel means. |
 | \`@helix-io/icons\` | 45,238 | 14,531 | 12,270 | The whole glyph set. |
-| \`@helix-io/theme\` | 3,274 | 1,567 | 1,349 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
+| \`@helix-io/theme\` | 3,288 | 1,570 | 1,353 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
 | \`@helix-io/styled\` | 1,504,955 | 429,213 | 301,849 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
@@ -2074,8 +2074,8 @@ column is what was removed rather than part of what remains.
 | \`@helix-io/headless\` | 7,357,796 | 390 | 615,466 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 63,768 | 11 | 19,847 | none |
 | \`@helix-io/styles\` | 79,699 | 5 | 0 | none |
-| \`@helix-io/theme\` | 564,859 | 16 | 47,856 | none |
-| \`@helix-io/styled\` | 8,110,107 | 675 | 273,338 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/theme\` | 465,772 | 8 | 4,793 | none |
+| \`@helix-io/styled\` | 8,109,761 | 673 | 272,981 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 
