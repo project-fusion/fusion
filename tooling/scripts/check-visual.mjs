@@ -34,7 +34,7 @@
  * bun run visual:update             rewrite the baselines
  * ```
  *
- * A failure writes `base.diff.png` beside the baseline, the changed pixels
+ * A failure writes `headless.diff.png` beside the baseline, the changed pixels
  * marked, and leaves it there to be looked at. It is gitignored: what belongs in
  * the history is the baseline a reviewer approved, not the artifact of a run.
  */
@@ -232,11 +232,11 @@ for (const family of families) {
     threshold: 0.1,
   })
   if (moved > 0) {
-    const where = join(SOURCE, family, '.examples/base.diff.png')
+    const where = join(SOURCE, family, '.examples/headless.diff.png')
     writeFileSync(where, PNG.sync.write(diff))
     changed.push(
       `${family}: ${moved} pixels moved. The marked difference is at ` +
-        `helix/styled/src/${family}/.examples/base.diff.png. If the change was meant, ` +
+        `helix/styled/src/${family}/.examples/headless.diff.png. If the change was meant, ` +
         '`bun run visual:update` takes the new picture and the review is the diff on the baseline.',
     )
   }
