@@ -27764,6 +27764,10 @@
           "name": "HelixHeadlessListItem",
           "cssParts": [
             {
+              "description": "The cell a railed list draws its number in, empty otherwise.",
+              "name": "rail"
+            },
+            {
               "description": "The layout, held off the host so the host can carry a marker.",
               "name": "row"
             }

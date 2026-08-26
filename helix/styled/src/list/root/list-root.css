@@ -58,6 +58,60 @@
   list-style-type: disc;
 }
 
+/* The rail: the same numbering, at the start edge of the block.
+ *
+ * A marker hangs *beside the words*. That is what a marker is, and for a list of
+ * short rows it is right. It is not right for a numbered argument, where each
+ * item is a claim with prose under it and the numbers want to read as a column
+ * down the left of the page with the text starting at one measure, the way a
+ * numbered specification is set.
+ *
+ * **The native marker cannot be moved there.** `outside` places the marker just
+ * clear of the row's content box, so widening the gutter moves the *text* right
+ * and takes the marker with it: the two stay a marker's width apart whatever the
+ * gutter is. Getting the number to a fixed start edge means putting it in a
+ * track, which means it is a box the row draws rather than one the platform
+ * generates, which is `[part="rail"]`.
+ *
+ * **The counter is the list's, because the row cannot count itself.** Nothing in
+ * a row knows its own index, and the alternative to a counter is the list
+ * writing one onto the consumer's markup, which is a number the server and the
+ * client can disagree about and the thing this family already refused for the
+ * ordinary marker. `counter-reset` here and `counter-increment` on each slotted
+ * row is the same mechanism `display: list-item` uses, said out loud, and it
+ * reaches `[part="rail"]::before` inside the row's shadow the way any inherited
+ * value reaches it. Nested lists get a fresh scope from their own `counter-reset`.
+ *
+ * What it gives up is the native marker, and with it native list numbering in
+ * whatever a reader's locale counts with. The number is still text in the
+ * accessibility tree, in the row and before the label, which is where the marker
+ * put it. `--list-rail-style` takes any `list-style-type`, so a rail can count
+ * the way the content needs.
+ */
+:host([marker="rail"]) {
+  counter-reset: list-rail;
+  /* Nothing to hang into: the number is inside the row now, so the gutter the
+     markers needed would be an indent on a list that has stopped using them. */
+  padding-inline-start: var(--helix-space-none);
+}
+
+:host([marker="rail"]) ::slotted(*) {
+  --list-item-rail-content: counter(list-rail, var(--list-rail-style, decimal-leading-zero));
+  /* The two things a row cannot work out for itself: that there is a rail at all,
+     and what number this row is. Its width it reads from `--list-rail-width`
+     directly, which a consumer sets on the list and every row inherits. */
+  --list-item-rail-display: block;
+  counter-increment: list-rail;
+}
+
+/* The marker goes when the rail arrives. Written against both kinds explicitly
+   rather than left to source order, so this holds wherever the file moves it. */
+:host([kind="ordered"][marker="rail"]) ::slotted(*),
+:host([kind="unordered"][marker="rail"]) ::slotted(*) {
+  display: block;
+  list-style: none;
+}
+
 /* A term and what it means. The row already holds a label and its supporting
    text, so the kind only changes their weight and their order of importance:
    the term carries the emphasis and the description is ordinary prose under

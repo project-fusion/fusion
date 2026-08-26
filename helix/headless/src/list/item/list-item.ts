@@ -35,6 +35,7 @@ import { property } from 'lit/decorators.js'
  * @aliases Row, Entry
  * @documentation https://helix.fusion.dev/components/list
  *
+ * @csspart rail - The cell a railed list draws its number in, empty otherwise.
  * @csspart row - The layout, held off the host so the host can carry a marker.
  *
  * @slot start - Leading content, usually an icon or an avatar.
@@ -83,7 +84,28 @@ export class HelixHeadlessListItem extends HelixElement {
        grid lost it the moment the list asked for a marker. Measured before this
        wrapper: a row with a leading icon put the icon 32px in instead of 16 and
        its supporting text beside the label instead of under it. */
-    const content = html`<slot name="start"></slot>
+    /* The rail cell, empty here and empty in every list that does not ask for
+       one. A railed list puts its number at the block's own start edge, in a
+       track of its own ahead of the content, and the native `::marker` cannot
+       reach there: `outside` hangs the marker just clear of the row's content
+       box, which is beside the words rather than at the edge of the block. A
+       number that has to sit in a track has to be a box in that track.
+
+       An element rather than `[part="row"]::before`, which could hold the same
+       counter. Generated content can only ever be a string, and this cell is the
+       one place a row's ordinal lives, so a consumer replacing it with a state
+       mark or a step glyph wants somewhere to put it. It is also a name: a part
+       is in `custom-elements.json` and a pseudo-element on another part is not,
+       and a hook nobody can find is a hook nobody uses.
+
+       It costs nothing when unused, and *nothing* is meant exactly. The styled
+       tier draws this cell `display: none` until a list turns it on, rather than
+       leaving an empty box in the row: an empty box is free to layout and is not
+       free to the native marker, which aligns to the first line box it can see.
+       Measured, an empty cell moved 178 pixels of the markers on a plain ordered
+       list while leaving every row and label on the identical pixel. */
+    const content = html`<span part="rail"></span>
+      <slot name="start"></slot>
       <slot></slot>
       <slot name="supporting"></slot>
       <slot name="end"></slot>`

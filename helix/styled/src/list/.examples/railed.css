@@ -1,0 +1,9 @@
+/* The second list, to show that the rail is a track and a counting style rather
+   than one fixed look. `--list-rail-width` narrows the track to what a roman
+   numeral of three characters needs, and `--list-rail-style` takes any
+   `list-style-type`: the rail replaces the platform's marker, so the way it
+   counts has to be sayable somewhere. */
+.roman {
+  --list-rail-style: upper-roman;
+  --list-rail-width: 2.5rem;
+}

@@ -3217,6 +3217,7 @@ decoration doing what emptiness already does.
 | `divided` | `divided` | `boolean` | `false` | - | Whether a rule sits between rows. |
 | `kind` | `kind` | `'default' \| 'description' \| 'ordered' \| 'unordered' \| undefined` | - | `HelixHeadlessList` | What kind of list this is, which is a fact about the content. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessList` | Accessible name for the set. |
+| `marker` | `marker` | `'rail' \| undefined` | - | - | Where the marker sits. |
 
 #### Slots
 
@@ -3230,6 +3231,8 @@ decoration doing what emptiness already does.
 | --- | --- |
 | `--list-gap` | Space between rows. |
 | `--list-marker-gutter` | Room the ordered and unordered markers hang into. |
+| `--list-rail-style` | What a rail counts with. Any `list-style-type`. |
+| `--list-rail-width` | The width of the rail's track. |
 
 ### Item (`helix-list-item`)
 
@@ -3262,6 +3265,7 @@ hold their own width and the middle takes the rest.
 
 | Part | Description |
 | --- | --- |
+| `rail` | The cell a railed list draws its number in, empty otherwise. |
 | `row` | The layout, held off the host so the host can carry a marker. |
 
 #### Custom properties
@@ -3269,6 +3273,8 @@ hold their own width and the middle takes the rest.
 | Property | Description |
 | --- | --- |
 | `--list-item-inset` | Padding inside the row. |
+| `--list-item-rail-content` | What the rail cell shows. Written by the list. |
+| `--list-item-rail-display` | Whether there is a rail at all. Written by the list. |
 | `--list-item-term-weight` | Weight of a description list's term. |
 
 ## Listbox

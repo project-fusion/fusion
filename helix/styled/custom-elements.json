@@ -36709,6 +36709,14 @@
               "name": "--list-item-inset"
             },
             {
+              "description": "What the rail cell shows. Written by the list.",
+              "name": "--list-item-rail-content"
+            },
+            {
+              "description": "Whether there is a rail at all. Written by the list.",
+              "name": "--list-item-rail-display"
+            },
+            {
               "description": "Weight of a description list's term.",
               "name": "--list-item-term-weight"
             }
@@ -36918,6 +36926,14 @@
           ],
           "cssParts": [
             {
+              "description": "The cell a railed list draws its number in, empty otherwise.",
+              "name": "rail",
+              "inheritedFrom": {
+                "name": "HelixHeadlessListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            },
+            {
               "description": "The layout, held off the host so the host can carry a marker.",
               "name": "row",
               "inheritedFrom": {
@@ -37026,6 +37042,14 @@
             {
               "description": "Room the ordered and unordered markers hang into.",
               "name": "--list-marker-gutter"
+            },
+            {
+              "description": "What a rail counts with. Any `list-style-type`.",
+              "name": "--list-rail-style"
+            },
+            {
+              "description": "The width of the rail's track.",
+              "name": "--list-rail-width"
             }
           ],
           "members": [
@@ -37038,6 +37062,16 @@
               "default": "false",
               "description": "Whether a rule sits between rows.",
               "attribute": "divided",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "marker",
+              "type": {
+                "text": "'rail' | undefined"
+              },
+              "description": "Where the marker sits.\n\nOn the styled tier because it is decoration, which is the other half of the\nargument `kind` makes on the headless one: *that* a list is numbered is a\nfact about the content, and *where the numbers are drawn* is not. A railed\nordered list and a plain one say the same thing about their rows.\n\n- unset draws the platform's marker beside the row, which is what a list of\n  short rows wants.\n- `rail` draws the ordinal in a track of its own at the start edge of the\n  block, so the numbers read as a column and every row's text begins at one\n  measure. This is how a numbered argument is set: a claim per item, prose\n  under it, and the numbering carried down the left rather than tucked\n  against the words.\n\nA rail replaces the marker rather than joining it, so it applies to\n`unordered` too, where it numbers what a bullet did not.",
+              "attribute": "marker",
               "reflects": true
             },
             {
@@ -37186,6 +37220,14 @@
               "fieldName": "divided"
             },
             {
+              "name": "marker",
+              "type": {
+                "text": "'rail' | undefined"
+              },
+              "description": "Where the marker sits.\n\nOn the styled tier because it is decoration, which is the other half of the\nargument `kind` makes on the headless one: *that* a list is numbered is a\nfact about the content, and *where the numbers are drawn* is not. A railed\nordered list and a plain one say the same thing about their rows.\n\n- unset draws the platform's marker beside the row, which is what a list of\n  short rows wants.\n- `rail` draws the ordinal in a track of its own at the start edge of the\n  block, so the numbers read as a column and every row's text begins at one\n  measure. This is how a numbered argument is set: a claim per item, prose\n  under it, and the numbering carried down the left rather than tucked\n  against the words.\n\nA rail replaces the marker rather than joining it, so it applies to\n`unordered` too, where it numbers what a bullet did not.",
+              "fieldName": "marker"
+            },
+            {
               "name": "label",
               "type": {
                 "text": "string"
@@ -37241,6 +37283,10 @@
               {
                 "description": "Rows that navigate, each whole row being the target.",
                 "slug": "linked"
+              },
+              {
+                "description": "A numbered argument, with the numbers in a rail rather than beside the words.",
+                "slug": "railed"
               }
             ],
             "source": "helix/styled/src/list"

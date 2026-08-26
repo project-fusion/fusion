@@ -17,6 +17,8 @@ import { styles } from './list-item.css.js'
  * @documentation https://helix.fusion.dev/components/list
  *
  * @cssproperty --list-item-inset - Padding inside the row.
+ * @cssproperty --list-item-rail-content - What the rail cell shows. Written by the list.
+ * @cssproperty --list-item-rail-display - Whether there is a rail at all. Written by the list.
  * @cssproperty --list-item-term-weight - Weight of a description list's term.
  */
 @customElement('helix-list-item')

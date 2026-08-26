@@ -11,8 +11,58 @@
 [part="row"] {
   align-items: center;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  /* Four tracks, and the first holds the rail. `auto` rather than a width, so
+     that a list which has not asked for a rail gets a track with nothing in it,
+     which is `0`: the cell below is `display: none` until a list turns it on, and
+     an `auto` track with no items takes no space. There is no `column-gap` on
+     this grid, by the argument the leading mark makes below, so an empty first
+     track adds nothing rather than adding a gap beside nothing. */
+  grid-template-columns: auto auto 1fr auto;
   padding: var(--list-item-inset, var(--helix-space-sm) var(--helix-space-md));
+}
+
+/* The rail: the ordinal, at the start edge of the block rather than beside the
+ * words.
+ *
+ * **`display: none` and not an empty box.** The cell was an empty `<span>` in
+ * every row, on the argument that a zero-width grid item costs nothing. It is
+ * free to *layout* and it is not free to the marker: an `outside` marker aligns
+ * to the first line box inside the principal box, and an empty first grid item
+ * is a box that alignment can see. Measured against the same tree without it,
+ * every row's box and label sat at the identical pixel and 178 pixels of the
+ * markers on a plain ordered list moved, which is a retaken baseline for a
+ * feature that list is not using. Absent rather than empty is exactly free.
+ *
+ * **A width and not a `min-width`.** Each row carries its own grid, so a track
+ * that sizes to its content is a track that differs between rows: `I` and `III`
+ * would put their labels at two measures and the rail would not read as a
+ * column. A fixed box in an `auto` track is the same width in every row, and a
+ * number too wide for it overflows visibly, which is a consumer's cue to widen
+ * the rail rather than a silent misalignment.
+ *
+ * `grid-row: 1` and not `1 / span 2`. The leading mark spans both rows because
+ * it belongs to the whole item; a number belongs to the line it numbers, and a
+ * row with supporting text under the label wants the two aligned. With the
+ * grid's `align-items: center` that centers the number on the label's line,
+ * which is where a reader looks for it. */
+[part="rail"] {
+  color: var(--helix-color-foreground-muted);
+  display: var(--list-item-rail-display, none);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  grid-column: 1;
+  grid-row: 1;
+  letter-spacing: var(--helix-tracking-wide);
+  width: var(--list-rail-width, var(--helix-space-3xl));
+}
+
+/* Written by the list, which is the only thing that knows the ordinal. An item
+   cannot count itself: it would have to be told its index, and an index written
+   onto the consumer's own markup is a number the server and the client can
+   disagree about. A CSS counter is reset on the list and incremented on each
+   row, and it crosses into this shadow root the way any inherited value does. */
+[part="rail"]::before {
+  content: var(--list-item-rail-content, "");
 }
 
 /* `span 2`, not `1 / -1`. The row has a column template and no row template, so
@@ -30,7 +80,7 @@
    column holding nothing. Same fault the toast had, and the same fix. */
 slot[name="start"]::slotted(*) {
   color: var(--helix-color-foreground-muted);
-  grid-column: 1;
+  grid-column: 2;
   margin-inline-end: var(--helix-space-sm);
   grid-row: 1 / span 2;
 }
@@ -76,7 +126,7 @@ slot:not([name]) {
      than a line of text, and inherited through the flat tree so the row needs
      to know nothing about which kind it is in. */
   font-weight: var(--list-item-term-weight, var(--helix-weight-regular));
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
 }
 
@@ -84,7 +134,7 @@ slot[name="supporting"] {
   color: var(--helix-color-foreground-muted);
   display: block;
   font-size: var(--helix-text-xs);
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 2;
 }
 
@@ -96,7 +146,7 @@ slot[name="supporting"]::slotted(*) {
 }
 
 slot[name="end"]::slotted(*) {
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 1 / span 2;
 }
 

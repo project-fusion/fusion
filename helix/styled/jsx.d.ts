@@ -7608,6 +7608,24 @@ than one derived from `target`, for the reason `Tree.Item` gives. */
 export type HelixListProps = {
   /** Whether a rule sits between rows. */
   divided?: HelixList["divided"];
+  /** Where the marker sits.
+
+On the styled tier because it is decoration, which is the other half of the
+argument `kind` makes on the headless one: *that* a list is numbered is a
+fact about the content, and *where the numbers are drawn* is not. A railed
+ordered list and a plain one say the same thing about their rows.
+
+- unset draws the platform's marker beside the row, which is what a list of
+  short rows wants.
+- `rail` draws the ordinal in a track of its own at the start edge of the
+  block, so the numbers read as a column and every row's text begins at one
+  measure. This is how a numbered argument is set: a claim per item, prose
+  under it, and the numbering carried down the left rather than tucked
+  against the words.
+
+A rail replaces the marker rather than joining it, so it applies to
+`unordered` too, where it numbers what a bullet did not. */
+  marker?: HelixList["marker"];
   /** Accessible name for the set. */
   label?: HelixList["label"];
   /** What kind of list this is, which is a fact about the content.
@@ -7636,6 +7654,24 @@ has to survive with the stylesheet turned off.
 export type HelixListSolidJsProps = {
   /** Whether a rule sits between rows. */
   "prop:divided"?: HelixList["divided"];
+  /** Where the marker sits.
+
+On the styled tier because it is decoration, which is the other half of the
+argument `kind` makes on the headless one: *that* a list is numbered is a
+fact about the content, and *where the numbers are drawn* is not. A railed
+ordered list and a plain one say the same thing about their rows.
+
+- unset draws the platform's marker beside the row, which is what a list of
+  short rows wants.
+- `rail` draws the ordinal in a track of its own at the start edge of the
+  block, so the numbers read as a column and every row's text begins at one
+  measure. This is how a numbered argument is set: a claim per item, prose
+  under it, and the numbering carried down the left rather than tucked
+  against the words.
+
+A rail replaces the marker rather than joining it, so it applies to
+`unordered` too, where it numbers what a bullet did not. */
+  "prop:marker"?: HelixList["marker"];
   /** Accessible name for the set. */
   "prop:label"?: HelixList["label"];
   /** What kind of list this is, which is a fact about the content.
@@ -21875,12 +21911,15 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
+   * - `--list-item-rail-content`: What the rail cell shows. Written by the list. (default: `undefined`)
+   * - `--list-item-rail-display`: Whether there is a rail at all. Written by the list. (default: `undefined`)
    * - `--list-item-term-weight`: Weight of a description list's term. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `rail`: The cell a railed list draws its number in, empty otherwise.
    * - `row`: The layout, held off the host so the host can carry a marker.
    */
   "helix-list-item": Partial<
@@ -21898,6 +21937,23 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `divided`: Whether a rule sits between rows.
+   * - `marker`: Where the marker sits.
+   *
+   * On the styled tier because it is decoration, which is the other half of the
+   * argument `kind` makes on the headless one: *that* a list is numbered is a
+   * fact about the content, and *where the numbers are drawn* is not. A railed
+   * ordered list and a plain one say the same thing about their rows.
+   *
+   * - unset draws the platform's marker beside the row, which is what a list of
+   *   short rows wants.
+   * - `rail` draws the ordinal in a track of its own at the start edge of the
+   *   block, so the numbers read as a column and every row's text begins at one
+   *   measure. This is how a numbered argument is set: a claim per item, prose
+   *   under it, and the numbering carried down the left rather than tucked
+   *   against the words.
+   *
+   * A rail replaces the marker rather than joining it, so it applies to
+   * `unordered` too, where it numbers what a bullet did not.
    * - `label`: Accessible name for the set.
    * - `kind`: What kind of list this is, which is a fact about the content.
    *
@@ -21932,6 +21988,8 @@ export type CustomElements = {
    *
    * - `--list-gap`: Space between rows. (default: `undefined`)
    * - `--list-marker-gutter`: Room the ordered and unordered markers hang into. (default: `undefined`)
+   * - `--list-rail-style`: What a rail counts with. Any `list-style-type`. (default: `undefined`)
+   * - `--list-rail-width`: The width of the rail's track. (default: `undefined`)
    */
   "helix-list": Partial<HelixListProps & BaseProps<HelixList> & BaseEvents>;
 
@@ -34802,12 +34860,15 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
+   * - `--list-item-rail-content`: What the rail cell shows. Written by the list. (default: `undefined`)
+   * - `--list-item-rail-display`: Whether there is a rail at all. Written by the list. (default: `undefined`)
    * - `--list-item-term-weight`: Weight of a description list's term. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `rail`: The cell a railed list draws its number in, empty otherwise.
    * - `row`: The layout, held off the host so the host can carry a marker.
    */
   "helix-list-item": Partial<
@@ -34828,6 +34889,23 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `divided`: Whether a rule sits between rows.
+   * - `marker`: Where the marker sits.
+   *
+   * On the styled tier because it is decoration, which is the other half of the
+   * argument `kind` makes on the headless one: *that* a list is numbered is a
+   * fact about the content, and *where the numbers are drawn* is not. A railed
+   * ordered list and a plain one say the same thing about their rows.
+   *
+   * - unset draws the platform's marker beside the row, which is what a list of
+   *   short rows wants.
+   * - `rail` draws the ordinal in a track of its own at the start edge of the
+   *   block, so the numbers read as a column and every row's text begins at one
+   *   measure. This is how a numbered argument is set: a claim per item, prose
+   *   under it, and the numbering carried down the left rather than tucked
+   *   against the words.
+   *
+   * A rail replaces the marker rather than joining it, so it applies to
+   * `unordered` too, where it numbers what a bullet did not.
    * - `label`: Accessible name for the set.
    * - `kind`: What kind of list this is, which is a fact about the content.
    *
@@ -34862,6 +34940,8 @@ export type CustomElementsSolidJs = {
    *
    * - `--list-gap`: Space between rows. (default: `undefined`)
    * - `--list-marker-gutter`: Room the ordered and unordered markers hang into. (default: `undefined`)
+   * - `--list-rail-style`: What a rail counts with. Any `list-style-type`. (default: `undefined`)
+   * - `--list-rail-width`: The width of the rail's track. (default: `undefined`)
    */
   "helix-list": Partial<
     HelixListProps & HelixListSolidJsProps & BaseProps<HelixList> & BaseEvents
@@ -42477,12 +42557,20 @@ export type CustomCssProperties = {
   "--line-chart-width"?: string;
   /** Padding inside the row. */
   "--list-item-inset"?: string;
+  /** What the rail cell shows. Written by the list. */
+  "--list-item-rail-content"?: string;
+  /** Whether there is a rail at all. Written by the list. */
+  "--list-item-rail-display"?: string;
   /** Weight of a description list's term. */
   "--list-item-term-weight"?: string;
   /** Space between rows. */
   "--list-gap"?: string;
   /** Room the ordered and unordered markers hang into. */
   "--list-marker-gutter"?: string;
+  /** What a rail counts with. Any `list-style-type`. */
+  "--list-rail-style"?: string;
+  /** The width of the rail's track. */
+  "--list-rail-width"?: string;
   /** How tall it gets before it scrolls. */
   "--listbox-max-block-size"?: string;
   /** Diameter. Defaults to 1.5em. */

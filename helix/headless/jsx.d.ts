@@ -18917,6 +18917,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `rail`: The cell a railed list draws its number in, empty otherwise.
    * - `row`: The layout, held off the host so the host can carry a marker.
    */
   "helix-headless-list-item": Partial<
@@ -31513,6 +31514,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `rail`: The cell a railed list draws its number in, empty otherwise.
    * - `row`: The layout, held off the host so the host can carry a marker.
    */
   "helix-headless-list-item": Partial<
