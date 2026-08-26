@@ -4,12 +4,12 @@
  *
  * **The editor's browser pane cannot do this, and the reason is worth writing
  * down rather than rediscovering.** Its document is `hidden`: the panel is not
- * displayed, so the renderer is backgrounded and rasterises no new tiles. What
+ * displayed, so the renderer is backgrounded and rasterizes no new tiles. What
  * was rastered at load captures correctly and nothing else does. Measured on the
  * home page: at `scrollY: 0` a perfect frame, and at `scrollY: 600` the masthead
  * drawn six hundred pixels below where it belongs with white above it, which is
  * the tiles from the top of the document composited against a new scroll offset.
- * Scrolling does not re-rasterise, and neither does dirtying layout at the new
+ * Scrolling does not re-rasterize, and neither does dirtying layout at the new
  * offset, which was the obvious guess and was measured wrong.
  *
  * The same absence of frames stops `behavior: 'smooth'` ever arriving and stops
@@ -19,7 +19,7 @@
  * needs a frame is not.
  *
  * So the visual half moves here, to the browser `specs:browser` already drives.
- * It is a real, visible page: it scrolls, it animates, and it rasterises what it
+ * It is a real, visible page: it scrolls, it animates, and it rasterizes what it
  * is looking at.
  *
  * ```

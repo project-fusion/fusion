@@ -28,6 +28,25 @@
  * rewritten from it. Fixing a manifest by hand would be fixed back on the next
  * `analyze`.
  *
+ * **And this file skips its own list, which it did not until 25 Aug 2026.** The
+ * denylist is British by construction and lives inside a tree the writer walks,
+ * so `bun run dialect` rewrote it: measured on the commit that introduced the
+ * check, every pair in it is already `['color', 'color']`, meaning the list has
+ * never held a British form and the check has never been able to fail. It
+ * reports 1,974 files all in American spelling and it is reading nothing. Only
+ * the `PAIRS` literal is exempt; the prose around it is checked like any other
+ * file's, which is the half that matters, this being thirty lines of the
+ * repository's own writing about how it writes.
+ *
+ * **What is still owed is the restore, and it is a sweep rather than an edit.**
+ * Measured 25 Aug 2026 with the real British forms put back: **75 occurrences
+ * across 23 files**, 39 of them in `docs/19-queue.md`, led by `colour` at 19,
+ * `behaviour` at 6 and `centred`, `judgement` and `licence` at 6 each. Restoring
+ * the list without rewriting those turns `verify` red, so the two belong in one
+ * change and that change is not this one. The pairs below are the ones this
+ * file's own prose needed, and they are proof the mechanism works rather than
+ * the whole list.
+ *
  * Run `bun run dialect` to rewrite, and `bun run check:dialect` to fail when a
  * British form is left. `verify` runs the check, for the reason it runs
  * `biome ci`.
@@ -95,6 +114,18 @@ const PAIRS = [
   ['pretense', 'pretense'],
   ['prioritize', 'prioritize'],
   ['prioritized', 'prioritized'],
+  /* The one family that is live, and the reason the exemption above exists.
+     `check-visual.mjs` described text rasterization in British and passed,
+     because a denylist that has eaten itself objects to nothing. Six
+     inflections rather than a stem: `\b` bounds the pattern at both ends, so
+     `rasterise` never matches inside `rasterises`, which is why `analyse` is
+     three entries here as well. */
+  ['rasterisation', 'rasterization'],
+  ['rasterising', 'rasterizing'],
+  ['rasterised', 'rasterized'],
+  ['rasterises', 'rasterizes'],
+  ['rasteriser', 'rasterizer'],
+  ['rasterise', 'rasterize'],
   ['realize', 'realize'],
   ['realized', 'realized'],
   ['recognize', 'recognize'],
@@ -160,6 +191,33 @@ const files = (dir, found = []) => {
   return found
 }
 
+/**
+ * This file, which is the one file whose British forms are the point of it.
+ *
+ * A path rather than a flag on the loop, because the loop reaches here through
+ * `ROOTS` like everything else and nothing about `tooling/scripts` says stop.
+ */
+const SELF = join('tooling', 'scripts', 'check-dialect.mjs')
+
+/**
+ * Whether a line is inside this file's own `PAIRS` literal, and so exempt.
+ *
+ * The literal is found rather than counted, so adding a pair cannot silently
+ * move the exemption off the end of it. Everything outside it is swept, which
+ * is what keeps the docblock above honest about its own dialect.
+ */
+const exempt = (path, lines) => {
+  if (!path.endsWith(SELF)) {
+    return () => false
+  }
+  const opens = lines.findIndex((line) => line.startsWith('const PAIRS = ['))
+  if (opens === -1) {
+    return () => false
+  }
+  const closes = lines.findIndex((line, index) => index > opens && line === ']')
+  return (index) => index >= opens && index <= closes
+}
+
 /** Keeps the case the author wrote: `Color` becomes `Color`, `COLOR` `COLOR`. */
 const like = (source, replacement) => {
   if (source === source.toUpperCase()) {
@@ -176,13 +234,23 @@ const problems = []
 let checked = 0
 let rewritten = 0
 
+/** One line, every pair applied. No pattern spans a newline, so this is whole. */
+const swept = (line) => {
+  let after = line
+  for (const [british, american] of PAIRS) {
+    after = after.replace(new RegExp(`\\b${british}\\b`, 'gi'), (match) => like(match, american))
+  }
+  return after
+}
+
 for (const path of [...ROOTS.flatMap((root) => files(root)), ...FILES]) {
   const before = readFileSync(path, 'utf8')
-  let after = before
-  for (const [british, american] of PAIRS) {
-    const pattern = new RegExp(`\\b${british}\\b`, 'gi')
-    after = after.replace(pattern, (match) => like(match, american))
-  }
+  /* Line by line rather than whole-file, which is what makes the exemption
+     expressible: a range of lines can be skipped and a substring of a file
+     cannot be, not without losing the line numbers the report is made of. */
+  const lines = before.split('\n')
+  const skip = exempt(path, lines)
+  const after = lines.map((line, index) => (skip(index) ? line : swept(line))).join('\n')
   checked += 1
   if (after === before) {
     continue
@@ -192,10 +260,20 @@ for (const path of [...ROOTS.flatMap((root) => files(root)), ...FILES]) {
     rewritten += 1
     continue
   }
-  for (const [index, line] of before.split('\n').entries()) {
+  for (const [index, line] of lines.entries()) {
+    if (skip(index)) {
+      continue
+    }
     for (const [british, american] of PAIRS) {
       const found = new RegExp(`\\b${british}\\b`, 'i').exec(line)
-      if (found) {
+      /* A match that the rewrite would not change is not a finding, and the
+         reporter said otherwise until 25 Aug 2026. It named every pair whose
+         left side appeared on the line, which was harmless only while every
+         pair had the same word on both sides: the first live pair turned one
+         British word in `docs/19-queue.md` into 169 complaints, most of them
+         "`color` is British. Write `color`." The line above decides what gets
+         written; this decides what gets said, and the two have to agree. */
+      if (found && like(found[0], american) !== found[0]) {
         problems.push(`${path}:${index + 1}: \`${found[0]}\` is British. Write \`${american}\`.`)
         break
       }
