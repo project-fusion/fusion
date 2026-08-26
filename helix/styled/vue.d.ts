@@ -25,6 +25,7 @@ import type {
   HelixCombobox,
   HelixCommand,
   HelixCopyButton,
+  HelixDataTable,
   HelixDateInput,
   HelixDatePicker,
   HelixDialog,
@@ -127,12 +128,13 @@ import type {
   HelixSampleStartEvent,
   HelixCopyEvent,
   HelixCreateEvent,
+  HelixSortEvent,
+  HelixFilterEvent,
   HelixNavigateEvent,
   HelixLoadEvent,
   HelixErrorEvent,
   HelixInputEvent,
   HelixShortcutEvent,
-  HelixFilterEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
   HelixResizeEvent,
@@ -2157,6 +2159,143 @@ anything a consumer sets. */
 export type HelixCopyButtonVueEvents = {
   /** Fired after the clipboard write succeeds. */
   "helix-copy": HelixCopyButtonHelixCopyElementEvent;
+};
+
+/** `HelixDataTable` component event */
+export type HelixDataTableElementEvent<E = Event> = TypedEvent<
+  HelixDataTable,
+  E
+>;
+/** `helix-sort` event type */
+export type HelixDataTableHelixSortElementEvent =
+  HelixDataTableElementEvent<HelixSortEvent>;
+/** `helix-filter` event type */
+export type HelixDataTableHelixFilterElementEvent =
+  HelixDataTableElementEvent<HelixFilterEvent>;
+/** `helix-navigate` event type */
+export type HelixDataTableHelixNavigateElementEvent =
+  HelixDataTableElementEvent<HelixNavigateEvent>;
+
+export type HelixDataTableVueProps = {
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixDataTable["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixDataTable["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixDataTable["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixDataTable["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixDataTable["emptyText"];
+  /** The field naming a row's stable identity.
+
+**Needed before selection exists, not after.** Lit keys the rendered rows by
+it, so a sort moves a row's element rather than rewriting every cell in
+place, which is what keeps focus inside a cell and keeps a CSS transition
+attached to the row it belongs to. Left unset the index is the key, which is
+correct only while nothing reorders: it is why this defaults to something
+that works and is worth setting anyway. */
+  key?: HelixDataTable["key"];
+  /** Whether this element does the work or asks the consumer to.
+
+`client` filters, sorts and pages `rows` itself. `server` applies none of
+them: `rows` is the page, `total` is the size of the whole result, and the
+three events are requests the consumer answers by fetching. Past some size
+the client cannot hold the data, so this is not an optimization, it is the
+only mode that works, and it is here from the start because adding it later
+inverts the data flow. */
+  mode?: HelixDataTable["mode"];
+  /** How many rows the whole result has, where this element cannot count them.
+
+Only read in `server` mode, where `rows` is one page and its length says
+nothing about the result. Ignored in `client` mode rather than trusted,
+because two sources for one count is the mistake, and here the array is the
+one that cannot be stale. */
+  total?: HelixDataTable["total"];
+  /** Accessible name for the grid. */
+  label?: HelixDataTable["label"];
+  /** The order, as `field:direction`.
+
+Set it and this element defers: a reader's click fires `helix-sort` and
+changes nothing until a new value arrives. `default-sort` seeds an order this
+element then owns. */
+  sort?: HelixDataTable["sort"];
+  /** Order to open on, where nothing declared one. */
+  "default-sort"?: HelixDataTable["defaultSort"];
+  /** Order to open on, where nothing declared one. */
+  defaultSort?: HelixDataTable["defaultSort"];
+  /** What the rows are narrowed to, as one query across every column.
+
+One query rather than a predicate per column, which is what a reader means
+by a search box above a table. It matches on each column's ordering value,
+so search and sort cannot disagree about what a column holds. */
+  filter?: HelixDataTable["filter"];
+  /** Query to open with, where nothing declared one. */
+  "default-filter"?: HelixDataTable["defaultFilter"];
+  /** Query to open with, where nothing declared one. */
+  defaultFilter?: HelixDataTable["defaultFilter"];
+  /** The page on show, from 1.
+
+Clamped on the way out, so what this reports is the page it drew: a
+bookmarked link to page 99 of a result that has since shrunk reads back as
+the last page rather than as 99. */
+  page?: HelixDataTable["page"];
+  /** Page to open on, where nothing declared one. */
+  "default-page"?: HelixDataTable["defaultPage"];
+  /** Page to open on, where nothing declared one. */
+  defaultPage?: HelixDataTable["defaultPage"];
+  /** How many rows a page holds. Zero is every row, which is what "no paging" means.
+
+**Not controlled, and that is not an omission.** Nothing in this element
+ever asks for a different page size: a size selector is
+`helix-pagination-size`, which a consumer puts in the `footer` slot and
+answers themselves. A `@controlled` tag here would name an event this
+element never fires for it, and `check:controlled` holds the tag against the
+calls that back it. */
+  "page-size"?: HelixDataTable["pageSize"];
+  /** How many rows a page holds. Zero is every row, which is what "no paging" means.
+
+**Not controlled, and that is not an omission.** Nothing in this element
+ever asks for a different page size: a size selector is
+`helix-pagination-size`, which a consumer puts in the `footer` slot and
+answers themselves. A `@controlled` tag here would name an event this
+element never fires for it, and `check:controlled` holds the tag against the
+calls that back it. */
+  pageSize?: HelixDataTable["pageSize"];
+  /** Page size to open with, where nothing declared one. */
+  "default-page-size"?: HelixDataTable["defaultPageSize"];
+  /** Page size to open with, where nothing declared one. */
+  defaultPageSize?: HelixDataTable["defaultPageSize"];
+  /** Whether to draw a pagination under the grid.
+
+On by default once a page size is set, because a paged table with no way to
+change pages shows a reader the first twenty rows and no way to know there
+are more. Off for a consumer supplying their own through the `footer` slot,
+which is why the slot replaces this rather than sitting beside it. */
+  paginated?: HelixDataTable["paginated"];
+  /** The whole result, in the order it arrived.
+
+A property and not an attribute: it is an array. Left alone this element
+filters, sorts and pages it; in `server` mode it is the page the consumer
+already fetched and none of the three is applied.
+
+**Read, never written.** Sorting produces a new array rather than reordering
+this one, because a consumer's array may be the same object their own state
+holds and reordering it under them is a mutation they did not ask for. */
+  rows?: HelixDataTable["rows"];
+};
+
+export type HelixDataTableVueEvents = {
+  /** Fired when a reader asks for a different order, and cancelable. */
+  "helix-sort": HelixDataTableHelixSortElementEvent;
+  /** Fired when the query changes, and cancelable. */
+  "helix-filter": HelixDataTableHelixFilterElementEvent;
+  /** Fired when a reader asks for another page, and cancelable. */
+  "helix-navigate": HelixDataTableHelixNavigateElementEvent;
 };
 
 /** `HelixDateInput` component event */
@@ -6180,6 +6319,47 @@ holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
 back into wrapping. A headless consumer owns the overflow either way, that
 being paint, and gets the honest track list. */
   width?: HelixTableColumn["width"];
+  /** The key this column reads out of a row.
+
+Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+from an API arrives shaped the way the API shaped it, and requiring a flat
+row would push a mapping pass onto every consumer.
+
+**It is also the sort and filter identity**, which is why sorting is by
+field and not by column index: a reordered or hidden column would otherwise
+change what `sort="2:asc"` means, and a sort that means something different
+after a column moves is a sort a consumer cannot store in a URL.
+
+Empty on a column that is purely presentational, an actions column say, and
+such a column is never sortable however it is marked. */
+  field?: HelixTableColumn["field"];
+  /** Whether a reader may reorder the set by this column.
+
+Ignored without a `field`, and silently: a column with nothing to sort by
+has no order to offer, and refusing loudly would mean an actions column
+carrying `sortable` breaks a table rather than doing nothing. */
+  sortable?: HelixTableColumn["sortable"];
+  /** Which edge the values line up against.
+
+`end` is what a column of numbers wants, so digits of the same magnitude sit
+above each other. Left unset the cell inherits the table's own alignment,
+which is `start` for text in either writing direction. */
+  align?: HelixTableColumn["align"];
+  /** How to read the cell, where the field alone will not do.
+
+A property and not an attribute, because it is a function. Set it from a Lit
+template with `.cell=${...}`, or assign it in script. A column with neither
+this nor a `field` renders an empty cell rather than the whole row stringified,
+which is the failure mode of guessing. */
+  cell?: HelixTableColumn["cell"];
+  /** How to read the value that gets sorted and filtered, where it is not the cell.
+
+**The one that is easy to leave out and expensive to add later.** A cell
+showing `2.4 MB` sorts as a string unless something says the underlying value
+is a number, so `12 kB` sorts above `2.4 MB` and the column looks broken
+while every value in it is right. Left unset this is the field, which is the
+correct default: the raw value is what an API sorted by. */
+  compare?: HelixTableColumn["compare"];
 };
 
 export type HelixTableColumnVueEvents = {};
@@ -8073,6 +8253,22 @@ export type CustomCssProperties = {
   "--command-size"?: string;
   /** How tall the list grows before it scrolls. */
   "--command-list-size"?: string;
+  /** Track list for the columns, which wins over the one the columns worked out. */
+  "--data-table-columns"?: string;
+  /** The hairline between rows. */
+  "--data-table-rule"?: string;
+  /** Ink in a cell. */
+  "--data-table-color"?: string;
+  /** Ink in a heading. */
+  "--data-table-heading-color"?: string;
+  /** Type size, headings and cells alike. */
+  "--data-table-text"?: string;
+  /** Space above and below a cell's content. */
+  "--data-table-padding-block"?: string;
+  /** Space either side of a cell's content. */
+  "--data-table-padding-inline"?: string;
+  /** The column track list, built from the columns the consumer declared. */
+  "--data-table-template"?: string;
   /** Fill behind the field. */
   "--date-input-background-color"?: string;
   /** Color of the panel's edge. */
@@ -8820,6 +9016,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixCopyButton,
     HelixCopyButtonVueProps,
     HelixCopyButtonVueEvents
+  >;
+  /** Hairline rules between rows and no fill, per the rule that depth comes from a single border rather than from elevation. A header band would be elevation spelled differently, so the headings are weight and color instead.  The grid scrolls its own box and the toolbar and footer sit outside it: a search field that slides sideways when a reader scrolls the columns is a search field they lose.  **The cell values do not server-render**, which is the headless tier's limitation and worth repeating where a consumer chooses between the two: use 'helix-table' where the content has to be in the served HTML. */
+  "helix-data-table": DefineCustomElement<
+    HelixDataTable,
+    HelixDataTableVueProps,
+    HelixDataTableVueEvents
   >;
   /** The frame is the field rather than the input, so the trigger sits inside the same box as the text and the focus ring is drawn once around the whole control. The trigger is a mark within that box rather than a button beside it: a second frame inside the first is two controls where a reader sees one.  The calendar is the real 'helix-date-picker', in a panel with no border of its own. A surface over the page is told apart by its shadow and by what it covers, and a line around it as well reads as a box drawn around something already separate.  Height comes from the region, like every other control: 'data-density' on whatever holds it. */
   "helix-date-input": DefineCustomElement<

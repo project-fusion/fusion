@@ -1,0 +1,132 @@
+/* The grid scrolls its own box rather than squeezing its columns.
+ *
+ * A column track floors at `max-content`, so a result with more content than
+ * room overflows instead of breaking a value mid-token, and that overflow has to
+ * land somewhere a reader can reach. The same arrangement `helix-table` arrived
+ * at, and for the same reason: `overflow-x` and no container query, because
+ * scrolling is not a decision. The box either has room or it does not.
+ *
+ * The toolbar and footer sit outside the scroller. A search field that slides
+ * sideways when the reader scrolls the columns is a search field they lose. */
+:host {
+  display: block;
+}
+
+[part="table"] {
+  display: grid;
+  /* The consumer's hook first, then what the columns worked out. The derived
+     value is written inline on this element, and an inline declaration beats
+     any stylesheet, so the public name has to be the outer one or a consumer
+     setting the documented hook is overruled by the component every render.
+     That exact fault shipped on `helix-table` and is fixed here by copying the
+     shape rather than the mistake. */
+  grid-template-columns: var(--data-table-columns, var(--data-table-template, minmax(0, 1fr)));
+  inline-size: 100%;
+  overflow-x: auto;
+}
+
+/* The header row exists for the accessibility tree and must not exist for the
+   layout: the whole grid is one grid, which is what aligns every column across
+   every row, so a wrapper that generated a box would take one cell and put every
+   heading inside it. The data rows are the same. */
+[part="head"],
+[part="row"] {
+  display: contents;
+}
+
+/* A heading and a cell are the same box with different weight, which is what
+   makes a column read as a column: one inline padding, one block padding, one
+   rule underneath. Anything else and the eye has to re-find the left edge on
+   every row. */
+[part="cell"] {
+  border-block-end: var(--helix-border-thin) solid var(--data-table-rule, var(--helix-color-border));
+  color: var(--data-table-color, var(--helix-color-foreground));
+  font-family: var(--helix-font-sans);
+  font-size: var(--data-table-text, var(--helix-text-sm));
+  padding-block: var(--data-table-padding-block, var(--helix-space-sm));
+  padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
+}
+
+/* The heading is the cell's own box, and the column element is what carries it.
+   Weight rather than a fill, per the rule that depth comes from a single border:
+   a filled header band is elevation spelled differently. */
+::slotted(helix-table-column) {
+  border-block-end: var(--helix-border-thin) solid var(--data-table-rule, var(--helix-color-border));
+  color: var(--data-table-heading-color, var(--helix-color-foreground-subtle));
+  font-family: var(--helix-font-sans);
+  font-size: var(--data-table-text, var(--helix-text-sm));
+  font-weight: var(--helix-weight-medium);
+  padding-block: var(--data-table-padding-block, var(--helix-space-sm));
+  padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
+  text-align: start;
+}
+
+/* A sortable heading is a control, and looking like one is not optional: a
+   reader who cannot tell which headings respond will click the ones that do not.
+   The cursor is the cheap half and the focus ring is the half that matters,
+   since the keyboard path is the one nobody tries. */
+::slotted(helix-table-column[sortable]) {
+  cursor: pointer;
+}
+
+::slotted(helix-table-column[sortable]:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The toolbar and the footer are regions rather than content, so they carry the
+   space between themselves and the grid and nothing else. Empty, they take none:
+   a consumer with no toolbar should not pay for the gap where one would go. */
+[part="toolbar"]:has(> slot:not(:has(*))),
+[part="footer"]:has(> slot:not(:has(*))):not(:has([part="pagination"])) {
+  display: none;
+}
+
+[part="toolbar"] {
+  padding-block-end: var(--helix-space-sm);
+}
+
+[part="footer"] {
+  padding-block-start: var(--helix-space-sm);
+}
+
+/* What a collection says instead of rows: the same two lines everywhere, in the
+   same voice. Spanning every column, because a status sitting in the first
+   column of a five-column grid reads as a value in that column. */
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  grid-column: 1 / -1;
+  margin: var(--helix-space-none);
+  padding-block: var(--helix-space-md);
+  padding-inline: var(--helix-space-sm);
+  text-align: center;
+}
+
+/* Rows that are already there stay, and dim, while a new set arrives. Removing
+   them collapses the box and throws the page around under the reader for as long
+   as the request takes, which is the whole of what a server-mode table does on
+   every sort. */
+:host([loading]) [part="table"] {
+  opacity: 0.5;
+}
+
+/* Print: zebra striping is a fill printers drop unevenly, which is worse than
+   none. `@media print` does not cross a shadow boundary, so a page cannot answer
+   this on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  [part="table"] {
+    overflow-x: visible;
+  }
+
+  [part="footer"] {
+    display: none;
+  }
+}

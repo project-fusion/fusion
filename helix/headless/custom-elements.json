@@ -13133,6 +13133,1422 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/data-table/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixHeadlessDataTable",
+          "declaration": {
+            "name": "HelixHeadlessDataTable",
+            "module": "./root/data-table-root.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Axis",
+          "declaration": {
+            "name": "Axis",
+            "module": "./root/order.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "cycle",
+          "declaration": {
+            "name": "cycle",
+            "module": "./root/order.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "DataRow",
+          "declaration": {
+            "name": "DataRow",
+            "module": "./root/order.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "filter",
+          "declaration": {
+            "name": "filter",
+            "module": "./root/order.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "format",
+          "declaration": {
+            "name": "format",
+            "module": "./root/order.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ordered",
+          "declaration": {
+            "name": "ordered",
+            "module": "./root/order.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parse",
+          "declaration": {
+            "name": "parse",
+            "module": "./root/order.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Sort",
+          "declaration": {
+            "name": "Sort",
+            "module": "./root/order.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "sort",
+          "declaration": {
+            "name": "sort",
+            "module": "./root/order.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "window_",
+          "declaration": {
+            "name": "window_",
+            "module": "./root/order.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/data-table/root/data-table-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**The schema is markup and the data is a property.** Columns are declared as\n`helix-table-column` children, because a schema is small, declarative, and\nsomething a reader should be able to see in the HTML; rows are handed over as\nan array, because data is large and a table that draws ten thousand elements\ncannot window them.\n\n```html\n<helix-data-table .rows=${rows} sort=\"name:asc\" page-size=\"20\">\n  <helix-table-column field=\"name\" sortable>Name</helix-table-column>\n  <helix-table-column field=\"size\" align=\"end\" sortable .cell=${bytes}>Size</helix-table-column>\n</helix-data-table>\n```\n\nThis is the resolution of a deferral rather than a new idea. `helix-table`\ntakes rows as markup and is the right component for a table of twelve things\na person wrote out; the repeated `page`, `page-size` and `total` attributes on\nthe three pagination elements are placeholders whose own comments name the fix\nas \"a data table composing a pagination inside itself\", and `helix-table`\nalready carried `@aliases DataTable`: a name claimed and not kept.\n\n**Sort and filter apply to the whole set, never the page.** Sorting the drawn\nwindow is correct on the first screen and wrong on every other one, which is\nhow it survives being looked at. The arithmetic lives in `order.ts` where\nnothing can see a window, and its spec asserts the composition rather than the\nthree steps, because each step alone passes either way.\n\n**What it does not do, stated where a consumer will read it: the cell values\ndo not server-render.** The headings do, because a column renders its own, and\nthe row elements do, because their count comes from `rows`. Reading a cell\nneeds the columns, and the columns are markup children that Lit SSR does not\nhand this element: `children` is undefined there. So a crawler and a reader on\na slow connection see a table of the right shape with nothing in it, which is\nstrictly less than `helix-table` serves for a table whose rows are markup.\n\nThat is the cost of \"the schema is markup and the data is a property\". Use\n`helix-table` where the content has to be in the served HTML and the result is\nsmall enough to write out; use this where the result is large, and accept that\nthe first paint is a shell. The obvious workaround, a `columns` property\nbeside the markup columns, is deliberately not offered: this family has\nalready shipped one source of truth for columns splitting into two, nothing\nchecked that they agreed, and a table rendering one way on the server and\nanother in the browser is that failure with a hydration mismatch on top.\n\n**Every axis is controlled or uncontrolled, and that is what makes a server\nmode fall out rather than be bolted on.** `sort`, `filter`, `page` and\n`page-size` each defer to the consumer when set and seed themselves from a\n`default-*` when not. A consumer who answers all four holds the data flow:\nthey hear the reader's request, fetch, and hand back a new `rows` with a\n`total`. Retrofitting that inverts the flow and is a rewrite, so it is here\nfrom the start.",
+          "name": "HelixHeadlessDataTable",
+          "cssProperties": [
+            {
+              "description": "The column track list, built from the columns the consumer declared.",
+              "name": "--data-table-template"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The grid.",
+              "name": "table"
+            },
+            {
+              "description": "The row the column headings sit in. `display: contents`, so it takes no space.",
+              "name": "head"
+            },
+            {
+              "description": "One row of data.",
+              "name": "row"
+            },
+            {
+              "description": "One cell.",
+              "name": "cell"
+            },
+            {
+              "description": "The region above the grid.",
+              "name": "toolbar"
+            },
+            {
+              "description": "The region below the grid.",
+              "name": "footer"
+            },
+            {
+              "description": "The pagination, where this draws one.",
+              "name": "pagination"
+            },
+            {
+              "description": "Shown when no rows match.",
+              "name": "empty"
+            },
+            {
+              "description": "Shown while the rows are still on their way.",
+              "name": "loading"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The columns, declared as `helix-table-column` children.",
+              "name": ""
+            },
+            {
+              "description": "Above the grid, for a search field or actions.",
+              "name": "toolbar"
+            },
+            {
+              "description": "Below the grid, replacing the pagination this would otherwise draw.",
+              "name": "footer"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }",
+              "description": "Nothing is assigned by name, so the columns can be put in a header row.\n\n`role=\"columnheader\"` under `role=\"grid\"` with no owning row is invalid, and\nthe columns are ordinary children a consumer writes with no `slot`. Manual\nassignment is the only way to wrap them without editing the consumer's\nmarkup, which is a change a React consumer's hydration reports and does not\npatch up. The same arrangement `helix-table` arrived at, for the same reason."
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "readonly DataRow[]"
+              },
+              "default": "[]",
+              "description": "The whole result, in the order it arrived.\n\nA property and not an attribute: it is an array. Left alone this element\nfilters, sorts and pages it; in `server` mode it is the page the consumer\nalready fetched and none of the three is applied.\n\n**Read, never written.** Sorting produces a new array rather than reordering\nthis one, because a consumer's array may be the same object their own state\nholds and reordering it under them is a mutation they did not ask for."
+            },
+            {
+              "kind": "field",
+              "name": "key",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The field naming a row's stable identity.\n\n**Needed before selection exists, not after.** Lit keys the rendered rows by\nit, so a sort moves a row's element rather than rewriting every cell in\nplace, which is what keeps focus inside a cell and keeps a CSS transition\nattached to the row it belongs to. Left unset the index is the key, which is\ncorrect only while nothing reorders: it is why this defaults to something\nthat works and is worth setting anyway.",
+              "attribute": "key"
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "'client' | 'server'"
+              },
+              "default": "'client'",
+              "description": "Whether this element does the work or asks the consumer to.\n\n`client` filters, sorts and pages `rows` itself. `server` applies none of\nthem: `rows` is the page, `total` is the size of the whole result, and the\nthree events are requests the consumer answers by fetching. Past some size\nthe client cannot hold the data, so this is not an optimization, it is the\nonly mode that works, and it is here from the start because adding it later\ninverts the data flow.",
+              "attribute": "mode"
+            },
+            {
+              "kind": "field",
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many rows the whole result has, where this element cannot count them.\n\nOnly read in `server` mode, where `rows` is one page and its length says\nnothing about the result. Ignored in `client` mode rather than trusted,\nbecause two sources for one count is the mistake, and here the array is the\none that cannot be stale.",
+              "attribute": "total"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the grid.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "sort",
+              "type": {
+                "text": "string"
+              },
+              "description": "The order, as `field:direction`.\n\nSet it and this element defers: a reader's click fires `helix-sort` and\nchanges nothing until a new value arrives. `default-sort` seeds an order this\nelement then owns.",
+              "attribute": "sort",
+              "helix": {
+                "controlled": [
+                  "helix-sort"
+                ]
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultSort",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Order to open on, where nothing declared one.",
+              "attribute": "default-sort"
+            },
+            {
+              "kind": "field",
+              "name": "filter",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the rows are narrowed to, as one query across every column.\n\nOne query rather than a predicate per column, which is what a reader means\nby a search box above a table. It matches on each column's ordering value,\nso search and sort cannot disagree about what a column holds.",
+              "attribute": "filter",
+              "helix": {
+                "controlled": [
+                  "helix-filter"
+                ]
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultFilter",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Query to open with, where nothing declared one.",
+              "attribute": "default-filter"
+            },
+            {
+              "kind": "field",
+              "name": "page",
+              "type": {
+                "text": "number"
+              },
+              "description": "The page on show, from 1.\n\nClamped on the way out, so what this reports is the page it drew: a\nbookmarked link to page 99 of a result that has since shrunk reads back as\nthe last page rather than as 99.",
+              "attribute": "page",
+              "helix": {
+                "controlled": [
+                  "helix-navigate"
+                ]
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultPage",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Page to open on, where nothing declared one.",
+              "attribute": "default-page"
+            },
+            {
+              "kind": "field",
+              "name": "pageSize",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many rows a page holds. Zero is every row, which is what \"no paging\" means.\n\n**Not controlled, and that is not an omission.** Nothing in this element\never asks for a different page size: a size selector is\n`helix-pagination-size`, which a consumer puts in the `footer` slot and\nanswers themselves. A `@controlled` tag here would name an event this\nelement never fires for it, and `check:controlled` holds the tag against the\ncalls that back it.",
+              "attribute": "page-size"
+            },
+            {
+              "kind": "field",
+              "name": "defaultPageSize",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Page size to open with, where nothing declared one.",
+              "attribute": "default-page-size"
+            },
+            {
+              "kind": "field",
+              "name": "paginated",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether to draw a pagination under the grid.\n\nOn by default once a page size is set, because a paged table with no way to\nchange pages shows a reader the first twenty rows and no way to know there\nare more. Off for a consumer supplying their own through the `footer` slot,\nwhich is why the slot replaces this rather than sitting beside it.",
+              "attribute": "paginated"
+            },
+            {
+              "kind": "field",
+              "name": "sortState",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "filterState",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "pageState",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "pageSizeState",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "paginatedState",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "sortMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Which axes the consumer took over, decided once and then left alone.\n\n**Read off whether anything had set the property by the first update**,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed. This is `MixinControllerValue`'s rule\nrather than a new one, and it is borrowed deliberately: the whole point of\nthe convention is that every controlled axis in the library answers the same\nway, and three axes here inventing their own would be three more things a\nconsumer has to learn per component.\n\nWhat it means in practice, and the part that reads as a limitation until it\nis the thing you want: a script assigning `sort` after mount changes the\norder without taking the axis over. Writing always applies. What a write\nafter the first update does not do is change which mode the element is in,\nbecause an element whose mode moved under it would start refusing a reader's\nclicks partway through a session.\n\nInferring it from the current value instead fails exactly where it matters:\na consumer who owns `sort` and sets it to `''` to mean unsorted still owns\nit, and an element reading ownership off \"is it empty\" would take the axis\nback and start sorting on its own."
+            },
+            {
+              "kind": "field",
+              "name": "filterMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "pageMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "sortIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "filterIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "pageIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "tableColumns",
+              "type": {
+                "text": "HelixHeadlessTableColumn[]"
+              },
+              "description": "The columns declared as children, in the order they are written.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "axes",
+              "type": {
+                "text": "Axis[]"
+              },
+              "privacy": "private",
+              "description": "The columns reduced to what the ordering needs.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "template",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The track list, from the columns if there are any.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "view",
+              "type": {
+                "text": "{ matched: number; rows: DataRow[]; total: number }"
+              },
+              "privacy": "private",
+              "description": "The rows to draw, and the counts around them.\n\nIn `server` mode this element applies nothing: `rows` is already the page,\n`total` is the result, and both counts come from the consumer. Anything else\nwould be this element filtering a page it was handed, which narrows one\nscreen and calls it a search.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "pages",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How many pages the result makes, which is at least one even when empty.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "matched",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "Rows after filtering, computed without paging.\n\nSeparate from `view` because `pages` needs it and `page` needs `pages`:\nasking `view` for it would recurse through the clamp in `page`.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "Emptiness is a fact about the data here, not about slotted children.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestSort",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Asks for a different order, and reports whether the request stood.\n\nAnnounced before it is applied, so `preventDefault()` is a refusal and the\norder does not move, which is what makes a server-side sort expressible: the\nconsumer refuses the local reorder, fetches, and hands back a new set."
+            },
+            {
+              "kind": "method",
+              "name": "requestFilter",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Asks for a different query."
+            },
+            {
+              "kind": "method",
+              "name": "requestPage",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Asks for a different page."
+            },
+            {
+              "kind": "method",
+              "name": "search",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "query",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Narrows the rows, from a consumer's own search field.\n\nPublic because the query lives above the table in every design that has one,\nand a consumer wiring their own input needs somewhere to send it. Returns\nwhether the change stood, the same as every other request here.",
+              "type": {
+                "text": "search(query: string) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleSort",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "field",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Cycles the order by one column, which is what a click on its heading means.\n\nAscending, descending, then the order the rows arrived in. Public for the\nsame reason `search` is: a consumer's own heading UI needs a way to ask.",
+              "type": {
+                "text": "toggleSort(field: string) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "assign",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The columns into the header row, everything else into the toolbar and footer.\n\nManual assignment, so a consumer's own markup is never written to."
+            },
+            {
+              "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Columns arrive from the light DOM, which changes no property here."
+            },
+            {
+              "kind": "method",
+              "name": "renderCell",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "column",
+                  "type": {
+                    "text": "HelixHeadlessTableColumn"
+                  }
+                },
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "DataRow"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderRows",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "rows",
+                  "type": {
+                    "text": "readonly DataRow[]"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "rowIndex",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "within",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "A row's place in the whole result, counting the header as row 1.\n\n**The number describes the result and not the window**, which is the whole\nreason a virtualized or paged grid needs `aria-rowindex` at all: a screen\nreader on page three should hear row 41, and a grid whose indices restart at\nevery page tells a reader the result is twenty rows long however many it has."
+            },
+            {
+              "kind": "field",
+              "name": "handleHeadClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A click on a sortable heading."
+            },
+            {
+              "kind": "field",
+              "name": "handleHeadKey",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The same on Enter and Space, since a heading that sorts is a control."
+            },
+            {
+              "kind": "method",
+              "name": "columnFrom",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HelixHeadlessTableColumn | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "handleNavigate",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The composed pagination's request, relayed as this element's own.\n\nStopped rather than allowed to bubble, because two `helix-navigate` events\nfor one click would reach a consumer's handler twice: the pagination's, and\nthis element's after it. The one that leaves carries this element's page\nbounds rather than the inner component's."
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "slotCounted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "slotRows",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many there were, the last time anyone looked.\n\n**Not `rows`, and the rename is the whole point of this comment.**\nTypeScript's `private` is a compile-time claim and the runtime field is\nwhatever it is named, so a subclass declaring `@property() rows` for the\ndata a consumer hands it would share one field with this counter: the\nslot count would overwrite the consumer's array on every `updated`, and\n`hasRows` would read the array's length as a slot count. Nothing would\nthrow. `helix-data-table` takes exactly that property, which is what\nfound this before it happened.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Counts what a rows slot was given.\n\nEmptiness is a fact about light DOM children and the server has none to\ncount. `slotchange` never fires there, so `counted` is false exactly when\nthe answer is unknown, and an unknown answer is not \"empty\": a list that\nshipped \"Nothing to show\" over markup about to have rows in it is the one\nthing an empty state must never do. Listbox's spec caught precisely that.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where there is content to show.\n\nLoading wins over empty. A collection that has not answered yet is not\nempty, and saying so is the most common version of this fault: the reader\nis told there is nothing a moment before there is something.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-headless-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-headless-pagination-size` composes `helix-headless-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/styled` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSortEvent"
+              },
+              "description": "Fired when a reader asks for a different order, and cancelable.",
+              "name": "helix-sort",
+              "reactProp": "onhelix-sort"
+            },
+            {
+              "type": {
+                "text": "HelixFilterEvent"
+              },
+              "description": "Fired when the query changes, and cancelable.",
+              "name": "helix-filter",
+              "reactProp": "onhelix-filter"
+            },
+            {
+              "type": {
+                "text": "HelixNavigateEvent"
+              },
+              "description": "Fired when a reader asks for another page, and cancelable.",
+              "name": "helix-navigate",
+              "reactProp": "onhelix-navigate"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "key",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The field naming a row's stable identity.\n\n**Needed before selection exists, not after.** Lit keys the rendered rows by\nit, so a sort moves a row's element rather than rewriting every cell in\nplace, which is what keeps focus inside a cell and keeps a CSS transition\nattached to the row it belongs to. Left unset the index is the key, which is\ncorrect only while nothing reorders: it is why this defaults to something\nthat works and is worth setting anyway.",
+              "fieldName": "key"
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "'client' | 'server'"
+              },
+              "default": "'client'",
+              "description": "Whether this element does the work or asks the consumer to.\n\n`client` filters, sorts and pages `rows` itself. `server` applies none of\nthem: `rows` is the page, `total` is the size of the whole result, and the\nthree events are requests the consumer answers by fetching. Past some size\nthe client cannot hold the data, so this is not an optimization, it is the\nonly mode that works, and it is here from the start because adding it later\ninverts the data flow.",
+              "fieldName": "mode"
+            },
+            {
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many rows the whole result has, where this element cannot count them.\n\nOnly read in `server` mode, where `rows` is one page and its length says\nnothing about the result. Ignored in `client` mode rather than trusted,\nbecause two sources for one count is the mistake, and here the array is the\none that cannot be stale.",
+              "fieldName": "total"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the grid.",
+              "fieldName": "label"
+            },
+            {
+              "name": "sort",
+              "type": {
+                "text": "string"
+              },
+              "description": "The order, as `field:direction`.\n\nSet it and this element defers: a reader's click fires `helix-sort` and\nchanges nothing until a new value arrives. `default-sort` seeds an order this\nelement then owns.",
+              "fieldName": "sort"
+            },
+            {
+              "name": "default-sort",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Order to open on, where nothing declared one.",
+              "fieldName": "defaultSort"
+            },
+            {
+              "name": "filter",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the rows are narrowed to, as one query across every column.\n\nOne query rather than a predicate per column, which is what a reader means\nby a search box above a table. It matches on each column's ordering value,\nso search and sort cannot disagree about what a column holds.",
+              "fieldName": "filter"
+            },
+            {
+              "name": "default-filter",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Query to open with, where nothing declared one.",
+              "fieldName": "defaultFilter"
+            },
+            {
+              "name": "page",
+              "type": {
+                "text": "number"
+              },
+              "description": "The page on show, from 1.\n\nClamped on the way out, so what this reports is the page it drew: a\nbookmarked link to page 99 of a result that has since shrunk reads back as\nthe last page rather than as 99.",
+              "fieldName": "page"
+            },
+            {
+              "name": "default-page",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Page to open on, where nothing declared one.",
+              "fieldName": "defaultPage"
+            },
+            {
+              "name": "page-size",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many rows a page holds. Zero is every row, which is what \"no paging\" means.\n\n**Not controlled, and that is not an omission.** Nothing in this element\never asks for a different page size: a size selector is\n`helix-pagination-size`, which a consumer puts in the `footer` slot and\nanswers themselves. A `@controlled` tag here would name an event this\nelement never fires for it, and `check:controlled` holds the tag against the\ncalls that back it.",
+              "fieldName": "pageSize"
+            },
+            {
+              "name": "default-page-size",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Page size to open with, where nothing declared one.",
+              "fieldName": "defaultPageSize"
+            },
+            {
+              "name": "paginated",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether to draw a pagination under the grid.\n\nOn by default once a page size is set, because a paged table with no way to\nchange pages shows a reader the first twenty rows and no way to know there\nare more. Off for a consumer supplying their own through the `footer` slot,\nwhich is why the slot replaces this rather than sitting beside it.",
+              "fieldName": "paginated"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "fieldName": "loadingText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "MixinCollection",
+              "package": "@helix-io/core"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A table that owns a result: rows as data, with sort, filter and paging.",
+          "helix": {
+            "category": "data",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/data-table",
+            "aliases": [
+              "Grid",
+              "Result table",
+              "Data grid"
+            ],
+            "tier": "headless",
+            "group": "BaseDataTable",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "A result with sort and paging, and no paint of its own.",
+                "layout": "padded",
+                "slug": "preview"
+              }
+            ],
+            "source": "helix/headless/src/data-table"
+          },
+          "tagName": "helix-headless-data-table",
+          "customElement": true,
+          "modulePath": "src/data-table/root/data-table-root.ts",
+          "definitionPath": "src/data-table/root/data-table-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixHeadlessDataTable",
+          "declaration": {
+            "name": "HelixHeadlessDataTable",
+            "module": "src/data-table/root/data-table-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-headless-data-table",
+          "declaration": {
+            "name": "HelixHeadlessDataTable",
+            "module": "src/data-table/root/data-table-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/data-table/root/order.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "parse",
+          "return": {
+            "type": {
+              "text": "Sort | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "spec",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "`field:asc` and `field:desc`, and nothing else.\n\nA bare `field` parses as ascending, because that is what a URL query usually\ncarries and refusing it would make the common case the verbose one. Anything\nunparseable is no sort rather than an error: this value arrives from a query\nstring as often as from code, and a bad one should leave the table in the\norder the data came in rather than break the page."
+        },
+        {
+          "kind": "function",
+          "name": "format",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "sort",
+              "type": {
+                "text": "Sort | undefined"
+              }
+            }
+          ],
+          "description": "A `Sort` written back out, so the property and the attribute agree."
+        },
+        {
+          "kind": "function",
+          "name": "cycle",
+          "return": {
+            "type": {
+              "text": "Sort | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "current",
+              "type": {
+                "text": "Sort | undefined"
+              }
+            },
+            {
+              "name": "field",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "What a reader gets on the next click of a sortable heading.\n\nAscending, descending, then none. **The third state is not an omission to be\ntidied away**: the order rows arrived in is information the data came with,\noften the server's own relevance ranking, and a two-state cycle makes it\nunreachable once a reader has sorted once."
+        },
+        {
+          "kind": "function",
+          "name": "filter",
+          "return": {
+            "type": {
+              "text": "DataRow[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "rows",
+              "type": {
+                "text": "readonly DataRow[]"
+              }
+            },
+            {
+              "name": "query",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "axes",
+              "type": {
+                "text": "readonly Axis[]"
+              }
+            }
+          ],
+          "description": "Rows matching a query, across every axis.\n\nOne query over all columns rather than a predicate per column, which is what a\nreader means by a search box above a table. Per-column predicates are a\ndifferent feature and compose with this rather than replacing it.\n\nCase-insensitive and substring, on the ordering value rather than the rendered\none: a cell showing a formatted date should be findable by the text a reader\nsees, and a cell showing an icon should be findable by the value behind it.\nWhere those differ, `compare` on the column is what decides, which is the same\nfunction sorting uses, so search and sort cannot disagree about what a column\nholds."
+        },
+        {
+          "kind": "function",
+          "name": "sort",
+          "return": {
+            "type": {
+              "text": "DataRow[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "rows",
+              "type": {
+                "text": "readonly DataRow[]"
+              }
+            },
+            {
+              "name": "spec",
+              "type": {
+                "text": "Sort | undefined"
+              }
+            },
+            {
+              "name": "axes",
+              "type": {
+                "text": "readonly Axis[]"
+              }
+            }
+          ],
+          "description": "Rows in the asked-for order, stably.\n\n**Stable, and that is load-bearing rather than tidy.** `Array.prototype.sort`\nis required to be stable since ES2019, so equal rows keep the order they\narrived in, which means sorting by one column and then another leaves the\nfirst as the tiebreak. A reader who sorts by status and then by name expects\nexactly that, and an unstable sort would shuffle equal rows on every\nre-render, which reads as the table twitching."
+        },
+        {
+          "kind": "function",
+          "name": "window_",
+          "return": {
+            "type": {
+              "text": "DataRow[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "rows",
+              "type": {
+                "text": "readonly DataRow[]"
+              }
+            },
+            {
+              "name": "page",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "number"
+              }
+            }
+          ],
+          "description": "One page of rows, clamped.\n\nA page past the end returns the last page rather than nothing, because the\nusual way to be past the end is a bookmarked link after the result shrank, and\nan empty table is a worse answer than the last page of a smaller one. The\nsame clamp `helix-pagination` already applies to what it reports."
+        },
+        {
+          "kind": "function",
+          "name": "ordered",
+          "return": {
+            "type": {
+              "text": "Ordered"
+            }
+          },
+          "parameters": [
+            {
+              "name": "rows",
+              "type": {
+                "text": "readonly DataRow[]"
+              }
+            },
+            {
+              "name": "axes",
+              "type": {
+                "text": "readonly Axis[]"
+              }
+            },
+            {
+              "name": "{ page, query, size, spec }",
+              "type": {
+                "text": "{ page: number; query: string; size: number; spec: string }"
+              }
+            }
+          ],
+          "description": "The whole pass, in the one order that is correct.\n\nExported as a single function so a caller cannot get the order wrong by\ncalling the three in the sequence that reads naturally, which is the sequence\nthat pages before it sorts."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "parse",
+          "declaration": {
+            "name": "parse",
+            "module": "src/data-table/root/order.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "format",
+          "declaration": {
+            "name": "format",
+            "module": "src/data-table/root/order.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "cycle",
+          "declaration": {
+            "name": "cycle",
+            "module": "src/data-table/root/order.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "filter",
+          "declaration": {
+            "name": "filter",
+            "module": "src/data-table/root/order.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "sort",
+          "declaration": {
+            "name": "sort",
+            "module": "src/data-table/root/order.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "window_",
+          "declaration": {
+            "name": "window_",
+            "module": "src/data-table/root/order.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ordered",
+          "declaration": {
+            "name": "ordered",
+            "module": "src/data-table/root/order.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/date-input/index.ts",
       "declarations": [],
       "exports": [
@@ -18142,7 +19558,7 @@
             },
             {
               "kind": "field",
-              "name": "counted",
+              "name": "slotCounted",
               "type": {
                 "text": "boolean"
               },
@@ -18156,13 +19572,13 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "slotRows",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
               "default": "0",
-              "description": "How many there were, the last time anyone looked.",
+              "description": "How many there were, the last time anyone looked.\n\n**Not `rows`, and the rename is the whole point of this comment.**\nTypeScript's `private` is a compile-time claim and the runtime field is\nwhatever it is named, so a subclass declaring `@property() rows` for the\ndata a consumer hands it would share one field with this counter: the\nslot count would overwrite the consumer's array on every `updated`, and\n`hasRows` would read the array's length as a slot count. Nothing would\nthrow. `helix-data-table` takes exactly that property, which is what\nfound this before it happened.",
               "inheritedFrom": {
                 "name": "MixinCollection",
                 "module": "src/mixins/mixin-collection/mixin-collection.ts"
@@ -21102,6 +22518,14 @@
           "declaration": {
             "name": "*",
             "module": "src/copy-button/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/data-table/index.js"
           }
         },
         {
@@ -24721,11 +26145,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the options have been looked at yet.\n\nEmptiness is a fact about light DOM children, and the server has none to\ncount: without this the list shipped \"Nothing to show\" over markup that was\nabout to have options in it, which is the one thing an empty state must\nnever do. `place` runs from `updated`, which the server never reaches, so\nthis is false exactly when the answer is unknown.",
-              "inheritedFrom": {
-                "name": "MixinCollection",
-                "module": "src/mixins/mixin-collection/mixin-collection.ts"
-              }
+              "description": "Whether the options have been looked at yet.\n\nEmptiness is a fact about light DOM children, and the server has none to\ncount: without this the list shipped \"Nothing to show\" over markup that was\nabout to have options in it, which is the one thing an empty state must\nnever do. `place` runs from `updated`, which the server never reaches, so\nthis is false exactly when the answer is unknown."
             },
             {
               "kind": "field",
@@ -24986,13 +26406,27 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "slotCounted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "slotRows",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
               "default": "0",
-              "description": "How many there were, the last time anyone looked.",
+              "description": "How many there were, the last time anyone looked.\n\n**Not `rows`, and the rename is the whole point of this comment.**\nTypeScript's `private` is a compile-time claim and the runtime field is\nwhatever it is named, so a subclass declaring `@property() rows` for the\ndata a consumer hands it would share one field with this counter: the\nslot count would overwrite the consumer's array on every `updated`, and\n`hasRows` would read the array's length as a slot count. Nothing would\nthrow. `helix-data-table` takes exactly that property, which is what\nfound this before it happened.",
               "inheritedFrom": {
                 "name": "MixinCollection",
                 "module": "src/mixins/mixin-collection/mixin-collection.ts"
@@ -27619,7 +29053,7 @@
             },
             {
               "kind": "field",
-              "name": "counted",
+              "name": "slotCounted",
               "type": {
                 "text": "boolean"
               },
@@ -27633,13 +29067,13 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "slotRows",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
               "default": "0",
-              "description": "How many there were, the last time anyone looked.",
+              "description": "How many there were, the last time anyone looked.\n\n**Not `rows`, and the rename is the whole point of this comment.**\nTypeScript's `private` is a compile-time claim and the runtime field is\nwhatever it is named, so a subclass declaring `@property() rows` for the\ndata a consumer hands it would share one field with this counter: the\nslot count would overwrite the consumer's array on every `updated`, and\n`hasRows` would read the array's length as a slot count. Nothing would\nthrow. `helix-data-table` takes exactly that property, which is what\nfound this before it happened.",
               "inheritedFrom": {
                 "name": "MixinCollection",
                 "module": "src/mixins/mixin-collection/mixin-collection.ts"
@@ -44859,7 +46293,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A column is a heading and a width, declared together, because they are two\nfacts about one thing and keeping them apart is what went wrong before.\n\n**This replaces a `columns` string on the table.** That property took a CSS\ntrack list, so the headings lived in a row of cells and the widths lived in\nan attribute, and nothing tied the two together: a table with three headings\nand a two-track list rendered without complaint. Worse, handing it the\nheadings instead of a track list produced invalid CSS, which the grid\nsilently ignored, so the whole table collapsed into one column and every cell\nstacked. That happened, in this library's own example, and the failure said\nnothing at all.\n\nNow the column is the source of both. Add one and the table has another\ntrack; remove one and it does not.\n\n**It generates no box of its own**, the same as a row: the heading is a grid\nitem of the table, so it lines up with the cells under it rather than sitting\nin a wrapper that has to be kept the same width.",
+          "description": "A column is a heading and a width, declared together, because they are two\nfacts about one thing and keeping them apart is what went wrong before.\n\n**This replaces a `columns` string on the table.** That property took a CSS\ntrack list, so the headings lived in a row of cells and the widths lived in\nan attribute, and nothing tied the two together: a table with three headings\nand a two-track list rendered without complaint. Worse, handing it the\nheadings instead of a track list produced invalid CSS, which the grid\nsilently ignored, so the whole table collapsed into one column and every cell\nstacked. That happened, in this library's own example, and the failure said\nnothing at all.\n\nNow the column is the source of both. Add one and the table has another\ntrack; remove one and it does not.\n\n**It is also where every per-column fact goes**, which is the reason\n`helix-data-table` needs no column config object. `field` names the key the\ncell reads, `sortable` says a reader may reorder by it, `align` says which\nedge the values line up against, and `cell` takes a function for anything the\nfield alone cannot express. The schema is markup and the data is a property:\na schema is small, declarative, and something a reader should be able to see\nin the HTML, and data is large and windowed.\n\n**The same element serves both tables**, the markup one and the data one. It\nis identified by a flag rather than by `instanceof`, so a `helix-table-column`\nworks inside either without the two roots sharing anything else.\n\n**It generates no box of its own**, the same as a row: the heading is a grid\nitem of the table, so it lines up with the cells under it rather than sitting\nin a wrapper that has to be kept the same width.",
           "name": "HelixHeadlessTableColumn",
           "cssParts": [
             {
@@ -44886,12 +46320,111 @@
             },
             {
               "kind": "field",
+              "name": "field",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The key this column reads out of a row.\n\nDot paths resolve, so `field=\"owner.name\"` reads a nested value: a result\nfrom an API arrives shaped the way the API shaped it, and requiring a flat\nrow would push a mapping pass onto every consumer.\n\n**It is also the sort and filter identity**, which is why sorting is by\nfield and not by column index: a reordered or hidden column would otherwise\nchange what `sort=\"2:asc\"` means, and a sort that means something different\nafter a column moves is a sort a consumer cannot store in a URL.\n\nEmpty on a column that is purely presentational, an actions column say, and\nsuch a column is never sortable however it is marked.",
+              "attribute": "field"
+            },
+            {
+              "kind": "field",
+              "name": "sortable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a reader may reorder the set by this column.\n\nIgnored without a `field`, and silently: a column with nothing to sort by\nhas no order to offer, and refusing loudly would mean an actions column\ncarrying `sortable` breaks a table rather than doing nothing.",
+              "attribute": "sortable"
+            },
+            {
+              "kind": "field",
+              "name": "align",
+              "type": {
+                "text": "'center' | 'end' | 'start' | ''"
+              },
+              "default": "''",
+              "description": "Which edge the values line up against.\n\n`end` is what a column of numbers wants, so digits of the same magnitude sit\nabove each other. Left unset the cell inherits the table's own alignment,\nwhich is `start` for text in either writing direction.",
+              "attribute": "align"
+            },
+            {
+              "kind": "field",
+              "name": "cell",
+              "type": {
+                "text": "CellReader | undefined"
+              },
+              "default": "undefined",
+              "description": "How to read the cell, where the field alone will not do.\n\nA property and not an attribute, because it is a function. Set it from a Lit\ntemplate with `.cell=${...}`, or assign it in script. A column with neither\nthis nor a `field` renders an empty cell rather than the whole row stringified,\nwhich is the failure mode of guessing."
+            },
+            {
+              "kind": "field",
+              "name": "compare",
+              "type": {
+                "text": "CellReader | undefined"
+              },
+              "default": "undefined",
+              "description": "How to read the value that gets sorted and filtered, where it is not the cell.\n\n**The one that is easy to leave out and expensive to add later.** A cell\nshowing `2.4 MB` sorts as a string unless something says the underlying value\nis a number, so `12 kB` sorts above `2.4 MB` and the column looks broken\nwhile every value in it is right. Left unset this is the field, which is the\ncorrect default: the raw value is what an API sorted by."
+            },
+            {
+              "kind": "field",
               "name": "track",
               "type": {
                 "text": "string"
               },
               "description": "The track this column contributes, resolved.",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "canSort",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether a reader can actually reorder by this column.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "read",
+              "return": {
+                "type": {
+                  "text": "unknown"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "Readonly<Record<string, unknown>>"
+                  }
+                }
+              ],
+              "description": "The value this column shows for a row.\n\n`cell` first, then the field. An explicit reader that returns `undefined` is\ntreated as declining rather than as an answer, so a formatter can hand the\ndefault back for the rows it has nothing to say about.",
+              "type": {
+                "text": "read(row: Readonly<Record<string, unknown>>) => unknown"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "order",
+              "return": {
+                "type": {
+                  "text": "unknown"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "Readonly<Record<string, unknown>>"
+                  }
+                }
+              ],
+              "description": "The value this column sorts and filters by, which is not always what it shows.",
+              "type": {
+                "text": "order(row: Readonly<Record<string, unknown>>) => unknown"
+              }
             },
             {
               "kind": "field",
@@ -45009,13 +46542,40 @@
               "default": "''",
               "description": "The track this column takes, as CSS.\n\nA single track value, so anything valid in `grid-template-columns` works:\n`16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is\nleft over equally, as `minmax(max-content, 1fr)`.\n\n**The floor was `0` and that is what broke a narrow table.** A zero floor\nlets a track shrink under its own content, so at 375 the columns were\nsqueezed to 75px and `eu-central-1` wrapped across lines, which reads as\ncorrupt data rather than as a table that ran out of room. The zero was\nchosen to stop one long value pushing the table past its container, and\nthat was the right worry with nowhere for the overflow to go.\n\nSomewhere now exists: `@helix-io/styled` scrolls the table's own box. So a\nlong value pushes past the container as the old comment feared, and the\ntable scrolls instead of the value being destroyed. Measured at 375: tracks\nof 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page\ndoes not move.\n\n**`max-content` and not `min-content`, because a hyphen is a wrap\nopportunity.** A `min-content` floor still broke `eu-central-1` at its\nhyphens, which is the whole of the reported fault. The cost is that a\ncolumn of prose asks for its longest paragraph on one line, so a column\nholding sentences rather than values wants `width=\"minmax(0, 1fr)\"` to opt\nback into wrapping. A headless consumer owns the overflow either way, that\nbeing paint, and gets the honest track list.",
               "fieldName": "width"
+            },
+            {
+              "name": "field",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The key this column reads out of a row.\n\nDot paths resolve, so `field=\"owner.name\"` reads a nested value: a result\nfrom an API arrives shaped the way the API shaped it, and requiring a flat\nrow would push a mapping pass onto every consumer.\n\n**It is also the sort and filter identity**, which is why sorting is by\nfield and not by column index: a reordered or hidden column would otherwise\nchange what `sort=\"2:asc\"` means, and a sort that means something different\nafter a column moves is a sort a consumer cannot store in a URL.\n\nEmpty on a column that is purely presentational, an actions column say, and\nsuch a column is never sortable however it is marked.",
+              "fieldName": "field"
+            },
+            {
+              "name": "sortable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a reader may reorder the set by this column.\n\nIgnored without a `field`, and silently: a column with nothing to sort by\nhas no order to offer, and refusing loudly would mean an actions column\ncarrying `sortable` breaks a table rather than doing nothing.",
+              "fieldName": "sortable"
+            },
+            {
+              "name": "align",
+              "type": {
+                "text": "'center' | 'end' | 'start' | ''"
+              },
+              "default": "''",
+              "description": "Which edge the values line up against.\n\n`end` is what a column of numbers wants, so digits of the same magnitude sit\nabove each other. Left unset the cell inherits the table's own alignment,\nwhich is `start` for text in either writing direction.",
+              "fieldName": "align"
             }
           ],
           "superclass": {
             "name": "HelixElement",
             "package": "@helix-io/core"
           },
-          "summary": "One column of a table: its heading, and how wide it is.",
+          "summary": "One column of a table: its heading, how wide it is, and what it reads.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
@@ -45245,7 +46805,7 @@
             },
             {
               "kind": "field",
-              "name": "counted",
+              "name": "slotCounted",
               "type": {
                 "text": "boolean"
               },
@@ -45259,13 +46819,13 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "slotRows",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
               "default": "0",
-              "description": "How many there were, the last time anyone looked.",
+              "description": "How many there were, the last time anyone looked.\n\n**Not `rows`, and the rename is the whole point of this comment.**\nTypeScript's `private` is a compile-time claim and the runtime field is\nwhatever it is named, so a subclass declaring `@property() rows` for the\ndata a consumer hands it would share one field with this counter: the\nslot count would overwrite the consumer's array on every `updated`, and\n`hasRows` would read the array's length as a slot count. Nothing would\nthrow. `helix-data-table` takes exactly that property, which is what\nfound this before it happened.",
               "inheritedFrom": {
                 "name": "MixinCollection",
                 "module": "src/mixins/mixin-collection/mixin-collection.ts"
@@ -56261,7 +57821,7 @@
             },
             {
               "kind": "field",
-              "name": "counted",
+              "name": "slotCounted",
               "type": {
                 "text": "boolean"
               },
@@ -56275,13 +57835,13 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "slotRows",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
               "default": "0",
-              "description": "How many there were, the last time anyone looked.",
+              "description": "How many there were, the last time anyone looked.\n\n**Not `rows`, and the rename is the whole point of this comment.**\nTypeScript's `private` is a compile-time claim and the runtime field is\nwhatever it is named, so a subclass declaring `@property() rows` for the\ndata a consumer hands it would share one field with this counter: the\nslot count would overwrite the consumer's array on every `updated`, and\n`hasRows` would read the array's length as a slot count. Nothing would\nthrow. `helix-data-table` takes exactly that property, which is what\nfound this before it happened.",
               "inheritedFrom": {
                 "name": "MixinCollection",
                 "module": "src/mixins/mixin-collection/mixin-collection.ts"

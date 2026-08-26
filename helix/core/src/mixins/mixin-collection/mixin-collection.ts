@@ -86,11 +86,22 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
 
     /** Whether the rows have been looked at yet. */
     @state()
-    private counted = false
+    private slotCounted = false
 
-    /** How many there were, the last time anyone looked. */
+    /**
+     * How many there were, the last time anyone looked.
+     *
+     * **Not `rows`, and the rename is the whole point of this comment.**
+     * TypeScript's `private` is a compile-time claim and the runtime field is
+     * whatever it is named, so a subclass declaring `@property() rows` for the
+     * data a consumer hands it would share one field with this counter: the
+     * slot count would overwrite the consumer's array on every `updated`, and
+     * `hasRows` would read the array's length as a slot count. Nothing would
+     * throw. `helix-data-table` takes exactly that property, which is what
+     * found this before it happened.
+     */
     @state()
-    private rows = 0
+    private slotRows = 0
 
     /**
      * Counts what a rows slot was given.
@@ -102,12 +113,12 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
      * thing an empty state must never do. Listbox's spec caught precisely that.
      */
     protected countRows(event: Event): void {
-      this.counted = true
-      this.rows = (event.target as HTMLSlotElement).assignedElements().length
+      this.slotCounted = true
+      this.slotRows = (event.target as HTMLSlotElement).assignedElements().length
     }
 
     protected get hasRows(): boolean {
-      return this.counted ? this.rows > 0 : true
+      return this.slotCounted ? this.slotRows > 0 : true
     }
 
     /**
@@ -135,9 +146,9 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
         return
       }
       const rows = slot.assignedElements().length
-      this.counted = true
-      if (rows !== this.rows) {
-        this.rows = rows
+      this.slotCounted = true
+      if (rows !== this.slotRows) {
+        this.slotRows = rows
       }
     }
 

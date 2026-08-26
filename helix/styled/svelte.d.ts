@@ -33,6 +33,7 @@ declare module 'svelte/elements' {
     'helix-combobox': CustomElements['helix-combobox']
     'helix-command': CustomElements['helix-command']
     'helix-copy-button': CustomElements['helix-copy-button']
+    'helix-data-table': CustomElements['helix-data-table']
     'helix-date-input': CustomElements['helix-date-input']
     'helix-date-picker': CustomElements['helix-date-picker']
     'helix-dialog': CustomElements['helix-dialog']

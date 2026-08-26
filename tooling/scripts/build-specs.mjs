@@ -80,6 +80,7 @@ const RUNTIME = {
   '@helix-io/icons': 'helix-icons',
   lit: 'lit',
   'lit/decorators.js': 'lit-decorators',
+  'lit/directives/repeat.js': 'lit-repeat',
   'lit/directives/style-map.js': 'lit-style-map',
   'lit/directives/unsafe-html.js': 'lit-unsafe-html',
   'lit/directives/unsafe-svg.js': 'lit-unsafe-svg',

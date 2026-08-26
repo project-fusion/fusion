@@ -1627,6 +1627,100 @@ it for reassurance reads as a second, accidental press.
 | `tooltip` | The bubble, forwarded from the tooltip inside. |
 | `tooltip-arrow` | The point, resting against the trigger. |
 
+## Data Table
+
+### Root (`helix-data-table`)
+
+A table that owns a result: rows as data, with sort, filter and paging.
+
+Extends `HelixHeadlessDataTable`.
+
+Hairline rules between rows and no fill, per the rule that depth comes from a
+single border rather than from elevation. A header band would be elevation
+spelled differently, so the headings are weight and color instead.
+
+The grid scrolls its own box and the toolbar and footer sit outside it: a
+search field that slides sideways when a reader scrolls the columns is a
+search field they lose.
+
+**The cell values do not server-render**, which is the headless tier's
+limitation and worth repeating where a consumer chooses between the two: use
+`helix-table` where the content has to be in the served HTML.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultFilter` | `default-filter` | `string` | `''` | `HelixHeadlessDataTable` | Query to open with, where nothing declared one. |
+| `defaultPage` | `default-page` | `number` | `1` | `HelixHeadlessDataTable` | Page to open on, where nothing declared one. |
+| `defaultPageSize` | `default-page-size` | `number` | `0` | `HelixHeadlessDataTable` | Page size to open with, where nothing declared one. |
+| `defaultSort` | `default-sort` | `string` | `''` | `HelixHeadlessDataTable` | Order to open on, where nothing declared one. |
+| `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
+| `filter` | `filter` | `string` | - | `HelixHeadlessDataTable` | What the rows are narrowed to, as one query across every column. |
+| `key` | `key` | `string` | `''` | `HelixHeadlessDataTable` | The field naming a row's stable identity. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessDataTable` | Accessible name for the grid. |
+| `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
+| `mode` | `mode` | `'client' \| 'server'` | `'client'` | `HelixHeadlessDataTable` | Whether this element does the work or asks the consumer to. |
+| `page` | `page` | `number` | - | `HelixHeadlessDataTable` | The page on show, from 1. |
+| `pageSize` | `page-size` | `number` | - | `HelixHeadlessDataTable` | How many rows a page holds. Zero is every row, which is what "no paging" means. |
+| `paginated` | `paginated` | `boolean` | - | `HelixHeadlessDataTable` | Whether to draw a pagination under the grid. |
+| `rows` | - | `readonly DataRow[]` | `[]` | `HelixHeadlessDataTable` | The whole result, in the order it arrived. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }` | `HelixHeadlessDataTable` | Nothing is assigned by name, so the columns can be put in a header row. |
+| `sort` | `sort` | `string` | - | `HelixHeadlessDataTable` | The order, as `field:direction`. |
+| `tableColumns` | - | `HelixHeadlessTableColumn[]` | - | `HelixHeadlessDataTable` | The columns declared as children, in the order they are written. |
+| `total` | `total` | `number` | `0` | `HelixHeadlessDataTable` | How many rows the whole result has, where this element cannot count them. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `search()` | `HelixHeadlessDataTable` | Narrows the rows, from a consumer's own search field. |
+| `toggleSort()` | `HelixHeadlessDataTable` | Cycles the order by one column, which is what a click on its heading means. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-sort` | `HelixSortEvent` | Fired when a reader asks for a different order, and cancelable. |
+| `helix-filter` | `HelixFilterEvent` | Fired when the query changes, and cancelable. |
+| `helix-navigate` | `HelixNavigateEvent` | Fired when a reader asks for another page, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The columns, declared as `helix-table-column` children. |
+| `toolbar` | Above the grid, for a search field or actions. |
+| `footer` | Below the grid, replacing the pagination this would otherwise draw. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `table` | The grid. |
+| `cell` | One cell. |
+| `head` | The row the column headings sit in. `display: contents`, so it takes no space. |
+| `row` | One row of data. |
+| `toolbar` | The region above the grid. |
+| `footer` | The region below the grid. |
+| `pagination` | The pagination, where this draws one. |
+| `empty` | Shown when no rows match. |
+| `loading` | Shown while the rows are still on their way. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--data-table-columns` | Track list for the columns, which wins over the one the columns worked out. |
+| `--data-table-rule` | The hairline between rows. |
+| `--data-table-color` | Ink in a cell. |
+| `--data-table-heading-color` | Ink in a heading. |
+| `--data-table-text` | Type size, headings and cells alike. |
+| `--data-table-padding-block` | Space above and below a cell's content. |
+| `--data-table-padding-inline` | Space either side of a cell's content. |
+| `--data-table-template` | The column track list, built from the columns the consumer declared. |
+
 ## Date Input
 
 ### Root (`helix-date-input`)
@@ -5470,8 +5564,21 @@ table.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `align` | `align` | `'center' \| 'end' \| 'start' \| ''` | `''` | `HelixHeadlessTableColumn` | Which edge the values line up against. |
+| `canSort` | - | `boolean` | - | `HelixHeadlessTableColumn` | Whether a reader can actually reorder by this column. |
+| `cell` | - | `CellReader \| undefined` | `undefined` | `HelixHeadlessTableColumn` | How to read the cell, where the field alone will not do. |
+| `compare` | - | `CellReader \| undefined` | `undefined` | `HelixHeadlessTableColumn` | How to read the value that gets sorted and filtered, where it is not the cell. |
+| `field` | `field` | `string` | `''` | `HelixHeadlessTableColumn` | The key this column reads out of a row. |
+| `sortable` | `sortable` | `boolean` | `false` | `HelixHeadlessTableColumn` | Whether a reader may reorder the set by this column. |
 | `track` | - | `string` | - | `HelixHeadlessTableColumn` | The track this column contributes, resolved. |
 | `width` | `width` | `string` | `''` | `HelixHeadlessTableColumn` | The track this column takes, as CSS. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `order()` | `HelixHeadlessTableColumn` | The value this column sorts and filters by, which is not always what it shows. |
+| `read()` | `HelixHeadlessTableColumn` | The value this column shows for a row. |
 
 #### Slots
 

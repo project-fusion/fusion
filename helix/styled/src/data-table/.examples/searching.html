@@ -1,0 +1,43 @@
+<!-- @summary One query across every column, from a search field the page owns. -->
+
+<helix-data-table
+  id="people"
+  label="People"
+>
+  <helix-input
+    id="query"
+    placeholder="Search"
+    slot="toolbar"
+    type="search"
+  ></helix-input>
+
+  <helix-table-column
+    field="name"
+    sortable
+    width="12rem"
+  >Name</helix-table-column>
+  <helix-table-column
+    field="team"
+    sortable
+  >Team</helix-table-column>
+  <helix-table-column field="location">Location</helix-table-column>
+</helix-data-table>
+
+<script>
+  const people = document.getElementById('people')
+
+  people.rows = [
+    { location: 'Lisbon', name: 'Ada Okonjo', team: 'Platform' },
+    { location: 'Berlin', name: 'Bo Lindqvist', team: 'Design' },
+    { location: 'Lisbon', name: 'Chen Wei', team: 'Platform' },
+    { location: 'Toronto', name: 'Dara Ellis', team: 'Research' },
+    { location: 'Berlin', name: 'Emil Novak', team: 'Design' },
+  ]
+
+  /* `search` rather than writing `filter`, because it goes through the same
+     request the component makes for itself: the page hears `helix-filter` and
+     can refuse it, which is what a server-side search would do. */
+  document.getElementById('query').addEventListener('helix-input', (event) => {
+    people.search(event.detail.value)
+  })
+</script>

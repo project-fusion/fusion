@@ -1,0 +1,53 @@
+<!-- @summary A result the table owns: sort by clicking a heading, and page through the rest. -->
+
+<helix-data-table
+  default-sort="name:asc"
+  id="files"
+  label="Objects"
+  page-size="4"
+>
+  <helix-table-column
+    field="name"
+    sortable
+    width="14rem"
+  >Name</helix-table-column>
+  <helix-table-column
+    field="region"
+    sortable
+  >Region</helix-table-column>
+  <helix-table-column
+    align="end"
+    field="size"
+    sortable
+    width="8rem"
+  >Size</helix-table-column>
+</helix-data-table>
+
+<script>
+  const files = document.getElementById('files')
+
+  files.rows = [
+    { name: 'archive.tar.gz', region: 'us-east-1', size: 4_823_100 },
+    { name: 'backup.sql', region: 'eu-central-1', size: 918_400 },
+    { name: 'index.json', region: 'us-east-1', size: 2_100 },
+    { name: 'manifest.yaml', region: 'ap-south-1', size: 812 },
+    { name: 'profile.bin', region: 'eu-west-2', size: 61_440 },
+    { name: 'report.pdf', region: 'us-west-1', size: 1_204_000 },
+    { name: 'snapshot.img', region: 'eu-central-1', size: 9_800_000 },
+    { name: 'trace.log', region: 'ap-south-1', size: 44_900 },
+  ]
+
+  /* The cell shows a size a person can read and the column still sorts by the
+     number, which is what `compare` is for: told only the formatted string, the
+     column would put 9.8 MB below 812 B and look broken while every value in it
+     is right. */
+  const bytes = new Intl.NumberFormat(undefined, {
+    maximumFractionDigits: 1,
+    style: 'unit',
+    unit: 'megabyte',
+  })
+
+  const size = files.querySelector('[field="size"]')
+  size.cell = (row) => bytes.format(row.size / 1_000_000)
+  size.compare = (row) => row.size
+</script>

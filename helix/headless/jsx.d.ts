@@ -35,6 +35,7 @@ import type {
   HelixHeadlessCombobox,
   HelixHeadlessCommand,
   HelixHeadlessCopyButton,
+  HelixHeadlessDataTable,
   HelixHeadlessDateInput,
   HelixHeadlessDatePicker,
   HelixHeadlessDialog,
@@ -128,6 +129,7 @@ import type {
   HelixSampleStartEvent,
   HelixSelectEvent,
   HelixShortcutEvent,
+  HelixSortEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
   fromMinutes,
@@ -3025,6 +3027,271 @@ anything a consumer sets. */
   "prop:focusable"?: HelixHeadlessCopyButton["focusable"];
   /** Fired after the clipboard write succeeds. */
   "on:helix-copy"?: (e: HelixHeadlessCopyButtonHelixCopyElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixHeadlessDataTable` component event */
+export type HelixHeadlessDataTableElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessDataTable,
+  E
+>;
+/** `helix-sort` event type */
+export type HelixHeadlessDataTableHelixSortElementEvent =
+  HelixHeadlessDataTableElementEvent<HelixSortEvent>;
+/** `helix-filter` event type */
+export type HelixHeadlessDataTableHelixFilterElementEvent =
+  HelixHeadlessDataTableElementEvent<HelixFilterEvent>;
+/** `helix-navigate` event type */
+export type HelixHeadlessDataTableHelixNavigateElementEvent =
+  HelixHeadlessDataTableElementEvent<HelixNavigateEvent>;
+
+export type HelixHeadlessDataTableProps = {
+  /** The field naming a row's stable identity.
+
+**Needed before selection exists, not after.** Lit keys the rendered rows by
+it, so a sort moves a row's element rather than rewriting every cell in
+place, which is what keeps focus inside a cell and keeps a CSS transition
+attached to the row it belongs to. Left unset the index is the key, which is
+correct only while nothing reorders: it is why this defaults to something
+that works and is worth setting anyway. */
+  key?: HelixHeadlessDataTable["key"];
+  /** Whether this element does the work or asks the consumer to.
+
+`client` filters, sorts and pages `rows` itself. `server` applies none of
+them: `rows` is the page, `total` is the size of the whole result, and the
+three events are requests the consumer answers by fetching. Past some size
+the client cannot hold the data, so this is not an optimization, it is the
+only mode that works, and it is here from the start because adding it later
+inverts the data flow. */
+  mode?: HelixHeadlessDataTable["mode"];
+  /** How many rows the whole result has, where this element cannot count them.
+
+Only read in `server` mode, where `rows` is one page and its length says
+nothing about the result. Ignored in `client` mode rather than trusted,
+because two sources for one count is the mistake, and here the array is the
+one that cannot be stale. */
+  total?: HelixHeadlessDataTable["total"];
+  /** Accessible name for the grid. */
+  label?: HelixHeadlessDataTable["label"];
+  /** The order, as `field:direction`.
+
+Set it and this element defers: a reader's click fires `helix-sort` and
+changes nothing until a new value arrives. `default-sort` seeds an order this
+element then owns. */
+  sort?: HelixHeadlessDataTable["sort"];
+  /** Order to open on, where nothing declared one. */
+  "default-sort"?: HelixHeadlessDataTable["defaultSort"];
+  /** Order to open on, where nothing declared one. */
+  defaultSort?: HelixHeadlessDataTable["defaultSort"];
+  /** What the rows are narrowed to, as one query across every column.
+
+One query rather than a predicate per column, which is what a reader means
+by a search box above a table. It matches on each column's ordering value,
+so search and sort cannot disagree about what a column holds. */
+  filter?: HelixHeadlessDataTable["filter"];
+  /** Query to open with, where nothing declared one. */
+  "default-filter"?: HelixHeadlessDataTable["defaultFilter"];
+  /** Query to open with, where nothing declared one. */
+  defaultFilter?: HelixHeadlessDataTable["defaultFilter"];
+  /** The page on show, from 1.
+
+Clamped on the way out, so what this reports is the page it drew: a
+bookmarked link to page 99 of a result that has since shrunk reads back as
+the last page rather than as 99. */
+  page?: HelixHeadlessDataTable["page"];
+  /** Page to open on, where nothing declared one. */
+  "default-page"?: HelixHeadlessDataTable["defaultPage"];
+  /** Page to open on, where nothing declared one. */
+  defaultPage?: HelixHeadlessDataTable["defaultPage"];
+  /** How many rows a page holds. Zero is every row, which is what "no paging" means.
+
+**Not controlled, and that is not an omission.** Nothing in this element
+ever asks for a different page size: a size selector is
+`helix-pagination-size`, which a consumer puts in the `footer` slot and
+answers themselves. A `@controlled` tag here would name an event this
+element never fires for it, and `check:controlled` holds the tag against the
+calls that back it. */
+  "page-size"?: HelixHeadlessDataTable["pageSize"];
+  /** How many rows a page holds. Zero is every row, which is what "no paging" means.
+
+**Not controlled, and that is not an omission.** Nothing in this element
+ever asks for a different page size: a size selector is
+`helix-pagination-size`, which a consumer puts in the `footer` slot and
+answers themselves. A `@controlled` tag here would name an event this
+element never fires for it, and `check:controlled` holds the tag against the
+calls that back it. */
+  pageSize?: HelixHeadlessDataTable["pageSize"];
+  /** Page size to open with, where nothing declared one. */
+  "default-page-size"?: HelixHeadlessDataTable["defaultPageSize"];
+  /** Page size to open with, where nothing declared one. */
+  defaultPageSize?: HelixHeadlessDataTable["defaultPageSize"];
+  /** Whether to draw a pagination under the grid.
+
+On by default once a page size is set, because a paged table with no way to
+change pages shows a reader the first twenty rows and no way to know there
+are more. Off for a consumer supplying their own through the `footer` slot,
+which is why the slot replaces this rather than sitting beside it. */
+  paginated?: HelixHeadlessDataTable["paginated"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixHeadlessDataTable["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixHeadlessDataTable["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixHeadlessDataTable["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixHeadlessDataTable["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixHeadlessDataTable["emptyText"];
+  /** The whole result, in the order it arrived.
+
+A property and not an attribute: it is an array. Left alone this element
+filters, sorts and pages it; in `server` mode it is the page the consumer
+already fetched and none of the three is applied.
+
+**Read, never written.** Sorting produces a new array rather than reordering
+this one, because a consumer's array may be the same object their own state
+holds and reordering it under them is a mutation they did not ask for. */
+  rows?: HelixHeadlessDataTable["rows"];
+
+  /** Fired when a reader asks for a different order, and cancelable. */
+  "onhelix-sort"?: (e: HelixHeadlessDataTableHelixSortElementEvent) => void;
+  /** Fired when the query changes, and cancelable. */
+  "onhelix-filter"?: (e: HelixHeadlessDataTableHelixFilterElementEvent) => void;
+  /** Fired when a reader asks for another page, and cancelable. */
+  "onhelix-navigate"?: (
+    e: HelixHeadlessDataTableHelixNavigateElementEvent,
+  ) => void;
+};
+
+export type HelixHeadlessDataTableSolidJsProps = {
+  /** The field naming a row's stable identity.
+
+**Needed before selection exists, not after.** Lit keys the rendered rows by
+it, so a sort moves a row's element rather than rewriting every cell in
+place, which is what keeps focus inside a cell and keeps a CSS transition
+attached to the row it belongs to. Left unset the index is the key, which is
+correct only while nothing reorders: it is why this defaults to something
+that works and is worth setting anyway. */
+  "prop:key"?: HelixHeadlessDataTable["key"];
+  /** Whether this element does the work or asks the consumer to.
+
+`client` filters, sorts and pages `rows` itself. `server` applies none of
+them: `rows` is the page, `total` is the size of the whole result, and the
+three events are requests the consumer answers by fetching. Past some size
+the client cannot hold the data, so this is not an optimization, it is the
+only mode that works, and it is here from the start because adding it later
+inverts the data flow. */
+  "prop:mode"?: HelixHeadlessDataTable["mode"];
+  /** How many rows the whole result has, where this element cannot count them.
+
+Only read in `server` mode, where `rows` is one page and its length says
+nothing about the result. Ignored in `client` mode rather than trusted,
+because two sources for one count is the mistake, and here the array is the
+one that cannot be stale. */
+  "prop:total"?: HelixHeadlessDataTable["total"];
+  /** Accessible name for the grid. */
+  "prop:label"?: HelixHeadlessDataTable["label"];
+  /** The order, as `field:direction`.
+
+Set it and this element defers: a reader's click fires `helix-sort` and
+changes nothing until a new value arrives. `default-sort` seeds an order this
+element then owns. */
+  "prop:sort"?: HelixHeadlessDataTable["sort"];
+  /** Order to open on, where nothing declared one. */
+  "attr:default-sort"?: HelixHeadlessDataTable["defaultSort"];
+  /** Order to open on, where nothing declared one. */
+  "prop:defaultSort"?: HelixHeadlessDataTable["defaultSort"];
+  /** What the rows are narrowed to, as one query across every column.
+
+One query rather than a predicate per column, which is what a reader means
+by a search box above a table. It matches on each column's ordering value,
+so search and sort cannot disagree about what a column holds. */
+  "prop:filter"?: HelixHeadlessDataTable["filter"];
+  /** Query to open with, where nothing declared one. */
+  "attr:default-filter"?: HelixHeadlessDataTable["defaultFilter"];
+  /** Query to open with, where nothing declared one. */
+  "prop:defaultFilter"?: HelixHeadlessDataTable["defaultFilter"];
+  /** The page on show, from 1.
+
+Clamped on the way out, so what this reports is the page it drew: a
+bookmarked link to page 99 of a result that has since shrunk reads back as
+the last page rather than as 99. */
+  "prop:page"?: HelixHeadlessDataTable["page"];
+  /** Page to open on, where nothing declared one. */
+  "attr:default-page"?: HelixHeadlessDataTable["defaultPage"];
+  /** Page to open on, where nothing declared one. */
+  "prop:defaultPage"?: HelixHeadlessDataTable["defaultPage"];
+  /** How many rows a page holds. Zero is every row, which is what "no paging" means.
+
+**Not controlled, and that is not an omission.** Nothing in this element
+ever asks for a different page size: a size selector is
+`helix-pagination-size`, which a consumer puts in the `footer` slot and
+answers themselves. A `@controlled` tag here would name an event this
+element never fires for it, and `check:controlled` holds the tag against the
+calls that back it. */
+  "attr:page-size"?: HelixHeadlessDataTable["pageSize"];
+  /** How many rows a page holds. Zero is every row, which is what "no paging" means.
+
+**Not controlled, and that is not an omission.** Nothing in this element
+ever asks for a different page size: a size selector is
+`helix-pagination-size`, which a consumer puts in the `footer` slot and
+answers themselves. A `@controlled` tag here would name an event this
+element never fires for it, and `check:controlled` holds the tag against the
+calls that back it. */
+  "prop:pageSize"?: HelixHeadlessDataTable["pageSize"];
+  /** Page size to open with, where nothing declared one. */
+  "attr:default-page-size"?: HelixHeadlessDataTable["defaultPageSize"];
+  /** Page size to open with, where nothing declared one. */
+  "prop:defaultPageSize"?: HelixHeadlessDataTable["defaultPageSize"];
+  /** Whether to draw a pagination under the grid.
+
+On by default once a page size is set, because a paged table with no way to
+change pages shows a reader the first twenty rows and no way to know there
+are more. Off for a consumer supplying their own through the `footer` slot,
+which is why the slot replaces this rather than sitting beside it. */
+  "prop:paginated"?: HelixHeadlessDataTable["paginated"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  "prop:loading"?: HelixHeadlessDataTable["loading"];
+  /** What is said while they are on their way. */
+  "attr:loading-text"?: HelixHeadlessDataTable["loadingText"];
+  /** What is said while they are on their way. */
+  "prop:loadingText"?: HelixHeadlessDataTable["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixHeadlessDataTable["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixHeadlessDataTable["emptyText"];
+  /** The whole result, in the order it arrived.
+
+A property and not an attribute: it is an array. Left alone this element
+filters, sorts and pages it; in `server` mode it is the page the consumer
+already fetched and none of the three is applied.
+
+**Read, never written.** Sorting produces a new array rather than reordering
+this one, because a consumer's array may be the same object their own state
+holds and reordering it under them is a mutation they did not ask for. */
+  "prop:rows"?: HelixHeadlessDataTable["rows"];
+  /** Fired when a reader asks for a different order, and cancelable. */
+  "on:helix-sort"?: (e: HelixHeadlessDataTableHelixSortElementEvent) => void;
+  /** Fired when the query changes, and cancelable. */
+  "on:helix-filter"?: (
+    e: HelixHeadlessDataTableHelixFilterElementEvent,
+  ) => void;
+  /** Fired when a reader asks for another page, and cancelable. */
+  "on:helix-navigate"?: (
+    e: HelixHeadlessDataTableHelixNavigateElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9540,6 +9807,47 @@ holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
 back into wrapping. A headless consumer owns the overflow either way, that
 being paint, and gets the honest track list. */
   width?: HelixHeadlessTableColumn["width"];
+  /** The key this column reads out of a row.
+
+Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+from an API arrives shaped the way the API shaped it, and requiring a flat
+row would push a mapping pass onto every consumer.
+
+**It is also the sort and filter identity**, which is why sorting is by
+field and not by column index: a reordered or hidden column would otherwise
+change what `sort="2:asc"` means, and a sort that means something different
+after a column moves is a sort a consumer cannot store in a URL.
+
+Empty on a column that is purely presentational, an actions column say, and
+such a column is never sortable however it is marked. */
+  field?: HelixHeadlessTableColumn["field"];
+  /** Whether a reader may reorder the set by this column.
+
+Ignored without a `field`, and silently: a column with nothing to sort by
+has no order to offer, and refusing loudly would mean an actions column
+carrying `sortable` breaks a table rather than doing nothing. */
+  sortable?: HelixHeadlessTableColumn["sortable"];
+  /** Which edge the values line up against.
+
+`end` is what a column of numbers wants, so digits of the same magnitude sit
+above each other. Left unset the cell inherits the table's own alignment,
+which is `start` for text in either writing direction. */
+  align?: HelixHeadlessTableColumn["align"];
+  /** How to read the cell, where the field alone will not do.
+
+A property and not an attribute, because it is a function. Set it from a Lit
+template with `.cell=${...}`, or assign it in script. A column with neither
+this nor a `field` renders an empty cell rather than the whole row stringified,
+which is the failure mode of guessing. */
+  cell?: HelixHeadlessTableColumn["cell"];
+  /** How to read the value that gets sorted and filtered, where it is not the cell.
+
+**The one that is easy to leave out and expensive to add later.** A cell
+showing `2.4 MB` sorts as a string unless something says the underlying value
+is a number, so `12 kB` sorts above `2.4 MB` and the column looks broken
+while every value in it is right. Left unset this is the field, which is the
+correct default: the raw value is what an API sorted by. */
+  compare?: HelixHeadlessTableColumn["compare"];
 };
 
 export type HelixHeadlessTableColumnSolidJsProps = {
@@ -9570,6 +9878,47 @@ holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
 back into wrapping. A headless consumer owns the overflow either way, that
 being paint, and gets the honest track list. */
   "prop:width"?: HelixHeadlessTableColumn["width"];
+  /** The key this column reads out of a row.
+
+Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+from an API arrives shaped the way the API shaped it, and requiring a flat
+row would push a mapping pass onto every consumer.
+
+**It is also the sort and filter identity**, which is why sorting is by
+field and not by column index: a reordered or hidden column would otherwise
+change what `sort="2:asc"` means, and a sort that means something different
+after a column moves is a sort a consumer cannot store in a URL.
+
+Empty on a column that is purely presentational, an actions column say, and
+such a column is never sortable however it is marked. */
+  "prop:field"?: HelixHeadlessTableColumn["field"];
+  /** Whether a reader may reorder the set by this column.
+
+Ignored without a `field`, and silently: a column with nothing to sort by
+has no order to offer, and refusing loudly would mean an actions column
+carrying `sortable` breaks a table rather than doing nothing. */
+  "prop:sortable"?: HelixHeadlessTableColumn["sortable"];
+  /** Which edge the values line up against.
+
+`end` is what a column of numbers wants, so digits of the same magnitude sit
+above each other. Left unset the cell inherits the table's own alignment,
+which is `start` for text in either writing direction. */
+  "prop:align"?: HelixHeadlessTableColumn["align"];
+  /** How to read the cell, where the field alone will not do.
+
+A property and not an attribute, because it is a function. Set it from a Lit
+template with `.cell=${...}`, or assign it in script. A column with neither
+this nor a `field` renders an empty cell rather than the whole row stringified,
+which is the failure mode of guessing. */
+  "prop:cell"?: HelixHeadlessTableColumn["cell"];
+  /** How to read the value that gets sorted and filtered, where it is not the cell.
+
+**The one that is easy to leave out and expensive to add later.** A cell
+showing `2.4 MB` sorts as a string unless something says the underlying value
+is a number, so `12 kB` sorts above `2.4 MB` and the column looks broken
+while every value in it is right. Left unset this is the field, which is the
+correct default: the raw value is what an API sorted by. */
+  "prop:compare"?: HelixHeadlessTableColumn["compare"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -15239,6 +15588,190 @@ export type CustomElements = {
       BaseProps<HelixHeadlessCopyButton> &
       BaseEvents
   >;
+
+  /**
+   * **The schema is markup and the data is a property.** Columns are declared as
+   * `helix-table-column` children, because a schema is small, declarative, and
+   * something a reader should be able to see in the HTML; rows are handed over as
+   * an array, because data is large and a table that draws ten thousand elements
+   * cannot window them.
+   *
+   * ```html
+   * <helix-data-table .rows=${rows} sort="name:asc" page-size="20">
+   *   <helix-table-column field="name" sortable>Name</helix-table-column>
+   *   <helix-table-column field="size" align="end" sortable .cell=${bytes}>Size</helix-table-column>
+   * </helix-data-table>
+   * ```
+   *
+   * This is the resolution of a deferral rather than a new idea. `helix-table`
+   * takes rows as markup and is the right component for a table of twelve things
+   * a person wrote out; the repeated `page`, `page-size` and `total` attributes on
+   * the three pagination elements are placeholders whose own comments name the fix
+   * as "a data table composing a pagination inside itself", and `helix-table`
+   * already carried `@aliases DataTable`: a name claimed and not kept.
+   *
+   * **Sort and filter apply to the whole set, never the page.** Sorting the drawn
+   * window is correct on the first screen and wrong on every other one, which is
+   * how it survives being looked at. The arithmetic lives in `order.ts` where
+   * nothing can see a window, and its spec asserts the composition rather than the
+   * three steps, because each step alone passes either way.
+   *
+   * **What it does not do, stated where a consumer will read it: the cell values
+   * do not server-render.** The headings do, because a column renders its own, and
+   * the row elements do, because their count comes from `rows`. Reading a cell
+   * needs the columns, and the columns are markup children that Lit SSR does not
+   * hand this element: `children` is undefined there. So a crawler and a reader on
+   * a slow connection see a table of the right shape with nothing in it, which is
+   * strictly less than `helix-table` serves for a table whose rows are markup.
+   *
+   * That is the cost of "the schema is markup and the data is a property". Use
+   * `helix-table` where the content has to be in the served HTML and the result is
+   * small enough to write out; use this where the result is large, and accept that
+   * the first paint is a shell. The obvious workaround, a `columns` property
+   * beside the markup columns, is deliberately not offered: this family has
+   * already shipped one source of truth for columns splitting into two, nothing
+   * checked that they agreed, and a table rendering one way on the server and
+   * another in the browser is that failure with a hydration mismatch on top.
+   *
+   * **Every axis is controlled or uncontrolled, and that is what makes a server
+   * mode fall out rather than be bolted on.** `sort`, `filter`, `page` and
+   * `page-size` each defer to the consumer when set and seed themselves from a
+   * `default-*` when not. A consumer who answers all four holds the data flow:
+   * they hear the reader's request, fetch, and hand back a new `rows` with a
+   * `total`. Retrofitting that inverts the flow and is a rewrite, so it is here
+   * from the start.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `key`: The field naming a row's stable identity.
+   *
+   * **Needed before selection exists, not after.** Lit keys the rendered rows by
+   * it, so a sort moves a row's element rather than rewriting every cell in
+   * place, which is what keeps focus inside a cell and keeps a CSS transition
+   * attached to the row it belongs to. Left unset the index is the key, which is
+   * correct only while nothing reorders: it is why this defaults to something
+   * that works and is worth setting anyway.
+   * - `mode`: Whether this element does the work or asks the consumer to.
+   *
+   * `client` filters, sorts and pages `rows` itself. `server` applies none of
+   * them: `rows` is the page, `total` is the size of the whole result, and the
+   * three events are requests the consumer answers by fetching. Past some size
+   * the client cannot hold the data, so this is not an optimization, it is the
+   * only mode that works, and it is here from the start because adding it later
+   * inverts the data flow.
+   * - `total`: How many rows the whole result has, where this element cannot count them.
+   *
+   * Only read in `server` mode, where `rows` is one page and its length says
+   * nothing about the result. Ignored in `client` mode rather than trusted,
+   * because two sources for one count is the mistake, and here the array is the
+   * one that cannot be stale.
+   * - `label`: Accessible name for the grid.
+   * - `sort`: The order, as `field:direction`.
+   *
+   * Set it and this element defers: a reader's click fires `helix-sort` and
+   * changes nothing until a new value arrives. `default-sort` seeds an order this
+   * element then owns.
+   * - `default-sort`/`defaultSort`: Order to open on, where nothing declared one.
+   * - `filter`: What the rows are narrowed to, as one query across every column.
+   *
+   * One query rather than a predicate per column, which is what a reader means
+   * by a search box above a table. It matches on each column's ordering value,
+   * so search and sort cannot disagree about what a column holds.
+   * - `default-filter`/`defaultFilter`: Query to open with, where nothing declared one.
+   * - `page`: The page on show, from 1.
+   *
+   * Clamped on the way out, so what this reports is the page it drew: a
+   * bookmarked link to page 99 of a result that has since shrunk reads back as
+   * the last page rather than as 99.
+   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
+   * - `page-size`/`pageSize`: How many rows a page holds. Zero is every row, which is what "no paging" means.
+   *
+   * **Not controlled, and that is not an omission.** Nothing in this element
+   * ever asks for a different page size: a size selector is
+   * `helix-pagination-size`, which a consumer puts in the `footer` slot and
+   * answers themselves. A `@controlled` tag here would name an event this
+   * element never fires for it, and `check:controlled` holds the tag against the
+   * calls that back it.
+   * - `default-page-size`/`defaultPageSize`: Page size to open with, where nothing declared one.
+   * - `paginated`: Whether to draw a pagination under the grid.
+   *
+   * On by default once a page size is set, because a paged table with no way to
+   * change pages shows a reader the first twenty rows and no way to know there
+   * are more. Off for a consumer supplying their own through the `footer` slot,
+   * which is why the slot replaces this rather than sitting beside it.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `rows`: The whole result, in the order it arrived.
+   *
+   * A property and not an attribute: it is an array. Left alone this element
+   * filters, sorts and pages it; in `server` mode it is the page the consumer
+   * already fetched and none of the three is applied.
+   *
+   * **Read, never written.** Sorting produces a new array rather than reordering
+   * this one, because a consumer's array may be the same object their own state
+   * holds and reordering it under them is a mutation they did not ask for. (property only)
+   * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-sort`: Fired when a reader asks for a different order, and cancelable.
+   * - `helix-filter`: Fired when the query changes, and cancelable.
+   * - `helix-navigate`: Fired when a reader asks for another page, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The columns, declared as `helix-table-column` children.
+   * - `toolbar`: Above the grid, for a search field or actions.
+   * - `footer`: Below the grid, replacing the pagination this would otherwise draw.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `search(query: string) => boolean`: Narrows the rows, from a consumer's own search field.
+   *
+   * Public because the query lives above the table in every design that has one,
+   * and a consumer wiring their own input needs somewhere to send it. Returns
+   * whether the change stood, the same as every other request here.
+   * - `toggleSort(field: string) => boolean`: Cycles the order by one column, which is what a click on its heading means.
+   *
+   * Ascending, descending, then the order the rows arrived in. Public for the
+   * same reason `search` is: a consumer's own heading UI needs a way to ask.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--data-table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `table`: The grid.
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
+   * - `row`: One row of data.
+   * - `cell`: One cell.
+   * - `toolbar`: The region above the grid.
+   * - `footer`: The region below the grid.
+   * - `pagination`: The pagination, where this draws one.
+   * - `empty`: Shown when no rows match.
+   * - `loading`: Shown while the rows are still on their way.
+   */
+  "helix-headless-data-table": Partial<
+    HelixHeadlessDataTableProps & BaseProps<HelixHeadlessDataTable> & BaseEvents
+  > & HelixHeadlessDataTableControlled;
 
   /**
    * **The calendar is `helix-date-picker`, not a second one written here.** It
@@ -21379,6 +21912,18 @@ export type CustomElements = {
    * Now the column is the source of both. Add one and the table has another
    * track; remove one and it does not.
    *
+   * **It is also where every per-column fact goes**, which is the reason
+   * `helix-data-table` needs no column config object. `field` names the key the
+   * cell reads, `sortable` says a reader may reorder by it, `align` says which
+   * edge the values line up against, and `cell` takes a function for anything the
+   * field alone cannot express. The schema is markup and the data is a property:
+   * a schema is small, declarative, and something a reader should be able to see
+   * in the HTML, and data is large and windowed.
+   *
+   * **The same element serves both tables**, the markup one and the data one. It
+   * is identified by a flag rather than by `instanceof`, so a `helix-table-column`
+   * works inside either without the two roots sharing anything else.
+   *
    * **It generates no box of its own**, the same as a row: the heading is a grid
    * item of the table, so it lines up with the cells under it rather than sitting
    * in a wrapper that has to be kept the same width.
@@ -21413,13 +21958,61 @@ export type CustomElements = {
    * holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
    * back into wrapping. A headless consumer owns the overflow either way, that
    * being paint, and gets the honest track list.
+   * - `field`: The key this column reads out of a row.
+   *
+   * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+   * from an API arrives shaped the way the API shaped it, and requiring a flat
+   * row would push a mapping pass onto every consumer.
+   *
+   * **It is also the sort and filter identity**, which is why sorting is by
+   * field and not by column index: a reordered or hidden column would otherwise
+   * change what `sort="2:asc"` means, and a sort that means something different
+   * after a column moves is a sort a consumer cannot store in a URL.
+   *
+   * Empty on a column that is purely presentational, an actions column say, and
+   * such a column is never sortable however it is marked.
+   * - `sortable`: Whether a reader may reorder the set by this column.
+   *
+   * Ignored without a `field`, and silently: a column with nothing to sort by
+   * has no order to offer, and refusing loudly would mean an actions column
+   * carrying `sortable` breaks a table rather than doing nothing.
+   * - `align`: Which edge the values line up against.
+   *
+   * `end` is what a column of numbers wants, so digits of the same magnitude sit
+   * above each other. Left unset the cell inherits the table's own alignment,
+   * which is `start` for text in either writing direction.
+   * - `cell`: How to read the cell, where the field alone will not do.
+   *
+   * A property and not an attribute, because it is a function. Set it from a Lit
+   * template with `.cell=${...}`, or assign it in script. A column with neither
+   * this nor a `field` renders an empty cell rather than the whole row stringified,
+   * which is the failure mode of guessing. (property only)
+   * - `compare`: How to read the value that gets sorted and filtered, where it is not the cell.
+   *
+   * **The one that is easy to leave out and expensive to add later.** A cell
+   * showing `2.4 MB` sorts as a string unless something says the underlying value
+   * is a number, so `12 kB` sorts above `2.4 MB` and the column looks broken
+   * while every value in it is right. Left unset this is the field, which is the
+   * correct default: the raw value is what an API sorted by. (property only)
    * - `track`: The track this column contributes, resolved. (property only) (readonly)
+   * - `canSort`: Whether a reader can actually reorder by this column. (property only) (readonly)
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The heading.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `read(row: Readonly<Record<string, unknown>>) => unknown`: The value this column shows for a row.
+   *
+   * `cell` first, then the field. An explicit reader that returns `undefined` is
+   * treated as declining rather than as an answer, so a formatter can hand the
+   * default back for the rows it has nothing to say about.
+   * - `order(row: Readonly<Record<string, unknown>>) => unknown`: The value this column sorts and filters by, which is not always what it shows.
    *
    * ## CSS Parts
    *
@@ -26911,6 +27504,193 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixHeadlessCopyButton> &
       BaseEvents
   >;
+
+  /**
+   * **The schema is markup and the data is a property.** Columns are declared as
+   * `helix-table-column` children, because a schema is small, declarative, and
+   * something a reader should be able to see in the HTML; rows are handed over as
+   * an array, because data is large and a table that draws ten thousand elements
+   * cannot window them.
+   *
+   * ```html
+   * <helix-data-table .rows=${rows} sort="name:asc" page-size="20">
+   *   <helix-table-column field="name" sortable>Name</helix-table-column>
+   *   <helix-table-column field="size" align="end" sortable .cell=${bytes}>Size</helix-table-column>
+   * </helix-data-table>
+   * ```
+   *
+   * This is the resolution of a deferral rather than a new idea. `helix-table`
+   * takes rows as markup and is the right component for a table of twelve things
+   * a person wrote out; the repeated `page`, `page-size` and `total` attributes on
+   * the three pagination elements are placeholders whose own comments name the fix
+   * as "a data table composing a pagination inside itself", and `helix-table`
+   * already carried `@aliases DataTable`: a name claimed and not kept.
+   *
+   * **Sort and filter apply to the whole set, never the page.** Sorting the drawn
+   * window is correct on the first screen and wrong on every other one, which is
+   * how it survives being looked at. The arithmetic lives in `order.ts` where
+   * nothing can see a window, and its spec asserts the composition rather than the
+   * three steps, because each step alone passes either way.
+   *
+   * **What it does not do, stated where a consumer will read it: the cell values
+   * do not server-render.** The headings do, because a column renders its own, and
+   * the row elements do, because their count comes from `rows`. Reading a cell
+   * needs the columns, and the columns are markup children that Lit SSR does not
+   * hand this element: `children` is undefined there. So a crawler and a reader on
+   * a slow connection see a table of the right shape with nothing in it, which is
+   * strictly less than `helix-table` serves for a table whose rows are markup.
+   *
+   * That is the cost of "the schema is markup and the data is a property". Use
+   * `helix-table` where the content has to be in the served HTML and the result is
+   * small enough to write out; use this where the result is large, and accept that
+   * the first paint is a shell. The obvious workaround, a `columns` property
+   * beside the markup columns, is deliberately not offered: this family has
+   * already shipped one source of truth for columns splitting into two, nothing
+   * checked that they agreed, and a table rendering one way on the server and
+   * another in the browser is that failure with a hydration mismatch on top.
+   *
+   * **Every axis is controlled or uncontrolled, and that is what makes a server
+   * mode fall out rather than be bolted on.** `sort`, `filter`, `page` and
+   * `page-size` each defer to the consumer when set and seed themselves from a
+   * `default-*` when not. A consumer who answers all four holds the data flow:
+   * they hear the reader's request, fetch, and hand back a new `rows` with a
+   * `total`. Retrofitting that inverts the flow and is a rewrite, so it is here
+   * from the start.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `key`: The field naming a row's stable identity.
+   *
+   * **Needed before selection exists, not after.** Lit keys the rendered rows by
+   * it, so a sort moves a row's element rather than rewriting every cell in
+   * place, which is what keeps focus inside a cell and keeps a CSS transition
+   * attached to the row it belongs to. Left unset the index is the key, which is
+   * correct only while nothing reorders: it is why this defaults to something
+   * that works and is worth setting anyway.
+   * - `mode`: Whether this element does the work or asks the consumer to.
+   *
+   * `client` filters, sorts and pages `rows` itself. `server` applies none of
+   * them: `rows` is the page, `total` is the size of the whole result, and the
+   * three events are requests the consumer answers by fetching. Past some size
+   * the client cannot hold the data, so this is not an optimization, it is the
+   * only mode that works, and it is here from the start because adding it later
+   * inverts the data flow.
+   * - `total`: How many rows the whole result has, where this element cannot count them.
+   *
+   * Only read in `server` mode, where `rows` is one page and its length says
+   * nothing about the result. Ignored in `client` mode rather than trusted,
+   * because two sources for one count is the mistake, and here the array is the
+   * one that cannot be stale.
+   * - `label`: Accessible name for the grid.
+   * - `sort`: The order, as `field:direction`.
+   *
+   * Set it and this element defers: a reader's click fires `helix-sort` and
+   * changes nothing until a new value arrives. `default-sort` seeds an order this
+   * element then owns.
+   * - `default-sort`/`defaultSort`: Order to open on, where nothing declared one.
+   * - `filter`: What the rows are narrowed to, as one query across every column.
+   *
+   * One query rather than a predicate per column, which is what a reader means
+   * by a search box above a table. It matches on each column's ordering value,
+   * so search and sort cannot disagree about what a column holds.
+   * - `default-filter`/`defaultFilter`: Query to open with, where nothing declared one.
+   * - `page`: The page on show, from 1.
+   *
+   * Clamped on the way out, so what this reports is the page it drew: a
+   * bookmarked link to page 99 of a result that has since shrunk reads back as
+   * the last page rather than as 99.
+   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
+   * - `page-size`/`pageSize`: How many rows a page holds. Zero is every row, which is what "no paging" means.
+   *
+   * **Not controlled, and that is not an omission.** Nothing in this element
+   * ever asks for a different page size: a size selector is
+   * `helix-pagination-size`, which a consumer puts in the `footer` slot and
+   * answers themselves. A `@controlled` tag here would name an event this
+   * element never fires for it, and `check:controlled` holds the tag against the
+   * calls that back it.
+   * - `default-page-size`/`defaultPageSize`: Page size to open with, where nothing declared one.
+   * - `paginated`: Whether to draw a pagination under the grid.
+   *
+   * On by default once a page size is set, because a paged table with no way to
+   * change pages shows a reader the first twenty rows and no way to know there
+   * are more. Off for a consumer supplying their own through the `footer` slot,
+   * which is why the slot replaces this rather than sitting beside it.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `rows`: The whole result, in the order it arrived.
+   *
+   * A property and not an attribute: it is an array. Left alone this element
+   * filters, sorts and pages it; in `server` mode it is the page the consumer
+   * already fetched and none of the three is applied.
+   *
+   * **Read, never written.** Sorting produces a new array rather than reordering
+   * this one, because a consumer's array may be the same object their own state
+   * holds and reordering it under them is a mutation they did not ask for. (property only)
+   * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-sort`: Fired when a reader asks for a different order, and cancelable.
+   * - `helix-filter`: Fired when the query changes, and cancelable.
+   * - `helix-navigate`: Fired when a reader asks for another page, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The columns, declared as `helix-table-column` children.
+   * - `toolbar`: Above the grid, for a search field or actions.
+   * - `footer`: Below the grid, replacing the pagination this would otherwise draw.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `search(query: string) => boolean`: Narrows the rows, from a consumer's own search field.
+   *
+   * Public because the query lives above the table in every design that has one,
+   * and a consumer wiring their own input needs somewhere to send it. Returns
+   * whether the change stood, the same as every other request here.
+   * - `toggleSort(field: string) => boolean`: Cycles the order by one column, which is what a click on its heading means.
+   *
+   * Ascending, descending, then the order the rows arrived in. Public for the
+   * same reason `search` is: a consumer's own heading UI needs a way to ask.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--data-table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `table`: The grid.
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
+   * - `row`: One row of data.
+   * - `cell`: One cell.
+   * - `toolbar`: The region above the grid.
+   * - `footer`: The region below the grid.
+   * - `pagination`: The pagination, where this draws one.
+   * - `empty`: Shown when no rows match.
+   * - `loading`: Shown while the rows are still on their way.
+   */
+  "helix-headless-data-table": Partial<
+    HelixHeadlessDataTableProps &
+      HelixHeadlessDataTableSolidJsProps &
+      BaseProps<HelixHeadlessDataTable> &
+      BaseEvents
+  > & HelixHeadlessDataTableControlledSolidJs;
 
   /**
    * **The calendar is `helix-date-picker`, not a second one written here.** It
@@ -33190,6 +33970,18 @@ export type CustomElementsSolidJs = {
    * Now the column is the source of both. Add one and the table has another
    * track; remove one and it does not.
    *
+   * **It is also where every per-column fact goes**, which is the reason
+   * `helix-data-table` needs no column config object. `field` names the key the
+   * cell reads, `sortable` says a reader may reorder by it, `align` says which
+   * edge the values line up against, and `cell` takes a function for anything the
+   * field alone cannot express. The schema is markup and the data is a property:
+   * a schema is small, declarative, and something a reader should be able to see
+   * in the HTML, and data is large and windowed.
+   *
+   * **The same element serves both tables**, the markup one and the data one. It
+   * is identified by a flag rather than by `instanceof`, so a `helix-table-column`
+   * works inside either without the two roots sharing anything else.
+   *
    * **It generates no box of its own**, the same as a row: the heading is a grid
    * item of the table, so it lines up with the cells under it rather than sitting
    * in a wrapper that has to be kept the same width.
@@ -33224,13 +34016,61 @@ export type CustomElementsSolidJs = {
    * holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
    * back into wrapping. A headless consumer owns the overflow either way, that
    * being paint, and gets the honest track list.
+   * - `field`: The key this column reads out of a row.
+   *
+   * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+   * from an API arrives shaped the way the API shaped it, and requiring a flat
+   * row would push a mapping pass onto every consumer.
+   *
+   * **It is also the sort and filter identity**, which is why sorting is by
+   * field and not by column index: a reordered or hidden column would otherwise
+   * change what `sort="2:asc"` means, and a sort that means something different
+   * after a column moves is a sort a consumer cannot store in a URL.
+   *
+   * Empty on a column that is purely presentational, an actions column say, and
+   * such a column is never sortable however it is marked.
+   * - `sortable`: Whether a reader may reorder the set by this column.
+   *
+   * Ignored without a `field`, and silently: a column with nothing to sort by
+   * has no order to offer, and refusing loudly would mean an actions column
+   * carrying `sortable` breaks a table rather than doing nothing.
+   * - `align`: Which edge the values line up against.
+   *
+   * `end` is what a column of numbers wants, so digits of the same magnitude sit
+   * above each other. Left unset the cell inherits the table's own alignment,
+   * which is `start` for text in either writing direction.
+   * - `cell`: How to read the cell, where the field alone will not do.
+   *
+   * A property and not an attribute, because it is a function. Set it from a Lit
+   * template with `.cell=${...}`, or assign it in script. A column with neither
+   * this nor a `field` renders an empty cell rather than the whole row stringified,
+   * which is the failure mode of guessing. (property only)
+   * - `compare`: How to read the value that gets sorted and filtered, where it is not the cell.
+   *
+   * **The one that is easy to leave out and expensive to add later.** A cell
+   * showing `2.4 MB` sorts as a string unless something says the underlying value
+   * is a number, so `12 kB` sorts above `2.4 MB` and the column looks broken
+   * while every value in it is right. Left unset this is the field, which is the
+   * correct default: the raw value is what an API sorted by. (property only)
    * - `track`: The track this column contributes, resolved. (property only) (readonly)
+   * - `canSort`: Whether a reader can actually reorder by this column. (property only) (readonly)
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The heading.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `read(row: Readonly<Record<string, unknown>>) => unknown`: The value this column shows for a row.
+   *
+   * `cell` first, then the field. An explicit reader that returns `undefined` is
+   * treated as declining rather than as an answer, so a formatter can hand the
+   * default back for the rows it has nothing to say about.
+   * - `order(row: Readonly<Record<string, unknown>>) => unknown`: The value this column sorts and filters by, which is not always what it shows.
    *
    * ## CSS Parts
    *
@@ -36108,6 +36948,8 @@ export type CustomCssProperties = {
   "--color-picker-saturation"?: string;
   /** A color to paint: the current one on the sample, a preset's on each preset. */
   "--color-picker-swatch"?: string;
+  /** The column track list, built from the columns the consumer declared. */
+  "--data-table-template"?: string;
   /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
   "--date-picker-column-count"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
@@ -36398,6 +37240,89 @@ type HelixHeadlessCommandControlledSolidJs =
         ref: BaseProps<HelixHeadlessCommand>["ref"];
       }
     | { open?: undefined }
+  );
+
+/**
+ * helix-headless-data-table: a controlled `sort` or `filter` or `page` announces and waits, so the handler comes with it.
+ */
+type HelixHeadlessDataTableControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-sort`. */
+        sort: HelixHeadlessDataTable["sort"];
+        "onhelix-sort": (event: HelixHeadlessDataTableHelixSortElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        sort: HelixHeadlessDataTable["sort"];
+        ref: import('react').Ref<HelixHeadlessDataTable>;
+      }
+    | { sort?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-filter`. */
+        filter: HelixHeadlessDataTable["filter"];
+        "onhelix-filter": (event: HelixHeadlessDataTableHelixFilterElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        filter: HelixHeadlessDataTable["filter"];
+        ref: import('react').Ref<HelixHeadlessDataTable>;
+      }
+    | { filter?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-navigate`. */
+        page: HelixHeadlessDataTable["page"];
+        "onhelix-navigate": (event: HelixHeadlessDataTableHelixNavigateElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        page: HelixHeadlessDataTable["page"];
+        ref: import('react').Ref<HelixHeadlessDataTable>;
+      }
+    | { page?: undefined }
+  );
+
+/** helix-headless-data-table, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessDataTableControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-sort`. */
+        sort: HelixHeadlessDataTable["sort"];
+        "on:helix-sort": (event: HelixHeadlessDataTableHelixSortElementEvent) => void;
+      }
+    | {
+        sort: HelixHeadlessDataTable["sort"];
+        ref: BaseProps<HelixHeadlessDataTable>["ref"];
+      }
+    | { sort?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-filter`. */
+        filter: HelixHeadlessDataTable["filter"];
+        "on:helix-filter": (event: HelixHeadlessDataTableHelixFilterElementEvent) => void;
+      }
+    | {
+        filter: HelixHeadlessDataTable["filter"];
+        ref: BaseProps<HelixHeadlessDataTable>["ref"];
+      }
+    | { filter?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-navigate`. */
+        page: HelixHeadlessDataTable["page"];
+        "on:helix-navigate": (event: HelixHeadlessDataTableHelixNavigateElementEvent) => void;
+      }
+    | {
+        page: HelixHeadlessDataTable["page"];
+        ref: BaseProps<HelixHeadlessDataTable>["ref"];
+      }
+    | { page?: undefined }
   );
 
 /**

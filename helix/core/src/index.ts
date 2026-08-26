@@ -91,6 +91,7 @@ export {
   HelixSampleStartEvent,
   HelixSelectEvent,
   HelixShortcutEvent,
+  HelixSortEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
   type LoadDetail,
@@ -100,6 +101,7 @@ export {
   type SelectDetail,
   type ShortcutDetail,
   type SkipDetail,
+  type SortDetail,
   type ToggleDetail,
 } from './events/events.js'
 export { HelixElement } from './helix-element/helix-element.js'

@@ -2265,6 +2265,28 @@
         },
         {
           "kind": "class",
+          "description": "Fired when the reader asks for a different order.\n\nCancelable, and refusing it leaves the order alone, which is what makes a\nserver-side sort expressible: the consumer refuses the local reorder, fetches,\nand hands back a new set. In controlled mode nothing is written whatever the\nanswer, and this is the element reporting that a heading was clicked.\n\nNot `helix-change`: nothing about the data changed, only the order it is read\nin, and a consumer listening for changes to a value should not hear a sort.\nThat is the same distinction `helix-filter` is drawn on.",
+          "name": "HelixSortEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-sort'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "Fired when a component narrows what it is showing.\n\nFiltering hides rather than removes, so nothing about the value changes and\n`helix-change` would be a lie. What a consumer wants to know is that the list\nin front of the reader is no longer the whole list.",
           "name": "HelixFilterEvent",
           "members": [
@@ -2497,6 +2519,14 @@
           "name": "HelixCompleteEvent",
           "declaration": {
             "name": "HelixCompleteEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSortEvent",
+          "declaration": {
+            "name": "HelixSortEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -3439,6 +3469,14 @@
         },
         {
           "kind": "js",
+          "name": "HelixSortEvent",
+          "declaration": {
+            "name": "HelixSortEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixToggleEvent",
           "declaration": {
             "name": "HelixToggleEvent",
@@ -3506,6 +3544,14 @@
           "name": "SkipDetail",
           "declaration": {
             "name": "SkipDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SortDetail",
+          "declaration": {
+            "name": "SortDetail",
             "module": "./events/events.js"
           }
         },
@@ -4527,7 +4573,7 @@
             },
             {
               "kind": "field",
-              "name": "counted",
+              "name": "slotCounted",
               "type": {
                 "text": "boolean"
               },
@@ -4537,13 +4583,13 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "slotRows",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
               "default": "0",
-              "description": "How many there were, the last time anyone looked."
+              "description": "How many there were, the last time anyone looked.\n\n**Not `rows`, and the rename is the whole point of this comment.**\nTypeScript's `private` is a compile-time claim and the runtime field is\nwhatever it is named, so a subclass declaring `@property() rows` for the\ndata a consumer hands it would share one field with this counter: the\nslot count would overwrite the consumer's array on every `updated`, and\n`hasRows` would read the array's length as a slot count. Nothing would\nthrow. `helix-data-table` takes exactly that property, which is what\nfound this before it happened."
             },
             {
               "kind": "method",

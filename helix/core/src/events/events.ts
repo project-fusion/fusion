@@ -158,6 +158,25 @@ export interface FilterDetail {
   value: string
 }
 
+/** Detail carried by `helix-sort`. */
+export interface SortDetail {
+  /**
+   * The order being asked for, as `field:direction`.
+   *
+   * **One string rather than a field and a direction beside it**, because a sort
+   * is one fact and two properties holding half of it each is the mistake
+   * `helix-table`'s `columns` string already made in this family: the headings
+   * and the widths were two halves of one thing kept in two places with nothing
+   * holding them together. `name:asc` is also what a URL query carries and what
+   * an API takes, so a consumer syncing either does no translation.
+   *
+   * Empty means unsorted, which is a state a reader can ask for: a third click
+   * on a sortable heading returns the set to the order it arrived in, and that
+   * order is information the data came with.
+   */
+  value: string
+}
+
 /** Detail carried by `helix-dismiss`. */
 export interface DismissDetail {
   /** Text content of the element asking to go, for identifying which it was. */
@@ -703,6 +722,31 @@ export class HelixCompleteEvent extends CustomEvent<CompleteDetail> {
 }
 
 /**
+ * Fired when the reader asks for a different order.
+ *
+ * Cancelable, and refusing it leaves the order alone, which is what makes a
+ * server-side sort expressible: the consumer refuses the local reorder, fetches,
+ * and hands back a new set. In controlled mode nothing is written whatever the
+ * answer, and this is the element reporting that a heading was clicked.
+ *
+ * Not `helix-change`: nothing about the data changed, only the order it is read
+ * in, and a consumer listening for changes to a value should not hear a sort.
+ * That is the same distinction `helix-filter` is drawn on.
+ */
+export class HelixSortEvent extends CustomEvent<SortDetail> {
+  static readonly eventName = 'helix-sort'
+
+  constructor(detail: SortDetail) {
+    super(HelixSortEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
  * Fired when a component narrows what it is showing.
  *
  * Filtering hides rather than removes, so nothing about the value changes and
@@ -812,6 +856,7 @@ const registry = {
   HelixSampleStartEvent,
   HelixSelectEvent,
   HelixShortcutEvent,
+  HelixSortEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
 } as const

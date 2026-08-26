@@ -32,6 +32,7 @@ declare module 'svelte/elements' {
     'helix-headless-combobox': CustomElements['helix-headless-combobox']
     'helix-headless-command': CustomElements['helix-headless-command']
     'helix-headless-copy-button': CustomElements['helix-headless-copy-button']
+    'helix-headless-data-table': CustomElements['helix-headless-data-table']
     'helix-headless-date-input': CustomElements['helix-headless-date-input']
     'helix-headless-date-picker': CustomElements['helix-headless-date-picker']
     'helix-headless-dialog': CustomElements['helix-headless-dialog']
