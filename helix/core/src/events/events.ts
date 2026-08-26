@@ -503,6 +503,39 @@ export class HelixConsoleEvent extends CustomEvent<ConsoleDetail> {
   }
 }
 
+/** Detail carried by `helix-resize`. */
+export interface ResizeDetail {
+  /** How tall the content is, in CSS pixels. */
+  size: number
+}
+
+/**
+ * Fired when something reports how much room its content actually needs.
+ *
+ * **A measurement crossing a boundary the measurer is on the far side of.** A
+ * sandboxed preview is its own document: nothing outside it can read the height
+ * of what it drew, because the frame is opaque and a box sized from the outside
+ * only ever reports the box. So the document measures itself and says so, and
+ * this is what it says it with.
+ *
+ * A number rather than a box, because the width is the container's to decide and
+ * only the block size follows the content. A consumer that wants to act on it
+ * clamps it: what arrives is what was drawn, which for an empty example is
+ * nearly nothing and for a long one is more than a page.
+ */
+export class HelixResizeEvent extends CustomEvent<ResizeDetail> {
+  static readonly eventName = 'helix-resize'
+
+  constructor(detail: ResizeDetail) {
+    super(HelixResizeEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** Detail carried by `helix-caret`. */
 export interface CaretDetail {
   /** One-based column, counted in characters from the start of the line. */
@@ -774,6 +807,7 @@ const registry = {
   HelixNextEvent,
   HelixOpenEvent,
   HelixPreviousEvent,
+  HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixSelectEvent,

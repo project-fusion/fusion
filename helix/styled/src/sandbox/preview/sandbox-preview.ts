@@ -1,4 +1,4 @@
-import { customElement, HelixConsoleEvent, HelixElement } from '@helix-io/core'
+import { customElement, HelixConsoleEvent, HelixElement, HelixResizeEvent } from '@helix-io/core'
 
 /**
  * How long the source has to stop changing before the frame is asked to render,
@@ -36,7 +36,13 @@ export interface PreviewConsole {
   type: 'helix-preview-console'
 }
 
-export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender
+/** How tall the frame says its content is, in CSS pixels. */
+export interface PreviewSize {
+  size: number
+  type: 'helix-preview-size'
+}
+
+export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender | PreviewSize
 
 /**
  * @summary Renders sandbox source in a frame of its own.
@@ -91,6 +97,8 @@ export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender
  * @documentation https://helix.fusion.dev/sandbox/preview
  *
  * @event {HelixConsoleEvent} helix-console - Relayed from the frame, one per console call.
+ *
+ * @event {HelixResizeEvent} helix-resize - How tall the frame's content is, whenever it changes.
  *
  * @csspart frame - The iframe.
  */
@@ -202,6 +210,14 @@ export class HelixSandboxPreview extends HelixElement {
     }
     if (event.data?.type === 'helix-preview-console') {
       this.dispatchEvent(new HelixConsoleEvent({ level: event.data.level, text: event.data.text }))
+    }
+    /* Relayed rather than acted on. What the frame measured is a fact about the
+       example; how much room to give it is a decision, and it belongs to
+       whatever laid this element out. A preview that resized itself would be
+       deciding for the page it sits in, and the workbench and a reference page
+       want opposite things from the same number. */
+    if (event.data?.type === 'helix-preview-size') {
+      this.dispatchEvent(new HelixResizeEvent({ size: event.data.size }))
     }
   }
 

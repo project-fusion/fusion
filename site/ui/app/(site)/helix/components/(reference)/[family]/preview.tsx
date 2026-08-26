@@ -1,6 +1,11 @@
 'use client'
 
-import type { HelixChangeEvent, HelixSandbox, HelixSandboxPreview } from '@helix-io/styled'
+import type {
+  HelixChangeEvent,
+  HelixResizeEvent,
+  HelixSandbox,
+  HelixSandboxPreview,
+} from '@helix-io/styled'
 import { useEffect, useRef, useState } from 'react'
 import { useSandboxEditor } from '@/hooks/use-sandbox-editor/use-sandbox-editor'
 import docs from '../docs.module.css'
@@ -12,6 +17,31 @@ interface Props {
   /** Where the same example opens for real, with its siblings beside it. */
   sandboxHref: string
 }
+
+/**
+ * How much room the two panes get, in pixels.
+ *
+ * **The preview follows its content and the editor does not**, which is the
+ * whole of the change: a source pane is worth the same five or six lines
+ * whatever is drawn above it, and a fixed share of a fixed box could say neither
+ * thing. Before this both were a percentage of 32rem, so every family got the
+ * same 317 over 195 whether it rendered a button or a table.
+ *
+ * The floor keeps a small example on a stage rather than collapsing it onto its
+ * own content. 180 rather than the 300 this was first written with: measured on
+ * the carousel page, the frame reported 79 pixels of content into a pane held at
+ * 299, so the floor was doing all the work and every small example still came out
+ * the same height. A floor should catch the ones that would vanish, not decide
+ * for most of them. The ceiling keeps a long one from pushing the API tables beneath
+ * it off the screen; past it the frame scrolls, which is what a frame is for.
+ */
+const PREVIEW_MIN = 180
+const PREVIEW_MAX = 720
+const EDITOR = 256
+
+/** What the preview pane should be, given what the frame says it drew. */
+const previewSize = (drawn: number | undefined): number =>
+  Math.min(PREVIEW_MAX, Math.max(PREVIEW_MIN, drawn ?? PREVIEW_MIN))
 
 /**
  * The headline example, running.
@@ -63,6 +93,11 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
    * so the two halves cannot disagree about which file was edited. */
   const [edits, setEdits] = useState<Record<string, string>>({})
   const [file, setFile] = useState<'index.html' | 'styles.css'>('index.html')
+  /* How tall the frame says its example is, once it has said so. `undefined`
+     until the first measurement, so the pane sits at its floor through the
+     moment before the frame has drawn anything rather than collapsing and then
+     jumping. */
+  const [drawn, setDrawn] = useState<number>()
   /* Both files, always. Only 35 of the 272 examples ship a stylesheet, and
      hiding the tab for the rest meant a reader could not add one: the sandbox
      is a place to try things, and the second file is where most of the trying
@@ -90,6 +125,15 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
     setEdits((held) => (held[key] === value ? held : { ...held, [key]: value }))
   }
 
+  /* **Only when it has moved, and only by enough to see.** The observer inside
+     the frame reports through every step of an upgrade, so a run of measurements
+     a pixel apart would set state on each and re-render the page under somebody
+     who is typing into it. Eight pixels is under half a line and over the noise. */
+  const measured = (event: HelixResizeEvent) => {
+    const { size } = event.detail
+    setDrawn((held) => (held !== undefined && Math.abs(held - size) < 8 ? held : size))
+  }
+
   useEffect(() => {
     const frame = preview.current
     if (!frame) {
@@ -106,7 +150,8 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
       onhelix-change={sourceEdited}
       orientation="vertical"
       ref={sandbox}
-      split={62}
+      split={Math.round((previewSize(drawn) / (previewSize(drawn) + EDITOR)) * 100)}
+      style={{ blockSize: `${previewSize(drawn) + EDITOR}px` }}
     >
       {/* Laid out by the frame, not by this page. The preview renders into a
           document with its own layout modes; styling the pane from out here
@@ -114,13 +159,26 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
           because a centered grid item does not stretch. The frame is the only
           thing that can lay out its own body.
           
-          `padded` rather than `centered`: an example reads as a page fragment,
-          and a fragment starts where a page starts. Centered, a card floated in
-          the middle of a tall pane and a full-width component looked identical
-          to one that had failed to fill it. */}
+          **`centered` since 25 Aug 2026, and this argued for `padded` until
+          then.** The case against was that a card floated in the middle of a
+          tall pane and a full-width component looked identical to one that had
+          failed to fill it. Both of those were consequences of the pane being a
+          fixed 32rem whatever it held. It is not any more: it follows what the
+          frame says it drew, so there is no tall pane for a small example to
+          float in, and the space a full-width component fills is the space
+          there is. What centering does now is hold the example against the
+          middle of its own stage rather than the top left corner of one. */}
+      {/* **Bound here and not on the sandbox around it.** `helix-resize` is
+          composed and does reach the root, but React repairs an `on` prop at the
+          moment the element itself dispatches, and an event merely passing
+          through a host on its way up never calls that host's own
+          `dispatchEvent`. Written on `<helix-sandbox>` the prop was recorded and
+          never wired, so nothing set the measured height and every page sat at
+          the floor looking exactly like the fixed pane it replaced. */}
       <helix-sandbox-preview
         label="Example preview"
-        layout="padded"
+        layout="centered"
+        onhelix-resize={measured}
         ref={preview}
         slot="preview"
         src="/sandbox/frame.html"

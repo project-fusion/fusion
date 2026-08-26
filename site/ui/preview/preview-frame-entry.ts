@@ -107,7 +107,53 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
     document.head.append(sheet)
   }
   sheet.textContent = styles
+  measure()
 })
+
+/**
+ * How tall what was drawn actually is, reported outward.
+ *
+ * **Measured from the children rather than from the document**, and that is the
+ * whole difficulty. `scrollHeight` on the body answers the viewport whenever the
+ * content is shorter than it, so a frame sized to that number can grow and can
+ * never shrink: swap a tall example for a short one and the measurement keeps
+ * reporting the height the frame already has. Taking the furthest bottom edge of
+ * the host's own children answers what was drawn, at any frame size, in both
+ * directions.
+ *
+ * **Watched rather than measured once.** A custom element is an unstyled inline
+ * box until its definition arrives, so a measurement taken at the end of the
+ * render handler is a measurement of markup that has not become components yet.
+ * A `ResizeObserver` on the host reports again when they upgrade, when a web
+ * font lands, and when an example animates something open.
+ */
+const measure = (): void => {
+  if (!host) {
+    return
+  }
+  const boxes = [...host.children].map((child) => child.getBoundingClientRect())
+  if (boxes.length === 0) {
+    return
+  }
+  /* **The children's own extent, not their distance from the host.** Measuring
+     down from the host's top edge is right in `padded` and wrong in `centered`,
+     where the host is `min-block-size: 100dvh` and the content is placed in the
+     middle of it: the gap above the first child would be counted as content, so
+     the number would come back as the viewport, the frame would be sized to the
+     viewport, and the next measurement would agree with itself forever. Top of
+     the highest to bottom of the lowest is what was drawn, wherever it was put. */
+  const top = Math.min(...boxes.map((box) => box.top))
+  const bottom = Math.max(...boxes.map((box) => box.bottom))
+  const style = getComputedStyle(host)
+  const padding =
+    (Number.parseFloat(style.paddingBlockStart) || 0) +
+    (Number.parseFloat(style.paddingBlockEnd) || 0)
+  post({ size: Math.ceil(bottom - top + padding), type: 'helix-preview-size' })
+}
+
+if (host) {
+  new ResizeObserver(measure).observe(host)
+}
 
 post({ type: 'helix-preview-ready' })
 

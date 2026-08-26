@@ -145,6 +145,9 @@
 /* Tall enough to be worth looking at, and bounded so the reference below it is
    still reachable by scrolling rather than by patience. */
 .docsPreview {
+  /* The height before the frame has measured itself, and what stands if the
+     script never runs at all. `preview.tsx` sets an inline block-size from what
+     the frame reports, which outranks this the moment it arrives. */
   block-size: 32rem;
   border: var(--helix-border-thin) solid var(--helix-color-border);
   /* 4px. `sm` is the seed halved, which is what that number is here, so the
