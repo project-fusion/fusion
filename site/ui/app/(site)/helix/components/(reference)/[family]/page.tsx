@@ -601,6 +601,15 @@ export default async function FamilyDocs({
      heading. `@summary` is the sentence that says what the component is. */
   const prose = family.summary
   const headline = family.examples[0]
+  /* One headline per tier, because the preference switches the whole page and
+     this was the half that did not move: a reader choosing Base got the headless
+     tables over the styled example, which is the one pairing that teaches
+     something untrue. `catalog()` orders styled first, so `find` takes each
+     tier's canonical example. */
+  const headlines = (['styled', 'headless'] as const).flatMap((tier) => {
+    const example = family.examples.find((one) => one.tier === tier)
+    return example ? [{ example, tier }] : []
+  })
   const source = sourceUrl(family.source)
 
   return (
@@ -697,20 +706,24 @@ export default async function FamilyDocs({
             {/* The family's headline example, which is `preview.html` and is
                 first in the list by construction. A family with no examples
                 shows nothing rather than an empty frame. */}
-            {headline ? (
-              <ComponentPreview
-                css={headline.css}
-                html={headline.html}
-                /* **The tier travels with the link.** A reader on the base
-                   reference who opens the sandbox was looking at the headless
-                   API and arrived at the styled example, because the sandbox
-                   reads its own tier from a preference this page had already
-                   overridden. Carried only when it was forced, so an ordinary
-                   link stays `?e=family.slug`. */
-                sandboxHref={`/helix/sandbox?e=${family.slug}.${headline.slug}${
-                  forced ? `&tier=${forced}` : ''
-                }`}
-              />
+            {headlines.length > 0 ? (
+              headlines.map(({ example, tier }) => (
+                <div data-tier={tier} key={tier}>
+                  <ComponentPreview
+                    css={example.css}
+                    html={example.html}
+                    /* **The tier travels with the link.** A reader on the base
+                       reference who opens the sandbox was looking at the headless
+                       API and arrived at the styled example, because the sandbox
+                       reads its own tier from a preference this page had already
+                       overridden. Carried only when it was forced, so an ordinary
+                       link stays `?e=family.slug`. */
+                    sandboxHref={`/helix/sandbox?e=${family.slug}.${example.slug}${
+                      forced ? `&tier=${forced}` : ''
+                    }`}
+                  />
+                </div>
+              ))
             ) : (
               <helix-empty>
                 <helix-text tone="muted" variant="caption">

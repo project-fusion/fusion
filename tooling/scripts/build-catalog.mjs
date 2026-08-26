@@ -43,8 +43,22 @@ const MANIFESTS = [
   'helix/sandbox/custom-elements.json',
 ]
 
-/** Where the example files sit, one folder per family. */
-const EXAMPLES = join(ROOT, 'helix/styled/src')
+/**
+ * Where the example files sit, one folder per family, in both tiers.
+ *
+ * **The headless half was never read.** This scanned `helix/styled/src` alone,
+ * so every example reached the catalog as `styled` and the tier switch on a
+ * reference page had nothing to switch to: a reader choosing Base got the
+ * headless *tables* and the styled *example*, which is the one combination that
+ * teaches something untrue. `catalog()` has handled both tiers since it was
+ * written and its spec asserts a headless example at index one; it was simply
+ * never given any.
+ *
+ * Order matters and styled is first. The canonical example is the family's
+ * headline and `catalog()` takes the first it is handed, so a reader with no
+ * preference set sees the tier almost everyone consumes.
+ */
+const EXAMPLES = ['helix/styled/src', 'helix/headless/src'].map((tier) => join(ROOT, tier))
 
 const manifests = MANIFESTS.map((path) => {
   const file = join(ROOT, path)
@@ -52,23 +66,28 @@ const manifests = MANIFESTS.map((path) => {
 })
 
 const examples = []
-for (const family of readdirSync(EXAMPLES, { withFileTypes: true })) {
-  const dir = join(EXAMPLES, family.name, '.examples')
-  if (!family.isDirectory() || !existsSync(dir)) {
+for (const source of EXAMPLES) {
+  if (!existsSync(source)) {
     continue
   }
-  for (const file of readdirSync(dir)) {
-    if (!file.endsWith('.html')) {
+  for (const family of readdirSync(source, { withFileTypes: true })) {
+    const dir = join(source, family.name, '.examples')
+    if (!family.isDirectory() || !existsSync(dir)) {
       continue
     }
-    const slug = file.replace(/\.html$/, '')
-    const stylesheet = join(dir, `${slug}.css`)
-    examples.push({
-      css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
-      family: family.name,
-      html: readFileSync(join(dir, file), 'utf8').trim(),
-      slug,
-    })
+    for (const file of readdirSync(dir)) {
+      if (!file.endsWith('.html')) {
+        continue
+      }
+      const slug = file.replace(/\.html$/, '')
+      const stylesheet = join(dir, `${slug}.css`)
+      examples.push({
+        css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
+        family: family.name,
+        html: readFileSync(join(dir, file), 'utf8').trim(),
+        slug,
+      })
+    }
   }
 }
 
