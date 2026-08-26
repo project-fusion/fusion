@@ -9,6 +9,14 @@ import type { SiteEssay, SitePage } from './index.js'
 
 export const generatedPages: SitePage[] = [
   {
+    description:
+      'Three preference keys, no cookies, no analytics, and nothing that identifies you.',
+    kicker: 'Privacy',
+    path: '/privacy',
+    slug: 'privacy',
+    title: 'What this site stores, which is almost nothing',
+  },
+  {
     appends: 'services',
     description: 'What we take on, and what it costs.',
     kicker: 'Services',
@@ -16,6 +24,13 @@ export const generatedPages: SitePage[] = [
     path: '/services',
     slug: 'services',
     title: 'The part of this you can buy today',
+  },
+  {
+    description: 'What we offer, what we do not, and the one clause the sandbox makes specific.',
+    kicker: 'Terms',
+    path: '/terms',
+    slug: 'terms',
+    title: 'Terms of use',
   },
   {
     description: 'Sovereignty at every scale, and the mechanism that makes it practical.',
