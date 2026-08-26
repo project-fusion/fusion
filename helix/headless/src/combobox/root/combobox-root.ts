@@ -156,6 +156,17 @@ const isInsertion = (event: Event): boolean =>
 export class HelixHeadlessCombobox extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /**
+   * What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
+   */
+  @property()
+  autocomplete = 'off'
+
   /** Text shown while nothing has been chosen. */
   @property()
   placeholder = ''
@@ -742,7 +753,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
           id="control"
           type="text"
           role="combobox"
-          autocomplete="off"
+          autocomplete=${this.autocomplete || nothing}
           spellcheck="false"
           aria-controls="listbox"
           aria-autocomplete=${this.suggest ? 'both' : 'list'}

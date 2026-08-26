@@ -48,6 +48,15 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
+  /**
+   * What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default. Set it to
+   * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
+   */
+  @property()
+  autocomplete = ''
+
   /** Whether the box follows its own content rather than scrolling. */
   @property({ attribute: 'auto-grow', reflect: true, type: Boolean })
   autoGrow = false
@@ -263,6 +272,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
         rows=${this.rows}
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}
+        autocomplete=${this.autocomplete || nothing}
         minlength=${this.minLength ?? nothing}
         maxlength=${this.maxLength ?? nothing}
         aria-describedby=${this.describedBy ?? nothing}

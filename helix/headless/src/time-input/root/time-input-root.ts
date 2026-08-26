@@ -103,6 +103,17 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
   /**
+   * What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default and is what
+   * lets autofill work at all. This used to be hardcoded `off`, so a reader
+   * could never have a birthday or a postal code filled in for them and a
+   * consumer had no way to ask for it. See 295.
+   */
+  @property()
+  autocomplete = ''
+
+  /**
    * Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
@@ -576,7 +587,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
           placeholder=${
             this.mode === 'multiple' && this.held.length > 0 ? nothing : this.placeholder || nothing
           }
-          autocomplete="off"
+          autocomplete=${this.autocomplete || nothing}
           aria-describedby=${this.describedBy ?? nothing}
           ?disabled=${this.isDisabled}
           ?required=${this.required}

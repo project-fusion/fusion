@@ -134,6 +134,17 @@ interface EyeDropperConstructor {
 @customElement('helix-headless-color-picker')
 export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElement) {
   /**
+   * What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
+   */
+  @property()
+  autocomplete = 'off'
+
+  /**
    * Whether the current selection fails validation.
    *
    * A flag rather than a message, which is the split Date Picker already drew and
@@ -550,7 +561,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                 part="value"
                 type="text"
                 aria-label="Color"
-                autocomplete="off"
+                autocomplete=${this.autocomplete || nothing}
                 spellcheck="false"
                 .value=${this.value}
                 ?disabled=${this.isDisabled}

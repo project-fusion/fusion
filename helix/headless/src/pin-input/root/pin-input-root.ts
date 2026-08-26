@@ -56,6 +56,17 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
+  /**
+   * What the browser may autofill, reaching the first cell only.
+   *
+   * `one-time-code` is why this defaults to anything at all: it is the token
+   * that lets a phone offer the code out of a message. Later cells stay `off`
+   * for the reason in the class comment above, that six cells each offering
+   * the same code is one offer made six times.
+   */
+  @property()
+  autocomplete = 'one-time-code'
+
   /** How many characters the code has. */
   @property({ type: Number })
   length = 6
@@ -355,7 +366,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
             type=${this.mask ? 'password' : 'text'}
             placeholder=${this.placeholder || nothing}
             inputmode=${this.type === 'numeric' ? 'numeric' : 'text'}
-            autocomplete=${at === 0 ? 'one-time-code' : 'off'}
+            autocomplete=${at === 0 ? this.autocomplete || nothing : 'off'}
             aria-label=${this.cellLabel
               .replaceAll('{index}', String(at + 1))
               .replaceAll('{length}', String(this.count))}

@@ -192,6 +192,17 @@ export class HelixHeadlessListbox extends MixinCollection(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
   /**
+   * What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
+   */
+  @property()
+  autocomplete = 'off'
+
+  /**
    * What the list is narrowed to, if anything.
    *
    * Filtering hides rather than removes, so nothing about the value changes and
@@ -841,7 +852,7 @@ export class HelixHeadlessListbox extends MixinCollection(
               <input
                 part="search-field"
                 type="text"
-                autocomplete="off"
+                autocomplete=${this.autocomplete || nothing}
                 spellcheck="false"
                 .value=${this.filter}
                 placeholder=${this.filterLabel}

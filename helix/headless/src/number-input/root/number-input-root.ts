@@ -98,6 +98,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
+  /**
+   * What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default and is what
+   * lets autofill work at all. This used to be hardcoded `off`, so a reader
+   * could never have a birthday or a postal code filled in for them and a
+   * consumer had no way to ask for it. See 295.
+   */
+  @property()
+  autocomplete = ''
+
   /** Smallest value the reader may reach. Absent has no floor. */
   @property({ type: Number })
   min?: number
@@ -526,7 +537,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           type="text"
           role="spinbutton"
           inputmode="decimal"
-          autocomplete="off"
+          autocomplete=${this.autocomplete || nothing}
           name=${this.name || nothing}
           placeholder=${this.placeholder || nothing}
           aria-describedby=${this.describedBy ?? nothing}

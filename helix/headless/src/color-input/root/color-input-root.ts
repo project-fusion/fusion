@@ -106,6 +106,17 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
   /**
+   * What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
+   */
+  @property()
+  autocomplete = 'off'
+
+  /**
    * Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
@@ -426,7 +437,7 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
           .value=${this.value}
           name=${this.name || nothing}
           placeholder=${this.placeholder || nothing}
-          autocomplete="off"
+          autocomplete=${this.autocomplete || nothing}
           spellcheck="false"
           aria-describedby=${this.describedBy ?? nothing}
           ?disabled=${this.isDisabled}
