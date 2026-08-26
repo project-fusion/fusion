@@ -1,0 +1,16 @@
+/* A width, because the panel's default is `max-content` and this one holds
+   prose.
+ *
+ * `max-content` is the right default for what a popover usually carries, a
+ * short menu or a label, which should be exactly as wide as it reads. Give it a
+ * sentence and the same rule asks for the sentence unwrapped: measured at 680
+ * pixels here, stopped only by the panel's own `calc(100vw - …)` cap, which is
+ * a viewport limit rather than a decision about this panel.
+ *
+ * So prose in a popover has to say how wide it is, and `--popover-inline-size`
+ * is the hook the component publishes for exactly that. Written here rather
+ * than changed in the component, because the default is not wrong: it is right
+ * for the common case and this example is the other one. */
+.details {
+  --popover-inline-size: 20rem;
+}

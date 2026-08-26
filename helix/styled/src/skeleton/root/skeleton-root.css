@@ -39,7 +39,7 @@
 /* The sweep, on a layer of its own so it can be moved rather than redrawn.
  *
  * `translate` is composited: the gradient is painted once and the compositor
- * slides it, where `background-position` re-rasterises the element on every
+ * slides it, where `background-position` re-rasterizes the element on every
  * frame. Same effect, same duration, same easing.
  *
  * Twice the width and traveling its own width, so the highlight enters from

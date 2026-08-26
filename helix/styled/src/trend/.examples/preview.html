@@ -1,87 +1,39 @@
-<!-- @summary Four figures and all four ways a movement can land, two of them down. -->
+<!-- @summary All four ways a movement can land, two of them down. -->
 
 <helix-flex
   gap="xl"
   wrap
 >
-  <helix-flex
-    direction="column"
-    gap="2xs"
+  <helix-trend
+    direction="up"
+    good="up"
   >
-    <helix-stat>
-      $48.2k
-      <span slot="label">Revenue</span>
-    </helix-stat>
-    <helix-trend
-      direction="up"
-      good="up"
-    >
-      12.4%
-      <span slot="label">month over month</span>
-    </helix-trend>
-  </helix-flex>
-  <helix-flex
-    direction="column"
-    gap="2xs"
+    12.4%
+    <span slot="label">Revenue</span>
+  </helix-trend>
+  <helix-trend
+    direction="down"
+    good="down"
   >
-    <helix-stat>
-      2.1
-      <span slot="label">Churn</span>
-      <span slot="unit">%</span>
-    </helix-stat>
-    <helix-trend
-      direction="down"
-      good="down"
-    >
-      0.4pt
-      <span slot="label">month over month</span>
-    </helix-trend>
-  </helix-flex>
-  <helix-flex
-    direction="column"
-    gap="2xs"
+    0.4pt
+    <span slot="label">Churn</span>
+  </helix-trend>
+  <helix-trend
+    direction="down"
+    good="up"
   >
-    <helix-stat>
-      3.8
-      <span slot="label">Conversion</span>
-      <span slot="unit">%</span>
-    </helix-stat>
-    <helix-trend
-      direction="down"
-      good="up"
-    >
-      0.6pt
-      <span slot="label">month over month</span>
-    </helix-trend>
-  </helix-flex>
-  <helix-flex
-    direction="column"
-    gap="2xs"
+    0.6pt
+    <span slot="label">Conversion</span>
+  </helix-trend>
+  <helix-trend
+    direction="up"
+    good="down"
   >
-    <helix-stat>
-      212
-      <span slot="label">p99 latency</span>
-      <span slot="unit">ms</span>
-    </helix-stat>
-    <helix-trend
-      direction="up"
-      good="down"
-    >
-      40ms
-      <span slot="label">week over week</span>
-    </helix-trend>
-  </helix-flex>
-  <helix-flex
-    direction="column"
-    gap="2xs"
-  >
-    <helix-stat>
-      3
-      <span slot="label">Open incidents</span>
-    </helix-stat>
-    <helix-trend direction="neutral">
-      0
-      <span slot="label">since Friday</span>
-    </helix-trend>
-  </helix-flex>
+    40ms
+    <span slot="label">p99 latency</span>
+  </helix-trend>
+  <helix-trend direction="neutral">
+    0
+    <span slot="label">Open incidents</span>
+  </helix-trend>
 </helix-flex>

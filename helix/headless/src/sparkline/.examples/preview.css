@@ -93,3 +93,11 @@ helix-headless-icon::part(svg) {
   display: block;
   inline-size: 100%;
 }
+
+/* Two plots side by side, which is what the styled twin shows. */
+.row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}

@@ -75,3 +75,17 @@ helix-headless-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
+
+/* The close button sits at the end of the panel, which is where an action in a
+   panel goes: the styled twin does the same with `<helix-flex justify="end">`. */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* A width, because prose needs one. The styled tier publishes
+   `--popover-inline-size` for this; the headless tier has no hook and no
+   opinion, so a consumer writes the rule, which is what this file is for. */
+helix-headless-popover::part(popover) {
+  inline-size: 20rem;
+}

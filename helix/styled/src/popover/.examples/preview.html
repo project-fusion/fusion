@@ -1,23 +1,30 @@
 <!-- @summary A panel anchored to what opened it. -->
+<!-- @min 380 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
 <helix-popover
+  class="details"
   id="details"
   label="Details"
 >
   <helix-button slot="trigger">Details</helix-button>
   <helix-flex
     direction="column"
-    gap="xs"
+    gap="md"
   >
     <helix-text variant="body">
       Anything can go in here. The panel is in the top layer, so it clears a
       scrolling parent without a z-index.
     </helix-text>
-    <helix-button
-      command="--close"
-      commandfor="details"
-      emphasis="ghost"
-    >
-      Close
-    </helix-button>
+    <helix-flex justify="end">
+      <helix-button
+        command="--close"
+        commandfor="details"
+        emphasis="outlined"
+      >Close</helix-button>
+    </helix-flex>
   </helix-flex>
 </helix-popover>
