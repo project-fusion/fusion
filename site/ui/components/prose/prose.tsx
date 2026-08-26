@@ -6,6 +6,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react'
+import styles from './prose.module.css'
 
 /*
  * What MDX renders its elements as, for every prose surface on this site.
@@ -322,10 +323,54 @@ const Table = ({ children }: { children?: ReactNode }) => {
 /** `thead` and `tbody` are grouping this grid does not have. */
 const Unwrap = ({ children }: { children?: ReactNode }) => children
 
-/** A heading, at the level markdown asked for. */
+/**
+ * An address for a heading, derived from what it says.
+ *
+ * `textOf` is the one the table already uses to measure a column, and a heading
+ * needs the same walk for the same reason: a heading can hold a link, a `code`
+ * span or an emphasis, so its children are a tree and `String(children)` gives
+ * `[object Object]`.
+ *
+ * Derived rather than counted, so a link keeps working when a section moves and
+ * breaks when it is renamed, which is the honest pair: a renamed section is a
+ * different section, and a link to the old name should fail rather than land on
+ * whatever now sits in that position.
+ */
+const slugOf = (node: ReactNode): string =>
+  textOf(node)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+/**
+ * A heading, at the level markdown asked for, with a link to itself.
+ *
+ * The link is what makes a section shareable, which prose had no way to be:
+ * headings carried no `id` at all, so the only address a reader could send was
+ * the whole page.
+ *
+ * `aria-hidden` on the mark and a label on the link, so a screen reader hears
+ * "link, Section name" once rather than the heading text followed by a hash.
+ */
 const heading = (as: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') =>
   function Heading({ children }: { children?: ReactNode }) {
-    return <helix-text as={as}>{children}</helix-text>
+    const id = slugOf(children)
+    return (
+      <helix-text as={as} class={styles.heading} id={id || undefined}>
+        {id && (
+          /* An anchor rather than `helix-icon-button`, which is a `button` and
+             has no `href`. What this is for is sending somebody the address, so
+             it has to be a real link: middle-click opens a tab, the context menu
+             offers "copy link address", and the status bar shows where it goes.
+             None of that is reachable from a button with a click handler. It
+             takes the icon button's *appearance* instead. */
+          <a aria-label={`Link to ${textOf(children)}`} className={styles.anchor} href={`#${id}`}>
+            <helix-icon name="link"></helix-icon>
+          </a>
+        )}
+        {children}
+      </helix-text>
+    )
   }
 
 /** The map handed to every `renderMdx` call. */
