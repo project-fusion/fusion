@@ -1,31 +1,41 @@
 {
   "families": [
     {
+      "adopted": true,
       "family": "button",
-      "render": 0.09999999403953552,
+      "hydrate": 6.299999952316284,
+      "render": 0.10000002384185791,
       "upgrade": 5.800000011920929
     },
     {
+      "adopted": true,
       "family": "checkbox",
-      "render": 0.19999998807907104,
-      "upgrade": 6.0999999940395355
+      "hydrate": 6.5,
+      "render": 0.10000002384185791,
+      "upgrade": 7
     },
     {
+      "adopted": true,
       "family": "dialog",
-      "render": 0.09999999403953552,
-      "upgrade": 6
+      "hydrate": 6.600000023841858,
+      "render": 0.09999996423721313,
+      "upgrade": 6.200000047683716
     },
     {
+      "adopted": true,
       "family": "tabs",
-      "render": 0.09999999403953552,
-      "upgrade": 6.5999999940395355
+      "hydrate": 6.899999976158142,
+      "render": 0.09999996423721313,
+      "upgrade": 6.600000023841858
     },
     {
+      "adopted": true,
       "family": "tooltip",
-      "render": 0.09999999403953552,
-      "upgrade": 7.200000017881393
+      "hydrate": 7,
+      "render": 0.10000002384185791,
+      "upgrade": 6.899999976158142
     }
   ],
-  "measured": "2026-08-24",
+  "measured": "2026-08-26",
   "runs": 9
 }

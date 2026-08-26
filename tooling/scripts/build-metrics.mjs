@@ -573,17 +573,21 @@ const timing = () => {
     '',
     '**Nothing checks these.** A timing moves several percent between runs on one machine and much further between machines, so a gate on it would fail for reasons nobody caused, which is the fastest way to teach a team that red means nothing. `verify` does not run it. It is refreshed by hand, the same as the peer table, and the date above is the answer to how current it is.',
     '',
-    '| Component | Time to upgrade | First render |',
-    '| --- | --- | --- |',
+    '| Component | Time to upgrade | First render | Hydration |',
+    '| --- | --- | --- | --- |',
     ...timings.families.map(
-      (one) => `| \`${one.family}\` | ${one.upgrade.toFixed(2)}ms | ${one.render.toFixed(2)}ms |`,
+      (one) =>
+        `| \`${one.family}\` | ${one.upgrade.toFixed(2)}ms | ${one.render.toFixed(2)}ms | ` +
+        `${one.hydrate.toFixed(2)}ms${one.adopted ? '' : ' (rebuilt)'} |`,
     ),
     '',
     '**Time to upgrade** is the gap between markup being in the document and its shadow root existing, which is the flash of unstyled content that server rendering exists to remove. It is measured the way it happens: the markup is parsed first and the definition arrives after, which is what a script at the foot of a page does. It is dominated by fetching and evaluating the module, so it tracks the byte tables above rather than saying something separate from them.',
     '',
     "**First render** is what one fresh element costs once the definition is already there, from construction to its first update completing. It is mostly Lit's and is close to identical across families, which is the point: a family far off it is doing something in its first update that the others are not.",
     '',
-    '**Hydration is the third number and is not here.** Adopting a server-rendered tree is the one with the most to say, and measuring it honestly needs the declarative shadow DOM markup and the hydration module loaded in the right order rather than a timer around an import. Left out rather than approximated, because a hydration figure that is really a re-render figure would be worse than no figure.',
+    '**Hydration** is the gap between a server-rendered tree sitting in the document and that same tree being live. It is the number server rendering exists to justify and the easiest of the three to fake, so it is measured against a document the server actually rendered and delivered: assigning that markup with `innerHTML` does not parse a declarative shadow root, so there would be nothing to adopt and every reading would be a rebuild wearing the right label.',
+    '',
+    '**Every figure above was checked for adoption rather than assumed to have it**, and the check is that adoption adds nothing: the count of parts in the shadow root before the definition arrives has to equal the count after. Marking a node and looking for it later passes either way, because Lit does not clear a shadow root it did not create, so a failed hydration leaves the mark in place and appends a second copy of the tree beneath it. Measured on Button with the support module removed, the parts went from one to two while the timing moved by half a millisecond, so without the adoption test the wrong number is indistinguishable from the right one. A row reading `(rebuilt)` is that failure, and there are none.',
     '',
   ]
 }
