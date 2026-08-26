@@ -69,6 +69,37 @@
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* **Wrapping is for the tags, and a field with none never needs it.**
+ *
+ * `flex-wrap: wrap` above is there for `mode="multiple"`, where the chosen times
+ * are tags and a row of them has to be able to run onto a second line. A field
+ * holding one input and one button has nothing to wrap, and wrapping it puts the
+ * clock on a line of its own: measured at 220, the field went from 40 tall to 55
+ * with the button sitting under the placeholder and empty space beside it.
+ *
+ * The mode rather than a width, because this is not about how much room there
+ * is. A single-value field never wants a second line however narrow it gets; the
+ * input shrinks instead, which is what its `min-inline-size: 0` is for. */
+:host(:not([mode="multiple"])) [part="field"] {
+  flex-wrap: nowrap;
+}
+
+/* **The mark the button is made of, which had no size at all.**
+ *
+ * `--icon-size` was declared on the trigger above and nothing ever read it: the
+ * glyph is a bare `<svg>` rather than a `helix-icon`, so no component rule sized
+ * it and an inline SVG with a `viewBox` and no dimensions collapsed. Measured at
+ * six widths from 420 down to 220, the svg was 0 by 0 and the button around it
+ * 0 wide, so the field showed a placeholder and no way to open the clock.
+ *
+ * Reported as the button wrapping and leaving a gap, which is the right thing to
+ * notice and the wrong cause: the field is 40px tall at every one of those
+ * widths, so nothing wraps. There was simply nothing there. */
+[part="trigger-icon"] {
+  block-size: var(--icon-size);
+  inline-size: var(--icon-size);
+}
+
 [part="trigger"]:hover {
   color: var(--helix-color-foreground);
 }
