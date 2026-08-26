@@ -28,7 +28,14 @@
   border: none;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-inverse);
+  font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
+  /* Stated, because a tooltip inherits from wherever its trigger happens to sit
+     and a trigger sits anywhere. In a table's column header, which is semibold,
+     every word of the tip came out bold: a paragraph of explanation set like a
+     heading, which reads as shouting rather than as the aside it is. The size
+     was already said here for the same reason; the weight was not. */
+  font-weight: var(--helix-weight-regular);
   inline-size: max-content;
   line-height: var(--helix-leading-tight);
   margin: var(--helix-space-none);

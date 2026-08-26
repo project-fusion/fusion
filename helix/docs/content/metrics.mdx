@@ -62,7 +62,7 @@ repository does that. The per-component tables are what a page pays.
 | `@helix-io/headless` | 453,700 | 116,528 | 91,797 | Every headless family, which is what the barrel means. |
 | `@helix-io/icons` | 45,238 | 14,531 | 12,270 | The whole glyph set. |
 | `@helix-io/theme` | 3,288 | 1,570 | 1,353 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| `@helix-io/styled` | 1,524,553 | 435,964 | 306,822 | Every styled family. |
+| `@helix-io/styled` | 1,525,028 | 436,114 | 306,805 | Every styled family. |
 | `lit` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -83,9 +83,9 @@ is the whole cost of adopting the base layer on its own.
 
 ## What the numbers say
 
-**Most of a first component is the runtime under it.** The median styled family is 19,163 bytes gzipped alone and adds 6,125 to a page that already has Helix on it, so 68 percent of the first one is shared and 32 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
+**Most of a first component is the runtime under it.** The median styled family is 19,163 bytes gzipped alone and adds 6,162 to a page that already has Helix on it, so 68 percent of the first one is shared and 32 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is `quote` at 9,004 gzipped alone, the dearest `color-input` at 64,255, over 88 components. Every family at once is 435,964.
+Across the tier: the cheapest is `quote` at 9,004 gzipped alone, the dearest `color-input` at 64,255, over 88 components. Every family at once is 436,114.
 
 **No family imports a barrel, and `check:barrels` is what keeps it that way.** `@helix-io/headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@helix-io/headless'` costs 116,528 bytes gzipped whatever else the page does, which is 6 times the median family measured above. The styled tier imports the family it extends instead, all 88 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
 
@@ -131,7 +131,7 @@ Four other libraries of custom elements, pinned and measured on 2026-08-24 by `b
 | | Material Web | 38,883 | 12,820 | 11,368 |
 | | Shoelace | 54,573 | 17,140 | 15,068 |
 | | Spectrum | 64,875 | 18,298 | 16,283 |
-| `tooltip` | **Helix** | 64,447 | 22,942 | 20,179 |
+| `tooltip` | **Helix** | 64,922 | 23,122 | 20,346 |
 | | Carbon | 189,382 | 30,354 | 22,273 |
 | | Material Web | | not shipped | |
 | | Shoelace | 57,412 | 20,220 | 17,933 |
@@ -276,7 +276,7 @@ The headless tier plus presentation. This is what `bun add @helix-io/styled` giv
 | `aura` | 90,647 | 32,265 | 27,878 | 66,574 | 23,570 | 20,288 |
 | `avatar` | 33,420 | 11,668 | 10,212 | 10,085 | 3,705 | 2,666 |
 | `badge` | 31,395 | 11,404 | 9,926 | 8,471 | 3,491 | 2,570 |
-| `bar-chart` | 112,244 | 37,314 | 32,622 | 55,864 | 17,794 | 14,454 |
+| `bar-chart` | 112,719 | 37,478 | 32,742 | 56,339 | 17,958 | 14,561 |
 | `blockquote` | 27,578 | 10,070 | 8,813 | 4,532 | 2,121 | 1,314 |
 | `breadcrumbs` | 79,711 | 27,489 | 22,975 | 11,670 | 4,462 | 3,393 |
 | `button` | 42,571 | 14,469 | 12,647 | 17,725 | 6,059 | 4,761 |
@@ -287,17 +287,17 @@ The headless tier plus presentation. This is what `bun add @helix-io/styled` giv
 | `checkbox` | 54,237 | 18,037 | 15,709 | 24,818 | 8,656 | 6,929 |
 | `checkbox-group` | 43,795 | 14,741 | 12,891 | 13,880 | 5,329 | 3,939 |
 | `code` | 28,244 | 10,463 | 9,152 | 6,119 | 2,805 | 2,053 |
-| `code-block` | 139,981 | 46,363 | 39,418 | 44,467 | 12,969 | 10,678 |
+| `code-block` | 140,456 | 46,519 | 39,476 | 44,942 | 13,121 | 10,780 |
 | `color-input` | 209,411 | 64,255 | 54,667 | 109,481 | 30,036 | 25,288 |
 | `color-picker` | 168,318 | 52,159 | 43,724 | 91,944 | 26,128 | 21,915 |
 | `combobox` | 161,940 | 52,296 | 44,487 | 60,941 | 17,932 | 15,012 |
 | `command` | 133,573 | 43,250 | 36,255 | 55,445 | 17,074 | 14,302 |
-| `copy-button` | 132,712 | 44,381 | 37,656 | 37,198 | 11,079 | 9,015 |
+| `copy-button` | 133,187 | 44,558 | 37,739 | 37,673 | 11,253 | 9,161 |
 | `date-input` | 161,867 | 53,211 | 45,367 | 63,401 | 19,554 | 16,405 |
 | `date-picker` | 94,668 | 32,185 | 26,719 | 23,290 | 7,937 | 6,284 |
 | `dialog` | 45,573 | 16,087 | 14,027 | 19,844 | 7,430 | 5,952 |
 | `divider` | 29,481 | 10,690 | 9,307 | 6,435 | 2,779 | 1,893 |
-| `donut-chart` | 103,891 | 34,762 | 30,492 | 48,863 | 15,920 | 12,915 |
+| `donut-chart` | 104,366 | 34,924 | 30,582 | 49,338 | 16,082 | 13,024 |
 | `drawer` | 43,714 | 15,545 | 13,590 | 18,275 | 6,915 | 5,551 |
 | `drilldown` | 84,532 | 28,891 | 23,906 | 14,011 | 4,922 | 3,649 |
 | `empty` | 26,488 | 9,553 | 8,395 | 3,192 | 1,497 | 918 |
@@ -310,7 +310,7 @@ The headless tier plus presentation. This is what `bun add @helix-io/styled` giv
 | `input` | 98,892 | 33,333 | 27,677 | 24,154 | 8,192 | 6,602 |
 | `kbd` | 30,022 | 11,058 | 9,688 | 7,092 | 3,222 | 2,286 |
 | `legend` | 36,556 | 12,800 | 11,174 | 11,423 | 4,164 | 3,059 |
-| `line-chart` | 97,752 | 32,844 | 28,730 | 41,373 | 13,333 | 10,517 |
+| `line-chart` | 98,227 | 33,021 | 28,849 | 41,848 | 13,510 | 10,804 |
 | `list` | 34,062 | 12,151 | 10,630 | 10,777 | 4,103 | 3,205 |
 | `listbox` | 100,950 | 33,933 | 28,044 | 24,340 | 8,124 | 6,325 |
 | `loader` | 34,404 | 12,371 | 10,804 | 11,109 | 4,314 | 3,312 |
@@ -351,7 +351,7 @@ The headless tier plus presentation. This is what `bun add @helix-io/styled` giv
 | `toast` | 99,560 | 33,766 | 28,278 | 29,616 | 9,823 | 8,093 |
 | `toggle` | 57,810 | 19,418 | 16,990 | 25,501 | 9,031 | 7,240 |
 | `toolbar` | 27,799 | 10,023 | 8,793 | 4,872 | 2,266 | 1,311 |
-| `tooltip` | 64,447 | 22,942 | 20,179 | 16,547 | 6,005 | 4,543 |
+| `tooltip` | 64,922 | 23,122 | 20,346 | 17,022 | 6,189 | 4,714 |
 | `tour` | 81,119 | 26,784 | 23,601 | 32,710 | 9,697 | 7,814 |
 | `tree` | 100,943 | 34,404 | 28,686 | 27,608 | 9,548 | 7,820 |
 | `trend` | 75,382 | 25,873 | 21,556 | 7,708 | 2,955 | 2,176 |
@@ -374,7 +374,7 @@ column is what was removed rather than part of what remains.
 | `@helix-io/icons` | 63,768 | 11 | 19,847 | none |
 | `@helix-io/styles` | 79,772 | 5 | 0 | none |
 | `@helix-io/theme` | 465,772 | 8 | 4,793 | none |
-| `@helix-io/styled` | 8,191,354 | 673 | 273,359 | `@helix-io/core`, `@helix-io/headless`, `@helix-io/styles` |
+| `@helix-io/styled` | 8,191,829 | 673 | 273,366 | `@helix-io/core`, `@helix-io/headless`, `@helix-io/styles` |
 
 ## Not measured yet
 

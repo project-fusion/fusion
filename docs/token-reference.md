@@ -136,7 +136,7 @@ The three families.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-font-sans` | `var(--_helix-family-sans)` | 75 |
+| `--helix-font-sans` | `var(--_helix-family-sans)` | 76 |
 | `--helix-font-mono` | `var(--_helix-family-mono)` | 14 |
 | `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 8 |
 
@@ -161,7 +161,7 @@ The three weights.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-weight-regular` | `400` | 11 |
+| `--helix-weight-regular` | `400` | 12 |
 | `--helix-weight-medium` | `500` | 69 |
 | `--helix-weight-semibold` | `600` | 31 |
 
