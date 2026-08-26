@@ -8613,7 +8613,7 @@ export type CustomCssProperties = {
   "--data-table-padding-block"?: string;
   /** Space either side of a cell's content. */
   "--data-table-padding-inline"?: string;
-  /** The column track list, built from the columns the consumer declared. */
+  /** The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. */
   "--data-table-template"?: string;
   /** Fill behind the field. */
   "--date-input-background-color"?: string;
@@ -8705,6 +8705,8 @@ export type CustomCssProperties = {
   "--file-input-background-color"?: string;
   /** Padding inside the field. */
   "--file-input-inset"?: string;
+  /** An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. */
+  "--grid-columns"?: string;
   /** The size a cell wants. The strip fits as many as the container allows. */
   "--heatmap-cell-size"?: string;
   /** Space between cells. */
@@ -9083,7 +9085,7 @@ export type CustomCssProperties = {
   "--switch-thumb-color"?: string;
   /** Track list for the columns. */
   "--table-columns"?: string;
-  /** The column track list, built from the columns the consumer declared. */
+  /** The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set. */
   "--table-template"?: string;
   /** Fill behind the tag. */
   "--tag-background-color"?: string;

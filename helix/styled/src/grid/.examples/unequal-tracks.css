@@ -1,0 +1,37 @@
+/* The layout the hook exists for: a fixed rail and a measured column of prose.
+   Written the way a consumer writes it, on the element, from a document
+   stylesheet, because `--grid-columns` is read before anything the component
+   works out for itself.
+   
+   The two lengths are written out rather than held in properties of their own.
+   A consumer would name them, and this file is scanned by `check:hooks`, which
+   cannot tell a consumer's `--site-rail` from a Helix hook nobody documented and
+   is right to ask about the second. */
+.page {
+  --grid-columns: 7rem minmax(0, 32rem);
+
+  justify-content: center;
+}
+
+/* One column when there is no room for two, which is four lines here and would
+   be a breakpoint listener if the track list were an attribute. */
+@media (max-width: 40rem) {
+  .page {
+    --grid-columns: minmax(0, 32rem);
+  }
+}
+
+.rail {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  margin: var(--helix-space-none);
+}
+
+.prose {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-normal);
+  margin: var(--helix-space-none);
+}

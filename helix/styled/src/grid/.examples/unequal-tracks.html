@@ -1,0 +1,24 @@
+<!-- @summary Two tracks of different widths, which neither `columns` nor `min` can say. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-grid
+  class="page"
+  gap="lg"
+>
+  <p class="rail">26 Aug 2026</p>
+  <p class="prose">
+    A rail of metadata beside a prose measure, the composition centered so the
+    prose is not. Neither track is a fraction of the other, so `columns` and
+    `min` both give the wrong answer: both produce equal tracks by design.
+  </p>
+
+  <p class="rail">25 Aug 2026</p>
+  <p class="prose">
+    Set as a custom property rather than an attribute, the track list can be
+    redefined in a media query, which is what lets the layout collapse to one
+    column on a narrow screen with no script watching a breakpoint.
+  </p>
+</helix-grid>

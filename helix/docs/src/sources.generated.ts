@@ -1763,7 +1763,7 @@ repository does that. The per-component tables are what a page pays.
 | \`@helix-io/headless\` | 489,239 | 124,723 | 98,240 | Every headless family, which is what the barrel means. |
 | \`@helix-io/icons\` | 45,238 | 14,531 | 12,270 | The whole glyph set. |
 | \`@helix-io/theme\` | 3,288 | 1,570 | 1,353 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| \`@helix-io/styled\` | 1,596,466 | 455,933 | 319,394 | Every styled family. |
+| \`@helix-io/styled\` | 1,597,874 | 456,691 | 319,994 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -1786,7 +1786,7 @@ is the whole cost of adopting the base layer on its own.
 
 **Most of a first component is the runtime under it.** The median styled family is 18,692 bytes gzipped alone and adds 6,134 to a page that already has Helix on it, so 67 percent of the first one is shared and 33 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is \`quote\` at 9,234 gzipped alone, the dearest \`color-input\` at 65,039, over 92 components. Every family at once is 455,933.
+Across the tier: the cheapest is \`quote\` at 9,234 gzipped alone, the dearest \`color-input\` at 65,039, over 92 components. Every family at once is 456,691.
 
 **No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@helix-io/headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@helix-io/headless'\` costs 124,723 bytes gzipped whatever else the page does, which is 7 times the median family measured above. The styled tier imports the family it extends instead, all 92 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
 
@@ -2012,7 +2012,7 @@ The headless tier plus presentation. This is what \`bun add @helix-io/styled\` g
 | \`empty\` | 27,613 | 9,777 | 8,595 | 3,192 | 1,489 | 822 |
 | \`file-input\` | 117,084 | 39,086 | 32,797 | 42,927 | 14,135 | 11,725 |
 | \`flex\` | 27,927 | 9,952 | 8,702 | 3,882 | 1,767 | 1,066 |
-| \`grid\` | 30,310 | 10,934 | 9,554 | 6,262 | 2,807 | 1,947 |
+| \`grid\` | 31,718 | 11,400 | 9,949 | 7,670 | 3,263 | 2,342 |
 | \`heatmap\` | 35,496 | 12,176 | 10,716 | 5,808 | 2,460 | 1,506 |
 | \`icon\` | 70,718 | 24,142 | 20,068 | 1,908 | 920 | 372 |
 | \`icon-button\` | 41,828 | 13,807 | 12,026 | 15,861 | 5,132 | 3,959 |
@@ -2081,11 +2081,11 @@ column is what was removed rather than part of what remains.
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
 | \`@helix-io/core\` | 815,095 | 105 | 145,800 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
-| \`@helix-io/headless\` | 8,090,160 | 420 | 692,129 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
+| \`@helix-io/headless\` | 8,094,283 | 420 | 692,129 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 63,768 | 11 | 19,847 | none |
 | \`@helix-io/styles\` | 79,772 | 5 | 0 | none |
 | \`@helix-io/theme\` | 465,772 | 8 | 4,793 | none |
-| \`@helix-io/styled\` | 8,726,063 | 711 | 289,771 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/styled\` | 8,731,954 | 711 | 289,792 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 

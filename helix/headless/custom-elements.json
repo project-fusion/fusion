@@ -14667,7 +14667,7 @@
           "name": "HelixHeadlessDataTable",
           "cssProperties": [
             {
-              "description": "The column track list, built from the columns the consumer declared.",
+              "description": "The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set.",
               "name": "--data-table-template"
             }
           ],
@@ -49986,7 +49986,7 @@
               "name": "--table-columns"
             },
             {
-              "description": "The column track list, built from the columns the consumer declared.",
+              "description": "The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set.",
               "name": "--table-template"
             }
           ],

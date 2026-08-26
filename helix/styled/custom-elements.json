@@ -19876,7 +19876,7 @@
               "name": "--data-table-padding-inline"
             },
             {
-              "description": "The column track list, built from the columns the consumer declared.",
+              "description": "The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set.",
               "name": "--data-table-template",
               "inheritedFrom": {
                 "name": "HelixHeadlessDataTable",
@@ -30026,6 +30026,12 @@
           "kind": "class",
           "description": "Two ways to declare columns, and only two. `columns` is a fixed count;\n`min` fills as many equal columns as fit above that width, which is a\nresponsive layout with no breakpoint to maintain. Setting `min` wins, because\na fixed count that also reflows is two intentions in one element.\n\nPresentation only, so there is no headless tier.",
           "name": "HelixGrid",
+          "cssProperties": [
+            {
+              "description": "An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say.",
+              "name": "--grid-columns"
+            }
+          ],
           "slots": [
             {
               "description": "The items to lay out.",
@@ -30255,6 +30261,10 @@
               {
                 "description": "A named number of columns, for a layout that must not reflow.",
                 "slug": "fixed-columns"
+              },
+              {
+                "description": "Two tracks of different widths, which neither `columns` nor `min` can say.",
+                "slug": "unequal-tracks"
               }
             ],
             "source": "helix/styled/src/grid"
@@ -67235,7 +67245,7 @@
               }
             },
             {
-              "description": "The column track list, built from the columns the consumer declared.",
+              "description": "The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set.",
               "name": "--table-template",
               "inheritedFrom": {
                 "name": "HelixHeadlessTable",

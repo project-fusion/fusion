@@ -22,7 +22,8 @@ import { styles } from './grid-root.css.js'
  * @documentation https://helix.fusion.dev/components/grid
  *
  * @slot - The items to lay out.
-
+ *
+ * @cssproperty --grid-columns - An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say.
  */
 @customElement('helix-grid')
 export class HelixGrid extends HelixElement {

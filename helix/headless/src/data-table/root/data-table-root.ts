@@ -96,7 +96,7 @@ import { type Axis, cycle, type DataRow, format, ordered, parse } from './order.
  * @csspart empty - Shown when no rows match.
  * @csspart loading - Shown while the rows are still on their way.
  *
- * @cssproperty --data-table-template - The column track list, built from the columns the consumer declared.
+ * @cssproperty --data-table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set.
  *
  * @event {HelixSortEvent} helix-sort - Fired when a reader asks for a different order, and cancelable.
  * @event {HelixFilterEvent} helix-filter - Fired when the query changes, and cancelable.

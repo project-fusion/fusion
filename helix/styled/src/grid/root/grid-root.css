@@ -1,5 +1,24 @@
-/* The track list is read from a custom property this rule never sets, and the
-   fallback is the single-column default. `applyTemplate` sets the property from
+/* The track list is read from custom properties this rule never sets, and the
+   fallback is the single-column default.
+
+   **`--grid-columns` is the consumer's, and it is read first because an explicit
+   track list is the most specific thing anyone can say about a grid.** `columns`
+   and `min` both produce *equal* tracks, so a layout of two unequal ones, a
+   narrow rail beside a prose measure, could not be said through this element at
+   all: the first consumer outside this repository wrote a plain `<div>` instead,
+   in a page otherwise built from Helix elements. A constraint that pushes a
+   layout out of the system is not protecting the space scale, it is losing the
+   element.
+
+   `helix-table` and `helix-data-table` already do exactly this, `--table-columns`
+   over `--table-template`, so the naming here follows theirs: `-columns` is what
+   a consumer sets and the derived value keeps its own name. Precedence is
+   consumer, then `min`, then `columns`, then a single column.
+
+   A property rather than an attribute, because a property can be redefined in a
+   media query and an attribute needs JavaScript watching a breakpoint to rewrite
+   markup, which is the `data-min` failure this file already records and rejects
+   two comments below. `applyTemplate` sets the property from
    a `<style>` in the shadow root; declaring the track list here directly would
    beat it, because a shadow root's adopted stylesheets cascade after its own
    `<style>` elements, and `static styles` is adopted. A property nothing else
@@ -12,7 +31,7 @@
      put space between things nobody had asked for. A layout primitive that adds
      space you did not ask for is the surprising one. */
   gap: var(--helix-space-none);
-  grid-template-columns: var(--_grid-template, minmax(0, 1fr));
+  grid-template-columns: var(--grid-columns, var(--_grid-template, minmax(0, 1fr)));
 }
 
 /* A fixed count is plain CSS, so it is right in server-rendered markup with no
@@ -30,19 +49,19 @@
    The template is already a custom property; asking for it here costs nothing
    and writes nothing. */
 :host([columns="2"]) {
-  grid-template-columns: var(--_grid-template, repeat(2, minmax(0, 1fr)));
+  grid-template-columns: var(--grid-columns, var(--_grid-template, repeat(2, minmax(0, 1fr))));
 }
 :host([columns="3"]) {
-  grid-template-columns: var(--_grid-template, repeat(3, minmax(0, 1fr)));
+  grid-template-columns: var(--grid-columns, var(--_grid-template, repeat(3, minmax(0, 1fr))));
 }
 :host([columns="4"]) {
-  grid-template-columns: var(--_grid-template, repeat(4, minmax(0, 1fr)));
+  grid-template-columns: var(--grid-columns, var(--_grid-template, repeat(4, minmax(0, 1fr))));
 }
 :host([columns="5"]) {
-  grid-template-columns: var(--_grid-template, repeat(5, minmax(0, 1fr)));
+  grid-template-columns: var(--grid-columns, var(--_grid-template, repeat(5, minmax(0, 1fr))));
 }
 :host([columns="6"]) {
-  grid-template-columns: var(--_grid-template, repeat(6, minmax(0, 1fr)));
+  grid-template-columns: var(--grid-columns, var(--_grid-template, repeat(6, minmax(0, 1fr))));
 }
 
 :host([gap="none"]) {

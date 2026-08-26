@@ -19521,7 +19521,7 @@ export type CustomElements = {
    * - `--data-table-text`: Type size, headings and cells alike. (default: `undefined`)
    * - `--data-table-padding-block`: Space above and below a cell's content. (default: `undefined`)
    * - `--data-table-padding-inline`: Space either side of a cell's content. (default: `undefined`)
-   * - `--data-table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
+   * - `--data-table-template`: The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -20841,6 +20841,12 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The items to lay out.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--grid-columns`: An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. (default: `undefined`)
    */
   "helix-grid": Partial<HelixGridProps & BaseProps<HelixGrid> & BaseEvents>;
 
@@ -26373,7 +26379,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--table-columns`: Track list for the columns. (default: `undefined`)
-   * - `--table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
+   * - `--table-template`: The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -32377,7 +32383,7 @@ export type CustomElementsSolidJs = {
    * - `--data-table-text`: Type size, headings and cells alike. (default: `undefined`)
    * - `--data-table-padding-block`: Space above and below a cell's content. (default: `undefined`)
    * - `--data-table-padding-inline`: Space either side of a cell's content. (default: `undefined`)
-   * - `--data-table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
+   * - `--data-table-template`: The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -33734,6 +33740,12 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The items to lay out.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--grid-columns`: An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. (default: `undefined`)
    */
   "helix-grid": Partial<
     HelixGridProps & HelixGridSolidJsProps & BaseProps<HelixGrid> & BaseEvents
@@ -39439,7 +39451,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--table-columns`: Track list for the columns. (default: `undefined`)
-   * - `--table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
+   * - `--table-template`: The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -42317,7 +42329,7 @@ export type CustomCssProperties = {
   "--data-table-padding-block"?: string;
   /** Space either side of a cell's content. */
   "--data-table-padding-inline"?: string;
-  /** The column track list, built from the columns the consumer declared. */
+  /** The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. */
   "--data-table-template"?: string;
   /** Fill behind the field. */
   "--date-input-background-color"?: string;
@@ -42409,6 +42421,8 @@ export type CustomCssProperties = {
   "--file-input-background-color"?: string;
   /** Padding inside the field. */
   "--file-input-inset"?: string;
+  /** An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. */
+  "--grid-columns"?: string;
   /** The size a cell wants. The strip fits as many as the container allows. */
   "--heatmap-cell-size"?: string;
   /** Space between cells. */
@@ -42787,7 +42801,7 @@ export type CustomCssProperties = {
   "--switch-thumb-color"?: string;
   /** Track list for the columns. */
   "--table-columns"?: string;
-  /** The column track list, built from the columns the consumer declared. */
+  /** The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set. */
   "--table-template"?: string;
   /** Fill behind the tag. */
   "--tag-background-color"?: string;

@@ -1918,7 +1918,7 @@ limitation and worth repeating where a consumer chooses between the two: use
 | `--data-table-text` | Type size, headings and cells alike. |
 | `--data-table-padding-block` | Space above and below a cell's content. |
 | `--data-table-padding-inline` | Space either side of a cell's content. |
-| `--data-table-template` | The column track list, built from the columns the consumer declared. |
+| `--data-table-template` | The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. |
 
 ## Date Input
 
@@ -2705,6 +2705,12 @@ Presentation only, so there is no headless tier.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The items to lay out. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--grid-columns` | An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. |
 
 ## Heatmap
 
@@ -5938,7 +5944,7 @@ decorating none of it.
 | Property | Description |
 | --- | --- |
 | `--table-columns` | Track list for the columns. |
-| `--table-template` | The column track list, built from the columns the consumer declared. |
+| `--table-template` | The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set. |
 
 ### Cell (`helix-table-cell`)
 

@@ -7087,7 +7087,7 @@ export type CustomCssProperties = {
   "--color-picker-saturation"?: string;
   /** A color to paint: the current one on the sample, a preset's on each preset. */
   "--color-picker-swatch"?: string;
-  /** The column track list, built from the columns the consumer declared. */
+  /** The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. */
   "--data-table-template"?: string;
   /** How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. */
   "--date-picker-column-count"?: string;
@@ -7137,7 +7137,7 @@ export type CustomCssProperties = {
   "--splitter-position"?: string;
   /** Track list for the columns. */
   "--table-columns"?: string;
-  /** The column track list, built from the columns the consumer declared. */
+  /** The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set. */
   "--table-template"?: string;
   /** How long this message stays, in milliseconds, for a progress hint. */
   "--toast-duration"?: string;
