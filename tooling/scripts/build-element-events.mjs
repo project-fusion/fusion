@@ -61,7 +61,7 @@ const formatted = (path, source) =>
     input: source,
   })
 
-const render = (pkg, entries) => {
+const render = (entries) => {
   const rows = entries
     .map(([tag, names]) => `  '${tag}': [${names.map((name) => `'${name}'`).join(', ')}],`)
     .join('\n')
@@ -84,7 +84,7 @@ for (const pkg of PACKAGES) {
   const entries = mapFor(pkg)
   total += entries.length
   const path = join(ROOT, 'helix', pkg, 'src', 'element-events.generated.ts')
-  const next = formatted(path, render(pkg, entries))
+  const next = formatted(path, render(entries))
   const held = (() => {
     try {
       return readFileSync(path, 'utf8')
