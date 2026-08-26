@@ -139,8 +139,6 @@ import type {
   HelixFilterEvent,
   HelixNavigateEvent,
   HelixResizeEvent,
-  HelixLoadEvent,
-  HelixErrorEvent,
   HelixInputEvent,
   HelixShortcutEvent,
   HelixReadEvent,
@@ -1727,6 +1725,13 @@ being four of a kind rather than four of three kinds. */
   label?: HelixColorInput["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixColorInput["required"];
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixColorInput["autocomplete"];
   /** Whether the field is a text box with a swatch on it, or only the swatch.
 
 `swatch` is the native control's shape: a block of color that opens a
@@ -1843,6 +1848,13 @@ means in React: the value is theirs and the control waits to be told.
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
   value?: HelixColorPicker["value"];
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixColorPicker["autocomplete"];
   /** Whether the current selection fails validation.
 
 A flag rather than a message, which is the split Date Picker already drew and
@@ -2009,6 +2021,13 @@ being four of a kind rather than four of three kinds. */
   label?: HelixCombobox["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixCombobox["required"];
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixCombobox["autocomplete"];
   /** Text shown while nothing has been chosen. */
   placeholder?: HelixCombobox["placeholder"];
   /** Whether more than one option can be chosen.
@@ -2517,6 +2536,13 @@ being four of a kind rather than four of three kinds. */
   label?: HelixDateInput["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixDateInput["required"];
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  autocomplete?: HelixDateInput["autocomplete"];
   /** How many dates can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -3454,12 +3480,6 @@ export type HelixIconVueEvents = {};
 
 /** `HelixImage` component event */
 export type HelixImageElementEvent<E = Event> = TypedEvent<HelixImage, E>;
-/** `helix-load` event type */
-export type HelixImageHelixLoadElementEvent =
-  HelixImageElementEvent<HelixLoadEvent>;
-/** `helix-error` event type */
-export type HelixImageHelixErrorElementEvent =
-  HelixImageElementEvent<HelixErrorEvent>;
 
 export type HelixImageVueProps = {
   /** Whether the corners are cut.
@@ -3521,10 +3541,10 @@ resting state of a mirror is the attribute's absence. */
 };
 
 export type HelixImageVueEvents = {
-  /** The picture arrived. */
-  "helix-load": HelixImageHelixLoadElementEvent;
-  /** It is not coming. */
-  "helix-error": HelixImageHelixErrorElementEvent;
+  /** Relayed, because the platform's own does not escape. */
+  load: HelixImageElementEvent;
+  /** Relayed for the same reason. */
+  error: HelixImageElementEvent;
 };
 
 /** `HelixInput` component event */
@@ -3558,6 +3578,11 @@ being four of a kind rather than four of three kinds. */
   label?: HelixInput["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixInput["required"];
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default. Set it to
+a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
+  autocomplete?: HelixInput["autocomplete"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   placeholder?: HelixInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
@@ -4024,6 +4049,13 @@ being four of a kind rather than four of three kinds. */
   label?: HelixListbox["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixListbox["required"];
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixListbox["autocomplete"];
   /** What the list is narrowed to, if anything.
 
 Filtering hides rather than removes, so nothing about the value changes and
@@ -4600,6 +4632,13 @@ being four of a kind rather than four of three kinds. */
   label?: HelixNumberInput["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixNumberInput["required"];
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  autocomplete?: HelixNumberInput["autocomplete"];
   /** Smallest value the reader may reach. Absent has no floor. */
   min?: HelixNumberInput["min"];
   /** Largest value the reader may reach. Absent has no ceiling. */
@@ -5055,6 +5094,13 @@ being four of a kind rather than four of three kinds. */
   label?: HelixPinInput["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixPinInput["required"];
+  /** What the browser may autofill, reaching the first cell only.
+
+`one-time-code` is why this defaults to anything at all: it is the token
+that lets a phone offer the code out of a message. Later cells stay `off`
+for the reason in the class comment above, that six cells each offering
+the same code is one offer made six times. */
+  autocomplete?: HelixPinInput["autocomplete"];
   /** How many characters the code has. */
   length?: HelixPinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
@@ -6969,6 +7015,11 @@ being four of a kind rather than four of three kinds. */
   label?: HelixTextarea["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixTextarea["required"];
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default. Set it to
+a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
+  autocomplete?: HelixTextarea["autocomplete"];
   /** Whether the box follows its own content rather than scrolling. */
   "auto-grow"?: HelixTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
@@ -7104,6 +7155,13 @@ being four of a kind rather than four of three kinds. */
   label?: HelixTimeInput["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixTimeInput["required"];
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  autocomplete?: HelixTimeInput["autocomplete"];
   /** Whether the panel is one list of times or a column each.
 
 `list` offers whole times, which is what a product with slots or opening

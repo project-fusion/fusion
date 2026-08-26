@@ -1361,6 +1361,7 @@ pads its own lower rows.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `alpha` | `alpha` | `boolean` | `false` | `HelixHeadlessColorInput` | Whether the color carries an alpha channel. |
+| `autocomplete` | `autocomplete` | `string` | `'off'` | `HelixHeadlessColorInput` | What the browser may autofill in the text field, as a platform token. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -1500,6 +1501,7 @@ brought its own card would be a card inside a card there.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `alpha` | `alpha` | `boolean` | `false` | `HelixHeadlessColorPicker` | Whether the color carries an alpha channel. |
+| `autocomplete` | `autocomplete` | `string` | `'off'` | `HelixHeadlessColorPicker` | What the browser may autofill in the text field, as a platform token. |
 | `color` | - | `Color` | - | `HelixHeadlessColorPicker` | Where the picker stands: what was moved, or what the value says, or the start. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -1596,6 +1598,7 @@ Input, Color Input and Date Input all take.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `autocomplete` | `autocomplete` | `string` | `'off'` | `HelixHeadlessCombobox` | What the browser may autofill in the text field, as a platform token. |
 | `creatable` | `creatable` | `boolean` | `false` | `HelixHeadlessCombobox` | Whether the reader may answer with something the list does not hold. |
 | `createLabel` | `create-label` | `string` | `'Add'` | `HelixHeadlessCombobox` | What the create row says, before the words it would add. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
@@ -1945,6 +1948,7 @@ whatever holds it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `autocomplete` | `autocomplete` | `string` | `''` | `HelixHeadlessDateInput` | What the browser may autofill here, as one of the platform's own tokens. |
 | `dateStyle` | `date-style` | `'full' \| 'iso' \| 'long' \| 'medium' \| 'short'` | `'long'` | `HelixHeadlessDateInput` | How a date is written in the field: `short` through `full`, or ISO. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
@@ -2909,8 +2913,8 @@ base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-load` | `HelixLoadEvent` | The picture arrived. |
-| `helix-error` | `HelixErrorEvent` | It is not coming. |
+| `load` | `Event` | Relayed, because the platform's own does not escape. |
+| `error` | `Event` | Relayed for the same reason. |
 
 #### Slots
 
@@ -2961,6 +2965,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `autocomplete` | `autocomplete` | `string` | `''` | `HelixHeadlessInput` | What the browser may autofill here, as one of the platform's own tokens. |
 | `clearable` | `clearable` | `boolean` | `false` | `HelixHeadlessInput` | Whether the field offers a button that empties it. |
 | `clearLabel` | `clear-label` | `string` | `'Clear'` | `HelixHeadlessInput` | What the clear button is called, since an icon has no name of its own. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
@@ -3297,6 +3302,7 @@ list moves under the reader rather than the reader moving to find it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `autocomplete` | `autocomplete` | `string` | `'off'` | `HelixHeadlessListbox` | What the browser may autofill in the text field, as a platform token. |
 | `defaultFilter` | `default-filter` | `string` | `''` | `HelixHeadlessListbox` | What to start narrowed to, where nothing declared it. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -3897,6 +3903,7 @@ three times as long to cross.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `autocomplete` | `autocomplete` | `string` | `''` | `HelixHeadlessNumberInput` | What the browser may autofill here, as one of the platform's own tokens. |
 | `decrementLabel` | `decrement-label` | `string` | `'Decrease'` | `HelixHeadlessNumberInput` | Accessible name for the control that steps down. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -4274,6 +4281,7 @@ breathe as a code is typed into it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `autocomplete` | `autocomplete` | `string` | `'one-time-code'` | `HelixHeadlessPinInput` | What the browser may autofill, reaching the first cell only. |
 | `cellLabel` | `cell-label` | `string` | `'Character {index} of {length}'` | `HelixHeadlessPinInput` | Accessible name for one box, with `{index}` and `{length}` filled in. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -6292,6 +6300,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `autocomplete` | `autocomplete` | `string` | `''` | `HelixHeadlessTextarea` | What the browser may autofill here, as one of the platform's own tokens. |
 | `autoGrow` | `auto-grow` | `boolean` | `false` | `HelixHeadlessTextarea` | Whether the box follows its own content rather than scrolling. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -6366,6 +6375,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `autocomplete` | `autocomplete` | `string` | `''` | `HelixHeadlessTimeInput` | What the browser may autofill here, as one of the platform's own tokens. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |

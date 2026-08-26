@@ -34,7 +34,7 @@ registerElementEvents({
   'helix-headless-drilldown-item': ['helix-select'],
   'helix-headless-file-input': ['helix-change'],
   'helix-headless-heatmap': ['helix-resize'],
-  'helix-headless-image': ['helix-error', 'helix-load'],
+  'helix-headless-image': ['error', 'load'],
   'helix-headless-input': ['change', 'helix-input'],
   'helix-headless-kbd': ['helix-shortcut'],
   'helix-headless-listbox': ['helix-change', 'helix-filter'],

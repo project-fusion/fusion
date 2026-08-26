@@ -8,7 +8,6 @@ import type {
   HelixCopyEvent,
   HelixCreateEvent,
   HelixDismissEvent,
-  HelixErrorEvent,
   HelixFilterEvent,
   HelixFormElement,
   HelixHeadlessAccordion,
@@ -127,7 +126,6 @@ import type {
   HelixHeadlessVideoPlaylistMenu,
   HelixHeadlessVirtualList,
   HelixInputEvent,
-  HelixLoadEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixOpenEvent,
@@ -2116,6 +2114,13 @@ export type HelixHeadlessColorInputHelixCloseElementEvent =
   HelixHeadlessColorInputElementEvent<HelixCloseEvent>;
 
 export type HelixHeadlessColorInputProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixHeadlessColorInput["autocomplete"];
   /** Whether the field is a text box with a swatch on it, or only the swatch.
 
 `swatch` is the native control's shape: a block of color that opens a
@@ -2249,6 +2254,13 @@ reflected none of them. */
 };
 
 export type HelixHeadlessColorInputSolidJsProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  "prop:autocomplete"?: HelixHeadlessColorInput["autocomplete"];
   /** Whether the field is a text box with a swatch on it, or only the swatch.
 
 `swatch` is the native control's shape: a block of color that opens a
@@ -2404,6 +2416,13 @@ export type HelixHeadlessColorPickerHelixCopyElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixCopyEvent>;
 
 export type HelixHeadlessColorPickerProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixHeadlessColorPicker["autocomplete"];
   /** Whether the current selection fails validation.
 
 A flag rather than a message, which is the split Date Picker already drew and
@@ -2524,6 +2543,13 @@ reflected none of them. */
 };
 
 export type HelixHeadlessColorPickerSolidJsProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  "prop:autocomplete"?: HelixHeadlessColorPicker["autocomplete"];
   /** Whether the current selection fails validation.
 
 A flag rather than a message, which is the split Date Picker already drew and
@@ -2666,6 +2692,13 @@ export type HelixHeadlessComboboxHelixCloseElementEvent =
   HelixHeadlessComboboxElementEvent<HelixCloseEvent>;
 
 export type HelixHeadlessComboboxProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixHeadlessCombobox["autocomplete"];
   /** Text shown while nothing has been chosen. */
   placeholder?: HelixHeadlessCombobox["placeholder"];
   /** Whether more than one option can be chosen.
@@ -2834,6 +2867,13 @@ reflected none of them. */
 };
 
 export type HelixHeadlessComboboxSolidJsProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  "prop:autocomplete"?: HelixHeadlessCombobox["autocomplete"];
   /** Text shown while nothing has been chosen. */
   "prop:placeholder"?: HelixHeadlessCombobox["placeholder"];
   /** Whether more than one option can be chosen.
@@ -3592,6 +3632,13 @@ export type HelixHeadlessDateInputHelixCloseElementEvent =
   HelixHeadlessDateInputElementEvent<HelixCloseEvent>;
 
 export type HelixHeadlessDateInputProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  autocomplete?: HelixHeadlessDateInput["autocomplete"];
   /** How many dates can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -3788,6 +3835,13 @@ reflected none of them. */
 };
 
 export type HelixHeadlessDateInputSolidJsProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  "prop:autocomplete"?: HelixHeadlessDateInput["autocomplete"];
   /** How many dates can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -5245,12 +5299,6 @@ export type HelixHeadlessImageElementEvent<E = Event> = TypedEvent<
   HelixHeadlessImage,
   E
 >;
-/** `helix-load` event type */
-export type HelixHeadlessImageHelixLoadElementEvent =
-  HelixHeadlessImageElementEvent<HelixLoadEvent>;
-/** `helix-error` event type */
-export type HelixHeadlessImageHelixErrorElementEvent =
-  HelixHeadlessImageElementEvent<HelixErrorEvent>;
 
 export type HelixHeadlessImageProps = {
   /** Where the picture is. */
@@ -5303,10 +5351,10 @@ different name a re-parse cannot mistake for a declaration, and it is what
 resting state of a mirror is the attribute's absence. */
   status?: HelixHeadlessImage["status"];
 
-  /** The picture arrived. */
-  "onhelix-load"?: (e: HelixHeadlessImageHelixLoadElementEvent) => void;
-  /** It is not coming. */
-  "onhelix-error"?: (e: HelixHeadlessImageHelixErrorElementEvent) => void;
+  /** Relayed, because the platform's own does not escape. */
+  onload?: (e: HelixHeadlessImageElementEvent) => void;
+  /** Relayed for the same reason. */
+  onerror?: (e: HelixHeadlessImageElementEvent) => void;
 };
 
 export type HelixHeadlessImageSolidJsProps = {
@@ -5359,10 +5407,10 @@ different name a re-parse cannot mistake for a declaration, and it is what
 `loading` writes nothing, because it is where every image starts and the
 resting state of a mirror is the attribute's absence. */
   "prop:status"?: HelixHeadlessImage["status"];
-  /** The picture arrived. */
-  "on:helix-load"?: (e: HelixHeadlessImageHelixLoadElementEvent) => void;
-  /** It is not coming. */
-  "on:helix-error"?: (e: HelixHeadlessImageHelixErrorElementEvent) => void;
+  /** Relayed, because the platform's own does not escape. */
+  "on:load"?: (e: HelixHeadlessImageElementEvent) => void;
+  /** Relayed for the same reason. */
+  "on:error"?: (e: HelixHeadlessImageElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5380,6 +5428,11 @@ export type HelixHeadlessInputHelixInputElementEvent =
   HelixHeadlessInputElementEvent<HelixInputEvent>;
 
 export type HelixHeadlessInputProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default. Set it to
+a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
+  autocomplete?: HelixHeadlessInput["autocomplete"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
@@ -5503,6 +5556,11 @@ reflected none of them. */
 };
 
 export type HelixHeadlessInputSolidJsProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default. Set it to
+a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
+  "prop:autocomplete"?: HelixHeadlessInput["autocomplete"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   "prop:placeholder"?: HelixHeadlessInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
@@ -6021,6 +6079,13 @@ export type HelixHeadlessListboxHelixFilterElementEvent =
   HelixHeadlessListboxElementEvent<HelixFilterEvent>;
 
 export type HelixHeadlessListboxProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixHeadlessListbox["autocomplete"];
   /** What the list is narrowed to, if anything.
 
 Filtering hides rather than removes, so nothing about the value changes and
@@ -6132,6 +6197,13 @@ reflected none of them. */
 };
 
 export type HelixHeadlessListboxSolidJsProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  "prop:autocomplete"?: HelixHeadlessListbox["autocomplete"];
   /** What the list is narrowed to, if anything.
 
 Filtering hides rather than removes, so nothing about the value changes and
@@ -7124,6 +7196,13 @@ export type HelixHeadlessNumberInputHelixInputElementEvent =
   HelixHeadlessNumberInputElementEvent<HelixInputEvent>;
 
 export type HelixHeadlessNumberInputProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  autocomplete?: HelixHeadlessNumberInput["autocomplete"];
   /** Smallest value the reader may reach. Absent has no floor. */
   min?: HelixHeadlessNumberInput["min"];
   /** Largest value the reader may reach. Absent has no ceiling. */
@@ -7226,6 +7305,13 @@ reflected none of them. */
 };
 
 export type HelixHeadlessNumberInputSolidJsProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  "prop:autocomplete"?: HelixHeadlessNumberInput["autocomplete"];
   /** Smallest value the reader may reach. Absent has no floor. */
   "prop:min"?: HelixHeadlessNumberInput["min"];
   /** Largest value the reader may reach. Absent has no ceiling. */
@@ -8016,6 +8102,13 @@ export type HelixHeadlessPinInputHelixCompleteElementEvent =
   HelixHeadlessPinInputElementEvent<HelixCompleteEvent>;
 
 export type HelixHeadlessPinInputProps = {
+  /** What the browser may autofill, reaching the first cell only.
+
+`one-time-code` is why this defaults to anything at all: it is the token
+that lets a phone offer the code out of a message. Later cells stay `off`
+for the reason in the class comment above, that six cells each offering
+the same code is one offer made six times. */
+  autocomplete?: HelixHeadlessPinInput["autocomplete"];
   /** How many characters the code has. */
   length?: HelixHeadlessPinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
@@ -8125,6 +8218,13 @@ reflected none of them. */
 };
 
 export type HelixHeadlessPinInputSolidJsProps = {
+  /** What the browser may autofill, reaching the first cell only.
+
+`one-time-code` is why this defaults to anything at all: it is the token
+that lets a phone offer the code out of a message. Later cells stay `off`
+for the reason in the class comment above, that six cells each offering
+the same code is one offer made six times. */
+  "prop:autocomplete"?: HelixHeadlessPinInput["autocomplete"];
   /** How many characters the code has. */
   "prop:length"?: HelixHeadlessPinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
@@ -10892,6 +10992,11 @@ export type HelixHeadlessTextareaHelixInputElementEvent =
   HelixHeadlessTextareaElementEvent<HelixInputEvent>;
 
 export type HelixHeadlessTextareaProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default. Set it to
+a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
+  autocomplete?: HelixHeadlessTextarea["autocomplete"];
   /** Whether the box follows its own content rather than scrolling. */
   "auto-grow"?: HelixHeadlessTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
@@ -10983,6 +11088,11 @@ reflected none of them. */
 };
 
 export type HelixHeadlessTextareaSolidJsProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default. Set it to
+a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
+  "prop:autocomplete"?: HelixHeadlessTextarea["autocomplete"];
   /** Whether the box follows its own content rather than scrolling. */
   "bool:auto-grow"?: HelixHeadlessTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
@@ -11093,6 +11203,13 @@ export type HelixHeadlessTimeInputHelixCloseElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixCloseEvent>;
 
 export type HelixHeadlessTimeInputProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  autocomplete?: HelixHeadlessTimeInput["autocomplete"];
   /** Whether the panel is one list of times or a column each.
 
 `list` offers whole times, which is what a product with slots or opening
@@ -11244,6 +11361,13 @@ reflected none of them. */
 };
 
 export type HelixHeadlessTimeInputSolidJsProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  "prop:autocomplete"?: HelixHeadlessTimeInput["autocomplete"];
   /** Whether the panel is one list of times or a column each.
 
 `list` offers whole times, which is what a product with slots or opening
@@ -15425,6 +15549,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
    * - `variant`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
@@ -15696,6 +15826,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
    * - `invalid`: Whether the current selection fails validation.
    *
    * A flag rather than a message, which is the split Date Picker already drew and
@@ -15956,6 +16092,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
    * - `placeholder`: Text shown while nothing has been chosen.
    * - `multiple`: Whether more than one option can be chosen.
    *
@@ -16672,6 +16814,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default and is what
+   * lets autofill work at all. This used to be hardcoded `off`, so a reader
+   * could never have a birthday or a postal code filled in for them and a
+   * consumer had no way to ask for it. See 295.
    * - `mode`: How many dates can be held at once.
    *
    * Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -18309,8 +18457,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-load`: The picture arrived.
-   * - `helix-error`: It is not coming.
+   * - `load`: Relayed, because the platform's own does not escape.
+   * - `error`: Relayed for the same reason.
    *
    * ## Slots
    *
@@ -18378,6 +18526,10 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default. Set it to
+   * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
@@ -19015,6 +19167,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
    * - `filter`: What the list is narrowed to, if anything.
    *
    * Filtering hides rather than removes, so nothing about the value changes and
@@ -20032,6 +20190,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default and is what
+   * lets autofill work at all. This used to be hardcoded `off`, so a reader
+   * could never have a birthday or a postal code filled in for them and a
+   * consumer had no way to ask for it. See 295.
    * - `min`: Smallest value the reader may reach. Absent has no floor.
    * - `max`: Largest value the reader may reach. Absent has no ceiling.
    * - `step`: How far one step moves.
@@ -20784,6 +20948,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill, reaching the first cell only.
+   *
+   * `one-time-code` is why this defaults to anything at all: it is the token
+   * that lets a phone offer the code out of a message. Later cells stay `off`
+   * for the reason in the class comment above, that six cells each offering
+   * the same code is one offer made six times.
    * - `length`: How many characters the code has.
    * - `type`: What a box accepts, which decides the keyboard a phone offers.
    *
@@ -23599,6 +23769,10 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default. Set it to
+   * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
@@ -23754,6 +23928,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default and is what
+   * lets autofill work at all. This used to be hardcoded `off`, so a reader
+   * could never have a birthday or a postal code filled in for them and a
+   * consumer had no way to ask for it. See 295.
    * - `variant`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
@@ -27963,6 +28143,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
    * - `variant`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
@@ -28235,6 +28421,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
    * - `invalid`: Whether the current selection fails validation.
    *
    * A flag rather than a message, which is the split Date Picker already drew and
@@ -28496,6 +28688,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
    * - `placeholder`: Text shown while nothing has been chosen.
    * - `multiple`: Whether more than one option can be chosen.
    *
@@ -29222,6 +29420,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default and is what
+   * lets autofill work at all. This used to be hardcoded `off`, so a reader
+   * could never have a birthday or a postal code filled in for them and a
+   * consumer had no way to ask for it. See 295.
    * - `mode`: How many dates can be held at once.
    *
    * Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -30890,8 +31094,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-load`: The picture arrived.
-   * - `helix-error`: It is not coming.
+   * - `load`: Relayed, because the platform's own does not escape.
+   * - `error`: Relayed for the same reason.
    *
    * ## Slots
    *
@@ -30962,6 +31166,10 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default. Set it to
+   * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
@@ -31617,6 +31825,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field filters a list rather than collecting a value, so a
+   * browser offering to fill it with a saved address is competing for the same
+   * keystrokes as the listbox. A consumer who wants autofill can still ask.
    * - `filter`: What the list is narrowed to, if anything.
    *
    * Filtering hides rather than removes, so nothing about the value changes and
@@ -32655,6 +32869,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default and is what
+   * lets autofill work at all. This used to be hardcoded `off`, so a reader
+   * could never have a birthday or a postal code filled in for them and a
+   * consumer had no way to ask for it. See 295.
    * - `min`: Smallest value the reader may reach. Absent has no floor.
    * - `max`: Largest value the reader may reach. Absent has no ceiling.
    * - `step`: How far one step moves.
@@ -33418,6 +33638,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill, reaching the first cell only.
+   *
+   * `one-time-code` is why this defaults to anything at all: it is the token
+   * that lets a phone offer the code out of a message. Later cells stay `off`
+   * for the reason in the class comment above, that six cells each offering
+   * the same code is one offer made six times.
    * - `length`: How many characters the code has.
    * - `type`: What a box accepts, which decides the keyboard a phone offers.
    *
@@ -36312,6 +36538,10 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default. Set it to
+   * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
@@ -36470,6 +36700,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
+   *
+   * Empty leaves the attribute off, which is the browser's default and is what
+   * lets autofill work at all. This used to be hardcoded `off`, so a reader
+   * could never have a birthday or a postal code filled in for them and a
+   * consumer had no way to ask for it. See 295.
    * - `variant`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening

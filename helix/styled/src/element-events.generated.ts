@@ -29,7 +29,7 @@ registerElementEvents({
   'helix-drilldown-item': ['helix-select'],
   'helix-file-input': ['helix-change'],
   'helix-heatmap': ['helix-resize'],
-  'helix-image': ['helix-error', 'helix-load'],
+  'helix-image': ['error', 'load'],
   'helix-input': ['change', 'helix-input'],
   'helix-kbd': ['helix-shortcut'],
   'helix-listbox': ['helix-change', 'helix-filter'],

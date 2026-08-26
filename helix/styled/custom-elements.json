@@ -13693,6 +13693,20 @@
             },
             {
               "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'off'",
+              "description": "What the browser may autofill in the text field, as a platform token.\n\n**Defaults to `off`, which is not the platform's default and is the\npoint.** The field filters a list rather than collecting a value, so a\nbrowser offering to fill it with a saved address is competing for the same\nkeystrokes as the listbox. A consumer who wants autofill can still ask.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "variant",
               "type": {
                 "text": "'swatch' | undefined"
@@ -14366,6 +14380,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'off'",
+              "description": "What the browser may autofill in the text field, as a platform token.\n\n**Defaults to `off`, which is not the platform's default and is the\npoint.** The field filters a list rather than collecting a value, so a\nbrowser offering to fill it with a saved address is competing for the same\nkeystrokes as the listbox. A consumer who wants autofill can still ask.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
               }
             },
             {
@@ -15147,6 +15174,20 @@
             },
             {
               "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'off'",
+              "description": "What the browser may autofill in the text field, as a platform token.\n\n**Defaults to `off`, which is not the platform's default and is the\npoint.** The field filters a list rather than collecting a value, so a\nbrowser offering to fill it with a saved address is competing for the same\nkeystrokes as the listbox. A consumer who wants autofill can still ask.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "invalid",
               "type": {
                 "text": "boolean"
@@ -15826,6 +15867,19 @@
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'off'",
+              "description": "What the browser may autofill in the text field, as a platform token.\n\n**Defaults to `off`, which is not the platform's default and is the\npoint.** The field filters a list rather than collecting a value, so a\nbrowser offering to fill it with a saved address is competing for the same\nkeystrokes as the listbox. A consumer who wants autofill can still ask.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -16818,6 +16872,20 @@
             },
             {
               "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'off'",
+              "description": "What the browser may autofill in the text field, as a platform token.\n\n**Defaults to `off`, which is not the platform's default and is the\npoint.** The field filters a list rather than collecting a value, so a\nbrowser offering to fill it with a saved address is competing for the same\nkeystrokes as the listbox. A consumer who wants autofill can still ask.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "placeholder",
               "type": {
                 "text": "string"
@@ -17702,6 +17770,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'off'",
+              "description": "What the browser may autofill in the text field, as a platform token.\n\n**Defaults to `off`, which is not the platform's default and is the\npoint.** The field filters a list rather than collecting a value, so a\nbrowser offering to fill it with a saved address is competing for the same\nkeystrokes as the listbox. A consumer who wants autofill can still ask.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
               }
             },
             {
@@ -21809,6 +21890,20 @@
             },
             {
               "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default and is what\nlets autofill work at all. This used to be hardcoded `off`, so a reader\ncould never have a birthday or a postal code filled in for them and a\nconsumer had no way to ask for it. See 295.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "mode",
               "type": {
                 "text": "'range' | 'multiple' | undefined"
@@ -22697,6 +22792,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default and is what\nlets autofill work at all. This used to be hardcoded `off`, so a reader\ncould never have a birthday or a postal code filled in for them and a\nconsumer had no way to ask for it. See 295.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
               }
             },
             {
@@ -32241,9 +32349,16 @@
                   "type": {
                     "text": "'error' | 'loaded'"
                   }
+                },
+                {
+                  "name": "event",
+                  "optional": true,
+                  "type": {
+                    "text": "Event"
+                  }
                 }
               ],
-              "description": "Says so, because the platform's own saying of it cannot be heard.\n\n`load` and `error` on an `<img>` neither bubble nor compose, so the ones\nfired inside this shadow root reach nobody outside it. A consumer had a\nreflected attribute and a `MutationObserver` and nothing else.",
+              "description": "Says so under the platform's own name, because the platform's cannot escape.\n\n`load` and `error` on an `<img>` neither bubble nor compose, so the ones\nfired inside this shadow root reach nobody outside it. A consumer had a\nreflected attribute and a `MutationObserver` and nothing else. Re-emitting\nfrom the host is what `relayNativeEvent` is for, and it is what `Avatar`\nalready did for the same pair on the same element.\n\n**These were `helix-load` and `helix-error`, and the rename is the fix.**\nThe argument for a prefix is a collision with a native name, and there was\nnone to collide with here: the native events cannot reach a consumer at\nall. So the prefix bought nothing and cost the two spellings this library\nhad for one idea, `Avatar` relaying `load` while `Image` invented one. See\n294 and 295.\n\n**Not bubbling, and that is not a small point.** The retired events were\n`bubbles: true, composed: true` deliberately, so a gallery could count its\npictures with one listener. A bubbling relay of `load` reaches nothing in\nReact: `load` is in react-dom's `nonDelegatedEvents`, so there is no root\nlistener to catch it, and React attaches a direct one for `<img>` and never\nfor a custom element. `bindReactHandler` binds exactly the non-bubbling\nones, so matching the native propagation is what makes `onLoad` work at\nall. A gallery does here what it already does for `<img>`, which is listen\nin the capture phase or listen per picture.",
               "inheritedFrom": {
                 "name": "HelixHeadlessImage",
                 "module": "src/image/root/image-root.ts"
@@ -32566,11 +32681,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixLoadEvent"
+                "text": "Event"
               },
-              "description": "The picture arrived.",
-              "name": "helix-load",
-              "reactProp": "onhelix-load",
+              "description": "Relayed, because the platform's own does not escape.",
+              "name": "load",
+              "reactProp": "onload",
               "inheritedFrom": {
                 "name": "HelixHeadlessImage",
                 "module": "src/image/root/image-root.ts"
@@ -32578,11 +32693,11 @@
             },
             {
               "type": {
-                "text": "HelixErrorEvent"
+                "text": "Event"
               },
-              "description": "It is not coming.",
-              "name": "helix-error",
-              "reactProp": "onhelix-error",
+              "description": "Relayed for the same reason.",
+              "name": "error",
+              "reactProp": "onerror",
               "inheritedFrom": {
                 "name": "HelixHeadlessImage",
                 "module": "src/image/root/image-root.ts"
@@ -33799,6 +33914,20 @@
             },
             {
               "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default. Set it to\na token like `email` or `bday` to ask for autofill, or to `off` to refuse.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "placeholder",
               "type": {
                 "text": "string"
@@ -34474,6 +34603,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default. Set it to\na token like `email` or `bday` to ask for autofill, or to `off` to refuse.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessInput",
+                "module": "src/input/root/input-root.ts"
               }
             },
             {
@@ -37899,6 +38041,20 @@
             },
             {
               "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'off'",
+              "description": "What the browser may autofill in the text field, as a platform token.\n\n**Defaults to `off`, which is not the platform's default and is the\npoint.** The field filters a list rather than collecting a value, so a\nbrowser offering to fill it with a saved address is competing for the same\nkeystrokes as the listbox. A consumer who wants autofill can still ask.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "filter",
               "type": {
                 "text": "string"
@@ -38778,6 +38934,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'off'",
+              "description": "What the browser may autofill in the text field, as a platform token.\n\n**Defaults to `off`, which is not the platform's default and is the\npoint.** The field filters a list rather than collecting a value, so a\nbrowser offering to fill it with a saved address is competing for the same\nkeystrokes as the listbox. A consumer who wants autofill can still ask.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessListbox",
+                "module": "src/listbox/root/listbox-root.ts"
               }
             },
             {
@@ -44890,6 +45059,20 @@
             },
             {
               "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default and is what\nlets autofill work at all. This used to be hardcoded `off`, so a reader\ncould never have a birthday or a postal code filled in for them and a\nconsumer had no way to ask for it. See 295.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNumberInput",
+                "module": "src/number-input/root/number-input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "min",
               "type": {
                 "text": "number | undefined"
@@ -45682,6 +45865,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default and is what\nlets autofill work at all. This used to be hardcoded `off`, so a reader\ncould never have a birthday or a postal code filled in for them and a\nconsumer had no way to ask for it. See 295.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNumberInput",
+                "module": "src/number-input/root/number-input-root.ts"
               }
             },
             {
@@ -49703,6 +49899,20 @@
             },
             {
               "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'one-time-code'",
+              "description": "What the browser may autofill, reaching the first cell only.\n\n`one-time-code` is why this defaults to anything at all: it is the token\nthat lets a phone offer the code out of a message. Later cells stay `off`\nfor the reason in the class comment above, that six cells each offering\nthe same code is one offer made six times.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessPinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "length",
               "type": {
                 "text": "number"
@@ -50373,6 +50583,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "'one-time-code'",
+              "description": "What the browser may autofill, reaching the first cell only.\n\n`one-time-code` is why this defaults to anything at all: it is the token\nthat lets a phone offer the code out of a message. Later cells stay `off`\nfor the reason in the class comment above, that six cells each offering\nthe same code is one offer made six times.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessPinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
               }
             },
             {
@@ -70360,6 +70583,20 @@
             },
             {
               "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default. Set it to\na token like `email` or `bday` to ask for autofill, or to `off` to refuse.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "autoGrow",
               "type": {
                 "text": "boolean"
@@ -70948,6 +71185,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default. Set it to\na token like `email` or `bday` to ask for autofill, or to `off` to refuse.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
               }
             },
             {
@@ -71714,6 +71964,20 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default and is what\nlets autofill work at all. This used to be hardcoded `off`, so a reader\ncould never have a birthday or a postal code filled in for them and a\nconsumer had no way to ask for it. See 295.",
+              "attribute": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
               }
             },
             {
@@ -72588,6 +72852,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "autocomplete",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the browser may autofill here, as one of the platform's own tokens.\n\nEmpty leaves the attribute off, which is the browser's default and is what\nlets autofill work at all. This used to be hardcoded `off`, so a reader\ncould never have a birthday or a postal code filled in for them and a\nconsumer had no way to ask for it. See 295.",
+              "fieldName": "autocomplete",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
               }
             },
             {

@@ -136,8 +136,6 @@ import type {
   HelixFilterEvent,
   HelixNavigateEvent,
   HelixResizeEvent,
-  HelixLoadEvent,
-  HelixErrorEvent,
   HelixInputEvent,
   HelixShortcutEvent,
   HelixReadEvent,
@@ -1106,6 +1104,13 @@ export type HelixHeadlessColorInputHelixCloseElementEvent =
   HelixHeadlessColorInputElementEvent<HelixCloseEvent>;
 
 export type HelixHeadlessColorInputVueProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixHeadlessColorInput["autocomplete"];
   /** Whether the field is a text box with a swatch on it, or only the swatch.
 
 `swatch` is the native control's shape: a block of color that opens a
@@ -1257,6 +1262,13 @@ export type HelixHeadlessColorPickerHelixCopyElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixCopyEvent>;
 
 export type HelixHeadlessColorPickerVueProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixHeadlessColorPicker["autocomplete"];
   /** Whether the current selection fails validation.
 
 A flag rather than a message, which is the split Date Picker already drew and
@@ -1391,6 +1403,13 @@ export type HelixHeadlessComboboxHelixCloseElementEvent =
   HelixHeadlessComboboxElementEvent<HelixCloseEvent>;
 
 export type HelixHeadlessComboboxVueProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixHeadlessCombobox["autocomplete"];
   /** Text shown while nothing has been chosen. */
   placeholder?: HelixHeadlessCombobox["placeholder"];
   /** Whether more than one option can be chosen.
@@ -1878,6 +1897,13 @@ export type HelixHeadlessDateInputHelixCloseElementEvent =
   HelixHeadlessDateInputElementEvent<HelixCloseEvent>;
 
 export type HelixHeadlessDateInputVueProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  autocomplete?: HelixHeadlessDateInput["autocomplete"];
   /** How many dates can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
@@ -2731,12 +2757,6 @@ export type HelixHeadlessImageElementEvent<E = Event> = TypedEvent<
   HelixHeadlessImage,
   E
 >;
-/** `helix-load` event type */
-export type HelixHeadlessImageHelixLoadElementEvent =
-  HelixHeadlessImageElementEvent<HelixLoadEvent>;
-/** `helix-error` event type */
-export type HelixHeadlessImageHelixErrorElementEvent =
-  HelixHeadlessImageElementEvent<HelixErrorEvent>;
 
 export type HelixHeadlessImageVueProps = {
   /** Where the picture is. */
@@ -2791,10 +2811,10 @@ resting state of a mirror is the attribute's absence. */
 };
 
 export type HelixHeadlessImageVueEvents = {
-  /** The picture arrived. */
-  "helix-load": HelixHeadlessImageHelixLoadElementEvent;
-  /** It is not coming. */
-  "helix-error": HelixHeadlessImageHelixErrorElementEvent;
+  /** Relayed, because the platform's own does not escape. */
+  load: HelixHeadlessImageElementEvent;
+  /** Relayed for the same reason. */
+  error: HelixHeadlessImageElementEvent;
 };
 
 /** `HelixHeadlessInput` component event */
@@ -2807,6 +2827,11 @@ export type HelixHeadlessInputHelixInputElementEvent =
   HelixHeadlessInputElementEvent<HelixInputEvent>;
 
 export type HelixHeadlessInputVueProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default. Set it to
+a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
+  autocomplete?: HelixHeadlessInput["autocomplete"];
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
@@ -3136,6 +3161,13 @@ export type HelixHeadlessListboxHelixFilterElementEvent =
   HelixHeadlessListboxElementEvent<HelixFilterEvent>;
 
 export type HelixHeadlessListboxVueProps = {
+  /** What the browser may autofill in the text field, as a platform token.
+
+**Defaults to `off`, which is not the platform's default and is the
+point.** The field filters a list rather than collecting a value, so a
+browser offering to fill it with a saved address is competing for the same
+keystrokes as the listbox. A consumer who wants autofill can still ask. */
+  autocomplete?: HelixHeadlessListbox["autocomplete"];
   /** What the list is narrowed to, if anything.
 
 Filtering hides rather than removes, so nothing about the value changes and
@@ -3714,6 +3746,13 @@ export type HelixHeadlessNumberInputHelixInputElementEvent =
   HelixHeadlessNumberInputElementEvent<HelixInputEvent>;
 
 export type HelixHeadlessNumberInputVueProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  autocomplete?: HelixHeadlessNumberInput["autocomplete"];
   /** Smallest value the reader may reach. Absent has no floor. */
   min?: HelixHeadlessNumberInput["min"];
   /** Largest value the reader may reach. Absent has no ceiling. */
@@ -4178,6 +4217,13 @@ export type HelixHeadlessPinInputHelixCompleteElementEvent =
   HelixHeadlessPinInputElementEvent<HelixCompleteEvent>;
 
 export type HelixHeadlessPinInputVueProps = {
+  /** What the browser may autofill, reaching the first cell only.
+
+`one-time-code` is why this defaults to anything at all: it is the token
+that lets a phone offer the code out of a message. Later cells stay `off`
+for the reason in the class comment above, that six cells each offering
+the same code is one offer made six times. */
+  autocomplete?: HelixHeadlessPinInput["autocomplete"];
   /** How many characters the code has. */
   length?: HelixHeadlessPinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
@@ -5683,6 +5729,11 @@ export type HelixHeadlessTextareaHelixInputElementEvent =
   HelixHeadlessTextareaElementEvent<HelixInputEvent>;
 
 export type HelixHeadlessTextareaVueProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default. Set it to
+a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
+  autocomplete?: HelixHeadlessTextarea["autocomplete"];
   /** Whether the box follows its own content rather than scrolling. */
   "auto-grow"?: HelixHeadlessTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
@@ -5791,6 +5842,13 @@ export type HelixHeadlessTimeInputHelixCloseElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixCloseEvent>;
 
 export type HelixHeadlessTimeInputVueProps = {
+  /** What the browser may autofill here, as one of the platform's own tokens.
+
+Empty leaves the attribute off, which is the browser's default and is what
+lets autofill work at all. This used to be hardcoded `off`, so a reader
+could never have a birthday or a postal code filled in for them and a
+consumer had no way to ask for it. See 295. */
+  autocomplete?: HelixHeadlessTimeInput["autocomplete"];
   /** Whether the panel is one list of times or a column each.
 
 `list` offers whole times, which is what a product with slots or opening
