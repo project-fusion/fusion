@@ -1,0 +1,25 @@
+/* What the headless tier asks a consumer to write for a chord, and how little.
+ *
+ * The same terms as `preview.css` beside it: grays only, no token, no radius
+ * beyond what is round rather than softened. A headless example is a diagram of
+ * what has to be styled, and what has to be styled here is the key itself,
+ * which `preview.css` already draws. This file is the layout around it, which
+ * the styled tier gets from `helix-flex` and this tier does not.
+ */
+
+.stack {
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+}
+
+/* Quieter than the sentence above it, and quiet by lightness rather than by
+   size: the note is an aside about the field, not a smaller kind of prose. */
+.caption {
+  color: #6b7280;
+  margin: 0;
+}
+
+.stack p {
+  margin: 0;
+}

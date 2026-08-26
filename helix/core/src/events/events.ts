@@ -689,6 +689,38 @@ export class HelixFilterEvent extends CustomEvent<FilterDetail> {
   }
 }
 
+/** What a shortcut reports when its chord is pressed. */
+export interface ShortcutDetail {
+  /**
+   * The chord that matched, as it was written.
+   *
+   * Given back rather than left to be remembered, so one handler can serve
+   * several keys and answer by comparing what it was told.
+   */
+  keys: string
+}
+
+/**
+ * Fired when a shortcut's chord is pressed.
+ *
+ * Cancelable, and the key event is only consumed where this is not refused: a
+ * consumer that decides the moment is wrong, a dialog is over the control or
+ * the reader is mid-composition, calls `preventDefault()` and the keystroke
+ * goes on to whatever would have had it.
+ */
+export class HelixShortcutEvent extends CustomEvent<ShortcutDetail> {
+  static readonly eventName = 'helix-shortcut'
+
+  constructor(detail: ShortcutDetail) {
+    super(HelixShortcutEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /**
  * Fired when the reader selects an item in a set.
  *
@@ -745,6 +777,7 @@ const registry = {
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixSelectEvent,
+  HelixShortcutEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
 } as const

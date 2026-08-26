@@ -1,0 +1,43 @@
+<!-- @summary A chord written once, drawn for whichever keyboard is reading it. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-text variant="body">
+    Press
+    <helix-kbd keys="mod+k"></helix-kbd>
+    to search. Written once as <code>mod+k</code>: an Apple keyboard is told the
+    Command glyph and every other keyboard is told Ctrl, so neither is asked for
+    a key it does not have.
+  </helix-text>
+
+  <helix-input
+    aria-label="Filter"
+    placeholder="Filter"
+  >
+    <helix-kbd
+      id="key"
+      keys="/"
+      slot="end"
+      within="control"
+    ></helix-kbd>
+  </helix-input>
+
+  <helix-text
+    id="said"
+    tone="subtle"
+    variant="caption"
+  >
+    The second one binds as well as draws. Put the cursor in the field and press
+    it: the key is listened for within the control it sits in, so it answers
+    there and nowhere else.
+  </helix-text>
+</helix-flex>
+
+<script type="module">
+  const key = document.getElementById('key')
+  const said = document.getElementById('said')
+  key.addEventListener('helix-shortcut', (event) => {
+    said.textContent = `Heard ${event.detail.keys} inside the field.`
+  })
+</script>
