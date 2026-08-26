@@ -24,12 +24,21 @@ export interface PageMeta {
   /** What the page is about, in one sentence. Used as the description and the card's. */
   description: string
   /**
-   * The card's image, absolute or rooted.
+   * The card's image, absolute or rooted, or `false` to stand aside.
    *
    * Absent takes the site card, which is the honest default: a page with no
    * picture of its own should not borrow one that is about something else.
+   *
+   * **`false` is for a route that ships an `opengraph-image` file**, and it
+   * exists because setting `images` at all is what silences that file: Next
+   * fills the block in from the convention only when nothing else has. Naming
+   * the file's own URL instead does not work and looks like it does. Next
+   * appends a content hash to an image route, so the built path is
+   * `/helix/components/[family]/opengraph-image-1czn6t`, and a hand-written
+   * `/helix/components/accordion/opengraph-image` is a 404 that no page renders
+   * and no test visits.
    */
-  image?: string
+  image?: string | false
   /** The canonical path, leading slash, no origin. */
   path: string
   /** The page's own title, without the site suffix the template adds. */
@@ -56,13 +65,17 @@ export const pageMetadata = ({
   type = 'website',
 }: PageMeta): Metadata => {
   const url = absolute(path)
-  const images = [{ url: image }]
+  /* Omitted entirely rather than set to something empty, which is the whole
+     mechanism: an `images` key that is present, whatever it holds, is Next's
+     signal that this page has already decided, and the `opengraph-image` file
+     beside the route is never consulted. */
+  const images = image === false ? {} : { images: [{ url: image }] }
   return {
     alternates: { canonical: url },
     description,
-    openGraph: { description, images, siteName: 'Fusion', title, type, url },
+    openGraph: { description, ...images, siteName: 'Fusion', title, type, url },
     title,
-    twitter: { card: 'summary_large_image', description, images, title },
+    twitter: { card: 'summary_large_image', description, ...images, title },
   }
 }
 

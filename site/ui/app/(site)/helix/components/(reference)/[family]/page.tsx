@@ -547,10 +547,12 @@ function onlyTier(examples: readonly Example[]): 'headless' | 'styled' | undefin
  * summary is written as the one sentence that says what the component is, which
  * is exactly what a card wants.
  *
- * No per-family picture, because there is none to use: `helix/gallery` is
- * compositions in TSX rather than images, and nothing on disk holds a shot per
- * family. The site card is the honest fallback until something draws one. See
- * 247.
+ * **The picture is drawn now too**, by `opengraph-image.tsx` beside this file,
+ * from the same `label`, `summary` and `status`. It used to fall back to the
+ * site's own card, so most of the site by count unfurled as though every page
+ * were the front page. There is still no *shot* of a family, and 255 decided
+ * there should not be: a card is read at thumbnail size, where a name set large
+ * is legible and a screenshot of a control is a gray smudge. See 247 and 255.
  */
 export async function generateMetadata({
   params,
@@ -563,6 +565,11 @@ export async function generateMetadata({
   }
   return pageMetadata({
     description: family.summary,
+    /* Stands aside for `opengraph-image.tsx` beside this file. `pageMetadata`
+       otherwise sets `images` to the site card, and a set `images` is what
+       stops Next reading the convention at all: measured before this, `og:image`
+       on both Accordion and Table was the site's own picture. */
+    image: false,
     path: `/helix/components/${family.slug}`,
     title: family.label,
   })
