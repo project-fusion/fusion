@@ -11,7 +11,7 @@ import { styles } from './timeline-item.css.js'
  * arrives at this entry from the one before.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases Activity item, History entry, Event
  * @documentation https://helix.fusion.dev/components/timeline

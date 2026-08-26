@@ -133,9 +133,13 @@ export class HelixHeadlessStep extends HelixElement {
    * a hairline in one beside a check inside a green coin in the other was two
    * answers to one question. Timeline's rings came off the same day.
    */
-  private get mark(): TemplateResult {
+  protected renderMarker(): TemplateResult {
     const icon = this.complete ? check : this.current ? record : circle
-    return html`<svg part="mark" fill="currentColor" viewBox=${icon.viewBox}>${unsafeSVG(icon.content)}</svg>`
+    return html`<slot name="marker"
+      ><svg part="mark" fill="currentColor" viewBox=${icon.viewBox}
+        >${unsafeSVG(icon.content)}</svg
+      ></slot
+    >`
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -182,7 +186,7 @@ export class HelixHeadlessStep extends HelixElement {
     return html`<span part="lead" aria-hidden="true"></span>
       <span part="trail" aria-hidden="true"></span>
       <span part="marker" aria-hidden="true">
-        <slot name="marker">${this.mark}</slot>
+        ${this.renderMarker()}
       </span>
       <span part="body">
         ${this.renderLabel()}

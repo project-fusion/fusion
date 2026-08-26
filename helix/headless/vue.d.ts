@@ -3,6 +3,7 @@ import type {
   HelixHeadlessAccordion,
   HelixHeadlessAnnouncement,
   HelixHeadlessAppHeader,
+  FOLDS_UP_TO,
   HelixHeadlessAvatarGroup,
   initialsOf,
   HelixHeadlessAvatar,

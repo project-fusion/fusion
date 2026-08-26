@@ -14,7 +14,7 @@ import { styles } from './avatar-root.css.js'
  * `--avatar-size`.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Profile picture, Gravatar
  * @documentation https://helix.fusion.dev/components/avatar

@@ -32,7 +32,7 @@ import { property } from 'lit/decorators.js'
  * A run of stages along a page is `Steps`.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases Activity feed, History, Changelog, Audit trail
  * @documentation https://helix.fusion.dev/components/timeline

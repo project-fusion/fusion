@@ -20,7 +20,7 @@ import { styles } from './avatar-group.css.js'
  * its markup is the worse trade of the two.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Avatar stack, Facepile
  * @documentation https://helix.fusion.dev/components/avatar
  *

@@ -11,7 +11,7 @@ import { styles } from './timeline-root.css.js'
  * event and the next. Every entry draws its own mark and its own line.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases Activity feed, History, Changelog, Audit trail
  * @documentation https://helix.fusion.dev/components/timeline

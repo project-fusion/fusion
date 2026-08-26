@@ -11,7 +11,7 @@ import { property } from 'lit/decorators.js'
  * tier that has to agree with it: a count that folds and a stylesheet that does
  * not would put a "+5" beside five avatars that are still on screen.
  */
-const FOLDS_UP_TO = 12
+export const FOLDS_UP_TO = 12
 
 /**
  * @summary Overlapping avatars, with a count for the ones not shown.
@@ -56,7 +56,7 @@ const FOLDS_UP_TO = 12
  * else's markup.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Avatar stack, Facepile
  * @documentation https://helix.fusion.dev/components/avatar
  *

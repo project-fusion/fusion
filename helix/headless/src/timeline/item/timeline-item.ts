@@ -24,7 +24,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * the mark. It takes `Announcement`'s vocabulary rather than a second one.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases Activity item, History entry, Event
  * @documentation https://helix.fusion.dev/components/timeline
@@ -67,6 +67,14 @@ export class HelixHeadlessTimelineItem extends HelixElement {
   /**
    * The mark for an entry that slotted none, which the tone decides.
    *
+   * **A `protected render…()` and not a getter, which is what it was.** A slot's
+   * fallback answers a consumer and a seam answers the tier above, and a getter
+   * answers neither: `check:fallbacks` permits `${this.x}` because a property is
+   * not markup a tier would redraw, and it tests for parentheses, so a getter
+   * returning a template reads as a bare reference and was let through. That is
+   * the same hole the check's own comment records closing for a static helper,
+   * reopened by a different spelling of the same thing.
+   *
    * Toned entries are reporting something, so they take the circle with a
    * center, which is `Steps` drawing the stage a reader is standing on. Untoned
    * ones are just things that happened and take the open circle, which is
@@ -74,11 +82,15 @@ export class HelixHeadlessTimelineItem extends HelixElement {
    * components rather than two that resemble each other: a shape drawn twice
    * drifts, and these are already the marks a reader has learned one page over.
    */
-  private get dot(): TemplateResult {
+  protected renderMarker(): TemplateResult {
     const icon = this.tone === undefined ? circle : record
-    return html`<svg part="dot" fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
-      ${unsafeSVG(icon.content)}
-    </svg>`
+    return html`<span part="marker"
+      ><slot name="marker"
+        ><svg part="dot" fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
+          ${unsafeSVG(icon.content)}
+        </svg></slot
+      ></span
+    >`
   }
 
   protected override render(): TemplateResult {
@@ -93,9 +105,7 @@ export class HelixHeadlessTimelineItem extends HelixElement {
           part="connector"
           aria-hidden="true"
         ></div>
-        <span part="marker"
-          ><slot name="marker">${this.dot}</slot
-        ></span>
+        ${this.renderMarker()}
       </div>
       ${
         this.datetime === ''

@@ -1,5 +1,6 @@
 import type {
   EDGES,
+  FOLDS_UP_TO,
   Helix,
   HelixChangeEvent,
   HelixCloseEvent,

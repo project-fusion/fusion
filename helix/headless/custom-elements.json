@@ -1272,6 +1272,15 @@
       "path": "src/avatar/group/avatar-group.ts",
       "declarations": [
         {
+          "kind": "variable",
+          "name": "FOLDS_UP_TO",
+          "type": {
+            "text": "number"
+          },
+          "default": "12",
+          "description": "The largest `max` the styled tier can hide past.\n\nThe fold is `:host([max=\"N\"]) ::slotted(:nth-child(n + N+1))`, one selector\nper value, because `An+B` takes a literal and no custom property can be read\ninto it. So the range is finite and this is where it is written down, in the\ntier that has to agree with it: a count that folds and a stylesheet that does\nnot would put a \"+5\" beside five avatars that are still on screen."
+        },
+        {
           "kind": "class",
           "description": "A part of `Avatar` rather than a family of its own: it arranges avatars and\nis about nothing else, and its member is a complete `Avatar` the group did\nnot have to explain.\n\n**The overflow count is the group's, not a slot.** Which avatars are hidden\nis a fact the group works out from `max` and how many it was given, so a\nconsumer writing the \"+3\" themselves would be writing a number that has to\nagree with a list they do not control.\n\n**Hidden, not removed.** Past `max`, the extra avatars stay in the DOM and\nstop being shown, so nothing re-renders when `max` changes and the accessible\nname can still be built from all of them. The count is what a sighted reader\ngets; the group's own name is what everyone else gets, and \"Seven people\" is\nmore useful than seven names read in a row.\n\n**And hidden by the stylesheet, not by this class.** It wrote `data-overflow`\nonto each avatar from `updated`, which is one update too late and one element\ntoo far out: Lit renders on a microtask, so an avatar appended past the limit\nwas laid out and painted before anything ran to hide it, and the group was\nwriting attributes onto markup a consumer owns to do it. Measured in Chrome\n148, appending two past `max=\"3\"` and reading before yielding: five `flex`,\nfolding to three on the next update. The styled tier now does it with\n`:host([max=\"N\"]) ::slotted(:nth-child(n + N+1))`, which is right at the\nfirst style resolution and writes nothing.\n\n**The fold is finite, and the count agrees with it.** `An+B` takes a literal,\nso there is one selector per value of `max` and the range stops at twelve.\nPast that the group shows everyone, counts nothing and says so, because\nshowing everyone is a defensible answer and showing everyone beside a \"+5\" is\nnot. `max` above twelve is a list the consumer should be slicing themselves.\n\n**It is a list.** A row of faces is a set of separate people, and a group\nwith no role announces as one run of text. `role=\"list\"` needs its children\nto be `listitem`, which they cannot be told to become without writing an\nattribute onto a consumer's element, so the group carries `role=\"group\"` and\nits name instead: one announcement, correct, and nothing written to anyone\nelse's markup.",
           "name": "HelixHeadlessAvatarGroup",
@@ -1470,7 +1479,7 @@
           "summary": "Overlapping avatars, with a count for the ones not shown.",
           "helix": {
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/avatar",
             "aliases": [
               "Avatar stack",
@@ -1487,6 +1496,14 @@
         }
       ],
       "exports": [
+        {
+          "kind": "js",
+          "name": "FOLDS_UP_TO",
+          "declaration": {
+            "name": "FOLDS_UP_TO",
+            "module": "src/avatar/group/avatar-group.ts"
+          }
+        },
         {
           "kind": "js",
           "name": "HelixHeadlessAvatarGroup",
@@ -1777,7 +1794,7 @@
           "helix": {
             "category": "media",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/avatar",
             "aliases": [
               "Profile picture",
@@ -46787,14 +46804,15 @@
               }
             },
             {
-              "kind": "field",
-              "name": "mark",
-              "type": {
-                "text": "TemplateResult"
+              "kind": "method",
+              "name": "renderMarker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
               },
-              "privacy": "private",
-              "description": "The mark this stage's state calls for.\n\n`complete` first, so a stage a reader has stepped back into keeps its check\nrather than losing it to the target: they did finish it, and the name and\nthe rule below still say which one is open.\n\n**Three shapes, and the reader can tell them apart with the color off.**\nAn outline circle for a stage nobody has reached, the same circle with a\ncenter for the one they are standing on, a bare check for one that is done.\nThe first two are one shape filling in, which is the progression, and the\ncheck is the only mark that leaves the family because finishing is the only\nstate that is not a position in the sequence.\n\nWhat went was the coin around the check: a filled disc carrying a check\nbeside a filled disc carrying a ring put two of the three inside the same\ncontainer, and left hue doing most of the work of telling them apart.\n\nThe bare check is `Timeline`'s, deliberately: the two components report the\nsame kind of thing, a sequence with marks down it, and a check floating on\na hairline in one beside a check inside a green coin in the other was two\nanswers to one question. Timeline's rings came off the same day.",
-              "readonly": true
+              "description": "The mark this stage's state calls for.\n\n`complete` first, so a stage a reader has stepped back into keeps its check\nrather than losing it to the target: they did finish it, and the name and\nthe rule below still say which one is open.\n\n**Three shapes, and the reader can tell them apart with the color off.**\nAn outline circle for a stage nobody has reached, the same circle with a\ncenter for the one they are standing on, a bare check for one that is done.\nThe first two are one shape filling in, which is the progression, and the\ncheck is the only mark that leaves the family because finishing is the only\nstate that is not a position in the sequence.\n\nWhat went was the coin around the check: a filled disc carrying a check\nbeside a filled disc carrying a ring put two of the three inside the same\ncontainer, and left hue doing most of the work of telling them apart.\n\nThe bare check is `Timeline`'s, deliberately: the two components report the\nsame kind of thing, a sequence with marks down it, and a check floating on\na hairline in one beside a check inside a green coin in the other was two\nanswers to one question. Timeline's rings came off the same day."
             },
             {
               "kind": "method",
@@ -54375,14 +54393,15 @@
               "reflects": true
             },
             {
-              "kind": "field",
-              "name": "dot",
-              "type": {
-                "text": "TemplateResult"
+              "kind": "method",
+              "name": "renderMarker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
               },
-              "privacy": "private",
-              "description": "The mark for an entry that slotted none, which the tone decides.\n\nToned entries are reporting something, so they take the circle with a\ncenter, which is `Steps` drawing the stage a reader is standing on. Untoned\nones are just things that happened and take the open circle, which is\n`Steps` drawing a stage nobody has reached. The same two glyphs in both\ncomponents rather than two that resemble each other: a shape drawn twice\ndrifts, and these are already the marks a reader has learned one page over.",
-              "readonly": true
+              "description": "The mark for an entry that slotted none, which the tone decides.\n\n**A `protected render…()` and not a getter, which is what it was.** A slot's\nfallback answers a consumer and a seam answers the tier above, and a getter\nanswers neither: `check:fallbacks` permits `${this.x}` because a property is\nnot markup a tier would redraw, and it tests for parentheses, so a getter\nreturning a template reads as a bare reference and was let through. That is\nthe same hole the check's own comment records closing for a static helper,\nreopened by a different spelling of the same thing.\n\nToned entries are reporting something, so they take the circle with a\ncenter, which is `Steps` drawing the stage a reader is standing on. Untoned\nones are just things that happened and take the open circle, which is\n`Steps` drawing a stage nobody has reached. The same two glyphs in both\ncomponents rather than two that resemble each other: a shape drawn twice\ndrifts, and these are already the marks a reader has learned one page over."
             },
             {
               "kind": "field",
@@ -54518,7 +54537,7 @@
           "helix": {
             "category": "data",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/timeline",
             "aliases": [
               "Activity item",
@@ -54705,7 +54724,7 @@
           "helix": {
             "category": "data",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/timeline",
             "aliases": [
               "Activity feed",

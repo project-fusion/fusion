@@ -2919,7 +2919,7 @@
           "summary": "Overlapping avatars, with a count for the ones not shown.",
           "helix": {
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/avatar",
             "aliases": [
               "Avatar stack",
@@ -3348,7 +3348,7 @@
           "helix": {
             "category": "media",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/avatar",
             "aliases": [
               "Profile picture",
@@ -63223,14 +63223,15 @@
               }
             },
             {
-              "kind": "field",
-              "name": "mark",
-              "type": {
-                "text": "TemplateResult"
+              "kind": "method",
+              "name": "renderMarker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
               },
-              "privacy": "private",
               "description": "The mark this stage's state calls for.\n\n`complete` first, so a stage a reader has stepped back into keeps its check\nrather than losing it to the target: they did finish it, and the name and\nthe rule below still say which one is open.\n\n**Three shapes, and the reader can tell them apart with the color off.**\nAn outline circle for a stage nobody has reached, the same circle with a\ncenter for the one they are standing on, a bare check for one that is done.\nThe first two are one shape filling in, which is the progression, and the\ncheck is the only mark that leaves the family because finishing is the only\nstate that is not a position in the sequence.\n\nWhat went was the coin around the check: a filled disc carrying a check\nbeside a filled disc carrying a ring put two of the three inside the same\ncontainer, and left hue doing most of the work of telling them apart.\n\nThe bare check is `Timeline`'s, deliberately: the two components report the\nsame kind of thing, a sequence with marks down it, and a check floating on\na hairline in one beside a check inside a green coin in the other was two\nanswers to one question. Timeline's rings came off the same day.",
-              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessStep",
                 "module": "src/steps/step/step.ts"
@@ -72643,14 +72644,15 @@
               }
             },
             {
-              "kind": "field",
-              "name": "dot",
-              "type": {
-                "text": "TemplateResult"
+              "kind": "method",
+              "name": "renderMarker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
               },
-              "privacy": "private",
-              "description": "The mark for an entry that slotted none, which the tone decides.\n\nToned entries are reporting something, so they take the circle with a\ncenter, which is `Steps` drawing the stage a reader is standing on. Untoned\nones are just things that happened and take the open circle, which is\n`Steps` drawing a stage nobody has reached. The same two glyphs in both\ncomponents rather than two that resemble each other: a shape drawn twice\ndrifts, and these are already the marks a reader has learned one page over.",
-              "readonly": true,
+              "description": "The mark for an entry that slotted none, which the tone decides.\n\n**A `protected render…()` and not a getter, which is what it was.** A slot's\nfallback answers a consumer and a seam answers the tier above, and a getter\nanswers neither: `check:fallbacks` permits `${this.x}` because a property is\nnot markup a tier would redraw, and it tests for parentheses, so a getter\nreturning a template reads as a bare reference and was let through. That is\nthe same hole the check's own comment records closing for a static helper,\nreopened by a different spelling of the same thing.\n\nToned entries are reporting something, so they take the circle with a\ncenter, which is `Steps` drawing the stage a reader is standing on. Untoned\nones are just things that happened and take the open circle, which is\n`Steps` drawing a stage nobody has reached. The same two glyphs in both\ncomponents rather than two that resemble each other: a shape drawn twice\ndrifts, and these are already the marks a reader has learned one page over.",
               "inheritedFrom": {
                 "name": "HelixHeadlessTimelineItem",
                 "module": "src/timeline/item/timeline-item.ts"
@@ -72771,7 +72773,7 @@
           "helix": {
             "category": "data",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/timeline",
             "aliases": [
               "Activity item",
@@ -73074,7 +73076,7 @@
           "helix": {
             "category": "data",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/timeline",
             "aliases": [
               "Activity feed",

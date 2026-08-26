@@ -1,9 +1,19 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, mount, part, registerDom } from '@helix-io/testing/dom'
 
+/** Read inside `beforeAll`, so it is a `let` rather than an import. */
+let FOLDS_UP_TO = 0
+
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  /* Imported here rather than at module scope, which is the same rule the
+     element import follows and for a worse reason than registration: a static
+     import of a library module runs before `registerDom`, and happy-dom then
+     throws out of its own HTML parser on the first `innerHTML`,
+     `undefined is not an object (evaluating 'attributes.getNamedItem')`, which
+     names neither the import nor the spec. */
+  ;({ FOLDS_UP_TO } = await import('@helix-io/headless/avatar'))
 })
 
 type Group = HTMLElement & {
@@ -131,3 +141,51 @@ if (hasLayout()) {
     })
   })
 }
+
+/**
+ * The one coupling in this family that no check holds and a reader cannot see.
+ *
+ * `An+B` takes a literal, so the fold is one selector per value of `max` and
+ * the range stops at `FOLDS_UP_TO`. The component counts against that constant
+ * and the stylesheet enumerates it, in two files, in two packages, with a
+ * comment in each saying the two have to agree.
+ *
+ * **The failure is silent and a reader sees it.** A missing rule for one value
+ * of `max` shows every avatar with a "+3" beside them: the count is right, the
+ * fold is not, and the layout looks deliberate. Only a `max` past the range
+ * warns, which is the case that already cannot go wrong.
+ *
+ * Asserted against the stylesheet's own text rather than against layout,
+ * because happy-dom has none and the claim is that the rule exists rather than
+ * that it applies.
+ */
+describe('the fold and the count agree about how far they go', () => {
+  const sheet = (): string => {
+    const held = (
+      customElements.get('helix-avatar-group') as unknown as {
+        styles: Array<{ cssText: string }> | { cssText: string }
+      }
+    ).styles
+    return (Array.isArray(held) ? held : [held]).map((one) => one.cssText).join('\n')
+  }
+
+  test('there is a rule for every value the component will count against', () => {
+    const text = sheet()
+    const missing: number[] = []
+    for (let max = 1; max <= FOLDS_UP_TO; max += 1) {
+      if (!text.includes(`[max="${max}"]`) || !text.includes(`nth-child(n + ${max + 1})`)) {
+        missing.push(max)
+      }
+    }
+    expect(missing).toEqual([])
+  })
+
+  /**
+   * And nothing past it, which is the other direction: a stylesheet that folds
+   * at a value the component refuses to count is a fold with no "+N" beside it,
+   * which reads as avatars that simply went missing.
+   */
+  test('and none past it', () => {
+    expect(sheet()).not.toContain(`[max="${FOLDS_UP_TO + 1}"]`)
+  })
+})

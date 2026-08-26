@@ -105,6 +105,11 @@ for (const tier of TIERS) {
       visibility: one[1],
     }))
 
+    /* Every name this file declares as a getter, which the exemption below
+       has to know about: a getter returning a template is markup wearing a
+       property's spelling. */
+    const getters = new Set([...text.matchAll(/\bget\s+(\w+)\s*\(/g)].map((one) => one[1]))
+
     for (const open of text.matchAll(/<slot\b/g)) {
       const end = tagEnd(text, open.index)
       if (end < 0) {
@@ -129,8 +134,23 @@ for (const tier of TIERS) {
          parentheses is the test, so `${this.label}` and `${this.label || x}`
          still pass and anything invoking something does not. */
       if (/^(\$\{[^{}()]*\}|\s)+$/.test(body)) {
-        bare += 1
-        continue
+        /* **A getter is not a property, which is the second spelling of the
+           same fault.** The paragraph above records `CopyButton` drawing its
+           marks through a static helper and being let through because the
+           expression looked bare. A `private get dot()` returning a template
+           looks barer still: `${this.dot}` has no parentheses at all to
+           notice. Two were live, `Steps` and `Timeline`, each drawing their
+           marker that way, so a tier wanting a different mark had to
+           reimplement the whole template to reach one element.
+      
+           So a name the file declares as a getter is markup until shown
+           otherwise. A real property keeps passing, which is the case the
+           exemption exists for. */
+        const named = [...body.matchAll(/\$\{\s*this\.(\w+)/g)].map((one) => one[1])
+        if (!named.some((name) => getters.has(name))) {
+          bare += 1
+          continue
+        }
       }
       let owner
       for (const one of methods) {
