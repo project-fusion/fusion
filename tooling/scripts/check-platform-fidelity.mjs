@@ -168,7 +168,17 @@ const TEMPORAL = [
 const COLOR = ['list', 'autocomplete', 'value', 'defaultValue']
 const FILE = ['accept', 'capture', 'multiple', 'required', 'files', 'value']
 
-/** The native element each family stands in for, and the scope to read of it. */
+/**
+ * The native element each family stands in for, and the scope to read of it.
+ *
+ * **`Radio` and `Toggle` are options rather than inputs, and mapping them at
+ * `HTMLInputElement` produced a false finding that nearly became a rename.**
+ * Both extend `HelixElement` and not `HelixFormElement`: the group owns the
+ * value and each one is a choice inside it, which is `<option>`'s shape and not
+ * `<input type="radio">`'s. So `selected` is the platform's word here, matching
+ * `<option selected>`, and `checked` would have been the divergence. A mapping
+ * is a claim about what a component *is*, and a wrong one reads as a finding.
+ */
 const NATIVE = {
   'helix-accordion-item': ['HTMLDetailsElement'],
   'helix-button': ['HTMLButtonElement'],
@@ -192,7 +202,7 @@ const NATIVE = {
   'helix-option': ['HTMLOptionElement'],
   'helix-pin-input': ['HTMLInputElement', TEXT],
   'helix-progress': ['HTMLProgressElement'],
-  'helix-radio': ['HTMLInputElement', CHECKED],
+  'helix-radio': ['HTMLOptionElement'],
   'helix-rating': ['HTMLInputElement', RANGE],
   'helix-select': ['HTMLSelectElement'],
   'helix-slider': ['HTMLInputElement', RANGE],
@@ -201,7 +211,7 @@ const NATIVE = {
   'helix-textarea': ['HTMLTextAreaElement'],
   'helix-time-input': ['HTMLInputElement', TEMPORAL],
   'helix-time-picker': ['HTMLInputElement', TEMPORAL],
-  'helix-toggle': ['HTMLInputElement', CHECKED],
+  'helix-toggle': ['HTMLOptionElement'],
   'helix-video': ['HTMLVideoElement', undefined, 'HTMLMediaElement'],
 }
 
@@ -295,7 +305,10 @@ const EXCUSED = {
     position: 'Derived from `value` and `max`, and readonly on the native element.',
   },
   'helix-radio': {
-    indeterminate: 'A radio is never indeterminate. The group owns which one is chosen.',
+    index: 'Derived from position among siblings, which the group owns.',
+    label:
+      'The visible text is slotted, so the component renders whatever is given rather than a string it holds.',
+    text: 'Slotted, as `label` is.',
   },
   'helix-select': {
     autocomplete:
@@ -309,7 +322,9 @@ const EXCUSED = {
       'Renders no control of its own, composing `helix-time-input`, which carries the property. Setting it here would be a second place to say one thing.',
   },
   'helix-toggle': {
-    indeterminate: 'Renders `<button role="radio">`, and a radio is never indeterminate.',
+    index: 'Derived from position among siblings, which the group owns.',
+    label: 'The visible text is slotted, as it is on `helix-radio`.',
+    text: 'Slotted, as `label` is.',
   },
   'helix-video': {
     onencrypted: 'Encrypted Media Extensions, which this component does not implement.',
@@ -380,6 +395,7 @@ const VALUE_EVENTS = ['change', 'input']
 const EXPECTED_EVENTS = {
   'helix-accordion-item': ['toggle'],
   'helix-checkbox': VALUE_EVENTS,
+  'helix-checkbox-group': VALUE_EVENTS,
   'helix-color-input': VALUE_EVENTS,
   'helix-color-picker': VALUE_EVENTS,
   'helix-combobox': VALUE_EVENTS,
@@ -393,7 +409,7 @@ const EXPECTED_EVENTS = {
   'helix-listbox': VALUE_EVENTS,
   'helix-number-input': VALUE_EVENTS,
   'helix-pin-input': VALUE_EVENTS,
-  'helix-radio': VALUE_EVENTS,
+  'helix-radio-group': VALUE_EVENTS,
   'helix-rating': VALUE_EVENTS,
   'helix-select': VALUE_EVENTS,
   'helix-slider': VALUE_EVENTS,
@@ -401,7 +417,7 @@ const EXPECTED_EVENTS = {
   'helix-textarea': VALUE_EVENTS,
   'helix-time-input': VALUE_EVENTS,
   'helix-time-picker': VALUE_EVENTS,
-  'helix-toggle': VALUE_EVENTS,
+  'helix-toggle-group': VALUE_EVENTS,
   'helix-video': ['ended', 'pause', 'play'],
 }
 
