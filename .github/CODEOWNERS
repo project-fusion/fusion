@@ -7,18 +7,40 @@
 # Two things still have to be set in the GitHub UI, because a file in the repo
 # cannot grant itself authority:
 #
-#   Settings > Branches > main: require a pull request, require review from
-#   Code Owners, require the `verify` and `browser-specs` checks, and do not
-#   allow bypassing. Nothing in CI pushes to `main`, by design, so there is no
-#   bot that needs an exemption.
+#   Settings > Branches > main: require a pull request, require the `verify`
+#   check, and refuse force pushes and deletion. Nothing in CI pushes to `main`,
+#   by design, so there is no bot that needs an exemption.
 #
 #   Settings > Environments > experimental: required reviewers. That is the
 #   gate on publishing from a pull request, and it is the one that works for
 #   forks, where a workflow gets no secrets and a label proves nothing.
 #
+# **Two of those have moved since this was written, and both are worth knowing
+# before anyone sets them.**
+#
+# This file used to name `verify` and `browser-specs` as the checks to require.
+# A branch rule matches a *job* name and not a workflow name, and 274 sharded
+# `verify.yml` into `plan`, `checks (0)` through `checks (5)`, `lint`, `types`,
+# `tests` and four `browser` entries, so neither name existed any more and
+# requiring either would have blocked every pull request on a check that never
+# reports. `verify.yml` now ends in an aggregation job called `verify` that
+# needs all of them: one context to require, immune to a shard count or a
+# renamed script, and it is why the line above is true again.
+#
+# Required reviewers on an environment returned HTTP 422 on 26 Aug 2026,
+# *"ensure the billing plan supports the required reviewers protection rule"*,
+# against an organization on the Team plan. The setting is available once the
+# repository is public, which 272 is about, so this closes with that flip rather
+# than before it. Until then `release-experimental.yml` describes an approval
+# that nothing enforces, and that is the state, not an oversight.
+#
 # Today this is one person, and naming that plainly is better than a team that
-# does not exist yet. Replace with @project-fusion/governance when there is
-# someone else in it.
+# does not exist yet. **Required review is therefore off rather than on**:
+# GitHub does not let an author approve their own pull request, so requiring one
+# with a single code owner makes `main` unmergeable except by admin bypass,
+# which is a gate that exists only by being ignored. Required approvals go to 1
+# and `require_code_owner_reviews` goes on the day there is a second person.
+# Replace the owner with @project-fusion/governance then too.
 
 * @irontitan76
 

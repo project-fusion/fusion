@@ -222,7 +222,7 @@ jobs:
           # lays out to nothing.
           - task: smoke
             run: bun run smoke
-          # Every headless example, pixel for pixel against a committed
+          # Every example in both tiers, pixel for pixel against a committed
           # baseline. This is the one fault class the rest of `verify` cannot
           # reach: everything else reads source or asserts a fact somebody
           # thought to assert, and a chevron drawn at 233 pixels breaks nothing
@@ -268,9 +268,51 @@ jobs:
       # each baseline and those files die with the runner, so a reviewer got a
       # pixel count and no way to see what moved. `if-no-files-found: ignore`
       # because only the visual shard ever writes one.
+      #
+      # **Four globs, and it was one for longer than it was correct.** A diff
+      # lands beside the baseline it belongs to, so the tier decides the package
+      # and the width decides the name: `preview.diff.png` at 640 and
+      # `preview.narrow.diff.png` at 390. Naming only the wide headless one
+      # collected a quarter of what a failing run can write, and silently, since
+      # `if-no-files-found: ignore` is exactly the setting that cannot say a
+      # glob matched nothing.
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: ignore
           name: visual-diffs-${{ matrix.task }}
-          path: helix/headless/src/*/.examples/preview.diff.png
+          path: |
+            helix/headless/src/*/.examples/preview.diff.png
+            helix/headless/src/*/.examples/preview.narrow.diff.png
+            helix/styled/src/*/.examples/preview.diff.png
+            helix/styled/src/*/.examples/preview.narrow.diff.png
+
+  # **One context to require, because the job names are not stable enough to
+  # require directly.** A branch protection rule matches a job name, and this
+  # workflow's are `checks (0)` through `checks (5)` and
+  # `browser (smoke, bun run smoke)`: the shard count is an argument and the
+  # matrix label carries the command, so renaming a script or changing `--of 6`
+  # silently un-requires whatever was named. Naming this one job instead means
+  # the rule keeps holding, and a job added to `needs` is covered without anyone
+  # touching the branch settings.
+  #
+  # It also makes `.github/CODEOWNERS` true rather than editing it. That file
+  # says to require `verify` and `browser-specs`, which were the job names
+  # before 274 sharded this workflow and are now neither of them; requiring
+  # either would have blocked every pull request on a check that never reports.
+  #
+  # **`needs` alone is not enough.** A needed job that fails skips this one, and
+  # a skipped required check is not a failing one, so the rule would pass on a
+  # red run. `always()` makes it run regardless and the result expression is
+  # what fails it.
+  verify:
+    if: always()
+    needs: [plan, checks, lint, types, tests, browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "::error::A job in this workflow did not pass."
+          exit 1
+      - run: echo "Every job in this workflow passed."

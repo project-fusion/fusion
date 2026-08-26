@@ -1,0 +1,37 @@
+body:
+  - attributes:
+      value:
+        A proposal usually belongs in `docs/19-queue.md` rather than here, since
+        that is where the reasoning survives next to the code. Open this if you
+        would rather discuss it before writing a row.
+    type: markdown
+  - attributes:
+      description:
+        The problem, not the solution. What is hard to do today, and what you
+        did instead.
+      label: What is missing
+    id: problem
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description:
+        What you would build, if you have a shape in mind. It is fine not to.
+      label: What you would do about it
+    id: proposal
+    type: textarea
+    validations:
+      required: false
+  - attributes:
+      description:
+        What you tried first, and why it was not enough. A proposal that has not
+        ruled out the existing surface is usually a documentation gap.
+      label: What you tried instead
+    id: alternatives
+    type: textarea
+    validations:
+      required: true
+description: Something is missing, or is harder than it should be.
+labels: [proposal]
+name: Proposal
+title: "[proposal] "
