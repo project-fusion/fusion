@@ -46,7 +46,20 @@
       //
       // A tracked source is never a task output. `files` still publishes
       // `wasm`, `check:wasm` still measures it, and nothing builds it here.
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      //
+      // **`public/sandbox` and `public/specs` are outputs and were not declared,
+      // which is the mirror of the `wasm` fault and cost four CI jobs.** The
+      // site's build is `catalog && frame && specs && next build`, so a cache hit
+      // skips all four and restores only what is listed: `.next` came back,
+      // `frame.html` did not, and both directories are gitignored so nothing else
+      // could put them there. Every browser job then failed one second in with
+      // `Cannot read properties of null (reading 'querySelectorAll')`, because
+      // `preview-root` lives in the frame that was never written. Red since the
+      // remote cache started hitting, and never for a reason in the code.
+      //
+      // The `wasm` lesson was that a tracked file must not be declared. This is
+      // the other half: a generated file that nothing tracks must be.
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/sandbox/**", "public/specs/**"]
     },
     // The fourth layer is `helix/styled/elements.css` and it was not in `inputs`,
     // so editing any component stylesheet did not invalidate this. `dependsOn`
@@ -64,7 +77,7 @@
         "$TURBO_ROOT$/helix/docs/src/naming.ts",
         "$TURBO_ROOT$/helix/docs/content/**",
         "$TURBO_ROOT$/helix/docs/src/reference.ts",
-        "lib/routes.ts",
+        "content/routes/routes.ts",
         "$TURBO_ROOT$/helix/headless/custom-elements.json",
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/custom-elements.json",
@@ -72,7 +85,7 @@
         "$TURBO_ROOT$/tooling/scripts/build-catalog.mjs"
       ],
       "outputs": [
-        "lib/catalog.generated.json",
+        "content/catalog/catalog.generated.json",
         "public/*.md",
         "public/helix/components/**",
         "public/helix/docs/**"
@@ -85,9 +98,9 @@
     "frame": {
       "dependsOn": ["^build"],
       "inputs": [
-        "lib/preview-frame-entry.ts",
-        "lib/preview-frame.css",
-        "app/fonts/**",
+        "preview/preview-frame-entry.ts",
+        "preview/preview-frame.css",
+        "public/fonts/**",
         "$TURBO_ROOT$/helix/styles/src/*.css",
         "$TURBO_ROOT$/helix/styled/elements.css",
         "$TURBO_ROOT$/tooling/scripts/build-frame.mjs"
