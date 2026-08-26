@@ -2265,6 +2265,28 @@
         },
         {
           "kind": "class",
+          "description": "Fired when the reader offers something they wrote.\n\n**Cancelable, and the composer clears only when nobody refused.** Sending is a\nround trip: a composer that empties itself and then hears the request failed\nhas thrown away the only copy of what the reader typed, and a reader who has\njust written three paragraphs is exactly who cannot afford that. Refusing\nleaves the text where it is.\n\nNot `helix-create`, which is the combobox's event for a value a list does not\nhold, and not `helix-change`, because nothing about a value changed: the\nreader finished something and handed it over.",
+          "name": "HelixSendEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-send'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "Fired when something a user comes back to is marked read, or unread.\n\n**Read state is reported rather than owned.** Marking a notification read is\nusually a round trip, and a component that flips the state itself and then\nhears the request failed has already told the reader something untrue. So this\nis cancelable, and refusing it leaves the item alone; a component left\nuncontrolled applies it once nobody has refused, which is the same contract\nevery other axis in the library uses.\n\nBubbles and is composed, so a feed hears its own items: one handler on the\nlist serves every notification in it, which is what a consumer syncing to a\nserver actually wants.",
           "name": "HelixReadEvent",
           "members": [
@@ -2541,6 +2563,14 @@
           "name": "HelixCompleteEvent",
           "declaration": {
             "name": "HelixCompleteEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSendEvent",
+          "declaration": {
+            "name": "HelixSendEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -3499,6 +3529,14 @@
         },
         {
           "kind": "js",
+          "name": "HelixSendEvent",
+          "declaration": {
+            "name": "HelixSendEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixShortcutEvent",
           "declaration": {
             "name": "HelixShortcutEvent",
@@ -3574,6 +3612,14 @@
           "name": "SelectDetail",
           "declaration": {
             "name": "SelectDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SendDetail",
+          "declaration": {
+            "name": "SendDetail",
             "module": "./events/events.js"
           }
         },

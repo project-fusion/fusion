@@ -71,6 +71,25 @@ describe('the count', () => {
     expect(element.unread).toBe(2)
   })
 
+  /**
+   * **The bug this replaced.** `@property({ reflect: true })` on a getter with
+   * no setter reflects once, because nothing puts a derived getter into
+   * `changedProperties` after the first update. Measured before the fix: the
+   * property answered 1 and the attribute still said 2, so a badge reading the
+   * attribute showed a count for an item the reader had just opened.
+   */
+  test('the attribute follows too, rather than being right once', async () => {
+    const element = await feed()
+    expect(element.getAttribute('unread')).toBe('2')
+    element.items[0]?.markRead(true)
+    await element.updateComplete
+    await new Promise((done) => {
+      queueMicrotask(() => done(undefined))
+    })
+    await element.updateComplete
+    expect(element.getAttribute('unread')).toBe('1')
+  })
+
   test('it follows an item being marked read', async () => {
     const element = await feed()
     element.items[0]?.markRead(true)

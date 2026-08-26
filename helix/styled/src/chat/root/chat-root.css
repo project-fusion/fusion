@@ -1,0 +1,86 @@
+/* Three rows: header, the transcript that scrolls, and everything under it. The
+   transcript scrolls and nothing else does, because a composer that slides away
+   as the reader scrolls up to re-read is the thing they were about to type into. */
+:host {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  max-block-size: var(--chat-max-height, none);
+  min-block-size: 0;
+}
+
+[part="log"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chat-gap, var(--helix-space-md));
+  overflow-y: auto;
+  padding-block: var(--helix-space-md);
+  padding-inline: var(--chat-padding-inline, var(--helix-space-md));
+  /* The transcript keeps its turns at the bottom when there are too few to fill
+     it, which is what a conversation looks like: a new one starts at the bottom
+     of the box rather than at the top of an empty column. */
+  justify-content: flex-end;
+}
+
+[part="header"]:not(:has(> slot:has(*))),
+[part="status"]:not(:has(> slot:has(*))),
+[part="composer"]:not(:has(> slot:has(*))) {
+  display: none;
+}
+
+[part="header"] {
+  border-block-end: var(--helix-border-thin) solid var(--chat-rule, var(--helix-color-border));
+  padding-block: var(--helix-space-sm);
+  padding-inline: var(--chat-padding-inline, var(--helix-space-md));
+}
+
+/* The way back sits over the transcript rather than in the column, so offering
+   it does not move what the reader is reading. That is the whole point of it. */
+[part="resume"] {
+  display: grid;
+  justify-items: center;
+  margin-block-start: calc(var(--helix-space-xl) * -1);
+  pointer-events: none;
+  position: relative;
+}
+
+[part="resume"] > * {
+  pointer-events: auto;
+}
+
+[part="status"] {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  padding-inline: var(--chat-padding-inline, var(--helix-space-md));
+}
+
+[part="composer"] {
+  border-block-start: var(--helix-border-thin) solid var(--chat-rule, var(--helix-color-border));
+  padding-block: var(--helix-space-sm);
+  padding-inline: var(--chat-padding-inline, var(--helix-space-md));
+}
+
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  padding-block: var(--helix-space-lg);
+  text-align: center;
+}
+
+@media print {
+  :host {
+    max-block-size: none;
+  }
+
+  [part="log"] {
+    overflow-y: visible;
+  }
+
+  [part="composer"],
+  [part="resume"] {
+    display: none;
+  }
+}

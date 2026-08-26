@@ -910,6 +910,205 @@ which is what a run of cards wants rather than a run of full-width panels.
 | `--carousel-bleed` | Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. |
 | `--carousel-gap` | Space between slides. |
 
+## Chat
+
+### Root (`helix-chat`)
+
+A conversation: the turns, and where the reader is in them.
+
+Extends `HelixHeadlessChat`.
+
+Three regions stacked, and only the transcript scrolls: a composer that slid
+away as the reader scrolled up to re-read would be the thing they were about
+to type into.
+
+**The transcript keeps its turns at the bottom when there are too few to fill
+it**, which is what a conversation looks like. A new one starting at the top
+of an empty column reads as a document.
+
+The way back sits over the transcript rather than in the column, so offering
+it does not move what the reader is reading, which is the whole point of
+offering it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultPinned` | `default-pinned` | `boolean` | `true` | `HelixHeadlessChat` | Whether to open pinned, where nothing declared it. |
+| `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessChat` | Accessible name for the conversation. |
+| `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
+| `messages` | - | `HelixHeadlessChatMessage[]` | - | `HelixHeadlessChat` | The turns declared as children, in the order they are written. |
+| `pinned` | `pinned` | `boolean` | - | `HelixHeadlessChat` | Whether the transcript follows new turns to the bottom. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }` | `HelixHeadlessChat` | Nothing is assigned by name, so the turns land in the log and the rest does not. |
+| `threshold` | `threshold` | `number` | `48` | `HelixHeadlessChat` | How near the bottom still counts as being at it, in pixels. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `resume()` | `HelixHeadlessChat` | Puts the transcript back at its most recent turn. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the reader pins or unpins the transcript by scrolling. Cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The turns, as `helix-chat-message` children. |
+| `header` | Above the transcript. |
+| `composer` | Below the transcript, where the reader writes. |
+| `status` | Beside the composer: somebody typing, connection lost. |
+| `resume` | The way back to the bottom. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `log` | The transcript, which is the thing that scrolls. |
+| `composer` | The region the composer sits in. |
+| `header` | The region above the transcript. |
+| `resume` | The affordance offered while the reader is away from the bottom. |
+| `status` | The status region, which is not part of the log. |
+| `empty` | Shown when the conversation has no turns. |
+| `loading` | Shown while the history is still on its way. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--chat-max-height` | How tall the conversation may get before the transcript scrolls. |
+| `--chat-gap` | Space between turns. |
+| `--chat-rule` | The hairline above the composer and under the header. |
+| `--chat-padding-inline` | Space either side of every region. |
+
+### Composer (`helix-chat-composer`)
+
+Where the reader writes their turn.
+
+Extends `HelixHeadlessChatComposer`.
+
+One row, and the field takes the room. **It grows with the text and stops at a
+ceiling**, through `field-sizing: content` rather than a script measuring
+anything: where that is not supported the field keeps its rows and scrolls,
+which is the answer a textarea has always given. A composer that grows without
+a ceiling eats the transcript it belongs to.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessChatComposer` | Whether the composer refuses input, while a turn is in flight say. |
+| `label` | `label` | `string` | `'Message'` | `HelixHeadlessChatComposer` | Accessible name for the field. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessChatComposer` | Shown in an empty field. |
+| `rows` | `rows` | `number` | `1` | `HelixHeadlessChatComposer` | How many rows the field opens at. It grows from there. |
+| `sendLabel` | `send-label` | `string` | `'Send'` | `HelixHeadlessChatComposer` | Label for the control that sends. |
+| `submitOn` | `submit-on` | `'button' \| 'enter'` | `'enter'` | `HelixHeadlessChatComposer` | What sends: pressing Enter, or only the control. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessChatComposer` | What the reader has written. Read it, or set it to seed a draft. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `send()` | `HelixHeadlessChatComposer` | Offers what is written, and reports whether it stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-send` | `HelixSendEvent` | Fired when the reader offers their turn, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `start` | Before the field: attachments, a model picker. |
+| `end` | After the field, beside the send control. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The text field. |
+| `send` | The control that offers the turn. |
+| `composer` | The whole row. |
+| `start` | The leading slot's box. |
+| `end` | The trailing slot's box. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--chat-composer-background` | Fill behind the field. |
+| `--chat-composer-max-height` | How tall the field may grow. |
+
+### Message (`helix-chat-message`)
+
+One turn in a conversation, and what has happened to it.
+
+Extends `HelixHeadlessChatMessage`.
+
+**`author="me"` is the one piece of paint that says whose turn it is**, and it
+says it by which edge the turn sits against. Everything else about a turn is
+the same on both sides, because two bubble styles is two components.
+
+A failure is the only state that takes a tone, because it is the one a reader
+has to find rather than notice. `streaming` is left alone: the text arriving
+is the signal, and decorating it competes with the thing it is decorating.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `at` | `at` | `string` | `''` | `HelixHeadlessChatMessage` | When it was said, as anything `Date` parses. |
+| `author` | `author` | `string` | `''` | `HelixHeadlessChatMessage` | Who said it. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessChatMessage` | Locale for the timestamp. Empty is the runtime's own. |
+| `retryLabel` | `retry-label` | `string` | `'Try again'` | `HelixHeadlessChatMessage` | Label for the control offered on a failed message. |
+| `sendingLabel` | `sending-label` | `string` | `'Sending'` | `HelixHeadlessChatMessage` | What to call each state, for a reader who cannot see it. |
+| `state` | `state` | `'' \| 'failed' \| 'sending' \| 'sent' \| 'streaming'` | `''` | `HelixHeadlessChatMessage` | What has happened to it. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-send` | `HelixSendEvent` | Fired when the reader asks to send a failed message again, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | What was said. |
+| `avatar` | Who said it. |
+| `actions` | What can be done with it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `content` | What was said. |
+| `meta` | The time and the state together. |
+| `message` | The whole turn. |
+| `avatar` | The leading slot's box. |
+| `body` | What was said, and the line under it. |
+| `time` | When it was said. |
+| `state` | What has happened to it, where that is worth saying. |
+| `retry` | The control offered on a failed message. |
+| `actions` | The trailing slot's box. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--chat-message-background` | Fill behind a turn. |
+| `--chat-message-background-me` | Fill behind the reader's own turns. |
+| `--chat-message-color` | Ink in a turn. |
+| `--chat-message-measure` | How wide a turn may get before it wraps. |
+
 ## Checkbox
 
 ### Root (`helix-checkbox`)
@@ -3549,7 +3748,7 @@ holds thousands wants `helix-data-table` with a custom cell.
 | `markAll` | `mark-all` | `boolean` | `false` | `HelixHeadlessNotifications` | Whether to draw a control that marks everything read. |
 | `markAllLabel` | `mark-all-label` | `string` | `'Mark all as read'` | `HelixHeadlessNotifications` | Label for that control. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }` | `HelixHeadlessNotifications` | Nothing is assigned by name, so the items land in a list and the rest does not. |
-| `unread` | `unread` | `number` | - | `HelixHeadlessNotifications` | How many items are unread, counted from the items themselves. |
+| `unread` | - | `number` | - | `HelixHeadlessNotifications` | How many items are unread, counted from the items themselves. |
 
 #### Methods
 

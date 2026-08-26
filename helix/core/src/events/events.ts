@@ -168,6 +168,12 @@ export interface ReadDetail {
   read: boolean
 }
 
+/** Detail carried by `helix-send`. */
+export interface SendDetail {
+  /** What the reader wrote, as they left it. */
+  value: string
+}
+
 /** Detail carried by `helix-sort`. */
 export interface SortDetail {
   /**
@@ -732,6 +738,32 @@ export class HelixCompleteEvent extends CustomEvent<CompleteDetail> {
 }
 
 /**
+ * Fired when the reader offers something they wrote.
+ *
+ * **Cancelable, and the composer clears only when nobody refused.** Sending is a
+ * round trip: a composer that empties itself and then hears the request failed
+ * has thrown away the only copy of what the reader typed, and a reader who has
+ * just written three paragraphs is exactly who cannot afford that. Refusing
+ * leaves the text where it is.
+ *
+ * Not `helix-create`, which is the combobox's event for a value a list does not
+ * hold, and not `helix-change`, because nothing about a value changed: the
+ * reader finished something and handed it over.
+ */
+export class HelixSendEvent extends CustomEvent<SendDetail> {
+  static readonly eventName = 'helix-send'
+
+  constructor(detail: SendDetail) {
+    super(HelixSendEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
  * Fired when something a user comes back to is marked read, or unread.
  *
  * **Read state is reported rather than owned.** Marking a notification read is
@@ -893,6 +925,7 @@ const registry = {
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixSelectEvent,
+  HelixSendEvent,
   HelixShortcutEvent,
   HelixSortEvent,
   HelixToggleEvent,

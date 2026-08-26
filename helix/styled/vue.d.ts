@@ -16,6 +16,9 @@ import type {
   HelixCallout,
   HelixCard,
   HelixCarousel,
+  HelixChatComposer,
+  HelixChatMessage,
+  HelixChat,
   HelixCheckboxGroup,
   HelixCheckbox,
   HelixCodeBlock,
@@ -125,6 +128,7 @@ import type {
   HelixCloseEvent,
   HelixDismissEvent,
   HelixSelectEvent,
+  HelixSendEvent,
   HelixChangeEvent,
   HelixToggleEvent,
   HelixSampleEndEvent,
@@ -1336,6 +1340,150 @@ case is the absent attribute, and the styles read it that way. */
 export type HelixCarouselVueEvents = {
   /** Fired when the slide in view changes, with its index. */
   "helix-select": HelixCarouselHelixSelectElementEvent;
+};
+
+/** `HelixChatComposer` component event */
+export type HelixChatComposerElementEvent<E = Event> = TypedEvent<
+  HelixChatComposer,
+  E
+>;
+/** `helix-send` event type */
+export type HelixChatComposerHelixSendElementEvent =
+  HelixChatComposerElementEvent<HelixSendEvent>;
+
+export type HelixChatComposerVueProps = {
+  /** What the reader has written. Read it, or set it to seed a draft. */
+  value?: HelixChatComposer["value"];
+  /** Shown in an empty field. */
+  placeholder?: HelixChatComposer["placeholder"];
+  /** What sends: pressing Enter, or only the control.
+
+`enter` is the messaging convention and makes Shift+Enter the line break.
+`button` is what a composer holding several paragraphs wants, where Enter
+has to mean a new line and nothing else. */
+  "submit-on"?: HelixChatComposer["submitOn"];
+  /** What sends: pressing Enter, or only the control.
+
+`enter` is the messaging convention and makes Shift+Enter the line break.
+`button` is what a composer holding several paragraphs wants, where Enter
+has to mean a new line and nothing else. */
+  submitOn?: HelixChatComposer["submitOn"];
+  /** Whether the composer refuses input, while a turn is in flight say. */
+  disabled?: HelixChatComposer["disabled"];
+  /** Accessible name for the field. */
+  label?: HelixChatComposer["label"];
+  /** Label for the control that sends. */
+  "send-label"?: HelixChatComposer["sendLabel"];
+  /** Label for the control that sends. */
+  sendLabel?: HelixChatComposer["sendLabel"];
+  /** How many rows the field opens at. It grows from there. */
+  rows?: HelixChatComposer["rows"];
+};
+
+export type HelixChatComposerVueEvents = {
+  /** Fired when the reader offers their turn, and cancelable. */
+  "helix-send": HelixChatComposerHelixSendElementEvent;
+};
+
+/** `HelixChatMessage` component event */
+export type HelixChatMessageElementEvent<E = Event> = TypedEvent<
+  HelixChatMessage,
+  E
+>;
+/** `helix-send` event type */
+export type HelixChatMessageHelixSendElementEvent =
+  HelixChatMessageElementEvent<HelixSendEvent>;
+
+export type HelixChatMessageVueProps = {
+  /** Who said it.
+
+Free text rather than a two-value union, because a conversation is not
+always two-sided: a transcript with a system turn, a tool call and three
+participants is the ordinary case for anything worth building this for.
+`me` and `them` are the conventional values and the stylesheet knows them;
+anything else is a name the consumer styles. */
+  author?: HelixChatMessage["author"];
+  /** What has happened to it.
+
+Reflected, because every one of the four is a visual state and a stylesheet
+has no other way to know. Empty is a settled message with nothing to report,
+which is what most of a transcript is. */
+  state?: HelixChatMessage["state"];
+  /** When it was said, as anything `Date` parses. */
+  at?: HelixChatMessage["at"];
+  /** Locale for the timestamp. Empty is the runtime's own. */
+  locale?: HelixChatMessage["locale"];
+  /** What to call each state, for a reader who cannot see it. */
+  "sending-label"?: HelixChatMessage["sendingLabel"];
+  /** What to call each state, for a reader who cannot see it. */
+  sendingLabel?: HelixChatMessage["sendingLabel"];
+  /** Label for the control offered on a failed message. */
+  "retry-label"?: HelixChatMessage["retryLabel"];
+  /** Label for the control offered on a failed message. */
+  retryLabel?: HelixChatMessage["retryLabel"];
+};
+
+export type HelixChatMessageVueEvents = {
+  /** Fired when the reader asks to send a failed message again, and cancelable. */
+  "helix-send": HelixChatMessageHelixSendElementEvent;
+};
+
+/** `HelixChat` component event */
+export type HelixChatElementEvent<E = Event> = TypedEvent<HelixChat, E>;
+/** `helix-change` event type */
+export type HelixChatHelixChangeElementEvent =
+  HelixChatElementEvent<HelixChangeEvent>;
+
+export type HelixChatVueProps = {
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixChat["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixChat["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixChat["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixChat["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixChat["emptyText"];
+  /** Accessible name for the conversation. */
+  label?: HelixChat["label"];
+  /** How near the bottom still counts as being at it, in pixels.
+
+A hook rather than a constant, because the right number depends on how tall
+a turn is: a transcript of one-line replies wants a smaller threshold than
+one of paragraphs, and a reader who has scrolled up by half a message has
+not left. */
+  threshold?: HelixChat["threshold"];
+  /** Whether the transcript follows new turns to the bottom.
+
+Set it and this element defers: the reader's scrolling fires `helix-change`
+and moves nothing until a new value arrives. `default-pinned` seeds a state
+this element then owns, and it defaults to pinned because a conversation
+opens at its most recent turn.
+
+**Not reflected, and the default is why.** A reflected property that
+defaults to true writes its attribute on upgrade whether or not the
+consumer wrote one, so the server serves `<helix-chat label="x">` and the
+client turns it into `<helix-chat label="x" pinned>`: a hydration mismatch a
+React consumer reports and does not patch up. Nothing needs the attribute
+either, because the one thing that changes with the pin is the way back, and
+that is a part inside the shadow tree where a stylesheet can already reach
+it. Measured rather than assumed: `label, pinned` after upgrade against
+`label` from the server. */
+  pinned?: HelixChat["pinned"];
+  /** Whether to open pinned, where nothing declared it. */
+  "default-pinned"?: HelixChat["defaultPinned"];
+  /** Whether to open pinned, where nothing declared it. */
+  defaultPinned?: HelixChat["defaultPinned"];
+};
+
+export type HelixChatVueEvents = {
+  /** Fired when the reader pins or unpins the transcript by scrolling. Cancelable. */
+  "helix-change": HelixChatHelixChangeElementEvent;
 };
 
 /** `HelixCheckboxGroup` component event */
@@ -4371,13 +4519,6 @@ say that without the component knowing what a row looks like. */
   "mark-all-label"?: HelixNotifications["markAllLabel"];
   /** Label for that control. */
   markAllLabel?: HelixNotifications["markAllLabel"];
-  /** How many items are unread, counted from the items themselves.
-
-Reflected so a stylesheet can answer it, and read-only for the reason it is
-derived: a count the consumer could set is a second source of truth for
-something the items already know, and the first time the two disagreed the
-badge would be right and the list would not. */
-  unread?: HelixNotifications["unread"];
 };
 
 export type HelixNotificationsVueEvents = {
@@ -8342,6 +8483,26 @@ export type CustomCssProperties = {
   "--carousel-bleed"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
+  /** Fill behind the field. */
+  "--chat-composer-background"?: string;
+  /** How tall the field may grow. */
+  "--chat-composer-max-height"?: string;
+  /** Fill behind a turn. */
+  "--chat-message-background"?: string;
+  /** Fill behind the reader's own turns. */
+  "--chat-message-background-me"?: string;
+  /** Ink in a turn. */
+  "--chat-message-color"?: string;
+  /** How wide a turn may get before it wraps. */
+  "--chat-message-measure"?: string;
+  /** How tall the conversation may get before the transcript scrolls. */
+  "--chat-max-height"?: string;
+  /** Space between turns. */
+  "--chat-gap"?: string;
+  /** The hairline above the composer and under the header. */
+  "--chat-rule"?: string;
+  /** Space either side of every region. */
+  "--chat-padding-inline"?: string;
   /** Space between the boxes. */
   "--checkbox-group-gap"?: string;
   /** Width and height of the box. */
@@ -9143,6 +9304,24 @@ export interface WcToolkitVueGlobalComponents {
     HelixCarousel,
     HelixCarouselVueProps,
     HelixCarouselVueEvents
+  >;
+  /** One row, and the field takes the room. **It grows with the text and stops at a ceiling**, through 'field-sizing: content' rather than a script measuring anything: where that is not supported the field keeps its rows and scrolls, which is the answer a textarea has always given. A composer that grows without a ceiling eats the transcript it belongs to. */
+  "helix-chat-composer": DefineCustomElement<
+    HelixChatComposer,
+    HelixChatComposerVueProps,
+    HelixChatComposerVueEvents
+  >;
+  /** **'author="me"' is the one piece of paint that says whose turn it is**, and it says it by which edge the turn sits against. Everything else about a turn is the same on both sides, because two bubble styles is two components.  A failure is the only state that takes a tone, because it is the one a reader has to find rather than notice. 'streaming' is left alone: the text arriving is the signal, and decorating it competes with the thing it is decorating. */
+  "helix-chat-message": DefineCustomElement<
+    HelixChatMessage,
+    HelixChatMessageVueProps,
+    HelixChatMessageVueEvents
+  >;
+  /** Three regions stacked, and only the transcript scrolls: a composer that slid away as the reader scrolled up to re-read would be the thing they were about to type into.  **The transcript keeps its turns at the bottom when there are too few to fill it**, which is what a conversation looks like. A new one starting at the top of an empty column reads as a document.  The way back sits over the transcript rather than in the column, so offering it does not move what the reader is reading, which is the whole point of offering it. */
+  "helix-chat": DefineCustomElement<
+    HelixChat,
+    HelixChatVueProps,
+    HelixChatVueEvents
   >;
   /** A column by default, which is what a list of choices wants: the eye scans one line per answer rather than hunting along a row. */
   "helix-checkbox-group": DefineCustomElement<

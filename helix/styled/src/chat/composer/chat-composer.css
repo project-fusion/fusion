@@ -1,0 +1,68 @@
+/* One row: what comes before the field, the field, what comes after, and send.
+   The field takes the room and grows down to a ceiling, because a composer that
+   grows without one eats the transcript it belongs to. */
+:host {
+  display: block;
+}
+
+[part="composer"] {
+  align-items: end;
+  display: grid;
+  gap: var(--helix-space-2xs);
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+}
+
+[part="start"]:not(:has(*)),
+[part="end"]:not(:has(*)) {
+  display: none;
+}
+
+[part="field"] {
+  background-color: var(--chat-composer-background, var(--helix-color-surface));
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-foreground);
+  /* `field-sizing` grows the box with the text and stops at the ceiling, which
+     is the whole of the auto-grow behavior with no script measuring anything.
+     Where it is not supported the field keeps its rows and scrolls, which is
+     the same answer a textarea has always given. */
+  field-sizing: content;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-normal);
+  max-block-size: var(--chat-composer-max-height, 12rem);
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-sm);
+  resize: none;
+}
+
+[part="field"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="send"] {
+  background-color: var(--helix-color-accent-surface);
+  border: 0;
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-foreground-on-accent);
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+[part="send"]:hover:not(:disabled) {
+  background-color: var(--helix-color-accent-surface-hover);
+}
+
+[part="send"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[part="send"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}

@@ -1,0 +1,66 @@
+<!-- @summary A conversation with the four states a turn can be in, and a composer under it. -->
+
+<helix-chat
+  id="support"
+  label="Support"
+>
+  <strong slot="header">Support</strong>
+
+  <helix-chat-message
+    author="them"
+    state="sent"
+  >
+    How can I help?
+  </helix-chat-message>
+
+  <helix-chat-message
+    author="me"
+    state="sent"
+  >
+    The deploy is stuck on the migration step.
+  </helix-chat-message>
+
+  <helix-chat-message
+    author="them"
+    state="streaming"
+  >
+    Let me look at the run now
+  </helix-chat-message>
+
+  <helix-chat-message
+    author="me"
+    state="failed"
+  >
+    Thanks
+  </helix-chat-message>
+
+  <span slot="status">Support is typing</span>
+
+  <helix-chat-composer
+    placeholder="Write a message"
+    slot="composer"
+  ></helix-chat-composer>
+</helix-chat>
+
+<script>
+  /* Set from script rather than written into the markup, because a timestamp in
+     an example is stale the moment it is committed. */
+  const support = document.getElementById('support')
+  const ago = (minutes) => new Date(Date.now() - minutes * 60000).toISOString()
+
+  const turns = support.querySelectorAll('helix-chat-message')
+  turns[0].at = ago(6)
+  turns[1].at = ago(4)
+  turns[2].at = ago(1)
+
+  /* The transcript reports and the page decides, which is the whole contract:
+     nothing here is a client. */
+  support.addEventListener('helix-send', (event) => {
+    const turn = document.createElement('helix-chat-message')
+    turn.setAttribute('author', 'me')
+    turn.setAttribute('state', 'sent')
+    turn.at = new Date().toISOString()
+    turn.textContent = event.detail.value
+    support.append(turn)
+  })
+</script>

@@ -1,0 +1,62 @@
+<!-- @summary A conversation with the four states a turn can be in, and a composer under it. -->
+<!-- @layout padded -->
+
+<helix-headless-chat
+  id="raw"
+  label="Support"
+>
+  <strong slot="header">Support</strong>
+
+  <helix-headless-chat-message
+    author="them"
+    state="sent"
+  >
+    How can I help?
+  </helix-headless-chat-message>
+
+  <helix-headless-chat-message
+    author="me"
+    state="sent"
+  >
+    The deploy is stuck on the migration step.
+  </helix-headless-chat-message>
+
+  <helix-headless-chat-message
+    author="them"
+    state="streaming"
+  >
+    Let me look at the run now
+  </helix-headless-chat-message>
+
+  <helix-headless-chat-message
+    author="me"
+    state="failed"
+  >
+    Thanks
+  </helix-headless-chat-message>
+
+  <span slot="status">Support is typing</span>
+
+  <helix-headless-chat-composer
+    placeholder="Write a message"
+    slot="composer"
+  ></helix-headless-chat-composer>
+</helix-headless-chat>
+
+<script>
+  const raw = document.getElementById('raw')
+  const ago = (minutes) => new Date(Date.now() - minutes * 60000).toISOString()
+  const turns = raw.querySelectorAll('helix-headless-chat-message')
+  turns[0].at = ago(6)
+  turns[1].at = ago(4)
+  turns[2].at = ago(1)
+
+  raw.addEventListener('helix-send', (event) => {
+    const turn = document.createElement('helix-headless-chat-message')
+    turn.setAttribute('author', 'me')
+    turn.setAttribute('state', 'sent')
+    turn.at = new Date().toISOString()
+    turn.textContent = event.detail.value
+    raw.append(turn)
+  })
+</script>

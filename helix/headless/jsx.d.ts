@@ -27,6 +27,9 @@ import type {
   HelixHeadlessCallout,
   HelixHeadlessCard,
   HelixHeadlessCarousel,
+  HelixHeadlessChat,
+  HelixHeadlessChatComposer,
+  HelixHeadlessChatMessage,
   HelixHeadlessCheckbox,
   HelixHeadlessCheckboxGroup,
   HelixHeadlessCode,
@@ -134,6 +137,7 @@ import type {
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixSelectEvent,
+  HelixSendEvent,
   HelixShortcutEvent,
   HelixSortEvent,
   HelixToggleEvent,
@@ -1510,6 +1514,273 @@ case is the absent attribute, and the styles read it that way. */
   "prop:perView"?: HelixHeadlessCarousel["perView"];
   /** Fired when the slide in view changes, with its index. */
   "on:helix-select"?: (e: HelixHeadlessCarouselHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixHeadlessChatComposer` component event */
+export type HelixHeadlessChatComposerElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessChatComposer,
+  E
+>;
+/** `helix-send` event type */
+export type HelixHeadlessChatComposerHelixSendElementEvent =
+  HelixHeadlessChatComposerElementEvent<HelixSendEvent>;
+
+export type HelixHeadlessChatComposerProps = {
+  /** What the reader has written. Read it, or set it to seed a draft. */
+  value?: HelixHeadlessChatComposer["value"];
+  /** Shown in an empty field. */
+  placeholder?: HelixHeadlessChatComposer["placeholder"];
+  /** What sends: pressing Enter, or only the control.
+
+`enter` is the messaging convention and makes Shift+Enter the line break.
+`button` is what a composer holding several paragraphs wants, where Enter
+has to mean a new line and nothing else. */
+  "submit-on"?: HelixHeadlessChatComposer["submitOn"];
+  /** What sends: pressing Enter, or only the control.
+
+`enter` is the messaging convention and makes Shift+Enter the line break.
+`button` is what a composer holding several paragraphs wants, where Enter
+has to mean a new line and nothing else. */
+  submitOn?: HelixHeadlessChatComposer["submitOn"];
+  /** Whether the composer refuses input, while a turn is in flight say. */
+  disabled?: HelixHeadlessChatComposer["disabled"];
+  /** Accessible name for the field. */
+  label?: HelixHeadlessChatComposer["label"];
+  /** Label for the control that sends. */
+  "send-label"?: HelixHeadlessChatComposer["sendLabel"];
+  /** Label for the control that sends. */
+  sendLabel?: HelixHeadlessChatComposer["sendLabel"];
+  /** How many rows the field opens at. It grows from there. */
+  rows?: HelixHeadlessChatComposer["rows"];
+
+  /** Fired when the reader offers their turn, and cancelable. */
+  "onhelix-send"?: (e: HelixHeadlessChatComposerHelixSendElementEvent) => void;
+};
+
+export type HelixHeadlessChatComposerSolidJsProps = {
+  /** What the reader has written. Read it, or set it to seed a draft. */
+  "prop:value"?: HelixHeadlessChatComposer["value"];
+  /** Shown in an empty field. */
+  "prop:placeholder"?: HelixHeadlessChatComposer["placeholder"];
+  /** What sends: pressing Enter, or only the control.
+
+`enter` is the messaging convention and makes Shift+Enter the line break.
+`button` is what a composer holding several paragraphs wants, where Enter
+has to mean a new line and nothing else. */
+  "attr:submit-on"?: HelixHeadlessChatComposer["submitOn"];
+  /** What sends: pressing Enter, or only the control.
+
+`enter` is the messaging convention and makes Shift+Enter the line break.
+`button` is what a composer holding several paragraphs wants, where Enter
+has to mean a new line and nothing else. */
+  "prop:submitOn"?: HelixHeadlessChatComposer["submitOn"];
+  /** Whether the composer refuses input, while a turn is in flight say. */
+  "prop:disabled"?: HelixHeadlessChatComposer["disabled"];
+  /** Accessible name for the field. */
+  "prop:label"?: HelixHeadlessChatComposer["label"];
+  /** Label for the control that sends. */
+  "attr:send-label"?: HelixHeadlessChatComposer["sendLabel"];
+  /** Label for the control that sends. */
+  "prop:sendLabel"?: HelixHeadlessChatComposer["sendLabel"];
+  /** How many rows the field opens at. It grows from there. */
+  "prop:rows"?: HelixHeadlessChatComposer["rows"];
+  /** Fired when the reader offers their turn, and cancelable. */
+  "on:helix-send"?: (e: HelixHeadlessChatComposerHelixSendElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixHeadlessChatMessage` component event */
+export type HelixHeadlessChatMessageElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessChatMessage,
+  E
+>;
+/** `helix-send` event type */
+export type HelixHeadlessChatMessageHelixSendElementEvent =
+  HelixHeadlessChatMessageElementEvent<HelixSendEvent>;
+
+export type HelixHeadlessChatMessageProps = {
+  /** Who said it.
+
+Free text rather than a two-value union, because a conversation is not
+always two-sided: a transcript with a system turn, a tool call and three
+participants is the ordinary case for anything worth building this for.
+`me` and `them` are the conventional values and the stylesheet knows them;
+anything else is a name the consumer styles. */
+  author?: HelixHeadlessChatMessage["author"];
+  /** What has happened to it.
+
+Reflected, because every one of the four is a visual state and a stylesheet
+has no other way to know. Empty is a settled message with nothing to report,
+which is what most of a transcript is. */
+  state?: HelixHeadlessChatMessage["state"];
+  /** When it was said, as anything `Date` parses. */
+  at?: HelixHeadlessChatMessage["at"];
+  /** Locale for the timestamp. Empty is the runtime's own. */
+  locale?: HelixHeadlessChatMessage["locale"];
+  /** What to call each state, for a reader who cannot see it. */
+  "sending-label"?: HelixHeadlessChatMessage["sendingLabel"];
+  /** What to call each state, for a reader who cannot see it. */
+  sendingLabel?: HelixHeadlessChatMessage["sendingLabel"];
+  /** Label for the control offered on a failed message. */
+  "retry-label"?: HelixHeadlessChatMessage["retryLabel"];
+  /** Label for the control offered on a failed message. */
+  retryLabel?: HelixHeadlessChatMessage["retryLabel"];
+
+  /** Fired when the reader asks to send a failed message again, and cancelable. */
+  "onhelix-send"?: (e: HelixHeadlessChatMessageHelixSendElementEvent) => void;
+};
+
+export type HelixHeadlessChatMessageSolidJsProps = {
+  /** Who said it.
+
+Free text rather than a two-value union, because a conversation is not
+always two-sided: a transcript with a system turn, a tool call and three
+participants is the ordinary case for anything worth building this for.
+`me` and `them` are the conventional values and the stylesheet knows them;
+anything else is a name the consumer styles. */
+  "prop:author"?: HelixHeadlessChatMessage["author"];
+  /** What has happened to it.
+
+Reflected, because every one of the four is a visual state and a stylesheet
+has no other way to know. Empty is a settled message with nothing to report,
+which is what most of a transcript is. */
+  "prop:state"?: HelixHeadlessChatMessage["state"];
+  /** When it was said, as anything `Date` parses. */
+  "prop:at"?: HelixHeadlessChatMessage["at"];
+  /** Locale for the timestamp. Empty is the runtime's own. */
+  "prop:locale"?: HelixHeadlessChatMessage["locale"];
+  /** What to call each state, for a reader who cannot see it. */
+  "attr:sending-label"?: HelixHeadlessChatMessage["sendingLabel"];
+  /** What to call each state, for a reader who cannot see it. */
+  "prop:sendingLabel"?: HelixHeadlessChatMessage["sendingLabel"];
+  /** Label for the control offered on a failed message. */
+  "attr:retry-label"?: HelixHeadlessChatMessage["retryLabel"];
+  /** Label for the control offered on a failed message. */
+  "prop:retryLabel"?: HelixHeadlessChatMessage["retryLabel"];
+  /** Fired when the reader asks to send a failed message again, and cancelable. */
+  "on:helix-send"?: (e: HelixHeadlessChatMessageHelixSendElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixHeadlessChat` component event */
+export type HelixHeadlessChatElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessChat,
+  E
+>;
+/** `helix-change` event type */
+export type HelixHeadlessChatHelixChangeElementEvent =
+  HelixHeadlessChatElementEvent<HelixChangeEvent>;
+
+export type HelixHeadlessChatProps = {
+  /** Accessible name for the conversation. */
+  label?: HelixHeadlessChat["label"];
+  /** How near the bottom still counts as being at it, in pixels.
+
+A hook rather than a constant, because the right number depends on how tall
+a turn is: a transcript of one-line replies wants a smaller threshold than
+one of paragraphs, and a reader who has scrolled up by half a message has
+not left. */
+  threshold?: HelixHeadlessChat["threshold"];
+  /** Whether the transcript follows new turns to the bottom.
+
+Set it and this element defers: the reader's scrolling fires `helix-change`
+and moves nothing until a new value arrives. `default-pinned` seeds a state
+this element then owns, and it defaults to pinned because a conversation
+opens at its most recent turn.
+
+**Not reflected, and the default is why.** A reflected property that
+defaults to true writes its attribute on upgrade whether or not the
+consumer wrote one, so the server serves `<helix-chat label="x">` and the
+client turns it into `<helix-chat label="x" pinned>`: a hydration mismatch a
+React consumer reports and does not patch up. Nothing needs the attribute
+either, because the one thing that changes with the pin is the way back, and
+that is a part inside the shadow tree where a stylesheet can already reach
+it. Measured rather than assumed: `label, pinned` after upgrade against
+`label` from the server. */
+  pinned?: HelixHeadlessChat["pinned"];
+  /** Whether to open pinned, where nothing declared it. */
+  "default-pinned"?: HelixHeadlessChat["defaultPinned"];
+  /** Whether to open pinned, where nothing declared it. */
+  defaultPinned?: HelixHeadlessChat["defaultPinned"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixHeadlessChat["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixHeadlessChat["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixHeadlessChat["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixHeadlessChat["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixHeadlessChat["emptyText"];
+
+  /** Fired when the reader pins or unpins the transcript by scrolling. Cancelable. */
+  "onhelix-change"?: (e: HelixHeadlessChatHelixChangeElementEvent) => void;
+};
+
+export type HelixHeadlessChatSolidJsProps = {
+  /** Accessible name for the conversation. */
+  "prop:label"?: HelixHeadlessChat["label"];
+  /** How near the bottom still counts as being at it, in pixels.
+
+A hook rather than a constant, because the right number depends on how tall
+a turn is: a transcript of one-line replies wants a smaller threshold than
+one of paragraphs, and a reader who has scrolled up by half a message has
+not left. */
+  "prop:threshold"?: HelixHeadlessChat["threshold"];
+  /** Whether the transcript follows new turns to the bottom.
+
+Set it and this element defers: the reader's scrolling fires `helix-change`
+and moves nothing until a new value arrives. `default-pinned` seeds a state
+this element then owns, and it defaults to pinned because a conversation
+opens at its most recent turn.
+
+**Not reflected, and the default is why.** A reflected property that
+defaults to true writes its attribute on upgrade whether or not the
+consumer wrote one, so the server serves `<helix-chat label="x">` and the
+client turns it into `<helix-chat label="x" pinned>`: a hydration mismatch a
+React consumer reports and does not patch up. Nothing needs the attribute
+either, because the one thing that changes with the pin is the way back, and
+that is a part inside the shadow tree where a stylesheet can already reach
+it. Measured rather than assumed: `label, pinned` after upgrade against
+`label` from the server. */
+  "prop:pinned"?: HelixHeadlessChat["pinned"];
+  /** Whether to open pinned, where nothing declared it. */
+  "bool:default-pinned"?: HelixHeadlessChat["defaultPinned"];
+  /** Whether to open pinned, where nothing declared it. */
+  "prop:defaultPinned"?: HelixHeadlessChat["defaultPinned"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  "prop:loading"?: HelixHeadlessChat["loading"];
+  /** What is said while they are on their way. */
+  "attr:loading-text"?: HelixHeadlessChat["loadingText"];
+  /** What is said while they are on their way. */
+  "prop:loadingText"?: HelixHeadlessChat["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixHeadlessChat["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixHeadlessChat["emptyText"];
+  /** Fired when the reader pins or unpins the transcript by scrolling. Cancelable. */
+  "on:helix-change"?: (e: HelixHeadlessChatHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6744,13 +7015,6 @@ export type HelixHeadlessNotificationsProps = {
   "mark-all-label"?: HelixHeadlessNotifications["markAllLabel"];
   /** Label for that control. */
   markAllLabel?: HelixHeadlessNotifications["markAllLabel"];
-  /** How many items are unread, counted from the items themselves.
-
-Reflected so a stylesheet can answer it, and read-only for the reason it is
-derived: a count the consumer could set is a second source of truth for
-something the items already know, and the first time the two disagreed the
-badge would be right and the list would not. */
-  unread?: HelixHeadlessNotifications["unread"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -6781,13 +7045,6 @@ export type HelixHeadlessNotificationsSolidJsProps = {
   "attr:mark-all-label"?: HelixHeadlessNotifications["markAllLabel"];
   /** Label for that control. */
   "prop:markAllLabel"?: HelixHeadlessNotifications["markAllLabel"];
-  /** How many items are unread, counted from the items themselves.
-
-Reflected so a stylesheet can answer it, and read-only for the reason it is
-derived: a count the consumer could set is a second source of truth for
-something the items already know, and the first time the two disagreed the
-badge would be right and the list would not. */
-  "prop:unread"?: HelixHeadlessNotifications["unread"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -14470,6 +14727,254 @@ export type CustomElements = {
   > & HelixHeadlessCarouselControlled;
 
   /**
+   * **A separate element because it is separately replaceable.** A consumer with
+   * attachments, slash commands or a model picker replaces the composer and keeps
+   * the transcript, which is only possible if the two were never one component.
+   *
+   * **Enter sends and Shift+Enter opens a line, and it is configurable rather than
+   * decided.** The convention is near-universal in messaging and near-inverted in
+   * anything that is really a document editor, and a component that picks one
+   * makes the other consumer reimplement the composer. `submit-on` takes `enter`
+   * or `button`, and the second is what a long-form composer wants.
+   *
+   * The composer clears only when nobody refused the send, because a composer that
+   * empties itself and then hears the request failed has thrown away the only copy
+   * of what the reader wrote.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What the reader has written. Read it, or set it to seed a draft.
+   * - `placeholder`: Shown in an empty field.
+   * - `submit-on`/`submitOn`: What sends: pressing Enter, or only the control.
+   *
+   * `enter` is the messaging convention and makes Shift+Enter the line break.
+   * `button` is what a composer holding several paragraphs wants, where Enter
+   * has to mean a new line and nothing else.
+   * - `disabled`: Whether the composer refuses input, while a turn is in flight say.
+   * - `label`: Accessible name for the field.
+   * - `send-label`/`sendLabel`: Label for the control that sends.
+   * - `rows`: How many rows the field opens at. It grows from there.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-send`: Fired when the reader offers their turn, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Before the field: attachments, a model picker.
+   * - `end`: After the field, beside the send control.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `send() => boolean`: Offers what is written, and reports whether it stood.
+   *
+   * Public because a consumer's own send control is as likely to ask as this
+   * element's is, and because a keyboard shortcut somewhere else on the page is
+   * a reasonable way to send.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `composer`: The whole row.
+   * - `start`: The leading slot's box.
+   * - `field`: The text field.
+   * - `end`: The trailing slot's box.
+   * - `send`: The control that offers the turn.
+   */
+  "helix-headless-chat-composer": Partial<
+    HelixHeadlessChatComposerProps &
+      BaseProps<HelixHeadlessChatComposer> &
+      BaseEvents
+  >;
+
+  /**
+   * **The states are the component.** Bubbles are paint; what a chat message has
+   * to carry is whether it is on its way, arrived, still arriving, or failed, and
+   * a failed message needs a retry that is a real action rather than a toast the
+   * reader has to catch.
+   *
+   * `streaming` is the state everything else is arranged around. A message
+   * arriving token by token changes height on every frame, so it is marked
+   * `aria-busy` while it arrives and announced once when it settles: a screen
+   * reader reading a stream character by character is unusable, and announcing on
+   * completion is the only version of this that works.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `author`: Who said it.
+   *
+   * Free text rather than a two-value union, because a conversation is not
+   * always two-sided: a transcript with a system turn, a tool call and three
+   * participants is the ordinary case for anything worth building this for.
+   * `me` and `them` are the conventional values and the stylesheet knows them;
+   * anything else is a name the consumer styles.
+   * - `state`: What has happened to it.
+   *
+   * Reflected, because every one of the four is a visual state and a stylesheet
+   * has no other way to know. Empty is a settled message with nothing to report,
+   * which is what most of a transcript is.
+   * - `at`: When it was said, as anything `Date` parses.
+   * - `locale`: Locale for the timestamp. Empty is the runtime's own.
+   * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
+   * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-send`: Fired when the reader asks to send a failed message again, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What was said.
+   * - `avatar`: Who said it.
+   * - `actions`: What can be done with it: copy, retry, react.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `message`: The whole turn.
+   * - `avatar`: The leading slot's box.
+   * - `body`: What was said, and the line under it.
+   * - `content`: The consumer's own markup.
+   * - `meta`: The time and the state together.
+   * - `time`: When it was said.
+   * - `state`: What has happened to it, where that is worth saying.
+   * - `retry`: The control offered on a failed message.
+   * - `actions`: The trailing slot's box.
+   */
+  "helix-headless-chat-message": Partial<
+    HelixHeadlessChatMessageProps &
+      BaseProps<HelixHeadlessChatMessage> &
+      BaseEvents
+  >;
+
+  /**
+   * **It has no opinion about where it sits.** A chat is asked for as a floating
+   * button, a page, a palette, a sidebar, a modal and an inline block, and none of
+   * those is a variant of a conversation: they are containers a conversation is
+   * put in, and the containers already exist. `Popover` and `SpeedDial` make the
+   * floating one, `Drawer` the sidebar, `Dialog` the modal, `Command` the palette,
+   * and a page is a page. Nothing here is positioned, nothing here has a backdrop,
+   * and nothing here owns a trigger, because a trigger opens a container and
+   * containers own their own. If a form factor needs a mode on this element, the
+   * split is wrong.
+   *
+   * **Scroll ownership is the behavior everything else depends on, and it is the
+   * most-got-wrong thing in the category.** A transcript that grows wants to stay
+   * at the bottom, except when the reader has scrolled up to read, where pinning
+   * is hostile. The rule: pin while the reader is within `threshold` of the
+   * bottom, release the moment they leave it, and offer a way back. **Never scroll
+   * a reader who is reading.**
+   *
+   * The element owns it, because it is the only party that knows a message arrived
+   * and where the viewport was when it did. `pinned` is a controlled property like
+   * any other, so a consumer who wants to own it can.
+   *
+   * **The live region announces on completion, not on arrival.** The transcript is
+   * `role="log"` with `aria-live="polite"`, and a streaming message carries
+   * `aria-busy` while it arrives: a screen reader reading a stream token by token
+   * is unusable, and holding the announcement until the flag clears is the only
+   * arrangement that works. Somebody typing is a separate status region, so it
+   * never interleaves with what was said.
+   *
+   * **Not a client.** No transport, no protocol, no model. It renders a
+   * conversation and reports what the reader did.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the conversation.
+   * - `threshold`: How near the bottom still counts as being at it, in pixels.
+   *
+   * A hook rather than a constant, because the right number depends on how tall
+   * a turn is: a transcript of one-line replies wants a smaller threshold than
+   * one of paragraphs, and a reader who has scrolled up by half a message has
+   * not left.
+   * - `pinned`: Whether the transcript follows new turns to the bottom.
+   *
+   * Set it and this element defers: the reader's scrolling fires `helix-change`
+   * and moves nothing until a new value arrives. `default-pinned` seeds a state
+   * this element then owns, and it defaults to pinned because a conversation
+   * opens at its most recent turn.
+   *
+   * **Not reflected, and the default is why.** A reflected property that
+   * defaults to true writes its attribute on upgrade whether or not the
+   * consumer wrote one, so the server serves `<helix-chat label="x">` and the
+   * client turns it into `<helix-chat label="x" pinned>`: a hydration mismatch a
+   * React consumer reports and does not patch up. Nothing needs the attribute
+   * either, because the one thing that changes with the pin is the way back, and
+   * that is a part inside the shadow tree where a stylesheet can already reach
+   * it. Measured rather than assumed: `label, pinned` after upgrade against
+   * `label` from the server.
+   * - `default-pinned`/`defaultPinned`: Whether to open pinned, where nothing declared it.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `messages`: The turns declared as children, in the order they are written. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The turns, as `helix-chat-message` children.
+   * - `header`: Above the transcript.
+   * - `composer`: Below the transcript, where the reader writes.
+   * - `status`: Beside the composer: somebody typing, connection lost.
+   * - `resume`: The way back to the bottom, shown while the reader has scrolled away.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `resume() => void`: Puts the transcript back at its most recent turn.
+   *
+   * Public because the way back is a slot, so the control offering it is the
+   * consumer's and needs something to call. Pins again on the way, which is what
+   * a reader asking to go to the bottom means.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The region above the transcript.
+   * - `log`: The transcript, which is the thing that scrolls.
+   * - `resume`: The affordance offered while the reader is away from the bottom.
+   * - `status`: The status region, which is not part of the log.
+   * - `composer`: The region the composer sits in.
+   * - `empty`: Shown when the conversation has no turns.
+   * - `loading`: Shown while the history is still on its way.
+   */
+  "helix-headless-chat": Partial<
+    HelixHeadlessChatProps & BaseProps<HelixHeadlessChat> & BaseEvents
+  > & HelixHeadlessChatControlled;
+
+  /**
    * The host is the group, so `role="group"` sits on it through internals and
    * `label` names it. A run of checkboxes with no name is announced as separate
    * controls, which is what the grouping exists to say it is not.
@@ -19357,12 +19862,6 @@ export type CustomElements = {
    * - `label`: Accessible name for the feed.
    * - `mark-all`/`markAll`: Whether to draw a control that marks everything read.
    * - `mark-all-label`/`markAllLabel`: Label for that control.
-   * - `unread`: How many items are unread, counted from the items themselves.
-   *
-   * Reflected so a stylesheet can answer it, and read-only for the reason it is
-   * derived: a count the consumer could set is a second source of truth for
-   * something the items already know, and the first time the two disagreed the
-   * badge would be right and the list would not.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
@@ -19370,6 +19869,19 @@ export type CustomElements = {
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
    * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `unread`: How many items are unread, counted from the items themselves.
+   *
+   * Read-only for the reason it is derived: a count the consumer could set is a
+   * second source of truth for something the items already know, and the first
+   * time the two disagreed the badge would be right and the list would not.
+   *
+   * **The attribute is written in `updated` rather than reflected, and the
+   * difference is a bug that shipped.** `@property({ reflect: true })` on a
+   * getter with no setter reflects once: Lit reflects what is in
+   * `changedProperties`, and nothing puts a derived getter there after the first
+   * update. Measured with two items, one marked read: the property answered 1
+   * and the attribute still said 2, so a badge reading the attribute showed a
+   * count for an item the reader had just opened. (property only) (readonly)
    * - `items`: The notifications declared as children, in the order they are written. (property only) (readonly)
    *
    * ## Events
@@ -26716,6 +27228,259 @@ export type CustomElementsSolidJs = {
   > & HelixHeadlessCarouselControlledSolidJs;
 
   /**
+   * **A separate element because it is separately replaceable.** A consumer with
+   * attachments, slash commands or a model picker replaces the composer and keeps
+   * the transcript, which is only possible if the two were never one component.
+   *
+   * **Enter sends and Shift+Enter opens a line, and it is configurable rather than
+   * decided.** The convention is near-universal in messaging and near-inverted in
+   * anything that is really a document editor, and a component that picks one
+   * makes the other consumer reimplement the composer. `submit-on` takes `enter`
+   * or `button`, and the second is what a long-form composer wants.
+   *
+   * The composer clears only when nobody refused the send, because a composer that
+   * empties itself and then hears the request failed has thrown away the only copy
+   * of what the reader wrote.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What the reader has written. Read it, or set it to seed a draft.
+   * - `placeholder`: Shown in an empty field.
+   * - `submit-on`/`submitOn`: What sends: pressing Enter, or only the control.
+   *
+   * `enter` is the messaging convention and makes Shift+Enter the line break.
+   * `button` is what a composer holding several paragraphs wants, where Enter
+   * has to mean a new line and nothing else.
+   * - `disabled`: Whether the composer refuses input, while a turn is in flight say.
+   * - `label`: Accessible name for the field.
+   * - `send-label`/`sendLabel`: Label for the control that sends.
+   * - `rows`: How many rows the field opens at. It grows from there.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-send`: Fired when the reader offers their turn, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Before the field: attachments, a model picker.
+   * - `end`: After the field, beside the send control.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `send() => boolean`: Offers what is written, and reports whether it stood.
+   *
+   * Public because a consumer's own send control is as likely to ask as this
+   * element's is, and because a keyboard shortcut somewhere else on the page is
+   * a reasonable way to send.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `composer`: The whole row.
+   * - `start`: The leading slot's box.
+   * - `field`: The text field.
+   * - `end`: The trailing slot's box.
+   * - `send`: The control that offers the turn.
+   */
+  "helix-headless-chat-composer": Partial<
+    HelixHeadlessChatComposerProps &
+      HelixHeadlessChatComposerSolidJsProps &
+      BaseProps<HelixHeadlessChatComposer> &
+      BaseEvents
+  >;
+
+  /**
+   * **The states are the component.** Bubbles are paint; what a chat message has
+   * to carry is whether it is on its way, arrived, still arriving, or failed, and
+   * a failed message needs a retry that is a real action rather than a toast the
+   * reader has to catch.
+   *
+   * `streaming` is the state everything else is arranged around. A message
+   * arriving token by token changes height on every frame, so it is marked
+   * `aria-busy` while it arrives and announced once when it settles: a screen
+   * reader reading a stream character by character is unusable, and announcing on
+   * completion is the only version of this that works.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `author`: Who said it.
+   *
+   * Free text rather than a two-value union, because a conversation is not
+   * always two-sided: a transcript with a system turn, a tool call and three
+   * participants is the ordinary case for anything worth building this for.
+   * `me` and `them` are the conventional values and the stylesheet knows them;
+   * anything else is a name the consumer styles.
+   * - `state`: What has happened to it.
+   *
+   * Reflected, because every one of the four is a visual state and a stylesheet
+   * has no other way to know. Empty is a settled message with nothing to report,
+   * which is what most of a transcript is.
+   * - `at`: When it was said, as anything `Date` parses.
+   * - `locale`: Locale for the timestamp. Empty is the runtime's own.
+   * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
+   * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-send`: Fired when the reader asks to send a failed message again, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What was said.
+   * - `avatar`: Who said it.
+   * - `actions`: What can be done with it: copy, retry, react.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `message`: The whole turn.
+   * - `avatar`: The leading slot's box.
+   * - `body`: What was said, and the line under it.
+   * - `content`: The consumer's own markup.
+   * - `meta`: The time and the state together.
+   * - `time`: When it was said.
+   * - `state`: What has happened to it, where that is worth saying.
+   * - `retry`: The control offered on a failed message.
+   * - `actions`: The trailing slot's box.
+   */
+  "helix-headless-chat-message": Partial<
+    HelixHeadlessChatMessageProps &
+      HelixHeadlessChatMessageSolidJsProps &
+      BaseProps<HelixHeadlessChatMessage> &
+      BaseEvents
+  >;
+
+  /**
+   * **It has no opinion about where it sits.** A chat is asked for as a floating
+   * button, a page, a palette, a sidebar, a modal and an inline block, and none of
+   * those is a variant of a conversation: they are containers a conversation is
+   * put in, and the containers already exist. `Popover` and `SpeedDial` make the
+   * floating one, `Drawer` the sidebar, `Dialog` the modal, `Command` the palette,
+   * and a page is a page. Nothing here is positioned, nothing here has a backdrop,
+   * and nothing here owns a trigger, because a trigger opens a container and
+   * containers own their own. If a form factor needs a mode on this element, the
+   * split is wrong.
+   *
+   * **Scroll ownership is the behavior everything else depends on, and it is the
+   * most-got-wrong thing in the category.** A transcript that grows wants to stay
+   * at the bottom, except when the reader has scrolled up to read, where pinning
+   * is hostile. The rule: pin while the reader is within `threshold` of the
+   * bottom, release the moment they leave it, and offer a way back. **Never scroll
+   * a reader who is reading.**
+   *
+   * The element owns it, because it is the only party that knows a message arrived
+   * and where the viewport was when it did. `pinned` is a controlled property like
+   * any other, so a consumer who wants to own it can.
+   *
+   * **The live region announces on completion, not on arrival.** The transcript is
+   * `role="log"` with `aria-live="polite"`, and a streaming message carries
+   * `aria-busy` while it arrives: a screen reader reading a stream token by token
+   * is unusable, and holding the announcement until the flag clears is the only
+   * arrangement that works. Somebody typing is a separate status region, so it
+   * never interleaves with what was said.
+   *
+   * **Not a client.** No transport, no protocol, no model. It renders a
+   * conversation and reports what the reader did.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the conversation.
+   * - `threshold`: How near the bottom still counts as being at it, in pixels.
+   *
+   * A hook rather than a constant, because the right number depends on how tall
+   * a turn is: a transcript of one-line replies wants a smaller threshold than
+   * one of paragraphs, and a reader who has scrolled up by half a message has
+   * not left.
+   * - `pinned`: Whether the transcript follows new turns to the bottom.
+   *
+   * Set it and this element defers: the reader's scrolling fires `helix-change`
+   * and moves nothing until a new value arrives. `default-pinned` seeds a state
+   * this element then owns, and it defaults to pinned because a conversation
+   * opens at its most recent turn.
+   *
+   * **Not reflected, and the default is why.** A reflected property that
+   * defaults to true writes its attribute on upgrade whether or not the
+   * consumer wrote one, so the server serves `<helix-chat label="x">` and the
+   * client turns it into `<helix-chat label="x" pinned>`: a hydration mismatch a
+   * React consumer reports and does not patch up. Nothing needs the attribute
+   * either, because the one thing that changes with the pin is the way back, and
+   * that is a part inside the shadow tree where a stylesheet can already reach
+   * it. Measured rather than assumed: `label, pinned` after upgrade against
+   * `label` from the server.
+   * - `default-pinned`/`defaultPinned`: Whether to open pinned, where nothing declared it.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `messages`: The turns declared as children, in the order they are written. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The turns, as `helix-chat-message` children.
+   * - `header`: Above the transcript.
+   * - `composer`: Below the transcript, where the reader writes.
+   * - `status`: Beside the composer: somebody typing, connection lost.
+   * - `resume`: The way back to the bottom, shown while the reader has scrolled away.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `resume() => void`: Puts the transcript back at its most recent turn.
+   *
+   * Public because the way back is a slot, so the control offering it is the
+   * consumer's and needs something to call. Pins again on the way, which is what
+   * a reader asking to go to the bottom means.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The region above the transcript.
+   * - `log`: The transcript, which is the thing that scrolls.
+   * - `resume`: The affordance offered while the reader is away from the bottom.
+   * - `status`: The status region, which is not part of the log.
+   * - `composer`: The region the composer sits in.
+   * - `empty`: Shown when the conversation has no turns.
+   * - `loading`: Shown while the history is still on its way.
+   */
+  "helix-headless-chat": Partial<
+    HelixHeadlessChatProps &
+      HelixHeadlessChatSolidJsProps &
+      BaseProps<HelixHeadlessChat> &
+      BaseEvents
+  > & HelixHeadlessChatControlledSolidJs;
+
+  /**
    * The host is the group, so `role="group"` sits on it through internals and
    * `label` names it. A run of checkboxes with no name is announced as separate
    * controls, which is what the grouping exists to say it is not.
@@ -31697,12 +32462,6 @@ export type CustomElementsSolidJs = {
    * - `label`: Accessible name for the feed.
    * - `mark-all`/`markAll`: Whether to draw a control that marks everything read.
    * - `mark-all-label`/`markAllLabel`: Label for that control.
-   * - `unread`: How many items are unread, counted from the items themselves.
-   *
-   * Reflected so a stylesheet can answer it, and read-only for the reason it is
-   * derived: a count the consumer could set is a second source of truth for
-   * something the items already know, and the first time the two disagreed the
-   * badge would be right and the list would not.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
@@ -31710,6 +32469,19 @@ export type CustomElementsSolidJs = {
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
    * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `unread`: How many items are unread, counted from the items themselves.
+   *
+   * Read-only for the reason it is derived: a count the consumer could set is a
+   * second source of truth for something the items already know, and the first
+   * time the two disagreed the badge would be right and the list would not.
+   *
+   * **The attribute is written in `updated` rather than reflected, and the
+   * difference is a bug that shipped.** `@property({ reflect: true })` on a
+   * getter with no setter reflects once: Lit reflects what is in
+   * `changedProperties`, and nothing puts a derived getter there after the first
+   * update. Measured with two items, one marked read: the property answered 1
+   * and the attribute still said 2, so a badge reading the attribute showed a
+   * count for an item the reader had just opened. (property only) (readonly)
    * - `items`: The notifications declared as children, in the order they are written. (property only) (readonly)
    *
    * ## Events
@@ -38131,6 +38903,39 @@ type HelixHeadlessCarouselControlledSolidJs =
         ref: BaseProps<HelixHeadlessCarousel>["ref"];
       }
     | { index?: undefined }
+  );
+
+/**
+ * helix-headless-chat: a controlled `pinned` announces and waits, so the handler comes with it.
+ */
+type HelixHeadlessChatControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        pinned: HelixHeadlessChat["pinned"];
+        "onhelix-change": (event: HelixHeadlessChatHelixChangeElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        pinned: HelixHeadlessChat["pinned"];
+        ref: import('react').Ref<HelixHeadlessChat>;
+      }
+    | { pinned?: undefined }
+  );
+
+/** helix-headless-chat, in Solid's dialect: `on:` and the event name. */
+type HelixHeadlessChatControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        pinned: HelixHeadlessChat["pinned"];
+        "on:helix-change": (event: HelixHeadlessChatHelixChangeElementEvent) => void;
+      }
+    | {
+        pinned: HelixHeadlessChat["pinned"];
+        ref: BaseProps<HelixHeadlessChat>["ref"];
+      }
+    | { pinned?: undefined }
   );
 
 /**

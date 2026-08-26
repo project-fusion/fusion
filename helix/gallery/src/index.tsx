@@ -9,15 +9,15 @@ import { toolingArt } from './tooling'
 /**
  * Abstract art for a family's gallery card, keyed by slug.
  *
- * All ninety-two families have an entry, and the six files are split by kind
- * rather than by anything the build cares about: one file of ninety-two is hard
+ * All ninety-three families have an entry, and the six files are split by kind
+ * rather than by anything the build cares about: one file of ninety-three is hard
  * to navigate and every entry would sit beside a neighbor it has nothing to do
  * with. **The split follows the catalog's own**, which is why `charts.tsx`
  * exists: `content` held 27 families and meant none of the other seven, and its
  * art file was 1,136 lines for exactly that reason. A drawer in the catalog is a
  * drawer in the gallery, so splitting one splits the other. The system they all obey is documented at the top of `core.tsx`.
  *
- * **Ninety-two, not the ninety-one folders in `helix/styled/src`.** The catalog is
+ * **Ninety-three, not the ninety-two folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
  * `@helix-io/sandbox`. Counting directories is how five families were missed on
  * the first pass, and the count that matters is whatever `getFamilies` returns.

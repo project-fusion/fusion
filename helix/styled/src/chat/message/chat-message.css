@@ -1,0 +1,94 @@
+/* Avatar, body, actions. A grid rather than a flex row for `notifications`'
+   reason: the avatar column has to line up down the transcript whether or not
+   every turn has one. */
+:host {
+  display: block;
+}
+
+[part="message"] {
+  align-items: start;
+  column-gap: var(--helix-space-sm);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+/* The reader's own turns sit against the trailing edge, which is the one piece
+   of paint that says whose turn it is without a label. Everything else about a
+   turn is the same on both sides: two bubble styles is two components. */
+:host([author="me"]) [part="message"] {
+  grid-template-columns: auto minmax(0, 1fr);
+  justify-items: end;
+}
+
+:host([author="me"]) [part="avatar"] {
+  display: none;
+}
+
+[part="avatar"]:not(:has(*)) {
+  display: none;
+}
+
+[part="body"] {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  max-inline-size: var(--chat-message-measure, 42rem);
+}
+
+[part="content"] {
+  background-color: var(--chat-message-background, var(--helix-color-surface-sunken));
+  border-radius: var(--helix-radii-md);
+  color: var(--chat-message-color, var(--helix-color-foreground));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-normal);
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+:host([author="me"]) [part="content"] {
+  background-color: var(--chat-message-background-me, var(--helix-color-accent-subtle));
+}
+
+[part="meta"] {
+  color: var(--helix-color-foreground-muted);
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-2xs);
+}
+
+:host([author="me"]) [part="meta"] {
+  justify-content: flex-end;
+}
+
+/* A failure is the one state that has to be found rather than noticed, so it is
+   the only one that takes a tone. `sending` is quieter than a settled turn and
+   `streaming` is left alone: the text arriving is the signal. */
+:host([state="failed"]) [part="meta"] {
+  color: var(--helix-color-danger);
+}
+
+:host([state="sending"]) [part="content"] {
+  opacity: 0.6;
+}
+
+[part="retry"] {
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: var(--helix-space-none);
+  text-decoration: underline;
+}
+
+[part="retry"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+@media print {
+  [part="retry"] {
+    display: none;
+  }
+}

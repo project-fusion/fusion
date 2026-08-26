@@ -8694,6 +8694,1868 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/chat/composer/chat-composer.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/chat/composer/chat-composer.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/chat/composer/chat-composer.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "One row, and the field takes the room. **It grows with the text and stops at a\nceiling**, through `field-sizing: content` rather than a script measuring\nanything: where that is not supported the field keeps its rows and scrolls,\nwhich is the answer a textarea has always given. A composer that grows without\na ceiling eats the transcript it belongs to.",
+          "name": "HelixChatComposer",
+          "cssProperties": [
+            {
+              "description": "Fill behind the field.",
+              "name": "--chat-composer-background"
+            },
+            {
+              "description": "How tall the field may grow.",
+              "name": "--chat-composer-max-height"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The text field.",
+              "name": "field",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "description": "The control that offers the turn.",
+              "name": "send",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "description": "The whole row.",
+              "name": "composer",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "description": "The leading slot's box.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "description": "The trailing slot's box.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "Before the field: attachments, a model picker.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "description": "After the field, beside the send control.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-headless-pagination-size` composes `helix-headless-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/styled` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the reader has written. Read it, or set it to seed a draft.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Shown in an empty field.",
+              "attribute": "placeholder",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "submitOn",
+              "type": {
+                "text": "'button' | 'enter'"
+              },
+              "default": "'enter'",
+              "description": "What sends: pressing Enter, or only the control.\n\n`enter` is the messaging convention and makes Shift+Enter the line break.\n`button` is what a composer holding several paragraphs wants, where Enter\nhas to mean a new line and nothing else.",
+              "attribute": "submit-on",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the composer refuses input, while a turn is in flight say.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Message'",
+              "description": "Accessible name for the field.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "sendLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Send'",
+              "description": "Label for the control that sends.",
+              "attribute": "send-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many rows the field opens at. It grows from there.",
+              "attribute": "rows",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "draft",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "text",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "What is in the field, whoever last wrote it.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "send",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Offers what is written, and reports whether it stood.\n\nPublic because a consumer's own send control is as likely to ask as this\nelement's is, and because a keyboard shortcut somewhere else on the page is\na reasonable way to send.",
+              "type": {
+                "text": "send() => boolean"
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleInput",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleSend",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKey",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Enter sends where that is what `submit-on` says, and never mid-composition.\n\n**`isComposing` is the part that is easy to leave out and breaks a whole\nwriting system.** A reader typing Japanese, Chinese or Korean presses Enter\nto accept the candidate their input method is offering, and a composer that\nreads it as send fires off a half-finished word every time. The flag is on\nthe event for exactly this and costs one condition.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixHeadlessChatComposer",
+            "package": "@helix-io/headless/chat"
+          },
+          "summary": "Where the reader writes their turn.",
+          "helix": {
+            "category": "forms",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/chat",
+            "tier": "styled",
+            "group": "Chat",
+            "part": "Composer"
+          },
+          "tagName": "helix-chat-composer",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the reader has written. Read it, or set it to seed a draft.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Shown in an empty field.",
+              "fieldName": "placeholder",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "name": "submit-on",
+              "type": {
+                "text": "'button' | 'enter'"
+              },
+              "default": "'enter'",
+              "description": "What sends: pressing Enter, or only the control.\n\n`enter` is the messaging convention and makes Shift+Enter the line break.\n`button` is what a composer holding several paragraphs wants, where Enter\nhas to mean a new line and nothing else.",
+              "fieldName": "submitOn",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the composer refuses input, while a turn is in flight say.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Message'",
+              "description": "Accessible name for the field.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "name": "send-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Send'",
+              "description": "Label for the control that sends.",
+              "fieldName": "sendLabel",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many rows the field opens at. It grows from there.",
+              "fieldName": "rows",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSendEvent"
+              },
+              "description": "Fired when the reader offers their turn, and cancelable.",
+              "name": "helix-send",
+              "reactProp": "onhelix-send",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            }
+          ],
+          "modulePath": "src/chat/composer/chat-composer.ts",
+          "definitionPath": "src/chat/composer/chat-composer.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixChatComposer",
+          "declaration": {
+            "name": "HelixChatComposer",
+            "module": "src/chat/composer/chat-composer.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-chat-composer",
+          "declaration": {
+            "name": "HelixChatComposer",
+            "module": "src/chat/composer/chat-composer.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/chat/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixChatComposer",
+          "declaration": {
+            "name": "HelixChatComposer",
+            "module": "./composer/chat-composer.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixChatMessage",
+          "declaration": {
+            "name": "HelixChatMessage",
+            "module": "./message/chat-message.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixChat",
+          "declaration": {
+            "name": "HelixChat",
+            "module": "./root/chat-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/chat/message/chat-message.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/chat/message/chat-message.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/chat/message/chat-message.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**`author=\"me\"` is the one piece of paint that says whose turn it is**, and it\nsays it by which edge the turn sits against. Everything else about a turn is\nthe same on both sides, because two bubble styles is two components.\n\nA failure is the only state that takes a tone, because it is the one a reader\nhas to find rather than notice. `streaming` is left alone: the text arriving\nis the signal, and decorating it competes with the thing it is decorating.",
+          "name": "HelixChatMessage",
+          "cssProperties": [
+            {
+              "description": "Fill behind a turn.",
+              "name": "--chat-message-background"
+            },
+            {
+              "description": "Fill behind the reader's own turns.",
+              "name": "--chat-message-background-me"
+            },
+            {
+              "description": "Ink in a turn.",
+              "name": "--chat-message-color"
+            },
+            {
+              "description": "How wide a turn may get before it wraps.",
+              "name": "--chat-message-measure"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "What was said.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "The time and the state together.",
+              "name": "meta",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "The whole turn.",
+              "name": "message",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "The leading slot's box.",
+              "name": "avatar",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "What was said, and the line under it.",
+              "name": "body",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "When it was said.",
+              "name": "time",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "What has happened to it, where that is worth saying.",
+              "name": "state",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "The control offered on a failed message.",
+              "name": "retry",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "The trailing slot's box.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "What was said.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "Who said it.",
+              "name": "avatar",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "What can be done with it.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-headless-pagination-size` composes `helix-headless-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/styled` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "author",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Who said it.\n\nFree text rather than a two-value union, because a conversation is not\nalways two-sided: a transcript with a system turn, a tool call and three\nparticipants is the ordinary case for anything worth building this for.\n`me` and `them` are the conventional values and the stylesheet knows them;\nanything else is a name the consumer styles.",
+              "attribute": "author",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "state",
+              "type": {
+                "text": "'' | 'failed' | 'sending' | 'sent' | 'streaming'"
+              },
+              "default": "''",
+              "description": "What has happened to it.\n\nReflected, because every one of the four is a visual state and a stylesheet\nhas no other way to know. Empty is a settled message with nothing to report,\nwhich is what most of a transcript is.",
+              "attribute": "state",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "at",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "When it was said, as anything `Date` parses.",
+              "attribute": "at",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the timestamp. Empty is the runtime's own.",
+              "attribute": "locale",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "sendingLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Sending'",
+              "description": "What to call each state, for a reader who cannot see it.",
+              "attribute": "sending-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "retryLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Try again'",
+              "description": "Label for the control offered on a failed message.",
+              "attribute": "retry-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "clock",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "moment",
+              "type": {
+                "text": "Date | undefined"
+              },
+              "privacy": "private",
+              "description": "The timestamp, or nothing where there is not one to read.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTime",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "What has happened to it, in words, and the way back from a failure.\n\nA seam of its own, because the styled tier draws a failure as an icon and a\nconsumer may want neither. `sent` says nothing: every settled message is\nsent, and a transcript that labels each one is a transcript of the word\n\"sent\".",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleRetry",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Retry is `helix-send` again, from the message rather than the composer.\n\n**Not an event of its own**, because a retry is the same request: the reader\nis offering what they wrote, and the only difference is which element is\noffering it. A listener that wants to tell them apart has `event.target`,\nwhich is the message on a retry and the composer on a first send, and that\nis a distinction the DOM already makes without a second name for it.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixHeadlessChatMessage",
+            "package": "@helix-io/headless/chat"
+          },
+          "summary": "One turn in a conversation, and what has happened to it.",
+          "helix": {
+            "category": "feedback",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/chat",
+            "tier": "styled",
+            "group": "Chat",
+            "part": "Message"
+          },
+          "tagName": "helix-chat-message",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "author",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Who said it.\n\nFree text rather than a two-value union, because a conversation is not\nalways two-sided: a transcript with a system turn, a tool call and three\nparticipants is the ordinary case for anything worth building this for.\n`me` and `them` are the conventional values and the stylesheet knows them;\nanything else is a name the consumer styles.",
+              "fieldName": "author",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "name": "state",
+              "type": {
+                "text": "'' | 'failed' | 'sending' | 'sent' | 'streaming'"
+              },
+              "default": "''",
+              "description": "What has happened to it.\n\nReflected, because every one of the four is a visual state and a stylesheet\nhas no other way to know. Empty is a settled message with nothing to report,\nwhich is what most of a transcript is.",
+              "fieldName": "state",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "name": "at",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "When it was said, as anything `Date` parses.",
+              "fieldName": "at",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the timestamp. Empty is the runtime's own.",
+              "fieldName": "locale",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "name": "sending-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Sending'",
+              "description": "What to call each state, for a reader who cannot see it.",
+              "fieldName": "sendingLabel",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "name": "retry-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Try again'",
+              "description": "Label for the control offered on a failed message.",
+              "fieldName": "retryLabel",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSendEvent"
+              },
+              "description": "Fired when the reader asks to send a failed message again, and cancelable.",
+              "name": "helix-send",
+              "reactProp": "onhelix-send",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            }
+          ],
+          "modulePath": "src/chat/message/chat-message.ts",
+          "definitionPath": "src/chat/message/chat-message.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixChatMessage",
+          "declaration": {
+            "name": "HelixChatMessage",
+            "module": "src/chat/message/chat-message.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-chat-message",
+          "declaration": {
+            "name": "HelixChatMessage",
+            "module": "src/chat/message/chat-message.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/chat/root/chat-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/chat/root/chat-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/chat/root/chat-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Three regions stacked, and only the transcript scrolls: a composer that slid\naway as the reader scrolled up to re-read would be the thing they were about\nto type into.\n\n**The transcript keeps its turns at the bottom when there are too few to fill\nit**, which is what a conversation looks like. A new one starting at the top\nof an empty column reads as a document.\n\nThe way back sits over the transcript rather than in the column, so offering\nit does not move what the reader is reading, which is the whole point of\noffering it.",
+          "name": "HelixChat",
+          "cssProperties": [
+            {
+              "description": "How tall the conversation may get before the transcript scrolls.",
+              "name": "--chat-max-height"
+            },
+            {
+              "description": "Space between turns.",
+              "name": "--chat-gap"
+            },
+            {
+              "description": "The hairline above the composer and under the header.",
+              "name": "--chat-rule"
+            },
+            {
+              "description": "Space either side of every region.",
+              "name": "--chat-padding-inline"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The transcript, which is the thing that scrolls.",
+              "name": "log",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "The region the composer sits in.",
+              "name": "composer",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "The region above the transcript.",
+              "name": "header",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "The affordance offered while the reader is away from the bottom.",
+              "name": "resume",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "The status region, which is not part of the log.",
+              "name": "status",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "Shown when the conversation has no turns.",
+              "name": "empty",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "Shown while the history is still on its way.",
+              "name": "loading",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The turns, as `helix-chat-message` children.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "Above the transcript.",
+              "name": "header",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "Below the transcript, where the reader writes.",
+              "name": "composer",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "Beside the composer: somebody typing, connection lost.",
+              "name": "status",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "The way back to the bottom.",
+              "name": "resume",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-headless-pagination-size` composes `helix-headless-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/styled` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "slotCounted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "slotRows",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many there were, the last time anyone looked.\n\n**Not `rows`, and the rename is the whole point of this comment.**\nTypeScript's `private` is a compile-time claim and the runtime field is\nwhatever it is named, so a subclass declaring `@property() rows` for the\ndata a consumer hands it would share one field with this counter: the\nslot count would overwrite the consumer's array on every `updated`, and\n`hasRows` would read the array's length as a slot count. Nothing would\nthrow. `helix-data-table` takes exactly that property, which is what\nfound this before it happened.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Counts what a rows slot was given.\n\nEmptiness is a fact about light DOM children and the server has none to\ncount. `slotchange` never fires there, so `counted` is false exactly when\nthe answer is unknown, and an unknown answer is not \"empty\": a list that\nshipped \"Nothing to show\" over markup about to have rows in it is the one\nthing an empty state must never do. Listbox's spec caught precisely that.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where there is content to show.\n\nLoading wins over empty. A collection that has not answered yet is not\nempty, and saying so is the most common version of this fault: the reader\nis told there is nothing a moment before there is something.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }",
+              "description": "Nothing is assigned by name, so the turns land in the log and the rest does not.\n\nThe messages are ordinary children a consumer writes with no `slot`, and a\n`role=\"log\"` whose turns are somewhere else is a log of nothing. Manual\nassignment is the only way to wrap them without editing the consumer's\nmarkup, which is a change a React consumer's hydration reports and does not\npatch up.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the conversation.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "threshold",
+              "type": {
+                "text": "number"
+              },
+              "default": "48",
+              "description": "How near the bottom still counts as being at it, in pixels.\n\nA hook rather than a constant, because the right number depends on how tall\na turn is: a transcript of one-line replies wants a smaller threshold than\none of paragraphs, and a reader who has scrolled up by half a message has\nnot left.",
+              "attribute": "threshold",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pinned",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the transcript follows new turns to the bottom.\n\nSet it and this element defers: the reader's scrolling fires `helix-change`\nand moves nothing until a new value arrives. `default-pinned` seeds a state\nthis element then owns, and it defaults to pinned because a conversation\nopens at its most recent turn.\n\n**Not reflected, and the default is why.** A reflected property that\ndefaults to true writes its attribute on upgrade whether or not the\nconsumer wrote one, so the server serves `<helix-chat label=\"x\">` and the\nclient turns it into `<helix-chat label=\"x\" pinned>`: a hydration mismatch a\nReact consumer reports and does not patch up. Nothing needs the attribute\neither, because the one thing that changes with the pin is the way back, and\nthat is a part inside the shadow tree where a stylesheet can already reach\nit. Measured rather than assumed: `label, pinned` after upgrade against\n`label` from the server.",
+              "attribute": "pinned",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultPinned",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to open pinned, where nothing declared it.",
+              "attribute": "default-pinned",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pinnedState",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pinnedMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pinnedIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "messages",
+              "type": {
+                "text": "HelixHeadlessChatMessage[]"
+              },
+              "description": "The turns declared as children, in the order they are written.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "log",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "description": "The element that scrolls, once there is one.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "atBottom",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether the reader is within `threshold` of the bottom right now.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resume",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts the transcript back at its most recent turn.\n\nPublic because the way back is a slot, so the control offering it is the\nconsumer's and needs something to call. Pins again on the way, which is what\na reader asking to go to the bottom means.",
+              "type": {
+                "text": "resume() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestPinned",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Asks to pin or unpin, and reports whether the request stood.\n\nAnnounced before it is applied, so a consumer owning the pin hears the\nreader's scroll and decides. `property` names it, which is what\n`helix-change`'s detail is for: a listener switching on the name is\nswitching on something with one meaning.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "assign",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleScroll",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The reader's own scrolling, which is the only thing that unpins.\n\nCaptured on the host rather than bound in the template, because the element\nthat scrolls is in the shadow tree and `scroll` does not bubble: it reaches\na listener in the capture phase and nowhere else.\n\n**The scroll this element does itself must not unpin it**, which is the\nsubtle half: `scrollTop = scrollHeight` fires the same event a reader's\nwheel does. Reading the position rather than counting events is what makes\nthat harmless, since after a programmatic scroll the position is the bottom\nand the answer is the one that was already true.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixHeadlessChat",
+            "package": "@helix-io/headless/chat"
+          },
+          "summary": "A conversation: the turns, and where the reader is in them.",
+          "helix": {
+            "category": "feedback",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/chat",
+            "tier": "styled",
+            "group": "Chat",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "A conversation with the four states a turn can be in, and a composer under it.",
+                "slug": "preview"
+              }
+            ],
+            "source": "helix/styled/src/chat"
+          },
+          "tagName": "helix-chat",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "fieldName": "loadingText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the conversation.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "name": "threshold",
+              "type": {
+                "text": "number"
+              },
+              "default": "48",
+              "description": "How near the bottom still counts as being at it, in pixels.\n\nA hook rather than a constant, because the right number depends on how tall\na turn is: a transcript of one-line replies wants a smaller threshold than\none of paragraphs, and a reader who has scrolled up by half a message has\nnot left.",
+              "fieldName": "threshold",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "name": "pinned",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the transcript follows new turns to the bottom.\n\nSet it and this element defers: the reader's scrolling fires `helix-change`\nand moves nothing until a new value arrives. `default-pinned` seeds a state\nthis element then owns, and it defaults to pinned because a conversation\nopens at its most recent turn.\n\n**Not reflected, and the default is why.** A reflected property that\ndefaults to true writes its attribute on upgrade whether or not the\nconsumer wrote one, so the server serves `<helix-chat label=\"x\">` and the\nclient turns it into `<helix-chat label=\"x\" pinned>`: a hydration mismatch a\nReact consumer reports and does not patch up. Nothing needs the attribute\neither, because the one thing that changes with the pin is the way back, and\nthat is a part inside the shadow tree where a stylesheet can already reach\nit. Measured rather than assumed: `label, pinned` after upgrade against\n`label` from the server.",
+              "fieldName": "pinned",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "name": "default-pinned",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to open pinned, where nothing declared it.",
+              "fieldName": "defaultPinned",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired when the reader pins or unpins the transcript by scrolling. Cancelable.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/chat/root/chat-root.ts",
+          "definitionPath": "src/chat/root/chat-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixChat",
+          "declaration": {
+            "name": "HelixChat",
+            "module": "src/chat/root/chat-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-chat",
+          "declaration": {
+            "name": "HelixChat",
+            "module": "src/chat/root/chat-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/checkbox-group/index.ts",
       "declarations": [],
       "exports": [
@@ -30970,6 +32832,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/chat/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/checkbox/index.js"
           }
         },
@@ -42119,10 +43989,8 @@
               "type": {
                 "text": "number"
               },
-              "description": "How many items are unread, counted from the items themselves.\n\nReflected so a stylesheet can answer it, and read-only for the reason it is\nderived: a count the consumer could set is a second source of truth for\nsomething the items already know, and the first time the two disagreed the\nbadge would be right and the list would not.",
+              "description": "How many items are unread, counted from the items themselves.\n\nRead-only for the reason it is derived: a count the consumer could set is a\nsecond source of truth for something the items already know, and the first\ntime the two disagreed the badge would be right and the list would not.\n\n**The attribute is written in `updated` rather than reflected, and the\ndifference is a bug that shipped.** `@property({ reflect: true })` on a\ngetter with no setter reflects once: Lit reflects what is in\n`changedProperties`, and nothing puts a derived getter there after the first\nupdate. Measured with two items, one marked read: the property answered 1\nand the attribute still said 2, so a badge reading the attribute showed a\ncount for an item the reader had just opened.",
               "readonly": true,
-              "attribute": "unread",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessNotifications",
                 "module": "src/notifications/root/notifications-root.ts"
@@ -42398,19 +44266,6 @@
               "default": "'Mark all as read'",
               "description": "Label for that control.",
               "fieldName": "markAllLabel",
-              "inheritedFrom": {
-                "name": "HelixHeadlessNotifications",
-                "module": "src/notifications/root/notifications-root.ts"
-              }
-            },
-            {
-              "name": "unread",
-              "type": {
-                "text": "number"
-              },
-              "description": "How many items are unread, counted from the items themselves.\n\nReflected so a stylesheet can answer it, and read-only for the reason it is\nderived: a count the consumer could set is a second source of truth for\nsomething the items already know, and the first time the two disagreed the\nbadge would be right and the list would not.",
-              "readonly": true,
-              "fieldName": "unread",
               "inheritedFrom": {
                 "name": "HelixHeadlessNotifications",
                 "module": "src/notifications/root/notifications-root.ts"

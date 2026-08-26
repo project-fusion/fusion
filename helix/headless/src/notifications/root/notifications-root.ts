@@ -84,12 +84,18 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   /**
    * How many items are unread, counted from the items themselves.
    *
-   * Reflected so a stylesheet can answer it, and read-only for the reason it is
-   * derived: a count the consumer could set is a second source of truth for
-   * something the items already know, and the first time the two disagreed the
-   * badge would be right and the list would not.
+   * Read-only for the reason it is derived: a count the consumer could set is a
+   * second source of truth for something the items already know, and the first
+   * time the two disagreed the badge would be right and the list would not.
+   *
+   * **The attribute is written in `updated` rather than reflected, and the
+   * difference is a bug that shipped.** `@property({ reflect: true })` on a
+   * getter with no setter reflects once: Lit reflects what is in
+   * `changedProperties`, and nothing puts a derived getter there after the first
+   * update. Measured with two items, one marked read: the property answered 1
+   * and the attribute still said 2, so a badge reading the attribute showed a
+   * count for an item the reader had just opened.
    */
-  @property({ reflect: true, type: Number })
   get unread(): number {
     return this.items.filter((item) => !item.read).length
   }
@@ -179,6 +185,13 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.assign()
+    /* Written after the render rather than reflected during it, so it follows
+       every change rather than only the first, and so the server's output and a
+       hydrating consumer's markup agree that neither has it yet. */
+    const unread = String(this.unread)
+    if (this.getAttribute('unread') !== unread) {
+      this.setAttribute('unread', unread)
+    }
   }
 
   protected override render(): TemplateResult {
