@@ -1,0 +1,71 @@
+/* The strip is one grid filled down the column and then across, which is what a
+   calendar heatmap is: a week is a column, so it reads left to right in weeks
+   and top to bottom in days. `grid-auto-flow: column` is the whole of that, and
+   `rows="1"` makes it a single row without a second layout. */
+:host {
+  display: block;
+}
+
+[part="strip"] {
+  display: grid;
+  gap: var(--heatmap-gap, var(--helix-space-2xs));
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--_heatmap-rows, 1), var(--heatmap-cell-size, 0.75rem));
+}
+
+/* A cell is a square with a tone in it and nothing else. The default is the
+   quietest ground the palette has rather than transparent: a strip of holes
+   reads as a broken picture, where a strip of empty cells reads as a period
+   with nothing in it, which is what it is. */
+[part="cell"] {
+  background-color: var(--heatmap-tone, var(--helix-color-surface-sunken));
+  border-radius: var(--helix-radii-sm);
+  inline-size: var(--heatmap-cell-size, 0.75rem);
+}
+
+/* The footer is `meter`'s three-slot arrangement: start, summary, end. The
+   middle takes the room, so the two ends sit against the strip's edges however
+   long the summary is. */
+[part="footer"] {
+  align-items: baseline;
+  color: var(--helix-color-foreground-subtle);
+  display: grid;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-xs);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding-block-start: var(--helix-space-2xs);
+}
+
+[part="summary"] {
+  text-align: center;
+}
+
+[part="end"] {
+  text-align: end;
+}
+
+[part="footer"]:not(:has(slot:has(*))) {
+  display: none;
+}
+
+[part="empty"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  grid-column: 1 / -1;
+  margin: var(--helix-space-none);
+  text-align: center;
+}
+
+/* Print: a tone is a fill, and a strip of ninety of them is the one thing on the
+   page a printer will render unevenly. Keeping the fills but adding a hairline
+   is what makes the cells countable on paper whatever the fills come out like.
+   `@media print` does not cross a shadow boundary, so every family says it for
+   itself. See 165. */
+@media print {
+  [part="cell"] {
+    outline: var(--helix-border-thin) solid var(--helix-color-border);
+    outline-offset: calc(var(--helix-border-thin) * -1);
+  }
+}

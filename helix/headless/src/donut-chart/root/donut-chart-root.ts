@@ -425,7 +425,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     const at = this.pointer.at
     const share = this.shares[at]
     if (!share) {
-      return drawTooltip(this.rows, at, this.tag('tooltip'))
+      return drawTooltip(this.sourceRows, at, this.tag('tooltip'))
     }
     /* **Outside the ring, on the slice's own bearing.** Centered in the hole was
        the first version: harmless over a donut, since the hole is empty, and it
@@ -440,7 +440,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     const edge = EDGE
     const x = CENTER + Math.cos(angle) * edge
     const y = CENTER + Math.sin(angle) * edge
-    return drawTooltip(this.rows, at, this.tag('tooltip'), {
+    return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
       /* The preferred side from the bearing's dominant axis, and
          `FloatingController` moves it if that side does not fit. Four fixed
          sides could not express a bearing at all, which is what made the arrow

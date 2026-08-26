@@ -214,6 +214,7 @@ interface Matchers {
   toContain: (expected: unknown) => void
   toEqual: (expected: unknown) => void
   toHaveLength: (expected: number) => void
+  toHaveProperty: (path: string | string[], value?: unknown) => void
   toMatch: (expected: RegExp | string) => void
   toMatchObject: (expected: Record<string, unknown>) => void
   toThrow: (expected?: RegExp | string) => void
@@ -278,6 +279,34 @@ const build = (actual: unknown, negated: boolean): Matchers => {
     toHaveLength: (expected) => {
       const length = (actual as { length?: number } | null)?.length
       check(length === expected, `to have length ${expected}, and it has ${show(length)}`)
+    },
+    /* Presence, not value, which is what makes it the matcher for "this key is
+       absent". `toEqual({ label, value })` cannot say that: an extra key fails
+       for the wrong reason, and `undefined` in the expectation passes against a
+       key that is present and undefined. A reader asking whether a point carries
+       no `tone` at all is asking about the shape.
+    
+       Dot paths, because `bun:test` takes them, and a spec that means one thing
+       here and another there is the one thing this harness must never be. */
+    toHaveProperty: (path, ...rest) => {
+      const keys = Array.isArray(path) ? path : String(path).split('.')
+      let cursor: unknown = actual
+      let held = true
+      for (const key of keys) {
+        if (typeof cursor !== 'object' || cursor === null || !(key in cursor)) {
+          held = false
+          break
+        }
+        cursor = (cursor as Record<string, unknown>)[key]
+      }
+      if (rest.length === 0) {
+        check(held, `to have property ${show(keys.join('.'))}`)
+        return
+      }
+      check(
+        held && same(cursor, rest[0]),
+        `to have property ${show(keys.join('.'))} equal to ${show(rest[0])}`,
+      )
     },
     toMatch: (expected) => {
       const pattern = typeof expected === 'string' ? new RegExp(expected) : expected

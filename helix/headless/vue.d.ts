@@ -36,6 +36,7 @@ import type {
   HelixHeadlessDrilldown,
   HelixHeadlessEmpty,
   HelixHeadlessFileInput,
+  HelixHeadlessHeatmap,
   HelixHeadlessIconButton,
   HelixHeadlessIcon,
   HelixHeadlessImage,
@@ -129,6 +130,7 @@ import type {
   HelixSortEvent,
   HelixFilterEvent,
   HelixNavigateEvent,
+  HelixResizeEvent,
   HelixLoadEvent,
   HelixErrorEvent,
   HelixInputEvent,
@@ -2422,6 +2424,72 @@ reflected none of them. */
 export type HelixHeadlessFileInputVueEvents = {
   /** Fired when the chosen files change, with their names. */
   "helix-change": HelixHeadlessFileInputHelixChangeElementEvent;
+};
+
+/** `HelixHeadlessHeatmap` component event */
+export type HelixHeadlessHeatmapElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessHeatmap,
+  E
+>;
+/** `helix-resize` event type */
+export type HelixHeadlessHeatmapHelixResizeElementEvent =
+  HelixHeadlessHeatmapElementEvent<HelixResizeEvent>;
+
+export type HelixHeadlessHeatmapVueProps = {
+  /** How many rows the strip has.
+
+`1` is a status strip and `7` is a calendar week, which are the two readings
+this covers. Cells fill down the column and then across, which is what a
+calendar heatmap does: a week is a column, so the strip reads left to right
+in weeks and top to bottom in days. */
+  rows?: HelixHeadlessHeatmap["rows"];
+  /** Lower bounds for the tone buckets, in the order the tones are given.
+
+`thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
+`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
+A value below the first bound gets no tone at all: an empty day in a
+contribution graph is a day with nothing in it, and painting it as the
+lowest bucket claims a reading that does not exist. */
+  thresholds?: HelixHeadlessHeatmap["thresholds"];
+  /** Tone per bucket, in the same order as `thresholds`. */
+  tones?: HelixHeadlessHeatmap["tones"];
+  /** The smallest a cell may get before the strip draws fewer of them.
+
+In CSS pixels, because this is arithmetic against a measured width rather
+than a length the stylesheet resolves. Zero turns the dropping off
+altogether, which is right for a strip in a container that cannot get narrow. */
+  "min-cell"?: HelixHeadlessHeatmap["minCell"];
+  /** The smallest a cell may get before the strip draws fewer of them.
+
+In CSS pixels, because this is arithmetic against a measured width rather
+than a length the stylesheet resolves. Zero turns the dropping off
+altogether, which is right for a strip in a container that cannot get narrow. */
+  minCell?: HelixHeadlessHeatmap["minCell"];
+  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
+  gap?: HelixHeadlessHeatmap["gap"];
+  /** Shown when the table has no readings in it. */
+  "empty-text"?: HelixHeadlessHeatmap["emptyText"];
+  /** Shown when the table has no readings in it. */
+  emptyText?: HelixHeadlessHeatmap["emptyText"];
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixHeadlessHeatmap["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixHeadlessHeatmap["label"];
+};
+
+export type HelixHeadlessHeatmapVueEvents = {
+  /** Fired when the number of cells drawn changes, carrying that number. */
+  "helix-resize": HelixHeadlessHeatmapHelixResizeElementEvent;
 };
 
 export type HelixHeadlessIconButtonVueProps = {
@@ -6858,6 +6926,12 @@ export type CustomCssProperties = {
   "--date-picker-column-count"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
   "--donut-chart-stroke"?: string;
+  /** The size a cell wants. The strip fits as many as the container allows. */
+  "--heatmap-cell-size"?: string;
+  /** Space between cells. */
+  "--heatmap-gap"?: string;
+  /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
+  "--heatmap-tone"?: string;
   /** Where the panel starts, measured from the bar above it. */
   "--megamenu-top"?: string;
   /** Where a bound sits on the arc, as a length along it. */
@@ -7129,6 +7203,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessFileInput,
     HelixHeadlessFileInputVueProps,
     HelixHeadlessFileInputVueEvents
+  >;
+  /** **One family covers both readings, and the split people expect does not exist.** It was filed as two on the argument that a contribution graph needs a continuous ramp where uptime needs a category. GitHub's contribution graph is five discrete levels rather than a gradient, so a cell that takes a tone covers both: 'rows="1"' is a status strip, 'rows="7"' is a contribution graph, and heatmap is the name of that.  **What it cannot be is a bar chart with flat values**, and the data model is what closes that rather than taste: chart color is per *series* everywhere else here, '--chart-series-1' through '-15', so ninety differently coloured cells would be ninety series.  The data is a real '<table>' named by 'for', the same convention every chart in this library uses, which also answers the accessibility question without inventing anything: **the table is the accessible representation**, it is already in the markup, and the drawing is a picture of it. Hide it with 'data-hidden-visually' and the reading is still there for anyone who needs it.  A cell takes its tone from its own 'data-tone', or from 'thresholds' and 'tones' bucketing its value. The first is what a status page wants and the second is what a contribution graph wants; the cell's own wins, so a page that already knows a day was degraded does not have to encode that as a number for this component to decode again.  **On a narrow container it draws fewer cells rather than thinner ones.** Ninety cells in 320 pixels is three and a half pixels each, which is a smear and not a strip. The cells it drops are the oldest, and it reflects 'visible' and fires 'helix-resize' when the number changes, because **a summary saying "99.2% over 90 days" above a strip drawing 45 of them is telling the reader something false about the picture in front of them** and nothing about the picture says so. */
+  "helix-headless-heatmap": DefineCustomElement<
+    HelixHeadlessHeatmap,
+    HelixHeadlessHeatmapVueProps,
+    HelixHeadlessHeatmapVueEvents
   >;
   /** Everything a button does, with one thing added and it is the reason this is an element rather than a note on 'Button': **an icon-only control has no accessible name unless it is given one.** A button whose content is a glyph announces as "button" and nothing else, which is the single most common way a toolbar becomes unusable without sight. 'label' is not optional in practice, and having a component that says so is what makes it reviewable.  **Registered, so it can be rendered and not only subclassed.** The styled icon button extended 'HelixHeadlessButton' directly, which left no 'helix-headless-icon-button' for anything to use: a headless consumer wanting an icon button had a button and a naming convention. Anything in this tier that needs one, such as an announcement's dismiss control, can now render it without reaching into the styled tier for a tag that would never upgrade.  Top-level rather than 'Button.Icon', because a namespace means composition and an icon-only button is not part of a button. It is a button with different content and a different shape, which makes it its own component. */
   "helix-headless-icon-button": DefineCustomElement<

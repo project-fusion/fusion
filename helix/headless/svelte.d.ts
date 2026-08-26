@@ -43,6 +43,7 @@ declare module 'svelte/elements' {
     'helix-headless-drilldown': CustomElements['helix-headless-drilldown']
     'helix-headless-empty': CustomElements['helix-headless-empty']
     'helix-headless-file-input': CustomElements['helix-headless-file-input']
+    'helix-headless-heatmap': CustomElements['helix-headless-heatmap']
     'helix-headless-icon-button': CustomElements['helix-headless-icon-button']
     'helix-headless-icon': CustomElements['helix-headless-icon']
     'helix-headless-image': CustomElements['helix-headless-image']

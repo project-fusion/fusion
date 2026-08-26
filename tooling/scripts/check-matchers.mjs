@@ -78,10 +78,46 @@ if (declared.size === 0) {
   process.exit(1)
 }
 
-/* In the matcher position and nowhere else. `expect(anything).toX` and
-   `.not.toX`, which together are every way a matcher is reached, and neither of
-   which matches `value.toLowerCase()`. */
-const CALLED = /(?:\)\s*\.|\.not\s*\.)(to[A-Z][A-Za-z]*)\s*\(/g
+/**
+ * Every matcher reached from an `expect(...)`, and nothing else.
+ *
+ * **The obvious regex is `).toX(` and it is wrong on ordinary code.** It reads
+ * `new Date(x).toISOString()` and `list.slice(0, 1).toString()` as matchers,
+ * because a close paren followed by a `to`-plus-capital method is what a great
+ * deal of JavaScript looks like. Reported against a spec that was correct, it
+ * sends whoever is reading it to add `toISOString` to a test harness.
+ *
+ * So the scan starts at `expect(`, balances the parentheses itself, and only
+ * then looks for the matcher. A regex cannot balance parens, which is the whole
+ * reason this is a loop rather than a pattern.
+ */
+const matchersIn = (text) => {
+  const found = []
+  for (let at = text.indexOf('expect('); at !== -1; at = text.indexOf('expect(', at + 1)) {
+    let depth = 0
+    let cursor = at + 'expect'.length
+    for (; cursor < text.length; cursor += 1) {
+      if (text[cursor] === '(') {
+        depth += 1
+      } else if (text[cursor] === ')') {
+        depth -= 1
+        if (depth === 0) {
+          cursor += 1
+          break
+        }
+      }
+    }
+    /* `.not`, `.resolves` and `.rejects` are the modifiers that sit between the
+       call and the matcher; anything else after the close paren is not ours. */
+    const reached = /^(?:\s*\.(?:not|resolves|rejects))*\s*\.(to[A-Z][A-Za-z]*)\s*\(/.exec(
+      text.slice(cursor),
+    )
+    if (reached?.[1]) {
+      found.push({ at, name: reached[1] })
+    }
+  }
+  return found
+}
 
 const problems = []
 let asserted = 0
@@ -89,10 +125,10 @@ let asserted = 0
 for (const file of specs(SPECS)) {
   const text = readFileSync(file, 'utf8')
   const seen = new Map()
-  for (const match of text.matchAll(CALLED)) {
+  for (const match of matchersIn(text)) {
     asserted += 1
-    if (!declared.has(match[1]) && !seen.has(match[1])) {
-      seen.set(match[1], text.slice(0, match.index).split('\n').length)
+    if (!declared.has(match.name) && !seen.has(match.name)) {
+      seen.set(match.name, text.slice(0, match.at).split('\n').length)
     }
   }
   for (const [name, line] of seen) {

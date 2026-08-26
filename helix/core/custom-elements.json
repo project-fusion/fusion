@@ -4321,7 +4321,7 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "sourceRows",
               "type": {
                 "text": "Row[]"
               },
@@ -4408,11 +4408,11 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "sourceRows",
               "type": {
                 "text": "Row[]"
               },
-              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.\n\n**Not `rows`, and the rename is the whole point of this paragraph.** It\nis the source table's rows, and `rows` on a chart is a name a chart\nwants for itself: `helix-heatmap` takes `rows=\"7\"` to mean a calendar\nweek, and declaring that against a base class whose `rows` is a `Row[]`\ngetter is a type error at best. The same fault `MixinCollection` had,\nwhere a slot counter called `rows` would have shared one field with a\nconsumer's data property. Name the member for what it holds rather than\nfor the shortest word available.",
               "readonly": true
             },
             {

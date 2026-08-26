@@ -101,8 +101,16 @@ const readGrid = (grid: Element): Series[] => {
       const raw = (cell as HTMLElement).dataset?.value ?? cell.textContent ?? ''
       const value = Number(raw.trim())
       const when = head?.querySelector('time')?.getAttribute('datetime')
+      const tone = (cell as HTMLElement).dataset?.tone
       return Number.isFinite(value) && raw.trim() !== ''
-        ? [{ label: head?.textContent?.trim() ?? '', value, ...(when ? { when } : {}) }]
+        ? [
+            {
+              label: head?.textContent?.trim() ?? '',
+              value,
+              ...(tone ? { tone } : {}),
+              ...(when ? { when } : {}),
+            },
+          ]
         : []
     }),
   }))
@@ -143,8 +151,16 @@ export const readSeries = (table: Element): Series[] => {
         const raw = cell.dataset.value ?? cell.textContent ?? ''
         const value = Number(raw.trim())
         const when = head?.querySelector('time')?.getAttribute('datetime')
+        const tone = cell.dataset.tone
         return Number.isFinite(value) && raw.trim() !== ''
-          ? [{ label: head?.textContent?.trim() ?? '', value, ...(when ? { when } : {}) }]
+          ? [
+              {
+                label: head?.textContent?.trim() ?? '',
+                value,
+                ...(tone ? { tone } : {}),
+                ...(when ? { when } : {}),
+              },
+            ]
           : []
       }),
     })),

@@ -46,6 +46,7 @@ import type {
   HelixHeadlessDrilldownItem,
   HelixHeadlessEmpty,
   HelixHeadlessFileInput,
+  HelixHeadlessHeatmap,
   HelixHeadlessIcon,
   HelixHeadlessIconButton,
   HelixHeadlessImage,
@@ -128,6 +129,7 @@ import type {
   HelixOpenEvent,
   HelixPreviousEvent,
   HelixReadEvent,
+  HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixSelectEvent,
@@ -4670,6 +4672,129 @@ reflected none of them. */
   "on:helix-change"?: (
     e: HelixHeadlessFileInputHelixChangeElementEvent,
   ) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixHeadlessHeatmap` component event */
+export type HelixHeadlessHeatmapElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessHeatmap,
+  E
+>;
+/** `helix-resize` event type */
+export type HelixHeadlessHeatmapHelixResizeElementEvent =
+  HelixHeadlessHeatmapElementEvent<HelixResizeEvent>;
+
+export type HelixHeadlessHeatmapProps = {
+  /** How many rows the strip has.
+
+`1` is a status strip and `7` is a calendar week, which are the two readings
+this covers. Cells fill down the column and then across, which is what a
+calendar heatmap does: a week is a column, so the strip reads left to right
+in weeks and top to bottom in days. */
+  rows?: HelixHeadlessHeatmap["rows"];
+  /** Lower bounds for the tone buckets, in the order the tones are given.
+
+`thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
+`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
+A value below the first bound gets no tone at all: an empty day in a
+contribution graph is a day with nothing in it, and painting it as the
+lowest bucket claims a reading that does not exist. */
+  thresholds?: HelixHeadlessHeatmap["thresholds"];
+  /** Tone per bucket, in the same order as `thresholds`. */
+  tones?: HelixHeadlessHeatmap["tones"];
+  /** The smallest a cell may get before the strip draws fewer of them.
+
+In CSS pixels, because this is arithmetic against a measured width rather
+than a length the stylesheet resolves. Zero turns the dropping off
+altogether, which is right for a strip in a container that cannot get narrow. */
+  "min-cell"?: HelixHeadlessHeatmap["minCell"];
+  /** The smallest a cell may get before the strip draws fewer of them.
+
+In CSS pixels, because this is arithmetic against a measured width rather
+than a length the stylesheet resolves. Zero turns the dropping off
+altogether, which is right for a strip in a container that cannot get narrow. */
+  minCell?: HelixHeadlessHeatmap["minCell"];
+  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
+  gap?: HelixHeadlessHeatmap["gap"];
+  /** Shown when the table has no readings in it. */
+  "empty-text"?: HelixHeadlessHeatmap["emptyText"];
+  /** Shown when the table has no readings in it. */
+  emptyText?: HelixHeadlessHeatmap["emptyText"];
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixHeadlessHeatmap["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixHeadlessHeatmap["label"];
+
+  /** Fired when the number of cells drawn changes, carrying that number. */
+  "onhelix-resize"?: (e: HelixHeadlessHeatmapHelixResizeElementEvent) => void;
+};
+
+export type HelixHeadlessHeatmapSolidJsProps = {
+  /** How many rows the strip has.
+
+`1` is a status strip and `7` is a calendar week, which are the two readings
+this covers. Cells fill down the column and then across, which is what a
+calendar heatmap does: a week is a column, so the strip reads left to right
+in weeks and top to bottom in days. */
+  "prop:rows"?: HelixHeadlessHeatmap["rows"];
+  /** Lower bounds for the tone buckets, in the order the tones are given.
+
+`thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
+`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
+A value below the first bound gets no tone at all: an empty day in a
+contribution graph is a day with nothing in it, and painting it as the
+lowest bucket claims a reading that does not exist. */
+  "prop:thresholds"?: HelixHeadlessHeatmap["thresholds"];
+  /** Tone per bucket, in the same order as `thresholds`. */
+  "prop:tones"?: HelixHeadlessHeatmap["tones"];
+  /** The smallest a cell may get before the strip draws fewer of them.
+
+In CSS pixels, because this is arithmetic against a measured width rather
+than a length the stylesheet resolves. Zero turns the dropping off
+altogether, which is right for a strip in a container that cannot get narrow. */
+  "attr:min-cell"?: HelixHeadlessHeatmap["minCell"];
+  /** The smallest a cell may get before the strip draws fewer of them.
+
+In CSS pixels, because this is arithmetic against a measured width rather
+than a length the stylesheet resolves. Zero turns the dropping off
+altogether, which is right for a strip in a container that cannot get narrow. */
+  "prop:minCell"?: HelixHeadlessHeatmap["minCell"];
+  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
+  "prop:gap"?: HelixHeadlessHeatmap["gap"];
+  /** Shown when the table has no readings in it. */
+  "attr:empty-text"?: HelixHeadlessHeatmap["emptyText"];
+  /** Shown when the table has no readings in it. */
+  "prop:emptyText"?: HelixHeadlessHeatmap["emptyText"];
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  "prop:for"?: HelixHeadlessHeatmap["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  "prop:label"?: HelixHeadlessHeatmap["label"];
+  /** Fired when the number of cells drawn changes, carrying that number. */
+  "on:helix-resize"?: (e: HelixHeadlessHeatmapHelixResizeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13699,12 +13824,21 @@ export type CustomElements = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
-   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   * - `sourceRows`: Every row of the table, with each cell's text as well as its number.
    *
    * This is where a tooltip's content comes from, and it is deliberately not
    * `series`. A chart draws numbers; a reader resting a pointer on one wants
    * what the table says, which is `$128k` and not `128000`, and often wants
-   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * the column beside it that nothing plotted at all.
+   *
+   * **Not `rows`, and the rename is the whole point of this paragraph.** It
+   * is the source table's rows, and `rows` on a chart is a name a chart
+   * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
+   * week, and declaring that against a base class whose `rows` is a `Row[]`
+   * getter is a type error at best. The same fault `MixinCollection` had,
+   * where a slot counter called `rows` would have shared one field with a
+   * consumer's data property. Name the member for what it holds rather than
+   * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## CSS Custom Properties
@@ -16693,12 +16827,21 @@ export type CustomElements = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
-   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   * - `sourceRows`: Every row of the table, with each cell's text as well as its number.
    *
    * This is where a tooltip's content comes from, and it is deliberately not
    * `series`. A chart draws numbers; a reader resting a pointer on one wants
    * what the table says, which is `$128k` and not `128000`, and often wants
-   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * the column beside it that nothing plotted at all.
+   *
+   * **Not `rows`, and the rename is the whole point of this paragraph.** It
+   * is the source table's rows, and `rows` on a chart is a name a chart
+   * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
+   * week, and declaring that against a base class whose `rows` is a `Row[]`
+   * getter is a type error at best. The same fault `MixinCollection` had,
+   * where a slot counter called `rows` would have shared one field with a
+   * consumer's data property. Name the member for what it holds rather than
+   * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## Slots
@@ -17207,6 +17350,158 @@ export type CustomElements = {
    */
   "helix-headless-file-input": Partial<
     HelixHeadlessFileInputProps & BaseProps<HelixHeadlessFileInput> & BaseEvents
+  >;
+
+  /**
+   * **One family covers both readings, and the split people expect does not
+   * exist.** It was filed as two on the argument that a contribution graph needs a
+   * continuous ramp where uptime needs a category. GitHub's contribution graph is
+   * five discrete levels rather than a gradient, so a cell that takes a tone
+   * covers both: `rows="1"` is a status strip, `rows="7"` is a contribution graph,
+   * and heatmap is the name of that.
+   *
+   * **What it cannot be is a bar chart with flat values**, and the data model is
+   * what closes that rather than taste: chart color is per *series* everywhere
+   * else here, `--chart-series-1` through `-15`, so ninety differently coloured
+   * cells would be ninety series.
+   *
+   * The data is a real `<table>` named by `for`, the same convention every chart
+   * in this library uses, which also answers the accessibility question without
+   * inventing anything: **the table is the accessible representation**, it is
+   * already in the markup, and the drawing is a picture of it. Hide it with
+   * `data-hidden-visually` and the reading is still there for anyone who needs it.
+   *
+   * A cell takes its tone from its own `data-tone`, or from `thresholds` and
+   * `tones` bucketing its value. The first is what a status page wants and the
+   * second is what a contribution graph wants; the cell's own wins, so a page that
+   * already knows a day was degraded does not have to encode that as a number for
+   * this component to decode again.
+   *
+   * **On a narrow container it draws fewer cells rather than thinner ones.**
+   * Ninety cells in 320 pixels is three and a half pixels each, which is a smear
+   * and not a strip. The cells it drops are the oldest, and it reflects `visible`
+   * and fires `helix-resize` when the number changes, because **a summary saying
+   * "99.2% over 90 days" above a strip drawing 45 of them is telling the reader
+   * something false about the picture in front of them** and nothing about the
+   * picture says so.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `rows`: How many rows the strip has.
+   *
+   * `1` is a status strip and `7` is a calendar week, which are the two readings
+   * this covers. Cells fill down the column and then across, which is what a
+   * calendar heatmap does: a week is a column, so the strip reads left to right
+   * in weeks and top to bottom in days.
+   * - `thresholds`: Lower bounds for the tone buckets, in the order the tones are given.
+   *
+   * `thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
+   * `muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
+   * A value below the first bound gets no tone at all: an empty day in a
+   * contribution graph is a day with nothing in it, and painting it as the
+   * lowest bucket claims a reading that does not exist.
+   * - `tones`: Tone per bucket, in the same order as `thresholds`.
+   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them.
+   *
+   * In CSS pixels, because this is arithmetic against a measured width rather
+   * than a length the stylesheet resolves. Zero turns the dropping off
+   * altogether, which is right for a strip in a container that cannot get narrow.
+   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a number.
+   * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: The drawing's name, for a pointer resting on it.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words and is already written.
+   * - `visible`: How many cells are actually drawn.
+   *
+   * **This is the number a summary has to agree with**, and the reason it is
+   * published at all: a consumer's own summary is their markup and this element
+   * cannot rewrite it, so the only honest arrangement is to hand over the count
+   * and say when it changed.
+   *
+   * **A plain getter, and the attribute is written in `updated`, because
+   * `@property({ reflect: true })` on a getter with no setter reflects once and
+   * then goes stale.** Lit reflects a property that is in `changedProperties`,
+   * and nothing puts a derived getter there after the first update: the
+   * attribute would be right on load and wrong from the first resize, which is
+   * the exact failure the count exists to prevent, arriving through the
+   * mechanism meant to prevent it. (property only) (readonly)
+   * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
+   *
+   * Public for the same reason `series` and `named` are: a protected member
+   * cannot be cast onto across unrelated classes, so it would be invisible to
+   * every chart that needs it. Reading where a pointer is resting is a fair
+   * thing to ask a chart anyway. (property only) (readonly)
+   * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
+   * - `named`: What to call the drawing, the consumer's word or the table's own.
+   *
+   * The fallback is the reason this is shared rather than copied: a caption is
+   * already written, already the right words, and already the thing a reader
+   * of the table sees. A chart that made the consumer say it twice would be
+   * asking for the second one to drift. (property only) (readonly)
+   * - `sourceRows`: Every row of the table, with each cell's text as well as its number.
+   *
+   * This is where a tooltip's content comes from, and it is deliberately not
+   * `series`. A chart draws numbers; a reader resting a pointer on one wants
+   * what the table says, which is `$128k` and not `128000`, and often wants
+   * the column beside it that nothing plotted at all.
+   *
+   * **Not `rows`, and the rename is the whole point of this paragraph.** It
+   * is the source table's rows, and `rows` on a chart is a name a chart
+   * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
+   * week, and declaring that against a base class whose `rows` is a `Row[]`
+   * getter is a type error at best. The same fault `MixinCollection` had,
+   * where a slot counter called `rows` would have shared one field with a
+   * consumer's data property. Name the member for what it holds rather than
+   * for the shortest word available. (property only) (readonly)
+   * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-resize`: Fired when the number of cells drawn changes, carrying that number.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Below the strip, at the leading edge: usually the oldest date.
+   * - `summary`: Below the strip, in the middle: the reading over the range drawn.
+   * - `end`: Below the strip, at the trailing edge: usually the newest date.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--heatmap-cell-size`: The size a cell wants. The strip fits as many as the container allows. (default: `undefined`)
+   * - `--heatmap-gap`: Space between cells. (default: `undefined`)
+   * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `strip`: The grid of cells.
+   * - `cell`: One reading.
+   * - `footer`: The three-slot row under the strip.
+   * - `start`: The leading slot's box.
+   * - `summary`: The middle slot's box.
+   * - `end`: The trailing slot's box.
+   * - `empty`: Shown when the table has no readings in it.
+   */
+  "helix-headless-heatmap": Partial<
+    HelixHeadlessHeatmapProps & BaseProps<HelixHeadlessHeatmap> & BaseEvents
   >;
 
   /**
@@ -17956,12 +18251,21 @@ export type CustomElements = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
-   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   * - `sourceRows`: Every row of the table, with each cell's text as well as its number.
    *
    * This is where a tooltip's content comes from, and it is deliberately not
    * `series`. A chart draws numbers; a reader resting a pointer on one wants
    * what the table says, which is `$128k` and not `128000`, and often wants
-   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * the column beside it that nothing plotted at all.
+   *
+   * **Not `rows`, and the rename is the whole point of this paragraph.** It
+   * is the source table's rows, and `rows` on a chart is a name a chart
+   * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
+   * week, and declaring that against a base class whose `rows` is a `Row[]`
+   * getter is a type error at best. The same fault `MixinCollection` had,
+   * where a slot counter called `rows` would have shared one field with a
+   * consumer's data property. Name the member for what it holds rather than
+   * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## CSS Parts
@@ -25747,12 +26051,21 @@ export type CustomElementsSolidJs = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
-   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   * - `sourceRows`: Every row of the table, with each cell's text as well as its number.
    *
    * This is where a tooltip's content comes from, and it is deliberately not
    * `series`. A chart draws numbers; a reader resting a pointer on one wants
    * what the table says, which is `$128k` and not `128000`, and often wants
-   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * the column beside it that nothing plotted at all.
+   *
+   * **Not `rows`, and the rename is the whole point of this paragraph.** It
+   * is the source table's rows, and `rows` on a chart is a name a chart
+   * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
+   * week, and declaring that against a base class whose `rows` is a `Row[]`
+   * getter is a type error at best. The same fault `MixinCollection` had,
+   * where a slot counter called `rows` would have shared one field with a
+   * consumer's data property. Name the member for what it holds rather than
+   * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## CSS Custom Properties
@@ -28792,12 +29105,21 @@ export type CustomElementsSolidJs = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
-   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   * - `sourceRows`: Every row of the table, with each cell's text as well as its number.
    *
    * This is where a tooltip's content comes from, and it is deliberately not
    * `series`. A chart draws numbers; a reader resting a pointer on one wants
    * what the table says, which is `$128k` and not `128000`, and often wants
-   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * the column beside it that nothing plotted at all.
+   *
+   * **Not `rows`, and the rename is the whole point of this paragraph.** It
+   * is the source table's rows, and `rows` on a chart is a name a chart
+   * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
+   * week, and declaring that against a base class whose `rows` is a `Row[]`
+   * getter is a type error at best. The same fault `MixinCollection` had,
+   * where a slot counter called `rows` would have shared one field with a
+   * consumer's data property. Name the member for what it holds rather than
+   * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## Slots
@@ -29319,6 +29641,161 @@ export type CustomElementsSolidJs = {
     HelixHeadlessFileInputProps &
       HelixHeadlessFileInputSolidJsProps &
       BaseProps<HelixHeadlessFileInput> &
+      BaseEvents
+  >;
+
+  /**
+   * **One family covers both readings, and the split people expect does not
+   * exist.** It was filed as two on the argument that a contribution graph needs a
+   * continuous ramp where uptime needs a category. GitHub's contribution graph is
+   * five discrete levels rather than a gradient, so a cell that takes a tone
+   * covers both: `rows="1"` is a status strip, `rows="7"` is a contribution graph,
+   * and heatmap is the name of that.
+   *
+   * **What it cannot be is a bar chart with flat values**, and the data model is
+   * what closes that rather than taste: chart color is per *series* everywhere
+   * else here, `--chart-series-1` through `-15`, so ninety differently coloured
+   * cells would be ninety series.
+   *
+   * The data is a real `<table>` named by `for`, the same convention every chart
+   * in this library uses, which also answers the accessibility question without
+   * inventing anything: **the table is the accessible representation**, it is
+   * already in the markup, and the drawing is a picture of it. Hide it with
+   * `data-hidden-visually` and the reading is still there for anyone who needs it.
+   *
+   * A cell takes its tone from its own `data-tone`, or from `thresholds` and
+   * `tones` bucketing its value. The first is what a status page wants and the
+   * second is what a contribution graph wants; the cell's own wins, so a page that
+   * already knows a day was degraded does not have to encode that as a number for
+   * this component to decode again.
+   *
+   * **On a narrow container it draws fewer cells rather than thinner ones.**
+   * Ninety cells in 320 pixels is three and a half pixels each, which is a smear
+   * and not a strip. The cells it drops are the oldest, and it reflects `visible`
+   * and fires `helix-resize` when the number changes, because **a summary saying
+   * "99.2% over 90 days" above a strip drawing 45 of them is telling the reader
+   * something false about the picture in front of them** and nothing about the
+   * picture says so.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `rows`: How many rows the strip has.
+   *
+   * `1` is a status strip and `7` is a calendar week, which are the two readings
+   * this covers. Cells fill down the column and then across, which is what a
+   * calendar heatmap does: a week is a column, so the strip reads left to right
+   * in weeks and top to bottom in days.
+   * - `thresholds`: Lower bounds for the tone buckets, in the order the tones are given.
+   *
+   * `thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
+   * `muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
+   * A value below the first bound gets no tone at all: an empty day in a
+   * contribution graph is a day with nothing in it, and painting it as the
+   * lowest bucket claims a reading that does not exist.
+   * - `tones`: Tone per bucket, in the same order as `thresholds`.
+   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them.
+   *
+   * In CSS pixels, because this is arithmetic against a measured width rather
+   * than a length the stylesheet resolves. Zero turns the dropping off
+   * altogether, which is right for a strip in a container that cannot get narrow.
+   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a number.
+   * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: The drawing's name, for a pointer resting on it.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words and is already written.
+   * - `visible`: How many cells are actually drawn.
+   *
+   * **This is the number a summary has to agree with**, and the reason it is
+   * published at all: a consumer's own summary is their markup and this element
+   * cannot rewrite it, so the only honest arrangement is to hand over the count
+   * and say when it changed.
+   *
+   * **A plain getter, and the attribute is written in `updated`, because
+   * `@property({ reflect: true })` on a getter with no setter reflects once and
+   * then goes stale.** Lit reflects a property that is in `changedProperties`,
+   * and nothing puts a derived getter there after the first update: the
+   * attribute would be right on load and wrong from the first resize, which is
+   * the exact failure the count exists to prevent, arriving through the
+   * mechanism meant to prevent it. (property only) (readonly)
+   * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
+   *
+   * Public for the same reason `series` and `named` are: a protected member
+   * cannot be cast onto across unrelated classes, so it would be invisible to
+   * every chart that needs it. Reading where a pointer is resting is a fair
+   * thing to ask a chart anyway. (property only) (readonly)
+   * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
+   * - `named`: What to call the drawing, the consumer's word or the table's own.
+   *
+   * The fallback is the reason this is shared rather than copied: a caption is
+   * already written, already the right words, and already the thing a reader
+   * of the table sees. A chart that made the consumer say it twice would be
+   * asking for the second one to drift. (property only) (readonly)
+   * - `sourceRows`: Every row of the table, with each cell's text as well as its number.
+   *
+   * This is where a tooltip's content comes from, and it is deliberately not
+   * `series`. A chart draws numbers; a reader resting a pointer on one wants
+   * what the table says, which is `$128k` and not `128000`, and often wants
+   * the column beside it that nothing plotted at all.
+   *
+   * **Not `rows`, and the rename is the whole point of this paragraph.** It
+   * is the source table's rows, and `rows` on a chart is a name a chart
+   * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
+   * week, and declaring that against a base class whose `rows` is a `Row[]`
+   * getter is a type error at best. The same fault `MixinCollection` had,
+   * where a slot counter called `rows` would have shared one field with a
+   * consumer's data property. Name the member for what it holds rather than
+   * for the shortest word available. (property only) (readonly)
+   * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-resize`: Fired when the number of cells drawn changes, carrying that number.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `start`: Below the strip, at the leading edge: usually the oldest date.
+   * - `summary`: Below the strip, in the middle: the reading over the range drawn.
+   * - `end`: Below the strip, at the trailing edge: usually the newest date.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--heatmap-cell-size`: The size a cell wants. The strip fits as many as the container allows. (default: `undefined`)
+   * - `--heatmap-gap`: Space between cells. (default: `undefined`)
+   * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `strip`: The grid of cells.
+   * - `cell`: One reading.
+   * - `footer`: The three-slot row under the strip.
+   * - `start`: The leading slot's box.
+   * - `summary`: The middle slot's box.
+   * - `end`: The trailing slot's box.
+   * - `empty`: Shown when the table has no readings in it.
+   */
+  "helix-headless-heatmap": Partial<
+    HelixHeadlessHeatmapProps &
+      HelixHeadlessHeatmapSolidJsProps &
+      BaseProps<HelixHeadlessHeatmap> &
       BaseEvents
   >;
 
@@ -30085,12 +30562,21 @@ export type CustomElementsSolidJs = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
-   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   * - `sourceRows`: Every row of the table, with each cell's text as well as its number.
    *
    * This is where a tooltip's content comes from, and it is deliberately not
    * `series`. A chart draws numbers; a reader resting a pointer on one wants
    * what the table says, which is `$128k` and not `128000`, and often wants
-   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * the column beside it that nothing plotted at all.
+   *
+   * **Not `rows`, and the rename is the whole point of this paragraph.** It
+   * is the source table's rows, and `rows` on a chart is a name a chart
+   * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
+   * week, and declaring that against a base class whose `rows` is a `Row[]`
+   * getter is a type error at best. The same fault `MixinCollection` had,
+   * where a slot counter called `rows` would have shared one field with a
+   * consumer's data property. Name the member for what it holds rather than
+   * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## CSS Parts
@@ -37480,6 +37966,12 @@ export type CustomCssProperties = {
   "--date-picker-column-count"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
   "--donut-chart-stroke"?: string;
+  /** The size a cell wants. The strip fits as many as the container allows. */
+  "--heatmap-cell-size"?: string;
+  /** Space between cells. */
+  "--heatmap-gap"?: string;
+  /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
+  "--heatmap-tone"?: string;
   /** Where the panel starts, measured from the bar above it. */
   "--megamenu-top"?: string;
   /** Where a bound sits on the arc, as a length along it. */

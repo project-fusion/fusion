@@ -1,0 +1,70 @@
+import { describe, expect, test } from 'bun:test'
+import { hostAttributes, partTag, ssr, withoutStyles } from '@helix-io/testing/ssr'
+import { html } from 'lit'
+import '../index.js'
+
+/**
+ * The server output, which for every chart here is the table and not the drawing.
+ *
+ * `SourceController.element` resolves an id through `getRootNode()`, and
+ * resolving an id wants a document, so it is null on the server by design: the
+ * table is served whole and the drawing arrives on hydration. That is the right
+ * arrangement rather than a limitation, because **the table is the accessible
+ * representation**, so what a crawler and a screen reader get before hydration
+ * is the reading itself rather than a picture of it.
+ */
+
+const markup = ssr(
+  html`<div>
+    <table data-hidden-visually id="uptime">
+      <caption>Uptime</caption>
+      <tbody>
+        <tr>
+          <th scope="row"><time datetime="2026-08-25">25 Aug</time></th>
+          <td data-value="0.81" data-tone="danger">81%</td>
+        </tr>
+      </tbody>
+    </table>
+    <helix-headless-heatmap for="uptime" label="Uptime">
+      <span slot="summary">99.6% over 90 days</span>
+    </helix-headless-heatmap>
+  </div>`,
+)
+
+describe('heatmap server output', () => {
+  test('the strip is served, even though it has nothing in it yet', () => {
+    expect(partTag(markup, 'strip')).toBeTruthy()
+  })
+
+  test('the table is the reading, and it is in the markup in full', () => {
+    const served = withoutStyles(markup)
+    expect(served).toContain('81%')
+    expect(served).toContain('datetime="2026-08-25"')
+  })
+
+  test("the consumer's summary is served with it", () => {
+    expect(withoutStyles(markup)).toContain('99.6% over 90 days')
+  })
+
+  /**
+   * No cells, because no id resolves. Asserted rather than left implicit: the
+   * day this changes it should be a spec that says so and not a surprise in a
+   * screenshot.
+   */
+  test('no cells are drawn, since resolving an id wants a document', () => {
+    expect(partTag(markup, 'strip')).not.toContain('part="cell"')
+  })
+
+  /**
+   * **Nothing added, and `rows` used to be.** It was declared `reflect: true`
+   * out of habit, so the server wrote `rows="1"` onto a host whose consumer had
+   * written no such attribute, which is a hydration mismatch a React consumer
+   * reports and does not patch up. Nothing reads the attribute either: the
+   * stylesheet takes the row count from an inline custom property. `visible` is
+   * written after the first render for the same reason, so the server's output
+   * and a hydrating consumer's markup agree that neither has it yet.
+   */
+  test('the host writes no attributes of its own', () => {
+    expect(hostAttributes(markup, 'helix-headless-heatmap')).toEqual(['for', 'label'])
+  })
+})

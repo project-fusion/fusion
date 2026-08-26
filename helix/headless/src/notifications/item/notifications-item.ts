@@ -233,17 +233,31 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
     return html`<time part="time" datetime=${moment.toISOString()}>${text}</time>`
   }
 
+  /**
+   * The control that removes the item, with the mark a consumer can replace.
+   *
+   * **A method rather than markup inside `render`, and the slot moves with
+   * it.** A fallback answers a consumer and a seam answers the tier above, which
+   * are different people: the styled tier wants an icon here, and with the slot
+   * written inline the only way to change it is to reimplement the whole
+   * template. `check:fallbacks` holds that, and moving only the fallback out was
+   * not enough, which is the right rule: the slot is the thing a tier redraws.
+   */
+  protected renderDismiss(): TemplateResult | typeof nothing {
+    if (!this.dismissible) {
+      return nothing
+    }
+    return html`<button
+      part="dismiss"
+      type="button"
+      aria-label=${this.dismissLabel}
+      @click=${this.handleDismiss}
+    >
+      <slot name="dismiss"><span aria-hidden="true">&times;</span></slot>
+    </button>`
+  }
+
   protected override render(): TemplateResult {
-    const dismiss = this.dismissible
-      ? html`<button
-          part="dismiss"
-          type="button"
-          aria-label=${this.dismissLabel}
-          @click=${this.handleDismiss}
-        >
-          <slot name="dismiss">&times;</slot>
-        </button>`
-      : nothing
     return html`<div part="item">
       <span part="media"><slot name="media"></slot></span>
       <div part="body">
@@ -251,7 +265,7 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
         ${this.renderTime()}
       </div>
       <span part="actions"><slot name="actions"></slot></span>
-      ${dismiss}
+      ${this.renderDismiss()}
     </div>`
   }
 

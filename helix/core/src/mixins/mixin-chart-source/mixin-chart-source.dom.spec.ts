@@ -28,7 +28,7 @@ interface Chart extends HTMLElement {
   label: string
   named: string
   readings: number
-  rows: { cells: { name: string; text: string; value?: number }[]; label: string }[]
+  sourceRows: { cells: { name: string; text: string; value?: number }[]; label: string }[]
   series: { name: string; points: { label: string; value: number }[] }[]
   renders: number
   updateComplete: Promise<boolean>
@@ -72,7 +72,7 @@ const TABLE = (id: string, caption: string, rows: string) => `
 
 /* `data-value` beside the text, because `$128k` is what a reader should see and
    is not a number: `Number('$128k')` is NaN and the column would not be a
-   series at all. That split is the whole reason `rows` exists beside `series`,
+   series at all. That split is the whole reason `sourceRows` exists beside `series`,
    so the fixture has to carry both. */
 const PAGE = `
   ${TABLE('first', 'Revenue by month', '<tr><th scope="row">March</th><td data-value="128000">$128k</td><td>Outage</td></tr><tr><th scope="row">April</th><td data-value="96000">$96k</td><td></td></tr>')}
@@ -110,14 +110,14 @@ const chart = async (markup = PAGE): Promise<Chart> => {
 describe('the table a chart reads', () => {
   test('is the one its `for` names', async () => {
     const one = await chart()
-    expect(one.rows.map((row) => row.label)).toEqual(['March', 'April'])
+    expect(one.sourceRows.map((row) => row.label)).toEqual(['March', 'April'])
   })
 
   test('and changes when the chart is pointed at another one', async () => {
     const one = await chart()
     one.for = 'second'
     await one.updateComplete
-    expect(one.rows.map((row) => row.label)).toEqual(['May'])
+    expect(one.sourceRows.map((row) => row.label)).toEqual(['May'])
   })
 
   /* **The bug the extraction found, and it is about repainting rather than
@@ -138,7 +138,7 @@ describe('the table a chart reads', () => {
     addRow('second', 'June', 70_000)
     await settled(one)
     expect(one.renders).toBeGreaterThan(before)
-    expect(one.rows.map((row) => row.label)).toEqual(['May', 'June'])
+    expect(one.sourceRows.map((row) => row.label)).toEqual(['May', 'June'])
   })
 
   test('and lets go of the one it left, which no longer repaints anything', async () => {
@@ -155,7 +155,7 @@ describe('the table a chart reads', () => {
     const one = await chart()
     one.for = 'absent'
     await one.updateComplete
-    expect([one.rows, one.series, one.readings]).toEqual([[], [], 0])
+    expect([one.sourceRows, one.series, one.readings]).toEqual([[], [], 0])
   })
 })
 
@@ -196,8 +196,8 @@ describe('the numbers and the words', () => {
      `128000`, and often wants the column beside it that nothing plotted. */
   test('and rows as text, which is what a tooltip shows', async () => {
     const one = await chart()
-    expect(one.rows[0]?.cells.map((cell) => cell.text)).toEqual(['$128k', 'Outage'])
-    expect(one.rows[0]?.cells[0]?.value).toBe(128_000)
+    expect(one.sourceRows[0]?.cells.map((cell) => cell.text)).toEqual(['$128k', 'Outage'])
+    expect(one.sourceRows[0]?.cells[0]?.value).toBe(128_000)
   })
 
   test('with the count the pointer maps onto', async () => {
@@ -242,6 +242,6 @@ describe('a chart inside another component', () => {
     const one = root.querySelector(tag) as Chart
     await one.updateComplete
     expect(one.named).toBe('The component’s')
-    expect(one.rows.map((row) => row.label)).toEqual(['Right'])
+    expect(one.sourceRows.map((row) => row.label)).toEqual(['Right'])
   })
 })

@@ -100,7 +100,7 @@ export const analyze = (
 
   for (const located of rules) {
     const selector = located.rule.selectorText
-    if (!selector || !selector.includes('helix-')) {
+    if (!selector?.includes('helix-')) {
       continue
     }
 

@@ -370,7 +370,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     const at = this.pointer.at
     const series = this.series
     if (at < 0 || series.length === 0) {
-      return drawTooltip(this.rows, at, this.tag('tooltip'))
+      return drawTooltip(this.sourceRows, at, this.tag('tooltip'))
     }
     /* Above the topmost series at that reading, so the box never covers the
        line it is describing. `y` counts down in the drawing, so the smallest is
@@ -383,7 +383,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       .filter((one): one is number => one !== undefined)
       .map((one) => scale(one))
     const slot = 100 / this.readings
-    return drawTooltip(this.rows, at, this.tag('tooltip'), {
+    return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
       placement: 'top',
       x: `${at * slot + slot / 2}%`,
       y: `${tops.length > 0 ? Math.min(...tops) : 0}%`,

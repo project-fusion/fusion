@@ -460,9 +460,9 @@ it is measured against.
 | `outlined` | `outlined` | `string \| undefined` | - | - | Which series are drawn as an outline rather than a fill, by name. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
-| `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `secondary` | `secondary` | `string \| undefined` | - | `HelixHeadlessBarChart` | Which series are measured against a scale of their own, by name. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
+| `sourceRows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `subtle` | `subtle` | `string \| undefined` | - | - | Which series are drawn as a wash of their color, by name. Matched as `outlined` is. |
 | `wash` | `wash` | `'gradient' \| undefined` | - | - | How a column's fill is distributed across it. |
 
@@ -2082,8 +2082,8 @@ larger than the default.
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
-| `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
+| `sourceRows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `sweep` | `sweep` | `'half' \| undefined` | - | `HelixHeadlessDonutChart` | How much of the circle the whole occupies. |
 
 #### Slots
@@ -2507,6 +2507,77 @@ Presentation only, so there is no headless tier.
 | --- | --- |
 | *(default)* | The items to lay out. |
 
+## Heatmap
+
+### Root (`helix-heatmap`)
+
+A strip of cells coloured by how each one went: uptime, contributions, activity.
+
+Extends `HelixHeadlessHeatmap`.
+
+One grid, filled down the column and then across, which is what a calendar
+heatmap is: a week is a column, so the strip reads left to right in weeks and
+top to bottom in days. `rows="1"` makes it a single row without a second
+layout.
+
+An empty cell takes the quietest ground the palette has rather than being
+transparent. A strip of holes reads as a broken picture; a strip of empty
+cells reads as a period with nothing in it, which is what it is.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `emptyText` | `empty-text` | `string` | `'No readings'` | `HelixHeadlessHeatmap` | Shown when the table has no readings in it. |
+| `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
+| `gap` | `gap` | `number` | `2` | `HelixHeadlessHeatmap` | Space between cells, in CSS pixels, for the same reason `min-cell` is a number. |
+| `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
+| `minCell` | `min-cell` | `number` | `8` | `HelixHeadlessHeatmap` | The smallest a cell may get before the strip draws fewer of them. |
+| `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
+| `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
+| `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
+| `rows` | `rows` | `number` | `1` | `HelixHeadlessHeatmap` | How many rows the strip has. |
+| `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
+| `sourceRows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
+| `thresholds` | `thresholds` | `string` | `''` | `HelixHeadlessHeatmap` | Lower bounds for the tone buckets, in the order the tones are given. |
+| `tones` | `tones` | `string` | `''` | `HelixHeadlessHeatmap` | Tone per bucket, in the same order as `thresholds`. |
+| `visible` | - | `number` | - | `HelixHeadlessHeatmap` | How many cells are actually drawn. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-resize` | `HelixResizeEvent` | Fired when the number of cells drawn changes, carrying that number. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The `<table>` this draws, where it is not named by `for`. |
+| `start` | Below the strip, at the leading edge. |
+| `summary` | Below the strip, in the middle. |
+| `end` | Below the strip, at the trailing edge. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `strip` | The grid of cells. |
+| `cell` | One reading. |
+| `footer` | The three-slot row under the strip. |
+| `start` | The leading slot's box. |
+| `summary` | The middle slot's box. |
+| `end` | The trailing slot's box. |
+| `empty` | Shown when the table has no readings in it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--heatmap-cell-size` | The size a cell wants. The strip fits as many as the container allows. |
+| `--heatmap-gap` | Space between cells. |
+| `--heatmap-tone` | The tone of the cell this is set on. Written by the component, read by the sheet that paints. |
+
 ## Icon
 
 ### Root (`helix-icon`)
@@ -2882,8 +2953,8 @@ answers for a shape.
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
-| `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
+| `sourceRows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `zero` | `zero` | `boolean` | `false` | `HelixHeadlessLineChart` | Whether zero is forced into the range. |
 
 #### Parts

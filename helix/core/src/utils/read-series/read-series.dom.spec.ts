@@ -97,6 +97,52 @@ describe('reading a table as series', () => {
   })
 })
 
+describe('a cell that carries its own tone', () => {
+  /**
+   * **Tone is a per-point fact here and a per-series fact everywhere else**,
+   * which is the exception a heatmap needs: a strip of ninety days coloured by
+   * how each day went would otherwise be ninety series, and that is the whole
+   * argument for the family existing rather than being a bar chart with flat
+   * values.
+   */
+  test('`data-tone` reaches the point', () => {
+    const series = readSeries(
+      table(`<table>
+        <caption>Uptime</caption>
+        <tbody>
+          <tr><th scope="row">Mon</th><td data-value="1" data-tone="success">Up</td></tr>
+          <tr><th scope="row">Tue</th><td data-value="0" data-tone="danger">Down</td></tr>
+        </tbody>
+      </table>`),
+    )
+    expect(series[0]?.points.map((point) => point.tone)).toEqual(['success', 'danger'])
+  })
+
+  test('a cell without one carries no tone at all, rather than an empty string', () => {
+    const series = readSeries(
+      table(`<table>
+        <caption>Uptime</caption>
+        <tbody><tr><th scope="row">Mon</th><td data-value="1">Up</td></tr></tbody>
+      </table>`),
+    )
+    expect(series[0]?.points[0]).not.toHaveProperty('tone')
+  })
+
+  /**
+   * The tone rides along with the value rather than replacing it, so a component
+   * that buckets numbers and one that reads tones can look at the same table.
+   */
+  test('the value survives beside it', () => {
+    const series = readSeries(
+      table(`<table>
+        <caption>Uptime</caption>
+        <tbody><tr><th scope="row">Mon</th><td data-value="0.997" data-tone="success">99.7%</td></tr></tbody>
+      </table>`),
+    )
+    expect(series[0]?.points[0]).toMatchObject({ label: 'Mon', tone: 'success', value: 0.997 })
+  })
+})
+
 describe('reading a grid built from roles', () => {
   /** A grid the way `helix-table` writes one, columns beside the rows. */
   const grid = (markup: string): Element => {

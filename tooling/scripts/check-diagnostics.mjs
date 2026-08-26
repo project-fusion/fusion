@@ -141,8 +141,7 @@ try {
       /* Twenty real elements, so the page holds twenty real Lit shadow roots
          all adopting the one stylesheet the class owns, which is the
          arrangement the dedup assertion below is about. */
-      document.body.innerHTML =
-        `<${tag}>Press</${tag}>`.repeat(20) + '<helix-copy-button value="x"></helix-copy-button>'
+      document.body.innerHTML = `${`<${tag}>Press</${tag}>`.repeat(20)}<helix-copy-button value="x"></helix-copy-button>`
       await customElements.whenDefined(tag)
       await customElements.whenDefined('helix-copy-button')
       await new Promise((done) => requestAnimationFrame(() => done()))

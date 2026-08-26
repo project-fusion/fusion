@@ -113,7 +113,7 @@ export declare class MixinChartSourceInterface {
   /**
    * Every row of the table, with each cell's text as well as its number.
    */
-  get rows(): Row[]
+  get sourceRows(): Row[]
   /**
    * How many readings there are, which is what the pointer maps onto.
    */
@@ -223,15 +223,24 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      * `series`. A chart draws numbers; a reader resting a pointer on one wants
      * what the table says, which is `$128k` and not `128000`, and often wants
      * the column beside it that nothing plotted at all.
+     *
+     * **Not `rows`, and the rename is the whole point of this paragraph.** It
+     * is the source table's rows, and `rows` on a chart is a name a chart
+     * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
+     * week, and declaring that against a base class whose `rows` is a `Row[]`
+     * getter is a type error at best. The same fault `MixinCollection` had,
+     * where a slot counter called `rows` would have shared one field with a
+     * consumer's data property. Name the member for what it holds rather than
+     * for the shortest word available.
      */
-    get rows(): Row[] {
+    get sourceRows(): Row[] {
       const element = this.source.element
       return element ? readRows(element) : []
     }
 
     /** How many readings there are, which is what the pointer maps onto. */
     get readings(): number {
-      return this.rows.length
+      return this.sourceRows.length
     }
   }
 

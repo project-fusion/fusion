@@ -38,6 +38,7 @@ import type {
   HelixFileInput,
   HelixFlex,
   HelixGrid,
+  HelixHeatmap,
   HelixIconButton,
   HelixIcon,
   HelixImage,
@@ -133,6 +134,7 @@ import type {
   HelixSortEvent,
   HelixFilterEvent,
   HelixNavigateEvent,
+  HelixResizeEvent,
   HelixLoadEvent,
   HelixErrorEvent,
   HelixInputEvent,
@@ -140,7 +142,6 @@ import type {
   HelixReadEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
-  HelixResizeEvent,
   HelixCaretEvent,
   HelixTourAskEvent,
   HelixNextEvent,
@@ -3111,6 +3112,69 @@ is two intentions in one element. */
 };
 
 export type HelixGridVueEvents = {};
+
+/** `HelixHeatmap` component event */
+export type HelixHeatmapElementEvent<E = Event> = TypedEvent<HelixHeatmap, E>;
+/** `helix-resize` event type */
+export type HelixHeatmapHelixResizeElementEvent =
+  HelixHeatmapElementEvent<HelixResizeEvent>;
+
+export type HelixHeatmapVueProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixHeatmap["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixHeatmap["label"];
+  /** How many rows the strip has.
+
+`1` is a status strip and `7` is a calendar week, which are the two readings
+this covers. Cells fill down the column and then across, which is what a
+calendar heatmap does: a week is a column, so the strip reads left to right
+in weeks and top to bottom in days. */
+  rows?: HelixHeatmap["rows"];
+  /** Lower bounds for the tone buckets, in the order the tones are given.
+
+`thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
+`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
+A value below the first bound gets no tone at all: an empty day in a
+contribution graph is a day with nothing in it, and painting it as the
+lowest bucket claims a reading that does not exist. */
+  thresholds?: HelixHeatmap["thresholds"];
+  /** Tone per bucket, in the same order as `thresholds`. */
+  tones?: HelixHeatmap["tones"];
+  /** The smallest a cell may get before the strip draws fewer of them.
+
+In CSS pixels, because this is arithmetic against a measured width rather
+than a length the stylesheet resolves. Zero turns the dropping off
+altogether, which is right for a strip in a container that cannot get narrow. */
+  "min-cell"?: HelixHeatmap["minCell"];
+  /** The smallest a cell may get before the strip draws fewer of them.
+
+In CSS pixels, because this is arithmetic against a measured width rather
+than a length the stylesheet resolves. Zero turns the dropping off
+altogether, which is right for a strip in a container that cannot get narrow. */
+  minCell?: HelixHeatmap["minCell"];
+  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
+  gap?: HelixHeatmap["gap"];
+  /** Shown when the table has no readings in it. */
+  "empty-text"?: HelixHeatmap["emptyText"];
+  /** Shown when the table has no readings in it. */
+  emptyText?: HelixHeatmap["emptyText"];
+};
+
+export type HelixHeatmapVueEvents = {
+  /** Fired when the number of cells drawn changes, carrying that number. */
+  "helix-resize": HelixHeatmapHelixResizeElementEvent;
+};
 
 export type HelixIconButtonVueProps = {
   /** The outline it is cut to, which is an axis of its own and not a value on one.
@@ -8458,6 +8522,12 @@ export type CustomCssProperties = {
   "--file-input-background-color"?: string;
   /** Padding inside the field. */
   "--file-input-inset"?: string;
+  /** The size a cell wants. The strip fits as many as the container allows. */
+  "--heatmap-cell-size"?: string;
+  /** Space between cells. */
+  "--heatmap-gap"?: string;
+  /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
+  "--heatmap-tone"?: string;
   /** Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`. */
   "--icon-button-radii"?: string;
   /** Edge length of the control. */
@@ -9205,6 +9275,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixGrid,
     HelixGridVueProps,
     HelixGridVueEvents
+  >;
+  /** One grid, filled down the column and then across, which is what a calendar heatmap is: a week is a column, so the strip reads left to right in weeks and top to bottom in days. 'rows="1"' makes it a single row without a second layout.  An empty cell takes the quietest ground the palette has rather than being transparent. A strip of holes reads as a broken picture; a strip of empty cells reads as a period with nothing in it, which is what it is. */
+  "helix-heatmap": DefineCustomElement<
+    HelixHeatmap,
+    HelixHeatmapVueProps,
+    HelixHeatmapVueEvents
   >;
   /** Top-level rather than 'Button.Icon', because a namespace means composition: 'Card.Header' is part of a card, and an icon-only button is not part of a button. It is a button with different content and a different shape, which makes it its own component.  'label' is not optional in practice. An icon-only control with no accessible name is announced as "button" and nothing else, which is the single most common way a toolbar becomes unusable without sight. */
   "helix-icon-button": DefineCustomElement<

@@ -2619,11 +2619,11 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "sourceRows",
               "type": {
                 "text": "Row[]"
               },
-              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.\n\n**Not `rows`, and the rename is the whole point of this paragraph.** It\nis the source table's rows, and `rows` on a chart is a name a chart\nwants for itself: `helix-heatmap` takes `rows=\"7\"` to mean a calendar\nweek, and declaring that against a base class whose `rows` is a `Row[]`\ngetter is a type error at best. The same fault `MixinCollection` had,\nwhere a slot counter called `rows` would have shared one field with a\nconsumer's data property. Name the member for what it holds rather than\nfor the shortest word available.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinChartSource",
@@ -18314,11 +18314,11 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "sourceRows",
               "type": {
                 "text": "Row[]"
               },
-              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.\n\n**Not `rows`, and the rename is the whole point of this paragraph.** It\nis the source table's rows, and `rows` on a chart is a name a chart\nwants for itself: `helix-heatmap` takes `rows=\"7\"` to mean a calendar\nweek, and declaring that against a base class whose `rows` is a `Row[]`\ngetter is a type error at best. The same fault `MixinCollection` had,\nwhere a slot counter called `rows` would have shared one field with a\nconsumer's data property. Name the member for what it holds rather than\nfor the shortest word available.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinChartSource",
@@ -21118,6 +21118,758 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/heatmap/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "fits",
+          "declaration": {
+            "name": "fits",
+            "module": "./root/buckets.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "numbers",
+          "declaration": {
+            "name": "numbers",
+            "module": "./root/buckets.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Reading",
+          "declaration": {
+            "name": "Reading",
+            "module": "./root/buckets.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "toneOf",
+          "declaration": {
+            "name": "toneOf",
+            "module": "./root/buckets.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "words",
+          "declaration": {
+            "name": "words",
+            "module": "./root/buckets.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixHeadlessHeatmap",
+          "declaration": {
+            "name": "HelixHeadlessHeatmap",
+            "module": "./root/heatmap-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/heatmap/root/buckets.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "toneOf",
+          "return": {
+            "type": {
+              "text": "string | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "reading",
+              "type": {
+                "text": "Reading"
+              }
+            },
+            {
+              "name": "thresholds",
+              "type": {
+                "text": "readonly number[]"
+              }
+            },
+            {
+              "name": "tones",
+              "type": {
+                "text": "readonly string[]"
+              }
+            }
+          ],
+          "description": "The tone for one reading, from its own `data-tone` or from the thresholds.\n\n**The cell's own tone wins**, and that ordering is the whole reason both\nexist. A status page already knows a day was degraded; making it encode that\nas a number so a component can decode it again is work for nothing, and the\nencoding would have to agree with the thresholds or the colours would drift\nfrom the truth. A contribution graph has only counts and wants the buckets.\n\nThresholds are read as lower bounds, in the order given, and the last one that\na value reaches wins. `thresholds=\"0,1,3,6\"` with `tones=\"muted,info,accent,success\"`\nputs 0 in `muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in\n`success`. A value below the first bound gets no tone rather than the first\none: an empty cell in a contribution graph is a day with nothing in it, and\npainting it as the lowest bucket claims a reading that does not exist."
+        },
+        {
+          "kind": "function",
+          "name": "numbers",
+          "return": {
+            "type": {
+              "text": "number[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "source",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "A comma or space separated list of numbers, in the order written."
+        },
+        {
+          "kind": "function",
+          "name": "words",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "source",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "A comma or space separated list of names, in the order written."
+        },
+        {
+          "kind": "function",
+          "name": "fits",
+          "return": {
+            "type": {
+              "text": "number"
+            }
+          },
+          "parameters": [
+            {
+              "name": "total",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "width",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "minimum",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "gap",
+              "type": {
+                "text": "number"
+              }
+            }
+          ],
+          "description": "How many readings fit across a given width, and which ones they are.\n\n**Ninety cells in 320 pixels is three and a half pixels each**, which is not a\nstrip, it is a smear. So a narrow container shows fewer cells rather than\nthinner ones, and it shows the *most recent* ones, because a status strip that\ndrops the newest days to keep the oldest is answering a question nobody asked.\n\n**The count it returns is what the summary has to be recomputed against.** A\nstrip labeled \"99.2% over 90 days\" that is drawing 45 of them is telling the\nreader something false about the picture in front of them, and nothing about\nthe picture says so. That is the one fault in this component that a screenshot\ncannot show, which is why the element reflects the number and announces it."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "toneOf",
+          "declaration": {
+            "name": "toneOf",
+            "module": "src/heatmap/root/buckets.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "numbers",
+          "declaration": {
+            "name": "numbers",
+            "module": "src/heatmap/root/buckets.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "words",
+          "declaration": {
+            "name": "words",
+            "module": "src/heatmap/root/buckets.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fits",
+          "declaration": {
+            "name": "fits",
+            "module": "src/heatmap/root/buckets.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/heatmap/root/heatmap-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**One family covers both readings, and the split people expect does not\nexist.** It was filed as two on the argument that a contribution graph needs a\ncontinuous ramp where uptime needs a category. GitHub's contribution graph is\nfive discrete levels rather than a gradient, so a cell that takes a tone\ncovers both: `rows=\"1\"` is a status strip, `rows=\"7\"` is a contribution graph,\nand heatmap is the name of that.\n\n**What it cannot be is a bar chart with flat values**, and the data model is\nwhat closes that rather than taste: chart color is per *series* everywhere\nelse here, `--chart-series-1` through `-15`, so ninety differently coloured\ncells would be ninety series.\n\nThe data is a real `<table>` named by `for`, the same convention every chart\nin this library uses, which also answers the accessibility question without\ninventing anything: **the table is the accessible representation**, it is\nalready in the markup, and the drawing is a picture of it. Hide it with\n`data-hidden-visually` and the reading is still there for anyone who needs it.\n\nA cell takes its tone from its own `data-tone`, or from `thresholds` and\n`tones` bucketing its value. The first is what a status page wants and the\nsecond is what a contribution graph wants; the cell's own wins, so a page that\nalready knows a day was degraded does not have to encode that as a number for\nthis component to decode again.\n\n**On a narrow container it draws fewer cells rather than thinner ones.**\nNinety cells in 320 pixels is three and a half pixels each, which is a smear\nand not a strip. The cells it drops are the oldest, and it reflects `visible`\nand fires `helix-resize` when the number changes, because **a summary saying\n\"99.2% over 90 days\" above a strip drawing 45 of them is telling the reader\nsomething false about the picture in front of them** and nothing about the\npicture says so.",
+          "name": "HelixHeadlessHeatmap",
+          "cssProperties": [
+            {
+              "description": "The size a cell wants. The strip fits as many as the container allows.",
+              "name": "--heatmap-cell-size"
+            },
+            {
+              "description": "Space between cells.",
+              "name": "--heatmap-gap"
+            },
+            {
+              "description": "The tone of the cell this is set on. Written by the component, read by the sheet that paints.",
+              "name": "--heatmap-tone"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The grid of cells.",
+              "name": "strip"
+            },
+            {
+              "description": "One reading.",
+              "name": "cell"
+            },
+            {
+              "description": "The three-slot row under the strip.",
+              "name": "footer"
+            },
+            {
+              "description": "The leading slot's box.",
+              "name": "start"
+            },
+            {
+              "description": "The middle slot's box.",
+              "name": "summary"
+            },
+            {
+              "description": "The trailing slot's box.",
+              "name": "end"
+            },
+            {
+              "description": "Shown when the table has no readings in it.",
+              "name": "empty"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Below the strip, at the leading edge: usually the oldest date.",
+              "name": "start"
+            },
+            {
+              "description": "Below the strip, in the middle: the reading over the range drawn.",
+              "name": "summary"
+            },
+            {
+              "description": "Below the strip, at the trailing edge: usually the newest date.",
+              "name": "end"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many rows the strip has.\n\n`1` is a status strip and `7` is a calendar week, which are the two readings\nthis covers. Cells fill down the column and then across, which is what a\ncalendar heatmap does: a week is a column, so the strip reads left to right\nin weeks and top to bottom in days.",
+              "attribute": "rows"
+            },
+            {
+              "kind": "field",
+              "name": "thresholds",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"0 1 3 6\"` with `tones=\"muted info accent success\"` puts 0 in\n`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.\nA value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
+              "attribute": "thresholds"
+            },
+            {
+              "kind": "field",
+              "name": "tones",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Tone per bucket, in the same order as `thresholds`.",
+              "attribute": "tones"
+            },
+            {
+              "kind": "field",
+              "name": "minCell",
+              "type": {
+                "text": "number"
+              },
+              "default": "8",
+              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves. Zero turns the dropping off\naltogether, which is right for a strip in a container that cannot get narrow.",
+              "attribute": "min-cell"
+            },
+            {
+              "kind": "field",
+              "name": "gap",
+              "type": {
+                "text": "number"
+              },
+              "default": "2",
+              "description": "Space between cells, in CSS pixels, for the same reason `min-cell` is a number.",
+              "attribute": "gap"
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'No readings'",
+              "description": "Shown when the table has no readings in it.",
+              "attribute": "empty-text"
+            },
+            {
+              "kind": "field",
+              "name": "visible",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many cells are actually drawn.\n\n**This is the number a summary has to agree with**, and the reason it is\npublished at all: a consumer's own summary is their markup and this element\ncannot rewrite it, so the only honest arrangement is to hand over the count\nand say when it changed.\n\n**A plain getter, and the attribute is written in `updated`, because\n`@property({ reflect: true })` on a getter with no setter reflects once and\nthen goes stale.** Lit reflects a property that is in `changedProperties`,\nand nothing puts a derived getter there after the first update: the\nattribute would be right on load and wrong from the first resize, which is\nthe exact failure the count exists to prevent, arriving through the\nmechanism meant to prevent it.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The width last measured, or nothing before the first measurement.\n\nUndefined rather than zero, because the two mean different things and the\ndifference is a whole strip: unmeasured has to show everything, since a\nfirst paint that shows one cell and then expands is a flicker on every load."
+            },
+            {
+              "kind": "field",
+              "name": "observer",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "announced",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "points",
+              "type": {
+                "text": "Array<{ label: string; tone?: string | undefined; value: number }>"
+              },
+              "privacy": "private",
+              "description": "Every reading in the table, oldest first, as the table is written.\n\n**Not `readings`, which the mixin already has and which means a count.**\nTwo members of the same name meaning a number and an array is the kind of\ncollision that type-checks in one direction and reads wrong in both.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "room",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How many cells the container has room for.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "drawn",
+              "type": {
+                "text": "Array<{ label: string; tone?: string | undefined; value: number }>"
+              },
+              "privacy": "private",
+              "description": "The readings actually drawn, newest kept.\n\nThe tail rather than the head: a status strip that drops the newest days to\nkeep the oldest is answering a question nobody asked.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "source",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new SourceController(this)",
+              "description": "Resolves `for` and re-renders when the table behind it changes.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pointer",
+              "readonly": true,
+              "default": "new ChartPointerController(this)",
+              "description": "Which reading a pointer is nearest, for a tooltip to sit on.\n\nPublic for the same reason `series` and `named` are: a protected member\ncannot be cast onto across unrelated classes, so it would be invisible to\nevery chart that needs it. Reading where a pointer is resting is a fair\nthing to ask a chart anyway.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "attribute": "for",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "series",
+              "type": {
+                "text": "Series[]"
+              },
+              "description": "The columns of the table, one series each, or none if there is no table.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "named",
+              "type": {
+                "text": "string"
+              },
+              "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "sourceRows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.\n\n**Not `rows`, and the rename is the whole point of this paragraph.** It\nis the source table's rows, and `rows` on a chart is a name a chart\nwants for itself: `helix-heatmap` takes `rows=\"7\"` to mean a calendar\nweek, and declaring that against a base class whose `rows` is a `Row[]`\ngetter is a type error at best. The same fault `MixinCollection` had,\nwhere a slot counter called `rows` would have shared one field with a\nconsumer's data property. Name the member for what it holds rather than\nfor the shortest word available.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readings",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many readings there are, which is what the pointer maps onto.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-headless-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-headless-pagination-size` composes `helix-headless-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/styled` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixResizeEvent"
+              },
+              "description": "Fired when the number of cells drawn changes, carrying that number.",
+              "name": "helix-resize",
+              "reactProp": "onhelix-resize"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many rows the strip has.\n\n`1` is a status strip and `7` is a calendar week, which are the two readings\nthis covers. Cells fill down the column and then across, which is what a\ncalendar heatmap does: a week is a column, so the strip reads left to right\nin weeks and top to bottom in days.",
+              "fieldName": "rows"
+            },
+            {
+              "name": "thresholds",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"0 1 3 6\"` with `tones=\"muted info accent success\"` puts 0 in\n`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.\nA value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
+              "fieldName": "thresholds"
+            },
+            {
+              "name": "tones",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Tone per bucket, in the same order as `thresholds`.",
+              "fieldName": "tones"
+            },
+            {
+              "name": "min-cell",
+              "type": {
+                "text": "number"
+              },
+              "default": "8",
+              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves. Zero turns the dropping off\naltogether, which is right for a strip in a container that cannot get narrow.",
+              "fieldName": "minCell"
+            },
+            {
+              "name": "gap",
+              "type": {
+                "text": "number"
+              },
+              "default": "2",
+              "description": "Space between cells, in CSS pixels, for the same reason `min-cell` is a number.",
+              "fieldName": "gap"
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'No readings'",
+              "description": "Shown when the table has no readings in it.",
+              "fieldName": "emptyText"
+            },
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "fieldName": "for",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "MixinChartSource",
+              "package": "@helix-io/core"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A strip of cells coloured by how each one went: uptime, contributions, activity.",
+          "helix": {
+            "category": "charts",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/heatmap",
+            "aliases": [
+              "Contribution graph",
+              "Uptime strip",
+              "Calendar heatmap",
+              "Activity graph"
+            ],
+            "tier": "headless",
+            "group": "BaseHeatmap",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "Ninety days of uptime, each cell coloured by how that day went.",
+                "layout": "padded",
+                "slug": "preview"
+              }
+            ],
+            "source": "helix/headless/src/heatmap"
+          },
+          "tagName": "helix-headless-heatmap",
+          "customElement": true,
+          "modulePath": "src/heatmap/root/heatmap-root.ts",
+          "definitionPath": "src/heatmap/root/heatmap-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixHeadlessHeatmap",
+          "declaration": {
+            "name": "HelixHeadlessHeatmap",
+            "module": "src/heatmap/root/heatmap-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-headless-heatmap",
+          "declaration": {
+            "name": "HelixHeadlessHeatmap",
+            "module": "src/heatmap/root/heatmap-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/icon-button/index.ts",
       "declarations": [],
       "exports": [
@@ -22598,6 +23350,14 @@
           "declaration": {
             "name": "*",
             "module": "src/file-input/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/heatmap/index.js"
           }
         },
         {
@@ -25209,11 +25969,11 @@
             },
             {
               "kind": "field",
-              "name": "rows",
+              "name": "sourceRows",
               "type": {
                 "text": "Row[]"
               },
-              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.\n\n**Not `rows`, and the rename is the whole point of this paragraph.** It\nis the source table's rows, and `rows` on a chart is a name a chart\nwants for itself: `helix-heatmap` takes `rows=\"7\"` to mean a calendar\nweek, and declaring that against a base class whose `rows` is a `Row[]`\ngetter is a type error at best. The same fault `MixinCollection` had,\nwhere a slot counter called `rows` would have shared one field with a\nconsumer's data property. Name the member for what it holds rather than\nfor the shortest word available.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinChartSource",
@@ -30573,6 +31333,17 @@
                   "text": "TemplateResult | typeof nothing"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "renderDismiss",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The control that removes the item, with the mark a consumer can replace.\n\n**A method rather than markup inside `render`, and the slot moves with\nit.** A fallback answers a consumer and a seam answers the tier above, which\nare different people: the styled tier wants an icon here, and with the slot\nwritten inline the only way to change it is to reimplement the whole\ntemplate. `check:fallbacks` holds that, and moving only the fallback out was\nnot enough, which is the right rule: the slot is the thing a tier redraws."
             },
             {
               "kind": "field",
