@@ -3622,6 +3622,16 @@
             },
             {
               "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the buttons are stacked.\n\nUnset is a row and stays unset, so a reflected default cannot appear on a\nhost whose server output never had it.\n\n**A property and not an `auto`, which the splitter and the carousel earned\nand this has not.** Turning those two changes what they *do*: a drag axis,\narrow keys, how many slides a page holds. A group of buttons turning is\npaint, so there is no state to resolve and nothing to observe; what it needs\nis for a consumer who knows the column is narrow to be able to say so.\n\n**What it is for, measured.** Three buttons at 320 come to 322 and overflow\nthe page by 26. A row of joined buttons cannot answer that by wrapping,\nwhich is the obvious reach and the wrong one: the group's whole contract is\nbuttons sharing edges as one shape, and a wrapped row carries the corners of\na first row into a second. Stacked, the same three keep one shape and one\ncolumn.",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "tier",
               "type": {
                 "text": "string"
@@ -3736,6 +3746,14 @@
               "default": "''",
               "description": "Accessible name for the group.\n\nOn the host through internals, so an author's `aria-label` still overrides\nit and nothing lands on the host that a consumer's markup did not have.",
               "fieldName": "label"
+            },
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the buttons are stacked.\n\nUnset is a row and stays unset, so a reflected default cannot appear on a\nhost whose server output never had it.\n\n**A property and not an `auto`, which the splitter and the carousel earned\nand this has not.** Turning those two changes what they *do*: a drag axis,\narrow keys, how many slides a page holds. A group of buttons turning is\npaint, so there is no state to resolve and nothing to observe; what it needs\nis for a consumer who knows the column is narrow to be able to say so.\n\n**What it is for, measured.** Three buttons at 320 come to 322 and overflow\nthe page by 26. A row of joined buttons cannot answer that by wrapping,\nwhich is the obvious reach and the wrong one: the group's whole contract is\nbuttons sharing edges as one shape, and a wrapped row carries the corners of\na first row into a second. Stacked, the same three keep one shape and one\ncolumn.",
+              "fieldName": "orientation"
             }
           ],
           "superclass": {
@@ -3759,6 +3777,10 @@
               {
                 "description": "The same button group on the headless tier, with every rule written by hand.",
                 "slug": "preview"
+              },
+              {
+                "description": "The same joined shape turned on its side, with every rule written by hand.",
+                "slug": "stacked"
               }
             ],
             "source": "helix/headless/src/button-group"

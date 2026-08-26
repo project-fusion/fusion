@@ -691,6 +691,10 @@ ring is declared here rather than inherited, because the base layer's
 | `--button-radii` | Corner radius of the control. |
 | `--button-radii-start` | Leading corners, which a group flattens. |
 | `--button-radii-end` | Trailing corners, which a group flattens. |
+| `--button-radii-start-start` | The top leading corner, for a group stacking down. |
+| `--button-radii-start-end` | The top trailing corner, for a group stacking down. |
+| `--button-radii-end-start` | The bottom leading corner, for a group stacking down. |
+| `--button-radii-end-end` | The bottom trailing corner, for a group stacking down. |
 
 ## Button Group
 
@@ -714,6 +718,7 @@ therefore serves a consumer's own anchor styled as a button.
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | - | - | - | - | Whether the buttons are one bar or a spaced row. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessButtonGroup` | Accessible name for the group. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessButtonGroup` | Which way the buttons are stacked. |
 | `variant` | `variant` | `'joined' \| 'spaced' \| undefined` | - | - | Whether the buttons are one bar or a spaced row. |
 
 #### Slots
@@ -4400,6 +4405,7 @@ nobody is looking at. Top-level navigation, popups and modals are not.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-console` | `HelixConsoleEvent` | Relayed from the frame, one per console call. |
+| `helix-resize` | `HelixResizeEvent` | How tall the frame's content is, whenever it changes. |
 
 #### Parts
 

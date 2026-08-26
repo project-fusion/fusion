@@ -2073,6 +2073,28 @@
         },
         {
           "kind": "class",
+          "description": "Fired when something reports how much room its content actually needs.\n\n**A measurement crossing a boundary the measurer is on the far side of.** A\nsandboxed preview is its own document: nothing outside it can read the height\nof what it drew, because the frame is opaque and a box sized from the outside\nonly ever reports the box. So the document measures itself and says so, and\nthis is what it says it with.\n\nA number rather than a box, because the width is the container's to decide and\nonly the block size follows the content. A consumer that wants to act on it\nclamps it: what arrives is what was drawn, which for an empty example is\nnearly nothing and for a long one is more than a page.",
+          "name": "HelixResizeEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-resize'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "Fired when the cursor moves in a text editor.\n\nNot cancelable, unlike everything else here. The others announce something\nabout to happen and a listener can refuse it; this one reports where the\ncaret already is, and there is nothing left to refuse.\n\nIt fires on every keystroke and every arrow press, which is why the status\nbar reads it from the DOM rather than through a framework's state: routing a\ncaret position through React would re-render the workbench on every cursor\nmove.",
           "name": "HelixCaretEvent",
           "members": [
@@ -2367,6 +2389,14 @@
           "name": "HelixConsoleEvent",
           "declaration": {
             "name": "HelixConsoleEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixResizeEvent",
+          "declaration": {
+            "name": "HelixResizeEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -3293,6 +3323,14 @@
         },
         {
           "kind": "js",
+          "name": "HelixResizeEvent",
+          "declaration": {
+            "name": "HelixResizeEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixSampleEndEvent",
           "declaration": {
             "name": "HelixSampleEndEvent",
@@ -3360,6 +3398,14 @@
           "name": "OpenDetail",
           "declaration": {
             "name": "OpenDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ResizeDetail",
+          "declaration": {
+            "name": "ResizeDetail",
             "module": "./events/events.js"
           }
         },

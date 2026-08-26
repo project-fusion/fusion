@@ -135,6 +135,7 @@ import type {
   HelixFilterEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
+  HelixResizeEvent,
   HelixCaretEvent,
   HelixTourAskEvent,
   HelixNextEvent,
@@ -800,6 +801,24 @@ gave the group and no choice about the spacing. */
 On the host through internals, so an author's `aria-label` still overrides
 it and nothing lands on the host that a consumer's markup did not have. */
   label?: HelixButtonGroup["label"];
+  /** Which way the buttons are stacked.
+
+Unset is a row and stays unset, so a reflected default cannot appear on a
+host whose server output never had it.
+
+**A property and not an `auto`, which the splitter and the carousel earned
+and this has not.** Turning those two changes what they *do*: a drag axis,
+arrow keys, how many slides a page holds. A group of buttons turning is
+paint, so there is no state to resolve and nothing to observe; what it needs
+is for a consumer who knows the column is narrow to be able to say so.
+
+**What it is for, measured.** Three buttons at 320 come to 322 and overflow
+the page by 26. A row of joined buttons cannot answer that by wrapping,
+which is the obvious reach and the wrong one: the group's whole contract is
+buttons sharing edges as one shape, and a wrapped row carries the corners of
+a first row into a second. Stacked, the same three keep one shape and one
+column. */
+  orientation?: HelixButtonGroup["orientation"];
   /** Whether the buttons are one bar or a spaced row. */
   appearance?: HelixButtonGroup["appearance"];
 };
@@ -5053,6 +5072,9 @@ export type HelixSandboxPreviewElementEvent<E = Event> = TypedEvent<
 /** `helix-console` event type */
 export type HelixSandboxPreviewHelixConsoleElementEvent =
   HelixSandboxPreviewElementEvent<HelixConsoleEvent>;
+/** `helix-resize` event type */
+export type HelixSandboxPreviewHelixResizeElementEvent =
+  HelixSandboxPreviewElementEvent<HelixResizeEvent>;
 
 export type HelixSandboxPreviewVueProps = {
   /** Which half of the palette the frame renders in.
@@ -5100,6 +5122,8 @@ including every one of the 24 series colours a chart reads. */
 export type HelixSandboxPreviewVueEvents = {
   /** Relayed from the frame, one per console call. */
   "helix-console": HelixSandboxPreviewHelixConsoleElementEvent;
+  /** How tall the frame's content is, whenever it changes. */
+  "helix-resize": HelixSandboxPreviewHelixResizeElementEvent;
 };
 
 /** `HelixSandbox` component event */
@@ -7862,6 +7886,14 @@ export type CustomCssProperties = {
   "--button-radii-start"?: string;
   /** Trailing corners, which a group flattens. */
   "--button-radii-end"?: string;
+  /** The top leading corner, for a group stacking down. */
+  "--button-radii-start-start"?: string;
+  /** The top trailing corner, for a group stacking down. */
+  "--button-radii-start-end"?: string;
+  /** The bottom leading corner, for a group stacking down. */
+  "--button-radii-end-start"?: string;
+  /** The bottom trailing corner, for a group stacking down. */
+  "--button-radii-end-end"?: string;
   /** Fill behind the callout. */
   "--callout-background-color"?: string;
   /** Corner radius of the callout. */
