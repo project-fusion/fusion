@@ -1,8 +1,46 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { SiteNav } from '@/components/site-nav/site-nav'
+import { PRODUCTS } from '@/content/products/products'
 import styles from '../../components/chrome.module.css'
 import { type RouteKind, routes } from '../../content/routes/routes'
+
+/**
+ * What the footer links, in three groups.
+ *
+ * **A footer is where a reader goes when the page did not answer them**, so it
+ * carries the whole site rather than the two legal pages that prompted it. The
+ * products come from `PRODUCTS` rather than being written again here: a footer
+ * that lists them separately is a second list to keep in step, which is exactly
+ * the drift the destinations module exists to remove.
+ *
+ * Legal is its own group rather than a line under the tagline. Terms and Privacy
+ * are what a reader scans a footer for, and burying them beside a slogan is how
+ * a site technically links them without anybody finding them.
+ */
+const FOOTER_GROUPS = [
+  {
+    heading: 'Products',
+    items: PRODUCTS.map((product) => ({ href: product.href, label: product.name })),
+  },
+  {
+    heading: 'Company',
+    items: [
+      { href: '/services', label: 'Services' },
+      { href: '/insights', label: 'Insights' },
+      { href: '/thesis', label: 'Thesis' },
+      { href: '/trust', label: 'Trust' },
+      { href: '/contact', label: 'Contact' },
+    ],
+  },
+  {
+    heading: 'Legal',
+    items: [
+      { href: '/terms', label: 'Terms of use' },
+      { href: '/privacy', label: 'Privacy' },
+    ],
+  },
+]
 
 /** The registry's routes of one kind, as palette items. */
 const findable = (kind: RouteKind) =>
@@ -60,33 +98,43 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <main style={{ viewTransitionName: 'site-content' }}>{children}</main>
 
       <footer className={styles.siteFooter} data-site-footer>
-        <helix-flex align="center" data-shell gap="md" justify="between" wrap>
-          <helix-flex align="center" gap="xs">
-            <helix-icon
-              className={styles.fusionLogo}
-              label="Fusion"
-              name="fusion"
-              style={{ '--icon-size': '1.25rem' }}
-            />
-            <helix-text tone="muted" variant="caption">
-              Fusion Development Group
-            </helix-text>
-          </helix-flex>
-          <helix-flex align="center" gap="md">
-            {/* The two legal pages, reachable and quiet. A footer is where a
-                reader looks for these and nothing else on the site links them,
-                so without this they exist and cannot be found. */}
-            <Link className={styles.siteFooterLink} href="/terms">
-              Terms
-            </Link>
-            <Link className={styles.siteFooterLink} href="/privacy">
-              Privacy
-            </Link>
+        {/* `data-site-footer` stays whatever else changes here: the Aura page
+            hides the footer with `[data-site-footer]` from a plain stylesheet,
+            and a CSS module rewrites class names, so the mark is the only thing
+            that selector can reach. */}
+        <div className={styles.footerInner} data-shell>
+          <div className={styles.footerBrand}>
+            <helix-flex align="center" gap="xs">
+              <helix-icon
+                className={styles.fusionLogo}
+                label="Fusion"
+                name="fusion"
+                style={{ '--icon-size': '1.25rem' }}
+              />
+              <helix-text tone="muted" variant="caption">
+                Fusion Development Group
+              </helix-text>
+            </helix-flex>
             <helix-text tone="subtle" variant="label">
               Developing for humanity.
             </helix-text>
-          </helix-flex>
-        </helix-flex>
+          </div>
+
+          <nav aria-label="Footer" className={styles.footerNav}>
+            {FOOTER_GROUPS.map((group) => (
+              <div className={styles.footerGroup} key={group.heading}>
+                <helix-text tone="muted" variant="label">
+                  {group.heading}
+                </helix-text>
+                {group.items.map((item) => (
+                  <Link className={styles.siteFooterLink} href={item.href} key={item.href}>
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </nav>
+        </div>
       </footer>
     </>
   )

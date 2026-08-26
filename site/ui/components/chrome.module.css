@@ -99,21 +99,57 @@
 .siteFooter {
   --site-inset: var(--helix-space-2xl);
 
-  padding-block: var(--helix-space-xl);
+  /* A rule, because the footer now holds links rather than one quiet line and
+     needs to read as its own region rather than as the end of the page. */
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block: var(--helix-space-2xl);
+}
+
+/* Brand at the start, links at the end, and both wrap onto their own line when
+   the row runs out. `space-between` rather than a grid: the two halves are
+   different kinds of thing and neither wants a column the other is measured
+   against. */
+.footerInner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xl);
+  justify-content: space-between;
+}
+
+.footerBrand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+.footerNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xl);
+}
+
+.footerGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
 }
 
 /* Quiet, because a legal link is something a reader finds when they go looking
    rather than something the page offers them. `label` is the same scale the line
    beside it takes, so the row reads as one thing at one weight. */
+/* Quiet at rest and plainly a link on hover. No underline by default, because a
+   column of underlined rows reads as a document's table of contents rather than
+   as navigation, which is the same fault the drawer had. */
 .siteFooterLink {
   color: var(--helix-color-foreground-subtle);
   font-size: var(--helix-text-sm);
   text-decoration: none;
+  width: fit-content;
 }
 
-.siteFooterLink:hover {
+.siteFooterLink:hover,
+.siteFooterLink:focus-visible {
   color: var(--helix-color-foreground);
-  text-decoration: underline;
 }
 
 /* ============================================================ chrome ===== */
