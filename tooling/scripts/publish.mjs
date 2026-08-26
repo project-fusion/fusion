@@ -200,11 +200,8 @@ if (promote !== undefined) {
  * Payoff, unpacked: 596K off headless, 261K off web, 135K off core and 47K off
  * theme in a consumer's `node_modules`. See 193.
  */
-const strip = (tarball, into) => {
-  const opened = join(into, 'opened')
-  mkdirSync(opened, { recursive: true })
-  run('tar', ['-xzf', tarball, '-C', opened], root)
-
+const strip = (directory) => {
+  const dist = join(root, directory, 'dist')
   const maps = []
   const walk = (dir) => {
     for (const entry of readdirSync(dir)) {
@@ -222,15 +219,14 @@ const strip = (tarball, into) => {
       }
     }
   }
-  walk(opened)
+  try {
+    walk(dist)
+  } catch {
+    return 0
+  }
   for (const path of maps) {
     rmSync(path)
   }
-
-  rmSync(tarball)
-  /* Repacked under the name npm expects, from `package/`, which is the one
-     directory a tarball may contain. */
-  run('tar', ['-czf', tarball, 'package'], opened)
   return maps.length
 }
 
@@ -248,6 +244,22 @@ for (const [name, { directory, manifest }] of packages) {
 
   const into = join(staging, name.replace('@', '').replace('/', '-'))
   mkdirSync(into, { recursive: true })
+  /* **Stripped before the pack, not after it.** This used to unpack the
+     tarball, delete the maps and re-tar, and every problem the first real
+     publish hit came from that reopening: BSD tar writes an entry for
+     `package/` and the registry answers `415 invalid path: package/`, and it
+     writes AppleDouble `._name` companions for files carrying macOS xattrs,
+     which shipped as junk in eight packages at 0.1.0.
+
+     Stripping `dist` first means bun packs a tree that is already correct and
+     nothing touches the archive afterwards, which is also what makes the
+     file's own promise true: what is packed is what is published.
+
+     The maps are emitted on purpose and are wanted in development, where
+     `declarationMap` is what lands go-to-definition on the source across
+     packages. Turning them off in the compiler would take that with it, and
+     doing it per package means a second tsconfig in every one of them. */
+  const dropped = strip(directory)
   run('bun', ['pm', 'pack', '--destination', into], join(root, directory))
   const [file] = readdirSync(into)
   if (file === undefined) {
@@ -266,8 +278,6 @@ for (const [name, { directory, manifest }] of packages) {
       )
     }
   }
-
-  const dropped = strip(join(into, file), into)
 
   console.log(`  ${name}@${version} (${file}, ${dropped} source maps stripped)`)
   if (!dry) {
