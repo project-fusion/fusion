@@ -158,6 +158,16 @@ export interface FilterDetail {
   value: string
 }
 
+/** Detail carried by `helix-read`. */
+export interface ReadDetail {
+  /**
+   * The state being asked for, as a boolean rather than a word that reads like
+   * one, which is `helix-toggle`'s rule and for the same reason: `"false"` is
+   * truthy and a consumer who forgets that marks everything read.
+   */
+  read: boolean
+}
+
 /** Detail carried by `helix-sort`. */
 export interface SortDetail {
   /**
@@ -722,6 +732,33 @@ export class HelixCompleteEvent extends CustomEvent<CompleteDetail> {
 }
 
 /**
+ * Fired when something a user comes back to is marked read, or unread.
+ *
+ * **Read state is reported rather than owned.** Marking a notification read is
+ * usually a round trip, and a component that flips the state itself and then
+ * hears the request failed has already told the reader something untrue. So this
+ * is cancelable, and refusing it leaves the item alone; a component left
+ * uncontrolled applies it once nobody has refused, which is the same contract
+ * every other axis in the library uses.
+ *
+ * Bubbles and is composed, so a feed hears its own items: one handler on the
+ * list serves every notification in it, which is what a consumer syncing to a
+ * server actually wants.
+ */
+export class HelixReadEvent extends CustomEvent<ReadDetail> {
+  static readonly eventName = 'helix-read'
+
+  constructor(detail: ReadDetail) {
+    super(HelixReadEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
  * Fired when the reader asks for a different order.
  *
  * Cancelable, and refusing it leaves the order alone, which is what makes a
@@ -851,6 +888,7 @@ const registry = {
   HelixNextEvent,
   HelixOpenEvent,
   HelixPreviousEvent,
+  HelixReadEvent,
   HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,

@@ -54,6 +54,8 @@ import type {
   HelixMenu,
   HelixMeter,
   HelixNavigation,
+  HelixNotificationsItem,
+  HelixNotifications,
   HelixNumberInput,
   HelixOptionGroup,
   HelixOption,
@@ -135,6 +137,7 @@ import type {
   HelixErrorEvent,
   HelixInputEvent,
   HelixShortcutEvent,
+  HelixReadEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
   HelixResizeEvent,
@@ -4221,6 +4224,102 @@ export type HelixNavigationVueProps = {
 };
 
 export type HelixNavigationVueEvents = {};
+
+/** `HelixNotificationsItem` component event */
+export type HelixNotificationsItemElementEvent<E = Event> = TypedEvent<
+  HelixNotificationsItem,
+  E
+>;
+/** `helix-read` event type */
+export type HelixNotificationsItemHelixReadElementEvent =
+  HelixNotificationsItemElementEvent<HelixReadEvent>;
+/** `helix-dismiss` event type */
+export type HelixNotificationsItemHelixDismissElementEvent =
+  HelixNotificationsItemElementEvent<HelixDismissEvent>;
+
+export type HelixNotificationsItemVueProps = {
+  /** When it happened, as anything `Date` parses.
+
+An ISO string is what an API sends and what `<time datetime>` takes, so it
+is the shape that needs no translation at either end. Left unset the item
+shows no timestamp rather than showing the epoch, which is what parsing an
+empty string would give. */
+  at?: HelixNotificationsItem["at"];
+  /** Whether the reader has seen it.
+
+Reflected, because unread is a visual state and a stylesheet has no other
+way to know. Set it and this element defers: a reader's click fires
+`helix-read` and changes nothing until a new value arrives. `default-read`
+seeds a state this element then owns. */
+  read?: HelixNotificationsItem["read"];
+  /** State to open with, where nothing declared one. */
+  "default-read"?: HelixNotificationsItem["defaultRead"];
+  /** State to open with, where nothing declared one. */
+  defaultRead?: HelixNotificationsItem["defaultRead"];
+  /** Whether a reader may remove it. */
+  dismissible?: HelixNotificationsItem["dismissible"];
+  /** Locale for the timestamp. Empty is the runtime's own. */
+  locale?: HelixNotificationsItem["locale"];
+  /** Accessible name for the dismiss control. */
+  "dismiss-label"?: HelixNotificationsItem["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  dismissLabel?: HelixNotificationsItem["dismissLabel"];
+};
+
+export type HelixNotificationsItemVueEvents = {
+  /** Fired when the item is marked read or unread, and cancelable. */
+  "helix-read": HelixNotificationsItemHelixReadElementEvent;
+  /** Fired when a reader asks to remove it, and cancelable. */
+  "helix-dismiss": HelixNotificationsItemHelixDismissElementEvent;
+};
+
+/** `HelixNotifications` component event */
+export type HelixNotificationsElementEvent<E = Event> = TypedEvent<
+  HelixNotifications,
+  E
+>;
+/** `helix-read` event type */
+export type HelixNotificationsHelixReadElementEvent =
+  HelixNotificationsElementEvent<HelixReadEvent>;
+
+export type HelixNotificationsVueProps = {
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixNotifications["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixNotifications["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixNotifications["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixNotifications["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixNotifications["emptyText"];
+  /** Accessible name for the feed. */
+  label?: HelixNotifications["label"];
+  /** Whether to draw a control that marks everything read. */
+  "mark-all"?: HelixNotifications["markAll"];
+  /** Whether to draw a control that marks everything read. */
+  markAll?: HelixNotifications["markAll"];
+  /** Label for that control. */
+  "mark-all-label"?: HelixNotifications["markAllLabel"];
+  /** Label for that control. */
+  markAllLabel?: HelixNotifications["markAllLabel"];
+  /** How many items are unread, counted from the items themselves.
+
+Reflected so a stylesheet can answer it, and read-only for the reason it is
+derived: a count the consumer could set is a second source of truth for
+something the items already know, and the first time the two disagreed the
+badge would be right and the list would not. */
+  unread?: HelixNotifications["unread"];
+};
+
+export type HelixNotificationsVueEvents = {
+  /** Fired by an item, and by this element when everything is marked read. Cancelable. */
+  "helix-read": HelixNotificationsHelixReadElementEvent;
+};
 
 /** `HelixNumberInput` component event */
 export type HelixNumberInputElementEvent<E = Event> = TypedEvent<
@@ -8477,6 +8576,18 @@ export type CustomCssProperties = {
   "--navigation-indicator-color"?: string;
   /** Space between destinations. */
   "--navigation-gap"?: string;
+  /** The hairline between items. */
+  "--notifications-rule"?: string;
+  /** Ink in an item that has been read. */
+  "--notifications-color"?: string;
+  /** The edge mark on an unread item. */
+  "--notifications-unread-mark"?: string;
+  /** Space above and below an item. */
+  "--notifications-padding-block"?: string;
+  /** Space either side of an item. */
+  "--notifications-padding-inline"?: string;
+  /** How tall the feed may get before the list scrolls. */
+  "--notifications-max-height"?: string;
   /** Space before the label, shared with a group heading. */
   "--option-inset"?: string;
   /** Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. */
@@ -9190,6 +9301,18 @@ export interface WcToolkitVueGlobalComponents {
     HelixNavigation,
     HelixNavigationVueProps,
     HelixNavigationVueEvents
+  >;
+  /** A three-column grid: media, body, actions. A grid rather than a flex row, because the media column has to line up down the feed whether or not every item has one, and a flex row collapses the empty ones so every line of text starts somewhere different.  **Unread is weight and a mark on the inline start edge, not a fill.** Depth comes from a single border in this library, and a filled row is elevation spelled differently; a feed of filled rows is a striped list nobody can read. */
+  "helix-notifications-item": DefineCustomElement<
+    HelixNotificationsItem,
+    HelixNotificationsItemVueProps,
+    HelixNotificationsItemVueEvents
+  >;
+  /** Three rows: header, a list that scrolls, footer. The list scrolls and the other two do not, because a panel is opened at a fixed height and a mark-all control that slides away as the reader scrolls is the control they were reaching for.  **It does not virtualize and it cannot**, which is the headless tier's note and worth repeating where the choice is made: the items are the consumer's own elements, so N notifications is N elements by construction. A feed that really holds thousands wants 'helix-data-table' with a custom cell. */
+  "helix-notifications": DefineCustomElement<
+    HelixNotifications,
+    HelixNotificationsVueProps,
+    HelixNotificationsVueEvents
   >;
   /** The frame an 'Input' wears, because in a form this stands in a row with them. The difference is inside it: a button at each end of the box rather than beside it, so the whole reads as one field rather than a field with two controls after it.  The number is centered and set in tabular figures, which is the one place this differs from every other field in the library. Digits are what changes under a repeated press, and proportional ones make the number shuffle while it counts.  The steppers are out of the tab order. A keyboard reader already has four keys on the field itself, and two more tab stops per number is a form that takes three times as long to cross. */
   "helix-number-input": DefineCustomElement<

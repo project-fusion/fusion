@@ -1,0 +1,94 @@
+/* The feed is a column: header, a list that scrolls, footer. The list scrolls
+   and the header and footer do not, because a panel is opened at a fixed height
+   and the mark-all control sliding away as a reader scrolls is the control they
+   were reaching for. */
+:host {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-block-size: var(--notifications-max-height, none);
+}
+
+[part="header"] {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid
+    var(--notifications-rule, var(--helix-color-border));
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+  padding-block: var(--helix-space-sm);
+  padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
+}
+
+/* Empty, the regions take no space. A consumer with no header should not pay
+   for the rule under one, and `:has` is what makes that answerable in CSS
+   rather than by an attribute the component would have to write. */
+[part="header"]:not(:has(> slot:has(*))):not(:has([part="mark-all"])),
+[part="footer"]:not(:has(> slot:has(*))) {
+  display: none;
+}
+
+[part="list"] {
+  overflow-y: auto;
+}
+
+[part="footer"] {
+  border-block-start: var(--helix-border-thin) solid
+    var(--notifications-rule, var(--helix-color-border));
+  padding-block: var(--helix-space-sm);
+  padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
+}
+
+/* The last item's rule and the footer's rule are the same line drawn twice,
+   which reads as a thicker one. */
+::slotted(helix-notifications-item:last-of-type) {
+  --notifications-rule: transparent;
+}
+
+[part="mark-all"] {
+  background: none;
+  border: 0;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-accent);
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-2xs);
+}
+
+[part="mark-all"]:hover {
+  text-decoration: underline;
+}
+
+[part="mark-all"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* What a collection says instead of items: the same two lines everywhere, in the
+   same voice. Quiet and centered, since neither is content: they are the absence
+   of it, and an absence set like a heading reads as an error. */
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  padding-block: var(--helix-space-lg);
+  padding-inline: var(--helix-space-md);
+  text-align: center;
+}
+
+@media print {
+  :host {
+    max-block-size: none;
+  }
+
+  [part="list"] {
+    overflow-y: visible;
+  }
+
+  [part="mark-all"] {
+    display: none;
+  }
+}

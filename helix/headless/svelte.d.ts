@@ -59,6 +59,8 @@ declare module 'svelte/elements' {
     'helix-headless-menu': CustomElements['helix-headless-menu']
     'helix-headless-meter': CustomElements['helix-headless-meter']
     'helix-headless-navigation': CustomElements['helix-headless-navigation']
+    'helix-headless-notifications-item': CustomElements['helix-headless-notifications-item']
+    'helix-headless-notifications': CustomElements['helix-headless-notifications']
     'helix-headless-number-input': CustomElements['helix-headless-number-input']
     'helix-headless-option-group': CustomElements['helix-headless-option-group']
     'helix-headless-option': CustomElements['helix-headless-option']

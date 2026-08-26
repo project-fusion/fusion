@@ -1,0 +1,31 @@
+<!-- @summary A feed with unread items and no paint of its own. -->
+<!-- @layout padded -->
+
+<helix-headless-notifications id="raw" label="Notifications" mark-all>
+  <h2 slot="header">Notifications</h2>
+
+  <helix-headless-notifications-item dismissible>
+    Ada Okonjo approved your deploy to production.
+    <button slot="actions" type="button">View</button>
+  </helix-headless-notifications-item>
+
+  <helix-headless-notifications-item dismissible>
+    Build #4821 failed on main
+    <button slot="actions" type="button">Logs</button>
+  </helix-headless-notifications-item>
+
+  <helix-headless-notifications-item default-read dismissible>
+    Your invitation to Fusion Design was accepted.
+  </helix-headless-notifications-item>
+
+  <a href="#all" slot="footer" >See everything</a>
+</helix-headless-notifications>
+
+<script>
+  const raw = document.getElementById('raw')
+  const ago = (minutes) => new Date(Date.now() - minutes * 60000).toISOString()
+  const items = raw.querySelectorAll('helix-headless-notifications-item')
+  items[0].at = ago(3)
+  items[1].at = ago(42)
+  items[2].at = ago(1500)
+</script>

@@ -1,0 +1,50 @@
+<!-- @summary Read state the page owns, so marking read can be the round trip it usually is. -->
+
+<helix-notifications
+  id="owned"
+  label="Activity"
+  mark-all
+>
+  <helix-notifications-item>
+    <strong>cortex-core</strong> finished indexing.
+  </helix-notifications-item>
+
+  <helix-notifications-item>
+    A new version of <strong>@helix-io/styled</strong> is available.
+  </helix-notifications-item>
+</helix-notifications>
+
+<script>
+  const owned = document.getElementById('owned')
+
+  /* **Refusing the event is how a page owns the state in plain HTML.** `read` is
+     a boolean attribute, so its presence means true and there is no way to write
+     "the page owns this and it is currently false" as markup: `read="false"` is
+     a present attribute and therefore true, which is the trap `helix-toggle`
+     carries the same warning about.
+     
+     So the page refuses instead. `preventDefault` stops the item applying
+     anything whatever mode it is in, the request goes to the server, and the
+     property is written only once the server agreed. A failed request leaves the
+     item unread rather than lying about it, which is the whole reason read state
+     is reported here and not invented. */
+  owned.addEventListener('helix-read', async (event) => {
+    if (event.target === owned) {
+      return
+    }
+
+    const item = event.target
+    event.preventDefault()
+
+    const accepted = await Promise.resolve(true)
+
+    if (accepted) {
+      item.read = event.detail.read
+    }
+  })
+
+  for (const item of owned.querySelectorAll('helix-notifications-item')) {
+    item.at = new Date(Date.now() - 9 * 60000).toISOString()
+    item.addEventListener('click', () => item.markRead(true))
+  }
+</script>

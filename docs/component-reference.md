@@ -3448,6 +3448,146 @@ says where the current page was as well as where it is.
 | `--navigation-indicator-color` | Fill of the traveling marker. |
 | `--navigation-gap` | Space between destinations. |
 
+## Notifications
+
+### Root (`helix-notifications`)
+
+A feed a reader comes back to, made of notifications they may not have seen.
+
+Extends `HelixHeadlessNotifications`.
+
+Three rows: header, a list that scrolls, footer. The list scrolls and the
+other two do not, because a panel is opened at a fixed height and a mark-all
+control that slides away as the reader scrolls is the control they were
+reaching for.
+
+**It does not virtualize and it cannot**, which is the headless tier's note
+and worth repeating where the choice is made: the items are the consumer's own
+elements, so N notifications is N elements by construction. A feed that really
+holds thousands wants `helix-data-table` with a custom cell.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
+| `items` | - | `HelixHeadlessNotificationsItem[]` | - | `HelixHeadlessNotifications` | The notifications declared as children, in the order they are written. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessNotifications` | Accessible name for the feed. |
+| `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
+| `markAll` | `mark-all` | `boolean` | `false` | `HelixHeadlessNotifications` | Whether to draw a control that marks everything read. |
+| `markAllLabel` | `mark-all-label` | `string` | `'Mark all as read'` | `HelixHeadlessNotifications` | Label for that control. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }` | `HelixHeadlessNotifications` | Nothing is assigned by name, so the items land in a list and the rest does not. |
+| `unread` | `unread` | `number` | - | `HelixHeadlessNotifications` | How many items are unread, counted from the items themselves. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `markEveryoneRead()` | `HelixHeadlessNotifications` | Marks every unread item read, and reports how many actually moved. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-read` | `HelixReadEvent` | Fired by an item, and by this element when everything is marked read. Cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The notifications, as `helix-notifications-item` children. |
+| `header` | Above the list, for a title and the mark-all control. |
+| `footer` | Below the list, for a link to everything. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `list` | The list itself. |
+| `mark-all` | The control that marks everything read. |
+| `header` | The region above the list. |
+| `footer` | The region below the list. |
+| `empty` | Shown when there is nothing in the feed. |
+| `loading` | Shown while the feed is still on its way. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--notifications-max-height` | How tall the feed may get before the list scrolls. |
+| `--notifications-rule` | The hairline between items and around the regions. |
+| `--notifications-padding-inline` | Space either side of the header and footer. |
+
+### Item (`helix-notifications-item`)
+
+One thing that happened, which a reader may not have seen yet.
+
+Extends `HelixHeadlessNotificationsItem`.
+
+A three-column grid: media, body, actions. A grid rather than a flex row,
+because the media column has to line up down the feed whether or not every
+item has one, and a flex row collapses the empty ones so every line of text
+starts somewhere different.
+
+**Unread is weight and a mark on the inline start edge, not a fill.** Depth
+comes from a single border in this library, and a filled row is elevation
+spelled differently; a feed of filled rows is a striped list nobody can read.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `at` | `at` | `string` | `''` | `HelixHeadlessNotificationsItem` | When it happened, as anything `Date` parses. |
+| `defaultRead` | `default-read` | `boolean` | `false` | `HelixHeadlessNotificationsItem` | State to open with, where nothing declared one. |
+| `dismissible` | `dismissible` | `boolean` | `false` | `HelixHeadlessNotificationsItem` | Whether a reader may remove it. |
+| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `HelixHeadlessNotificationsItem` | Accessible name for the dismiss control. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessNotificationsItem` | Locale for the timestamp. Empty is the runtime's own. |
+| `read` | `read` | `boolean` | - | `HelixHeadlessNotificationsItem` | Whether the reader has seen it. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `markRead()` | `HelixHeadlessNotificationsItem` | Asks to be marked read, and reports whether the request stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-read` | `HelixReadEvent` | Fired when the item is marked read or unread, and cancelable. |
+| `helix-dismiss` | `HelixDismissEvent` | Fired when a reader asks to remove it, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | What happened, in the consumer's own markup. |
+| `media` | An avatar or icon identifying who or what it came from. |
+| `actions` | What a reader can do about it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `item` | The whole notification. |
+| `time` | When it happened. |
+| `dismiss` | The control that removes it. |
+| `media` | The leading slot's box. |
+| `body` | Content and timestamp together. |
+| `content` | The consumer's own markup. |
+| `actions` | The trailing slot's box. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--notifications-rule` | The hairline between items. |
+| `--notifications-color` | Ink in an item that has been read. |
+| `--notifications-unread-mark` | The edge mark on an unread item. |
+| `--notifications-padding-block` | Space above and below an item. |
+| `--notifications-padding-inline` | Space either side of an item. |
+
 ## Number Input
 
 ### Root (`helix-number-input`)

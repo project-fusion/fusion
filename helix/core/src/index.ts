@@ -86,6 +86,7 @@ export {
   HelixNextEvent,
   HelixOpenEvent,
   HelixPreviousEvent,
+  HelixReadEvent,
   HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
@@ -97,6 +98,7 @@ export {
   type LoadDetail,
   type NavigateDetail,
   type OpenDetail,
+  type ReadDetail,
   type ResizeDetail,
   type SelectDetail,
   type ShortcutDetail,
@@ -166,6 +168,10 @@ export {
   type Series,
   type SeriesPoint,
 } from './utils/read-series/read-series.js'
+export {
+  type Relative,
+  relativeTime,
+} from './utils/relative-time/relative-time.js'
 export {
   type ControlledChangeOptions,
   requestControlledChange,

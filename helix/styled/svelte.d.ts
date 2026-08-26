@@ -62,6 +62,8 @@ declare module 'svelte/elements' {
     'helix-menu': CustomElements['helix-menu']
     'helix-meter': CustomElements['helix-meter']
     'helix-navigation': CustomElements['helix-navigation']
+    'helix-notifications-item': CustomElements['helix-notifications-item']
+    'helix-notifications': CustomElements['helix-notifications']
     'helix-number-input': CustomElements['helix-number-input']
     'helix-option-group': CustomElements['helix-option-group']
     'helix-option': CustomElements['helix-option']

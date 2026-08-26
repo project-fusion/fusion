@@ -1,0 +1,50 @@
+<!-- @summary A feed with unread items, a mark-all control, and timestamps that stay correct. -->
+
+<helix-notifications
+  id="feed"
+  label="Notifications"
+  mark-all
+>
+  <h2 slot="header">Notifications</h2>
+
+  <helix-notifications-item dismissible>
+    <strong>Ada Okonjo</strong> approved your deploy to production.
+    <helix-button
+      emphasis="ghost"
+      slot="actions"
+    >View</helix-button>
+  </helix-notifications-item>
+
+  <helix-notifications-item dismissible>
+    Build <strong>#4821</strong> failed on <code>main</code>
+    <helix-button
+      emphasis="ghost"
+      slot="actions"
+    >Logs</helix-button>
+  </helix-notifications-item>
+
+  <helix-notifications-item
+    default-read
+    dismissible
+  >
+    Your invitation to <strong>Fusion Design</strong> was accepted.
+  </helix-notifications-item>
+
+  <a
+    href="#all"
+    slot="footer"
+  >See everything</a>
+</helix-notifications>
+
+<script>
+  /* Set from script rather than written into the markup, because a timestamp in
+     an example is stale the moment it is committed: written as a literal, the
+     feed reads "8 months ago" by the time anybody looks at it. */
+  const feed = document.getElementById('feed')
+  const ago = (minutes) => new Date(Date.now() - minutes * 60_000).toISOString()
+
+  const items = feed.querySelectorAll('helix-notifications-item')
+  items[0].at = ago(3)
+  items[1].at = ago(42)
+  items[2].at = ago(1500)
+</script>

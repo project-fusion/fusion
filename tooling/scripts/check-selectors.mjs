@@ -317,9 +317,19 @@ for (const tier of TIERS) {
     }
     const declared = attributes.get(owner)
     /* Each decorator with the property that follows it. `attribute: false` opts
-       out of having one at all, and `attribute: 'x'` names it. */
+       out of having one at all, and `attribute: 'x'` names it.
+      *
+      * **`get` and `set` are skipped, and leaving them out recorded the wrong
+      * name.** A controlled property is declared as an accessor pair, which is
+      * what the controlled/uncontrolled convention is built on, so
+      * `@property({ reflect: true }) get read()` matched `get` as the property
+      * and 26 accessor-backed attributes across the two tiers were all filed
+      * under that one name. None of them was selectable, and the only way to
+      * find out was to write a `:host([read])` for one and be told it does not
+      * exist.
+      */
     for (const [, options, property] of text.matchAll(
-      /@property\(([^)]*)\)\s*(?:override\s+)?(\w+)/g,
+      /@property\(([^)]*)\)\s*(?:override\s+)?(?:(?:get|set)\s+)?(\w+)/g,
     )) {
       const explicit = options.match(/attribute:\s*'([^']+)'/)
       if (/attribute:\s*false/.test(options)) {

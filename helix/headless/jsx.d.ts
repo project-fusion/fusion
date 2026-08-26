@@ -62,6 +62,8 @@ import type {
   HelixHeadlessMenuItem,
   HelixHeadlessMeter,
   HelixHeadlessNavigation,
+  HelixHeadlessNotifications,
+  HelixHeadlessNotificationsItem,
   HelixHeadlessNumberInput,
   HelixHeadlessOption,
   HelixHeadlessOptionGroup,
@@ -125,6 +127,7 @@ import type {
   HelixNextEvent,
   HelixOpenEvent,
   HelixPreviousEvent,
+  HelixReadEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixSelectEvent,
@@ -6496,6 +6499,187 @@ export type HelixHeadlessNavigationProps = {
 export type HelixHeadlessNavigationSolidJsProps = {
   /** Accessible name for the landmark. */
   "prop:label"?: HelixHeadlessNavigation["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixHeadlessNotificationsItem` component event */
+export type HelixHeadlessNotificationsItemElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessNotificationsItem,
+  E
+>;
+/** `helix-read` event type */
+export type HelixHeadlessNotificationsItemHelixReadElementEvent =
+  HelixHeadlessNotificationsItemElementEvent<HelixReadEvent>;
+/** `helix-dismiss` event type */
+export type HelixHeadlessNotificationsItemHelixDismissElementEvent =
+  HelixHeadlessNotificationsItemElementEvent<HelixDismissEvent>;
+
+export type HelixHeadlessNotificationsItemProps = {
+  /** When it happened, as anything `Date` parses.
+
+An ISO string is what an API sends and what `<time datetime>` takes, so it
+is the shape that needs no translation at either end. Left unset the item
+shows no timestamp rather than showing the epoch, which is what parsing an
+empty string would give. */
+  at?: HelixHeadlessNotificationsItem["at"];
+  /** Whether the reader has seen it.
+
+Reflected, because unread is a visual state and a stylesheet has no other
+way to know. Set it and this element defers: a reader's click fires
+`helix-read` and changes nothing until a new value arrives. `default-read`
+seeds a state this element then owns. */
+  read?: HelixHeadlessNotificationsItem["read"];
+  /** State to open with, where nothing declared one. */
+  "default-read"?: HelixHeadlessNotificationsItem["defaultRead"];
+  /** State to open with, where nothing declared one. */
+  defaultRead?: HelixHeadlessNotificationsItem["defaultRead"];
+  /** Whether a reader may remove it. */
+  dismissible?: HelixHeadlessNotificationsItem["dismissible"];
+  /** Locale for the timestamp. Empty is the runtime's own. */
+  locale?: HelixHeadlessNotificationsItem["locale"];
+  /** Accessible name for the dismiss control. */
+  "dismiss-label"?: HelixHeadlessNotificationsItem["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  dismissLabel?: HelixHeadlessNotificationsItem["dismissLabel"];
+
+  /** Fired when the item is marked read or unread, and cancelable. */
+  "onhelix-read"?: (
+    e: HelixHeadlessNotificationsItemHelixReadElementEvent,
+  ) => void;
+  /** Fired when a reader asks to remove it, and cancelable. */
+  "onhelix-dismiss"?: (
+    e: HelixHeadlessNotificationsItemHelixDismissElementEvent,
+  ) => void;
+};
+
+export type HelixHeadlessNotificationsItemSolidJsProps = {
+  /** When it happened, as anything `Date` parses.
+
+An ISO string is what an API sends and what `<time datetime>` takes, so it
+is the shape that needs no translation at either end. Left unset the item
+shows no timestamp rather than showing the epoch, which is what parsing an
+empty string would give. */
+  "prop:at"?: HelixHeadlessNotificationsItem["at"];
+  /** Whether the reader has seen it.
+
+Reflected, because unread is a visual state and a stylesheet has no other
+way to know. Set it and this element defers: a reader's click fires
+`helix-read` and changes nothing until a new value arrives. `default-read`
+seeds a state this element then owns. */
+  "prop:read"?: HelixHeadlessNotificationsItem["read"];
+  /** State to open with, where nothing declared one. */
+  "bool:default-read"?: HelixHeadlessNotificationsItem["defaultRead"];
+  /** State to open with, where nothing declared one. */
+  "prop:defaultRead"?: HelixHeadlessNotificationsItem["defaultRead"];
+  /** Whether a reader may remove it. */
+  "prop:dismissible"?: HelixHeadlessNotificationsItem["dismissible"];
+  /** Locale for the timestamp. Empty is the runtime's own. */
+  "prop:locale"?: HelixHeadlessNotificationsItem["locale"];
+  /** Accessible name for the dismiss control. */
+  "attr:dismiss-label"?: HelixHeadlessNotificationsItem["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  "prop:dismissLabel"?: HelixHeadlessNotificationsItem["dismissLabel"];
+  /** Fired when the item is marked read or unread, and cancelable. */
+  "on:helix-read"?: (
+    e: HelixHeadlessNotificationsItemHelixReadElementEvent,
+  ) => void;
+  /** Fired when a reader asks to remove it, and cancelable. */
+  "on:helix-dismiss"?: (
+    e: HelixHeadlessNotificationsItemHelixDismissElementEvent,
+  ) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixHeadlessNotifications` component event */
+export type HelixHeadlessNotificationsElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessNotifications,
+  E
+>;
+/** `helix-read` event type */
+export type HelixHeadlessNotificationsHelixReadElementEvent =
+  HelixHeadlessNotificationsElementEvent<HelixReadEvent>;
+
+export type HelixHeadlessNotificationsProps = {
+  /** Accessible name for the feed. */
+  label?: HelixHeadlessNotifications["label"];
+  /** Whether to draw a control that marks everything read. */
+  "mark-all"?: HelixHeadlessNotifications["markAll"];
+  /** Whether to draw a control that marks everything read. */
+  markAll?: HelixHeadlessNotifications["markAll"];
+  /** Label for that control. */
+  "mark-all-label"?: HelixHeadlessNotifications["markAllLabel"];
+  /** Label for that control. */
+  markAllLabel?: HelixHeadlessNotifications["markAllLabel"];
+  /** How many items are unread, counted from the items themselves.
+
+Reflected so a stylesheet can answer it, and read-only for the reason it is
+derived: a count the consumer could set is a second source of truth for
+something the items already know, and the first time the two disagreed the
+badge would be right and the list would not. */
+  unread?: HelixHeadlessNotifications["unread"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixHeadlessNotifications["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixHeadlessNotifications["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixHeadlessNotifications["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixHeadlessNotifications["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixHeadlessNotifications["emptyText"];
+
+  /** Fired by an item, and by this element when everything is marked read. Cancelable. */
+  "onhelix-read"?: (e: HelixHeadlessNotificationsHelixReadElementEvent) => void;
+};
+
+export type HelixHeadlessNotificationsSolidJsProps = {
+  /** Accessible name for the feed. */
+  "prop:label"?: HelixHeadlessNotifications["label"];
+  /** Whether to draw a control that marks everything read. */
+  "bool:mark-all"?: HelixHeadlessNotifications["markAll"];
+  /** Whether to draw a control that marks everything read. */
+  "prop:markAll"?: HelixHeadlessNotifications["markAll"];
+  /** Label for that control. */
+  "attr:mark-all-label"?: HelixHeadlessNotifications["markAllLabel"];
+  /** Label for that control. */
+  "prop:markAllLabel"?: HelixHeadlessNotifications["markAllLabel"];
+  /** How many items are unread, counted from the items themselves.
+
+Reflected so a stylesheet can answer it, and read-only for the reason it is
+derived: a count the consumer could set is a second source of truth for
+something the items already know, and the first time the two disagreed the
+badge would be right and the list would not. */
+  "prop:unread"?: HelixHeadlessNotifications["unread"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  "prop:loading"?: HelixHeadlessNotifications["loading"];
+  /** What is said while they are on their way. */
+  "attr:loading-text"?: HelixHeadlessNotifications["loadingText"];
+  /** What is said while they are on their way. */
+  "prop:loadingText"?: HelixHeadlessNotifications["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixHeadlessNotifications["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixHeadlessNotifications["emptyText"];
+  /** Fired by an item, and by this element when everything is marked read. Cancelable. */
+  "on:helix-read"?: (
+    e: HelixHeadlessNotificationsHelixReadElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -18756,6 +18940,176 @@ export type CustomElements = {
   >;
 
   /**
+   * A notification is a toast that did not go away. `helix-toast` is deliberately
+   * the opposite of this: a live region whose items carry a `duration` and whose
+   * root never creates or destroys anything. What makes this its own family is the
+   * state each item carries rather than the arrangement it sits in: read and
+   * unread, a timestamp that has to stay correct, and an action a reader can take
+   * later.
+   *
+   * **The timestamp is the part that is easy to get wrong and impossible to
+   * notice.** "2 minutes ago" is correct for sixty seconds, and a feed left open
+   * ends up describing when the page loaded rather than when anything happened.
+   * Every item's reading is refreshed on a schedule it works out for itself, from
+   * one timer the page shares: fifty items with fifty intervals is fifty wakeups a
+   * second where one will do.
+   *
+   * **Read state is reported, not invented.** Marking something read is usually a
+   * round trip, and a component that flips its own state and then hears the
+   * request failed has told the reader something untrue. `helix-read` is
+   * cancelable, and a `read` set by the consumer makes this element defer entirely.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `at`: When it happened, as anything `Date` parses.
+   *
+   * An ISO string is what an API sends and what `<time datetime>` takes, so it
+   * is the shape that needs no translation at either end. Left unset the item
+   * shows no timestamp rather than showing the epoch, which is what parsing an
+   * empty string would give.
+   * - `read`: Whether the reader has seen it.
+   *
+   * Reflected, because unread is a visual state and a stylesheet has no other
+   * way to know. Set it and this element defers: a reader's click fires
+   * `helix-read` and changes nothing until a new value arrives. `default-read`
+   * seeds a state this element then owns.
+   * - `default-read`/`defaultRead`: State to open with, where nothing declared one.
+   * - `dismissible`: Whether a reader may remove it.
+   * - `locale`: Locale for the timestamp. Empty is the runtime's own.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-read`: Fired when the item is marked read or unread, and cancelable.
+   * - `helix-dismiss`: Fired when a reader asks to remove it, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What happened, in the consumer's own markup.
+   * - `media`: An avatar or icon identifying who or what it came from.
+   * - `actions`: What a reader can do about it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `markRead(next = true) => boolean`: Asks to be marked read, and reports whether the request stood.
+   *
+   * Public because a consumer's own control is as likely to ask as this
+   * element's own markup is, and because a list marking everything read has to
+   * go through the same request rather than writing the property behind it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The whole notification.
+   * - `media`: The leading slot's box.
+   * - `body`: Content and timestamp together.
+   * - `content`: The consumer's own markup.
+   * - `time`: When it happened, read the way a person reads one.
+   * - `actions`: The trailing slot's box.
+   * - `dismiss`: The control that removes it.
+   */
+  "helix-headless-notifications-item": Partial<
+    HelixHeadlessNotificationsItemProps &
+      BaseProps<HelixHeadlessNotificationsItem> &
+      BaseEvents
+  >;
+
+  /**
+   * **Slotted children rather than a data property**, which is the opposite of the
+   * choice `helix-data-table` made and correct for the opposite reason. A table's
+   * rows are homogeneous values a consumer wants windowed; a notification is a
+   * small piece of somebody's own markup, with an avatar and a link and a button
+   * in it, and there are tens of them rather than thousands. Writing them out is
+   * the web-component reading of a list and lets an item hold anything.
+   *
+   * **The cost is stated rather than discovered: this does not virtualize, and it
+   * cannot.** Windowing needs the list to own the data, and here the consumer owns
+   * it: N notifications is N elements by construction. That is the same trade
+   * `25-data-table.md` §2.2 rejected for a table and accepts here, because the
+   * sizes are not comparable. A feed that really does hold thousands wants a data
+   * table with a custom cell, and this component will not grow into one.
+   *
+   * **Read state is reported, never invented.** Marking read is usually a round
+   * trip: this element asks its items and each item asks the consumer, so a
+   * refused `helix-read` leaves everything alone and a consumer who owns `read`
+   * sees nothing change until they say so. `unread` is derived from the items and
+   * reflected, so a stylesheet and a badge can both read it without either of them
+   * counting.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the feed.
+   * - `mark-all`/`markAll`: Whether to draw a control that marks everything read.
+   * - `mark-all-label`/`markAllLabel`: Label for that control.
+   * - `unread`: How many items are unread, counted from the items themselves.
+   *
+   * Reflected so a stylesheet can answer it, and read-only for the reason it is
+   * derived: a count the consumer could set is a second source of truth for
+   * something the items already know, and the first time the two disagreed the
+   * badge would be right and the list would not.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `items`: The notifications declared as children, in the order they are written. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-read`: Fired by an item, and by this element when everything is marked read. Cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The notifications, as `helix-notifications-item` children.
+   * - `header`: Above the list, for a title and the mark-all control.
+   * - `footer`: Below the list, for a link to everything.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `markEveryoneRead() => number`: Marks every unread item read, and reports how many actually moved.
+   *
+   * **Through each item's own request rather than by writing its property**,
+   * which is what makes one refusal refuse one item: a consumer who owns some
+   * items and not others gets the right answer for each, and a server that
+   * rejects one does not silently mark the rest.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The region above the list.
+   * - `list`: The list itself.
+   * - `footer`: The region below the list.
+   * - `mark-all`: The control that marks everything read.
+   * - `empty`: Shown when there is nothing in the feed.
+   * - `loading`: Shown while the feed is still on its way.
+   */
+  "helix-headless-notifications": Partial<
+    HelixHeadlessNotificationsProps &
+      BaseProps<HelixHeadlessNotifications> &
+      BaseEvents
+  >;
+
+  /**
    * **A family rather than `Input`'s `type="number"`, and rather than a part of
    * it.** `Input` already takes that type and will keep it: a bare numeric field
    * in a form is a text field with a different keyboard, and that is all it needs
@@ -30739,6 +31093,178 @@ export type CustomElementsSolidJs = {
     HelixHeadlessNavigationProps &
       HelixHeadlessNavigationSolidJsProps &
       BaseProps<HelixHeadlessNavigation> &
+      BaseEvents
+  >;
+
+  /**
+   * A notification is a toast that did not go away. `helix-toast` is deliberately
+   * the opposite of this: a live region whose items carry a `duration` and whose
+   * root never creates or destroys anything. What makes this its own family is the
+   * state each item carries rather than the arrangement it sits in: read and
+   * unread, a timestamp that has to stay correct, and an action a reader can take
+   * later.
+   *
+   * **The timestamp is the part that is easy to get wrong and impossible to
+   * notice.** "2 minutes ago" is correct for sixty seconds, and a feed left open
+   * ends up describing when the page loaded rather than when anything happened.
+   * Every item's reading is refreshed on a schedule it works out for itself, from
+   * one timer the page shares: fifty items with fifty intervals is fifty wakeups a
+   * second where one will do.
+   *
+   * **Read state is reported, not invented.** Marking something read is usually a
+   * round trip, and a component that flips its own state and then hears the
+   * request failed has told the reader something untrue. `helix-read` is
+   * cancelable, and a `read` set by the consumer makes this element defer entirely.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `at`: When it happened, as anything `Date` parses.
+   *
+   * An ISO string is what an API sends and what `<time datetime>` takes, so it
+   * is the shape that needs no translation at either end. Left unset the item
+   * shows no timestamp rather than showing the epoch, which is what parsing an
+   * empty string would give.
+   * - `read`: Whether the reader has seen it.
+   *
+   * Reflected, because unread is a visual state and a stylesheet has no other
+   * way to know. Set it and this element defers: a reader's click fires
+   * `helix-read` and changes nothing until a new value arrives. `default-read`
+   * seeds a state this element then owns.
+   * - `default-read`/`defaultRead`: State to open with, where nothing declared one.
+   * - `dismissible`: Whether a reader may remove it.
+   * - `locale`: Locale for the timestamp. Empty is the runtime's own.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-read`: Fired when the item is marked read or unread, and cancelable.
+   * - `helix-dismiss`: Fired when a reader asks to remove it, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What happened, in the consumer's own markup.
+   * - `media`: An avatar or icon identifying who or what it came from.
+   * - `actions`: What a reader can do about it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `markRead(next = true) => boolean`: Asks to be marked read, and reports whether the request stood.
+   *
+   * Public because a consumer's own control is as likely to ask as this
+   * element's own markup is, and because a list marking everything read has to
+   * go through the same request rather than writing the property behind it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The whole notification.
+   * - `media`: The leading slot's box.
+   * - `body`: Content and timestamp together.
+   * - `content`: The consumer's own markup.
+   * - `time`: When it happened, read the way a person reads one.
+   * - `actions`: The trailing slot's box.
+   * - `dismiss`: The control that removes it.
+   */
+  "helix-headless-notifications-item": Partial<
+    HelixHeadlessNotificationsItemProps &
+      HelixHeadlessNotificationsItemSolidJsProps &
+      BaseProps<HelixHeadlessNotificationsItem> &
+      BaseEvents
+  >;
+
+  /**
+   * **Slotted children rather than a data property**, which is the opposite of the
+   * choice `helix-data-table` made and correct for the opposite reason. A table's
+   * rows are homogeneous values a consumer wants windowed; a notification is a
+   * small piece of somebody's own markup, with an avatar and a link and a button
+   * in it, and there are tens of them rather than thousands. Writing them out is
+   * the web-component reading of a list and lets an item hold anything.
+   *
+   * **The cost is stated rather than discovered: this does not virtualize, and it
+   * cannot.** Windowing needs the list to own the data, and here the consumer owns
+   * it: N notifications is N elements by construction. That is the same trade
+   * `25-data-table.md` §2.2 rejected for a table and accepts here, because the
+   * sizes are not comparable. A feed that really does hold thousands wants a data
+   * table with a custom cell, and this component will not grow into one.
+   *
+   * **Read state is reported, never invented.** Marking read is usually a round
+   * trip: this element asks its items and each item asks the consumer, so a
+   * refused `helix-read` leaves everything alone and a consumer who owns `read`
+   * sees nothing change until they say so. `unread` is derived from the items and
+   * reflected, so a stylesheet and a badge can both read it without either of them
+   * counting.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the feed.
+   * - `mark-all`/`markAll`: Whether to draw a control that marks everything read.
+   * - `mark-all-label`/`markAllLabel`: Label for that control.
+   * - `unread`: How many items are unread, counted from the items themselves.
+   *
+   * Reflected so a stylesheet can answer it, and read-only for the reason it is
+   * derived: a count the consumer could set is a second source of truth for
+   * something the items already know, and the first time the two disagreed the
+   * badge would be right and the list would not.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `items`: The notifications declared as children, in the order they are written. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-read`: Fired by an item, and by this element when everything is marked read. Cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The notifications, as `helix-notifications-item` children.
+   * - `header`: Above the list, for a title and the mark-all control.
+   * - `footer`: Below the list, for a link to everything.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `markEveryoneRead() => number`: Marks every unread item read, and reports how many actually moved.
+   *
+   * **Through each item's own request rather than by writing its property**,
+   * which is what makes one refusal refuse one item: a consumer who owns some
+   * items and not others gets the right answer for each, and a server that
+   * rejects one does not silently mark the rest.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `header`: The region above the list.
+   * - `list`: The list itself.
+   * - `footer`: The region below the list.
+   * - `mark-all`: The control that marks everything read.
+   * - `empty`: Shown when there is nothing in the feed.
+   * - `loading`: Shown while the feed is still on its way.
+   */
+  "helix-headless-notifications": Partial<
+    HelixHeadlessNotificationsProps &
+      HelixHeadlessNotificationsSolidJsProps &
+      BaseProps<HelixHeadlessNotifications> &
       BaseEvents
   >;
 

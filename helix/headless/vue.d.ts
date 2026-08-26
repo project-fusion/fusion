@@ -52,6 +52,8 @@ import type {
   HelixHeadlessMenu,
   HelixHeadlessMeter,
   HelixHeadlessNavigation,
+  HelixHeadlessNotificationsItem,
+  HelixHeadlessNotifications,
   HelixHeadlessNumberInput,
   HelixHeadlessOptionGroup,
   HelixHeadlessOption,
@@ -131,6 +133,7 @@ import type {
   HelixErrorEvent,
   HelixInputEvent,
   HelixShortcutEvent,
+  HelixReadEvent,
   HelixCompleteEvent,
   HelixTourAskEvent,
   HelixNextEvent,
@@ -3369,6 +3372,102 @@ export type HelixHeadlessNavigationVueProps = {
 };
 
 export type HelixHeadlessNavigationVueEvents = {};
+
+/** `HelixHeadlessNotificationsItem` component event */
+export type HelixHeadlessNotificationsItemElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessNotificationsItem,
+  E
+>;
+/** `helix-read` event type */
+export type HelixHeadlessNotificationsItemHelixReadElementEvent =
+  HelixHeadlessNotificationsItemElementEvent<HelixReadEvent>;
+/** `helix-dismiss` event type */
+export type HelixHeadlessNotificationsItemHelixDismissElementEvent =
+  HelixHeadlessNotificationsItemElementEvent<HelixDismissEvent>;
+
+export type HelixHeadlessNotificationsItemVueProps = {
+  /** When it happened, as anything `Date` parses.
+
+An ISO string is what an API sends and what `<time datetime>` takes, so it
+is the shape that needs no translation at either end. Left unset the item
+shows no timestamp rather than showing the epoch, which is what parsing an
+empty string would give. */
+  at?: HelixHeadlessNotificationsItem["at"];
+  /** Whether the reader has seen it.
+
+Reflected, because unread is a visual state and a stylesheet has no other
+way to know. Set it and this element defers: a reader's click fires
+`helix-read` and changes nothing until a new value arrives. `default-read`
+seeds a state this element then owns. */
+  read?: HelixHeadlessNotificationsItem["read"];
+  /** State to open with, where nothing declared one. */
+  "default-read"?: HelixHeadlessNotificationsItem["defaultRead"];
+  /** State to open with, where nothing declared one. */
+  defaultRead?: HelixHeadlessNotificationsItem["defaultRead"];
+  /** Whether a reader may remove it. */
+  dismissible?: HelixHeadlessNotificationsItem["dismissible"];
+  /** Locale for the timestamp. Empty is the runtime's own. */
+  locale?: HelixHeadlessNotificationsItem["locale"];
+  /** Accessible name for the dismiss control. */
+  "dismiss-label"?: HelixHeadlessNotificationsItem["dismissLabel"];
+  /** Accessible name for the dismiss control. */
+  dismissLabel?: HelixHeadlessNotificationsItem["dismissLabel"];
+};
+
+export type HelixHeadlessNotificationsItemVueEvents = {
+  /** Fired when the item is marked read or unread, and cancelable. */
+  "helix-read": HelixHeadlessNotificationsItemHelixReadElementEvent;
+  /** Fired when a reader asks to remove it, and cancelable. */
+  "helix-dismiss": HelixHeadlessNotificationsItemHelixDismissElementEvent;
+};
+
+/** `HelixHeadlessNotifications` component event */
+export type HelixHeadlessNotificationsElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessNotifications,
+  E
+>;
+/** `helix-read` event type */
+export type HelixHeadlessNotificationsHelixReadElementEvent =
+  HelixHeadlessNotificationsElementEvent<HelixReadEvent>;
+
+export type HelixHeadlessNotificationsVueProps = {
+  /** Accessible name for the feed. */
+  label?: HelixHeadlessNotifications["label"];
+  /** Whether to draw a control that marks everything read. */
+  "mark-all"?: HelixHeadlessNotifications["markAll"];
+  /** Whether to draw a control that marks everything read. */
+  markAll?: HelixHeadlessNotifications["markAll"];
+  /** Label for that control. */
+  "mark-all-label"?: HelixHeadlessNotifications["markAllLabel"];
+  /** Label for that control. */
+  markAllLabel?: HelixHeadlessNotifications["markAllLabel"];
+  /** How many items are unread, counted from the items themselves.
+
+Reflected so a stylesheet can answer it, and read-only for the reason it is
+derived: a count the consumer could set is a second source of truth for
+something the items already know, and the first time the two disagreed the
+badge would be right and the list would not. */
+  unread?: HelixHeadlessNotifications["unread"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixHeadlessNotifications["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixHeadlessNotifications["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixHeadlessNotifications["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixHeadlessNotifications["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixHeadlessNotifications["emptyText"];
+};
+
+export type HelixHeadlessNotificationsVueEvents = {
+  /** Fired by an item, and by this element when everything is marked read. Cancelable. */
+  "helix-read": HelixHeadlessNotificationsHelixReadElementEvent;
+};
 
 /** `HelixHeadlessNumberInput` component event */
 export type HelixHeadlessNumberInputElementEvent<E = Event> = TypedEvent<
@@ -7126,6 +7225,18 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessNavigation,
     HelixHeadlessNavigationVueProps,
     HelixHeadlessNavigationVueEvents
+  >;
+  /** A notification is a toast that did not go away. 'helix-toast' is deliberately the opposite of this: a live region whose items carry a 'duration' and whose root never creates or destroys anything. What makes this its own family is the state each item carries rather than the arrangement it sits in: read and unread, a timestamp that has to stay correct, and an action a reader can take later.  **The timestamp is the part that is easy to get wrong and impossible to notice.** "2 minutes ago" is correct for sixty seconds, and a feed left open ends up describing when the page loaded rather than when anything happened. Every item's reading is refreshed on a schedule it works out for itself, from one timer the page shares: fifty items with fifty intervals is fifty wakeups a second where one will do.  **Read state is reported, not invented.** Marking something read is usually a round trip, and a component that flips its own state and then hears the request failed has told the reader something untrue. 'helix-read' is cancelable, and a 'read' set by the consumer makes this element defer entirely. */
+  "helix-headless-notifications-item": DefineCustomElement<
+    HelixHeadlessNotificationsItem,
+    HelixHeadlessNotificationsItemVueProps,
+    HelixHeadlessNotificationsItemVueEvents
+  >;
+  /** **Slotted children rather than a data property**, which is the opposite of the choice 'helix-data-table' made and correct for the opposite reason. A table's rows are homogeneous values a consumer wants windowed; a notification is a small piece of somebody's own markup, with an avatar and a link and a button in it, and there are tens of them rather than thousands. Writing them out is the web-component reading of a list and lets an item hold anything.  **The cost is stated rather than discovered: this does not virtualize, and it cannot.** Windowing needs the list to own the data, and here the consumer owns it: N notifications is N elements by construction. That is the same trade '25-data-table.md' §2.2 rejected for a table and accepts here, because the sizes are not comparable. A feed that really does hold thousands wants a data table with a custom cell, and this component will not grow into one.  **Read state is reported, never invented.** Marking read is usually a round trip: this element asks its items and each item asks the consumer, so a refused 'helix-read' leaves everything alone and a consumer who owns 'read' sees nothing change until they say so. 'unread' is derived from the items and reflected, so a stylesheet and a badge can both read it without either of them counting. */
+  "helix-headless-notifications": DefineCustomElement<
+    HelixHeadlessNotifications,
+    HelixHeadlessNotificationsVueProps,
+    HelixHeadlessNotificationsVueEvents
   >;
   /** **A family rather than 'Input''s 'type="number"', and rather than a part of it.** 'Input' already takes that type and will keep it: a bare numeric field in a form is a text field with a different keyboard, and that is all it needs to be. This is a different control. It renders two buttons, binds four keys that 'Input' does not, and owns clamping and stepping, so it is an alternative and not a variant. Namespacing it under 'Input' would say it is contained by one, which is what 'IconButton' is top-level for.  **The field is 'type="text"' with 'inputmode="decimal"', and that is a measurement rather than a preference.** Asked of a real browser, 'type=number' fails three ways this control cannot live with:  ''' typed "12e" into type=number  → .value === "" focused, wheeled over it      → 5 became 4 selectionStart on type=number → null same keystrokes into type=text → .value === "12e" '''  The first is fatal on its own: the element cannot see what the reader typed, so a controlled value is destroyed by a keystroke and there is nothing left to correct or to report. The second changes a value because a page scrolled past. The third means the caret cannot be managed at all, which any correcting or formatting field needs. 'inputmode' is what keeps the phone keypad, which is the one thing 'type=number' was giving.  Validity is still the platform's, through 'min', 'max' and 'step' mirrored onto the host's own 'setValidity'. What is not mirrored is the field's 'type', because a text field has no opinion about numbers.  **Stepping is separate from typing.** A reader mid-way through "1" of "12" has not asked for anything to be clamped, so the value is only pulled into range when they step, blur, or the form asks. Clamping on every keystroke is what makes a field that cannot be typed backwards into. */
   "helix-headless-number-input": DefineCustomElement<

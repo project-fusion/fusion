@@ -22717,6 +22717,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/notifications/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/number-input/index.js"
           }
         },
@@ -30325,6 +30333,1046 @@
           "declaration": {
             "name": "HelixHeadlessNavigation",
             "module": "src/navigation/root/navigation-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/notifications/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixHeadlessNotificationsItem",
+          "declaration": {
+            "name": "HelixHeadlessNotificationsItem",
+            "module": "./item/notifications-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixHeadlessNotifications",
+          "declaration": {
+            "name": "HelixHeadlessNotifications",
+            "module": "./root/notifications-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/notifications/item/notifications-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A notification is a toast that did not go away. `helix-toast` is deliberately\nthe opposite of this: a live region whose items carry a `duration` and whose\nroot never creates or destroys anything. What makes this its own family is the\nstate each item carries rather than the arrangement it sits in: read and\nunread, a timestamp that has to stay correct, and an action a reader can take\nlater.\n\n**The timestamp is the part that is easy to get wrong and impossible to\nnotice.** \"2 minutes ago\" is correct for sixty seconds, and a feed left open\nends up describing when the page loaded rather than when anything happened.\nEvery item's reading is refreshed on a schedule it works out for itself, from\none timer the page shares: fifty items with fifty intervals is fifty wakeups a\nsecond where one will do.\n\n**Read state is reported, not invented.** Marking something read is usually a\nround trip, and a component that flips its own state and then hears the\nrequest failed has told the reader something untrue. `helix-read` is\ncancelable, and a `read` set by the consumer makes this element defer entirely.",
+          "name": "HelixHeadlessNotificationsItem",
+          "cssParts": [
+            {
+              "description": "The whole notification.",
+              "name": "item"
+            },
+            {
+              "description": "The leading slot's box.",
+              "name": "media"
+            },
+            {
+              "description": "Content and timestamp together.",
+              "name": "body"
+            },
+            {
+              "description": "The consumer's own markup.",
+              "name": "content"
+            },
+            {
+              "description": "When it happened, read the way a person reads one.",
+              "name": "time"
+            },
+            {
+              "description": "The trailing slot's box.",
+              "name": "actions"
+            },
+            {
+              "description": "The control that removes it.",
+              "name": "dismiss"
+            }
+          ],
+          "slots": [
+            {
+              "description": "What happened, in the consumer's own markup.",
+              "name": ""
+            },
+            {
+              "description": "An avatar or icon identifying who or what it came from.",
+              "name": "media"
+            },
+            {
+              "description": "What a reader can do about it.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "at",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "When it happened, as anything `Date` parses.\n\nAn ISO string is what an API sends and what `<time datetime>` takes, so it\nis the shape that needs no translation at either end. Left unset the item\nshows no timestamp rather than showing the epoch, which is what parsing an\nempty string would give.",
+              "attribute": "at"
+            },
+            {
+              "kind": "field",
+              "name": "read",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the reader has seen it.\n\nReflected, because unread is a visual state and a stylesheet has no other\nway to know. Set it and this element defers: a reader's click fires\n`helix-read` and changes nothing until a new value arrives. `default-read`\nseeds a state this element then owns.",
+              "attribute": "read",
+              "reflects": true,
+              "helix": {
+                "controlled": [
+                  "helix-read"
+                ]
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultRead",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "State to open with, where nothing declared one.",
+              "attribute": "default-read"
+            },
+            {
+              "kind": "field",
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a reader may remove it.",
+              "attribute": "dismissible"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the timestamp. Empty is the runtime's own.",
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "dismissLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "attribute": "dismiss-label"
+            },
+            {
+              "kind": "field",
+              "name": "readState",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "clock",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The clock this item last drew against.\n\nA state field and not a read of `Date.now()` inside `render`, which would\nmake the template a function of something Lit cannot see change: the item\nwould draw the right text once and never notice it had gone stale."
+            },
+            {
+              "kind": "field",
+              "name": "readMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "stopTicking",
+              "type": {
+                "text": "(() => void) | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "readIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "moment",
+              "type": {
+                "text": "Date | undefined"
+              },
+              "privacy": "private",
+              "description": "The timestamp, or nothing where there is not one to read.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "markRead",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "default": "true"
+                }
+              ],
+              "description": "Asks to be marked read, and reports whether the request stood.\n\nPublic because a consumer's own control is as likely to ask as this\nelement's own markup is, and because a list marking everything read has to\ngo through the same request rather than writing the property behind it.",
+              "type": {
+                "text": "markRead(next = true) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Schedules the next reading, and only the next one.\n\nThe formatter says when its own answer expires, so this asks for exactly\nthat moment rather than polling: an item minutes old wakes once a minute and\nan item weeks old wakes once an hour, which is the difference between a\nfeed that costs nothing to leave open and one that does not."
+            },
+            {
+              "kind": "method",
+              "name": "renderTime",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleDismiss",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-headless-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-headless-pagination-size` composes `helix-headless-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/styled` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixReadEvent"
+              },
+              "description": "Fired when the item is marked read or unread, and cancelable.",
+              "name": "helix-read",
+              "reactProp": "onhelix-read"
+            },
+            {
+              "type": {
+                "text": "HelixDismissEvent"
+              },
+              "description": "Fired when a reader asks to remove it, and cancelable.",
+              "name": "helix-dismiss",
+              "reactProp": "onhelix-dismiss"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "at",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "When it happened, as anything `Date` parses.\n\nAn ISO string is what an API sends and what `<time datetime>` takes, so it\nis the shape that needs no translation at either end. Left unset the item\nshows no timestamp rather than showing the epoch, which is what parsing an\nempty string would give.",
+              "fieldName": "at"
+            },
+            {
+              "name": "read",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the reader has seen it.\n\nReflected, because unread is a visual state and a stylesheet has no other\nway to know. Set it and this element defers: a reader's click fires\n`helix-read` and changes nothing until a new value arrives. `default-read`\nseeds a state this element then owns.",
+              "fieldName": "read"
+            },
+            {
+              "name": "default-read",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "State to open with, where nothing declared one.",
+              "fieldName": "defaultRead"
+            },
+            {
+              "name": "dismissible",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a reader may remove it.",
+              "fieldName": "dismissible"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the timestamp. Empty is the runtime's own.",
+              "fieldName": "locale"
+            },
+            {
+              "name": "dismiss-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Dismiss'",
+              "description": "Accessible name for the dismiss control.",
+              "fieldName": "dismissLabel"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One thing that happened, which a reader may not have seen yet.",
+          "helix": {
+            "category": "feedback",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/notifications",
+            "aliases": [
+              "Notification item",
+              "Inbox item"
+            ],
+            "tier": "headless",
+            "group": "BaseNotifications",
+            "part": "Item"
+          },
+          "tagName": "helix-headless-notifications-item",
+          "customElement": true,
+          "modulePath": "src/notifications/item/notifications-item.ts",
+          "definitionPath": "src/notifications/item/notifications-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixHeadlessNotificationsItem",
+          "declaration": {
+            "name": "HelixHeadlessNotificationsItem",
+            "module": "src/notifications/item/notifications-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-headless-notifications-item",
+          "declaration": {
+            "name": "HelixHeadlessNotificationsItem",
+            "module": "src/notifications/item/notifications-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/notifications/item/ticker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "subscribe",
+          "return": {
+            "type": {
+              "text": "(() => void)"
+            }
+          },
+          "parameters": [
+            {
+              "name": "delay",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "run",
+              "type": {
+                "text": "() => void"
+              }
+            }
+          ],
+          "description": "Asks to be run in `delay` milliseconds, and returns the way to stop asking.\n\nThe returned function is the whole of the contract: an element that forgets to\ncall it on disconnect leaks a closure over itself for the life of the page,\nand a panel that opens and closes leaks one per open."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "subscribe",
+          "declaration": {
+            "name": "subscribe",
+            "module": "src/notifications/item/ticker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/notifications/root/notifications-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**Slotted children rather than a data property**, which is the opposite of the\nchoice `helix-data-table` made and correct for the opposite reason. A table's\nrows are homogeneous values a consumer wants windowed; a notification is a\nsmall piece of somebody's own markup, with an avatar and a link and a button\nin it, and there are tens of them rather than thousands. Writing them out is\nthe web-component reading of a list and lets an item hold anything.\n\n**The cost is stated rather than discovered: this does not virtualize, and it\ncannot.** Windowing needs the list to own the data, and here the consumer owns\nit: N notifications is N elements by construction. That is the same trade\n`25-data-table.md` §2.2 rejected for a table and accepts here, because the\nsizes are not comparable. A feed that really does hold thousands wants a data\ntable with a custom cell, and this component will not grow into one.\n\n**Read state is reported, never invented.** Marking read is usually a round\ntrip: this element asks its items and each item asks the consumer, so a\nrefused `helix-read` leaves everything alone and a consumer who owns `read`\nsees nothing change until they say so. `unread` is derived from the items and\nreflected, so a stylesheet and a badge can both read it without either of them\ncounting.",
+          "name": "HelixHeadlessNotifications",
+          "cssParts": [
+            {
+              "description": "The region above the list.",
+              "name": "header"
+            },
+            {
+              "description": "The list itself.",
+              "name": "list"
+            },
+            {
+              "description": "The region below the list.",
+              "name": "footer"
+            },
+            {
+              "description": "The control that marks everything read.",
+              "name": "mark-all"
+            },
+            {
+              "description": "Shown when there is nothing in the feed.",
+              "name": "empty"
+            },
+            {
+              "description": "Shown while the feed is still on its way.",
+              "name": "loading"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The notifications, as `helix-notifications-item` children.",
+              "name": ""
+            },
+            {
+              "description": "Above the list, for a title and the mark-all control.",
+              "name": "header"
+            },
+            {
+              "description": "Below the list, for a link to everything.",
+              "name": "footer"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }",
+              "description": "Nothing is assigned by name, so the items land in a list and the rest does not.\n\n`role=\"listitem\"` under anything but a `list` is a list item belonging to\nnothing, and the items are ordinary children a consumer writes with no\n`slot`. Manual assignment is the only way to wrap them without editing the\nconsumer's markup, which is a change a React consumer's hydration reports\nand does not patch up."
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the feed.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "markAll",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to draw a control that marks everything read.",
+              "attribute": "mark-all"
+            },
+            {
+              "kind": "field",
+              "name": "markAllLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Mark all as read'",
+              "description": "Label for that control.",
+              "attribute": "mark-all-label"
+            },
+            {
+              "kind": "field",
+              "name": "unread",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many items are unread, counted from the items themselves.\n\nReflected so a stylesheet can answer it, and read-only for the reason it is\nderived: a count the consumer could set is a second source of truth for\nsomething the items already know, and the first time the two disagreed the\nbadge would be right and the list would not.",
+              "readonly": true,
+              "attribute": "unread",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "HelixHeadlessNotificationsItem[]"
+              },
+              "description": "The notifications declared as children, in the order they are written.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "markEveryoneRead",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "description": "Marks every unread item read, and reports how many actually moved.\n\n**Through each item's own request rather than by writing its property**,\nwhich is what makes one refusal refuse one item: a consumer who owns some\nitems and not others gets the right answer for each, and a server that\nrejects one does not silently mark the rest.",
+              "type": {
+                "text": "markEveryoneRead() => number"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Items arrive from the light DOM, which changes no property here."
+            },
+            {
+              "kind": "field",
+              "name": "handleRead",
+              "privacy": "private",
+              "readonly": true,
+              "description": "An item's own read event, heard on the way past, so the count follows.\n\n`unread` is derived from the items and nothing about an item changing tells\nLit to look again. Not stopped: the event is the consumer's to hear, and\nthis element is a bystander that happens to need to redraw."
+            },
+            {
+              "kind": "method",
+              "name": "assign",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleMarkAll",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "slotCounted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "slotRows",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many there were, the last time anyone looked.\n\n**Not `rows`, and the rename is the whole point of this comment.**\nTypeScript's `private` is a compile-time claim and the runtime field is\nwhatever it is named, so a subclass declaring `@property() rows` for the\ndata a consumer hands it would share one field with this counter: the\nslot count would overwrite the consumer's array on every `updated`, and\n`hasRows` would read the array's length as a slot count. Nothing would\nthrow. `helix-data-table` takes exactly that property, which is what\nfound this before it happened.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Counts what a rows slot was given.\n\nEmptiness is a fact about light DOM children and the server has none to\ncount. `slotchange` never fires there, so `counted` is false exactly when\nthe answer is unknown, and an unknown answer is not \"empty\": a list that\nshipped \"Nothing to show\" over markup about to have rows in it is the one\nthing an empty state must never do. Listbox's spec caught precisely that.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where there is content to show.\n\nLoading wins over empty. A collection that has not answered yet is not\nempty, and saying so is the most common version of this fault: the reader\nis told there is nothing a moment before there is something.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-headless-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-headless-pagination-size` composes `helix-headless-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/styled` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixReadEvent"
+              },
+              "description": "Fired by an item, and by this element when everything is marked read. Cancelable.",
+              "name": "helix-read",
+              "reactProp": "onhelix-read"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the feed.",
+              "fieldName": "label"
+            },
+            {
+              "name": "mark-all",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to draw a control that marks everything read.",
+              "fieldName": "markAll"
+            },
+            {
+              "name": "mark-all-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Mark all as read'",
+              "description": "Label for that control.",
+              "fieldName": "markAllLabel"
+            },
+            {
+              "name": "unread",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many items are unread, counted from the items themselves.\n\nReflected so a stylesheet can answer it, and read-only for the reason it is\nderived: a count the consumer could set is a second source of truth for\nsomething the items already know, and the first time the two disagreed the\nbadge would be right and the list would not.",
+              "readonly": true,
+              "fieldName": "unread"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "fieldName": "loadingText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "MixinCollection",
+              "package": "@helix-io/core"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A feed a reader comes back to, made of notifications they may not have seen.",
+          "helix": {
+            "category": "feedback",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/notifications",
+            "aliases": [
+              "Notification feed",
+              "Inbox",
+              "Activity"
+            ],
+            "tier": "headless",
+            "group": "BaseNotifications",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "A feed with unread items and no paint of its own.",
+                "layout": "padded",
+                "slug": "preview"
+              }
+            ],
+            "source": "helix/headless/src/notifications"
+          },
+          "tagName": "helix-headless-notifications",
+          "customElement": true,
+          "modulePath": "src/notifications/root/notifications-root.ts",
+          "definitionPath": "src/notifications/root/notifications-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixHeadlessNotifications",
+          "declaration": {
+            "name": "HelixHeadlessNotifications",
+            "module": "src/notifications/root/notifications-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-headless-notifications",
+          "declaration": {
+            "name": "HelixHeadlessNotifications",
+            "module": "src/notifications/root/notifications-root.ts"
           }
         }
       ]
