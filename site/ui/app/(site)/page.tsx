@@ -67,9 +67,9 @@ export default function Home() {
         class={styles.reelAura}
         gain={0.85}
         scale={1.7}
-        shape="flow"
         speed={1}
         terminus={0.5625}
+        variant="flow"
       ></helix-aura>
       <div className={styles.reelScrim} />
 
@@ -269,9 +269,9 @@ export default function Home() {
           class={styles.reelAuraLate}
           gain={0.85}
           scale={1.7}
-          shape="flow"
           speed={1}
           terminus={0.5625}
+          variant="flow"
         ></helix-aura>
         <div className={styles.reelScrimLate} />
         <helix-flex data-shell direction="column" gap="xl">
@@ -411,9 +411,9 @@ export default function Home() {
           class={styles.reelAuraLate}
           gain={0.85}
           scale={1.7}
-          shape="flow"
           speed={1}
           terminus={0.5625}
+          variant="flow"
         ></helix-aura>
         <div className={styles.reelScrimLate} />
         <helix-flex data-shell direction="column" gap="xl">

@@ -85,6 +85,18 @@ const AXES = {
      CSS's own `fill` property, which every chart writes for paint and which is
      not ours to rename. */
   separation: ['elevated', 'filled', 'outlined', 'plain'],
+  /* **Geometry, and the word had six vocabularies and no check until 26 Aug
+     2026.** Avatar said `circle` and `square`, Meter and Progress said `arc`
+     and `ring`, QR Code said `dots`, `rounded` and `square`, Skeleton said
+     `text` and `circle`, and Aura said `aurora`, `braid`, `caustics` and eight
+     more. Five of those are the same idea, the outline the thing takes; the
+     sixth was eleven names for a look, which is `variant` by this registry's
+     own rule and was renamed to it.
+
+     `text` earns its place beside the round words: a skeleton shaped like lines
+     of prose is a shape in the sense that matters here, which is what outline a
+     placeholder takes rather than whether that outline is a circle. */
+  shape: ['arc', 'circle', 'dots', 'ring', 'rounded', 'square', 'text'],
   /* `muted` and `subtle` are the neutral role's own quiet inks rather than an
      emphasis axis fused into this one, which was the reading until it was
      measured. Every *other* tone is already solved to the least extreme value
@@ -217,12 +229,18 @@ for (const tier of ['headless', 'styled']) {
           seenLengths.add(family)
           continue
         }
-        /* `tone` is the one axis both tiers may carry, and the exception is
-         principled rather than a concession: it says what a thing *means*, and
-         meaning survives having no stylesheet. The other three say how it is
-         painted, so on a tier with nothing to paint they are a promise nobody
-         keeps. */
-        if (tier === 'headless' && name !== 'tone') {
+        /* `tone` and `shape` are the two axes both tiers may carry, and both
+         exceptions are principled rather than concessions.
+
+         `tone` says what a thing *means*, and meaning survives having no
+         stylesheet. `shape` says what gets *rendered*: a headless Meter at
+         `ring` emits an arc rather than a bar, and a headless QR Code at
+         `dots` draws different path geometry, so the markup differs before
+         any rule is written. Both survive a tier with nothing to paint.
+
+         `emphasis`, `material` and `separation` do not. They say how a thing
+         is painted, so on the base tier they are a promise nobody keeps. */
+        if (tier === 'headless' && name !== 'tone' && name !== 'shape') {
           problems.push(
             `${tag} declares \`${name}\` on the headless tier, which has no styling to ` +
               'vary. A visual axis belongs to `web`; a structural choice is `variant`.',

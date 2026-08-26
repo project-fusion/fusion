@@ -12,24 +12,24 @@ describe('aura server output', () => {
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    /* `shape` is the only reflected property and it takes no default, so an
+    /* `variant` is the only reflected property and it takes no default, so an
        unconfigured aura writes no attribute and hydration reconciles nothing.
        The numeric axes are not reflected at all, because no CSS selects on
        them: reflection exists so a selector can reach a value. */
     expect(hostAttributes(ssr(html`<helix-aura></helix-aura>`), 'helix-aura')).toEqual([])
   })
 
-  test('and reflects the shape, which the fallback gradient selects on', () => {
-    expect(hostAttributes(ssr(html`<helix-aura shape="rays"></helix-aura>`), 'helix-aura')).toEqual(
-      ['shape'],
-    )
+  test('and reflects the variant, which the fallback gradient selects on', () => {
+    expect(
+      hostAttributes(ssr(html`<helix-aura variant="rays"></helix-aura>`), 'helix-aura'),
+    ).toEqual(['variant'])
   })
 
   test('nothing about the shader reaches the server', () => {
     /* The contract is that this renders a box and upgrades. A server that
        emitted a uniform, a program or a frame would be a server pretending to
        have a GPU. */
-    const output = withoutStyles(ssr(html`<helix-aura shape="orbit"></helix-aura>`))
+    const output = withoutStyles(ssr(html`<helix-aura variant="orbit"></helix-aura>`))
     expect(output).not.toContain('#version')
     expect(output).not.toContain('gl_')
   })

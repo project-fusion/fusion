@@ -138,11 +138,11 @@ export function AuraLab(): React.ReactElement {
           interactive={interactive || undefined}
           reach={knobs.reach}
           scale={knobs.scale}
-          shape={current?.name}
           speed={knobs.speed}
           terminus={aim === 'terminus' ? knobs.terminus : undefined}
           tilt={aim === 'tilt' ? knobs.tilt : undefined}
           variance={knobs.variance}
+          variant={current?.name}
         ></helix-aura>
       </div>
       <div className="auraScrim" />

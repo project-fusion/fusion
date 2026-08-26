@@ -32,7 +32,7 @@ describe('aura', () => {
        reader on a refused context gets. The element must render and stay
        usable: the canvas simply never paints, and the host's own token
        gradient is what shows. Nothing detects this, which is the point. */
-    const host = (await mount('<helix-aura shape="rays"></helix-aura>')) as HTMLElement & {
+    const host = (await mount('<helix-aura variant="rays"></helix-aura>')) as HTMLElement & {
       updateComplete: Promise<boolean>
     }
     await host.updateComplete
@@ -40,18 +40,18 @@ describe('aura', () => {
     expect(host.isConnected).toBe(true)
   })
 
-  test('the shape reflects and the numbers do not', async () => {
+  test('the variant reflects and the numbers do not', async () => {
     // Reflection exists so a selector can reach a value. The fallback gradient
-    // selects on `shape`; nothing selects on `speed`.
+    // selects on `variant`; nothing selects on `speed`.
     const host = (await mount('<helix-aura></helix-aura>')) as HTMLElement & {
-      shape: string
+      variant: string
       speed: number
       updateComplete: Promise<boolean>
     }
-    host.shape = 'aurora'
+    host.variant = 'aurora'
     host.speed = 2
     await host.updateComplete
-    expect(host.getAttribute('shape')).toBe('aurora')
+    expect(host.getAttribute('variant')).toBe('aurora')
     expect(host.getAttribute('speed')).toBeNull()
   })
   test('takes no pointer events at rest, and takes them when asked', async () => {

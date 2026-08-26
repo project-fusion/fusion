@@ -67,9 +67,17 @@ export class HelixAura extends HelixElement {
    * Reflected because the fallback gradient selects on it, and given no default
    * for the same reason every axis here has none: a default on a reflected
    * property writes the attribute onto every host anybody renders.
+   *
+   * **`variant` and not `shape`, which it was until 26 Aug 2026.** `shape` is
+   * an axis about geometry, `circle` against `square`, `arc` against `ring`,
+   * and it is registered as one now. Aurora, braid and caustics are not
+   * geometries; they are eleven names for a look, which is what `variant` is
+   * for by the rule the registry already states. Renamed rather than
+   * grandfathered because nothing is published yet: there is no `helix-v` tag,
+   * so this costs an edit today and a deprecation later. See 236.
    */
   @property({ reflect: true })
-  shape?:
+  variant?:
     | 'aurora'
     | 'braid'
     | 'caustics'
@@ -553,7 +561,7 @@ export class HelixAura extends HelixElement {
     gl.uniform3fv(uniforms.uPeak ?? null, peak)
 
     gl.uniform1f(uniforms.uTime ?? null, this.elapsed)
-    gl.uniform1i(uniforms.uShape ?? null, SHAPES.indexOf(this.shape ?? 'braid'))
+    gl.uniform1i(uniforms.uShape ?? null, SHAPES.indexOf(this.variant ?? 'braid'))
     /* Each axis wanders on its own period. The seeds are deliberately not
        simple ratios of each other: two axes on periods that divide would come
        back into phase and give the whole field a beat. */
