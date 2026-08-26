@@ -358,6 +358,33 @@ helix-app-header {
    a masthead and how tall it is are facts about this page. The drawer's own
    default is a plain inset, which is what an app with no header wants and what
    the component's examples render with. */
+/* Fusion's sliders take a thick track and a capsule handle.
+ *
+ * **A house preference, stated by the consumer, which is why it is here.** The
+ * library's resting slider is a thin track with a round thumb, and that is the
+ * right default for a design system: it is the plainest reading of the control
+ * and it costs a consumer nothing to leave alone. Whether this app's sliders
+ * should look like that is taste, and taste belongs to the app.
+ *
+ * Reachable at all only because Slider follows Switch: the track, the thumb's
+ * thickness, the thumb's length along the track and its radius are four
+ * published hooks rather than four private variables. Before that the thumb
+ * bound both dimensions to one value with `border-radius: full` written in
+ * place, so a capsule was unreachable by construction and this rule could not
+ * have been written. See 236.
+ *
+ * `thumb-size` is the thickness across the track and `thumb-length` is the
+ * distance along it, so a handle taller than it is wide is the capsule, and the
+ * small radius is what keeps it a capsule rather than a pill. Every one of the
+ * four is a token, so this follows the scale and the density steps rather than
+ * pinning pixels beside them. */
+helix-slider {
+  --slider-thumb-length: var(--helix-space-xs);
+  --slider-thumb-radii: var(--helix-radii-sm);
+  --slider-thumb-size: var(--helix-space-lg);
+  --slider-track-size: var(--helix-space-md);
+}
+
 helix-drawer {
   /* The header, plus the drawer's own inset. This is the whole top padding
      rather than something added to one, which is what makes it safe to write:
