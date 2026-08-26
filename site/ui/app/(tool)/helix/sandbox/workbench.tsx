@@ -6,6 +6,7 @@ import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type {
   HelixChangeEvent,
   HelixDialog,
+  HelixInput,
   HelixInputEvent,
   HelixMenu,
   HelixSandbox,
@@ -21,6 +22,7 @@ import type {
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
+import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
 import type { Family } from '../../../../content/catalog/catalog'
 import { useApiTier } from '../../../../hooks/use-api-tier/use-api-tier'
@@ -209,6 +211,15 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   const [siteTheme, setSiteTheme] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
   const [filter, setFilter] = useState('')
+  const filterRef = useRef<HelixInput>(null)
+
+  /* Focus and select, so a second press of `/` replaces what is there rather
+     than appending to it: the key means "start filtering", and starting again is
+     what pressing it twice asks for. */
+  const focusFilter = useCallback(() => {
+    filterRef.current?.focus()
+    filterRef.current?.select()
+  }, [])
   // Null is "nobody has said", which is the current family open and the rest
   // shut. Once the button is pressed it is an answer, and it holds.
   const [expandAll, setExpandAll] = useState<boolean | null>(null)
@@ -227,6 +238,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   // phone gets: one is a region of the layout and the other is an overlay.
   const [showRail, setShowRail] = useState(DEFAULTS.panes.includes('rail'))
   const [prefsOpen, setPrefsOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [narrow, setNarrow] = useState(false)
 
   /* Measured on layout and then watched, so a rail asked for at 272px keeps
@@ -877,11 +889,41 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     let canceled = false
     const show = async (): Promise<void> => {
       await tree.updateComplete
+      /* **The tree's own update is not its rows'.** Awaiting `tree.updateComplete`
+         waits for the element that holds them; each row is a custom element that
+         upgrades on its own, and before it does it has no `value` property at
+         all, only the attribute React wrote. So this matched nothing on a cold
+         arrival: measured at `?e=tooltip`, 530 rows in the DOM and every one of
+         them reporting `undefined`, so the branch stayed shut and the panel sat
+         at zero with the row 3681 pixels below it.
+
+         Waiting for the definition rather than for a frame, for the same reason
+         the frame below is not enough on its own: a frame is a guess about when
+         the work is done and this is the work being done. */
+      await customElements.whenDefined('helix-tree-item')
       const row = [...tree.querySelectorAll<HelixTreeItem>('helix-tree-item')].find(
-        (one) => one.value === chosen,
+        /* The attribute as well, because the two disagree for as long as an
+           upgrade is outstanding and either one being right is enough. */
+        (one) => (one.value || one.getAttribute('value')) === chosen,
       )
       if (!row) {
         return
+      }
+      /* Opened here as well as in the navigation effect above, and not instead
+         of it. That one runs once, on the render where the tree arrives, and a
+         row is only in the DOM to be opened if React has finished putting the
+         rows there: arriving at `?e=tooltip` cold, the branch was still shut and
+         the row inside it had no layout at all, so there was nothing to scroll
+         to and the panel stayed at zero with the row 3681 pixels below it.
+
+         This one waits for the tree by construction, which is the whole reason
+         it is written as an async walk rather than a frame. Additive in the same
+         way: it opens the one branch the address names and closes nothing, so a
+         reader's own open branches are left alone. */
+      const branch = row.parentElement?.closest<HelixTreeItem>('helix-tree-item')
+      if (branch && !branch.open) {
+        branch.open = true
+        await branch.updateComplete
       }
       await row.updateComplete
       await new Promise((settled) => {
@@ -945,10 +987,26 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           class={styles.examplesFilter}
           onhelix-input={filterChanged}
           placeholder="Filter"
+          ref={filterRef}
           type="search"
           value={filter}
         >
           <helix-icon name="funnel-simple" slot="start"></helix-icon>
+          {/* **The one thing on the page that says which key it answers to.**
+              A shortcut nobody is told about is a feature for whoever wrote it,
+              which is the argument `SiteFind` makes for showing its own chord on
+              its own trigger.
+
+              `document`, and that is the exception rather than the default: `/`
+              has to work while the reader is in the tree, which is the whole
+              point of a key that focuses the field. `control` would mean
+              pressing it inside the field it had already focused. */}
+          <helix-kbd
+            keys="/"
+            onhelix-shortcut={focusFilter}
+            slot="end"
+            within="document"
+          ></helix-kbd>
         </helix-input>
         {/* Filled, so it and the field beside it are one piece of chrome rather
             than a box with a button floating after it. The tooltip repeats the
@@ -1054,9 +1112,26 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             lockup that says one thing and goes to another is a link nobody can
             predict. The site's header has always sent it to `/` and this is the
             same mark. Helix is one row down in the palette either way. */}
-        <a data-link="quiet" href="/" slot="start">
-          <Wordmark />
-        </a>
+        {/* **The way out, and the sandbox had none.** The wordmark went home
+            and nothing else went anywhere, so a reader who opened the sandbox
+            from the components page could reach the rest of the site only by
+            going back the way they came. A tool is still a page on this site.
+
+            A button rather than the row of destinations the site's header
+            carries, and ahead of the mark rather than after it. A tool's header
+            is already full of the tool, so what belongs in it is one way out
+            rather than four; and the menu is the outermost thing on the page,
+            so it sits outside the mark that names the page. */}
+        <helix-flex align="center" gap="2xs" slot="start">
+          <helix-tooltip content="Menu" placement="bottom">
+            <helix-icon-button label="Menu" onClick={() => setMenuOpen(true)}>
+              <helix-icon name="list"></helix-icon>
+            </helix-icon-button>
+          </helix-tooltip>
+          <a data-link="quiet" href="/">
+            <Wordmark />
+          </a>
+        </helix-flex>
 
         {/* What is about the site rather than the sandbox: how the whole thing
             looks, and on a phone, the way to the examples. The sandbox's own
@@ -1086,6 +1161,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
         </helix-flex>
       </helix-app-header>
 
+      <SiteMenu onOpenChange={setMenuOpen} open={menuOpen} placement="start" />
+
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
       {/* The body is a splitter now, so the rail is a pane a reader can size
@@ -1093,9 +1170,24 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           on every viewport, the rail pane simply going empty on a narrow one:
           wrapping the sandbox conditionally would unmount it at the breakpoint,
           and the preview is an iframe that reloads when it does. */}
+      {/* **A floor for the editor, in rem rather than per cent.**
+          
+          The pane on this side holds source, and source is the thing a
+          percentage minimum cannot protect: twenty per cent is 280px on a desk
+          and 100px on a laptop split in half, and the number worth picking was
+          always about how much of a line fits. 20rem is 320px of it, which is
+          where a line stops being cut mid-token.
+          
+          Only this side has one. The rail closes by being driven to 100, and a
+          `min` is a lower bound, so the toggle still shuts it completely. The
+          theme builder deliberately has no `min` for the mirror of that reason:
+          it hides its controls by driving the divider to *zero*, every position
+          goes through the same clamp, and a minimum would hold the panel open
+          at the floor instead of letting it shut. */}
       <helix-splitter
         className={styles.workbenchBody}
         default-position={railHome}
+        min="20rem"
         onhelix-change={railMoved}
         position={railPosition}
         ref={setRailSplitter}

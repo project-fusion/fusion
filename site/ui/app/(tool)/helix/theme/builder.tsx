@@ -5,6 +5,7 @@ import { type DerivedTheme, initTheme, type ThemeEngine } from '@helix-io/theme'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
+import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
 import { type FaceRow, GOOGLE_FACES } from '@/content/faces/faces'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
@@ -163,6 +164,7 @@ export function ThemeBuilder({
 }) {
   useSandboxEditor()
 
+  const [menuOpen, setMenuOpen] = useState(false)
   const [prefsOpen, setPrefsOpen] = useState(false)
 
   /**
@@ -514,9 +516,20 @@ export function ThemeBuilder({
           place: two tools under the same roof that differ in their chrome are
           two tools a reader has to learn twice. */}
       <helix-app-header class={styles.workbenchHeader}>
-        <a data-link="quiet" href="/" slot="start">
-          <Wordmark />
-        </a>
+        {/* The way out, ahead of the mark. Same argument as the sandbox: a
+            tool's header is full of the tool, so it carries one way back to the
+            site rather than the four destinations the site's own header lists,
+            and the menu sits outside the mark because it is outside the page. */}
+        <helix-flex align="center" gap="2xs" slot="start">
+          <helix-tooltip content="Menu" placement="bottom">
+            <helix-icon-button label="Menu" onClick={() => setMenuOpen(true)}>
+              <helix-icon name="list"></helix-icon>
+            </helix-icon-button>
+          </helix-tooltip>
+          <a data-link="quiet" href="/">
+            <Wordmark />
+          </a>
+        </helix-flex>
         <helix-flex align="center" gap="2xs" slot="end">
           <SiteFind findable={findable} />
           <helix-tooltip content="Preferences" placement="bottom">
@@ -526,6 +539,8 @@ export function ThemeBuilder({
           </helix-tooltip>
         </helix-flex>
       </helix-app-header>
+
+      <SiteMenu onOpenChange={setMenuOpen} open={menuOpen} placement="start" />
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
