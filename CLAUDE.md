@@ -37,6 +37,7 @@ Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 |---|---|
 | `bun run verify` | Everything. Must pass before anything is called done |
 | `bun run check` | Fixes what it can: ordering, formatting, tokens |
+| `bun run regen` | Every generated file, in the one order that works |
 | `bun run build` | Compiles TS. Runs `styles` and `analyze` first |
 | `bun run analyze` | Regenerates custom-elements manifests |
 | `cargo test --workspace` | Rust |
@@ -44,6 +45,16 @@ Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 **`verify` never writes.** It runs `biome ci`, not `biome check --write`. A step
 that edits your files cannot tell you whether they were correct. `check` fixes;
 `verify` judges.
+
+**`regen` exists because the order is not obvious and getting it wrong is a red
+build.** Twelve generators have a `check:` that judges them, and several read
+what an earlier one wrote: `reference` and `element-events` read the manifests
+`analyze` produces, `tokens` reads what `tokens:build` emits, `metrics` measures
+the built packages, and `content` and `catalog` read the pages `docs` filled.
+Run out of order they each succeed and disagree with each other, and the failure
+surfaces in CI as *"the tree is unchanged by verifying it"*, which names none of
+them. The order was carried in a conversation until it was got wrong twice in one
+night; it is a script now.
 
 **`verify` is CI's job, not a local ritual.** `verify.yml` runs all of it on every
 push, sharded across `plan`, `checks`, `lint`, `types`, `tests` and four `browser`

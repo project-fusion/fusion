@@ -99,6 +99,7 @@
     "order": "node tooling/scripts/order-manifests.mjs",
     "prepare": "git config core.hooksPath .githooks",
     "probe:stuck": "bun tooling/scripts/probe-stuck-spec.mjs",
+    "regen": "bun run check && bun run analyze && bun run element-events && bun run reference && bun run tokens:build && bun run tokens && bun run metrics && bun run samples && bun run docs && bun run catalog && bun run content && bun run eval:build",
     "reference": "bun tooling/scripts/build-reference.mjs",
     "rs:build": "cargo build --workspace",
     "rs:check": "cargo clippy --workspace --all-targets -- -D warnings",

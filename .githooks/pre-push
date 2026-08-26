@@ -28,8 +28,12 @@ bunx biome ci . >/dev/null 2>&1 || {
   exit 1
 }
 
+# The list is the generated-file checks, and it is kept in step with `regen` by
+# hand: a writer with a `check:` that judges it belongs in both. `element-events`
+# was in neither for one night, and the run that found out reported *"the tree is
+# unchanged by verifying it"* on three shards, which names nothing.
 printf 'pre-push: generated files\n'
-for task in reference tokens-reference metrics docs samples content eval queue; do
+for task in reference element-events tokens-reference metrics docs samples content eval queue; do
   bun run "check:$task" >/tmp/pre-push-$$.log 2>&1 || {
     printf '\n'
     grep -v '^\$' /tmp/pre-push-$$.log | tail -3 | sed 's/^/  /'
