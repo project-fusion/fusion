@@ -7,7 +7,12 @@
  * it happens to be styled from.
  */
 
-/* The same field the drawings sit on, at the same pitch, over the whole band.
+/* *The lattice this describes is real as of 25 Aug 2026, and was not when this
+   was written.* It sat here as an argument for a rule the file never had. The
+   rule is in `browser.module.css` now, shared by both galleries, and this is
+   what it is for.
+ *
+ * The same field the drawings sit on, at the same pitch, over the whole band.
  *
  * Dots rather than gridlines. Both would work as texture and only one is
  * already the language: sixty-five cards are drawn on this exact lattice, so

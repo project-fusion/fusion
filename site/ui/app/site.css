@@ -517,27 +517,6 @@ helix-drawer {
   text-align: center;
 }
 
-/* Interior-only, so 0% and 100% resolve to the resting `opacity: 0` and
-   `scale: 1`. A `from` that differed from rest would make every one of these
-   jump the instant the page loaded.
- *
- * Held to 0.55 and to a small swell. At full strength against a light page the
- * dots read as interface rather than as texture, and the point of the field is
- * that a reader notices it without ever being asked to look at it. */
-@keyframes siteHeroShine {
-  6% {
-    opacity: 0;
-    scale: 1;
-  }
-  11% {
-    opacity: 0.55;
-    scale: 1.45;
-  }
-  17% {
-    opacity: 0;
-    scale: 1;
-  }
-}
 
 /* An absence, not an identifier. */
 /* Lezer's token classes, painted from the library's syntax tokens.
@@ -749,7 +728,7 @@ helix-table[data-prose-table] {
  * Only the background is inline, being the one thing that differs per row and
  * the one thing the generator knows. The shape is here, where it changes once.
  *
- * A border, because two of the tokens it draws are the page's own colour in one
+ * A border, because two of the tokens it draws are the page's own color in one
  * mode or the other: `--helix-color-background` is white on white in light and
  * black on black in dark, so without an edge the first row of the ladder shows
  * nothing at all.

@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useState } from 'react'
+import { HeroField } from '@/components/hero-field/hero-field'
 import type { Insight } from '../../../content/insights'
 import browser from '../browser.module.css'
 import styles from './insights.module.css'
@@ -157,6 +158,7 @@ export function InsightBrowser({
   return (
     <>
       <section className={`${browser.pageHero} ${styles.insightsHero}`}>
+        <HeroField />
         <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
           <helix-flex align="center" data-density="sm" direction="column" gap="sm">
             <helix-tag>Fusion Development Group</helix-tag>

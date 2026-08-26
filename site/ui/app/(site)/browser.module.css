@@ -95,8 +95,142 @@
      invisible while the two are the same color and would not stay invisible if
      the hero ever takes one of its own again. */
   margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
+  /* One falloff, named once, because two surfaces wear it: the lattice itself
+     and the layer of shines that light up dots within it. Written twice they
+     would drift, and a shine that outlives the field it belongs to is a stray
+     mark rather than a lit dot. */
+  --site-lattice-mask: radial-gradient(ellipse 90% 78% at 50% 22%, #000 0%, transparent 100%);
+
   min-block-size: 28rem;
   padding-block: calc(var(--helix-space-3xl) + var(--helix-size-header)) var(--helix-space-3xl);
+}
+
+/* **The lattice belongs to both galleries now.** *Moved out of `gallery.module.css`
+   on 25 Aug 2026, and the note this replaces said Insights should not have it.*
+   The reasoning there was that the field is "a fact about a page whose cards are
+   drawn on that same field", which is true of the cards and was extended to the
+   hero without anything to support it: a hero is the top of a page rather than a
+   caption for the grid under it, and `.pageHero` has carried `isolation` and
+   `position: relative` for this pseudo-element the whole time.
+  
+   Insights' own stylesheet had already written the argument for it and never the
+   rule, describing a lattice that has never existed on that page. Three comments
+   disagreed; this is the one that is now true. */
+
+.pageHero::before {
+  background-image: radial-gradient(var(--site-lattice) 1px, transparent 1px);
+  background-position: center;
+  background-size: var(--site-lattice-pitch) var(--site-lattice-pitch);
+  content: "";
+  inset: 0;
+  mask-image: var(--site-lattice-mask);
+  pointer-events: none;
+  position: absolute;
+  /* `base` under `raised`, rather than a negative z-index.
+   *
+   * An absolutely positioned pseudo-element paints above its own element's
+   * in-flow content, so without this the lattice sits over the heading and the
+   * search. `-1` is the usual answer and is a raw value where a layer token
+   * belongs; there is no rung below `base`, so the two are ordered by lifting
+   * the content instead. `isolation` on the hero keeps that pair local. */
+  z-index: var(--helix-layer-base);
+}
+
+/* Light on the lattice.
+ *
+ * Two dozen of the field's own dots go primary for a couple of seconds each, on
+ * long staggered cycles, so the texture is never quite still without anything
+ * on it ever moving. It is the one place on the page the brand color appears
+ * at rest, which is the whole trick: the hero is the background color now, and
+ * a flat field that large wants a reason to be looked at that is not another
+ * heading.
+ *
+ * Drawn on top of the lattice rather than replacing a dot in it, because a
+ * background is one image and cannot have two dozen of its tiles animated
+ * separately. The gray dot stays underneath and the primary one is the same
+ * size at rest, so what a reader sees is a dot changing color rather than a
+ * second mark arriving next to one. */
+.pageHeroField {
+  inset: 0;
+  mask-image: var(--site-lattice-mask);
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+/* `scale` and not `inline-size`, so the growth is composited and not a layout
+ * pass two dozen times a second. `translate` holds the centering, which is why
+ * the two are separate properties here instead of one `transform`: a keyframe
+ * setting `transform` would drop the centering translation and each shine would
+ * light half a pitch down and to the right of the dot it belongs to.
+ *
+ * No `prefers-reduced-motion` block, and that is the one case where its absence
+ * is the answer. These are light-DOM elements, so the base layer's global cap
+ * does reach them, and it resolves the animation to a single 0.01ms pass that
+ * settles on the resting value. The keyframes are interior-only, so that
+ * resting value is `opacity: 0` and the shines simply do not appear. A
+ * component's own sheet has to answer the preference because `*` cannot cross a
+ * shadow boundary; nothing here is behind one. */
+
+/* **The keyframes live here, beside the only rule that reads them.** *Moved out
+   of `site.css` on 25 Aug 2026, where they had never once run.* A CSS module
+   scopes an animation name, so `animation: siteHeroShine` in a module resolved
+   to `browser-module__…__siteHeroShine` while the `@keyframes` sat unscoped in a
+   global sheet: two names that could not meet. Measured in Chrome,
+   `getAnimations()` on a shine returned an empty array and the computed opacity
+   stayed at its resting 0, which is exactly what an unlit field looks like, so
+   nothing about it read as broken.
+  
+   It was written that way from the start and moving the rule between modules
+   carried it across unchanged. Defined in the same module as the rule, the two
+   names are scoped together and match by construction. */
+
+/* Interior-only, so 0% and 100% resolve to the resting `opacity: 0` and
+ `scale: 1`. A `from` that differed from rest would make every one of these
+ jump the instant the page loaded.
+ *
+ * Held to 0.55 and to a small swell. At full strength against a light page the
+ * dots read as interface rather than as texture, and the point of the field is
+ * that a reader notices it without ever being asked to look at it. */
+@keyframes siteHeroShine {
+6% {
+  opacity: 0;
+  scale: 1;
+}
+11% {
+  opacity: 0.55;
+  scale: 1.45;
+}
+17% {
+  opacity: 0;
+  scale: 1;
+}
+}
+
+.pageHeroShine {
+  animation: siteHeroShine var(--shine-duration) ease-in-out var(--shine-delay) infinite;
+  aspect-ratio: 1;
+  /* A hard core the size of the lattice dot, then a halo. The core is what
+     makes it read as one of the field's dots rather than as a glow placed over
+     it, and the halo is what makes it read as lit. */
+  background: radial-gradient(
+    circle,
+    var(--helix-color-primary) 0 16%,
+    color-mix(in oklab, var(--helix-color-primary) 40%, transparent) 30%,
+    transparent 68%
+  );
+  border-radius: var(--helix-radii-full);
+  inline-size: 0.75rem;
+  /* A percentage of the section, snapped to the nearest lattice dot. The
+     percentage is what carries the field across the whole hero at any width;
+     the snap is what keeps every shine on a dot instead of near one. Rounding
+     is against the offset from the center, not from the edge, because
+     `background-position: center` is what anchors the lattice. */
+  inset-block-start: calc(50% + round(var(--shine-y) * 1% - 50%, var(--site-lattice-pitch)));
+  inset-inline-start: calc(50% + round(var(--shine-x) * 1% - 50%, var(--site-lattice-pitch)));
+  opacity: 0;
+  position: absolute;
+  translate: -50% -50%;
 }
 
 .pageHeroInner {
