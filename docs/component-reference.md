@@ -3265,7 +3265,7 @@ hold their own width and the middle takes the rest.
 
 | Part | Description |
 | --- | --- |
-| `rail` | The cell a railed list draws its number in, empty otherwise. |
+| `rail` | The cell a railed list draws its number in. |
 | `row` | The layout, held off the host so the host can carry a marker. |
 
 #### Custom properties

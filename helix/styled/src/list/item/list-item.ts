@@ -1,6 +1,6 @@
 import { customElement } from '@helix-io/core'
 import { HelixHeadlessListItem } from '@helix-io/headless/list'
-import type { CSSResultGroup } from 'lit'
+import { type CSSResultGroup, html, type TemplateResult } from 'lit'
 import { styles } from './list-item.css.js'
 
 /**
@@ -20,10 +20,34 @@ import { styles } from './list-item.css.js'
  * @cssproperty --list-item-rail-content - What the rail cell shows. Written by the list.
  * @cssproperty --list-item-rail-display - Whether there is a rail at all. Written by the list.
  * @cssproperty --list-item-term-weight - Weight of a description list's term.
+ *
+ * @csspart rail - The cell a railed list draws its number in.
  */
 @customElement('helix-list-item')
 export class HelixListItem extends HelixHeadlessListItem {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * The rail cell, which this tier can afford because it has a sheet.
+   *
+   * An element rather than `[part="row"]::before`, which could hold the same
+   * counter. Generated content can only ever be a string, and this cell is the
+   * one place a row's ordinal lives, so a consumer replacing it with a state
+   * mark or a step glyph wants somewhere to put it. It is also a name: a part is
+   * in `custom-elements.json` and a pseudo-element on another part is not, and a
+   * hook nobody can find is a hook nobody uses.
+   *
+   * Always rendered, because a row cannot know whether its list asked for a
+   * rail, and drawn `display: none` until the list says so. *Absent* and not
+   * *empty*: an empty box is free to layout and is not free to the native
+   * marker, which aligns to the first line box it can see. Measured against the
+   * same tree without it, every row and label sat on the identical pixel and 178
+   * pixels of the markers on a plain ordered list moved, which is a retaken
+   * baseline for a feature that list is not using.
+   */
+  protected override renderRail(): TemplateResult {
+    return html`<span part="rail"></span>`
+  }
 }
 
 declare global {

@@ -35,7 +35,6 @@ import { property } from 'lit/decorators.js'
  * @aliases Row, Entry
  * @documentation https://helix.fusion.dev/components/list
  *
- * @csspart rail - The cell a railed list draws its number in, empty otherwise.
  * @csspart row - The layout, held off the host so the host can carry a marker.
  *
  * @slot start - Leading content, usually an icon or an avatar.
@@ -71,6 +70,36 @@ export class HelixHeadlessListItem extends HelixElement {
     hostAria(this.internals, { role: 'listitem' })
   }
 
+  /**
+   * The cell before the row's content, which this tier leaves empty.
+   *
+   * A railed list puts its number at the block's own start edge, in a track of
+   * its own ahead of the words, and the native `::marker` cannot reach there:
+   * `outside` hangs the marker just clear of the row's content box, which is
+   * beside the words rather than at the edge of the block. A number that has to
+   * sit in a track has to be a box in that track.
+   *
+   * **The box belongs to the styled tier, which is why this returns `nothing`.**
+   * It was rendered here, on the argument that the template lives here, and that
+   * put an unstyled empty box in front of every headless row. A row styled with
+   * `display: flex` and a `gap` draws that gap beside the empty child: measured
+   * on this tier's own example, which is exactly such a row, 1384 pixels moved
+   * and every label sat half a rem further in. It is the fault the styled row's
+   * own comment already records about a column gap beside a zero-width column,
+   * and the one the toast had before it.
+   *
+   * A tier that ships no CSS cannot make a box it renders cost nothing, so it
+   * does not render one. `marker="rail"` is a styled-tier attribute for the same
+   * reason: *that* a list is numbered is a fact about the content and *where the
+   * numbers are drawn* is not. A headless consumer wanting a rail writes the
+   * cell they were going to style anyway.
+   *
+   * `protected` rather than `private`, so the tier above can reach it.
+   */
+  protected renderRail(): TemplateResult | typeof nothing {
+    return nothing
+  }
+
   protected override render(): TemplateResult {
     /* One wrapper, and it earns its place rather than breaking the bare-slot
        rule. That rule is about optional *regions*, which generate an empty box
@@ -84,28 +113,7 @@ export class HelixHeadlessListItem extends HelixElement {
        grid lost it the moment the list asked for a marker. Measured before this
        wrapper: a row with a leading icon put the icon 32px in instead of 16 and
        its supporting text beside the label instead of under it. */
-    /* The rail cell, empty here and empty in every list that does not ask for
-       one. A railed list puts its number at the block's own start edge, in a
-       track of its own ahead of the content, and the native `::marker` cannot
-       reach there: `outside` hangs the marker just clear of the row's content
-       box, which is beside the words rather than at the edge of the block. A
-       number that has to sit in a track has to be a box in that track.
-
-       An element rather than `[part="row"]::before`, which could hold the same
-       counter. Generated content can only ever be a string, and this cell is the
-       one place a row's ordinal lives, so a consumer replacing it with a state
-       mark or a step glyph wants somewhere to put it. It is also a name: a part
-       is in `custom-elements.json` and a pseudo-element on another part is not,
-       and a hook nobody can find is a hook nobody uses.
-
-       It costs nothing when unused, and *nothing* is meant exactly. The styled
-       tier draws this cell `display: none` until a list turns it on, rather than
-       leaving an empty box in the row: an empty box is free to layout and is not
-       free to the native marker, which aligns to the first line box it can see.
-       Measured, an empty cell moved 178 pixels of the markers on a plain ordered
-       list while leaving every row and label on the identical pixel. */
-    const content = html`<span part="rail"></span>
-      <slot name="start"></slot>
+    const content = html`${this.renderRail()}<slot name="start"></slot>
       <slot></slot>
       <slot name="supporting"></slot>
       <slot name="end"></slot>`

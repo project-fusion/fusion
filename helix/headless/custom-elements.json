@@ -27764,10 +27764,6 @@
           "name": "HelixHeadlessListItem",
           "cssParts": [
             {
-              "description": "The cell a railed list draws its number in, empty otherwise.",
-              "name": "rail"
-            },
-            {
               "description": "The layout, held off the host so the host can carry a marker.",
               "name": "row"
             }
@@ -27820,6 +27816,17 @@
               "default": "''",
               "description": "What the link declares about where it goes. The consumer's decision rather\nthan one derived from `target`, for the reason `Tree.Item` gives.",
               "attribute": "rel"
+            },
+            {
+              "kind": "method",
+              "name": "renderRail",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The cell before the row's content, which this tier leaves empty.\n\nA railed list puts its number at the block's own start edge, in a track of\nits own ahead of the words, and the native `::marker` cannot reach there:\n`outside` hangs the marker just clear of the row's content box, which is\nbeside the words rather than at the edge of the block. A number that has to\nsit in a track has to be a box in that track.\n\n**The box belongs to the styled tier, which is why this returns `nothing`.**\nIt was rendered here, on the argument that the template lives here, and that\nput an unstyled empty box in front of every headless row. A row styled with\n`display: flex` and a `gap` draws that gap beside the empty child: measured\non this tier's own example, which is exactly such a row, 1384 pixels moved\nand every label sat half a rem further in. It is the fault the styled row's\nown comment already records about a column gap beside a zero-width column,\nand the one the toast had before it.\n\nA tier that ships no CSS cannot make a box it renders cost nothing, so it\ndoes not render one. `marker=\"rail\"` is a styled-tier attribute for the same\nreason: *that* a list is numbered is a fact about the content and *where the\nnumbers are drawn* is not. A headless consumer wanting a rail writes the\ncell they were going to style anyway.\n\n`protected` rather than `private`, so the tier above can reach it."
             },
             {
               "kind": "field",

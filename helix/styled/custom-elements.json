@@ -36721,7 +36721,36 @@
               "name": "--list-item-term-weight"
             }
           ],
+          "cssParts": [
+            {
+              "description": "The cell a railed list draws its number in.",
+              "name": "rail"
+            },
+            {
+              "description": "The layout, held off the host so the host can carry a marker.",
+              "name": "row",
+              "inheritedFrom": {
+                "name": "HelixHeadlessListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            }
+          ],
           "members": [
+            {
+              "kind": "method",
+              "name": "renderRail",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The rail cell, which this tier can afford because it has a sheet.\n\nAn element rather than `[part=\"row\"]::before`, which could hold the same\ncounter. Generated content can only ever be a string, and this cell is the\none place a row's ordinal lives, so a consumer replacing it with a state\nmark or a step glyph wants somewhere to put it. It is also a name: a part is\nin `custom-elements.json` and a pseudo-element on another part is not, and a\nhook nobody can find is a hook nobody uses.\n\nAlways rendered, because a row cannot know whether its list asked for a\nrail, and drawn `display: none` until the list says so. *Absent* and not\n*empty*: an empty box is free to layout and is not free to the native\nmarker, which aligns to the first line box it can see. Measured against the\nsame tree without it, every row and label sat on the identical pixel and 178\npixels of the markers on a plain ordered list moved, which is a retaken\nbaseline for a feature that list is not using.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            },
             {
               "kind": "field",
               "name": "href",
@@ -36918,24 +36947,6 @@
             {
               "description": "Trailing content.",
               "name": "end",
-              "inheritedFrom": {
-                "name": "HelixHeadlessListItem",
-                "module": "src/list/item/list-item.ts"
-              }
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The cell a railed list draws its number in, empty otherwise.",
-              "name": "rail",
-              "inheritedFrom": {
-                "name": "HelixHeadlessListItem",
-                "module": "src/list/item/list-item.ts"
-              }
-            },
-            {
-              "description": "The layout, held off the host so the host can carry a marker.",
-              "name": "row",
               "inheritedFrom": {
                 "name": "HelixHeadlessListItem",
                 "module": "src/list/item/list-item.ts"
