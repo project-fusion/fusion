@@ -6172,6 +6172,8 @@
             "examples": [
               {
                 "description": "The same checkbox group on the headless tier, with every rule written by hand.",
+                "layout": "hug",
+                "min": 240,
                 "slug": "preview"
               }
             ],
@@ -10224,6 +10226,7 @@
             "examples": [
               {
                 "description": "The same color picker on the headless tier, with every rule written by hand.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -12351,6 +12354,7 @@
             "examples": [
               {
                 "description": "The same command on the headless tier, with every rule written by hand.",
+                "min": 320,
                 "slug": "preview"
               }
             ],
@@ -16295,6 +16299,7 @@
             "examples": [
               {
                 "description": "The same dialog on the headless tier, with every rule written by hand.",
+                "min": 420,
                 "slug": "preview"
               }
             ],
@@ -17095,6 +17100,7 @@
             "examples": [
               {
                 "description": "The same donut chart on the headless tier, with every rule written by hand.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -17563,6 +17569,7 @@
             "examples": [
               {
                 "description": "The same drawer on the headless tier, with every rule written by hand.",
+                "min": 420,
                 "slug": "preview"
               }
             ],
@@ -18651,6 +18658,7 @@
             "examples": [
               {
                 "description": "The same empty on the headless tier, with every rule written by hand.",
+                "min": 320,
                 "slug": "preview"
               }
             ],
@@ -23300,6 +23308,7 @@
             "examples": [
               {
                 "description": "The same legend on the headless tier, with every rule written by hand.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -23988,6 +23997,7 @@
             "examples": [
               {
                 "description": "The same line chart on the headless tier, with every rule written by hand.",
+                "min": 300,
                 "slug": "preview"
               }
             ],
@@ -25900,6 +25910,7 @@
             "examples": [
               {
                 "description": "The same listbox on the headless tier, with every rule written by hand.",
+                "min": 300,
                 "slug": "preview"
               }
             ],
@@ -26802,6 +26813,8 @@
             "examples": [
               {
                 "description": "The same megamenu on the headless tier, with every rule written by hand.",
+                "layout": "padded",
+                "min": 360,
                 "slug": "preview"
               }
             ],
@@ -28072,6 +28085,7 @@
             "examples": [
               {
                 "description": "The same menu on the headless tier, with every rule written by hand.",
+                "min": 300,
                 "slug": "preview"
               }
             ],
@@ -32004,6 +32018,7 @@
             "examples": [
               {
                 "description": "The same pagination on the headless tier, with every rule written by hand.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -33758,6 +33773,7 @@
             "examples": [
               {
                 "description": "The same pin input on the headless tier, with every rule written by hand.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -34249,6 +34265,7 @@
             "examples": [
               {
                 "description": "The same popover on the headless tier, with every rule written by hand.",
+                "min": 380,
                 "slug": "preview"
               }
             ],
@@ -36338,6 +36355,7 @@
             "examples": [
               {
                 "description": "The same radio on the headless tier, with every rule written by hand.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -39239,6 +39257,7 @@
             "examples": [
               {
                 "description": "The same skeleton on the headless tier, with every rule written by hand.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -42914,6 +42933,7 @@
             "examples": [
               {
                 "description": "The same stat on the headless tier, with every rule written by hand.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -50820,6 +50840,7 @@
             "examples": [
               {
                 "description": "The same time picker on the headless tier, with every rule written by hand.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -51319,6 +51340,7 @@
             "examples": [
               {
                 "description": "The same timeline on the headless tier, with every rule written by hand.",
+                "min": 420,
                 "slug": "preview"
               }
             ],
@@ -54978,6 +55000,7 @@
             "examples": [
               {
                 "description": "The same tour on the headless tier, with every rule written by hand.",
+                "min": 420,
                 "slug": "preview"
               }
             ],

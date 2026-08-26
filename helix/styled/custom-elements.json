@@ -9424,6 +9424,8 @@
             "examples": [
               {
                 "description": "Several checkboxes under one label, each submitting itself.",
+                "layout": "hug",
+                "min": 240,
                 "slug": "preview"
               },
               {
@@ -13946,6 +13948,7 @@
             "examples": [
               {
                 "description": "The area, the hue rail, and the value in a field.",
+                "layout": "hug",
                 "slug": "preview"
               },
               {
@@ -16806,6 +16809,7 @@
             "examples": [
               {
                 "description": "A command palette open, with its list already filtered by what is typed.",
+                "min": 320,
                 "slug": "preview"
               },
               {
@@ -21941,6 +21945,7 @@
             "examples": [
               {
                 "description": "A dialog opened by a button, with actions in its footer.",
+                "min": 420,
                 "slug": "preview"
               },
               {
@@ -22986,6 +22991,7 @@
             "examples": [
               {
                 "description": "Sessions by source as a ring, read from the table beside it.",
+                "layout": "hug",
                 "slug": "preview"
               },
               {
@@ -23740,6 +23746,7 @@
             "examples": [
               {
                 "description": "A panel from the edge, opened by a button.",
+                "min": 420,
                 "slug": "preview"
               },
               {
@@ -25047,6 +25054,7 @@
             "examples": [
               {
                 "description": "Nothing to show, with a heading, an explanation and a way forward.",
+                "min": 320,
                 "slug": "preview"
               },
               {
@@ -31574,6 +31582,7 @@
             "examples": [
               {
                 "description": "One entry per data column, named by the header row. The table is in the page and clipped, which is where a chart reads it from.",
+                "layout": "hug",
                 "slug": "preview"
               },
               {
@@ -32389,6 +32398,7 @@
             "examples": [
               {
                 "description": "Sessions a month, read from the table beside it. The cell text is what a reader sees and data-value is the number.",
+                "min": 300,
                 "slug": "preview"
               },
               {
@@ -34501,6 +34511,7 @@
             "examples": [
               {
                 "description": "A list to choose one from, always open.",
+                "min": 300,
                 "slug": "preview"
               },
               {
@@ -35937,6 +35948,8 @@
             "examples": [
               {
                 "description": "A navigation whose items open a full-width panel of columns.",
+                "layout": "padded",
+                "min": 360,
                 "slug": "preview"
               },
               {
@@ -37465,6 +37478,7 @@
             "examples": [
               {
                 "description": "A menu with items, a submenu, and a separator.",
+                "min": 300,
                 "slug": "preview"
               },
               {
@@ -42679,6 +42693,7 @@
             "examples": [
               {
                 "description": "Numbered pages with the current one marked.",
+                "layout": "hug",
                 "slug": "preview"
               },
               {
@@ -44830,6 +44845,7 @@
             "examples": [
               {
                 "description": "A code across separate boxes, one character each.",
+                "layout": "hug",
                 "slug": "preview"
               },
               {
@@ -45626,6 +45642,7 @@
             "examples": [
               {
                 "description": "A panel anchored to what opened it.",
+                "min": 380,
                 "slug": "preview"
               },
               {
@@ -48275,6 +48292,7 @@
             "examples": [
               {
                 "description": "One answer from several, with a hint under the question.",
+                "layout": "hug",
                 "slug": "preview"
               },
               {
@@ -49940,7 +49958,7 @@
               "kind": "field",
               "name": "layout",
               "type": {
-                "text": "'padded' | 'centered' | 'fullscreen' | undefined"
+                "text": "'padded' | 'centered' | 'fullscreen' | 'hug' | undefined"
               },
               "description": "How the example is placed in the frame.",
               "attribute": "layout",
@@ -50216,7 +50234,7 @@
             {
               "name": "layout",
               "type": {
-                "text": "'padded' | 'centered' | 'fullscreen' | undefined"
+                "text": "'padded' | 'centered' | 'fullscreen' | 'hug' | undefined"
               },
               "description": "How the example is placed in the frame.",
               "fieldName": "layout"
@@ -54135,6 +54153,7 @@
             "examples": [
               {
                 "description": "The shape of content that has not arrived, in text, circle and block.",
+                "layout": "hug",
                 "slug": "preview"
               }
             ],
@@ -56016,7 +56035,8 @@
             "part": "Root",
             "examples": [
               {
-                "description": "Three series in one line each, the mark on where every one of them ended.",
+                "description": "The same seven days as bars, as a line and as an area.",
+                "layout": "hug",
                 "slug": "preview"
               },
               {
@@ -58949,6 +58969,7 @@
             "examples": [
               {
                 "description": "Figures in a row with rules between them.",
+                "layout": "hug",
                 "slug": "preview"
               },
               {
@@ -68391,6 +68412,7 @@
             "examples": [
               {
                 "description": "Hours and minutes, with a time already chosen.",
+                "layout": "hug",
                 "slug": "preview"
               },
               {
@@ -69393,6 +69415,7 @@
             "examples": [
               {
                 "description": "Events down a line, each with its own mark and time.",
+                "min": 420,
                 "slug": "preview"
               }
             ],
@@ -73894,6 +73917,7 @@
             "examples": [
               {
                 "description": "Four stops across an app shell, each holding a card.",
+                "min": 420,
                 "slug": "preview"
               },
               {
@@ -76510,7 +76534,7 @@
             "part": "Root",
             "examples": [
               {
-                "description": "Four figures and all four ways a movement can land, two of them down.",
+                "description": "All four ways a movement can land, two of them down.",
                 "slug": "preview"
               },
               {

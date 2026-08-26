@@ -4390,7 +4390,7 @@ nobody is looking at. Top-level navigation, popups and modals are not.
 | `colorMode` | `color-mode` | `'dark' \| 'light' \| undefined` | - | - | Which half of the palette the frame renders in. |
 | `direction` | `direction` | `'rtl' \| undefined` | - | - | Writing direction inside the frame. |
 | `label` | `label` | `string` | `'Preview'` | - | Accessible name for the frame. |
-| `layout` | `layout` | `'padded' \| 'centered' \| 'fullscreen' \| undefined` | - | - | How the example is placed in the frame. |
+| `layout` | `layout` | `'padded' \| 'centered' \| 'fullscreen' \| 'hug' \| undefined` | - | - | How the example is placed in the frame. |
 | `source` | `source` | `string` | `''` | - | Markup to render. |
 | `src` | `src` | `string` | `''` | - | Document the frame loads, which brings the styles and the elements. |
 
