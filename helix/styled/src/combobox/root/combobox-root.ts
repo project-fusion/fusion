@@ -7,8 +7,8 @@ import type { CSSResultGroup } from 'lit'
    in it to remind anyone. `check:composed` enforces it. */
 import '../../listbox/index.js'
 import '../../tag/index.js'
-import { styles as fieldStyles } from '../../field/field.css.js'
-import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
+import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './combobox-root.css.js'
 
 /**

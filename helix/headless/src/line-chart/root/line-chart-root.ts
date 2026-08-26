@@ -179,7 +179,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    *
    * `none` lets the lines stop on their own, which suits a chart read for its
    * shape rather than for where it finished. The shapes come from
-   * `helix/styled/src/chart/terminus.css`, the same sheet `Sparkline` takes, so
+   * `helix/styled/src/shared/chart/terminus.css`, the same sheet `Sparkline` takes, so
    * the set is identical wherever one appears.
    *
    * `ring` is the one that asks something of the drawing. It leaves a hole and a

@@ -2,7 +2,7 @@ import { customElement, seriesIndex } from '@helix-io/core'
 import { HelixHeadlessBarChart } from '@helix-io/headless/bar-chart'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as seriesStyles } from '../../chart/series.css.js'
+import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles } from './bar-chart-root.css.js'
 import '../../tooltip/index.js'
 

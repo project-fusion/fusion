@@ -2,8 +2,8 @@ import { customElement } from '@helix-io/core'
 import { HelixHeadlessCheckbox } from '@helix-io/headless/checkbox'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as fieldStyles } from '../../field/field.css.js'
-import { styles as fieldInlineStyles } from '../../field/field-inline.css.js'
+import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldInlineStyles } from '../../shared/field/field-inline.css.js'
 import { styles } from './checkbox-root.css.js'
 
 /**

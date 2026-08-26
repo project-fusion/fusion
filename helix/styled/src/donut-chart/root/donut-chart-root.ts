@@ -2,7 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixHeadlessDonutChart } from '@helix-io/headless/donut-chart'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as seriesStyles } from '../../chart/series.css.js'
+import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles } from './donut-chart-root.css.js'
 import '../../tooltip/index.js'
 

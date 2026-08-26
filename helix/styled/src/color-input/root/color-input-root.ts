@@ -6,8 +6,8 @@ import type { CSSResultGroup } from 'lit'
    template, which is why it has to be restated here: this file has no
    `<helix-slider>` in it to remind anyone. `check:composed` enforces it. */
 import '../../color-picker/index.js'
-import { styles as fieldStyles } from '../../field/field.css.js'
-import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
+import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './color-input-root.css.js'
 
 /**

@@ -8654,46 +8654,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/chart/series.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/chart/series.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/chart/terminus.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/chart/terminus.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/chat/composer/chat-composer.css.ts",
       "declarations": [
         {
@@ -28434,66 +28394,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/field/field-inline.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/field/field-inline.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/field/field-stacked.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/field/field-stacked.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/field/field.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/field/field.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/file-input/index.ts",
       "declarations": [],
       "exports": [
@@ -36009,7 +35909,7 @@
               "type": {
                 "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
               },
-              "description": "The shape of the mark on each series' last reading.\n\nAbsent is a dot, and absent rather than defaulted because a reflecting\nproperty with a default writes its attribute onto a host the consumer\nrendered, which React reports as a hydration mismatch.\n\n**One per series, in a column at the right edge**, because every series here\nshares an x-axis and therefore ends at the same reading. That column is the\nuseful thing: it is where a reader looks for \"and what is it now\", which is\nthe question a sparkline's single mark answers too.\n\n`none` lets the lines stop on their own, which suits a chart read for its\nshape rather than for where it finished. The shapes come from\n`helix/styled/src/chart/terminus.css`, the same sheet `Sparkline` takes, so\nthe set is identical wherever one appears.\n\n`ring` is the one that asks something of the drawing. It leaves a hole and a\nline ends at the reading, which is the hole's center, so the `<svg>` is\nmasked with one disc per series and every stroke stops at its own ring's\ninner edge. `mask-composite: intersect` is what makes N holes out of N\nlayers; a single `mask-image` would only ever cut the last one.",
+              "description": "The shape of the mark on each series' last reading.\n\nAbsent is a dot, and absent rather than defaulted because a reflecting\nproperty with a default writes its attribute onto a host the consumer\nrendered, which React reports as a hydration mismatch.\n\n**One per series, in a column at the right edge**, because every series here\nshares an x-axis and therefore ends at the same reading. That column is the\nuseful thing: it is where a reader looks for \"and what is it now\", which is\nthe question a sparkline's single mark answers too.\n\n`none` lets the lines stop on their own, which suits a chart read for its\nshape rather than for where it finished. The shapes come from\n`helix/styled/src/shared/chart/terminus.css`, the same sheet `Sparkline` takes, so\nthe set is identical wherever one appears.\n\n`ring` is the one that asks something of the drawing. It leaves a hole and a\nline ends at the reading, which is the hole's center, so the `<svg>` is\nmasked with one disc per series and every stroke stops at its own ring's\ninner edge. `mask-composite: intersect` is what makes N holes out of N\nlayers; a single `mask-image` would only ever cut the last one.",
               "attribute": "terminus",
               "reflects": true,
               "inheritedFrom": {
@@ -36493,7 +36393,7 @@
               "type": {
                 "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
               },
-              "description": "The shape of the mark on each series' last reading.\n\nAbsent is a dot, and absent rather than defaulted because a reflecting\nproperty with a default writes its attribute onto a host the consumer\nrendered, which React reports as a hydration mismatch.\n\n**One per series, in a column at the right edge**, because every series here\nshares an x-axis and therefore ends at the same reading. That column is the\nuseful thing: it is where a reader looks for \"and what is it now\", which is\nthe question a sparkline's single mark answers too.\n\n`none` lets the lines stop on their own, which suits a chart read for its\nshape rather than for where it finished. The shapes come from\n`helix/styled/src/chart/terminus.css`, the same sheet `Sparkline` takes, so\nthe set is identical wherever one appears.\n\n`ring` is the one that asks something of the drawing. It leaves a hole and a\nline ends at the reading, which is the hole's center, so the `<svg>` is\nmasked with one disc per series and every stroke stops at its own ring's\ninner edge. `mask-composite: intersect` is what makes N holes out of N\nlayers; a single `mask-image` would only ever cut the last one.",
+              "description": "The shape of the mark on each series' last reading.\n\nAbsent is a dot, and absent rather than defaulted because a reflecting\nproperty with a default writes its attribute onto a host the consumer\nrendered, which React reports as a hydration mismatch.\n\n**One per series, in a column at the right edge**, because every series here\nshares an x-axis and therefore ends at the same reading. That column is the\nuseful thing: it is where a reader looks for \"and what is it now\", which is\nthe question a sparkline's single mark answers too.\n\n`none` lets the lines stop on their own, which suits a chart read for its\nshape rather than for where it finished. The shapes come from\n`helix/styled/src/shared/chart/terminus.css`, the same sheet `Sparkline` takes, so\nthe set is identical wherever one appears.\n\n`ring` is the one that asks something of the drawing. It leaves a hole and a\nline ends at the reading, which is the hole's center, so the `<svg>` is\nmasked with one disc per series and every stroke stops at its own ring's\ninner edge. `mask-composite: intersect` is what makes N holes out of N\nlayers; a single `mask-image` would only ever cut the last one.",
               "fieldName": "terminus",
               "inheritedFrom": {
                 "name": "HelixHeadlessLineChart",
@@ -59400,6 +59300,106 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/shared/chart/series.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/shared/chart/series.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/chart/terminus.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/shared/chart/terminus.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/field/field-inline.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/shared/field/field-inline.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/field/field-stacked.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/shared/field/field-stacked.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/shared/field/field.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/shared/field/field.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/skeleton/index.ts",
       "declarations": [],
       "exports": [
@@ -61170,7 +61170,7 @@
               "type": {
                 "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
               },
-              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/styled/src/chart/terminus.css`, shared with\n`LineChart`, so the set is the same wherever a line ends. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its center, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
+              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/styled/src/shared/chart/terminus.css`, shared with\n`LineChart`, so the set is the same wherever a line ends. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its center, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
               "attribute": "terminus",
               "reflects": true
             },
@@ -61399,7 +61399,7 @@
               "type": {
                 "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
               },
-              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/styled/src/chart/terminus.css`, shared with\n`LineChart`, so the set is the same wherever a line ends. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its center, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
+              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/styled/src/shared/chart/terminus.css`, shared with\n`LineChart`, so the set is the same wherever a line ends. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its center, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
               "fieldName": "terminus"
             },
             {

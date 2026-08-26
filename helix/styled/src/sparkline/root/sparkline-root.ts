@@ -2,7 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixHeadlessSparkline } from '@helix-io/headless/sparkline'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as terminusStyles } from '../../chart/terminus.css.js'
+import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'
 import { styles } from './sparkline-root.css.js'
 
 /**
@@ -109,7 +109,7 @@ export class HelixSparkline extends HelixHeadlessSparkline {
    * A `bar` plot draws none of them: the last column already is the last
    * reading, and a mark on top of it would say the same thing twice.
    *
-   * The shapes come from `helix/styled/src/chart/terminus.css`, shared with
+   * The shapes come from `helix/styled/src/shared/chart/terminus.css`, shared with
    * `LineChart`, so the set is the same wherever a line ends. `ring` is the
    * one that asks anything of the drawing: the disc it leaves open is masked out
    * of the `<svg>`, so the line stops at the ring's inner edge rather than

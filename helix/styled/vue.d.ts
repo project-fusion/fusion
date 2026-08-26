@@ -3899,7 +3899,7 @@ the question a sparkline's single mark answers too.
 
 `none` lets the lines stop on their own, which suits a chart read for its
 shape rather than for where it finished. The shapes come from
-`helix/styled/src/chart/terminus.css`, the same sheet `Sparkline` takes, so
+`helix/styled/src/shared/chart/terminus.css`, the same sheet `Sparkline` takes, so
 the set is identical wherever one appears.
 
 `ring` is the one that asks something of the drawing. It leaves a hole and a
@@ -6133,7 +6133,7 @@ as "and onward" rather than as a second claim about the data.
 A `bar` plot draws none of them: the last column already is the last
 reading, and a mark on top of it would say the same thing twice.
 
-The shapes come from `helix/styled/src/chart/terminus.css`, shared with
+The shapes come from `helix/styled/src/shared/chart/terminus.css`, shared with
 `LineChart`, so the set is the same wherever a line ends. `ring` is the
 one that asks anything of the drawing: the disc it leaves open is masked out
 of the `<svg>`, so the line stops at the ring's inner edge rather than

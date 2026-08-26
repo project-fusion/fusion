@@ -1,8 +1,8 @@
 import { customElement } from '@helix-io/core'
 import { HelixHeadlessSelect } from '@helix-io/headless/select'
 import type { CSSResultGroup } from 'lit'
-import { styles as fieldStyles } from '../../field/field.css.js'
-import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
+import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './select-root.css.js'
 /* Side-effect imports, because this renders `<helix-listbox>` in its own shadow
    root and a custom element registers on import. Without them a consumer who

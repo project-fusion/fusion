@@ -126,6 +126,23 @@ tooling/   CI and build scripts
 
 - **Product domains at root, packages flat inside.** A new product gets a new
   top-level folder.
+- **A folder inside a tier is a component family, except under `shared/`.**
+  `helix/styled/src/shared/field` and `helix/styled/src/shared/chart` hold
+  stylesheets several families import, and they are not families: `field/` is
+  taken by seventeen of them and `chart/series.css` by four. They sat directly in
+  `src/` until 26 Aug 2026, where they sorted among ninety families and read like
+  two more, which is the only thing that was wrong with them.
+
+  **The bar is a file more than one family imports**, and `check:hooks` holds it:
+  a sheet in there with one reader belongs inside that reader, and every folder
+  under `shared/` is discovered rather than listed. That rule is separate from the
+  naming exemption which lets `--chart-*` not be named after the family reading
+  it, because granting an exemption is a decision and `field/` needs the first
+  rule while declaring no hooks at all.
+
+  **They cannot move to `@helix-io/styles`**, which is the question they invite.
+  That package ships document CSS; these are shadow styles, and `:host([terminus="ring"])`
+  and `[part="label"]` mean nothing outside a shadow root.
 - **The folder drops the domain prefix; the package name keeps it.**
   `helix/styled` is `@helix-io/styled`; `cortex/core` is the crate `fusion-cortex-core`.
   Scope searches by path (`cortex/core`), not folder name, since bare leaf

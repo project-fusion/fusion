@@ -10,8 +10,8 @@ import type { CSSResultGroup } from 'lit'
    uses for its listbox and Pagination for its select. */
 import '../../date-picker/index.js'
 import '../../tag/index.js'
-import { styles as fieldStyles } from '../../field/field.css.js'
-import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
+import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './date-input-root.css.js'
 
 /**

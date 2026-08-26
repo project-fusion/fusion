@@ -2,7 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixHeadlessLegend } from '@helix-io/headless/legend'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as seriesStyles } from '../../chart/series.css.js'
+import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles } from './legend-root.css.js'
 
 /**

@@ -5,9 +5,9 @@ import type { CSSResultGroup } from 'lit'
    import: a consumer importing this family alone would otherwise get an inert
    unknown element where the mark should be. */
 import '../../icon/index.js'
-import { styles as fieldStyles } from '../../field/field.css.js'
-import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles as glyphStyles } from '../../icon/glyph.css.js'
+import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './input-root.css.js'
 
 /**

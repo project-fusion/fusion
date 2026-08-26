@@ -115,7 +115,7 @@ const packageOf = (path) => path.split('/').slice(0, 2).join('/')
  * Prefixes owned by a shared vocabulary rather than by one family.
  *
  * **Registered rather than inferred, so the exemption is a decision somebody
- * made.** `--chart-*` is real: `helix/styled/src/chart/series.css` is imported
+ * made.** `--chart-*` is real: `helix/styled/src/shared/chart/series.css` is imported
  * by Legend and three chart families, `chart/terminus.css` by Sparkline, and
  * `MixinChartSource` in core writes `--chart-series-N` for all of them. A hook
  * five components read is not Sparkline's however it was declared, and naming
@@ -125,6 +125,33 @@ const packageOf = (path) => path.split('/').slice(0, 2).join('/')
  * is a family hook that has drifted.
  */
 const SHARED = new Set(['chart'])
+
+/** Where the shared sheets live, which is not where a family lives. */
+const SHARED_ROOT = 'helix/styled/src/shared'
+
+/**
+ * Every shared folder, discovered rather than listed.
+ *
+ * **Two jobs, and conflating them pre-grants an exemption nothing asked for.**
+ * `SHARED` above is the naming exemption: it lets `--chart-*` be a hook not
+ * named after the family that reads it, and it is an opt-in because granting it
+ * is a decision. This is the other rule, that a sheet in a shared folder has the
+ * second reader the folder exists for, and it applies to every folder in there
+ * whether or not any of its rules declare a hook.
+ *
+ * `field/` is the case that separates them: seventeen families import it and it
+ * declares no `--field-*` at all, reading only tokens. Registering it in `SHARED`
+ * to get the two-reader rule would have handed it a naming exemption for hooks
+ * that do not exist, so the day one appeared it would have escaped the check
+ * silently. Discovered here, and named there when something needs it.
+ */
+const sharedFolders = () => {
+  try {
+    return readdirSync(SHARED_ROOT).filter((one) => statSync(join(SHARED_ROOT, one)).isDirectory())
+  } catch {
+    return []
+  }
+}
 
 /**
  * The family a hook belongs to, which is the directory the component sits in.
@@ -339,30 +366,30 @@ for (const [name, where] of [...privateDeclared].sort()) {
  * So the folder is asked the question its own comment asks. One importer means
  * the sheet belongs inside that family, and the hooks belong to it too.
  */
-for (const folder of SHARED) {
+for (const folder of sharedFolders()) {
   let sheets
   try {
-    sheets = readdirSync(join('helix/styled/src', folder)).filter((one) => one.endsWith('.css'))
+    sheets = readdirSync(join(SHARED_ROOT, folder)).filter((one) => one.endsWith('.css'))
   } catch {
-    problems.push(`helix/styled/src/${folder}: is registered as shared and does not exist.`)
+    problems.push(`${join(SHARED_ROOT, folder)}: is a shared folder and could not be read.`)
     continue
   }
   for (const sheet of sheets) {
     const readers = new Set()
     for (const path of walk('helix/styled/src')) {
-      if (!path.endsWith('.ts') || path.endsWith('.css.ts') || path.includes(`/${folder}/`)) {
+      if (!path.endsWith('.ts') || path.endsWith('.css.ts') || path.includes('/shared/')) {
         continue
       }
-      if (readFileSync(path, 'utf8').includes(`${folder}/${sheet}.js`)) {
+      if (readFileSync(path, 'utf8').includes(`shared/${folder}/${sheet}.js`)) {
         readers.add(path.split('/')[3])
       }
     }
     if (readers.size < 2) {
       problems.push(
-        `helix/styled/src/${folder}/${sheet}: is in a shared folder and ${
+        `${join(SHARED_ROOT, folder)}/${sheet}: is in a shared folder and ${
           readers.size === 0 ? 'no family imports it' : `only \`${[...readers][0]}\` imports it`
-        }. \`SHARED\` exempts \`--${folder}-*\` from being named after the family that reads it, and ` +
-          'the bar for that is a file more than one family imports. Move the sheet into the family, ' +
+        }. A folder under \`shared/\` exists so more than one family can take the sheet, and ` +
+          'the bar is a file more than one family imports. Move it into the family that reads it, ' +
           'or give the other families the part it draws.',
       )
     }
