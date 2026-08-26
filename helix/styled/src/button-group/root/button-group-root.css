@@ -29,6 +29,38 @@
   --button-radii-end: 0;
 }
 
+/* **Stacked, and the shape turns with it.**
+ *
+ * Everything below joins the buttons along the inline axis: the pull onto a
+ * neighbor's border is `margin-inline-start`, and the flattened corners are the
+ * inline pair. A column needs all three said again about the other axis, which
+ * is why `Button` publishes a hook per corner underneath the pair.
+ *
+ * `align-items: stretch` so the buttons agree on a width. In a row they agree
+ * on a height for free, every button being the same control size; in a column
+ * the widths are the labels', and three buttons of different widths sharing
+ * edges is not one shape. */
+:host([orientation="vertical"]) {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+:host([orientation="vertical"]:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
+  margin-block-start: calc(var(--helix-border-thin) * -1);
+  /* Cleared, or the row's pull is still in effect sideways and every button
+     after the first sits a border to the left of the one above it. */
+  margin-inline-start: 0;
+  --button-radii-start-start: 0;
+  --button-radii-start-end: 0;
+  --button-radii-start: var(--button-radii, var(--helix-radii-sm));
+}
+
+:host([orientation="vertical"]:not([variant="spaced"])) ::slotted(*:not(:last-child)) {
+  --button-radii-end-end: 0;
+  --button-radii-end-start: 0;
+  --button-radii-end: var(--button-radii, var(--helix-radii-sm));
+}
+
 /* A hovered or focused button has to draw above its neighbours, or the border
    it lights up is half covered by the one overlapping it. */
 ::slotted(*:hover),

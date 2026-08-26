@@ -1,6 +1,23 @@
+/* **It wraps, because a list of links can and a row of them ran out of room.**
+ *
+ * Measured at 320: the control came to 24 past the page. It already windows the
+ * run, `siblings` and `boundaries` deciding how many slots there are and a gap
+ * standing over what is hidden, so there is no missing setting here; the
+ * default simply asks for one slot more than a 272px row holds.
+ *
+ * Wrapping rather than dropping a slot, and the difference matters. Which pages
+ * are reachable is what `siblings` says, and a component that quietly reduced it
+ * to fit would change what a reader can get to without being asked. A second
+ * line changes nothing about that: every page still there, still one press away.
+ *
+ * `helix-button-group` is the case that cannot do this and says so: its buttons
+ * share edges as one shape, so a wrapped row carries the corners of a first row
+ * into a second. These are separate controls with gaps between them, so a
+ * second line is just a second line. */
 :host {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   font-size: var(--helix-text-sm);
   gap: var(--pagination-gap, var(--helix-space-2xs));
 }
@@ -8,6 +25,7 @@
 [part="list"] {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: var(--pagination-gap, var(--helix-space-2xs));
   /* Markers are removed, which is why the headless tier sets `role="list"`:
      Safari drops list semantics when it sees this. */

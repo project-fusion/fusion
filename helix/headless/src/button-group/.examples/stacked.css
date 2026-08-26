@@ -1,0 +1,33 @@
+/* What the headless tier asks a consumer to write for a stacked group.
+ *
+ * The same terms as `preview.css` beside it: grays only, no token, and no
+ * radius beyond what a joined shape needs to keep at its two ends. What is
+ * different is the axis, which is the whole of this example: the pull onto a
+ * neighbor's border is a block margin rather than an inline one, and the
+ * corners that stay round are the top two and the bottom two.
+ */
+
+helix-headless-button-group[orientation="vertical"] {
+  align-items: stretch;
+  display: inline-flex;
+  flex-direction: column;
+}
+
+helix-headless-button-group[orientation="vertical"] > *:not(:first-child) {
+  margin-block-start: -1px;
+}
+
+/* Squared everywhere the shape continues, rounded only where it ends. */
+helix-headless-button-group[orientation="vertical"] > * {
+  --button-radii: 0;
+}
+
+helix-headless-button-group[orientation="vertical"] > *:first-child {
+  --button-radii-start-start: 3px;
+  --button-radii-start-end: 3px;
+}
+
+helix-headless-button-group[orientation="vertical"] > *:last-child {
+  --button-radii-end-start: 3px;
+  --button-radii-end-end: 3px;
+}

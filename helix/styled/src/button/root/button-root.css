@@ -163,12 +163,32 @@
  * host and hands the value across the boundary the way a custom property can and
  * a rule cannot. The group used to reach the corner itself with
  * `::part(button)` from the base layer, and that stopped one boundary short in
- * the same place everything else did. */
+ * the same place everything else did.
+ *
+ * **And a corner apiece under those, because a pair groups by one axis only.**
+ * `start` and `end` name the two *inline* sides, which is all a row of buttons
+ * needs: the first keeps its leading corners and the last its trailing ones. A
+ * column needs the other axis, top two and bottom two, and no setting of an
+ * inline pair can say that. Each corner reads its own name first and falls
+ * through to the pair, so nothing that set the pair changes and a group
+ * stacking vertically has something to write. */
 [part="button"] {
-  border-end-end-radius: var(--button-radii-end, var(--button-radii, var(--helix-radii-sm)));
-  border-end-start-radius: var(--button-radii-start, var(--button-radii, var(--helix-radii-sm)));
-  border-start-end-radius: var(--button-radii-end, var(--button-radii, var(--helix-radii-sm)));
-  border-start-start-radius: var(--button-radii-start, var(--button-radii, var(--helix-radii-sm)));
+  border-end-end-radius: var(
+    --button-radii-end-end,
+    var(--button-radii-end, var(--button-radii, var(--helix-radii-sm)))
+  );
+  border-end-start-radius: var(
+    --button-radii-end-start,
+    var(--button-radii-start, var(--button-radii, var(--helix-radii-sm)))
+  );
+  border-start-end-radius: var(
+    --button-radii-start-end,
+    var(--button-radii-end, var(--button-radii, var(--helix-radii-sm)))
+  );
+  border-start-start-radius: var(
+    --button-radii-start-start,
+    var(--button-radii-start, var(--button-radii, var(--helix-radii-sm)))
+  );
 }
 
 /* Hover deepens the wash rather than drawing a line that was not there.

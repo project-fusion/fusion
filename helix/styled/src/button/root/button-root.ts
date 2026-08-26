@@ -35,6 +35,10 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-radii - Corner radius of the control.
  * @cssproperty --button-radii-start - Leading corners, which a group flattens.
  * @cssproperty --button-radii-end - Trailing corners, which a group flattens.
+ * @cssproperty --button-radii-start-start - The top leading corner, for a group stacking down.
+ * @cssproperty --button-radii-start-end - The top trailing corner, for a group stacking down.
+ * @cssproperty --button-radii-end-start - The bottom leading corner, for a group stacking down.
+ * @cssproperty --button-radii-end-end - The bottom trailing corner, for a group stacking down.
  */
 @customElement('helix-button')
 export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {
