@@ -1,6 +1,7 @@
 import { findSitePage, sitePageSources } from '@fusion-io/insights'
 import { SERVICES } from '@/content/services/services'
 import { pageMetadata } from '@/utils/metadata/metadata'
+import { EMAIL, MAILTO } from '@/utils/site/site'
 import { renderMdx } from '../../../utils/mdx/mdx'
 import documents from '../document-page.module.css'
 import styles from './services.module.css'
@@ -177,8 +178,8 @@ export default async function Page() {
             <a data-button href="/trust">
               The trust bar
             </a>
-            <a data-button="solid" data-button-tone="primary" href="mailto:hello@fusion.dev">
-              hello@fusion.dev
+            <a data-button="solid" data-button-tone="primary" href={MAILTO}>
+              {EMAIL}
             </a>
           </helix-flex>
         </helix-flex>

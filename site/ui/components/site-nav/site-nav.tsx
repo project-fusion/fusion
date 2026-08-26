@@ -9,6 +9,7 @@ import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { Wordmark } from '@/components/wordmark/wordmark'
 import { PRODUCTS } from '@/content/products/products'
 import { stageAppearance } from '@/content/verticals/verticals'
+import { MAILTO } from '@/utils/site/site'
 import styles from '../chrome.module.css'
 
 /**
@@ -183,7 +184,7 @@ export function SiteMenu({
           data-button="solid"
           data-button-tone="primary"
           data-density="lg"
-          href="mailto:hello@fusion.dev"
+          href={MAILTO}
         >
           Get in touch
         </a>

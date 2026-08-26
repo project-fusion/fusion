@@ -1,5 +1,6 @@
 import { CONTACT, INCLUDE, NEXT } from '@/content/contact/contact'
 import { pageMetadata } from '@/utils/metadata/metadata'
+import { EMAIL, MAILTO } from '@/utils/site/site'
 import styles from './contact.module.css'
 
 export const metadata = pageMetadata({
@@ -38,15 +39,15 @@ export default function Page() {
               controls that happen to touch. */}
           <helix-flex data-density="lg">
             <helix-button-group label="Reach us">
-              <a data-button="solid" data-button-tone="primary" href="mailto:hello@fusion.dev">
-                hello@fusion.dev
+              <a data-button="solid" data-button-tone="primary" href={MAILTO}>
+                {EMAIL}
               </a>
               <helix-copy-button
                 copied-label="Address copied"
                 emphasis="solid"
                 label="Copy the address"
                 tone="primary"
-                value="hello@fusion.dev"
+                value={EMAIL}
               ></helix-copy-button>
             </helix-button-group>
           </helix-flex>
