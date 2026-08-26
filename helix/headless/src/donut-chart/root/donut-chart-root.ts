@@ -390,6 +390,17 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
 
        Ids are scoped to the shadow root, so an index is enough to keep them
        apart, and two donuts on a page cannot collide. */
+    /* **`fill="none"` as an attribute, not a rule, because this tier has
+         no rules.** An SVG path fills black by default and the styled tier
+         says `fill: none` in its own stylesheet, so the shape was invisible
+         there and four black slices covering the ring everywhere else. Caught
+         by retaking the visual baselines: the headless donut lost two of its
+         four greys to a closed shape nobody had told to stop filling.
+
+         A presentation attribute loses to any CSS rule, so the styled tier
+         still decides and a consumer can still fill this if they want one.
+         What it cannot do any more is fill by accident on the tier whose
+         whole premise is that it ships no CSS. */
     const clip = `helix-donut-edge-${index}`
     return svg`<clipPath id=${clip}><path d=${shape} /></clipPath>
     <path
@@ -397,6 +408,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
       d=${shape}
       data-active=${this.pointer.at === index ? '' : nothing}
       data-series=${seriesIndex(index)}
+        fill="none"
       part="segment-edge"
       style="--chart-series: var(--chart-series-${seriesIndex(index)})"
     />`
