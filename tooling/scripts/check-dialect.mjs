@@ -40,8 +40,8 @@
  *
  * **What is still owed is the restore, and it is a sweep rather than an edit.**
  * Measured 25 Aug 2026 with the real British forms put back: **75 occurrences
- * across 23 files**, 39 of them in `docs/19-queue.md`, led by `colour` at 19,
- * `behaviour` at 6 and `centred`, `judgement` and `licence` at 6 each. Restoring
+ * across 23 files**, 39 of them in `docs/19-queue.md`, led by `color` at 19,
+ * `behavior` at 6 and `centered`, `judgment` and `license` at 6 each. Restoring
  * the list without rewriting those turns `verify` red, so the two belong in one
  * change and that change is not this one. The pairs below are the ones this
  * file's own prose needed, and they are proof the mechanism works rather than
@@ -72,48 +72,48 @@ import { join } from 'node:path'
  * release. The same timing argument as [#215](../../docs/19-queue.md).
  */
 const PAIRS = [
-  ['acknowledgment', 'acknowledgment'],
-  ['aluminum', 'aluminum'],
-  ['apologize', 'apologize'],
-  ['artifact', 'artifact'],
-  ['behavior', 'behavior'],
-  ['caliber', 'caliber'],
-  ['canceled', 'canceled'],
-  ['canceling', 'canceling'],
-  ['catalog', 'catalog'],
-  ['centering', 'centering'],
-  ['centered', 'centered'],
-  ['center', 'center'],
-  ['color', 'color'],
-  ['defense', 'defense'],
-  ['emphasize', 'emphasize'],
-  ['emphasized', 'emphasized'],
-  ['favor', 'favor'],
-  ['fiber', 'fiber'],
-  ['flavor', 'flavor'],
-  ['fueled', 'fueled'],
-  ['honor', 'honor'],
-  ['humor', 'humor'],
-  ['judgment', 'judgment'],
-  ['labeled', 'labeled'],
-  ['labeling', 'labeling'],
-  ['labor', 'labor'],
-  ['license', 'license'],
-  ['liter', 'liter'],
-  ['marvelous', 'marvelous'],
-  ['modeled', 'modeled'],
-  ['modeling', 'modeling'],
-  ['neighbor', 'neighbor'],
-  ['normalize', 'normalize'],
-  ['normalized', 'normalized'],
-  ['normalizing', 'normalizing'],
-  ['offense', 'offense'],
-  ['organize', 'organize'],
-  ['organized', 'organized'],
-  ['organization', 'organization'],
-  ['pretense', 'pretense'],
-  ['prioritize', 'prioritize'],
-  ['prioritized', 'prioritized'],
+  ['acknowledgement', 'acknowledgment'],
+  ['aluminium', 'aluminum'],
+  ['apologise', 'apologize'],
+  ['artefact', 'artifact'],
+  ['behaviour', 'behavior'],
+  ['calibre', 'caliber'],
+  ['cancelled', 'canceled'],
+  ['cancelling', 'canceling'],
+  ['catalogue', 'catalog'],
+  ['centring', 'centering'],
+  ['centred', 'centered'],
+  ['centre', 'center'],
+  ['colour', 'color'],
+  ['defence', 'defense'],
+  ['emphasise', 'emphasize'],
+  ['emphasised', 'emphasized'],
+  ['favour', 'favor'],
+  ['fibre', 'fiber'],
+  ['flavour', 'flavor'],
+  ['fuelled', 'fueled'],
+  ['honour', 'honor'],
+  ['humour', 'humor'],
+  ['judgement', 'judgment'],
+  ['labelled', 'labeled'],
+  ['labelling', 'labeling'],
+  ['labour', 'labor'],
+  ['licence', 'license'],
+  ['litre', 'liter'],
+  ['marvellous', 'marvelous'],
+  ['modelled', 'modeled'],
+  ['modelling', 'modeling'],
+  ['neighbour', 'neighbor'],
+  ['normalise', 'normalize'],
+  ['normalised', 'normalized'],
+  ['normalising', 'normalizing'],
+  ['offence', 'offense'],
+  ['organise', 'organize'],
+  ['organised', 'organized'],
+  ['organisation', 'organization'],
+  ['pretence', 'pretense'],
+  ['prioritise', 'prioritize'],
+  ['prioritised', 'prioritized'],
   /* The one family that is live, and the reason the exemption above exists.
      `check-visual.mjs` described text rasterization in British and passed,
      because a denylist that has eaten itself objects to nothing. Six
@@ -126,28 +126,28 @@ const PAIRS = [
   ['rasterises', 'rasterizes'],
   ['rasteriser', 'rasterizer'],
   ['rasterise', 'rasterize'],
-  ['realize', 'realize'],
-  ['realized', 'realized'],
-  ['recognize', 'recognize'],
-  ['recognized', 'recognized'],
-  ['rumor', 'rumor'],
-  ['skeptical', 'skeptical'],
-  ['skeptic', 'skeptic'],
-  ['signaled', 'signaled'],
-  ['skillful', 'skillful'],
-  ['smolder', 'smolder'],
-  ['specialize', 'specialize'],
-  ['summarize', 'summarize'],
-  ['theater', 'theater'],
-  ['traveled', 'traveled'],
-  ['traveling', 'traveling'],
-  ['willful', 'willful'],
-  ['analyzed', 'analyzed'],
-  ['analyzing', 'analyzing'],
-  ['analyze', 'analyze'],
-  ['gray', 'gray'],
-  ['among', 'among'],
-  ['while', 'while'],
+  ['realise', 'realize'],
+  ['realised', 'realized'],
+  ['recognise', 'recognize'],
+  ['recognised', 'recognized'],
+  ['rumour', 'rumor'],
+  ['sceptical', 'skeptical'],
+  ['sceptic', 'skeptic'],
+  ['signalled', 'signaled'],
+  ['skilful', 'skillful'],
+  ['smoulder', 'smolder'],
+  ['specialise', 'specialize'],
+  ['summarise', 'summarize'],
+  ['theatre', 'theater'],
+  ['travelled', 'traveled'],
+  ['travelling', 'traveling'],
+  ['wilful', 'willful'],
+  ['analysed', 'analyzed'],
+  ['analysing', 'analyzing'],
+  ['analyse', 'analyze'],
+  ['grey', 'gray'],
+  ['amongst', 'among'],
+  ['whilst', 'while'],
 ]
 
 const ROOTS = ['cortex', 'docs', 'helix', 'site', 'tooling', '.github']
@@ -200,22 +200,44 @@ const files = (dir, found = []) => {
 const SELF = join('tooling', 'scripts', 'check-dialect.mjs')
 
 /**
+ * The marker a line uses to say its British spellings are quoted, not written.
+ *
+ * **Prose about spelling has to be able to name a spelling.** Two rows in the
+ * queue do: one records that `::part(center)` was a real public part before it
+ * was renamed, and one carries the measurement behind #288. Swept, the first
+ * loses the name of the thing it is about and the second reports that the most
+ * common British spelling in the repository is `color`.
+ *
+ * An explicit marker rather than a rule that guesses. Backticks were the
+ * tempting signal and are the wrong one: an identifier named in a comment is
+ * backticked too, and an identifier spelled the British way is exactly what
+ * this should catch. Whether a word is being used or named is something only
+ * the author knows, so the author says it, on the line, where a reader sees it.
+ *
+ * An HTML comment because both rows are markdown table cells, where nothing
+ * else is invisible to a reader and legal inside a `|` delimited row.
+ */
+const QUOTED = 'dialect:quoted'
+
+/**
  * Whether a line is inside this file's own `PAIRS` literal, and so exempt.
  *
  * The literal is found rather than counted, so adding a pair cannot silently
  * move the exemption off the end of it. Everything outside it is swept, which
  * is what keeps the docblock above honest about its own dialect.
  */
+
 const exempt = (path, lines) => {
+  const marked = (index) => lines[index]?.includes(QUOTED) === true
   if (!path.endsWith(SELF)) {
-    return () => false
+    return marked
   }
   const opens = lines.findIndex((line) => line.startsWith('const PAIRS = ['))
   if (opens === -1) {
-    return () => false
+    return marked
   }
   const closes = lines.findIndex((line, index) => index > opens && line === ']')
-  return (index) => index >= opens && index <= closes
+  return (index) => marked(index) || (index >= opens && index <= closes)
 }
 
 /** Keeps the case the author wrote: `Color` becomes `Color`, `COLOR` `COLOR`. */

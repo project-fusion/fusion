@@ -825,7 +825,7 @@ export const TOKENS: Token[] = [
      `surface` *and* light `surface-inverse` *and* this, so moving it drags two
      unrelated roles, and pointing the material at `neutral-800` makes a glass
      panel read as a *lifted surface* rather than as glass. The rung is the
-     ground's colour. Coverage is how much of it there is, which is what
+     ground's color. Coverage is how much of it there is, which is what
      "translucent" names.
 
      **`translucent-strong` stays at 88%, and the gap widening is the point.**

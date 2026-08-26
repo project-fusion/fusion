@@ -123,7 +123,7 @@ export class HelixHeadlessButton extends HelixFormElement {
      * not.
      *
      * A click listener is early enough, and that is measured rather than read
-     * off the specification: activation behaviour runs after the click has
+     * off the specification: activation behavior runs after the click has
      * finished dispatching, so a handler that assigns `commandForElement` sets
      * it before the browser looks. Probed on a bare `<button command>` whose
      * target was assigned from its own click listener, the dialog opened, and

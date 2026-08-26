@@ -544,9 +544,9 @@
  * It ran to both window edges and wore `data-material="glass"` with the
  * corrections a full-bleed surface needs, chief among them no left or right
  * border, because those two sides were the window rather than an edge of the
- * object. Capped and centred, all four sides are the object's own, so the border
+ * object. Capped and centered, all four sides are the object's own, so the border
  * the material carries is doing the job it exists for: keeping a translucent
- * surface a shape when it takes its colour from whatever is behind it.
+ * surface a shape when it takes its color from whatever is behind it.
  *
  * The showcase used to share this and no longer does, having lost its grounds
  * entirely, so this is one element's rule now and named for it.

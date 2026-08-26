@@ -19,7 +19,7 @@
 .documentShell {
   /* **Fixed, not `--site-inset`.** That clamp opens to seven rem on a wide
      screen, which is right for a layout running to the viewport edge and wrong
-     inside a box that is capped and centred: above the cap this shell is nowhere
+     inside a box that is capped and centered: above the cap this shell is nowhere
      near an edge, so the growing gutter had nothing to hold the text off and ate
      the reading column instead. Enough to keep the text clear below the cap,
      and the same on every screen above it. */
@@ -37,7 +37,7 @@
    * count of the characters it was supposed to be counting. Worse, the cap is a
    * border box and the padding came from `[data-shell]`, which is
    * `clamp(space-lg, 6vw, 7rem)`: a gutter meant to hold *full width* layouts
-   * off the viewport edge. This box is capped and centred, so above the cap it
+   * off the viewport edge. This box is capped and centered, so above the cap it
    * is nowhere near that edge, and the only thing the growing gutter did was eat
    * the column.
    *
@@ -82,8 +82,8 @@
  * headline is taken in rather than read and wants a longer line than prose. The
  * argument is sound in print and it was wrong here, because it produced two
  * columns rather than one: a 112ch shell with a 72ch article pinned to its left
- * edge, so the body sat left of the page's centre while the title ran past it.
- * The block stopped looking centred, which it no longer was.
+ * edge, so the body sat left of the page's center while the title ran past it.
+ * The block stopped looking centered, which it no longer was.
  *
  * A headline that is genuinely long wraps, and that is ordinary. What is not
  * ordinary is a page whose text has two different centres. */

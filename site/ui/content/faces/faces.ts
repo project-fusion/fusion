@@ -629,7 +629,7 @@ export const GOOGLE_FACES: readonly FaceRow[] = [
   ['Grechen Fuemen', '400', 0],
   ['Grenze', '400;500;600', 0],
   ['Grenze Gotisch', '400;500;600', 0],
-  ['Grey Qo', '400', 0],
+  ['Grey Qo', '400', 0], // dialect:quoted, a Google Font family name rather than a color
   ['Griffy', '400', 0],
   ['Gruppo', '400', 0],
   ['Gudea', '400', 0],

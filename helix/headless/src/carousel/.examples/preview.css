@@ -79,7 +79,7 @@ helix-headless-carousel::part(rotation-mark) {
   inline-size: 1em;
 }
 
-/* The track is the scroller the slides sit in, and this had it as a 0.5rem grey
+/* The track is the scroller the slides sit in, and this had it as a 0.5rem gray
    bar: a slider's track rather than a carousel's. So the slides fell out of it
    and ran together as one line of inline text with a small filled pill
    underneath, which is what the baseline had been recording.

@@ -44,7 +44,7 @@ export function DocumentPage({
   trail?: ReactNode
 }) {
   /* **No `data-shell` on the shell.** That attribute means "full width, held off
-     the edges by the inset", and this box is neither: it is capped and centred,
+     the edges by the inset", and this box is neither: it is capped and centered,
      so above the cap it is nowhere near an edge, and its `6vw` inset was eating
      the reading column as the window grew. The shell supplies its own fixed
      one. */

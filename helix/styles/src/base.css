@@ -13,7 +13,7 @@
   box-sizing: border-box;
 }
 
-/* **The tap highlight is a grey rectangle iOS paints over whatever you touch**,
+/* **The tap highlight is a gray rectangle iOS paints over whatever you touch**,
  * ignoring the border radius under it, and it fires on the first touch of a
  * gesture rather than on a tap. Reported from a carousel: swiping the slides
  * lit up the card the finger started on, which reads as having pressed

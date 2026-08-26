@@ -64,7 +64,7 @@ const SYSTEM: Face = { family: '', label: 'System default' }
 /**
  * Every Google family, rather than the six somebody happened to like.
  *
- * The nine hardcoded here were a list, not a judgement: they carried the exact
+ * The nine hardcoded here were a list, not a judgment: they carried the exact
  * weights the token layer uses because each was written out by hand, which is
  * precisely what does not scale and precisely what `bun run faces` now does for
  * 1,939 of them. A family is offered when it can serve at least one of 400, 500
@@ -198,7 +198,7 @@ export function ThemeBuilder({
     return () => query.removeEventListener('change', sync)
   }, [])
 
-  /* Nearly the whole width on a phone, because a column of labelled fields at a
+  /* Nearly the whole width on a phone, because a column of labeled fields at a
      quarter of 375px is the thing 244 measured and called a column rather than a
      form. A sliver is left so the preview says it is still there. */
   const controlsPosition = controlsShown ? (narrow ? 88 : 24) : 0

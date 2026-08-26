@@ -379,7 +379,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     const shape = `M ${at(outer, from)} ${outward} ${homeward} Z`
     /* **Clipped to itself, because a stroke straddles the line it is drawn on.**
        Half of it falls outside the wedge: past the fill on both arcs, and across
-       the seam into the neighbour on both radial sides, where that neighbour is
+       the seam into the neighbor on both radial sides, where that neighbor is
        drawing the same line from the other direction and the two overlap. Seen
        as a doubled edge at every join and a halo around the ring.
 

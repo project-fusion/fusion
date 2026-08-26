@@ -222,7 +222,7 @@
 
    So the source value is named on `:host` and mixed by name. A consumer's
    `--sparkline-color` is then quietened rather than replaced, which is the
-   behaviour the wrong version only appeared to have. */
+   behavior the wrong version only appeared to have. */
 :host([emphasis="subtle"]) {
   color: color-mix(in oklab, var(--_sparkline-ink) 40%, var(--helix-color-background));
 }

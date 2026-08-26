@@ -24,7 +24,7 @@ const row = async (attributes = 'value="a"'): Promise<Row> =>
  * could not be activated from a keyboard at all.
  */
 describe('one drilldown row', () => {
-  /* A real `<button>`, because Enter and Space are behaviour the platform gives
+  /* A real `<button>`, because Enter and Space are behavior the platform gives
      one and gives nothing else. Same argument `Button` makes for rendering one
      rather than reproducing it. */
   test('is a real button, so the platform gives it Enter and Space', async () => {
