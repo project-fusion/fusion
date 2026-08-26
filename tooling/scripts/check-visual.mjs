@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Screenshots every headless example and compares it to a committed baseline.
+ * Screenshots every example in both tiers and compares it to a committed baseline.
  *
  * **The one fault class nothing else here can see.** A 233 pixel chevron, a
  * callout drawn as a black half-circle, an indicator translated through its own
@@ -9,28 +9,87 @@
  * A pixel diff asserts the part nobody thinks to, which is everything that was
  * already right. See 148.
  *
- * **The corpus was built for something else and is better for it.** Each
- * `.examples/preview.html` renders one family's headless tier against
- * `preview.css`, a hand-written sheet with no token, no theme and a fixed
- * seven-value gray ramp. That is the determinism a screenshot comparison needs,
- * and the styled tier cannot offer it while theming is in flight: a seed change
- * would redraw all eighty-three baselines and say nothing about any component.
+ * **The headless corpus was built for something else and is better for it.**
+ * Each `.examples/preview.html` under `helix/headless/src` renders one family's
+ * headless tier against `preview.css`, a hand-written sheet with no token, no
+ * theme and a fixed seven-value gray ramp. That is the determinism a screenshot
+ * comparison needs with nothing asked of anybody, which is why this started
+ * there and why that tier still needs no stylesheet from outside its own
+ * directory.
+ *
+ * **The styled tier was refused, on an argument that was right when it was made
+ * and has since expired.** It read: the styled tier cannot offer that
+ * determinism while theming is in flight, because a seed change would redraw
+ * all eighty-three baselines and say nothing about any component. That was true
+ * of a library whose ramp, spacing and surfaces were being rebuilt weekly.
+ * Re-measured 25 Aug 2026 against `helix/styles/src/tokens.css`: **0 of the
+ * last 30 commits touched it, 1 of the last 100, and 4 of the last 300.** The
+ * one inside a hundred is `bf7ffdc1`, a translucency moved from 72% to 60%. A
+ * file that moves four times in three hundred commits is not in flight, and a
+ * token change that does redraw every styled picture is now itself the kind of
+ * thing worth seeing laid out as a diff rather than discovered on a page.
+ *
+ * So both tiers are pictured. Eighty-eight styled families against eighty-three
+ * headless ones, every headless name also a styled name: layout and effect
+ * families ship in the styled tier alone, having no behavior to separate, so a
+ * family with no headless twin is expected rather than a fault.
+ *
+ * **The styled tier needs `frame.css`, and learning that cost a set of false
+ * findings rather than a broken picture, which is the more expensive way.** A
+ * styled sheet resolves design tokens and nothing in this harness defines one;
+ * the elements upgrade from `frame.js` either way, so a styled page rendered
+ * without the stylesheet looks like a page rather than like an error. All
+ * eighty-eight styled families measured at 640, both ways: without the sheet,
+ * **23 of the 30 `<helix-icon>` elements in the corpus are 100px or wider**,
+ * most of them 300 by 300, and three pages report wider than the viewport they
+ * were given, `app-header` at 707, `pin-input` at 984 and `toolbar` at 667.
+ * With `/frame.css` served, no icon reaches 100px, the same ones measure 16 or
+ * 20, and no page reports over 640. Four of those families had already been
+ * filed as responsiveness faults by a sweep that rendered them this way, and
+ * not one of them overflows anything. A baseline taken without the sheet bakes
+ * that in as the expected picture, which is worse than having no baseline at
+ * all: from then on the check defends it.
+ *
+ * **The link comes before the inline style, and the ordering is load-bearing.**
+ * `frame.css` sets `:root { color-scheme: light dark }` and a `body` background
+ * from `--helix-color-background`, both at the same specificity as the two
+ * rules written below, so nothing but source order decides. Measured both ways
+ * on the same page: link last reports `color-scheme: light dark` and a body
+ * painted in a token, which hands the color mode to whatever the runner's
+ * `prefers-color-scheme` answers and puts the page's own ground under test;
+ * link first reports `color-scheme: light` and `rgb(255, 255, 255)`, which is
+ * what this file declares. There is no Playwright `colorScheme` option here for
+ * the same reason the declaration exists: the mode is a property of the
+ * document, so it is written into the document and holds for both tiers.
+ *
+ * **The three brand faces are served, because `frame.css` asks for them.** It
+ * carries `@font-face` rules naming `/fonts/*.woff2`, real files under
+ * `site/ui/public/fonts` since the frame stopped inlining them. Left
+ * unanswered, `document.fonts` reports `Fusion Sans: error` and the styled
+ * examples are drawn in whatever the platform calls `sans-serif`, so a baseline
+ * would picture the library in a face the sandbox never shows it in. Served,
+ * the same probe reports `loaded`.
  *
  * **Linux only, and that is a decision rather than a limitation.** Text
- * rasterisation, subpixel antialiasing and the default font stack all differ
- * between macOS and the `ubuntu-latest` this runs on, and no headless example sets
- * `font-family`, so a baseline taken here and compared there differs on nearly
- * every glyph. Rather than tune a threshold until real faults fit under it, the
- * comparison never crosses platforms: the baselines are Linux, the check runs
- * on Linux, and on anything else it says so and exits clean. To refresh them
- * from a Mac, run this in the same container CI uses.
+ * rasterization and subpixel antialiasing differ between macOS and the
+ * `ubuntu-latest` this runs on, and no headless example sets `font-family`, so
+ * on that tier the default stack differs as well and a baseline taken here and
+ * compared there differs on nearly every glyph. Serving the faces settles the
+ * font question for the styled tier and neither of the other two for either, so
+ * the comparison still never crosses platforms: the baselines are Linux, the
+ * check runs on Linux, and on anything else it says so and exits clean. To
+ * refresh them from a Mac, dispatch the `Visual baselines` workflow, which
+ * takes them on `ubuntu-latest` and opens a pull request to be looked at.
  *
- * Baselines live beside the example they picture, `\`.examples/preview.png\``, which
- * `check:examples` ignores because it reads only `.html` and `.css`.
+ * Baselines live beside the example they picture, `.examples/preview.png` and
+ * `.examples/preview.narrow.png`, in the package that authors it. The tiers
+ * keep separate `src` trees, so the two sets share names and never a path.
+ * `check:examples` ignores them because it reads only `.html` and `.css`, which
+ * is true of every other reader of an `.examples` directory as well.
  *
  * ```
- * bun run check:visual              compare, and fail on a difference
- * bun run check:visual accordion    just that family
+ * bun run check:visual              compare both tiers, and fail on a difference
+ * bun run check:visual accordion    just that family, in whichever tiers have one
  * bun run visual:update             rewrite the baselines
  * ```
  *
@@ -40,18 +99,30 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:http'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
 import { PNG } from 'pngjs'
 
 const root = resolve(import.meta.dirname, '../..')
-/* **The headless package, because that is where its examples live now.** They
-   were filed under `helix/styled/src` and generated from the styled example
-   beside them, which made the base tier's evidence a function of the tier above
-   it. Both tiers author their own now, under the same name, so this reads the
-   one it pictures. */
-const SOURCE = join(root, 'helix/headless/src')
+
+/**
+ * The two tiers, each read from the package that authors its own examples.
+ *
+ * The headless examples were filed under `helix/styled/src` once, and generated
+ * from the styled example beside them, which made the base tier's evidence a
+ * function of the tier above it. Both tiers author their own now, under the
+ * same name, so each is pictured from where it lives.
+ *
+ * `sheet` is the whole difference between them. A headless example is
+ * deliberately token-free and its `preview.css` is the only styling it wants; a
+ * styled example is nothing but tokens, and `frame.css` is the only file in the
+ * repository that defines them for a document this harness assembles.
+ */
+const TIERS = [
+  { name: 'headless', sheet: false, source: join(root, 'helix/headless/src') },
+  { name: 'styled', sheet: true, source: join(root, 'helix/styled/src') },
+]
 
 /**
  * The widths every family is pictured at, and why there are two.
@@ -72,62 +143,99 @@ const WIDTHS = [
   { suffix: '', width: 640 },
   { suffix: '.narrow', width: 390 },
 ]
+
+/* Both halves of what `bun run frame` writes, and both are required.
+   `build-frame.mjs` empties the directory and writes the bundle, the stylesheet
+   and the document together, so one of them missing means none of them is
+   trustworthy. The bundle alone was checked until the styled tier was added,
+   which was sufficient exactly while nothing needed a token. */
 const FRAME = join(root, 'site/ui/public/sandbox/frame.js')
+const SHEET = join(root, 'site/ui/public/sandbox/frame.css')
+const FONTS = join(root, 'site/ui/public/fonts')
 
 /* The family is the first argument that is not a flag, rather than the first
    argument. `visual:update` puts `--update` in that slot itself, so reading
-   position two meant `bun run visual:update accordion` silently rewrote all
-   eighty-three baselines: the one command where doing more than was asked is
-   least recoverable. */
+   position two meant `bun run visual:update accordion` silently rewrote every
+   baseline in the repository: the one command where doing more than was asked
+   is least recoverable. */
 const args = process.argv.slice(2)
 const only = args.find((one) => !one.startsWith('--'))
 const update = args.includes('--update')
 
 if (process.platform !== 'linux') {
   console.log(
-    `visual: skipped on ${process.platform}. Baselines are Linux, because no headless example sets a ` +
-      'font and the default stack differs by platform, so a comparison that crossed them would ' +
-      'differ on nearly every glyph. CI is where this runs.',
+    `visual: skipped on ${process.platform}. Baselines are Linux, because text rasterization and ` +
+      'antialiasing differ by platform and no headless example names a font, so a comparison that ' +
+      'crossed them would differ on nearly every glyph. CI is where this runs.',
   )
   process.exit(0)
 }
 
-if (!existsSync(FRAME)) {
-  console.error('visual: no frame bundle. Run `bun run frame` first: it is what defines the tags.')
+const absent = [FRAME, SHEET].filter((one) => !existsSync(one))
+if (absent.length > 0) {
+  console.error(
+    `visual: missing ${absent.map((one) => relative(root, one)).join(', ')}. Run \`bun run frame\`` +
+      ' first: the bundle is what defines the tags, and the stylesheet is what defines every token ' +
+      'the styled tier draws with.',
+  )
   process.exit(1)
 }
 
-const families = readdirSync(SOURCE, { withFileTypes: true })
-  .filter(
-    (one) => one.isDirectory() && existsSync(join(SOURCE, one.name, '.examples/preview.html')),
-  )
-  .map((one) => one.name)
-  .filter((name) => only === undefined || name === only)
-  .sort()
+/** Every family in a tier that has an example, filtered to the one asked for. */
+const found = (source) =>
+  readdirSync(source, { withFileTypes: true })
+    .filter(
+      (one) => one.isDirectory() && existsSync(join(source, one.name, '.examples/preview.html')),
+    )
+    .map((one) => one.name)
+    .filter((name) => only === undefined || name === only)
+    .sort()
 
-if (families.length === 0) {
+const tiers = TIERS.map((tier) => ({ ...tier, families: found(tier.source) }))
+const total = tiers.reduce((count, tier) => count + tier.families.length, 0)
+
+if (total === 0) {
   console.error(
-    only ? `visual: no headless example for ${only}.` : 'visual: no headless examples found.',
+    only ? `visual: no example for ${only} in either tier.` : 'visual: no examples found.',
   )
   process.exit(1)
+}
+
+/* A named family present in one tier and not the other is reported and not
+   refused. Layout and effect families ship styled-only, having no structure or
+   a11y to separate, so `bun run check:visual flex` legitimately pictures one
+   tier; failing on it would make the filter unusable for exactly the families
+   whose appearance is all they are. */
+for (const tier of tiers) {
+  if (only !== undefined && tier.families.length === 0) {
+    console.log(
+      `visual: no ${tier.name} example for ${only}, so only the other tier is pictured. A family ` +
+        'that is presentation with nothing to separate has no headless tier to picture.',
+    )
+  }
 }
 
 /* Served rather than opened from disk: the frame bundle is a classic script and
    the example links `styles.css` relatively, so both want a real origin. The
    page is assembled here rather than read from a file so nothing has to be
    written into the tree to take a picture of it. */
-const page = (family, width) => {
-  const html = readFileSync(join(SOURCE, family, '.examples/preview.html'), 'utf8')
+const page = (tier, family, width) => {
+  const html = readFileSync(join(tier.source, family, '.examples/preview.html'), 'utf8')
   return (
-    '<!doctype html><meta charset="utf-8"><title>base</title>' +
+    '<!doctype html><meta charset="utf-8"><title>preview</title>' +
+    /* First, so the two rules below outrank it. See the header: `frame.css`
+       declares `color-scheme` and a body background of its own, at the same
+       specificity, and whichever comes last wins. */
+    (tier.sheet ? '<link rel="stylesheet" href="/frame.css">' : '') +
     /* A fixed ground and a fixed inset, so a component that draws to its own
        edge is not cropped and the page's own color is never the thing under
        test. `color-scheme` is declared because the base sheets resolve their
-       grays through `light-dark()`. */
+       grays through `light-dark()`, and the token layer resolves everything
+       else through it. */
     '<style>:root{color-scheme:light}' +
     `body{margin:0;padding:24px;background:#fff;width:${width}px;box-sizing:border-box}</style>` +
     /* `defer`, which is what `frame.html` ships and is not a detail.
-       
+
        Loaded eagerly the bundle runs mid-parse, so an element upgrades the
        moment the parser reaches it and anything it looks up by id further down
        the document does not exist yet. Virtual List reads its rows from a
@@ -140,7 +248,7 @@ const page = (family, width) => {
   )
 }
 
-const TYPES = { '.css': 'text/css', '.js': 'text/javascript' }
+const TYPES = { '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2' }
 const server = createServer((request, response) => {
   const path = (request.url ?? '/').split('?')[0]
   if (path === '/frame.js') {
@@ -148,14 +256,40 @@ const server = createServer((request, response) => {
     response.end(readFileSync(FRAME))
     return
   }
-  const example = /^\/([a-z][a-z0-9-]*)\/(styles\.css)?$/.exec(path)
+  if (path === '/frame.css') {
+    response.writeHead(200, { 'content-type': TYPES['.css'] })
+    response.end(readFileSync(SHEET))
+    return
+  }
+  /* The faces `frame.css` names, from the same public directory the site serves
+     them out of, so the frame's stylesheet gets the same answer here that it
+     gets in the sandbox. */
+  const face = /^\/fonts\/([a-z0-9-]+\.woff2)$/.exec(path)
+  if (face !== null) {
+    const file = join(FONTS, face[1])
+    if (!existsSync(file)) {
+      response.writeHead(404).end()
+      return
+    }
+    response.writeHead(200, { 'content-type': TYPES['.woff2'] })
+    response.end(readFileSync(file))
+    return
+  }
+  /* The tier is in the path rather than in the port or in a module variable,
+     for the reason the width is in the query: a request carries everything
+     needed to answer it, so the two corpora cannot be served the wrong sheet by
+     being asked for in the wrong order. A relative `styles.css` from
+     `/styled/card/` resolves inside the same pair, which is what lets one
+     example file work under either tier. */
+  const example = /^\/(headless|styled)\/([a-z][a-z0-9-]*)\/(styles\.css)?$/.exec(path)
   if (example === null) {
     response.writeHead(404).end()
     return
   }
-  const [, family, sheet] = example
+  const [, name, family, sheet] = example
+  const tier = TIERS.find((one) => one.name === name)
   if (sheet !== undefined) {
-    const file = join(SOURCE, family, '.examples/preview.css')
+    const file = join(tier.source, family, '.examples/preview.css')
     response.writeHead(200, { 'content-type': TYPES['.css'] })
     response.end(existsSync(file) ? readFileSync(file) : '')
     return
@@ -166,7 +300,7 @@ const server = createServer((request, response) => {
      be fetched in any order without the page depending on when it was asked. */
   const width =
     Number(new URL(request.url ?? '/', 'http://x').searchParams.get('w')) || WIDTHS[0].width
-  response.end(page(family, width))
+  response.end(page(tier, family, width))
 })
 
 await new Promise((done) => server.listen(0, '127.0.0.1', done))
@@ -190,7 +324,10 @@ const tab = await browser.newPage({ viewport: { height: 800, width: WIDTHS[0].wi
  * Blocked, all three render the same missing-media state everywhere, which is
  * deterministic and is still the thing under test: what a baseline guards on
  * these families is the component's own frame, controls and layout, and the
- * poster was never more than what happened to be behind them. */
+ * poster was never more than what happened to be behind them.
+ *
+ * The brand faces are the reason this is an origin test rather than a scheme
+ * test: they are served from here, so they continue, and nothing else does. */
 await tab.route('**/*', (route) => {
   const url = route.request().url()
   return url.startsWith(origin) ? route.continue() : route.abort()
@@ -198,80 +335,86 @@ await tab.route('**/*', (route) => {
 
 const changed = []
 const written = []
-let compared = 0
+const compared = new Map(TIERS.map((tier) => [tier.name, 0]))
 
 for (const { suffix, width } of WIDTHS) {
   await tab.setViewportSize({ height: 800, width })
 
-  for (const family of families) {
-    await tab.goto(`${origin}/${family}/?w=${width}`, { waitUntil: 'load' })
-    /* The tags upgrade when the bundle runs, and a component may render again
-       after that: Lit batches, so the first paint can be the pre-update one.
-       Waiting on the definition and then on the frame after it is what the spec
-       runner does for the same reason. */
-    await tab.evaluate(async () => {
-      await Promise.all(
-        [...document.body.querySelectorAll(':not(:defined)')].map((one) =>
-          customElements.whenDefined(one.localName),
-        ),
-      )
-      await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
-      await document.fonts.ready
-    })
+  for (const tier of tiers) {
+    for (const family of tier.families) {
+      await tab.goto(`${origin}/${tier.name}/${family}/?w=${width}`, { waitUntil: 'load' })
+      /* The tags upgrade when the bundle runs, and a component may render again
+         after that: Lit batches, so the first paint can be the pre-update one.
+         Waiting on the definition and then on the frame after it is what the spec
+         runner does for the same reason. */
+      await tab.evaluate(async () => {
+        await Promise.all(
+          [...document.body.querySelectorAll(':not(:defined)')].map((one) =>
+            customElements.whenDefined(one.localName),
+          ),
+        )
+        await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+        await document.fonts.ready
+      })
 
-    const shot = await tab.screenshot({ fullPage: true })
-    const baseline = join(SOURCE, family, `.examples/preview${suffix}.png`)
+      const shot = await tab.screenshot({ fullPage: true })
+      const baseline = join(tier.source, family, `.examples/preview${suffix}.png`)
+      /* Both tiers, both widths, one name each. The pictures never collide
+         because the tiers keep separate `src` trees, so the name says only
+         which width it is and the path says which tier. */
+      const what = `${tier.name}/${family}${suffix}`
 
-    if (update) {
-      mkdirSync(dirname(baseline), { recursive: true })
-      writeFileSync(baseline, shot)
-      written.push(family)
-      continue
-    }
+      if (update) {
+        mkdirSync(dirname(baseline), { recursive: true })
+        writeFileSync(baseline, shot)
+        written.push(what)
+        continue
+      }
 
-    /* A missing baseline is a failure and not a chance to write one. Seeding on a
-       bare run is the version of this that passes forever: CI would take its own
-       picture, agree with it, report success and commit nothing, so the check
-       would be green from the day it was added without ever having compared
-       anything. `--update` is the only thing that writes, and what it writes is
-       reviewed as a diff before it counts. */
-    if (!existsSync(baseline)) {
-      changed.push(
-        `${family}: no baseline. Run \`bun run visual:update\` on Linux and commit what it takes, ` +
-          'after looking at it: the first picture is the one every later comparison trusts.',
-      )
-      continue
-    }
+      /* A missing baseline is a failure and not a chance to write one. Seeding on a
+         bare run is the version of this that passes forever: CI would take its own
+         picture, agree with it, report success and commit nothing, so the check
+         would be green from the day it was added without ever having compared
+         anything. `--update` is the only thing that writes, and what it writes is
+         reviewed as a diff before it counts. */
+      if (!existsSync(baseline)) {
+        changed.push(
+          `${what}: no baseline. Dispatch the \`Visual baselines\` workflow and look at the pull ` +
+            'request it opens: the first picture is the one every later comparison trusts.',
+        )
+        continue
+      }
 
-    const before = PNG.sync.read(readFileSync(baseline))
-    const after = PNG.sync.read(shot)
-    compared += 1
+      const before = PNG.sync.read(readFileSync(baseline))
+      const after = PNG.sync.read(shot)
+      compared.set(tier.name, compared.get(tier.name) + 1)
 
-    if (before.width !== after.width || before.height !== after.height) {
-      changed.push(
-        `${family}: ${before.width}x${before.height} became ${after.width}x${after.height}. A size ` +
-          'change is a layout change, and no diff image is written because there is nothing to ' +
-          'lay one over.',
-      )
-      continue
-    }
+      if (before.width !== after.width || before.height !== after.height) {
+        changed.push(
+          `${what}: ${before.width}x${before.height} became ${after.width}x${after.height}. A size ` +
+            'change is a layout change, and no diff image is written because there is nothing to ' +
+            'lay one over.',
+        )
+        continue
+      }
 
-    const diff = new PNG({ height: before.height, width: before.width })
-    /* `threshold` is per-pixel color distance, not a budget of pixels. Zero
-       tolerated pixels, because this only ever compares Linux to Linux and a
-       single moved pixel is the fault it exists to catch. The threshold is off
-       the floor only so a renderer's own dithering does not read as a change. */
-    const moved = pixelmatch(before.data, after.data, diff.data, before.width, before.height, {
-      threshold: 0.1,
-    })
-    if (moved > 0) {
-      const where = join(SOURCE, family, `.examples/preview${suffix}.diff.png`)
-      writeFileSync(where, PNG.sync.write(diff))
-      changed.push(
-        `${family}: ${moved} pixels moved. The marked difference is at ` +
-          `helix/styled/src/${family}/.examples/headless.diff.png. If the change was meant, ` +
-          '`bun run visual:update` takes the new picture and the review is the diff on the baseline.',
-      )
+      const diff = new PNG({ height: before.height, width: before.width })
+      /* `threshold` is per-pixel color distance, not a budget of pixels. Zero
+         tolerated pixels, because this only ever compares Linux to Linux and a
+         single moved pixel is the fault it exists to catch. The threshold is off
+         the floor only so a renderer's own dithering does not read as a change. */
+      const moved = pixelmatch(before.data, after.data, diff.data, before.width, before.height, {
+        threshold: 0.1,
+      })
+      if (moved > 0) {
+        const where = join(tier.source, family, `.examples/preview${suffix}.diff.png`)
+        writeFileSync(where, PNG.sync.write(diff))
+        changed.push(
+          `${what}: ${moved} pixels moved. The marked difference is at ${relative(root, where)}. ` +
+            'If the change was meant, dispatch the `Visual baselines` workflow and the review is ' +
+            'the diff on the baseline.',
+        )
+      }
     }
   }
 }
@@ -279,18 +422,34 @@ for (const { suffix, width } of WIDTHS) {
 await browser.close()
 server.close()
 
+/** `2 headless, 3 styled`, from a map keyed by tier, with the empty ones out. */
+const counted = (counts) =>
+  [...counts]
+    .filter(([, count]) => count > 0)
+    .map(([name, count]) => `${count} ${name}`)
+    .join(', ')
+
 if (changed.length > 0) {
-  console.error(`Headless examples have moved (${changed.length}):\n\n  ${changed.join('\n  ')}\n`)
+  console.error(`Examples have moved (${changed.length}):\n\n  ${changed.join('\n  ')}\n`)
   process.exit(1)
 }
 
 if (written.length > 0) {
+  const by = new Map(TIERS.map((tier) => [tier.name, 0]))
+  for (const what of written) {
+    const name = what.split('/')[0]
+    by.set(name, by.get(name) + 1)
+  }
   console.log(
-    `visual: wrote ${written.length} baseline(s) (${written.join(', ')})` +
-      (compared > 0 ? `, compared ${compared} more` : '') +
+    `visual: wrote ${written.length} baseline(s) (${counted(by)})` +
+      /* Named while there are few enough to read. Both tiers at both widths is
+         three hundred and forty-two lines, which is a wall rather than a
+         report; one family is four, which is exactly what somebody running
+         `visual:update accordion` wants to see. */
+      (written.length <= 12 ? `: ${written.join(', ')}` : '') +
       '. Commit them: an unreviewed baseline records whatever was on screen as correct.',
   )
   process.exit(0)
 }
 
-console.log(`visual: ${compared} headless examples, every one pixel for pixel with its baseline`)
+console.log(`visual: ${counted(compared)} examples, every one pixel for pixel with its baseline`)
