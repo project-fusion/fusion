@@ -29,7 +29,7 @@ bunx biome ci . >/dev/null 2>&1 || {
 }
 
 printf 'pre-push: generated files\n'
-for task in reference tokens-reference metrics docs content eval queue; do
+for task in reference tokens-reference metrics docs samples content eval queue; do
   bun run "check:$task" >/tmp/pre-push-$$.log 2>&1 || {
     printf '\n'
     grep -v '^\$' /tmp/pre-push-$$.log | tail -3 | sed 's/^/  /'

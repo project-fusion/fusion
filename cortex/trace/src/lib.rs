@@ -117,6 +117,20 @@ impl Graph {
     /// by a person asking why an output happened, and its first entries should
     /// be the immediate causes. A depth-first walk surfaces one arbitrary
     /// ancestor chain to its root before mentioning the sibling that mattered.
+    ///
+    /// ```
+    /// use fusion_cortex_trace::{Graph, Node, NodeKind};
+    ///
+    /// let mut graph = Graph::new();
+    /// let source = graph.insert(Node::new(NodeKind::Source, vec![]));
+    /// let memory = graph.insert(Node::new(NodeKind::Memory, vec![source]));
+    /// let context = graph.insert(Node::new(NodeKind::Context, vec![memory]));
+    /// let output = graph.insert(Node::new(NodeKind::Output, vec![context]));
+    ///
+    /// // The full derivation: which memories, which context decisions, which model.
+    /// let trace = graph.why(output);
+    /// assert_eq!(trace.len(), 4);
+    /// ```
     #[must_use]
     pub fn why(&self, id: Id) -> Vec<&Node> {
         let mut seen = HashSet::new();
@@ -141,6 +155,23 @@ impl Graph {
     /// Returns the ids removed. Deleting a memory must also remove the
     /// summaries, embeddings, and outputs computed from it, or "delete" is a
     /// promise the system cannot keep.
+    ///
+    /// The setup here is hidden because the point is the cascade rather than the
+    /// graph: rustdoc runs every line and shows only the ones a reader needs.
+    ///
+    /// ```
+    /// # use fusion_cortex_trace::{Graph, Node, NodeKind};
+    /// # let mut graph = Graph::new();
+    /// # let source = graph.insert(Node::new(NodeKind::Source, vec![]));
+    /// # let memory = graph.insert(Node::new(NodeKind::Memory, vec![source]));
+    /// # let context = graph.insert(Node::new(NodeKind::Context, vec![memory]));
+    /// # let output = graph.insert(Node::new(NodeKind::Output, vec![context]));
+    /// let removed = graph.delete_cascade(memory);
+    ///
+    /// assert_eq!(removed.len(), 3);          // memory, context, and output
+    /// assert!(graph.get(output).is_none());  // derived output does not survive
+    /// assert!(graph.get(source).is_some());  // ancestors are untouched
+    /// ```
     pub fn delete_cascade(&mut self, id: Id) -> Vec<Id> {
         let mut removed = Vec::new();
         let mut queue = vec![id];

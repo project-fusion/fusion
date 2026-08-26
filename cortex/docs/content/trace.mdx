@@ -13,6 +13,8 @@ beside it, and three capabilities fall out of that which cannot be retrofitted.
 
 The query the product rests on.
 
+[//]: # (rust:fusion-cortex-trace::Graph::why)
+
 ```rust
 use fusion_cortex_trace::{Graph, Node, NodeKind};
 
@@ -26,6 +28,8 @@ let output = graph.insert(Node::new(NodeKind::Output, vec![context]));
 let trace = graph.why(output);
 assert_eq!(trace.len(), 4);
 ```
+
+[//]: # (/rust)
 
 `why()` walks the derivation transitively and terminates on cycles, which a
 buggy writer can produce.
@@ -42,6 +46,8 @@ text.
 Deleting a memory must also remove the summaries, embeddings, and outputs
 computed from it, or "delete" is a promise the system cannot keep.
 
+[//]: # (rust:fusion-cortex-trace::Graph::delete_cascade)
+
 ```rust
 let removed = graph.delete_cascade(memory);
 
@@ -49,6 +55,8 @@ assert_eq!(removed.len(), 3);          // memory, context, and output
 assert!(graph.get(output).is_none());  // derived output does not survive
 assert!(graph.get(source).is_some());  // ancestors are untouched
 ```
+
+[//]: # (/rust)
 
 A reverse index is maintained on insert, so cascading deletion does not require
 a full scan, and dangling parent references are dropped afterwards so the graph

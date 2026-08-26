@@ -14,6 +14,14 @@ pub mod provider;
 /// `UUIDv7` rather than v4: the timestamp prefix makes identifiers sort in
 /// creation order, which turns index locality and time-range scans over
 /// episodic memory into a property of the key rather than a separate column.
+///
+/// ```
+/// use fusion_cortex_core::Id;
+///
+/// let first = Id::new();
+/// let second = Id::new();
+/// assert!(first <= second);
+/// ```
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(transparent)]
 pub struct Id(pub uuid::Uuid);

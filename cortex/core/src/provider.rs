@@ -49,6 +49,13 @@ pub trait Provider: Send + Sync {
 }
 
 /// A deterministic provider for tests and offline development.
+///
+/// ```
+/// use fusion_cortex_core::provider::{MockProvider, Provider};
+///
+/// let provider = MockProvider { reply: "hello".into() };
+/// assert!(provider.is_local());
+/// ```
 #[derive(Clone, Debug, Default)]
 pub struct MockProvider {
     pub reply: String,

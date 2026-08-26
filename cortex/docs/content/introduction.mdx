@@ -27,12 +27,16 @@ Cortex defaults to a single SQLite file on your machine. The hosted tier is
 convenience, never a chokepoint. The `Provider` trait carries an `is_local`
 flag so a product can tell the user whether their data left the device:
 
+[//]: # (rust:fusion-cortex-core::provider::MockProvider)
+
 ```rust
 use fusion_cortex_core::provider::{MockProvider, Provider};
 
 let provider = MockProvider { reply: "hello".into() };
 assert!(provider.is_local());
 ```
+
+[//]: # (/rust)
 
 ## Primitives
 
@@ -52,6 +56,8 @@ Ids are UUIDv7 rather than v4. The timestamp prefix makes them sort in creation
 order, which turns index locality and time-range scans over episodic memory
 into a property of the key rather than a separate column.
 
+[//]: # (rust:fusion-cortex-core::Id)
+
 ```rust
 use fusion_cortex_core::Id;
 
@@ -59,3 +65,5 @@ let first = Id::new();
 let second = Id::new();
 assert!(first <= second);
 ```
+
+[//]: # (/rust)

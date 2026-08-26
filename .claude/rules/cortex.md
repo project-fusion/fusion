@@ -48,6 +48,24 @@ spine, not a module.
   embedding field and relevance scoring is a strategy, so enabling them is
   swapping a scorer. `pgvector` is an extension, not a migration.
 
+## Documentation
+
+**Every Rust sample on a Cortex docs page lives in a `///` doc comment, and the
+page cites it.** The pages carried eight fenced `rust` blocks that nothing
+compiled, and the crates reported zero doc-tests, so a rename left the page
+wrong with every check green. Now `cargo test --workspace --doc` runs them,
+which also holds the behavioral claims (`trace.len() == 4`) that no signature
+check could.
+
+- Write the sample as a doc example on the item it documents. Hidden `#` lines
+  carry the setup, so the sample compiles standalone and the page still shows
+  only the lines that carry the idea.
+- Cite it from the MDX with `[//]: # (rust:<crate>::<Type>::<method>)`, closed by
+  `[//]: # (/rust)`. **The key is the name rustdoc prints**, so a failing
+  doc-test names its own region.
+- `bun run samples` fills the regions; `check:samples` fails when a page is
+  behind its crate, and refuses a fenced `rust` block outside a region.
+
 ## Gotchas that produced bugs
 
 - **`why()` is breadth-first.** A "why did it say that" answer that walks one

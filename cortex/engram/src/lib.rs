@@ -8,6 +8,17 @@
 //! v0 ships episodic and semantic. Procedural memory (distilling repeated
 //! successful action sequences into reusable procedure) is deferred to v1
 //! because it is a research problem and the first two already differentiate.
+//!
+//! ```
+//! use fusion_cortex_core::Id;
+//! use fusion_cortex_engram::{Episode, Fact, Memory};
+//!
+//! let mut memory = Memory::new();
+//! let trace = Id::new();
+//!
+//! let episode = memory.record(Episode::new("bills on a time-of-use plan", trace));
+//! memory.assert_fact(Fact::new("on a time-of-use plan", vec![episode], 0.9), None);
+//! ```
 
 use chrono::{DateTime, Utc};
 use fusion_cortex_core::Id;
@@ -79,6 +90,14 @@ impl Fact {
     /// above what was recorded, which is not decay running backwards, it is a
     /// clock skew or an unset timestamp producing a fact the system believes
     /// more than anything it was ever told.
+    ///
+    /// ```
+    /// # use fusion_cortex_engram::Fact;
+    /// let fact = Fact::new("x", vec![], 1.0);
+    ///
+    /// assert_eq!(fact.decayed_confidence(30.0, 30.0), 0.5);  // one half-life
+    /// assert!(fact.decayed_confidence(300.0, 30.0) < 0.01);  // ten half-lives
+    /// ```
     #[must_use]
     pub fn decayed_confidence(&self, days: f32, half_life_days: f32) -> f32 {
         if half_life_days <= 0.0 || !days.is_finite() {
@@ -118,6 +137,17 @@ impl Memory {
     /// fact would otherwise overwrite that link: the lineage forks, the earlier
     /// replacement stays current, and the store reports two current facts that
     /// were meant to be one.
+    /// ```
+    /// # use fusion_cortex_core::Id;
+    /// # use fusion_cortex_engram::{Episode, Fact, Memory};
+    /// # let mut memory = Memory::new();
+    /// # let episode = memory.record(Episode::new("bills", Id::new()));
+    /// let old = memory.assert_fact(Fact::new("on a flat rate plan", vec![episode], 0.6), None);
+    /// let new = memory.assert_fact(Fact::new("on a time-of-use plan", vec![episode], 0.9), Some(old));
+    ///
+    /// assert_eq!(memory.current_facts().len(), 1); // only the newer one is current
+    /// # assert_eq!(memory.current_facts()[0].id, new);
+    /// ```
     pub fn assert_fact(&mut self, fact: Fact, supersedes: Option<Id>) -> Id {
         let id = fact.id;
         if let Some(old) = supersedes {
@@ -167,6 +197,14 @@ impl Memory {
 
     /// Episodes not yet distilled into any fact. The input to consolidation.
     #[must_use]
+    /// ```
+    /// # use fusion_cortex_core::Id;
+    /// # use fusion_cortex_engram::{Episode, Memory};
+    /// # let mut memory = Memory::new();
+    /// # memory.record(Episode::new("bills on a time-of-use plan", Id::new()));
+    /// let pending = memory.unconsolidated();
+    /// # assert_eq!(pending.len(), 1);
+    /// ```
     pub fn unconsolidated(&self) -> Vec<&Episode> {
         let consumed: std::collections::HashSet<Id> = self
             .facts
