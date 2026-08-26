@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { SiteNav } from '@/components/site-nav/site-nav'
 import styles from '../../components/chrome.module.css'
@@ -71,9 +72,20 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               Fusion Development Group
             </helix-text>
           </helix-flex>
-          <helix-text tone="subtle" variant="label">
-            Developing for humanity.
-          </helix-text>
+          <helix-flex align="center" gap="md">
+            {/* The two legal pages, reachable and quiet. A footer is where a
+                reader looks for these and nothing else on the site links them,
+                so without this they exist and cannot be found. */}
+            <Link className={styles.siteFooterLink} href="/terms">
+              Terms
+            </Link>
+            <Link className={styles.siteFooterLink} href="/privacy">
+              Privacy
+            </Link>
+            <helix-text tone="subtle" variant="label">
+              Developing for humanity.
+            </helix-text>
+          </helix-flex>
         </helix-flex>
       </footer>
     </>

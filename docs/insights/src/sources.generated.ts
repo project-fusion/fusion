@@ -159,6 +159,75 @@ worth keeping: a constraint that holds because of a current absence is not a
 constraint, it is a coincidence, and coincidences do not survive the commit that
 ends them.
 `,
+  privacy: `---
+description: Three preference keys, no cookies, no analytics, and nothing that identifies you.
+kicker: Privacy
+path: /privacy
+title: What this site stores, which is almost nothing
+---
+
+Last updated 26 August 2026. This is short because there is little to describe,
+and it describes what the site actually does rather than reserving rights we do
+not exercise.
+
+## We collect nothing you type
+
+There is no form anywhere on this site. The [contact](/contact) page is a
+\`mailto:\` link, so writing to us opens your own mail client and the message
+travels from you to us without passing through anything of ours. Nothing you
+type into the site reaches us, because there is no path for it to take.
+
+The sandbox is the same story from the other direction: the code you write there
+runs in your browser against an opaque origin and is never sent to a server. See
+the [terms](/terms) for how that is built.
+
+## Three keys in local storage, all of them preferences
+
+The site writes three values to your browser's local storage:
+
+| Key | What it holds |
+| --- | --- |
+| \`fusion-color-mode\` | Whether you chose light or dark |
+| \`fusion-api-tier\` | Whether you prefer the styled or headless API tables |
+| \`fusion-sandbox-arrangement\` | How you left the sandbox panes arranged |
+
+That is the complete list. None of them identifies you, none is sent anywhere,
+and all three are readable and deletable by you in your browser's developer
+tools. Clearing site data removes them and costs you nothing but the three
+choices.
+
+**No cookies. No session storage. No analytics.** There is no tracking script on
+this site, first-party or third-party, and no pixel, tag manager, or advertising
+identifier. We do not know how many of you there are.
+
+## What our host sees
+
+The site is served by a hosting provider, and like every web server theirs
+records requests: an IP address, a URL, a user agent, a timestamp. We do not use
+those logs to build a profile and we have not turned on any product that would.
+This is worth stating rather than omitting, because "we collect nothing" would be
+a claim about somebody else's infrastructure that we are not in a position to
+make.
+
+Fonts are served from this site rather than from a font CDN, so loading a page
+does not tell a third party that you did.
+
+## Why the policy is this short
+
+The Sovereignty Constraint is the company's stated test: no Fusion product may
+create a dependency its user cannot exit. A company whose test is what happens to
+you if Fusion disappears tomorrow cannot ship a policy claiming the right to hold
+what it does not hold. If the answer is *nothing happens, you keep everything*,
+the policy has to be short enough to prove it.
+
+If that changes, this page changes with it, and the previous wording stays in the
+repository's history.
+
+## Reaching us
+
+Questions, or a request to remove something, go to the address on the
+[contact](/contact) page.
+`,
   services: `---
 appends: services
 description: What we take on, and what it costs.
@@ -278,6 +347,69 @@ The useful side effect is internal. A stage label that cannot be softened is a
 label that has to be earned, so moving something from Building to Active is a
 real event with a real precondition rather than a decision made in a planning
 document. It puts a floor under what shipping means.
+`,
+  terms: `---
+description: What we offer, what we do not, and the one clause the sandbox makes specific.
+kicker: Terms
+path: /terms
+title: Terms of use
+---
+
+Last updated 26 August 2026. These terms cover this website. They do not cover
+the software: every package Fusion publishes is MIT licensed, and the \`LICENSE\`
+file in the repository is the whole of that agreement.
+
+## The site is documentation, offered as-is
+
+Everything here is reference material and writing. We make no promise that it is
+complete, current, or correct, and nothing on the site is advice you should act
+on without checking it. If a page and the code disagree, the code is right.
+
+We may change or remove any of it at any time. Nothing here is an offer, and
+reading it creates no relationship between us. Engagement terms for paid work
+are agreed separately and in writing.
+
+## The sandbox runs your code, not ours
+
+\`/helix/sandbox\` and \`/helix/theme\` execute whatever you type into them. This is
+the clause worth stating precisely rather than disclaiming in general terms,
+because how it is built is the substance of it.
+
+Your code runs inside an iframe declared \`sandbox="allow-scripts allow-forms"\`.
+\`allow-same-origin\` is deliberately absent, so the document runs against an
+opaque origin: it cannot read our cookies or storage, cannot call our origin, and
+cannot reach anything of ours. It is your code in your browser.
+
+Two consequences follow, and they run in both directions. We do not receive what
+you type: the source you edit is never sent to a server, so we could not keep it
+if we wanted to and do not. And we are not responsible for what your code does
+in your own browser. Do not paste a secret into it, for the same reason you would
+not paste one into a browser console: it is not that we would read it, it is that
+you have no reason to take our word for that.
+
+## What you may not do
+
+Do not use the site to attack it or anyone else, to break the law, or to
+misrepresent yourself as us. Do not scrape it in a way that degrades it for other
+people; the documentation is also published as plain markdown beside every page
+and as \`llms.txt\`, which is the cheaper path for both of us.
+
+## Liability, in the terms we can honestly offer
+
+We provide the site without warranties of any kind. To the extent the law allows,
+Fusion Development Group is not liable for loss arising from your use of it. We
+are a small company; this is the limit we can honestly stand behind rather than
+the largest one a template would reserve.
+
+## Governing law, and changing these terms
+
+These terms are governed by the law of the State of Delaware, United States. If
+we change them, the date at the top changes, and the previous wording stays in
+the repository's history where anyone can read it.
+
+## Reaching us
+
+Questions about these terms go to the address on the [contact](/contact) page.
 `,
   'the-sovereignty-constraint': `---
 author: Ross Sheppard

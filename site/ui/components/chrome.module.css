@@ -102,6 +102,20 @@
   padding-block: var(--helix-space-xl);
 }
 
+/* Quiet, because a legal link is something a reader finds when they go looking
+   rather than something the page offers them. `label` is the same scale the line
+   beside it takes, so the row reads as one thing at one weight. */
+.siteFooterLink {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+  text-decoration: none;
+}
+
+.siteFooterLink:hover {
+  color: var(--helix-color-foreground);
+  text-decoration: underline;
+}
+
 /* ============================================================ chrome ===== */
 
 /* Mixed case, and large enough to be worth setting.

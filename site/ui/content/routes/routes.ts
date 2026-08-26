@@ -93,6 +93,26 @@ const PROSE: Route[] = [
     section: 'Fusion',
     title: 'Contact',
   },
+  /* The two legal pages, at a lower priority than anything a reader came for.
+     Listed rather than omitted because `check:routes` holds every address the
+     site serves, and an unlisted page is one a sitemap never names and nothing
+     notices going missing. */
+  {
+    description: findSitePage('/terms')?.description ?? '',
+    kind: 'page',
+    path: '/terms',
+    priority: 0.3,
+    section: 'Fusion',
+    title: 'Terms of use',
+  },
+  {
+    description: findSitePage('/privacy')?.description ?? '',
+    kind: 'page',
+    path: '/privacy',
+    priority: 0.3,
+    section: 'Fusion',
+    title: 'Privacy',
+  },
   {
     description: 'The design system: tokens, two component tiers, and a theme engine.',
     kind: 'page',
