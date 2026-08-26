@@ -99,20 +99,13 @@
  * Written among the defaults and not after them, so `indicator-align` still
  * beats it. The two are equal specificity, so this is source order deciding. */
 @media (hover: none) and (pointer: coarse) {
-  :host(:not([controls="always"])) [part="previous"],
-  :host(:not([controls="always"])) [part="next"] {
-    display: none;
-  }
-
-  /* Nothing left in the row unless the carousel rotates, and an empty box still
-     takes its gap. The rotation control is the one thing in here a touch device
-     must keep, so whether there is one decides. */
-  :host(:not([controls="always"]):not([autoplay])) [part="controls"] {
-    display: none;
-  }
-
   /* The dots sat at `start` to be opposite controls that are no longer there,
-     which leaves them on one edge with the rest of the row empty beside them. */
+     which leaves them on one edge with the rest of the row empty beside them.
+   
+     This half stays here, among the defaults, because `indicator-align` is the
+     same specificity and has to keep winning on source order. The half that
+     hides the controls has no such requirement and sits further down, after the
+     rules that draw them, so specificity ascends the way biome asks. */
   :host(:not([controls="always"])) [part="indicators"] {
     --_carousel-indicators-along: center;
   }
@@ -584,5 +577,23 @@
     box-shadow: none;
     max-block-size: none;
     overflow: visible;
+  }
+}
+
+/* The other half of the pointer rule above: where the pointer cannot hover, the
+   track is already the control and the arrows are a second way to say it. Placed
+   after the rules that draw them rather than beside their sibling, so a lower
+   specificity selector never follows a higher one. */
+@media (hover: none) and (pointer: coarse) {
+  :host(:not([controls="always"])) [part="previous"],
+  :host(:not([controls="always"])) [part="next"] {
+    display: none;
+  }
+
+  /* Nothing left in the row unless the carousel rotates, and an empty box still
+     takes its gap. The rotation control is the one thing in here a touch device
+     must keep, so whether there is one decides. */
+  :host(:not([controls="always"]):not([autoplay])) [part="controls"] {
+    display: none;
   }
 }

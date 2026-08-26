@@ -36,6 +36,22 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+/* A row, so the separator sits on the text's middle rather than on its
+   baseline. An inline box of 1em aligns its bottom to the baseline, which puts
+   a chevron a third of a line high beside the word it separates.
+
+   And the first item has nothing to be separated from. The styled tier hides
+   that one; a diagram that leaves it in teaches a leading chevron. */
+helix-headless-breadcrumb {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+helix-headless-breadcrumb:first-child::part(separator) {
+  display: none;
+}
+
 helix-headless-icon {
   block-size: 1em;
   display: inline-flex;

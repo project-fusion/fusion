@@ -36,6 +36,16 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+/* A row: the mark beside the message rather than above it. The host has no
+   layout of its own on this tier, so without this the icon is one block and the
+   slotted text is the next. `start` rather than `center`, because a callout of
+   several lines wants its mark against the first one. */
+helix-headless-callout {
+  align-items: start;
+  display: flex;
+  gap: 0.5rem;
+}
+
 helix-headless-icon {
   block-size: 1em;
   display: inline-flex;

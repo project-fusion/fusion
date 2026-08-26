@@ -79,11 +79,25 @@ helix-headless-carousel::part(rotation-mark) {
   inline-size: 1em;
 }
 
+/* The track is the scroller the slides sit in, and this had it as a 0.5rem grey
+   bar: a slider's track rather than a carousel's. So the slides fell out of it
+   and ran together as one line of inline text with a small filled pill
+   underneath, which is what the baseline had been recording.
+ 
+   A row that scrolls and snaps, which is the minimum a carousel is: without the
+   snap the slides are a list that happens to overflow. `flex: 0 0 100%` is one
+   slide per view, this tier having no `per-view` arithmetic to do and no token
+   to do it with. */
 helix-headless-carousel::part(track) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  inline-size: 100%;
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+helix-headless-carousel > * {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
 }
 
 helix-headless-icon::part(svg) {

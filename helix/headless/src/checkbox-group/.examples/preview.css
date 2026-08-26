@@ -36,6 +36,15 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+/* A column, which is what a group of checkboxes is. Left to normal flow the
+   boxes and their labels run together as inline content and the group reads as
+   a paragraph rather than a set. */
+helix-headless-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 helix-headless-icon {
   block-size: 1em;
   display: inline-flex;
@@ -48,9 +57,16 @@ helix-headless-checkbox-group::part(label) {
   font-weight: 600;
 }
 
+/* A column of options, which is what a group of checkboxes is.
+ *
+ * This was a centered row, so four options ran together on one line and the
+ * group read as a sentence, with the label and the hint at the edge and the
+ * boxes under the middle of the group. The styled tier stacks them and turns
+ * this into a row only for `orientation="horizontal"`. */
 helix-headless-checkbox-group::part(items) {
-  align-items: center;
+  align-items: start;
   display: flex;
+  flex-direction: column;
   gap: 0.25rem;
 }
 
