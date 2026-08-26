@@ -18,8 +18,16 @@
  * fills the map, so a consumer importing one component is checked against that
  * component and nothing else.
  *
+ * **It formats its own output, and the first version did not.** `bun run check`
+ * runs Biome over the tree, which rewrapped the arrays this emits, and from then
+ * on the generator's text never matched the file again: `--check` reported it
+ * behind its manifest on every run and regenerating did not settle it, because
+ * the next `check` undid the write. A generated file has to arrive in the shape
+ * the formatter would leave it in, or the two disagree forever.
+ *
  * `--check` compares without writing, for `verify`.
  */
+import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -45,6 +53,14 @@ const mapFor = (pkg) => {
   return entries.sort(([a], [b]) => a.localeCompare(b))
 }
 
+/** The text as Biome would leave it, so a later `check` cannot rewrite it. */
+const formatted = (path, source) =>
+  execFileSync('bunx', ['biome', 'format', `--stdin-file-path=${path}`], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    input: source,
+  })
+
 const render = (pkg, entries) => {
   const rows = entries
     .map(([tag, names]) => `  '${tag}': [${names.map((name) => `'${name}'`).join(', ')}],`)
@@ -68,7 +84,7 @@ for (const pkg of PACKAGES) {
   const entries = mapFor(pkg)
   total += entries.length
   const path = join(ROOT, 'helix', pkg, 'src', 'element-events.generated.ts')
-  const next = render(pkg, entries)
+  const next = formatted(path, render(pkg, entries))
   const held = (() => {
     try {
       return readFileSync(path, 'utf8')
