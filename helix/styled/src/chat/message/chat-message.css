@@ -12,14 +12,26 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
 }
 
+/* **Each part names its own column**, so hiding one does not move the others.
+   A `display: none` grid item leaves the grid entirely, so with implicit
+   placement the body slid into the avatar's column the moment a me-turn hid it,
+   and the 1fr column was left holding the empty actions box: measured at 640,
+   the reader's own bubbles sat at 16 and 52 with the container's edge at 640. */
+[part="avatar"] {
+  grid-column: 1;
+}
+
+[part="body"] {
+  grid-column: 2;
+}
+
+[part="actions"] {
+  grid-column: 3;
+}
+
 /* The reader's own turns sit against the trailing edge, which is the one piece
    of paint that says whose turn it is without a label. Everything else about a
    turn is the same on both sides: two bubble styles is two components. */
-:host([author="me"]) [part="message"] {
-  grid-template-columns: auto minmax(0, 1fr);
-  justify-items: end;
-}
-
 :host([author="me"]) [part="avatar"] {
   display: none;
 }
