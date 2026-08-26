@@ -73,7 +73,7 @@ jobs:
       # `fetch-depth: 0` and the tags, because the version is computed from
       # them. A shallow clone reports no tags and every release looks like the
       # first one.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -85,7 +85,7 @@ jobs:
 
       # Trusted publishing needs npm 11.5.1+ on Node 22.14+, which is newer than
       # the runner default.
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
           registry-url: 'https://registry.npmjs.org'

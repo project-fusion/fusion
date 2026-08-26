@@ -52,7 +52,7 @@ jobs:
     # some of a set that is only meaningful whole.
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -86,7 +86,7 @@ jobs:
       # retaken in the tier that has it.
       - run: bun run visual:update ${{ inputs.family }}
 
-      - uses: peter-evans/create-pull-request@v7
+      - uses: peter-evans/create-pull-request@v8
         with:
           branch: visual-baselines
           title: Retake the visual baselines
