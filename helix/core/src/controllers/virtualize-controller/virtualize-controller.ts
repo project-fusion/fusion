@@ -251,8 +251,8 @@ export class VirtualizeController implements ReactiveController {
    * the window well, and that is the consumer's stylesheet to fix, not
    * something this can decide on their behalf.
    *
-   * Once per controller, for the reason `requestControlledChange` gives about
-   * its own audit: a warning per frame is one people filter out.
+   * Once per controller, because a warning per frame is one people filter out
+   * and this one has to be believed the day it is right.
    */
   private report(): void {
     if (this.warned) {

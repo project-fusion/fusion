@@ -207,7 +207,11 @@ describe('controlled and uncontrolled', () => {
    * an attribute, a hydrating server's output and a framework's initial
    * properties have all landed.
    */
-  test('a declared `sort` makes the element defer to the consumer', async () => {
+  /* Asserted the opposite until 26 Aug 2026, when declaring an axis was a claim
+     of ownership and the table announced without re-sorting. Control is an
+     action now: it applies, and a consumer refuses to take the decision.
+     See 294. */
+  test('a declared `sort` is a seed, and the element still re-sorts', async () => {
     const { element, remove } = await mount(`
       <helix-headless-data-table sort="size:asc">
         <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
@@ -216,19 +220,31 @@ describe('controlled and uncontrolled', () => {
     expect(cells(element)[0]).toBe('bravo')
     heading(element).click()
     await settled(element)
+    expect(element.sort).toBe('name:asc')
+    remove()
+  })
+
+  test('and refusing the change is what holds the axis', async () => {
+    const { element, remove } = await mount(`
+      <helix-headless-data-table sort="size:asc">
+        <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
+        <helix-headless-table-column field="size" sortable>Size</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    element.addEventListener('helix-sort', (event: Event) => {
+      event.preventDefault()
+    })
+    heading(element).click()
+    await settled(element)
     expect(element.sort).toBe('size:asc')
     expect(cells(element)[0]).toBe('bravo')
     remove()
   })
 
   /**
-   * The other half of the convention, and the half that reads as a limitation
-   * until it is what you want: writing always applies, and a write after the
-   * first update does not change which mode the element is in. An element whose
-   * mode moved under it would start refusing a reader's clicks partway through a
-   * session.
+   * Writing always applies, which used to be half a convention and is now the
+   * whole of it: there is no mode a write could move the element into. See 294.
    */
-  test('a script write after mount applies without taking the axis over', async () => {
+  test('a script write after mount applies, and the element keeps responding', async () => {
     const { element, remove } = await mount(SCHEMA)
     element.sort = 'size:asc'
     await settled(element)
@@ -241,10 +257,11 @@ describe('controlled and uncontrolled', () => {
   })
 
   /**
-   * Inferring ownership from the current value takes the axis back the moment a
-   * consumer sets it to empty to mean unsorted.
+   * An axis set back to empty means unsorted, and the element goes on sorting
+   * from there. This asserted that emptiness kept a controlled axis controlled,
+   * which was a fact about a mode that no longer exists. See 294.
    */
-  test('a controlled axis set back to empty is still controlled', async () => {
+  test('an axis set back to empty is unsorted, and the element still sorts', async () => {
     const { element, remove } = await mount(`
       <helix-headless-data-table sort="size:asc">
         <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
@@ -254,7 +271,7 @@ describe('controlled and uncontrolled', () => {
     await settled(element)
     heading(element).click()
     await settled(element)
-    expect(element.sort).toBe('')
+    expect(element.sort).toBe('name:asc')
     remove()
   })
 })

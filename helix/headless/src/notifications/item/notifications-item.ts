@@ -5,7 +5,7 @@ import {
   HelixReadEvent,
   hostAria,
   relativeTime,
-  requestControlledChange,
+  requestChange,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -76,7 +76,7 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
    * `helix-read` and changes nothing until a new value arrives. `default-read`
    * seeds a state this element then owns.
    *
-   * @controlled helix-read
+   *
    */
   @property({ reflect: true, type: Boolean })
   get read(): boolean {
@@ -113,6 +113,8 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
   readonly isNotification = true
 
   @state()
+  private stopTicking: (() => void) | undefined = undefined
+
   private readState: boolean | undefined = undefined
 
   /**
@@ -124,14 +126,6 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
    */
   @state()
   private clock: number | undefined = undefined
-
-  private readMode: boolean | undefined = undefined
-
-  private stopTicking: (() => void) | undefined = undefined
-
-  private get readIsControlled(): boolean {
-    return this.readMode === true
-  }
 
   /** The timestamp, or nothing where there is not one to read. */
   private get moment(): Date | undefined {
@@ -153,21 +147,15 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
     if (next === this.read) {
       return false
     }
-    return requestControlledChange({
+    return requestChange({
       apply: (read) => {
-        if (this.readIsControlled) {
-          return
-        }
         const previous = this.read
         this.readState = read
         this.requestUpdate('read', previous)
       },
-      controlled: this.readIsControlled,
       event: (read) => new HelixReadEvent({ read }),
       host: this,
-      label: 'read',
       next,
-      read: () => this.read,
     })
   }
 
@@ -211,10 +199,6 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // Only the first time, before anything reads it. See `MixinControllerValue`.
-    if (this.readMode === undefined) {
-      this.readMode = this.readState !== undefined
-    }
     if (changed.has('at') || changed.has('locale')) {
       this.tick()
     }

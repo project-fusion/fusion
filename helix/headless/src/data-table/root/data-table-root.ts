@@ -6,7 +6,7 @@ import {
   HelixSortEvent,
   hostAria,
   MixinCollection,
-  requestControlledChange,
+  requestChange,
 } from '@helix-io/core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -180,7 +180,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * changes nothing until a new value arrives. `default-sort` seeds an order this
    * element then owns.
    *
-   * @controlled helix-sort
+   *
    */
   @property()
   get sort(): string {
@@ -204,7 +204,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * by a search box above a table. It matches on each column's ordering value,
    * so search and sort cannot disagree about what a column holds.
    *
-   * @controlled helix-filter
+   *
    */
   @property()
   get filter(): string {
@@ -228,7 +228,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * bookmarked link to page 99 of a result that has since shrunk reads back as
    * the last page rather than as 99.
    *
-   * @controlled helix-navigate
+   *
    */
   @property({ type: Number })
   get page(): number {
@@ -249,12 +249,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * How many rows a page holds. Zero is every row, which is what "no paging" means.
    *
-   * **Not controlled, and that is not an omission.** Nothing in this element
-   * ever asks for a different page size: a size selector is
+   * **It announces nothing, and that is not an omission.** Nothing in this
+   * element ever asks for a different page size: a size selector is
    * `helix-pagination-size`, which a consumer puts in the `footer` slot and
-   * answers themselves. A `@controlled` tag here would name an event this
-   * element never fires for it, and `check:controlled` holds the tag against the
-   * calls that back it.
+   * answers themselves. Routing this through `requestChange` would announce an
+   * event the element never has cause to fire.
    */
   @property({ attribute: 'page-size', type: Number })
   get pageSize(): number {
@@ -304,45 +303,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   @state()
   private paginatedState: boolean | undefined = undefined
-
-  /**
-   * Which axes the consumer took over, decided once and then left alone.
-   *
-   * **Read off whether anything had set the property by the first update**,
-   * which is where markup, a hydrating server's attributes and a framework's
-   * initial properties have all landed. This is `MixinControllerValue`'s rule
-   * rather than a new one, and it is borrowed deliberately: the whole point of
-   * the convention is that every controlled axis in the library answers the same
-   * way, and three axes here inventing their own would be three more things a
-   * consumer has to learn per component.
-   *
-   * What it means in practice, and the part that reads as a limitation until it
-   * is the thing you want: a script assigning `sort` after mount changes the
-   * order without taking the axis over. Writing always applies. What a write
-   * after the first update does not do is change which mode the element is in,
-   * because an element whose mode moved under it would start refusing a reader's
-   * clicks partway through a session.
-   *
-   * Inferring it from the current value instead fails exactly where it matters:
-   * a consumer who owns `sort` and sets it to `''` to mean unsorted still owns
-   * it, and an element reading ownership off "is it empty" would take the axis
-   * back and start sorting on its own.
-   */
-  private sortMode: boolean | undefined = undefined
-  private filterMode: boolean | undefined = undefined
-  private pageMode: boolean | undefined = undefined
-
-  private get sortIsControlled(): boolean {
-    return this.sortMode === true
-  }
-
-  private get filterIsControlled(): boolean {
-    return this.filterMode === true
-  }
-
-  private get pageIsControlled(): boolean {
-    return this.pageMode === true
-  }
 
   /** The columns declared as children, in the order they are written. */
   get tableColumns(): HelixHeadlessTableColumn[] {
@@ -436,41 +396,29 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * consumer refuses the local reorder, fetches, and hands back a new set.
    */
   private requestSort(next: string): boolean {
-    return requestControlledChange({
+    return requestChange({
       apply: (value) => {
-        if (this.sortIsControlled) {
-          return
-        }
         const previous = this.sort
         this.sortState = value
         this.requestUpdate('sort', previous)
       },
-      controlled: this.sortIsControlled,
       event: (value) => new HelixSortEvent({ value }),
       host: this,
-      label: 'sort',
       next,
-      read: () => this.sort,
     })
   }
 
   /** Asks for a different query. */
   private requestFilter(next: string): boolean {
-    return requestControlledChange({
+    return requestChange({
       apply: (value) => {
-        if (this.filterIsControlled) {
-          return
-        }
         const previous = this.filter
         this.filterState = value
         this.requestUpdate('filter', previous)
       },
-      controlled: this.filterIsControlled,
       event: (value) => new HelixFilterEvent({ value }),
       host: this,
-      label: 'filter',
       next,
-      read: () => this.filter,
     })
   }
 
@@ -479,21 +427,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (next === this.page || next < 1 || next > this.pages) {
       return false
     }
-    return requestControlledChange({
+    return requestChange({
       apply: (value) => {
-        if (this.pageIsControlled) {
-          return
-        }
         const previous = this.page
         this.pageState = value
         this.requestUpdate('page', previous)
       },
-      controlled: this.pageIsControlled,
       event: (value) => new HelixNavigateEvent({ value: String(value) }),
       host: this,
-      label: 'page',
       next,
-      read: () => this.page,
     })
   }
 
@@ -548,16 +490,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // Only the first time, before anything reads it. See `MixinControllerValue`.
-    if (this.sortMode === undefined) {
-      this.sortMode = this.sortState !== undefined
-    }
-    if (this.filterMode === undefined) {
-      this.filterMode = this.filterState !== undefined
-    }
-    if (this.pageMode === undefined) {
-      this.pageMode = this.pageState !== undefined
-    }
     hostAria(this.internals, { label: this.label || 'Table', role: 'grid' })
   }
 

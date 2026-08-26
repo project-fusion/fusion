@@ -2,8 +2,6 @@ import type { Config } from '@custom-elements-manifest/analyzer'
 import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { vuejsTypesPlugin } from '@wc-toolkit/vuejs-types'
 import { composition } from './plugins/composition.js'
-import { controlled } from './plugins/controlled.js'
-import { controlledProps } from './plugins/controlled-props.js'
 import { type ConventionLintOptions, conventionLint } from './plugins/convention-lint.js'
 import { declaredEvents } from './plugins/declared-events.js'
 import { examples } from './plugins/examples.js'
@@ -76,7 +74,6 @@ export const createHelixCemConfig = ({
     source(),
     // Must precede the linter: it validates declared events, not inferred ones.
     declaredEvents(),
-    controlled(),
     references(),
     reactEvents(),
     ...(lint === false ? [] : [conventionLint(lint)]),
@@ -101,10 +98,6 @@ export const createHelixCemConfig = ({
           // Also after the generator: its `ref` type is framework-agnostic and
           // rejects the `useRef` every React consumer reaches for.
           jsxReactRef(),
-          // Last of the JSX set: it reads back the tag entries the generator
-          // wrote, and the requirement it adds has to sit outside their
-          // `Partial<>`.
-          controlledProps(),
           /* Vue reads none of the above. Its templates are not JSX, so the
              types augment `GlobalComponents` rather than `IntrinsicElements`,
              and a handler is bound with `@helix-input` rather than a prop. Same
@@ -171,7 +164,6 @@ export {
 export type { ConventionLintOptions }
 export {
   composition,
-  controlledProps,
   conventionLint,
   declaredEvents,
   examples,

@@ -116,11 +116,11 @@ describe('toast item', () => {
     expect(found.isConnected).toBe(true)
   })
 
-  test('a declared `open` belongs to the consumer, and dismissing only asks', async () => {
-    /* The exception this component used to be: it waited to be told in every
-       case, so `duration` did nothing without consumer script and the control
-       looked broken. Now only a consumer who said the state is theirs gets
-       that, which is the contract everywhere else. */
+  test('a declared `open` is a seed, and dismissing closes it', async () => {
+    /* This component was once the exception, waiting to be told in every case,
+       so `duration` did nothing without consumer script. Then only a consumer
+       who declared `open` got that. Now nobody does: the element dismisses
+       itself and a consumer who wants the decision refuses it. See 294. */
     const found = await item('dismissible open')
     let asked = false
     found.addEventListener('helix-dismiss', () => {
@@ -129,7 +129,7 @@ describe('toast item', () => {
     found.dismiss()
     await found.updateComplete
     expect(asked).toBe(true)
-    expect(found.open).toBe(true)
+    expect(found.open).toBe(false)
 
     found.open = false
     await found.updateComplete

@@ -118,7 +118,11 @@ describe('splitter settling', () => {
     expect(settled).toBe('55')
   })
 
-  test('declaring `position` hands it over: it announces and applies nothing', async () => {
+  test('declaring `position` seeds it, and the divider still moves', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const host = await splitter('position="50" step="5"')
     let asked = ''
     host.addEventListener('helix-change', (event) => {
@@ -126,7 +130,7 @@ describe('splitter settling', () => {
     })
     await press(host, 'ArrowRight')
     expect(asked).toBe('55')
-    expect(host.position).toBe(50)
+    expect(host.position).toBe(55)
   })
 
   test('a double click puts it back where the markup put it', async () => {
@@ -516,7 +520,11 @@ describe('splitter collapsing', () => {
     expect(separator(host).hasAttribute('data-flush')).toBe(false)
   })
 
-  test('declaring `collapsed` hands it over: it announces and applies nothing', async () => {
+  test('declaring `collapsed` seeds it, and the pane still collapses', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const host = (await splitter('collapsed="start"')) as Splitter & { collapsed?: 'end' | 'start' }
     let asked = ''
     host.addEventListener('helix-change', (event) => {
@@ -527,7 +535,7 @@ describe('splitter collapsing', () => {
     })
     await press(host, 'End')
     expect(asked).toBe('end')
-    expect(host.collapsed).toBe('start')
+    expect(host.collapsed).toBe('end')
   })
 })
 
@@ -558,12 +566,13 @@ describe('splitter under a consumer that owns the position', () => {
     await host.updateComplete
   }
 
-  test('a controlled splitter can still be dragged, and says where to', async () => {
-    /* It could not. `move` refuses to apply anything when the consumer owns the
-       position, so `position` never changed during the drag, and letting go
-       settled at *that*: the announcement carried the number it started with and
-       the divider never moved. Every controlled splitter, and nothing exercised
-       one until the sandbox did. */
+  test('a splitter whose markup declared a position can still be dragged', async () => {
+    /* It could not, twice over. `move` used to refuse to apply anything when the
+       consumer owned the position, so `position` never changed during the drag
+       and letting go settled at *that*: the announcement carried the number it
+       started with and the divider never moved. That was fixed by drawing
+       without applying; it is moot now, since there is no ownership to defer to
+       and the drag applies like any other change. See 294. */
     const host = await splitter('position="50"')
     Object.defineProperty(host, 'getBoundingClientRect', {
       value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
@@ -577,18 +586,15 @@ describe('splitter under a consumer that owns the position', () => {
     })
     await drag(host, 0.5, 0.25)
     expect(asked).toBe('25')
-    // And applied nothing itself, which is the other half of being controlled.
-    expect(host.position).toBe(50)
+    expect(host.position).toBe(25)
   })
 
-  test('and draws the drag as it happens, without announcing it', async () => {
-    /* Applying nothing is right; drawing nothing is not. The divider held still
-       for the whole gesture and jumped when the pointer came up and the consumer
-       answered, which is a drag that does not follow the hand. Reported against
-       the sandbox after it became the first controlled consumer.
-
-       The rule that has not changed is when it *tells* anyone: once, at the end.
-       This is what the sandbox did for itself before it used this component. */
+  test('and announces once at the end, however many times it is drawn', async () => {
+    /* The divider follows the hand and says nothing until the hand lets go. The
+       drawing half was once the interesting part, because a controlled splitter
+       applied nothing and had to be drawn some other way; what survives that is
+       the rule about *telling*, which is once, at the end. This is what the
+       sandbox did for itself before it used this component. */
     const host = await splitter('position="50"')
     Object.defineProperty(host, 'getBoundingClientRect', {
       value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
@@ -619,9 +625,9 @@ describe('splitter under a consumer that owns the position', () => {
     at('pointerdown', 0.5)
     at('pointermove', 0.8)
     await host.updateComplete
-    // Drawn at the pointer, reported as the consumer's value, and silent so far.
+    // Drawn at the pointer, moved with it, and silent until it is dropped.
     expect(part(host, 'start')?.getAttribute('style')).toContain('80%')
-    expect(host.position).toBe(50)
+    expect(host.position).toBe(80)
     expect(said).toEqual([])
 
     at('pointerup', 0.8)

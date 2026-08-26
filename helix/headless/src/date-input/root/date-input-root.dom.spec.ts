@@ -121,7 +121,11 @@ describe('input date', () => {
     expect((part(host, 'trigger') as HTMLElement).getAttribute('aria-expanded')).toBe('true')
   })
 
-  test('declaring `value` hands it over: it announces and applies nothing', async () => {
+  test('declaring `value` seeds it, and the field still moves', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const host = await field('value="2026-01-01"')
     let asked = ''
     host.addEventListener('helix-change', (event) => {
@@ -129,9 +133,9 @@ describe('input date', () => {
     })
     await type(host, '2026-02-02')
     expect(asked).toBe('2026-02-02')
-    expect(host.value).toBe('2026-01-01')
-    // And the field is put back, or what is on screen is not the answer.
-    expect(control(host).value).toBe('2026-01-01')
+    expect(host.value).toBe('2026-02-02')
+    // And what is on screen is the answer, since the element applied it.
+    expect(control(host).value).toBe('2026-02-02')
   })
 
   test('the hint is described by the input, in the same tree', async () => {

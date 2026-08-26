@@ -124,7 +124,7 @@ describe('listbox filtering ownership', () => {
     expect(options(host).filter((option) => !option.hasAttribute('hidden'))).toHaveLength(1)
   })
 
-  test("a declared filter is the consumer's, and typing only asks", async () => {
+  test('a declared filter is a seed, and typing still moves it', async () => {
     const host = (await list('filterable filter="be"')) as Updatable & { filter: string }
     let announced: string | undefined
     host.addEventListener('helix-filter', (event) => {
@@ -133,13 +133,13 @@ describe('listbox filtering ownership', () => {
     type(host, 'gam')
     await host.updateComplete
     expect(announced).toBe('gam')
-    expect(host.filter).toBe('be')
-    expect(field(host).value).toBe('be')
-
-    // The consumer answering is what moves it.
-    host.filter = 'gam'
-    await host.updateComplete
     expect(host.filter).toBe('gam')
+    expect(field(host).value).toBe('gam')
+
+    // And a refusal is what would have held it. See 294.
+    host.filter = 'be'
+    await host.updateComplete
+    expect(host.filter).toBe('be')
   })
 
   test("a seeded filter is the list's own, and typing over it works", async () => {

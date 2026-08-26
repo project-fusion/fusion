@@ -2,7 +2,7 @@ import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixToggleEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
-import { requestControlledChange } from '../../utils/request-controlled-change/request-controlled-change.js'
+import { requestChange } from '../../utils/request-change/request-change.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -79,7 +79,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * Not reflected: the attribute is the consumer's input and stays as they
      * wrote it, and `data-checked` carries the resolved state for stylesheets.
      *
-     * @controlled helix-toggle
+     *
      */
     @property({ type: Boolean })
     get checked(): boolean {
@@ -106,20 +106,6 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     private checkedState: boolean | undefined = undefined
 
     /**
-     * Whether the consumer owns the state, decided once and then fixed.
-     *
-     * Read off whether anything had set `checked` by the first update, which is
-     * where markup, a hydrating server's attributes and a framework's initial
-     * properties have all landed. See `MixinControllerOpen` for why this is
-     * decided once rather than continuously.
-     */
-    private checkedMode: boolean | undefined = undefined
-
-    private get checkedIsControlled(): boolean {
-      return this.checkedMode === true
-    }
-
-    /**
      * Mirrors the resolved state onto the host as `data-checked`.
      *
      * In `willUpdate` rather than `connectedCallback` because SSR calls the
@@ -127,10 +113,6 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
-      // Only the first time, before anything reads it. See `MixinControllerOpen`.
-      if (this.checkedMode === undefined) {
-        this.checkedMode = this.checkedState !== undefined
-      }
       this.toggleAttribute('data-checked', this.checked)
     }
 
@@ -138,30 +120,24 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * Requests a checked change, and reports whether it was applied.
      *
      * Announces before it acts, so `preventDefault()` on the
-     * `helix-change` is a refusal and nothing moves. In uncontrolled mode
-     * the element then updates itself; in controlled mode it applies nothing
-     * and waits for the consumer to pass a new `checked`, which is what
-     * "controlled" means.
+     * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+     * declared the property: a declared property is a seed and a correction,
+     * the way `<input value>` is, and a consumer who wants the change for
+     * themselves refuses it and assigns their own. See 294.
      */
     requestChecked(next: boolean): boolean {
       if (this.checked === next) {
         return true
       }
-      return requestControlledChange({
+      return requestChange({
         apply: (checked) => {
-          if (this.checkedIsControlled) {
-            return
-          }
           const previous = this.checked
           this.checkedState = checked
           this.requestUpdate('checked', previous)
         },
-        controlled: this.checkedIsControlled,
         event: (checked) => new HelixToggleEvent({ checked }),
         host: this,
-        label: 'checked',
         next,
-        read: () => this.checked,
       })
     }
 

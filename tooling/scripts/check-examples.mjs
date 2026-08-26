@@ -6,6 +6,16 @@
  * component leaves its examples rendering an element that silently ignores
  * them, and the sandbox shows a component that does not do what it says.
  *
+ * **It held a rule about declared state until 26 Aug 2026, and that rule is
+ * gone with the model it enforced.** It read `@controlled` out of the manifest
+ * and failed an example that declared a controlled attribute without a listener
+ * for the event that settled it, because `value="Ada"` was a claim of ownership
+ * and a calendar written that way had arrows that did nothing. A declared
+ * property is a seed now, so an example may write one and the control still
+ * works when a reader copies it. Removed rather than left inert: the tag is
+ * gone from the manifest, so the rule would have read an empty set, passed
+ * everything, and gone on looking thorough. See 294.
+ *
  * Run with `bun run check:examples` (also part of `bun run verify`).
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
@@ -60,74 +70,11 @@ for (const module of MANIFESTS.flatMap(
     }
     const attributes = new Set((declaration.attributes ?? []).map((a) => a.name))
     tags.set(declaration.tagName, {
-      /* What answers each one, read from `@controlled` rather than derived. The
-         line above knows an attribute is controlled; only the tag knows which
-         event settles it, and an example claiming ownership has to listen for
-         the right one rather than for any event at all. */
-      answers: new Map(
-        (declaration.members ?? [])
-          .filter((member) => member.helix?.controlled?.length && member.name)
-          .map((member) => [member.name, member.helix.controlled]),
-      ),
       attributes,
-      /* Which attributes hand the state to a consumer, read from `@controlled`
-         and not from the `default-` naming pattern.
-       *
-       * The pattern was the first test, on the reasoning that an attribute is a
-         controlled state exactly when the element declares its `default-`
-         sibling, because that pair is the model. It is true of every component
-         that follows the contract and false of `Sandbox`, where `default-split`
-         means *what a reset makes it* rather than the seed of a controlled
-         pair: the element writes `split` back on every drag, so it owns the
-         state and hands nobody anything. Its own comment says so.
-       *
-         Derived, that produced a complaint with no fix in it. `@controlled`
-         also names the settling event, so a property without the tag has no
-         event to name, and the message degraded to "nothing here can answer",
-         which is true and useless. The tag is authoritative and loses no
-         coverage: `check:controlled` holds it and the `requestControlledChange`
-         call to each other in both directions, so a genuinely controlled
-         property cannot be missing it. */
-      controlled: new Set(
-        (declaration.members ?? [])
-          .filter((member) => member.helix?.controlled?.length && member.name)
-          .map((member) => member.attribute ?? member.name),
-      ),
       slots: new Set((declaration.slots ?? []).map((s) => s.name).filter(Boolean)),
     })
   }
 }
-
-/**
- * Says why a declared state is wrong here, in the words a reader needs.
- *
- * The trap, and the reason this check exists: `value="Ada"` is the native seed
- * and in Helix it is a claim of ownership, so the control announces its changes
- * and waits to be told. Six examples were in exactly that state, silently, and
- * a reader opening the sandbox found a calendar whose arrows did nothing.
- *
- * **It used to be absolute, and is now conditional.** Nothing in an example
- * could answer: an example is HTML and a stylesheet, and the preview injected
- * both with `innerHTML`, which parses a `<script>` and refuses to run it. So
- * there was no correct way to write a controlled control in one. The preview
- * executes example scripts now, which makes the answer writable, so the rule
- * becomes the one that was always meant: **declare a state and answer it, or
- * seed it with `default-`.**
- *
- * What answers is read from the manifest rather than guessed, because
- * `@controlled` already records it: `checked` is answered by `helix-toggle`,
- * `open` by `helix-open` and `helix-close`. An example listening for one of
- * those has said it owns the state and means it.
- *
- * An HTML fence in prose is still absolute, because a fence is markup by
- * definition and a reader copies what is in front of them.
- */
-const declaresState = (where, tag, name, answers) =>
-  `${where}: <${tag}> declares "${name}", which hands that state to a consumer. ` +
-  (answers?.length
-    ? `Answer it with a listener for ${answers.map((one) => `\`${one}\``).join(' or ')}, ` +
-      `or seed it with "default-${name}".`
-    : `Nothing here can answer, so the control will not respond. Use "default-${name}".`)
 
 const problems = []
 /* Family directories. `src` also holds `index.ts`, which is not one, and
@@ -267,20 +214,6 @@ for (const family of families) {
         }
         if (!known.attributes.has(name)) {
           problems.push(`${where}: <${tag}> has no attribute "${name}"`)
-          continue
-        }
-        if (known.controlled.has(name)) {
-          const answers = known.answers.get(name) ?? []
-          /* Answered, so the example owns the state on purpose. A listener for
-             the settling event is the whole test: it is what a consumer writes,
-             it is what the runtime audit looks for, and an example that has one
-             works when a reader copies it. */
-          const answered = answers.some(
-            (event) => html.includes(`'${event}'`) || html.includes(`"${event}"`),
-          )
-          if (!answered) {
-            problems.push(declaresState(where, tag, name, answers))
-          }
         }
       }
     }
@@ -317,25 +250,6 @@ for (const dir of DOCS) {
     for (const [, fence] of text.matchAll(/```html\n([\s\S]*?)```/g)) {
       for (const [, tag] of fence.matchAll(/<([a-z][a-z0-9-]*)[^>]*\sstyle=/g)) {
         problems.push(`${dir}/${file}: <${tag}> carries a style attribute in an HTML sample`)
-      }
-
-      /* And the same rule about state, for the same reason as the style one: a
-         reader copies what is in front of them. An HTML fence is markup with no
-         script by definition, so a declared state in one is a sample that does
-         not work when it is pasted. A prose mention is untouched, and a page
-         that means to show controlled use writes the listener beside it, which
-         makes it a `ts` fence rather than an `html` one. */
-      for (const [, tag, rest] of fence.matchAll(/<(helix-[a-z0-9-]+)([^>]*)>/g)) {
-        const known = tags.get(tag)
-        if (!known) {
-          continue
-        }
-        const bare = rest.replace(/=\s*"[^"]*"/g, '=').replace(/=\s*'[^']*'/g, '=')
-        for (const [, name] of bare.matchAll(/(?:^|\s)([a-z][a-z0-9-]*)/g)) {
-          if (known.controlled.has(name)) {
-            problems.push(declaresState(`${dir}/${file}`, tag, name))
-          }
-        }
       }
     }
   }

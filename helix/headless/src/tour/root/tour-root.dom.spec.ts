@@ -159,16 +159,16 @@ describe('a stop', () => {
  * The three things `21-component-audit.md` named against this family, each of
  * which was live for two days and none of which had a test.
  *
- * `index` carried an `@controlled` tag and honoured none of it: the tour wrote
- * the property and announced afterwards, so a refusal arrived after the move it
- * was refusing and a consumer who declared `index` had it overwritten on the
- * next press. `skip()` and `finish()` did the same with `open`.
+ * `index` was written before it was announced, so a refusal arrived after the
+ * move it was refusing and `preventDefault` did nothing at all. `skip()` and
+ * `finish()` did the same with `open`.
  *
- * The tag was invisible to `check:controlled`, whose regex wanted the property
- * name followed immediately by `(`, `:` or `=` and so read `get value():` and
- * not `index = 0`. Twelve of the thirteen tags in the library are written the
- * first way, which is why a check reporting a count rather than the names it
- * found could go on looking thorough.
+ * It was invisible to the check that was meant to catch it, whose regex wanted
+ * the property name followed immediately by `(`, `:` or `=`, so it read
+ * `get value():` and not `index = 0`. That check is gone with the mode it
+ * guarded, and the lesson is not: **a check reporting a count rather than the
+ * names it found goes on looking thorough while it reads a fraction of the
+ * library.** Twelve of the thirteen sites were written the way it could see.
  */
 describe('moving between stops', () => {
   test('announces before it moves, so a refusal is a refusal', async () => {
@@ -198,7 +198,11 @@ describe('a tour whose stop the consumer owns', () => {
   /* Declaring `index` is a claim of ownership, so the tour announces and
      applies nothing until it is told, which is the contract the tag promises
      and the whole reason it is worth having. */
-  test('announces and applies nothing itself', async () => {
+  test('announces and moves, a declared index being a seed', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     /* Three stops and starting on the first, because `next()` on the last stop
        is a completion rather than a move and announces nothing at all. */
     const host = (await mount(
@@ -215,7 +219,7 @@ describe('a tour whose stop the consumer owns', () => {
     })
     host.next()
     await host.updateComplete
-    expect([heard, host.index]).toEqual([1, 0])
+    expect([heard, host.index]).toEqual([1, 1])
   })
 
   /* Decided once, at the first update. A script assigning `index` to a tour

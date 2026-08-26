@@ -244,7 +244,7 @@ describe('tabs, controlled and uncontrolled', () => {
   /* The reason all four mixins changed shape. A consumer who wrote `value="one"`
      and then clicked another tab read back "two": the set overwrote them, so a
      tab strip could not be owned by the thing rendering it. */
-  test('writing active hands the set to the consumer, and it stays put', async () => {
+  test('writing active seeds the set, and selecting still moves it', async () => {
     const host = (await mount(
       `<helix-headless-tabs active="one">
         <helix-headless-tabs-tab value="one">One</helix-headless-tabs-tab>
@@ -255,9 +255,9 @@ describe('tabs, controlled and uncontrolled', () => {
     ;(tabs(host)[1] as unknown as { select(): void }).select()
     await host.updateComplete
 
-    // Announced, and not applied: the consumer owns it and will say what next.
-    expect(host.active).toBe('one')
-    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+    // Announced and applied: a declared `active` is a seed. See 294.
+    expect(host.active).toBe('two')
+    expect(tabs(host)[1]?.hasAttribute('selected')).toBe(true)
   })
 
   test('the change is still announced, so the consumer knows what to set', async () => {

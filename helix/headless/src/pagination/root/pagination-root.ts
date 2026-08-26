@@ -4,7 +4,7 @@ import {
   HelixElement,
   HelixNavigateEvent,
   hostAria,
-  requestControlledChange,
+  requestChange,
 } from '@helix-io/core'
 import {
   caretDoubleLeft,
@@ -223,7 +223,7 @@ export class HelixHeadlessPagination extends HelixElement {
    *
    * Rounded here too, so `2.7` reads as the 2 it renders.
    *
-   * @controlled helix-navigate
+   *
    */
   @property({ type: Number })
   get page(): number {
@@ -344,13 +344,6 @@ export class HelixHeadlessPagination extends HelixElement {
   /** The page on show, whoever set it, and `undefined` until somebody has. */
   private pageState: number | undefined = undefined
 
-  /** Whether the consumer owns the page, decided once and then fixed. */
-  private pageMode: boolean | undefined = undefined
-
-  private get pageIsControlled(): boolean {
-    return this.pageMode === true
-  }
-
   /** Held across every component asking for the same locale. */
   private get numbers(): (value: number) => string {
     return formatNumbers(this.locale)
@@ -448,21 +441,15 @@ export class HelixHeadlessPagination extends HelixElement {
     if (next === this.current || next < 1 || next > this.count) {
       return false
     }
-    return requestControlledChange({
+    return requestChange({
       apply: (page) => {
-        if (this.pageIsControlled) {
-          return
-        }
         const previous = this.page
         this.pageState = page
         this.requestUpdate('page', previous)
       },
-      controlled: this.pageIsControlled,
       event: (page) => new HelixNavigateEvent({ value: String(page) }),
       host: this,
-      label: 'page',
       next,
-      read: () => this.current,
     })
   }
 
@@ -482,10 +469,6 @@ export class HelixHeadlessPagination extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // Only the first time, before anything reads it. See `MixinControllerOpen`.
-    if (this.pageMode === undefined) {
-      this.pageMode = this.pageState !== undefined
-    }
     /* On the host through internals, so the landmark is the element itself. A
        page may hold more than one navigation and landmarks are how a
        screen-reader user chooses between them, which is why this carries a

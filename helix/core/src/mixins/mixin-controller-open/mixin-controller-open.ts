@@ -2,7 +2,7 @@ import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixCloseEvent, HelixOpenEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
-import { requestControlledChange } from '../../utils/request-controlled-change/request-controlled-change.js'
+import { requestChange } from '../../utils/request-change/request-change.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -81,7 +81,7 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * back controlled and stop responding. `data-open` carries the resolved
      * state for stylesheets, which is what it has always been for.
      *
-     * @controlled helix-open helix-close
+     * helix-close
      */
     @property({ type: Boolean })
     get open(): boolean {
@@ -116,26 +116,6 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
     private openState: boolean | undefined = undefined
 
     /**
-     * Whether the consumer owns the state, decided once and then fixed.
-     *
-     * Read off whether anything had set `open` by the time of the first update,
-     * which is where markup, a hydrating server's attributes and a framework's
-     * initial properties have all landed and nothing else has happened yet.
-     *
-     * Decided once, because the alternative is deciding continuously, and that
-     * was tried: taking any write as a claim of ownership meant an uncontrolled
-     * element became controlled the moment a script assigned to it, or the
-     * moment the component set its own state, and then stopped responding. Both
-     * were real and neither is anything a consumer asked for. A mode is a
-     * declaration, and a declaration is made once.
-     */
-    private openMode: boolean | undefined = undefined
-
-    private get openIsControlled(): boolean {
-      return this.openMode === true
-    }
-
-    /**
      * Mirrors the resolved state onto the host as `data-open`.
      *
      * In `willUpdate` rather than `connectedCallback` because SSR calls the
@@ -143,12 +123,6 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
-      /* Before anything else reads it, and only the first time. Everything that
-         declares the mode has arrived by now: attributes from markup or from a
-         server's output, and properties a framework assigned on mount. */
-      if (this.openMode === undefined) {
-        this.openMode = this.openState !== undefined
-      }
       this.toggleAttribute('data-open', this.open)
     }
 
@@ -156,34 +130,25 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * Requests an open-state change, and reports whether it was applied.
      *
      * Announces before it acts, so `preventDefault()` on the `helix-open` or
-     * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-     * element then updates itself; in controlled mode it applies nothing and
-     * waits for the consumer to pass a new `open`, which is what "controlled"
-     * means.
+     * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+     * element opens or closes itself, whether or not a consumer declared
+     * `open`: a declared property is a seed and a correction, and a consumer
+     * who wants the decision for themselves refuses it and assigns their own.
+     * See 294.
      */
     requestOpen(next: boolean): boolean {
       if (this.open === next) {
         return true
       }
-      return requestControlledChange({
+      return requestChange({
         apply: (open) => {
-          /* Nothing in controlled mode: the element announced, and the consumer
-             is the one who decides. This is the only path that respects that,
-             which is why a component's own changes go through here and never
-             through the setter. */
-          if (this.openIsControlled) {
-            return
-          }
           const previous = this.open
           this.openState = open
           this.requestUpdate('open', previous)
         },
-        controlled: this.openIsControlled,
         event: (open) => (open ? new HelixOpenEvent() : new HelixCloseEvent()),
         host: this,
-        label: 'open',
         next,
-        read: () => this.open,
       })
     }
 

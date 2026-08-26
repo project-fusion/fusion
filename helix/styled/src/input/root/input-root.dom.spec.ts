@@ -365,14 +365,18 @@ describe('input, controlled and uncontrolled', () => {
     expect(host.value).toBe('then typed')
   })
 
-  test('a controlled value is still the consumer’s to change', async () => {
+  test('a declared value is a seed, and typing still moves it', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const host = (await mount(
       '<helix-input label="Name" value="mine"></helix-input>',
     )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
     await host.updateComplete
 
     await typed(host, 'tried')
-    expect(host.value).toBe('mine')
+    expect(host.value).toBe('tried')
 
     host.value = 'handed back'
     await host.updateComplete
@@ -401,14 +405,18 @@ describe('input, controlled and uncontrolled', () => {
     expect(host.value).toBe('set from outside')
   })
 
-  test('a controlled input keeps its value and puts the control back', async () => {
-    /* What React does with the same markup: the value belongs to the consumer,
-       so what was typed is undone until they hand back a new one. The native
-       control has already moved by the time this runs, which is why putting it
-       back is a separate act from not applying the change. */
+  test('a refused change is undone, on the host and on the control alike', async () => {
+    /* Refusing is how a consumer takes the decision now, and the native control
+       has already moved by the time the refusal runs, so putting it back is a
+       separate act from not applying the change. This asserted the same two
+       things about a declared `value` until 26 Aug 2026, when declaring one was
+       the refusal. See 294. */
     const host = (await mount(
       '<helix-input label="Name" value="fixed"></helix-input>',
     )) as HTMLElement & { value: string }
+    host.addEventListener('helix-input', (event: Event) => {
+      event.preventDefault()
+    })
     await typed(host, 'tried')
     expect(host.value).toBe('fixed')
     expect(native(host)).toBe('fixed')

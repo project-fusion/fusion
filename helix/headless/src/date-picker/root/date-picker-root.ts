@@ -4,7 +4,7 @@ import {
   HelixNavigateEvent,
   hostAria,
   MixinControllerValue,
-  requestControlledChange,
+  requestChange,
 } from '@helix-io/core'
 import { caretLeft, caretRight } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -191,7 +191,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * never told. Reading gives the month on show; writing declares it theirs,
    * and `default-month` seeds one the calendar owns.
    *
-   * @controlled helix-navigate
+   *
    */
   @property()
   get month(): string {
@@ -233,13 +233,6 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
 
   /** The month on show, whoever set it, and `undefined` until somebody has. */
   private monthState: string | undefined = undefined
-
-  /** Whether the consumer owns the view, decided once and then fixed. */
-  private monthMode: boolean | undefined = undefined
-
-  private get monthIsControlled(): boolean {
-    return this.monthMode === true
-  }
 
   /** Earliest selectable date, as `YYYY-MM-DD`. */
   @property()
@@ -376,21 +369,15 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     if (next === this.month) {
       return
     }
-    requestControlledChange({
+    requestChange({
       apply: (month) => {
-        if (this.monthIsControlled) {
-          return
-        }
         const previous = this.month
         this.monthState = month
         this.requestUpdate('month', previous)
       },
-      controlled: this.monthIsControlled,
       event: (month) => new HelixNavigateEvent({ value: month }),
       host: this,
-      label: 'month',
       next,
-      read: () => this.month,
     })
   }
 
@@ -439,7 +426,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
 
     /* Announced before it is written, which it was not: this set `value` and
        then dispatched, so a listener calling `preventDefault()` was refusing a
-       date that had already been chosen. `requestControlledChange` is the one
+       date that had already been chosen. `requestChange` is the one
        audited path its own documentation claims for every stateful change in
        the system, and this was not on it. */
     this.requestValue(next.join(','))
@@ -498,10 +485,6 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // Only the first time, before anything reads it. See `MixinControllerOpen`.
-    if (this.monthMode === undefined) {
-      this.monthMode = this.monthState !== undefined
-    }
     hostAria(this.internals, { label: this.label, role: 'group' })
     /* Announced as off, not merely inert. Removing it from the accessibility
        tree would take the dates with it; this says the control exists and

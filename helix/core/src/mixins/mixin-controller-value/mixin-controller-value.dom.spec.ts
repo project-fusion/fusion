@@ -102,13 +102,27 @@ describe('an uncontrolled control', () => {
   })
 })
 
-describe('a controlled control', () => {
-  test('announces the change and applies none of it, which is what controlled means', async () => {
+describe('a control whose consumer declared a value', () => {
+  /* This asserted the opposite until 26 Aug 2026, that declaring `value` made
+     the control announce and apply nothing. A declared property is a seed and a
+     correction now, the way `<input value>` is, and a consumer who wants the
+     change for themselves refuses it. See 294. */
+  test('announces the change and applies it, a declared value being a seed', async () => {
     const host = await mount(`<${tag} value="theirs"></${tag}>`)
     const names = await heard(host, () => {
       host.requestValue('ours')
     })
     expect(names).toEqual(['helix-change'])
+    expect(host.value).toBe('ours')
+  })
+
+  test('and refusing is what keeps it where they put it', async () => {
+    const host = await mount(`<${tag} value="theirs"></${tag}>`)
+    host.addEventListener('helix-change', (event: Event) => {
+      event.preventDefault()
+    })
+    host.requestValue('ours')
+    await host.updateComplete
     expect(host.value).toBe('theirs')
   })
 
@@ -120,11 +134,13 @@ describe('a controlled control', () => {
   })
 })
 
-describe('which mode a control is in', () => {
-  /* The fault this exists to prevent: a script assigning `value` to a control
-     nobody owns would hand it to a consumer who never asked for it, and the
-     control would stop responding to its own reader from then on. */
-  test('is decided at the first update, so a later assignment does not take it over', async () => {
+describe('writing the property', () => {
+  /* There is no mode to take over any more. This block asserted one until
+     26 Aug 2026: that ownership was decided at the first update and a later
+     assignment could not claim it. A write is now a write, the way it is on a
+     native control, and the element keeps applying its own changes whoever
+     wrote last. See 294. */
+  test('is a seed and a correction, and never stops the control responding', async () => {
     const host = await mount(`<${tag} default-value="one"></${tag}>`)
     host.value = 'written by a script'
     await host.updateComplete
@@ -133,16 +149,13 @@ describe('which mode a control is in', () => {
     expect(host.value).toBe('two')
   })
 
-  /* And the other way round, which is the half that makes it a decision rather
-     than a guess: markup that owns the value keeps owning it even after the
-     control has been through an update that did not mention it. */
-  test('and a controlled one stays controlled across updates that say nothing about it', async () => {
+  test('and markup that declared a value does not stop it either', async () => {
     const host = await mount(`<${tag} value="theirs"></${tag}>`)
     host.setAttribute('default-value', 'noise')
     await host.updateComplete
     host.requestValue('ours')
     await host.updateComplete
-    expect(host.value).toBe('theirs')
+    expect(host.value).toBe('ours')
   })
 })
 

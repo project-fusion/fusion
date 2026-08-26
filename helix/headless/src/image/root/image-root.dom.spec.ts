@@ -82,14 +82,16 @@ describe('an image', () => {
     )
   })
 
-  test('says it arrived, because the platform says it where nobody can hear', async () => {
+  test("says it arrived, under the platform's own name", async () => {
     /* `load` and `error` on an `<img>` neither bubble nor compose, so the ones
-       fired inside this shadow root reach nobody outside it. Without these a
-       consumer had a reflected attribute and a `MutationObserver`. */
+       fired inside this shadow root reach nobody outside it. Relaying from the
+       host is what makes them audible, and it keeps the native name: this sent
+       `helix-load` until 26 Aug 2026, which was a second word for something the
+       platform had already named. See 294. */
     const host = await image('src="/pier.jpg"')
     const heard: string[] = []
-    host.addEventListener('helix-load', (event) => {
-      heard.push(`load:${(event as CustomEvent<{ src: string }>).detail.src}`)
+    host.addEventListener('load', () => {
+      heard.push(`load:${host.src}`)
     })
     img(host).dispatchEvent(new Event('load'))
     await host.updateComplete
@@ -99,22 +101,27 @@ describe('an image', () => {
   test('and says when it is not coming, which is the more useful of the two', async () => {
     const host = await image('src="/gone.jpg"')
     const heard: string[] = []
-    host.addEventListener('helix-error', (event) => {
-      heard.push(`error:${(event as CustomEvent<{ src: string }>).detail.src}`)
+    host.addEventListener('error', () => {
+      heard.push(`error:${host.src}`)
     })
     img(host).dispatchEvent(new Event('error'))
     await host.updateComplete
     expect(heard).toEqual(['error:/gone.jpg'])
   })
 
-  test('the report leaves the element, so a gallery can count without binding each', async () => {
-    // Bubbling and composed, unlike `helix-close`: delegation is the point.
+  test('and does not bubble, because a native `load` does not', async () => {
+    /* The retired `helix-load` bubbled deliberately, so a gallery could count
+       with one listener. A bubbling relay of `load` reaches nothing in React:
+       it is in react-dom's `nonDelegatedEvents`, so no root listener exists,
+       and `bindReactHandler` binds only the non-bubbling ones. Matching the
+       native propagation is what makes `onLoad` work at all, and a gallery
+       does here what it does for `<img>`. See 294. */
     const host = await image('src="/pier.jpg"')
     const heard: string[] = []
-    host.parentElement?.addEventListener('helix-load', () => heard.push('heard'))
+    host.parentElement?.addEventListener('load', () => heard.push('heard'))
     img(host).dispatchEvent(new Event('load'))
     await host.updateComplete
-    expect(heard).toEqual(['heard'])
+    expect(heard).toEqual([])
   })
 
   test('asks for the picture urgently only when told to', async () => {

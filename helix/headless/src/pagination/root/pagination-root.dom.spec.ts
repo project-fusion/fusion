@@ -172,7 +172,11 @@ describe('pagination state', () => {
     expect((nav as HTMLElement & { page: number }).page).toBe(2)
   })
 
-  test('declaring `page` hands it over: it announces and applies nothing', async () => {
+  test('declaring `page` seeds it, and the element still moves', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const nav = await mount(
       '<helix-headless-pagination page="2" pages="12"></helix-headless-pagination>',
     )
@@ -183,7 +187,7 @@ describe('pagination state', () => {
     part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true }))
     await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     expect(announced).toBe('3')
-    expect((nav as HTMLElement & { page: number }).page).toBe(2)
+    expect((nav as HTMLElement & { page: number }).page).toBe(3)
   })
 
   test('a step off either end asks for nothing', async () => {

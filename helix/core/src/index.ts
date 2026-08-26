@@ -172,9 +172,9 @@ export {
   relativeTime,
 } from './utils/relative-time/relative-time.js'
 export {
-  type ControlledChangeOptions,
-  requestControlledChange,
-} from './utils/request-controlled-change/request-controlled-change.js'
+  type ChangeRequestOptions,
+  requestChange,
+} from './utils/request-change/request-change.js'
 export {
   type ActivatableItem,
   resolveActiveItem,

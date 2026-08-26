@@ -55,9 +55,8 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * is the whole cost of the version that is correct before any JavaScript runs.
  *
  * Because it is the consumer's line to write, it is also theirs to forget, so
- * `for` audits itself on first open and says so once. Same shape as
- * `requestControlledChange` warning about a controlled property nothing
- * answered.
+ * `for` audits itself on first open and says so once, rather than on every
+ * open, since a warning that repeats is one people learn to filter out.
  *
  * It shows on hover and on focus, and hides on leave, on blur, on Escape, and
  * once the trigger has been activated: the hint is spent when the control has

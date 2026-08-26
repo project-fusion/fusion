@@ -8,7 +8,7 @@ import {
   MixinCollection,
   MixinControllerValue,
   MixinField,
-  requestControlledChange,
+  requestChange,
   scrollItemIntoView,
 } from '@helix-io/core'
 import { magnifyingGlass } from '@helix-io/icons'
@@ -210,7 +210,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    * gives what is being filtered on; writing declares it theirs, and
    * `default-filter` seeds one the list owns.
    *
-   * @controlled helix-filter
+   *
    */
   @property()
   get filter(): string {
@@ -229,13 +229,6 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /** What the list is narrowed to, whoever set it. */
   private filterState: string | undefined = undefined
-
-  /** Whether the consumer owns the narrowing, decided once and then fixed. */
-  private filterMode: boolean | undefined = undefined
-
-  private get filterIsControlled(): boolean {
-    return this.filterMode === true
-  }
 
   /**
    * Whether the list renders a field for narrowing itself.
@@ -636,10 +629,6 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // Only the first time, before anything reads it. See `MixinControllerOpen`.
-    if (this.filterMode === undefined) {
-      this.filterMode = this.filterState !== undefined
-    }
     hostAria(this.internals, { label: this.label, role: 'listbox' })
     this.internals.ariaMultiSelectable = this.multiple ? 'true' : null
   }
@@ -736,21 +725,15 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (next === this.filter) {
       return true
     }
-    return requestControlledChange({
+    return requestChange({
       apply: (value) => {
-        if (this.filterIsControlled) {
-          return
-        }
         const previous = this.filter
         this.filterState = value
         this.requestUpdate('filter', previous)
       },
-      controlled: this.filterIsControlled,
       event: (value) => new HelixFilterEvent({ value }),
       host: this,
-      label: 'filter',
       next,
-      read: () => this.filter,
     })
   }
 

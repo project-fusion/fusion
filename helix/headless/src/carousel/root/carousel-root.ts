@@ -3,7 +3,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   hostAria,
-  requestControlledChange,
+  requestChange,
 } from '@helix-io/core'
 import { caretLeft, caretRight, play, stop } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -70,7 +70,7 @@ export class HelixHeadlessCarousel extends HelixElement {
    * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
    * state turns up, this is what it is extracted from.
    *
-   * @controlled helix-select
+   *
    */
   @property({ type: Number })
   get index(): number {
@@ -134,13 +134,6 @@ export class HelixHeadlessCarousel extends HelixElement {
 
   /** The slide in view, whoever set it, and `undefined` until somebody has. */
   private indexState: number | undefined = undefined
-
-  /** Whether the consumer owns the slide, decided once and then fixed. */
-  private indexMode: boolean | undefined = undefined
-
-  private get indexIsControlled(): boolean {
-    return this.indexMode === true
-  }
 
   /** Whether moving past either end wraps to the other. */
   @property({ type: Boolean })
@@ -248,29 +241,15 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (next === this.index) {
       return
     }
-    /* Announced before it moves, which it was not: this set `index`, scrolled,
-       and then dispatched, so a listener calling `preventDefault()` was
-       refusing a decision already taken and the carousel moved anyway.
-       `requestControlledChange` is the audited path its own documentation says
-       every stateful change in the system goes through, and three components
-       were not on it. */
-    requestControlledChange({
+    requestChange({
       apply: (value) => {
-        /* Nothing in controlled mode: the carousel has said where it would go
-           and the consumer decides whether it goes. */
-        if (this.indexIsControlled) {
-          return
-        }
         const previous = this.index
         this.indexState = value
         this.requestUpdate('index', previous)
       },
-      controlled: this.indexIsControlled,
       event: (value) => new HelixSelectEvent({ value: String(value) }),
       host: this,
-      label: 'index',
       next,
-      read: () => this.index,
     })
   }
 
@@ -529,14 +508,8 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (nearest === this.index) {
       return
     }
-    /* Announced whoever owns the state, written only if we do. `goTo` has this
-       guard and this did not, so a consumer who declared `index` had it
-       overwritten by every drag: the one thing controlled mode promises is that
-       nothing but them assigns it. */
-    if (!this.indexIsControlled) {
-      this.indexState = nearest
-      this.requestUpdate('index')
-    }
+    this.indexState = nearest
+    this.requestUpdate('index')
     this.dispatchEvent(new HelixSelectEvent({ value: String(nearest) }))
   }
 
@@ -592,10 +565,6 @@ export class HelixHeadlessCarousel extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // Only the first time, before anything reads it. See `MixinControllerOpen`.
-    if (this.indexMode === undefined) {
-      this.indexMode = this.indexState !== undefined
-    }
     /* Seeded from the markup rather than started on connect, so the server and
        the client agree about whether it is running. A reader's stop survives a
        reconnection because `stopped` outlives it. */

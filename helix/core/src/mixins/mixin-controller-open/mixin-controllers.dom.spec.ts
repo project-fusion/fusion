@@ -152,7 +152,11 @@ for (const kind of KINDS) {
       expect(host[kind.state]).toBe(kind.resting)
     })
 
-    test('a declared property is a claim of ownership, so the element only announces', async () => {
+    /* This asserted the opposite until 26 Aug 2026, that a declared property was
+       a claim of ownership and the element announced without moving. Control is
+       an action now: the element always applies, and a consumer takes the
+       decision by refusing it. See 294. */
+    test('a declared property is a seed, so the element announces and still moves', async () => {
       const host = await mount(`<${kind.tag} ${claimed(kind)}></${kind.tag}>`)
       let heard = 0
       host.addEventListener(kind.closing, () => {
@@ -160,7 +164,17 @@ for (const kind of KINDS) {
       })
       ask(host, kind, kind.resting)
       await host.updateComplete
-      expect([heard, host[kind.state]]).toEqual([1, kind.moved])
+      expect([heard, host[kind.state]]).toEqual([1, kind.resting])
+    })
+
+    test('and refusing is what stops it, whoever declared the property', async () => {
+      const host = await mount(`<${kind.tag} ${claimed(kind)}></${kind.tag}>`)
+      host.addEventListener(kind.closing, (event: Event) => {
+        event.preventDefault()
+      })
+      ask(host, kind, kind.resting)
+      await host.updateComplete
+      expect(host[kind.state]).toBe(kind.moved)
     })
 
     test('and it moves when the consumer passes a new one', async () => {

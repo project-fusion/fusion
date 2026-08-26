@@ -2,7 +2,7 @@ import {
   customElement,
   HelixElement,
   MixinDismissible,
-  requestControlledChange,
+  requestChange,
   type ToneMark,
   toneMark,
 } from '@helix-io/core'
@@ -129,7 +129,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
    * is showing. An attribute whose only legal value is the default is an
    * attribute nobody can use.
    *
-   * @controlled helix-dismiss
+   *
    */
   @property({ type: Boolean })
   get open(): boolean {
@@ -144,13 +144,6 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
 
   /** Whether it is showing, whoever said so, and `undefined` until somebody has. */
   private openState: boolean | undefined = undefined
-
-  /** Whether the consumer owns it, decided once and then fixed. */
-  private openMode: boolean | undefined = undefined
-
-  private get openIsControlled(): boolean {
-    return this.openMode === true
-  }
 
   /**
    * Asks to be taken away, and reports whether the request stood.
@@ -169,16 +162,12 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
        did. */
     clearTimeout(this.timer)
     this.timer = undefined
-    return requestControlledChange({
+    return requestChange({
       apply: () => {
-        if (this.openIsControlled) {
-          return
-        }
         const previous = this.open
         this.openState = false
         this.requestUpdate('open', previous)
       },
-      controlled: this.openIsControlled,
       /* `helix-dismiss` answers a controlled `open`, which reads oddly and is
          exact. A toast is not an overlay that opens and closes: `next` below is
          `false` and nothing here ever calls `requestOpen(true)`, so it only
@@ -189,9 +178,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
          `onhelix-dismiss`, and the generated types ask for exactly that. */
       event: () => this.dismissEvent(),
       host: this,
-      label: 'open',
       next: false,
-      read: () => this.open,
     })
   }
 
@@ -267,9 +254,6 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     /* Before anything else reads it, and only the first time. Everything that
        declares the mode has arrived by now: attributes from markup or from a
        server's output, and properties a framework assigned on mount. */
-    if (this.openMode === undefined) {
-      this.openMode = this.openState !== undefined
-    }
     /* Mirrored for CSS rather than reflected onto `open` itself, which is the
        library's rule about state: a reflected `open` is indistinguishable from
        one the consumer declared, and that attribute is what ownership is read

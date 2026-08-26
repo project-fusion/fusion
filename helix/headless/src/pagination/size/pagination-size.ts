@@ -3,7 +3,7 @@ import {
   formatNumbers,
   HelixChangeEvent,
   HelixElement,
-  requestControlledChange,
+  requestChange,
 } from '@helix-io/core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -87,7 +87,7 @@ export class HelixHeadlessPaginationSize extends HelixElement {
    * `default-value` seeds one this element owns. Same accessor pair as
    * `Pagination.page` and the calendar's `month`.
    *
-   * @controlled helix-change
+   *
    */
   @property({ type: Number })
   get value(): number {
@@ -114,13 +114,6 @@ export class HelixHeadlessPaginationSize extends HelixElement {
 
   /** The size, whoever set it, and `undefined` until somebody has. */
   private valueState: number | undefined = undefined
-
-  /** Whether the consumer owns it, decided once and then fixed. */
-  private valueMode: boolean | undefined = undefined
-
-  private get valueIsControlled(): boolean {
-    return this.valueMode === true
-  }
 
   /** Held across every component asking for the same locale. */
   private get numbers(): (value: number) => string {
@@ -152,25 +145,19 @@ export class HelixHeadlessPaginationSize extends HelixElement {
     if (!Number.isFinite(next) || next === this.current) {
       return
     }
-    requestControlledChange({
+    requestChange({
       apply: (size) => {
-        if (this.valueIsControlled) {
-          return
-        }
         const previous = this.value
         this.valueState = size
         this.requestUpdate('value', previous)
       },
-      controlled: this.valueIsControlled,
       event: (size) => new HelixChangeEvent({ property: 'value', value: String(size) }),
       host: this,
-      label: 'value',
       next,
-      read: () => this.current,
     })
     /* Put back where the consumer refused it or owns it, because the control has
        already moved: a select changes itself and then tells you, which is the
-       one case `requestControlledChange` cannot announce ahead of. Lit skips a
+       one case `requestChange` cannot announce ahead of. Lit skips a
        property binding whose value has not changed, so a refusal leaves the
        select holding the reader's choice and nothing else would put it back.
        Deferred, so the read happens after the render a successful change asked
@@ -187,10 +174,6 @@ export class HelixHeadlessPaginationSize extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // Only the first time, before anything reads it. See `MixinControllerOpen`.
-    if (this.valueMode === undefined) {
-      this.valueMode = this.valueState !== undefined
-    }
     /* Feature-tested, like `Pagination`'s: an engine without `CustomStateSet`
        gets an empty select rather than no element, which is the behavior this
        had before. */

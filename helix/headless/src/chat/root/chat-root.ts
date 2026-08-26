@@ -4,7 +4,7 @@ import {
   HelixElement,
   hostAria,
   MixinCollection,
-  requestControlledChange,
+  requestChange,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -116,7 +116,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * it. Measured rather than assumed: `label, pinned` after upgrade against
    * `label` from the server.
    *
-   * @controlled helix-change
+   *
    */
   @property({ type: Boolean })
   get pinned(): boolean {
@@ -135,12 +135,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   @state()
   private pinnedState: boolean | undefined = undefined
-
-  private pinnedMode: boolean | undefined = undefined
-
-  private get pinnedIsControlled(): boolean {
-    return this.pinnedMode === true
-  }
 
   /** The turns declared as children, in the order they are written. */
   get messages(): HelixHeadlessChatMessage[] {
@@ -193,21 +187,15 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     if (next === this.pinned) {
       return false
     }
-    return requestControlledChange({
+    return requestChange({
       apply: (value) => {
-        if (this.pinnedIsControlled) {
-          return
-        }
         const previous = this.pinned
         this.pinnedState = value
         this.requestUpdate('pinned', previous)
       },
-      controlled: this.pinnedIsControlled,
       event: (value) => new HelixChangeEvent({ property: 'pinned', value: String(value) }),
       host: this,
-      label: 'pinned',
       next,
-      read: () => this.pinned,
     })
   }
 
@@ -238,10 +226,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // Only the first time, before anything reads it. See `MixinControllerValue`.
-    if (this.pinnedMode === undefined) {
-      this.pinnedMode = this.pinnedState !== undefined
-    }
     hostAria(this.internals, { label: this.label || 'Conversation', role: 'region' })
   }
 

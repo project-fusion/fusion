@@ -199,10 +199,22 @@ describe('carousel, controlled and uncontrolled', () => {
     return host
   }
 
-  test('an index in the markup is the consumer’s, and the carousel does not move it', async () => {
-    /* The same fault the four mixins were reshaped for, in the one component
-       whose state is a position rather than a name. */
+  test('an index in the markup is a seed, and the carousel still moves', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const host = await carousel('index="1"')
+    host.goTo(2)
+    await host.updateComplete
+    expect(host.index).toBe(2)
+  })
+
+  test('and refusing is what holds it where the markup put it', async () => {
+    const host = await carousel('index="1"')
+    host.addEventListener('helix-select', (event: Event) => {
+      event.preventDefault()
+    })
     host.goTo(2)
     await host.updateComplete
     expect(host.index).toBe(1)
@@ -372,10 +384,11 @@ describe('carousel settling', () => {
     expect(host.index).toBe(1)
   })
 
-  test('a drag does not write an index the consumer owns', async () => {
-    // `goTo` has this guard and the scroll handler did not, so every drag
-    // overwrote a declared `index`, which is the one thing controlled mode
-    // promises will not happen.
+  test('a drag writes the index it settled on, declared or not', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const { host, track } = await scrolling('index="0"')
     let asked = ''
     host.addEventListener('helix-select', (event) => {
@@ -384,7 +397,7 @@ describe('carousel settling', () => {
     track.dispatchEvent(new Event('pointerdown'))
     settle(track, 200)
     await host.updateComplete
-    expect(host.index).toBe(0)
+    expect(host.index).toBe(2)
     expect(asked).toBe('2')
   })
 })

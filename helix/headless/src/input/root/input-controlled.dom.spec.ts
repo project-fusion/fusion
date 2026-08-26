@@ -15,29 +15,48 @@ type Input = HTMLElement & {
 const input = async (extra = ''): Promise<Input> =>
   (await mount(`<helix-headless-input label="Name" ${extra}></helix-headless-input>`)) as Input
 
-/** The real input inside, which is where a caret lives. */
-const _control = (host: Input): HTMLInputElement =>
-  host.shadowRoot?.querySelector<HTMLInputElement>('[part="control"]') as HTMLInputElement
-
 /**
- * Runs a body with `console.warn` captured, and answers what it said.
+ * What a declared `value` means, which is the opposite of what it meant.
  *
- * The audit fires while a request is being made, so nothing here has to wait.
- * The tick is kept because a handler answering later is part of what these
- * assert.
+ * **This file held nine cases and all nine are gone**, 26 Aug 2026. They
+ * asserted an audit: a control whose consumer declared `value` announced,
+ * applied nothing, and warned on its second unanswered request if nobody was
+ * listening. The audit existed because a declared property was a claim of
+ * ownership rather than the seed it looks like, so `value="Ada"` quietly
+ * stopped the control responding and six of our own examples fell into it.
+ *
+ * Control is an action now. The element always applies, `value="Ada"` is the
+ * native seed it resembles, and a consumer who wants the change for themselves
+ * refuses it. There is no mode to be silently in, so there is nothing to audit
+ * and no warning to test. See 294.
  */
-const warnings = async (body: () => void | Promise<void>): Promise<string[]> => {
-  const said: string[] = []
-  const real = console.warn
-  console.warn = (...parts: unknown[]) => said.push(parts.join(' '))
-  try {
-    await body()
-    await new Promise((done) => setTimeout(done, 1))
-  } finally {
-    console.warn = real
-  }
-  return said
-}
+describe('a control whose markup declared a value', () => {
+  test('still moves, the property being a seed rather than a claim', async () => {
+    const host = await input('value="Ada"')
+    expect(host.requestValue('Grace')).toBe(true)
+    await host.updateComplete
+    expect(host.value).toBe('Grace')
+  })
+
+  test('and refusing is what holds it where they put it', async () => {
+    const host = await input('value="Ada"')
+    host.addEventListener('helix-input', (event: Event) => {
+      event.preventDefault()
+    })
+    expect(host.requestValue('Grace')).toBe(false)
+    await host.updateComplete
+    expect(host.value).toBe('Ada')
+  })
+
+  test('and a later assignment is a correction, not a takeover', async () => {
+    const host = await input('value="Ada"')
+    host.value = 'Grace'
+    await host.updateComplete
+    expect(host.requestValue('Hopper')).toBe(true)
+    await host.updateComplete
+    expect(host.value).toBe('Hopper')
+  })
+})
 
 /* **There is no spec for the caret, and that is a finding rather than an
    omission.** Typing in the middle of a controlled field used to throw the
@@ -57,114 +76,3 @@ const warnings = async (body: () => void | Promise<void>): Promise<string[]> => 
    whether or not the code works reads as coverage. What holds this honest is
    the measurement in the commit and the note on `holdCaret`. If someone finds
    the harness that reproduces it, this is the place for it. */
-
-describe('a control that is controlled and unattended says so', () => {
-  test('declaring `value` and listening to nothing is reported', async () => {
-    /* The trap, and the reason this exists: `value="Ada"` is the native seed
-       and here it is a claim of ownership, so the control announces and waits
-       for an answer that never comes. Nothing was logged before this, and the
-       symptom is a field that ignores typing. */
-    const host = await input('value="Ada"')
-    const said = await warnings(() => {
-      // Twice: unmoved across two requests is unanswered, whatever the timing.
-      host.requestValue('Grace')
-      host.requestValue('Hopper')
-    })
-    expect(said).toHaveLength(1)
-    expect(said[0]).toContain('<helix-headless-input> is controlled')
-    expect(said[0]).toContain('`value` was declared')
-    expect(said[0]).toContain('default-value')
-  })
-
-  test('a consumer answering synchronously is not accused', async () => {
-    // The reading has to be taken before the event, or a handler that assigns
-    // straight away looks exactly like one that was never there.
-    const host = await input('value="Ada"')
-    host.addEventListener('helix-input', (event) => {
-      host.value = (event as CustomEvent<{ value: string }>).detail.value
-    })
-    expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
-  })
-
-  test('a consumer answering a task later is not accused either', async () => {
-    // Which is what React does: `setState` in the handler, and the property
-    // lands when React commits, after the event has finished.
-    const host = await input('value="Ada"')
-    host.addEventListener('helix-input', (event) => {
-      const { value } = (event as CustomEvent<{ value: string }>).detail
-      queueMicrotask(() => {
-        host.value = value
-      })
-    })
-    expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
-  })
-
-  /* The case the old deadline got wrong. A consumer who answers by navigating
-     cannot have moved the state within a task, and was accused of not
-     listening: our own documentation nav derives a tree's `active` from the
-     route and does exactly this. There is no deadline now, so a slow answer is
-     an answer. */
-  test('a consumer answering long after the fact is not accused', async () => {
-    const host = await input('value="Ada"')
-    host.addEventListener('helix-input', (event) => {
-      const { value } = (event as CustomEvent<{ value: string }>).detail
-      setTimeout(() => {
-        host.value = value
-      }, 8)
-    })
-
-    const said = await warnings(async () => {
-      host.requestValue('Grace')
-      await new Promise((done) => setTimeout(done, 20))
-      host.requestValue('Hopper')
-    })
-
-    expect(said).toEqual([])
-  })
-
-  test('one request is never enough to accuse, however long nothing answers', async () => {
-    const host = await input('value="Ada"')
-
-    expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
-  })
-
-  test('a deliberate refusal is silent, because refusing is listening', async () => {
-    const host = await input('value="Ada"')
-    host.addEventListener('helix-input', (event) => event.preventDefault())
-    expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
-  })
-
-  test('an uncontrolled control is never audited, however it is driven', async () => {
-    const host = await input('default-value="Ada"')
-    expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
-    expect(host.value).toBe('Grace')
-  })
-
-  test('it says it once, not once per keystroke', async () => {
-    const host = await input('value="Ada"')
-    const said = await warnings(async () => {
-      host.requestValue('G')
-      await new Promise((done) => setTimeout(done, 1))
-      host.requestValue('Gr')
-      await new Promise((done) => setTimeout(done, 1))
-      host.requestValue('Gra')
-    })
-    expect(said).toHaveLength(1)
-  })
-
-  test('a control that answered once is not audited again when it stops', async () => {
-    /* Deliberate, and worth naming. The audit is the first request an element
-       ever makes: an element that answered it is wired up, and re-checking
-       forever would cost a timer per keystroke to catch a consumer who removed
-       their own listener. */
-    const host = await input('value="Ada"')
-    const answer = (event: Event): void => {
-      host.value = (event as CustomEvent<{ value: string }>).detail.value
-    }
-    host.addEventListener('helix-input', answer)
-    expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
-
-    host.removeEventListener('helix-input', answer)
-    expect(await warnings(() => host.requestValue('Hopper'))).toEqual([])
-  })
-})

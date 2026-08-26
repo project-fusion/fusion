@@ -1,8 +1,7 @@
-import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixChangeEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
-import { requestControlledChange } from '../../utils/request-controlled-change/request-controlled-change.js'
+import { requestChange } from '../../utils/request-change/request-change.js'
 import {
   type ActivatableItem,
   resolveActiveItem,
@@ -83,7 +82,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      * active="one">` is a set that stays on that tab and `default-active` is
      * how markup says where to start.
      *
-     * @controlled helix-change
+     *
      */
     @property()
     get active(): string {
@@ -110,65 +109,28 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
     private activeState: string | undefined = undefined
 
     /**
-     * Whether the consumer owns the state, decided once and then fixed.
-     *
-     * Read off whether anything had set `active` by the first update, which is
-     * where markup, a hydrating server's attributes and a framework's initial
-     * properties have all landed. See `MixinControllerOpen` for why this is
-     * decided once rather than continuously.
-     */
-    private activeMode: boolean | undefined = undefined
-
-    private get activeIsControlled(): boolean {
-      return this.activeMode === true
-    }
-
-    /**
-     * Reads the mode, once, before anything else looks at it.
-     *
-     * Everything that declares it has arrived by the first update: attributes
-     * from markup or from a server's output, and properties a framework
-     * assigned on mount. Nothing after that changes it, which is what lets a
-     * script assign `active` to an uncontrolled element without taking it over.
-     */
-    protected override willUpdate(changed: PropertyValues): void {
-      super.willUpdate(changed)
-      if (this.activeMode === undefined) {
-        this.activeMode = this.activeState !== undefined
-      }
-    }
-
-    /**
      * Requests a new current item, and reports whether the request stood.
      *
      * Announces before it acts, so `preventDefault()` on the `helix-change` is
      * a refusal and nothing moves. Unlike a native control, nothing has moved
      * by the time this runs, so refusing is simply not writing: there is
-     * nothing to put back.
+     * nothing to put back. Nobody refusing means the set updates itself,
+     * whether or not a consumer declared `active`, a declared property being a
+     * seed and a correction. See 294.
      */
     requestActive(next: string): boolean {
       if (next === this.active) {
         return true
       }
-      return requestControlledChange({
+      return requestChange({
         apply: (value) => {
-          /* Nothing at all in controlled mode, which is what controlled means:
-             the set announces and waits to be told. This was a bare
-             `this.value = next`, so a consumer who owned the state had it
-             overwritten on every choice and could not own it at all. */
-          if (this.activeIsControlled) {
-            return
-          }
           const previous = this.active
           this.activeState = value
           this.requestUpdate('active', previous)
         },
-        controlled: this.activeIsControlled,
         event: (value) => new HelixChangeEvent({ property: 'active', value }),
         host: this,
-        label: 'active',
         next,
-        read: () => this.active,
       })
     }
 

@@ -1,8 +1,7 @@
-import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixChangeEvent, HelixInputEvent } from '../../events/events.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
-import { requestControlledChange } from '../../utils/request-controlled-change/request-controlled-change.js'
+import { requestChange } from '../../utils/request-change/request-change.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -105,7 +104,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * The same shape as the other three mixins, which is the point of them
      * being four of a kind rather than four of three kinds.
      *
-     * @controlled helix-change helix-input
+     * helix-input
      */
     @property()
     get value(): string {
@@ -122,39 +121,9 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * The state, whoever set it, and `undefined` until somebody has.
      *
      * One field and not two. Writing always applies, the way a native control
-     * does when a script assigns to it. What the write does not do is change
-     * which mode the element is in.
+     * does when a script assigns to it.
      */
     private valueState: string | undefined = undefined
-
-    /**
-     * Whether the consumer owns the state, decided once and then fixed.
-     *
-     * Read off whether anything had set `value` by the first update, which is
-     * where markup, a hydrating server's attributes and a framework's initial
-     * properties have all landed. See `MixinControllerOpen` for why this is
-     * decided once rather than continuously.
-     */
-    private valueMode: boolean | undefined = undefined
-
-    private get valueIsControlled(): boolean {
-      return this.valueMode === true
-    }
-
-    /**
-     * Reads the mode, once, before anything else looks at it.
-     *
-     * Everything that declares it has arrived by the first update: attributes
-     * from markup or from a server's output, and properties a framework
-     * assigned on mount. Nothing after that changes it, which is what lets a
-     * script assign `value` to an uncontrolled element without taking it over.
-     */
-    protected override willUpdate(changed: PropertyValues): void {
-      super.willUpdate(changed)
-      if (this.valueMode === undefined) {
-        this.valueMode = this.valueState !== undefined
-      }
-    }
 
     /** Discrete by default: only a control the reader edits continuously says otherwise. */
     protected readonly announcesInput: boolean = false
@@ -163,34 +132,29 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * Requests a new value, and reports whether the request stood.
      *
      * Announces before it acts, so `preventDefault()` on the `helix-change` is
-     * a refusal and nothing moves. In uncontrolled mode the control then
-     * updates itself; in controlled mode it applies nothing and waits for the
-     * consumer to pass a new `value`, which is what controlled means.
+     * a refusal and nothing moves. Nobody refusing means the control updates
+     * itself, whether or not a consumer declared `value`: a declared property
+     * is a seed and a correction, the way `<input value>` is, and a consumer
+     * who wants the change for themselves refuses it and assigns their own.
+     * See 294.
      */
-
     requestValue(next: string): boolean {
       if (this.value === next) {
         return true
       }
-      return requestControlledChange({
+      return requestChange({
         apply: (value) => {
-          if (this.valueIsControlled) {
-            return
-          }
           const previous = this.value
           this.valueState = value
           this.requestUpdate('value', previous)
         },
-        controlled: this.valueIsControlled,
         event: (value) =>
           new (this.announcesInput ? HelixInputEvent : HelixChangeEvent)({
             property: 'value',
             value,
           }),
         host: this,
-        label: 'value',
         next,
-        read: () => this.value,
       })
     }
 

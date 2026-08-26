@@ -5,7 +5,7 @@ import {
   HelixCompleteEvent,
   HelixElement,
   hostAria,
-  requestControlledChange,
+  requestChange,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
@@ -77,18 +77,18 @@ export class HelixHeadlessTour extends HelixElement {
   /**
    * Which stop the reader is on.
    *
-   * **It said `@controlled` for two days and honoured none of it.** The tag is
-   * a claim that a consumer may own the value, and `index` was a plain property
-   * the tour wrote to directly: `move` assigned it and *then* announced, so
-   * `preventDefault` on the change arrived after the move it was refusing, and
-   * a consumer who declared `index` had it overwritten on the next press.
+   * **It announced after it moved for two days, which made refusing it
+   * impossible.** `index` was a plain property the tour wrote to directly:
+   * `move` assigned it and *then* announced, so `preventDefault` on the change
+   * arrived after the move it was refusing. It goes through `requestChange`
+   * now, which announces first and applies only if nobody refused, and refusing
+   * is how a consumer takes the decision. See 294.
    *
    * The shape is `Carousel`'s, which is the nearest thing in the library: a
-   * `default-index` for markup that only seeds, a held state that is
-   * `undefined` until somebody sets one, and a mode decided once at the first
-   * update so a later assignment cannot take the tour over.
+   * `default-index` for markup that only seeds and a held state that is
+   * `undefined` until somebody sets one.
    *
-   * @controlled helix-change
+   *
    */
   @property({ type: Number })
   get index(): number {
@@ -107,13 +107,6 @@ export class HelixHeadlessTour extends HelixElement {
 
   /** The stop being shown, whoever set it, and `undefined` until somebody has. */
   private indexState: number | undefined = undefined
-
-  /** Whether the consumer owns the stop, decided once and then fixed. */
-  private indexMode: boolean | undefined = undefined
-
-  private get indexIsControlled(): boolean {
-    return this.indexMode === true
-  }
 
   /** Accessible name for the run, such as "Getting started". */
   @property()
@@ -206,19 +199,13 @@ export class HelixHeadlessTour extends HelixElement {
      and where the consumer has not taken the value over, and it audits a
      controlled tour whose consumer never answers. */
   private move(to: number): void {
-    requestControlledChange({
+    requestChange({
       apply: (value) => {
-        if (this.indexIsControlled) {
-          return
-        }
         this.index = value
       },
-      controlled: this.indexIsControlled,
       event: (value) => new HelixChangeEvent({ property: 'index', value: String(value) }),
       host: this,
-      label: 'index',
       next: to,
-      read: () => this.index,
     })
   }
 
@@ -275,9 +262,6 @@ export class HelixHeadlessTour extends HelixElement {
        to a tour nobody owns would otherwise hand it to a consumer who never
        asked, and the tour would stop moving itself from then on. See
        `MixinControllerOpen`, which argues the whole decide-once rule. */
-    if (this.indexMode === undefined) {
-      this.indexMode = this.indexState !== undefined
-    }
     hostAria(this.internals, { label: this.label, role: 'region' })
   }
 

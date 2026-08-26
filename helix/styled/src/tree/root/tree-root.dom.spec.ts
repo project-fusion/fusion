@@ -417,8 +417,22 @@ describe('a branch opening is announced, and can be owned', () => {
     expect(item.open).toBe(true)
   })
 
-  test('open in the markup is the consumer’s, and the branch does not move it', async () => {
+  test('open in the markup is a seed, and the branch still closes', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const item = await branch('open')
+    item.toggleOpen()
+    await item.updateComplete
+    expect(item.open).toBe(false)
+  })
+
+  test('and refusing the close is what holds it open', async () => {
+    const item = await branch('open')
+    item.addEventListener('helix-close', (event: Event) => {
+      event.preventDefault()
+    })
     item.toggleOpen()
     await item.updateComplete
     expect(item.open).toBe(true)

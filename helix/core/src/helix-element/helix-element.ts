@@ -480,7 +480,7 @@ export class HelixElement extends LitElement {
    * Announces an event, having first bound whatever React is holding for it.
    *
    * Every event this library sends passes through here, the concrete classes in
-   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * `events.ts` and the relayed native ones alike, and `requestChange`
    * dispatches through the host as well. One override therefore covers all
    * ninety-seven of them, which is the reason it is here rather than at each
    * dispatch. See `bindReactHandler`.

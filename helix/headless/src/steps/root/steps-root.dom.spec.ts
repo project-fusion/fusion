@@ -207,9 +207,11 @@ describe('the list can hold which step is current', () => {
     expect(currents(host)).toEqual([false, false, true])
   })
 
-  test('and announces without moving where the consumer owns it', async () => {
-    // Controlled is decided once, off whether anything set `active` by the
-    // first update, so this element must announce and wait to be told.
+  test('and announces and moves, a declared active being a seed', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const host = await seq('active="one"')
     const said: string[] = []
     host.addEventListener('helix-change', (event) => {
@@ -220,6 +222,6 @@ describe('the list can hold which step is current', () => {
     ;(part(third, 'label') as HTMLElement).click()
     await host.updateComplete
     expect(said).toEqual(['three'])
-    expect(currents(host)).toEqual([true, false, false])
+    expect(currents(host)).toEqual([false, false, true])
   })
 })

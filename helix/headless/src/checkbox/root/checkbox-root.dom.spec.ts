@@ -64,10 +64,22 @@ describe('checkbox', () => {
     expect(typeof seen).toBe('boolean')
   })
 
-  test('a controlled box does not move itself', async () => {
-    // Setting `checked` is what enters controlled mode, and from there the
-    // consumer owns the value.
+  test('a box whose markup declared `checked` still moves, the property being a seed', async () => {
+    /* This asserted the opposite until 26 Aug 2026, when setting `checked`
+       entered a controlled mode and the consumer owned the state from then on.
+       Control is an action now: the element applies, and a consumer takes the
+       decision by refusing it. See 294. */
     const box = await checkbox('checked')
+    control(box).click()
+    await box.updateComplete
+    expect(box.checked).toBe(false)
+  })
+
+  test('and refusing the toggle is what holds it, whoever declared it', async () => {
+    const box = await checkbox('checked')
+    box.addEventListener('helix-toggle', (event: Event) => {
+      event.preventDefault()
+    })
     control(box).click()
     await box.updateComplete
     expect(box.checked).toBe(true)

@@ -4,7 +4,7 @@ import {
   customElement,
   HelixChangeEvent,
   HelixElement,
-  requestControlledChange,
+  requestChange,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -181,7 +181,7 @@ export class HelixHeadlessSplitter extends HelixElement {
    * `default-position` seeds one this element owns. The same accessor pair
    * `Pagination.page` and the calendar's `month` carry.
    *
-   * @controlled helix-change
+   *
    */
   @property({ type: Number })
   get position(): number {
@@ -222,7 +222,7 @@ export class HelixHeadlessSplitter extends HelixElement {
    * It overrides `min` and `max`, which is the point of it. Those keep a sliver
    * of a pane during a drag; this is the thing that says the sliver can go.
    *
-   * @controlled helix-change
+   *
    */
   @property()
   get collapsed(): 'end' | 'start' | undefined {
@@ -342,22 +342,8 @@ export class HelixHeadlessSplitter extends HelixElement {
   /** The position, whoever set it, and `undefined` until somebody has. */
   private positionState: number | undefined = undefined
 
-  /** Whether the consumer owns it, decided once and then fixed. */
-  private positionMode: boolean | undefined = undefined
-
-  private get positionIsControlled(): boolean {
-    return this.positionMode === true
-  }
-
   /** The collapse, whoever set it, and `undefined` until somebody has. */
   private collapsedState: 'end' | 'none' | 'start' | undefined = undefined
-
-  /** Whether the consumer owns it, decided once and then fixed. */
-  private collapsedMode: boolean | undefined = undefined
-
-  private get collapsedIsControlled(): boolean {
-    return this.collapsedMode === true
-  }
 
   /**
    * Where the divider was before the gesture that may be about to shut it.
@@ -576,7 +562,7 @@ export class HelixHeadlessSplitter extends HelixElement {
        every controlled one. The keyboard was fine because it computes its next
        position rather than reading it back. */
     this.reached = wanted
-    if (wanted === this.position || this.positionIsControlled) {
+    if (wanted === this.position) {
       return
     }
     const previous = this.position
@@ -584,9 +570,7 @@ export class HelixHeadlessSplitter extends HelixElement {
     /* A divider that is moving is a pane that is opening, and a shut one is
        still draggable precisely so it can be. Silent, like the move itself:
        the settling below is what announces either. */
-    if (!this.collapsedIsControlled) {
-      this.collapsedState = 'none'
-    }
+    this.collapsedState = 'none'
     this.requestUpdate('position', previous)
   }
 
@@ -599,37 +583,22 @@ export class HelixHeadlessSplitter extends HelixElement {
   private settle(next: number): void {
     const wanted = this.clamp(next)
     const shut = this.shutAt(wanted)
-    requestControlledChange({
+    requestChange({
       apply: (value) => {
-        if (this.positionIsControlled) {
-          return
-        }
         const previous = this.position
         this.positionState = value
         this.requestUpdate('position', previous)
       },
-      controlled: this.positionIsControlled,
       event: (value) => new HelixChangeEvent({ property: 'position', value: String(value) }),
       host: this,
-      label: 'position',
       next: wanted,
-      read: () => this.position,
     })
     if (shut !== this.collapsed) {
       /* Two values from one gesture, so two announcements. `ChangeDetail`
          carries a name for exactly this, and a consumer listening for one of
          them is not made to care about the other. */
-      requestControlledChange({
+      requestChange({
         apply: (value) => {
-          /* A consumer who owns `position` owns the geometry, and collapse is
-             geometry: applied here it would win over the number they set, and
-             `position` would report the edge forever after. Latched once by a
-             drag, a controlled splitter could never be reopened by its own
-             consumer. They collapse it by saying `collapsed`, like everything
-             else they own. */
-          if (this.collapsedIsControlled || this.positionIsControlled) {
-            return
-          }
           const previous = this.collapsed
           // Back to where the gesture started, so opening it again is a return
           // rather than a jump to the edge it was dragged against.
@@ -639,12 +608,9 @@ export class HelixHeadlessSplitter extends HelixElement {
           this.collapsedState = value === '' ? 'none' : (value as 'end' | 'start')
           this.requestUpdate('collapsed', previous)
         },
-        controlled: this.collapsedIsControlled,
         event: (value) => new HelixChangeEvent({ property: 'collapsed', value }),
         host: this,
-        label: 'collapsed',
         next: shut ?? '',
-        read: () => this.collapsed ?? '',
       })
     }
   }
@@ -1048,13 +1014,6 @@ export class HelixHeadlessSplitter extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    // Only the first time, before anything reads it. See `MixinControllerOpen`.
-    if (this.positionMode === undefined) {
-      this.positionMode = this.positionState !== undefined
-    }
-    if (this.collapsedMode === undefined) {
-      this.collapsedMode = this.collapsedState !== undefined
-    }
   }
 
   protected override render(): TemplateResult {

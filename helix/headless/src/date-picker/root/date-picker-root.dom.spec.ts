@@ -359,7 +359,7 @@ describe('date picker as a form control', () => {
     expect(announced).toBe('2026-09')
   })
 
-  test("a declared month is the consumer's, and the arrows only ask", async () => {
+  test('a declared month is a seed, and the arrows still move it', async () => {
     /* The reason this is worth a spec of its own. `month` said in its own
        documentation that a consumer could drive the view, and the calendar
        wrote it on every page, so a consumer holding it in state was overwritten
@@ -372,9 +372,9 @@ describe('date picker as a form control', () => {
     next(cal)
     await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
     expect(announced).toBe('2026-09')
-    expect(cal.month).toBe('2026-08')
+    expect(cal.month).toBe('2026-09')
 
-    // And the consumer moving it is what moves it.
+    // And the consumer may still correct it. See 294.
     cal.month = '2026-09'
     await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
     expect(cal.month).toBe('2026-09')

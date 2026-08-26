@@ -55,8 +55,21 @@ describe('read state', () => {
     expect(element.read).toBe(false)
   })
 
-  test('a declared `read` makes the element defer entirely', async () => {
+  test('a declared `read` is a seed, and the element still marks itself', async () => {
+    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
+       claim of ownership and the element announced without moving. Control is
+       an action now: it applies, and a consumer refuses to take the decision.
+       See 294. */
     const element = await item('read')
+    element.markRead(false)
+    expect(element.read).toBe(false)
+  })
+
+  test('and refusing is what keeps it read', async () => {
+    const element = await item('read')
+    element.addEventListener('helix-read', (event: Event) => {
+      event.preventDefault()
+    })
     element.markRead(false)
     expect(element.read).toBe(true)
   })

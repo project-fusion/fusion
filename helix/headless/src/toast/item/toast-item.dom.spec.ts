@@ -43,9 +43,11 @@ describe('one toast message', () => {
     expect(host.open).toBe(false)
   })
 
-  /* Declared, it announces and waits, which is the same decide-once contract
-     every other stateful thing here carries. */
-  test('announces and waits, where the markup claimed it', async () => {
+  /* Asserted the opposite until 26 Aug 2026, when declaring `open` was a claim
+     of ownership and the element announced without closing. Control is an
+     action now: it applies, and a consumer refuses to take the decision.
+     See 294. */
+  test('announces and closes, where the markup only seeded it', async () => {
     const host = await message('dismissible open')
     let heard = 0
     host.addEventListener('helix-dismiss', () => {
@@ -56,6 +58,18 @@ describe('one toast message', () => {
     await host.updateComplete
 
     expect(heard).toBe(1)
+    expect(host.open).toBe(false)
+  })
+
+  test('and a refused dismissal leaves it open', async () => {
+    const host = await message('dismissible open')
+    host.addEventListener('helix-dismiss', (event: Event) => {
+      event.preventDefault()
+    })
+
+    ;(part(host, 'dismiss') as HTMLElement).click()
+    await host.updateComplete
+
     expect(host.open).toBe(true)
   })
 
