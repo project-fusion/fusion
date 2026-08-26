@@ -24,12 +24,26 @@
    property the item writes onto this row, so every depth works rather than the
    handful an enumerated rule set covers. */
 [part="row"] {
-  /* `stretch`, so a child can be as tall as the row rather than as tall as its
-     own text. The row has a `min-block-size` for the sake of a target, and with
-     `center` a slotted link was 18px inside a 37px row: the bands above and
-     below it belonged to the row, which selects rather than navigates. Anything
-     that should stay its own height says so with `align-self`. */
-  align-items: stretch;
+  /* **`center`, and the row's height no longer comes from its tallest child.**
+   *
+   * This was `stretch` so a slotted link could fill the row rather than sit at
+   * its own height with bands above and below belonging to the row, which
+   * selects rather than navigates. The half that was missing is that a child
+   * taller than the line then set the row: the sandbox rail puts a 24px docs
+   * link in `end`, so its 88 family rows came out 40 against 34 for every
+   * example row under them, which is the opposite of what `min-block-size`
+   * below says it is for.
+   *
+   * So the line decides the height and a taller control centers against it and
+   * overflows into the padding the row already owns. Measured in the rail: rows
+   * 34 throughout, the docs link still 24 square, and the padding it grows into
+   * is inside the row rather than beyond it.
+   *
+   * The old complaint survives for a control *shorter* than the line, which now
+   * keeps its own height instead of filling the row. That is the better failure
+   * of the two: a small target is the consumer's to size, and a row that
+   * disagrees with every other row is nobody's. */
+  align-items: center;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
@@ -42,6 +56,13 @@
      a size a pointer finds without care and a finger can reach at all. The
      minimum is what holds a row with no icon in it to the same height as one
      that has. */
+  /* One line plus the padding, floored at the target size. `block-size` rather
+     than `min-block-size` alone, because a minimum only holds a row up: it is
+     what let the docs link push one past every other. */
+  block-size: max(
+    var(--tree-row-size, var(--helix-size-control-sm)),
+    calc(1lh + var(--helix-space-xs) * 2)
+  );
   min-block-size: var(--tree-row-size, var(--helix-size-control-sm));
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-xs);
