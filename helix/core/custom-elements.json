@@ -1761,6 +1761,66 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/events/element-events.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "registerElementEvents",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "entries",
+              "type": {
+                "text": "Readonly<Record<string, readonly string[]>>"
+              }
+            }
+          ],
+          "description": "Records the events a set of tags dispatch. Called by generated code."
+        },
+        {
+          "kind": "function",
+          "name": "eventsForTag",
+          "return": {
+            "type": {
+              "text": "ReadonlySet<string> | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tag",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "The events a tag dispatches, or `undefined` if nothing registered it."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "registerElementEvents",
+          "declaration": {
+            "name": "registerElementEvents",
+            "module": "src/events/element-events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "eventsForTag",
+          "declaration": {
+            "name": "eventsForTag",
+            "module": "src/events/element-events.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/events/events.ts",
       "declarations": [
         {
@@ -3127,6 +3187,22 @@
           "declaration": {
             "name": "Window",
             "module": "./controllers/virtualize-controller/virtualize-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "eventsForTag",
+          "declaration": {
+            "name": "eventsForTag",
+            "module": "./events/element-events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "registerElementEvents",
+          "declaration": {
+            "name": "registerElementEvents",
+            "module": "./events/element-events.js"
           }
         },
         {

@@ -1,5 +1,6 @@
 import { type CSSResultOrNative, css, LitElement, type PropertyValues } from 'lit'
 import { type StaticValue, unsafeStatic } from 'lit/static-html.js'
+import { eventsForTag } from '../events/element-events.js'
 import { helixEventNames } from '../events/events.js'
 
 /**
@@ -238,10 +239,32 @@ const auditReactProps = (host: EventTarget, props: Record<string, unknown>): voi
       )
       continue
     }
-    if (key.startsWith('on') && key.includes('-') && !helixEventNames.has(key.slice(2))) {
+    if (!key.startsWith('on') || !key.includes('-')) {
+      continue
+    }
+    const name = key.slice(2)
+    if (!helixEventNames.has(name)) {
       console.warn(
-        `${tag} was given \`${key}\`, and nothing dispatches \`${key.slice(2)}\`. TypeScript cannot ` +
+        `${tag} was given \`${key}\`, and nothing dispatches \`${name}\`. TypeScript cannot ` +
           `check a hyphenated JSX prop, so this is the only place it shows up.`,
+      )
+      continue
+    }
+    /* **A real name on the element that does not send it**, which is the mistake
+       made while writing a *correct* event and so the one the name check could
+       never see. The event usually does reach this element, being composed and
+       bubbling, but React binds an `on` prop by reading it as the element itself
+       dispatches: one merely passing through never calls this host's own
+       `dispatchEvent`, so the prop is recorded and never wired.
+    
+       Silent when nothing registered the tag, which is a component from outside
+       this library or a package built before the map existed. */
+    const mine = host instanceof Element ? eventsForTag(host.localName) : undefined
+    if (mine && !mine.has(name)) {
+      console.warn(
+        `${tag} was given \`${key}\`, but it dispatches ${[...mine].map((one) => `\`${one}\``).join(', ')}. ` +
+          `\`${name}\` is sent by a different element, and React only wires an \`on\` prop on the ` +
+          'element that dispatches, so this handler will never run. Put it on that element.',
       )
     }
   }
@@ -521,6 +544,19 @@ export class HelixElement extends LitElement {
     super.firstUpdated(changed)
     requestAnimationFrame(() => {
       this.setAttribute('data-settled', '')
+      /* **Audited here as well as at dispatch, and this is the half that catches
+         the real mistake.** The audit ran only from inside `dispatchEvent`, so an
+         element holding a handler prop and sending nothing was never looked at.
+         A prop on the wrong element is exactly the case where that element has no
+         reason to dispatch, so the check could not reach the thing it is for.
+
+         A frame late, alongside `data-settled`, because React has to have
+         committed its props for there to be anything to read. Once per element
+         either way: the audit holds its own set. */
+      const props = reactPropsOf(this)
+      if (props !== undefined) {
+        auditReactProps(this, props)
+      }
     })
   }
 }

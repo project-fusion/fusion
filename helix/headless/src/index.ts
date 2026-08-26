@@ -1,3 +1,5 @@
+import './element-events.generated.js'
+
 /**
  * Everything core exports, forwarded whole.
  *

@@ -1,3 +1,5 @@
+import './element-events.generated.js'
+
 /**
  * Everything core exports, forwarded whole. See the note in `helix/headless`:
  * a hand-kept list drifts, and it drifts silently until a component happens to

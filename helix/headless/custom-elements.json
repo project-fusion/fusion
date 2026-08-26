@@ -18455,6 +18455,12 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/element-events.generated.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/empty/index.ts",
       "declarations": [],
       "exports": [

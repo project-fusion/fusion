@@ -60,6 +60,7 @@ export {
   type VirtualizeOptions,
   type Window as VirtualizeWindow,
 } from './controllers/virtualize-controller/virtualize-controller.js'
+export { eventsForTag, registerElementEvents } from './events/element-events.js'
 export {
   type CaretDetail,
   type ChangeDetail,
