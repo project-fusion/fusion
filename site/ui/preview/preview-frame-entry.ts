@@ -25,7 +25,7 @@ import '@helix-io/styled'
 interface RenderMessage {
   colorMode?: 'dark' | 'light'
   direction?: 'ltr' | 'rtl'
-  layout?: 'padded' | 'centered' | 'fullscreen'
+  layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
   source?: string
   styles?: string
   type?: string
@@ -111,6 +111,39 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
 })
 
 /**
+ * The boxes one top-level child actually draws.
+ *
+ * **A `display: contents` element generates no box of its own**, so asking it
+ * for a rect answers zero and a frame sized to that answer collapses onto the
+ * floor. Six styled roots are `contents` on purpose, Dialog, Drawer, Menu,
+ * Popover, Tooltip and Tour, because an overlay owner should not become a box
+ * in its owner's layout. Measured on the Popover example: the element reported
+ * `0x0` while what it had drawn was 77 by 40, and the preview came back 180
+ * because that is the floor rather than because anything was 180 tall.
+ *
+ * So an empty rect is a question rather than an answer, and the descendants are
+ * where it is answered.
+ *
+ * **`fixed` is excluded, and that is what keeps this from running away.** An
+ * open Drawer is `100dvh`, so counting it would make the frame taller, which
+ * makes the drawer taller, which makes the frame taller: the measurement would
+ * chase its own result and never settle. A viewport-anchored overlay is sized
+ * by the viewport by definition, so it is not content the frame can be fitted
+ * to. What the frame owes such an example is room for its trigger, which is in
+ * flow and is measured.
+ */
+const drawn = (child: Element): DOMRect[] => {
+  const own = child.getBoundingClientRect()
+  if (own.width > 0 || own.height > 0) {
+    return [own]
+  }
+  return [...child.querySelectorAll('*')]
+    .filter((node) => getComputedStyle(node).position !== 'fixed')
+    .map((node) => node.getBoundingClientRect())
+    .filter((box) => box.width > 0 || box.height > 0)
+}
+
+/**
  * How tall what was drawn actually is, reported outward.
  *
  * **Measured from the children rather than from the document**, and that is the
@@ -127,11 +160,12 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
  * A `ResizeObserver` on the host reports again when they upgrade, when a web
  * font lands, and when an example animates something open.
  */
+
 const measure = (): void => {
   if (!host) {
     return
   }
-  const boxes = [...host.children].map((child) => child.getBoundingClientRect())
+  const boxes = [...host.children].flatMap(drawn)
   if (boxes.length === 0) {
     return
   }

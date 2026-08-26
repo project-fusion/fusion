@@ -8,36 +8,114 @@
  * not there.
  */
 
+/**
+ * How wide a centered example may be before it stops growing.
+ *
+ * Not a design token, and it should not become one: this is a property of the
+ * documentation frame rather than of the library, and a component that read it
+ * would be reading its own preview. Declared here so the one number lives in
+ * one place and an embedder can override it on the frame.
+ *
+ * 48rem, because the reference pane is roughly 740 pixels at a desktop width
+ * and a measure wider than the pane would never apply. It leaves a small
+ * example clearly centered, and it is about where a table stops being readable
+ * and starts being a wide monitor's problem.
+ */
+:root {
+  --preview-measure: 48rem;
+}
+
 #preview-root[data-layout="padded"] {
   padding: var(--helix-space-lg);
 }
 
-/* `grid` rather than `flex`, and the difference is the whole of 122.
+/* Centered: a block box with a measure, centered in the frame.
  *
- * This centres an example, which is a thing made of blocks; as a flex container
- * it centered the example's *children*, one per line, laid out along the inline
- * axis. `tour/nested` reported it: a bar of two buttons and a third control
- * under it came out as three on one line with the odd one dropped, because
- * `align-items: center` was centering boxes of different heights against each
- * other. The example was right. Every example separating blocks with a
- * `margin-block-end` was, and in this one mode none of them worked, because a
- * block margin says nothing along an inline axis.
+ * **Three layouts have been tried here and each fixed the last one's fault.**
+ * Flex centered the example's *children* along the inline axis, so `tour/nested`
+ * came out as three controls on one line with the odd one dropped, and every
+ * example separating blocks with a `margin-block-end` was wrong in this mode
+ * alone. A single-column grid fixed that by stacking children the way the
+ * document would, and introduced the opposite fault: every top-level child
+ * became its own row, so the Icon example's seven inline glyphs stacked into a
+ * vertical line, and the column track was sized to content, so a block element
+ * with nothing intrinsic to be wide about collapsed. Measured: Divider came out
+ * 0 by 1 and Progress 0 by 8, which is a preview of nothing.
  *
- * A single-column grid stacks its children the way the document would and
- * places the whole track in the middle, so `place-content` centres the example
- * rather than rearranging it. Measured on `tour/nested`: as flex the bar and
- * the button shared a line, as grid the button sits a full `space-xl` below the
- * bar, which is what its own sheet asks for.
+ * Normal flow is what both were reaching for. A block box lays its children out
+ * exactly as the document would, so seven inline icons are a row and two
+ * paragraphs are two blocks, and `align-content` centers them in the block axis
+ * without restructuring anything. Where it is unsupported the example sits at
+ * the top, which is `padded`, so the degradation is a layout this frame already
+ * offers rather than a broken one.
  *
- * The fix is here rather than in the examples for the reason 122 gives: if the
- * container restructures what it is given, every example that separates blocks
- * with a block margin is wrong in one preview mode and right everywhere else,
- * and there are a hundred and sixty of them. */
+ * **The measure is what makes a full-width component visible at all.** A
+ * content-sized track gave a block element no width to fill; a definite one
+ * gives Divider, Progress and Meter a line to draw along, and keeps a table
+ * from running the full width of a wide monitor.
+ *
+ * `text-align` centers the *boxes* of inline-level children, which is what
+ * centers Drilldown and the icon row, and the child rule puts text back to the
+ * start so a card's prose is not centered along with it. */
 #preview-root[data-layout="centered"] {
-  display: grid;
+  align-content: center;
+  display: block;
+  inline-size: min(100%, var(--preview-measure));
+  margin-inline: auto;
   min-block-size: 100dvh;
   padding: var(--helix-space-lg);
-  place-content: center;
+  text-align: center;
+}
+
+/* **Two properties, because a box is centered by whichever one applies to it.**
+   `text-align` on the parent centers inline-level children, which is what
+   centers the Icon example's row of seven and any component that sizes itself.
+   It cannot move a block box, and a block box that has capped its own width is
+   exactly the case Drilldown is: its sheet sets `max-inline-size: 18rem` for
+   the honest reason that a drill-down does not know whether it is in a sidebar
+   or on a phone, so it sat 288 wide against the inline start. `margin-inline`
+   centers that, and is a no-op on a block that fills its container, which is
+   most of them.
+
+   `text-align: start` on the same children puts prose back, so a card's
+   paragraphs are not centered along with the card. */
+#preview-root[data-layout="centered"] > * {
+  margin-inline: auto;
+  text-align: start;
+}
+
+/* Hug: the example shrinks to its content, and the content is what gets
+ * centered.
+ *
+ * **`centered` centers the box, which is not the same thing and for a third of
+ * the library is not what anybody meant.** Most Helix roots are full-width
+ * blocks: `helix-pagination` is 693 wide in this frame with its seven buttons
+ * drawn at the inline start, and Donut Chart is 693 wide with the donut at the
+ * left. Both were centered, exactly, and both looked pinned to the left edge,
+ * because what a reader sees is the ink and not the box around it.
+ *
+ * Measured across 71 families: 23 draw content that hugs and sits at the start,
+ * and 44 genuinely fill. So this is a mode a component opts into rather than
+ * the default, because flipping it would collapse a Divider, a Progress and a
+ * Table, whose whole shape is the width they are given.
+ *
+ * `fit-content` rather than centering the text, and that distinction is the
+ * reason this is a mode at all. Inheriting `text-align: center` would center a
+ * card's paragraphs along with the card. Shrinking the box and centering *it*
+ * leaves everything inside laid out exactly as its author wrote it. */
+#preview-root[data-layout="hug"] {
+  align-content: center;
+  display: block;
+  inline-size: min(100%, var(--preview-measure));
+  margin-inline: auto;
+  min-block-size: 100dvh;
+  padding: var(--helix-space-lg);
+}
+
+#preview-root[data-layout="hug"] > * {
+  inline-size: fit-content;
+  margin-inline: auto;
+  max-inline-size: 100%;
 }
 
 #preview-root[data-layout="fullscreen"] {
