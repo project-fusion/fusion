@@ -1309,29 +1309,40 @@ helix-toggle[disabled]::part(item) {
  *
  * Decorative and empty, so nothing is announced twice: `aria-current="page"` is
  * on the anchor and is what a reader is told. */
-/* The name becomes the row that carries the mark, so the mark can be centered
-   against it rather than sat on a baseline.
- 
-   `vertical-align: middle` was the first try and is the reason this rule
-   exists: it aligns a box to the middle of the *x-height*, not of the line, so
-   the dot rode high against a semibold cap-height name. A flex line has a real
-   center. Scoped to the current row, so no other name changes its display type
-   for a mark it does not have, and `gap` is what sets the distance, which is
-   one step wider than the margin it replaces. */
-[data-megamenu-item][aria-current="page"] > :where(strong, b) {
-  align-items: center;
-  display: inline-flex;
-  gap: var(--helix-space-xs);
-}
-
-[data-megamenu-item][aria-current="page"] > :where(strong, b)::after {
-  animation: helix-current-dot 4s var(--helix-easing-standard) infinite;
-  background-color: var(--helix-color-primary);
+/* **Before the name, and reserved on every row so the column holds still.**
+ *
+ * The dot used to follow the name, which reads a row at a time: you find out
+ * that this was the current one after having read it. Ahead of the name it is
+ * scanned instead, and a column of rows shows which is current before any of
+ * them is read.
+ *
+ * The reason it was not there already is alignment. A mark in front of one name
+ * pushes that name right, so the current row hangs out of the column its
+ * neighbors line up in. So the cell is reserved on every row and filled on one:
+ * transparent is still 8 pixels wide, and every label starts at the same place
+ * whether or not its row is the one being read.
+ *
+ * Only where nothing else claims that column. A row given a leading mark puts
+ * it in column 1 spanning both lines, and a dot in the same cell would sit on
+ * top of it; those rows keep the mark as their signal and take the weight and
+ * color the rules below give them.
+ *
+ * Decorative and empty, so nothing is announced twice: `aria-current="page"` is
+ * on the anchor and is what a reader is told. */
+[data-megamenu-item]:not(:has(> :where(helix-icon, img, svg)))::before {
+  align-self: center;
+  background-color: transparent;
   block-size: var(--helix-space-xs);
   border-radius: var(--helix-radii-full);
   content: "";
-  flex: none;
+  grid-column: 1;
+  grid-row: 1;
   inline-size: var(--helix-space-xs);
+}
+
+[data-megamenu-item][aria-current="page"]:not(:has(> :where(helix-icon, img, svg)))::before {
+  animation: helix-current-dot 4s var(--helix-easing-standard) infinite;
+  background-color: var(--helix-color-primary);
 }
 
 /* Interior-only, so 0% and 100% resolve to the resting dot.

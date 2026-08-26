@@ -126,22 +126,6 @@ const PROSE: Route[] = [
     title: 'Cortex',
   },
   {
-    description: 'Energy, and why it is the other half of the thesis.',
-    kind: 'page',
-    path: '/energy',
-    priority: 0.6,
-    section: 'Fusion',
-    title: 'Energy',
-  },
-  {
-    description: 'Capital, and what we are building it for.',
-    kind: 'page',
-    path: '/capital',
-    priority: 0.6,
-    section: 'Fusion',
-    title: 'Capital',
-  },
-  {
     description: 'A WebGL field, and the geometry behind it.',
     kind: 'page',
     path: '/helix/aura',

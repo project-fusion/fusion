@@ -126,6 +126,77 @@ helix-megamenu {
   --megamenu-background: transparent;
 }
 
+/* **The band runs the width of the window and its contents no longer should.**
+ *
+ * `variant="full"` is the band, and it is the right shape: a sheet the whole
+ * masthead sits on rather than a card hanging off one word. What changed under
+ * it is what it holds. The panel used to carry the products *and* the five
+ * verticals, which filled a full-width grid; with the verticals gone it holds
+ * two columns, and a grid with room for four spread them to opposite edges,
+ * 592px each with the whole middle empty and Cortex's single row stranded
+ * against the right rim.
+ *
+ * So the sheet keeps its width and the content takes a measure. Centered rather
+ * than aligned to the wordmark, because the trigger that opens it is centered:
+ * the panel drops from `Products` and should look like it came from there.
+ *
+ * **Padding and not a maximum, which is the version of this that worked.**
+ * Capping the surface with `max-inline-size` and centering it with an auto
+ * margin reads as the obvious way to say it and breaks the band: the tracks are
+ * `repeat(auto-fit, minmax(15rem, 1fr))`, and `auto-fit` can only count columns
+ * against a width it knows. The component says so where the band is written,
+ * that the card cannot use `auto-fit` because it is as wide as its own contents.
+ * Measured at 2000: capped, the track list came out as a single 240px column
+ * with Cortex stacked under Helix; padded, it is two columns as it should be.
+ *
+ * So the surface keeps the full width it needs to do the arithmetic, and the
+ * padding brings the content to a measure. `max()` rather than a plain
+ * calculation, so a window narrower than the measure keeps the chrome inset
+ * instead of a negative one. */
+/* A row for something named and not yet built.
+ *
+ * Quieter than a destination and not quiet enough to miss: the name keeps its
+ * weight, because the point of listing Engram, Trace and Recall is that they are
+ * the shape of Cortex, and the sentence under it dims because it describes
+ * something you cannot go and read yet. No hover wash and no pointer, since
+ * neither is true of a row that does nothing. */
+[data-megamenu-item][data-soon] {
+  cursor: default;
+}
+
+[data-megamenu-item][data-soon] > strong {
+  align-items: center;
+  /* **One line box, whatever is standing in it.**
+   *
+   * A tag is taller than the text beside it, 24px against a 19.5px line, and a
+   * flex line grows to its tallest item. So a tagged row came out 72 where its
+   * neighbors were 67, and because the panel is two columns of rows that is not
+   * a wobble in one row: Helix's rows sat at 117, 184, 251, 318 while Cortex's
+   * went 117, 184, 256, 327, the two columns drifting further apart the further
+   * down you read.
+   *
+   * `1lh` is the line box this text would have had on its own, so the name
+   * keeps the pitch of every other row and the tag is centered against it and
+   * allowed to be taller. No magic number: the unit is the line height. */
+  block-size: 1lh;
+  color: var(--helix-color-foreground-muted);
+  display: flex;
+  gap: var(--helix-space-sm);
+}
+
+[data-megamenu-item][data-soon] > span {
+  color: var(--helix-color-foreground-subtle);
+}
+
+helix-megamenu::part(surface) {
+  /* A measure rather than a space, which is why it is named here instead of
+     written into the padding: `check:tokens` reads a raw length in
+     `padding-inline` as a spacing token that got away, and it is right to. */
+  --site-panel-measure: 52rem;
+
+  padding-inline: max(var(--site-chrome-inset), calc((100% - var(--site-panel-measure)) / 2));
+}
+
 /* One step up the icon scale for the product marks in the column headings.
  *
  * The base layer sizes a heading's mark at `icon-sm`, which is right for what

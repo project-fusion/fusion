@@ -17,6 +17,16 @@ export interface Destination {
    */
   summary: string
   /**
+   * Whether it is named but not yet there.
+   *
+   * A row with this set says what is coming and does not pretend to be a link:
+   * nothing is followed and it leaves the tab order, rather than being
+   * focusable and inert. Naming the modules before they exist is the point,
+   * since the division of the product is the argument; letting one be pressed
+   * would be the part that lied.
+   */
+  soon?: boolean
+  /**
    * The name on the row.
    */
   title: string
@@ -192,11 +202,34 @@ export const PRODUCTS: Product[] = [
   },
   {
     body: 'Memory and provenance. What a system knows, where it learned it, and how much of it to trust. Not a model wrapper: the part that remains true when the model underneath is replaced.',
+    /* The three modules that have earned an evocative name, per `CLAUDE.md`:
+       inside Cortex that is exactly Engram, Trace and Recall, and the rest stay
+       descriptive. They are named here before they are built because the
+       division of the thing is what Cortex *is*, and a panel showing only what
+       already ships describes a smaller idea than the one on offer. */
     destinations: [
       {
         href: '/cortex',
         summary: 'What a system knows, and how far to trust it.',
-        title: 'Overview',
+        title: 'Docs',
+      },
+      {
+        href: '/cortex',
+        soon: true,
+        summary: 'Memory. What the system holds on to, and for how long.',
+        title: 'Engram',
+      },
+      {
+        href: '/cortex',
+        soon: true,
+        summary: 'Provenance. Where a fact came from, all the way back.',
+        title: 'Trace',
+      },
+      {
+        href: '/cortex',
+        soon: true,
+        summary: 'Context. What to put in front of a model, and why that.',
+        title: 'Recall',
       },
     ],
     href: '/cortex',

@@ -8,7 +8,6 @@ import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { Wordmark } from '@/components/wordmark/wordmark'
 import { PRODUCTS } from '@/content/products/products'
-import { stageAppearance, VERTICALS } from '@/content/verticals/verticals'
 import styles from '../chrome.module.css'
 
 /**
@@ -31,6 +30,162 @@ const SECTIONS = [
   { href: '/services', label: 'Services' },
   { href: '/insights', label: 'Insights' },
 ]
+
+/**
+ * The top level, with every destination in it exactly once.
+ *
+ * Products and Verticals used to be two taxonomies over one set of pages, so
+ * `/helix` was in the menu as both Helix and Fusion Design, `/cortex` as both
+ * Cortex and Fusion Mind, and `/services` as both Services and Fusion Studio.
+ * Nine rows, six destinations, and nothing telling a reader which pairs were the
+ * same page.
+ *
+ * A vertical is the company's map rather than a place to go. `VerticalPage`
+ * says so already, titling a page with the product and demoting the vertical to
+ * an eyebrow over it, and the landing page said so when it dropped its
+ * verticals band. The menu says it now too.
+ */
+export const DESTINATIONS = [
+  ...PRODUCTS.map((product) => ({ href: product.href, label: product.name })),
+  ...SECTIONS,
+]
+
+/**
+ * The site's destinations in a drawer, wherever a header has no room for them.
+ *
+ * Three headers use this and they arrive at it differently. The site's shows it
+ * on a narrow viewport, where the bar cannot hold four words beside a search
+ * field. The sandbox and the theme builder show it at every width, because a
+ * tool's header is already full of the tool: what belongs in those is a way out,
+ * and a way out is one button rather than a row of them.
+ *
+ * The state is the caller's. A drawer that owned its own would need the button
+ * that opens it to reach inside, and every one of these has its button
+ * somewhere different.
+ */
+export function SiteMenu({
+  onOpenChange,
+  open,
+  placement = 'end',
+}: {
+  onOpenChange: (open: boolean) => void
+  open: boolean
+  /**
+   * Which edge it arrives from, because a drawer comes from where it was
+   * opened. The site's Menu sits at the end of the bar and its panel arrives
+   * from the end; the tools put theirs ahead of the wordmark, so theirs arrives
+   * from the start. A panel flying in from the opposite edge to the button that
+   * summoned it reads as a second, unrelated thing appearing.
+   */
+  placement?: 'end' | 'start'
+}) {
+  const pathname = usePathname()
+
+  return (
+    <helix-drawer
+      label="Site navigation"
+      material="glass"
+      onhelix-close={() => onOpenChange(false)}
+      onhelix-open={() => onOpenChange(true)}
+      open={open}
+      placement={placement}
+    >
+      <div className={styles.navMenu}>
+        {/* A tree, because the depth is real and was being hidden.
+            
+            The menu listed four destinations and stopped, so everything a
+            reader actually goes to inside Helix, the docs, the component
+            reference, the sandbox, the theme builder, could be reached only by
+            landing on `/helix` first and looking for it. That is a fair top
+            level and a poor menu: the four are what the site *is*, and the rows
+            under them are where the work is.
+
+            `helix-tree-item` with an `href` rather than a tree of buttons that
+            navigate. The component's own docstring is explicit that this is the
+            navigation flavor of the pattern: given an `href` the row is an
+            `<a>`, so a middle click opens a tab and the platform provides
+            everything a link provides. A tree of handlers would have taken all
+            of that away to look the same.
+
+            Not the duplication the top level had. Products and Verticals were
+            two names for one page; these are pages inside a page, which is what
+            depth is for. */}
+        <helix-tree active={pathname} label="Site navigation">
+          {PRODUCTS.map((product) => (
+            <helix-tree-item
+              /* Open where the reader already is. A tree that opens nothing
+                 hides the current page behind a chevron, and the rows under a
+                 product are the whole reason for the tree: a reader in the
+                 sandbox should see Sandbox marked without hunting for it.
+                 `default-open` and not `open`, because after that first paint
+                 the branch is the reader's to open and shut. */
+              default-open={pathname.startsWith(product.href)}
+              key={product.href}
+            >
+              {product.name}
+              {/* The product's own page as a row of its own, because the row
+                  above it is no longer a link.
+
+                  `helix-tree-item` does support both at once and says so: a
+                  branch that is also a link goes where it points and its chevron
+                  is what opens it. Two targets in one row is still two targets,
+                  and on a touch screen the chevron is the smaller of them by
+                  some margin. A parent that only discloses has one meaning
+                  everywhere in the row, and the page it used to link to is the
+                  first thing inside it.
+
+                  Only where nothing else already points there. Cortex's `Docs`
+                  is `/cortex`, so Cortex needs no second row saying the same. */}
+              {!product.destinations.some((destination) => destination.href === product.href) && (
+                <helix-tree-item href={product.href} slot="children" value={product.href}>
+                  Overview
+                </helix-tree-item>
+              )}
+              {product.destinations.map((destination) =>
+                /* A module named and not yet built takes no `href`, so the row
+                   renders as a `div` and is not a link to nowhere. It keeps its
+                   place in the tree because the shape of the product is the
+                   point. */
+                destination.soon ? (
+                  <helix-tree-item key={destination.title} slot="children">
+                    {destination.title}
+                    <helix-tag data-density="sm" slot="end">
+                      Coming soon
+                    </helix-tag>
+                  </helix-tree-item>
+                ) : (
+                  <helix-tree-item
+                    href={destination.href}
+                    key={destination.title}
+                    slot="children"
+                    value={destination.href}
+                  >
+                    {destination.title}
+                  </helix-tree-item>
+                ),
+              )}
+            </helix-tree-item>
+          ))}
+          {SECTIONS.map((section) => (
+            <helix-tree-item href={section.href} key={section.href} value={section.href}>
+              {section.label}
+            </helix-tree-item>
+          ))}
+        </helix-tree>
+
+        <a
+          className={styles.navAction}
+          data-button="solid"
+          data-button-tone="primary"
+          data-density="lg"
+          href="mailto:hello@fusion.dev"
+        >
+          Get in touch
+        </a>
+      </div>
+    </helix-drawer>
+  )
+}
 
 /**
  * Site navigation: the sections, centered in the masthead.
@@ -142,11 +297,10 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
      it, which is the state a hero is guaranteed not to still be in. */
   const onHero = pathname === '/' || pathname === '/helix' || pathname === '/insights'
 
-  /* Products is current wherever a product or a vertical is, which is what the
-     panel actually contains. Checked against the verticals rather than the
-     products because it is the wider set: `/energy` is in the panel and is not
-     a product. */
-  const onProducts = VERTICALS.some((vertical) => within(vertical.href))
+  /* Products is current wherever a product is, which is the whole of what the
+     panel contains now. This read the verticals instead, deliberately, back
+     when the panel listed those too and they were the wider set. */
+  const onProducts = PRODUCTS.some((product) => within(product.href))
 
   return (
     <>
@@ -255,14 +409,29 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                     <helix-icon name={product.mark}></helix-icon>
                     {product.name}. {product.role}
                   </h3>
-                  {product.destinations.map((destination) => (
-                    <Link
-                      aria-current={pathname === destination.href ? 'page' : undefined}
-                      data-megamenu-item
-                      href={destination.href}
-                      key={destination.href}
-                    >
-                      {/* Two rows, and the second is one line. The sentence
+                  {product.destinations.map((destination) =>
+                    /* A module that is named and not yet built is a `div`, not a
+                       disabled link. There is nowhere for it to go, so an anchor
+                       would be a promise the href cannot keep, and
+                       `aria-disabled` on a real link leaves it in the tab order
+                       announcing itself as somewhere you cannot follow. A row
+                       that is not interactive simply is not one. */
+                    destination.soon ? (
+                      <div data-megamenu-item data-soon key={destination.title}>
+                        <strong>
+                          {destination.title}
+                          <helix-tag data-density="sm">Coming soon</helix-tag>
+                        </strong>
+                        <span>{destination.summary}</span>
+                      </div>
+                    ) : (
+                      <Link
+                        aria-current={pathname === destination.href ? 'page' : undefined}
+                        data-megamenu-item
+                        href={destination.href}
+                        key={destination.href}
+                      >
+                        {/* Two rows, and the second is one line. The sentence
                           earns its place, but a sentence that wraps turns a row
                           of names into a paragraph to read before choosing, and
                           the wrap is what made the panel long. Kept short
@@ -274,35 +443,13 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                           read as a set of icons rather than a set of places to
                           go. The row grid leaves that column at `auto`, so
                           these start where the heading does. */}
-                      <strong>{destination.title}</strong>
-                      <span>{destination.summary}</span>
-                    </Link>
-                  ))}
+                        <strong>{destination.title}</strong>
+                        <span>{destination.summary}</span>
+                      </Link>
+                    ),
+                  )}
                 </div>
               ))}
-
-              {/* Plain anchors rather than `data-megamenu-item` rows, which the
-                  base layer supports and which is the point: a vertical is the
-                  map rather than a destination with a sentence about it, and
-                  four more marked rows would read as four more products. The
-                  stage rides along, because this is the first place a reader
-                  meets Energy and Capital, and the label is what makes their
-                  emptiness honest rather than disappointing. */}
-              <div data-megamenu-group>
-                <h3 data-megamenu-heading>Verticals</h3>
-                {VERTICALS.map((vertical) => (
-                  <Link
-                    aria-current={within(vertical.href) ? 'page' : undefined}
-                    href={vertical.href}
-                    key={vertical.href}
-                  >
-                    <helix-flex align="center" data-density="sm" gap="sm" justify="between">
-                      {vertical.name}
-                      <helix-tag tone={stageAppearance(vertical.stage)}>{vertical.stage}</helix-tag>
-                    </helix-flex>
-                  </Link>
-                ))}
-              </div>
             </helix-megamenu>
 
             {SECTIONS.map((section) => (
@@ -342,80 +489,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           off a word in a row, and there is no row here: the drawer is already
           the disclosure, so nesting another one would be two things to open
           before reading a link. */}
-      <helix-drawer
-        label="Site navigation"
-        material="glass"
-        onhelix-close={() => setOpen(false)}
-        onhelix-open={() => setOpen(true)}
-        open={open}
-        placement="end"
-      >
-        <div className={styles.navMenu}>
-          <div className={styles.navGroup}>
-            <helix-text className={styles.navGroupLabel} tone="subtle" variant="label">
-              Products
-            </helix-text>
-            {PRODUCTS.map((product) => (
-              <a
-                aria-current={pathname === product.href ? 'page' : undefined}
-                className={styles.navItem}
-                href={product.href}
-                key={product.name}
-                onClick={() => setOpen(false)}
-              >
-                {product.name}
-              </a>
-            ))}
-          </div>
-
-          <div className={styles.navGroup}>
-            <helix-text className={styles.navGroupLabel} tone="subtle" variant="label">
-              Verticals
-            </helix-text>
-            {/* The row is the link and the tag sits inside it, so the whole
-                44px band is the target and the stages line up at the end. Held
-                apart, each tag started wherever its own name stopped. */}
-            {VERTICALS.map((vertical) => (
-              <a
-                aria-current={pathname === vertical.href ? 'page' : undefined}
-                className={styles.navItem}
-                href={vertical.href}
-                key={vertical.href}
-                onClick={() => setOpen(false)}
-              >
-                {vertical.name}
-                <helix-tag data-density="sm" tone={stageAppearance(vertical.stage)}>
-                  {vertical.stage}
-                </helix-tag>
-              </a>
-            ))}
-          </div>
-
-          <div className={styles.navGroup}>
-            {SECTIONS.map((section) => (
-              <a
-                aria-current={pathname === section.href ? 'page' : undefined}
-                className={styles.navItem}
-                href={section.href}
-                key={section.href}
-                onClick={() => setOpen(false)}
-              >
-                {section.label}
-              </a>
-            ))}
-          </div>
-
-          <a
-            className={styles.navAction}
-            data-button="solid"
-            data-button-tone="primary"
-            data-density="lg"
-            href="mailto:hello@fusion.dev"
-          >
-            Get in touch
-          </a>
-        </div>
-      </helix-drawer>
+      <SiteMenu onOpenChange={setOpen} open={open} />
     </>
   )
 }

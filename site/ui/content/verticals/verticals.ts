@@ -90,24 +90,6 @@ export const VERTICALS: Vertical[] = [
     stage: 'Building',
     summary: 'Intelligence. Cortex lives here.',
   },
-  {
-    body: 'Cheap energy is half of why sovereignty stops being a principle you agree with and becomes something you can run. Committed direction, no product yet, and it is on the map rather than left off so the map is the whole map.',
-    href: '/energy',
-    icon: 'sun',
-    label: 'Energy',
-    name: 'Fusion Energy',
-    stage: 'Declared',
-    summary: 'The literal sun, and what it powers.',
-  },
-  {
-    body: 'Allocation. Committed direction with no work started, listed for the same reason Energy is: a roadmap that shows only the parts that are going well is a brochure.',
-    href: '/capital',
-    icon: 'chart-line',
-    label: 'Capital',
-    name: 'Fusion Capital',
-    stage: 'Declared',
-    summary: 'Allocation. No product yet.',
-  },
 ]
 
 export const stageAppearance = (stage: string) =>
