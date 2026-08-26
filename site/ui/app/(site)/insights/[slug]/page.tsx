@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { findInsight, formatDate, INSIGHTS } from '../../../../content/insights'
-import { renderMdx } from '../../../../utils/mdx/mdx'
+import { renderDocument } from '../../../../utils/mdx/mdx'
 import { DocumentPage } from '../../document-page'
 import styles from '../insights.module.css'
 import { PublishedOn, ReadingProgress } from './reading'
@@ -67,7 +67,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   return (
     <DocumentPage
-      body={await renderMdx(source)}
+      body={await renderDocument(source)}
       footer={
         <helix-flex class="insightMore" direction="column" gap="lg">
           <helix-divider></helix-divider>

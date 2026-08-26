@@ -42,10 +42,18 @@
  *
  * `grid-row: 1` and not `1 / span 2`. The leading mark spans both rows because
  * it belongs to the whole item; a number belongs to the line it numbers, and a
- * row with supporting text under the label wants the two aligned. With the
- * grid's `align-items: center` that centers the number on the label's line,
- * which is where a reader looks for it. */
+ * row with supporting text under the label wants the two aligned.
+ *
+ * **`align-self: start`, against the row's `align-items: center`.** Centering was
+ * written here on the reasoning that it puts the number on the label's line,
+ * which is true of a label that is one line and false of every other: a claim
+ * that wraps to three lines got its number against the second, floating in the
+ * middle of the block it was numbering. A number belongs on the *first* line of
+ * what it numbers, at any length, and the label's line-height is inherited here
+ * so the two baselines land together rather than the number sitting high on a
+ * box of its own. */
 [part="rail"] {
+  align-self: start;
   color: var(--helix-color-foreground-muted);
   display: var(--list-item-rail-display, none);
   font-family: var(--helix-font-mono);
@@ -53,6 +61,7 @@
   grid-column: 1;
   grid-row: 1;
   letter-spacing: var(--helix-tracking-wide);
+  line-height: calc(var(--helix-text-sm) * var(--helix-leading-normal));
   width: var(--list-rail-width, var(--helix-space-3xl));
 }
 

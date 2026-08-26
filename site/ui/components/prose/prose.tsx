@@ -373,7 +373,7 @@ const heading = (as: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') =>
     )
   }
 
-/** The map handed to every `renderMdx` call. */
+/** The map handed to every ordinary `renderMdx` call. */
 export const PROSE_COMPONENTS = {
   a: ({ children, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a data-link="subtle" {...rest}>
@@ -412,5 +412,31 @@ export const PROSE_COMPONENTS = {
   tr: TableRow,
   ul: ({ children }: { children?: ReactNode }) => (
     <helix-list kind="unordered">{children}</helix-list>
+  ),
+}
+
+/**
+ * The same map, with ordered lists set in a rail.
+ *
+ * An argued document numbers its claims, and a claim is a sentence with prose
+ * under it rather than a short row: the numbers want to read as a column down
+ * the left with every claim beginning at one measure, which is `marker="rail"`.
+ * A numbered list in the component documentation is a list of steps and wants
+ * the platform's marker beside the words, so the two cannot share one map.
+ *
+ * **A spread over `PROSE_COMPONENTS` and never a map of its own.** `renderMdx`
+ * passes its components centrally because it once passed none, and every fenced
+ * block on all five surfaces came out an unhighlighted `<pre>`. A second map
+ * written from scratch is that failure with more steps: it would be a map that
+ * drifts one element at a time. Spreading keeps the property the central pass
+ * was protecting, which is that no surface can render with less than the base
+ * map, while letting one element differ deliberately.
+ */
+export const DOCUMENT_COMPONENTS = {
+  ...PROSE_COMPONENTS,
+  ol: ({ children }: { children?: ReactNode }) => (
+    <helix-list kind="ordered" marker="rail">
+      {children}
+    </helix-list>
   ),
 }

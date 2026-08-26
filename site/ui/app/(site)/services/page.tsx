@@ -2,7 +2,7 @@ import { findSitePage, sitePageSources } from '@fusion-io/insights'
 import { SERVICES } from '@/content/services/services'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { EMAIL, MAILTO } from '@/utils/site/site'
-import { renderMdx } from '../../../utils/mdx/mdx'
+import { renderDocument } from '../../../utils/mdx/mdx'
 import documents from '../document-page.module.css'
 import styles from './services.module.css'
 
@@ -172,7 +172,7 @@ export default async function Page() {
               while whole bands of space separated the sections around it, which
               is the rhythm inverted: too much between, none within. */}
           <div className={documents.documentBody} data-measure data-prose>
-            {source ? await renderMdx(source) : null}
+            {source ? await renderDocument(source) : null}
           </div>
           <helix-flex data-density="lg" gap="sm" wrap>
             <a data-button href="/trust">

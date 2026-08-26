@@ -1,9 +1,10 @@
 import { evaluate } from '@mdx-js/mdx'
+import type { MDXComponents } from 'mdx/types'
 import type { ReactNode } from 'react'
 import * as runtime from 'react/jsx-runtime'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
-import { PROSE_COMPONENTS } from '../../components/prose/prose'
+import { DOCUMENT_COMPONENTS, PROSE_COMPONENTS } from '../../components/prose/prose'
 
 /**
  * MDX, compiled to React at build time.
@@ -31,16 +32,36 @@ import { PROSE_COMPONENTS } from '../../components/prose/prose'
  * shape that data always had: it was a grid of components before, which is the
  * same table with more machinery around it.
  *
- * **`PROSE_COMPONENTS` is passed here rather than per call site**, so that
- * every MDX surface renders the same way. It shipped without one, which meant a
- * fenced block came out as an unhighlighted `<pre>` on all five of them; that
- * module says which elements map and, at more length, which deliberately do
- * not.
+ * **The component map is passed here rather than per call site**, so that every
+ * MDX surface renders the same way. It shipped without one, which meant a fenced
+ * block came out as an unhighlighted `<pre>` on all five of them; that module
+ * says which elements map and, at more length, which deliberately do not.
+ *
+ * **Two entry points and one map, which is not a walk back from that.** What the
+ * central pass protects is that no surface renders with fewer components than
+ * the base map, and a call site that could hand its own would put that back at
+ * risk one page at a time. So the choice is not a parameter: `renderDocument`
+ * names the surface it is for, and `DOCUMENT_COMPONENTS` is a spread over
+ * `PROSE_COMPONENTS` rather than a map of its own, so neither entry point can be
+ * reached with less than the base.
+ *
+ * The one element that differs is `ol`. An argued document sets its numbers in a
+ * rail, a claim per item with prose under it and the numbering carried down the
+ * left; a numbered list in the component documentation is a list of steps and
+ * wants the platform's marker beside the words. Both are correct and they are
+ * not the same list, which is the whole reason there are two.
  */
-export const renderMdx = async (source: string): Promise<ReactNode> => {
+const render = async (source: string, components: MDXComponents): Promise<ReactNode> => {
   const { default: Content } = await evaluate(source, {
     ...runtime,
     remarkPlugins: [remarkFrontmatter, remarkGfm],
   })
-  return Content({ components: PROSE_COMPONENTS })
+  return Content({ components })
 }
+
+/** Prose, rendered the way every surface renders it. */
+export const renderMdx = (source: string): Promise<ReactNode> => render(source, PROSE_COMPONENTS)
+
+/** An argued document, which differs from prose only in how it numbers. */
+export const renderDocument = (source: string): Promise<ReactNode> =>
+  render(source, DOCUMENT_COMPONENTS)

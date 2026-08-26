@@ -132,40 +132,45 @@
   text-wrap: balance;
 }
 
-/* **A numbered document reads its numbers in a rail**, which the legacy about
- * page did with `grid-template-columns: 7rem 1fr` and a mono number in the first
- * column. That exact shape is not reachable from here and should not be faked:
- * `helix-list` keeps its host a `list-item` so the marker is the platform's, and
- * its own comment says why, that `list-item` cannot combine with `grid`. A
- * document rule making the host a grid would kill both of the component's
- * declarations, which is what `check:overruled` exists to refuse.
+/* **A numbered document reads its numbers in a rail.**
  *
- * What is reachable is the two things that make the rail read as one: room
- * between the number and the words, through the documented `--list-marker-gutter`,
- * and a number set apart from the prose it labels. `::marker` takes font and
- * color and the component styles it nowhere, so nothing is being overruled.
+ * A claim with prose under it is not a short row, and the platform's marker is
+ * placed for short rows: `outside` hangs it just clear of the row's content box,
+ * so widening the gutter moves the words right and takes the marker along. The
+ * two stay a marker's width apart whatever the gutter is, which is why this page
+ * spent a while approximating the shape with `--list-marker-gutter` and a mono
+ * `::marker` and could never actually reach it.
  *
- * `letter-spacing` is deliberately absent: it is not in the property set
- * `::marker` accepts, so it would be a declaration that parses and does nothing.
+ * `marker="rail"` is the real thing, and it is the component's now rather than
+ * this sheet's: the number sits in a track of its own at the start edge, every
+ * claim begins at one measure, and the mono, muted, extra-small treatment the
+ * rules here used to apply to `::marker` is in `list-item.css` where it belongs.
+ * What is left for a page to say is how far apart the claims sit, which is a fact
+ * about this kind of page and not about lists.
  *
- * The true rail, with the number at the block's own start edge, wants
- * `helix-list` to render it into `[part="row"]`'s grid rather than leave it to
- * the platform. That is a component change rather than a page one.
+ * The rail's width is the component's default and is deliberately not restated
+ * here. A page repeating a default is a line that goes stale silently the day the
+ * default moves.
+ *
+ * **Set by `renderDocument`, not by this selector**, because CSS cannot write an
+ * attribute. That is the seam in `mdx.ts`: the document surfaces render `ol` as a
+ * railed list and the component documentation does not, since a numbered list of
+ * steps wants its marker beside the words.
  *
  * In the shared shell rather than on Trust, because it is a fact about how this
  * site sets a numbered argument rather than about that page: counted, Trust is
- * the only document with an ordered list in it today, and an insight that grows
- * one should get the same treatment without asking for it.
+ * still the only document with an ordered list in it, and a thesis or an insight
+ * that grows one should get the same treatment without asking for it.
  */
 .documentBody helix-list[kind="ordered"] {
   --list-gap: var(--helix-space-lg);
-  --list-marker-gutter: var(--helix-space-2xl);
-}
-
-.documentBody helix-list[kind="ordered"] helix-list-item::marker {
-  color: var(--helix-color-foreground-muted);
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
+  /* No inset, because a claim here is prose and not a control. The row's default
+     padding is for rows that are targets, and its leading half put the number
+     16px inside the block it is supposed to start: measured, the prose sat at
+     x=24 and the rail at x=40, so the numbers did not line up with the headings
+     they run beside, which is the whole thing a rail is for. The gap above
+     already separates the claims. */
+  --list-item-inset: var(--helix-space-none);
 }
 
 /* Air between the blocks, said once here rather than on every element: the base

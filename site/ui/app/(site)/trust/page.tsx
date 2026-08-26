@@ -1,6 +1,6 @@
 import { findSitePage, sitePageSources } from '@fusion-io/insights'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { renderMdx } from '../../../utils/mdx/mdx'
+import { renderDocument } from '../../../utils/mdx/mdx'
 import { DocumentPage } from '../document-page'
 
 /**
@@ -17,11 +17,17 @@ import { DocumentPage } from '../document-page'
  * actually be editing, and the numbering is the list's own for the same reason:
  * the count is a fact about the document, so the document carries it.
  *
- * **This said `##` headings and a CSS counter, and neither was true.** The file
- * holds an ordered list, `renderMdx` turns it into a `helix-list`, the numbers
- * are the platform's markers, and no counter existed anywhere in the site's CSS.
- * A comment that describes an implementation the file no longer has is worse than
- * no comment, because it is the thing a reader trusts instead of looking.
+ * **This said `##` headings and a CSS counter, and then said markers.** The file
+ * holds an ordered list and `renderDocument` turns it into a railed
+ * `helix-list`, so the numbers are a counter again: the list resets it and each
+ * row increments it, and the row draws the result in a track at the start edge.
+ * The correction before this one was right to say no counter existed in the
+ * site's CSS, and it does not now either. The counter is the component's.
+ *
+ * Recorded rather than tidied away because this comment has now been wrong twice
+ * about the same six numbers, which is what a comment describing an
+ * implementation does when the implementation moves: it is the thing a reader
+ * trusts instead of looking.
  *
  * The second half is the part most companies leave out and the reason this page
  * is worth having at all: none of it has been exercised yet, because nothing
@@ -48,7 +54,7 @@ export default async function Page() {
   const source = sitePageSources[page.slug]
   return (
     <DocumentPage
-      body={source ? await renderMdx(source) : null}
+      body={source ? await renderDocument(source) : null}
       kicker={page.kicker}
       lede={page.lede}
       title={page.title}

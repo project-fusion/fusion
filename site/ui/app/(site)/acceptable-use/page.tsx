@@ -1,6 +1,6 @@
 import { findSitePage, sitePageSources } from '@fusion-io/insights'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { renderMdx } from '../../../utils/mdx/mdx'
+import { renderDocument } from '../../../utils/mdx/mdx'
 import { DocumentPage } from '../document-page'
 
 /**
@@ -27,7 +27,7 @@ export default async function Page() {
   const source = sitePageSources[page.slug]
   return (
     <DocumentPage
-      body={source ? await renderMdx(source) : null}
+      body={source ? await renderDocument(source) : null}
       kicker={page.kicker}
       lede={page.lede}
       title={page.title}
