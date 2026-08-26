@@ -235,7 +235,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessAccordionItem["defaultOpen"];
@@ -1173,7 +1175,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessColorInput["defaultOpen"];
@@ -1193,7 +1197,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessColorInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessColorInput["hint"];
@@ -1340,7 +1346,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessColorPicker["value"];
   /** Whether the control is non-interactive.
 
@@ -1507,7 +1515,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCombobox["defaultOpen"];
@@ -1527,7 +1537,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessCombobox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessCombobox["hint"];
@@ -1630,7 +1642,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCommand["defaultOpen"];
@@ -1819,21 +1833,19 @@ the last page rather than as 99. */
   defaultPage?: HelixHeadlessDataTable["defaultPage"];
   /** How many rows a page holds. Zero is every row, which is what "no paging" means.
 
-**Not controlled, and that is not an omission.** Nothing in this element
-ever asks for a different page size: a size selector is
+**It announces nothing, and that is not an omission.** Nothing in this
+element ever asks for a different page size: a size selector is
 `helix-pagination-size`, which a consumer puts in the `footer` slot and
-answers themselves. A `@controlled` tag here would name an event this
-element never fires for it, and `check:controlled` holds the tag against the
-calls that back it. */
+answers themselves. Routing this through `requestChange` would announce an
+event the element never has cause to fire. */
   "page-size"?: HelixHeadlessDataTable["pageSize"];
   /** How many rows a page holds. Zero is every row, which is what "no paging" means.
 
-**Not controlled, and that is not an omission.** Nothing in this element
-ever asks for a different page size: a size selector is
+**It announces nothing, and that is not an omission.** Nothing in this
+element ever asks for a different page size: a size selector is
 `helix-pagination-size`, which a consumer puts in the `footer` slot and
-answers themselves. A `@controlled` tag here would name an event this
-element never fires for it, and `check:controlled` holds the tag against the
-calls that back it. */
+answers themselves. Routing this through `requestChange` would announce an
+event the element never has cause to fire. */
   pageSize?: HelixHeadlessDataTable["pageSize"];
   /** Page size to open with, where nothing declared one. */
   "default-page-size"?: HelixHeadlessDataTable["defaultPageSize"];
@@ -2031,7 +2043,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDateInput["defaultOpen"];
@@ -2051,7 +2065,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessDateInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessDateInput["hint"];
@@ -2186,7 +2202,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessDatePicker["value"];
   /** Whether the control is non-interactive.
 
@@ -2278,7 +2296,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDialog["defaultOpen"];
@@ -2428,7 +2448,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDrawer["defaultOpen"];
@@ -2908,7 +2930,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessInput["hint"];
@@ -3232,7 +3256,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessListbox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessListbox["hint"];
@@ -3383,7 +3409,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMegamenu["defaultOpen"];
@@ -3535,7 +3563,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMenu["defaultOpen"];
@@ -3808,7 +3838,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessNumberInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessNumberInput["hint"];
@@ -4284,7 +4316,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessPinInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessPinInput["hint"];
@@ -4372,7 +4406,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessPopover["defaultOpen"];
@@ -4533,7 +4569,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessRadioGroup["hint"];
@@ -4679,7 +4717,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessRating["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessRating["hint"];
@@ -4797,7 +4837,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSelect["defaultOpen"];
@@ -4817,7 +4859,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessSelect["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessSelect["hint"];
@@ -4940,7 +4984,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessSlider["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessSlider["hint"];
@@ -5132,7 +5178,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
@@ -5778,7 +5826,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessTextarea["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessTextarea["hint"];
@@ -5931,7 +5981,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTimeInput["defaultOpen"];
@@ -5951,7 +6003,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessTimeInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessTimeInput["hint"];
@@ -6113,7 +6167,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessTimePicker["value"];
   /** Whether the control is non-interactive.
 
@@ -6313,7 +6369,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessToggleGroup["hint"];
@@ -6511,7 +6569,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTooltip["defaultOpen"];
@@ -6546,16 +6606,16 @@ export type HelixHeadlessTourVueProps = {
   open?: HelixHeadlessTour["open"];
   /** Which stop the reader is on.
 
-**It said `@controlled` for two days and honoured none of it.** The tag is
-a claim that a consumer may own the value, and `index` was a plain property
-the tour wrote to directly: `move` assigned it and *then* announced, so
-`preventDefault` on the change arrived after the move it was refusing, and
-a consumer who declared `index` had it overwritten on the next press.
+**It announced after it moved for two days, which made refusing it
+impossible.** `index` was a plain property the tour wrote to directly:
+`move` assigned it and *then* announced, so `preventDefault` on the change
+arrived after the move it was refusing. It goes through `requestChange`
+now, which announces first and applies only if nobody refused, and refusing
+is how a consumer takes the decision. See 294.
 
 The shape is `Carousel`'s, which is the nearest thing in the library: a
-`default-index` for markup that only seeds, a held state that is
-`undefined` until somebody sets one, and a mode decided once at the first
-update so a later assignment cannot take the tour over. */
+`default-index` for markup that only seeds and a held state that is
+`undefined` until somebody sets one. */
   index?: HelixHeadlessTour["index"];
   /** Stop to start on, where nothing declared one. */
   "default-index"?: HelixHeadlessTour["defaultIndex"];
@@ -6717,7 +6777,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTreeItem["defaultOpen"];
@@ -7837,7 +7899,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessToolbarVueProps,
     HelixHeadlessToolbarVueEvents
   >;
-  /** The trigger is slotted and stays the consumer's own element. The bubble is rendered here, in the top layer through the popover API, so it clears any ancestor with 'overflow: hidden' without a 'z-index' anywhere.  Position comes from 'FloatingController', which flips to another side when the preferred one does not fit and slides along it to stay in view.  **Two forms, and they are not equivalent for a screen reader.**  Wrapping is the convenience form and is right where the bubble decorates a control that already says what it is. The trigger stays the consumer's own element, slotted, and nothing here can describe it: an IDREF cannot cross a shadow boundary, an element reference is valid only into the same tree or a shadow-including *ancestor* (the bubble's tree is neither, it is inward), and a string on the trigger means writing to markup the consumer server-rendered. All three measured.  'for' is the form that works. The tooltip sits *beside* the trigger in the consumer's own tree and names it by id, so both are in one tree and an IDREF between them is legal in the ordinary way:  '''html <helix-button id="save" aria-describedby="save-tip">Save</helix-button> <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip> '''  Note that the reference points at *this host*, not at the bubble inside its shadow root: the description is computed from the flat tree, which descends into shadow content on its own.  **The consumer writes that 'aria-describedby', and nothing here writes it for them.** WebAwesome and Spectrum Web Components both do write it, with 'setAttribute' on the trigger at runtime, which is the one thing this library declines everywhere: React rendered that element on the server without the attribute and reports a mismatch it will not patch up. Two ids in the markup is the whole cost of the version that is correct before any JavaScript runs.  Because it is the consumer's line to write, it is also theirs to forget, so 'for' audits itself on first open and says so once. Same shape as 'requestControlledChange' warning about a controlled property nothing answered.  It shows on hover and on focus, and hides on leave, on blur, on Escape, and once the trigger has been activated: the hint is spent when the control has been used. A tooltip that answers only the pointer is one a keyboard reader never sees.  The pointer waits out 'delay' first, or sweeping a row of controls flashes a tooltip for each of them. Focus does not wait: a keyboard reader landing on a control has already committed to it.  Open state comes from 'MixinControllerOpen', so it announces 'helix-open' and 'helix-close' like every other overlay here, and a consumer can drive it with 'open' where they need to. */
+  /** The trigger is slotted and stays the consumer's own element. The bubble is rendered here, in the top layer through the popover API, so it clears any ancestor with 'overflow: hidden' without a 'z-index' anywhere.  Position comes from 'FloatingController', which flips to another side when the preferred one does not fit and slides along it to stay in view.  **Two forms, and they are not equivalent for a screen reader.**  Wrapping is the convenience form and is right where the bubble decorates a control that already says what it is. The trigger stays the consumer's own element, slotted, and nothing here can describe it: an IDREF cannot cross a shadow boundary, an element reference is valid only into the same tree or a shadow-including *ancestor* (the bubble's tree is neither, it is inward), and a string on the trigger means writing to markup the consumer server-rendered. All three measured.  'for' is the form that works. The tooltip sits *beside* the trigger in the consumer's own tree and names it by id, so both are in one tree and an IDREF between them is legal in the ordinary way:  '''html <helix-button id="save" aria-describedby="save-tip">Save</helix-button> <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip> '''  Note that the reference points at *this host*, not at the bubble inside its shadow root: the description is computed from the flat tree, which descends into shadow content on its own.  **The consumer writes that 'aria-describedby', and nothing here writes it for them.** WebAwesome and Spectrum Web Components both do write it, with 'setAttribute' on the trigger at runtime, which is the one thing this library declines everywhere: React rendered that element on the server without the attribute and reports a mismatch it will not patch up. Two ids in the markup is the whole cost of the version that is correct before any JavaScript runs.  Because it is the consumer's line to write, it is also theirs to forget, so 'for' audits itself on first open and says so once, rather than on every open, since a warning that repeats is one people learn to filter out.  It shows on hover and on focus, and hides on leave, on blur, on Escape, and once the trigger has been activated: the hint is spent when the control has been used. A tooltip that answers only the pointer is one a keyboard reader never sees.  The pointer waits out 'delay' first, or sweeping a row of controls flashes a tooltip for each of them. Focus does not wait: a keyboard reader landing on a control has already committed to it.  Open state comes from 'MixinControllerOpen', so it announces 'helix-open' and 'helix-close' like every other overlay here, and a consumer can drive it with 'open' where they need to. */
   "helix-headless-tooltip": DefineCustomElement<
     HelixHeadlessTooltip,
     HelixHeadlessTooltipVueProps,

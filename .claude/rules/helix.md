@@ -397,9 +397,8 @@ the property is the state. What builds the wrong intuition is that
 `setAttribute('value', …)` *does* move the displayed text right up until the
 first edit sets that flag.
 
-**And here reflecting is worse than merely unfaithful, because the attribute is
-the channel ownership is read from.** With `reflect: true` on the value mixin,
-measured:
+**And reflecting a payload leaks state into markup, which is its own fault.**
+With `reflect: true` on the value mixin, measured:
 
 ```
 AT REST:       <helix-input label="L" default-value="Ada" type="text" value="Ada">
@@ -407,13 +406,18 @@ AFTER TYPING:  <helix-input label="L" default-value="Ada" type="text" value="Gra
 PASTED:        started "Grace", typed "Hopper", still holds "Grace"
 ```
 
-Serialize the host, re-parse it, and the new element sees `value` declared
-before its first update, latches controlled, and freezes. Note the first line:
-untouched, the seed had already leaked into `value`, so even a never-typed-in
-control comes back dead from a copy-paste. Decide-once settles the element that
-is already alive; it cannot settle markup that outlives it. Lit SSR does emit
-reflected attributes (verified with `disabled` set as a property), so this is
-not a client-only concern.
+Serialize the host, re-parse it, and the new element opens holding whatever the
+last reader typed rather than what the author wrote, and the author's seed is
+gone with no way to tell the two apart. Lit SSR does emit reflected attributes
+(verified with `disabled` set as a property), so this is not a client-only
+concern.
+
+*The second half of this measurement has expired, 26 Aug 2026, and is worth
+recording rather than deleting.* It read that the re-parsed element "sees `value`
+declared before its first update, latches controlled, and freezes", so even a
+never-typed-in control came back dead from a copy-paste. There is no latch now
+and nothing to freeze. The reflection is still wrong, for the reason above, and
+one of the two reasons it was wrong has gone.
 
 The line that is actually drawn, and it is not "value is special":
 
@@ -429,22 +433,33 @@ the payload: a floating label cares whether there is text, not what it says. And
 `helix-input` takes `type="password"`, which a `data-value` would carry straight
 past every session-replay masker that knows to mask `.value` and `input[value]`.
 
-**Where we do diverge from native is the name, and it is a real trap.** Native
-`<input value="Ada">` seeds; `<helix-input value="Ada">` claims ownership and
-the control goes quiet. We took React's `value`/`defaultValue` split, which is
-right for our consumers and wrong for anyone reasoning from HTML, and it caught
-six of our own examples. `requestControlledChange` therefore audits a
-controlled element that asks and is not answered. Read the state **before**
-dispatching, or a consumer answering synchronously looks identical to one that
-was never there.
+**We used to diverge from native on the name, and no longer do.** *Rewritten 26
+Aug 2026; this described the opposite for months.* It read: native
+`<input value="Ada">` seeds while `<helix-input value="Ada">` claims ownership
+and the control goes quiet, and `requestControlledChange` therefore audits a
+controlled element that asks and is not answered.
 
-**It judges on the next request, not on a deadline.** It read the state back
-after `setTimeout(0)` until 19 Aug 2026, which is true of React committing a
-`setState` from a handler and false of anything slower: a consumer who answers
-by navigating, as the documentation nav does by deriving a tree's `active` from
-the route, cannot have moved the state inside one task and was accused of not
-listening. Unmoved across two requests is unanswered whatever the timing, and a
-control asked once and never again is never accused.
+`value="Ada"` is the seed it looks like. **Control is an action, not a mode**:
+the element always owns its state and always applies it, a cancelable
+`helix-before-*` lets a consumer take one decision, and a consumer who wants
+full ownership refuses and assigns their own. That is how the platform says the
+same thing on a form submit, a link click and `beforeinput`.
+
+**The audit is gone with the divergence, which is the part worth understanding.**
+It existed to catch a trap of our own making, a declared property that read as a
+seed and was not, and it needed two `WeakMap`s, a console warning and an
+argument about judging on the second request rather than on a timer. Remove the
+divergence and the trap cannot happen, so none of that machinery has anything to
+do. The generated `helix-controlled-props` constraint went the same way: a
+`value` prop no longer needs a handler beside it, because it is not a claim.
+
+**What decided it was the reach.** `requestChange` is not a value-control
+mechanism. `MixinControllerValue`, `MixinControllerChecked`, `MixinControllerOpen`
+and `MixinControllerActive` all run on it, so a mode would fork the event
+vocabulary across ninety-two families by prop presence: which event a consumer
+binds would depend on whether they passed a property, and an HTML consumer would
+have no ergonomic spelling for the controlled half at all, a prefixed event
+having no inline handler attribute. See 294.
 
 **Shared test scaffolding lives in `@helix-io/testing`**, one module per
 environment: `dom` for happy-dom under bun, `browser` for Chromium, `ssr` for
@@ -1005,35 +1020,29 @@ Five controls are continuous: Input, Textarea, Number Input, Pin Input and
 Slider. They set `announcesInput` on `MixinControllerValue`, which picks the
 event; everything else changes one step at a time, and a step is a change.
 
-The `@controlled` tag on `value` names both, and the plugin keeps whichever the
-component declares, so one tag serves both shapes and a component cannot ask a
-consumer for a handler it never fires.
+**`@controlled` is deleted, and so is everything that read it.** *Rewritten 26
+Aug 2026, and this section described a tag, two analyzer plugins and a check
+that no longer exist.* It read: a controlled property declares itself with
+`@controlled` naming the events that answer it, declaring `value` is a claim of
+ownership so the element announces and applies nothing until told,
+`check:controlled` holds the tag and the call together in both directions, and
+the generated JSX types refuse the property without a handler.
 
-**A controlled property declares itself with `@controlled`**, naming the events
-that answer it:
+None of that is true. A declared property is a seed and a correction, the
+element always applies, and a consumer takes one decision by refusing the before
+event. With no mode to be silently in there is nothing for a tag to declare,
+nothing for the generated constraint to require, and nothing for a check to
+hold. `helix-controlled`, `helix-controlled-props`, `check:controlled` and its
+fixture were removed together. See 294, and the longer version of the argument
+under the reflected-property rules above.
 
-```ts
-/** Whether the control is checked. @controlled helix-change */
-```
-
-Declaring `value` on a Helix control is a claim of ownership, so the element
-announces and applies nothing until it is told. Which properties work that way
-was inferred from `inheritedFrom` for exactly one commit, on the reasoning that
-they all come from a controller mixin. Eight do not: pagination's `page` and its
-size `value`, toast's `open`, listbox's `filter`, splitter's `position` and
-`collapsed`, carousel's `index`, date picker's `month` are implemented in the
-component and inherit from nothing. A third of the surface went unguarded and
-every check reported success.
-
-Nothing in the source says it either, short of a guess: `requestControlledChange`
-is called from a private method three hundred lines from the property it
-settles. So the property says so, `check:controlled` holds the tag and the call
-together in both directions, and the generated JSX types refuse the property
-without a handler.
-
-`@controlled` on the property, not the class, so it survives inheritance: a
-component's `checked` is a copy of the mixin's member, and a list kept beside
-the members would need merging by hand at every tier.
+**What survives is the finding underneath it**, which was never about ownership:
+which properties are stateful cannot be inferred from `inheritedFrom`. Eight are
+implemented in the component and inherit from nothing: pagination's `page` and
+its size `value`, toast's `open`, listbox's `filter`, splitter's `position` and
+`collapsed`, carousel's `index`, date picker's `month`. Any future check that
+tries to find stateful properties by walking the mixins will miss a third of
+them and report success, which is what happened the first time.
 
 Every `@property` gets a one-line description.
 

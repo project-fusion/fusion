@@ -393,7 +393,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessAccordionItem["defaultOpen"];
@@ -448,7 +450,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessAccordionItem["defaultOpen"];
@@ -2183,7 +2187,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessColorInput["defaultOpen"];
@@ -2203,7 +2209,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessColorInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessColorInput["hint"];
@@ -2323,7 +2331,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessColorInput["defaultOpen"];
@@ -2343,7 +2353,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessColorInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessColorInput["hint"];
@@ -2494,7 +2506,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessColorPicker["value"];
   /** Whether the control is non-interactive.
 
@@ -2621,7 +2635,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessColorPicker["value"];
   /** Whether the control is non-interactive.
 
@@ -2796,7 +2812,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCombobox["defaultOpen"];
@@ -2816,7 +2834,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessCombobox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessCombobox["hint"];
@@ -2971,7 +2991,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessCombobox["defaultOpen"];
@@ -2991,7 +3013,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessCombobox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessCombobox["hint"];
@@ -3096,7 +3120,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCommand["defaultOpen"];
@@ -3147,7 +3173,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessCommand["defaultOpen"];
@@ -3426,21 +3454,19 @@ the last page rather than as 99. */
   defaultPage?: HelixHeadlessDataTable["defaultPage"];
   /** How many rows a page holds. Zero is every row, which is what "no paging" means.
 
-**Not controlled, and that is not an omission.** Nothing in this element
-ever asks for a different page size: a size selector is
+**It announces nothing, and that is not an omission.** Nothing in this
+element ever asks for a different page size: a size selector is
 `helix-pagination-size`, which a consumer puts in the `footer` slot and
-answers themselves. A `@controlled` tag here would name an event this
-element never fires for it, and `check:controlled` holds the tag against the
-calls that back it. */
+answers themselves. Routing this through `requestChange` would announce an
+event the element never has cause to fire. */
   "page-size"?: HelixHeadlessDataTable["pageSize"];
   /** How many rows a page holds. Zero is every row, which is what "no paging" means.
 
-**Not controlled, and that is not an omission.** Nothing in this element
-ever asks for a different page size: a size selector is
+**It announces nothing, and that is not an omission.** Nothing in this
+element ever asks for a different page size: a size selector is
 `helix-pagination-size`, which a consumer puts in the `footer` slot and
-answers themselves. A `@controlled` tag here would name an event this
-element never fires for it, and `check:controlled` holds the tag against the
-calls that back it. */
+answers themselves. Routing this through `requestChange` would announce an
+event the element never has cause to fire. */
   pageSize?: HelixHeadlessDataTable["pageSize"];
   /** Page size to open with, where nothing declared one. */
   "default-page-size"?: HelixHeadlessDataTable["defaultPageSize"];
@@ -3548,21 +3574,19 @@ the last page rather than as 99. */
   "prop:defaultPage"?: HelixHeadlessDataTable["defaultPage"];
   /** How many rows a page holds. Zero is every row, which is what "no paging" means.
 
-**Not controlled, and that is not an omission.** Nothing in this element
-ever asks for a different page size: a size selector is
+**It announces nothing, and that is not an omission.** Nothing in this
+element ever asks for a different page size: a size selector is
 `helix-pagination-size`, which a consumer puts in the `footer` slot and
-answers themselves. A `@controlled` tag here would name an event this
-element never fires for it, and `check:controlled` holds the tag against the
-calls that back it. */
+answers themselves. Routing this through `requestChange` would announce an
+event the element never has cause to fire. */
   "attr:page-size"?: HelixHeadlessDataTable["pageSize"];
   /** How many rows a page holds. Zero is every row, which is what "no paging" means.
 
-**Not controlled, and that is not an omission.** Nothing in this element
-ever asks for a different page size: a size selector is
+**It announces nothing, and that is not an omission.** Nothing in this
+element ever asks for a different page size: a size selector is
 `helix-pagination-size`, which a consumer puts in the `footer` slot and
-answers themselves. A `@controlled` tag here would name an event this
-element never fires for it, and `check:controlled` holds the tag against the
-calls that back it. */
+answers themselves. Routing this through `requestChange` would announce an
+event the element never has cause to fire. */
   "prop:pageSize"?: HelixHeadlessDataTable["pageSize"];
   /** Page size to open with, where nothing declared one. */
   "attr:default-page-size"?: HelixHeadlessDataTable["defaultPageSize"];
@@ -3766,7 +3790,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDateInput["defaultOpen"];
@@ -3786,7 +3812,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessDateInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessDateInput["hint"];
@@ -3969,7 +3997,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessDateInput["defaultOpen"];
@@ -3989,7 +4019,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessDateInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessDateInput["hint"];
@@ -4128,7 +4160,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessDatePicker["value"];
   /** Whether the control is non-interactive.
 
@@ -4243,7 +4277,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessDatePicker["value"];
   /** Whether the control is non-interactive.
 
@@ -4341,7 +4377,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDialog["defaultOpen"];
@@ -4394,7 +4432,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessDialog["defaultOpen"];
@@ -4628,7 +4668,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDrawer["defaultOpen"];
@@ -4684,7 +4726,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessDrawer["defaultOpen"];
@@ -5509,7 +5553,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessInput["hint"];
@@ -5637,7 +5683,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessInput["hint"];
@@ -6150,7 +6198,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessListbox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessListbox["hint"];
@@ -6268,7 +6318,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessListbox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessListbox["hint"];
@@ -6429,7 +6481,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMegamenu["defaultOpen"];
@@ -6526,7 +6580,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessMegamenu["defaultOpen"];
@@ -6747,7 +6803,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMenu["defaultOpen"];
@@ -6808,7 +6866,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessMenu["defaultOpen"];
@@ -7258,7 +7318,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessNumberInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessNumberInput["hint"];
@@ -7367,7 +7429,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessNumberInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessNumberInput["hint"];
@@ -8169,7 +8233,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessPinInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessPinInput["hint"];
@@ -8285,7 +8351,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessPinInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessPinInput["hint"];
@@ -8377,7 +8445,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessPopover["defaultOpen"];
@@ -8418,7 +8488,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessPopover["defaultOpen"];
@@ -8697,7 +8769,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessRadioGroup["hint"];
@@ -8767,7 +8841,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessRadioGroup["hint"];
@@ -8931,7 +9007,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessRating["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessRating["hint"];
@@ -9043,7 +9121,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessRating["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessRating["hint"];
@@ -9173,7 +9253,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSelect["defaultOpen"];
@@ -9193,7 +9275,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessSelect["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessSelect["hint"];
@@ -9289,7 +9373,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessSelect["defaultOpen"];
@@ -9309,7 +9395,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessSelect["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessSelect["hint"];
@@ -9439,7 +9527,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessSlider["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessSlider["hint"];
@@ -9545,7 +9635,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessSlider["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessSlider["hint"];
@@ -9836,7 +9928,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
@@ -9880,7 +9974,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
@@ -11041,7 +11137,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessTextarea["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessTextarea["hint"];
@@ -11137,7 +11235,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessTextarea["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessTextarea["hint"];
@@ -11292,7 +11392,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTimeInput["defaultOpen"];
@@ -11312,7 +11414,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessTimeInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessTimeInput["hint"];
@@ -11450,7 +11554,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessTimeInput["defaultOpen"];
@@ -11470,7 +11576,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessTimeInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessTimeInput["hint"];
@@ -11636,7 +11744,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessTimePicker["value"];
   /** Whether the control is non-interactive.
 
@@ -11777,7 +11887,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessTimePicker["value"];
   /** Whether the control is non-interactive.
 
@@ -12084,7 +12196,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   value?: HelixHeadlessToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessToggleGroup["hint"];
@@ -12179,7 +12293,9 @@ means in React: the value is theirs and the control waits to be told.
 `default-value` is how markup seeds one it does not want to own.
 
 The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
+being four of a kind rather than four of three kinds.
+
+helix-input */
   "prop:value"?: HelixHeadlessToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   "prop:hint"?: HelixHeadlessToggleGroup["hint"];
@@ -12415,7 +12531,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTooltip["defaultOpen"];
@@ -12526,7 +12644,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessTooltip["defaultOpen"];
@@ -12563,16 +12683,16 @@ export type HelixHeadlessTourProps = {
   open?: HelixHeadlessTour["open"];
   /** Which stop the reader is on.
 
-**It said `@controlled` for two days and honoured none of it.** The tag is
-a claim that a consumer may own the value, and `index` was a plain property
-the tour wrote to directly: `move` assigned it and *then* announced, so
-`preventDefault` on the change arrived after the move it was refusing, and
-a consumer who declared `index` had it overwritten on the next press.
+**It announced after it moved for two days, which made refusing it
+impossible.** `index` was a plain property the tour wrote to directly:
+`move` assigned it and *then* announced, so `preventDefault` on the change
+arrived after the move it was refusing. It goes through `requestChange`
+now, which announces first and applies only if nobody refused, and refusing
+is how a consumer takes the decision. See 294.
 
 The shape is `Carousel`'s, which is the nearest thing in the library: a
-`default-index` for markup that only seeds, a held state that is
-`undefined` until somebody sets one, and a mode decided once at the first
-update so a later assignment cannot take the tour over. */
+`default-index` for markup that only seeds and a held state that is
+`undefined` until somebody sets one. */
   index?: HelixHeadlessTour["index"];
   /** Stop to start on, where nothing declared one. */
   "default-index"?: HelixHeadlessTour["defaultIndex"];
@@ -12614,16 +12734,16 @@ export type HelixHeadlessTourSolidJsProps = {
   "prop:open"?: HelixHeadlessTour["open"];
   /** Which stop the reader is on.
 
-**It said `@controlled` for two days and honoured none of it.** The tag is
-a claim that a consumer may own the value, and `index` was a plain property
-the tour wrote to directly: `move` assigned it and *then* announced, so
-`preventDefault` on the change arrived after the move it was refusing, and
-a consumer who declared `index` had it overwritten on the next press.
+**It announced after it moved for two days, which made refusing it
+impossible.** `index` was a plain property the tour wrote to directly:
+`move` assigned it and *then* announced, so `preventDefault` on the change
+arrived after the move it was refusing. It goes through `requestChange`
+now, which announces first and applies only if nobody refused, and refusing
+is how a consumer takes the decision. See 294.
 
 The shape is `Carousel`'s, which is the nearest thing in the library: a
-`default-index` for markup that only seeds, a held state that is
-`undefined` until somebody sets one, and a mode decided once at the first
-update so a later assignment cannot take the tour over. */
+`default-index` for markup that only seeds and a held state that is
+`undefined` until somebody sets one. */
   "prop:index"?: HelixHeadlessTour["index"];
   /** Stop to start on, where nothing declared one. */
   "attr:default-index"?: HelixHeadlessTour["defaultIndex"];
@@ -12831,7 +12951,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   open?: HelixHeadlessTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTreeItem["defaultOpen"];
@@ -12907,7 +13029,9 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for. */
+state for stylesheets, which is what it has always been for.
+
+helix-close */
   "prop:open"?: HelixHeadlessTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessTreeItem["defaultOpen"];
@@ -13721,6 +13845,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -13749,10 +13875,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -14892,7 +15019,7 @@ export type CustomElements = {
    */
   "helix-headless-carousel": Partial<
     HelixHeadlessCarouselProps & BaseProps<HelixHeadlessCarousel> & BaseEvents
-  > & HelixHeadlessCarouselControlled;
+  >;
 
   /**
    * **A separate element because it is separately replaceable.** A consumer with
@@ -15140,7 +15267,7 @@ export type CustomElements = {
    */
   "helix-headless-chat": Partial<
     HelixHeadlessChatProps & BaseProps<HelixHeadlessChat> & BaseEvents
-  > & HelixHeadlessChatControlled;
+  >;
 
   /**
    * The host is the group, so `role="group"` sits on it through internals and
@@ -15362,10 +15489,10 @@ export type CustomElements = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-change` is a refusal and nothing moves. In uncontrolled mode
-   * the element then updates itself; in controlled mode it applies nothing
-   * and waits for the consumer to pass a new `checked`, which is what
-   * "controlled" means.
+   * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+   * declared the property: a declared property is a seed and a correction,
+   * the way `<input value>` is, and a consumer who wants the change for
+   * themselves refuses it and assigns their own. See 294.
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
    *
@@ -15430,7 +15557,7 @@ export type CustomElements = {
    */
   "helix-headless-checkbox": Partial<
     HelixHeadlessCheckboxProps & BaseProps<HelixHeadlessCheckbox> & BaseEvents
-  > & HelixHeadlessCheckboxControlled;
+  >;
 
   /**
    * **`<pre><code>` and nothing cleverer.** The pair is what the platform means
@@ -15607,6 +15734,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -15620,6 +15749,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -15680,17 +15811,20 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -15876,6 +16010,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -15924,9 +16060,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -16162,6 +16300,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -16175,6 +16315,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -16234,17 +16376,20 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -16321,7 +16466,7 @@ export type CustomElements = {
    */
   "helix-headless-combobox": Partial<
     HelixHeadlessComboboxProps & BaseProps<HelixHeadlessCombobox> & BaseEvents
-  > & HelixHeadlessComboboxControlled;
+  >;
 
   /**
    * **The list is `helix-listbox`, filtering and all.** Listbox already owns
@@ -16381,6 +16526,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -16405,10 +16552,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -16431,7 +16579,7 @@ export type CustomElements = {
    */
   "helix-headless-command": Partial<
     HelixHeadlessCommandProps & BaseProps<HelixHeadlessCommand> & BaseEvents
-  > & HelixHeadlessCommandControlled;
+  >;
 
   /**
    * **The confirmation is the component.** Writing to the clipboard is three
@@ -16698,12 +16846,11 @@ export type CustomElements = {
    * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
    * - `page-size`/`pageSize`: How many rows a page holds. Zero is every row, which is what "no paging" means.
    *
-   * **Not controlled, and that is not an omission.** Nothing in this element
-   * ever asks for a different page size: a size selector is
+   * **It announces nothing, and that is not an omission.** Nothing in this
+   * element ever asks for a different page size: a size selector is
    * `helix-pagination-size`, which a consumer puts in the `footer` slot and
-   * answers themselves. A `@controlled` tag here would name an event this
-   * element never fires for it, and `check:controlled` holds the tag against the
-   * calls that back it.
+   * answers themselves. Routing this through `requestChange` would announce an
+   * event the element never has cause to fire.
    * - `default-page-size`/`defaultPageSize`: Page size to open with, where nothing declared one.
    * - `paginated`: Whether to draw a pagination under the grid.
    *
@@ -16781,7 +16928,7 @@ export type CustomElements = {
    */
   "helix-headless-data-table": Partial<
     HelixHeadlessDataTableProps & BaseProps<HelixHeadlessDataTable> & BaseEvents
-  > & HelixHeadlessDataTableControlled;
+  >;
 
   /**
    * **The calendar is `helix-date-picker`, not a second one written here.** It
@@ -16893,6 +17040,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -16906,6 +17055,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -16964,17 +17115,20 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -17053,7 +17207,7 @@ export type CustomElements = {
    */
   "helix-headless-date-input": Partial<
     HelixHeadlessDateInputProps & BaseProps<HelixHeadlessDateInput> & BaseEvents
-  > & HelixHeadlessDateInputControlled;
+  >;
 
   /**
    * A grid of days, per the APG date grid: the whole grid is one tab stop, arrows
@@ -17139,6 +17293,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -17183,9 +17339,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -17337,6 +17495,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -17364,10 +17524,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -17378,7 +17539,7 @@ export type CustomElements = {
    */
   "helix-headless-dialog": Partial<
     HelixHeadlessDialogProps & BaseProps<HelixHeadlessDialog> & BaseEvents
-  > & HelixHeadlessDialogControlled;
+  >;
 
   /**
    * The separator role lives on the rule inside the shadow root rather than on
@@ -17650,6 +17811,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -17673,10 +17836,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -17689,7 +17853,7 @@ export type CustomElements = {
    */
   "helix-headless-drawer": Partial<
     HelixHeadlessDrawerProps & BaseProps<HelixHeadlessDrawer> & BaseEvents
-  > & HelixHeadlessDrawerControlled;
+  >;
 
   /**
    * A row that opens a page *contains* that page: its rows are this row's own
@@ -18584,6 +18748,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -18641,9 +18807,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -18703,7 +18871,7 @@ export type CustomElements = {
    */
   "helix-headless-input": Partial<
     HelixHeadlessInputProps & BaseProps<HelixHeadlessInput> & BaseEvents
-  > & HelixHeadlessInputControlled;
+  >;
 
   /**
    * Renders a real `<kbd>`, so the passage still means "press this" to anything
@@ -19214,6 +19382,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -19308,9 +19478,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -19372,7 +19544,7 @@ export type CustomElements = {
    */
   "helix-headless-listbox": Partial<
     HelixHeadlessListboxProps & BaseProps<HelixHeadlessListbox> & BaseEvents
-  > & HelixHeadlessListboxControlled;
+  >;
 
   /**
    * Two concentric circles rather than one arc: the track is what makes the
@@ -19529,6 +19701,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -19552,10 +19726,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Custom Properties
@@ -19573,7 +19748,7 @@ export type CustomElements = {
    */
   "helix-headless-megamenu": Partial<
     HelixHeadlessMegamenuProps & BaseProps<HelixHeadlessMegamenu> & BaseEvents
-  > & HelixHeadlessMegamenuControlled;
+  >;
 
   /**
    * Three shapes, one element, because a reader moving down a menu with the
@@ -19761,6 +19936,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -19787,10 +19964,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -19807,7 +19985,7 @@ export type CustomElements = {
    */
   "helix-headless-menu": Partial<
     HelixHeadlessMenuProps & BaseProps<HelixHeadlessMenu> & BaseEvents
-  > & HelixHeadlessMenuControlled;
+  >;
 
   /**
    * **Not `Progress`, and the difference is the whole component.** A progress bar
@@ -20228,6 +20406,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -20291,9 +20471,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -21002,6 +21184,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -21052,9 +21236,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -21111,7 +21297,7 @@ export type CustomElements = {
    */
   "helix-headless-pin-input": Partial<
     HelixHeadlessPinInputProps & BaseProps<HelixHeadlessPinInput> & BaseEvents
-  > & HelixHeadlessPinInputControlled;
+  >;
 
   /**
    * The general case the specific overlays are versions of. `Menu` holds
@@ -21164,6 +21350,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -21189,10 +21377,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -21204,7 +21393,7 @@ export type CustomElements = {
    */
   "helix-headless-popover": Partial<
     HelixHeadlessPopoverProps & BaseProps<HelixHeadlessPopover> & BaseEvents
-  > & HelixHeadlessPopoverControlled;
+  >;
 
   /**
    * Determinate by default, and `indeterminate` for a task whose total is not
@@ -21451,6 +21640,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -21507,9 +21698,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -21706,6 +21899,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -21754,9 +21949,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -21826,7 +22023,7 @@ export type CustomElements = {
    */
   "helix-headless-rating": Partial<
     HelixHeadlessRatingProps & BaseProps<HelixHeadlessRating> & BaseEvents
-  > & HelixHeadlessRatingControlled;
+  >;
 
   /**
    * **The whole component is one fact a stylesheet cannot work out for itself:
@@ -21946,6 +22143,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -21959,6 +22158,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -22019,17 +22220,20 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -22099,7 +22303,7 @@ export type CustomElements = {
    */
   "helix-headless-select": Partial<
     HelixHeadlessSelectProps & BaseProps<HelixHeadlessSelect> & BaseEvents
-  > & HelixHeadlessSelectControlled;
+  >;
 
   /**
    * Carries `aria-busy` and a polite live region, so a reader using a screen
@@ -22213,6 +22417,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -22262,9 +22468,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -22334,7 +22542,7 @@ export type CustomElements = {
    */
   "helix-headless-slider": Partial<
     HelixHeadlessSliderProps & BaseProps<HelixHeadlessSlider> & BaseEvents
-  > & HelixHeadlessSliderControlled;
+  >;
 
   /**
    * The one chart here that takes its numbers from an attribute, and the reversal
@@ -22578,6 +22786,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -22601,10 +22811,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -22617,7 +22828,7 @@ export type CustomElements = {
    */
   "helix-headless-speed-dial": Partial<
     HelixHeadlessSpeedDialProps & BaseProps<HelixHeadlessSpeedDial> & BaseEvents
-  > & HelixHeadlessSpeedDialControlled;
+  >;
 
   /**
    * **One axis, and nesting is how you get two.** The sandbox this was taken from
@@ -22846,7 +23057,7 @@ export type CustomElements = {
    */
   "helix-headless-splitter": Partial<
     HelixHeadlessSplitterProps & BaseProps<HelixHeadlessSplitter> & BaseEvents
-  > & HelixHeadlessSplitterControlled;
+  >;
 
   /**
    * A group rather than a list, because the figures are read together and their
@@ -23017,7 +23228,9 @@ export type CustomElements = {
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
-   * nothing to put back.
+   * nothing to put back. Nobody refusing means the set updates itself,
+   * whether or not a consumer declared `active`, a declared property being a
+   * seed and a correction. See 294.
    */
   "helix-headless-steps": Partial<
     HelixHeadlessStepsProps & BaseProps<HelixHeadlessSteps> & BaseEvents
@@ -23208,10 +23421,10 @@ export type CustomElements = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-change` is a refusal and nothing moves. In uncontrolled mode
-   * the element then updates itself; in controlled mode it applies nothing
-   * and waits for the consumer to pass a new `checked`, which is what
-   * "controlled" means.
+   * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+   * declared the property: a declared property is a seed and a correction,
+   * the way `<input value>` is, and a consumer who wants the change for
+   * themselves refuses it and assigns their own. See 294.
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
    *
@@ -23276,7 +23489,7 @@ export type CustomElements = {
    */
   "helix-headless-switch": Partial<
     HelixHeadlessSwitchProps & BaseProps<HelixHeadlessSwitch> & BaseEvents
-  > & HelixHeadlessSwitchControlled;
+  >;
 
   /**
    * Carries its own role, because a grid of divs is not a table to anything
@@ -23637,7 +23850,9 @@ export type CustomElements = {
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
-   * nothing to put back.
+   * nothing to put back. Nobody refusing means the set updates itself,
+   * whether or not a consumer declared `active`, a declared property being a
+   * seed and a correction. See 294.
    *
    * ## CSS Parts
    *
@@ -23796,6 +24011,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -23845,9 +24062,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -23904,7 +24123,7 @@ export type CustomElements = {
    */
   "helix-headless-textarea": Partial<
     HelixHeadlessTextareaProps & BaseProps<HelixHeadlessTextarea> & BaseEvents
-  > & HelixHeadlessTextareaControlled;
+  >;
 
   /**
    * **The list is `helix-time-picker`, not a second one written here.** It is worth
@@ -23992,6 +24211,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -24005,6 +24226,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -24063,17 +24286,20 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -24167,7 +24393,7 @@ export type CustomElements = {
    */
   "helix-headless-time-input": Partial<
     HelixHeadlessTimeInputProps & BaseProps<HelixHeadlessTimeInput> & BaseEvents
-  > & HelixHeadlessTimeInputControlled;
+  >;
 
   /**
    * **A list rather than three wheels**, and the reason is what a list already
@@ -24273,6 +24499,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -24334,9 +24562,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -24643,7 +24873,7 @@ export type CustomElements = {
    */
   "helix-headless-toast-item": Partial<
     HelixHeadlessToastItemProps & BaseProps<HelixHeadlessToastItem> & BaseEvents
-  > & HelixHeadlessToastItemControlled;
+  >;
 
   /**
    * **The region is why this is one family rather than two.** A live region has
@@ -24767,6 +24997,8 @@ export type CustomElements = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -24821,9 +25053,11 @@ export type CustomElements = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -25014,9 +25248,8 @@ export type CustomElements = {
    * is the whole cost of the version that is correct before any JavaScript runs.
    *
    * Because it is the consumer's line to write, it is also theirs to forget, so
-   * `for` audits itself on first open and says so once. Same shape as
-   * `requestControlledChange` warning about a controlled property nothing
-   * answered.
+   * `for` audits itself on first open and says so once, rather than on every
+   * open, since a warning that repeats is one people learn to filter out.
    *
    * It shows on hover and on focus, and hides on leave, on blur, on Escape, and
    * once the trigger has been activated: the hint is spent when the control has
@@ -25122,6 +25355,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -25158,10 +25393,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -25173,7 +25409,7 @@ export type CustomElements = {
    */
   "helix-headless-tooltip": Partial<
     HelixHeadlessTooltipProps & BaseProps<HelixHeadlessTooltip> & BaseEvents
-  > & HelixHeadlessTooltipControlled;
+  >;
 
   /**
    * The root owns the order and nothing else. Which stop is current, what Next
@@ -25220,16 +25456,16 @@ export type CustomElements = {
    * - `open`: Whether the tour is running.
    * - `index`: Which stop the reader is on.
    *
-   * **It said `@controlled` for two days and honoured none of it.** The tag is
-   * a claim that a consumer may own the value, and `index` was a plain property
-   * the tour wrote to directly: `move` assigned it and *then* announced, so
-   * `preventDefault` on the change arrived after the move it was refusing, and
-   * a consumer who declared `index` had it overwritten on the next press.
+   * **It announced after it moved for two days, which made refusing it
+   * impossible.** `index` was a plain property the tour wrote to directly:
+   * `move` assigned it and *then* announced, so `preventDefault` on the change
+   * arrived after the move it was refusing. It goes through `requestChange`
+   * now, which announces first and applies only if nobody refused, and refusing
+   * is how a consumer takes the decision. See 294.
    *
    * The shape is `Carousel`'s, which is the nearest thing in the library: a
-   * `default-index` for markup that only seeds, a held state that is
-   * `undefined` until somebody sets one, and a mode decided once at the first
-   * update so a later assignment cannot take the tour over.
+   * `default-index` for markup that only seeds and a held state that is
+   * `undefined` until somebody sets one.
    * - `default-index`/`defaultIndex`: Stop to start on, where nothing declared one.
    * - `label`: Accessible name for the run, such as "Getting started".
    * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
@@ -25274,7 +25510,7 @@ export type CustomElements = {
    */
   "helix-headless-tour": Partial<
     HelixHeadlessTourProps & BaseProps<HelixHeadlessTour> & BaseEvents
-  > & HelixHeadlessTourControlled;
+  >;
 
   /**
    * A stop names a target with `for` and holds whatever the consumer puts in it.
@@ -25460,6 +25696,8 @@ export type CustomElements = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    *
@@ -25500,10 +25738,11 @@ export type CustomElements = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Custom Properties
@@ -25524,7 +25763,7 @@ export type CustomElements = {
    */
   "helix-headless-tree-item": Partial<
     HelixHeadlessTreeItemProps & BaseProps<HelixHeadlessTreeItem> & BaseEvents
-  > & HelixHeadlessTreeItemControlled;
+  >;
 
   /**
    * Focus is a single tab stop, moved with the arrow keys, which is what the tree
@@ -25584,7 +25823,9 @@ export type CustomElements = {
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
-   * nothing to put back.
+   * nothing to put back. Nobody refusing means the set updates itself,
+   * whether or not a consumer declared `active`, a declared property being a
+   * seed and a correction. See 294.
    *
    * ## CSS Parts
    *
@@ -25885,7 +26126,9 @@ export type CustomElements = {
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
-   * nothing to put back.
+   * nothing to put back. Nobody refusing means the set updates itself,
+   * whether or not a consumer declared `active`, a declared property being a
+   * seed and a correction. See 294.
    *
    * ## CSS Parts
    *
@@ -26266,6 +26509,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -26294,10 +26539,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -27471,7 +27717,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessCarouselSolidJsProps &
       BaseProps<HelixHeadlessCarousel> &
       BaseEvents
-  > & HelixHeadlessCarouselControlledSolidJs;
+  >;
 
   /**
    * **A separate element because it is separately replaceable.** A consumer with
@@ -27724,7 +27970,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessChatSolidJsProps &
       BaseProps<HelixHeadlessChat> &
       BaseEvents
-  > & HelixHeadlessChatControlledSolidJs;
+  >;
 
   /**
    * The host is the group, so `role="group"` sits on it through internals and
@@ -27947,10 +28193,10 @@ export type CustomElementsSolidJs = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-change` is a refusal and nothing moves. In uncontrolled mode
-   * the element then updates itself; in controlled mode it applies nothing
-   * and waits for the consumer to pass a new `checked`, which is what
-   * "controlled" means.
+   * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+   * declared the property: a declared property is a seed and a correction,
+   * the way `<input value>` is, and a consumer who wants the change for
+   * themselves refuses it and assigns their own. See 294.
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
    *
@@ -28018,7 +28264,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessCheckboxSolidJsProps &
       BaseProps<HelixHeadlessCheckbox> &
       BaseEvents
-  > & HelixHeadlessCheckboxControlledSolidJs;
+  >;
 
   /**
    * **`<pre><code>` and nothing cleverer.** The pair is what the platform means
@@ -28201,6 +28447,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -28214,6 +28462,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -28274,17 +28524,20 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -28471,6 +28724,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -28519,9 +28774,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -28758,6 +29015,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -28771,6 +29030,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -28830,17 +29091,20 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -28920,7 +29184,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessComboboxSolidJsProps &
       BaseProps<HelixHeadlessCombobox> &
       BaseEvents
-  > & HelixHeadlessComboboxControlledSolidJs;
+  >;
 
   /**
    * **The list is `helix-listbox`, filtering and all.** Listbox already owns
@@ -28980,6 +29244,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -29004,10 +29270,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -29033,7 +29300,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessCommandSolidJsProps &
       BaseProps<HelixHeadlessCommand> &
       BaseEvents
-  > & HelixHeadlessCommandControlledSolidJs;
+  >;
 
   /**
    * **The confirmation is the component.** Writing to the clipboard is three
@@ -29301,12 +29568,11 @@ export type CustomElementsSolidJs = {
    * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
    * - `page-size`/`pageSize`: How many rows a page holds. Zero is every row, which is what "no paging" means.
    *
-   * **Not controlled, and that is not an omission.** Nothing in this element
-   * ever asks for a different page size: a size selector is
+   * **It announces nothing, and that is not an omission.** Nothing in this
+   * element ever asks for a different page size: a size selector is
    * `helix-pagination-size`, which a consumer puts in the `footer` slot and
-   * answers themselves. A `@controlled` tag here would name an event this
-   * element never fires for it, and `check:controlled` holds the tag against the
-   * calls that back it.
+   * answers themselves. Routing this through `requestChange` would announce an
+   * event the element never has cause to fire.
    * - `default-page-size`/`defaultPageSize`: Page size to open with, where nothing declared one.
    * - `paginated`: Whether to draw a pagination under the grid.
    *
@@ -29387,7 +29653,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessDataTableSolidJsProps &
       BaseProps<HelixHeadlessDataTable> &
       BaseEvents
-  > & HelixHeadlessDataTableControlledSolidJs;
+  >;
 
   /**
    * **The calendar is `helix-date-picker`, not a second one written here.** It
@@ -29499,6 +29765,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -29512,6 +29780,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -29570,17 +29840,20 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -29662,7 +29935,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessDateInputSolidJsProps &
       BaseProps<HelixHeadlessDateInput> &
       BaseEvents
-  > & HelixHeadlessDateInputControlledSolidJs;
+  >;
 
   /**
    * A grid of days, per the APG date grid: the whole grid is one tab stop, arrows
@@ -29748,6 +30021,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -29792,9 +30067,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -29947,6 +30224,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -29974,10 +30253,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -29991,7 +30271,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessDialogSolidJsProps &
       BaseProps<HelixHeadlessDialog> &
       BaseEvents
-  > & HelixHeadlessDialogControlledSolidJs;
+  >;
 
   /**
    * The separator role lives on the rule inside the shadow root rather than on
@@ -30267,6 +30547,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -30290,10 +30572,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -30309,7 +30592,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessDrawerSolidJsProps &
       BaseProps<HelixHeadlessDrawer> &
       BaseEvents
-  > & HelixHeadlessDrawerControlledSolidJs;
+  >;
 
   /**
    * A row that opens a page *contains* that page: its rows are this row's own
@@ -31224,6 +31507,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -31281,9 +31566,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -31346,7 +31633,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessInputSolidJsProps &
       BaseProps<HelixHeadlessInput> &
       BaseEvents
-  > & HelixHeadlessInputControlledSolidJs;
+  >;
 
   /**
    * Renders a real `<kbd>`, so the passage still means "press this" to anything
@@ -31872,6 +32159,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -31966,9 +32255,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -32033,7 +32324,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessListboxSolidJsProps &
       BaseProps<HelixHeadlessListbox> &
       BaseEvents
-  > & HelixHeadlessListboxControlledSolidJs;
+  >;
 
   /**
    * Two concentric circles rather than one arc: the track is what makes the
@@ -32193,6 +32484,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -32216,10 +32509,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Custom Properties
@@ -32240,7 +32534,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessMegamenuSolidJsProps &
       BaseProps<HelixHeadlessMegamenu> &
       BaseEvents
-  > & HelixHeadlessMegamenuControlledSolidJs;
+  >;
 
   /**
    * Three shapes, one element, because a reader moving down a menu with the
@@ -32431,6 +32725,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -32457,10 +32753,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -32480,7 +32777,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessMenuSolidJsProps &
       BaseProps<HelixHeadlessMenu> &
       BaseEvents
-  > & HelixHeadlessMenuControlledSolidJs;
+  >;
 
   /**
    * **Not `Progress`, and the difference is the whole component.** A progress bar
@@ -32907,6 +33204,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -32970,9 +33269,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -33692,6 +33993,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -33742,9 +34045,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -33804,7 +34109,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessPinInputSolidJsProps &
       BaseProps<HelixHeadlessPinInput> &
       BaseEvents
-  > & HelixHeadlessPinInputControlledSolidJs;
+  >;
 
   /**
    * The general case the specific overlays are versions of. `Menu` holds
@@ -33857,6 +34162,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -33882,10 +34189,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -33900,7 +34208,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessPopoverSolidJsProps &
       BaseProps<HelixHeadlessPopover> &
       BaseEvents
-  > & HelixHeadlessPopoverControlledSolidJs;
+  >;
 
   /**
    * Determinate by default, and `indeterminate` for a task whose total is not
@@ -34156,6 +34464,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -34212,9 +34522,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -34415,6 +34727,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -34463,9 +34777,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -34538,7 +34854,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessRatingSolidJsProps &
       BaseProps<HelixHeadlessRating> &
       BaseEvents
-  > & HelixHeadlessRatingControlledSolidJs;
+  >;
 
   /**
    * **The whole component is one fact a stylesheet cannot work out for itself:
@@ -34659,6 +34975,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -34672,6 +34990,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -34732,17 +35052,20 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -34815,7 +35138,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessSelectSolidJsProps &
       BaseProps<HelixHeadlessSelect> &
       BaseEvents
-  > & HelixHeadlessSelectControlledSolidJs;
+  >;
 
   /**
    * Carries `aria-busy` and a polite live region, so a reader using a screen
@@ -34932,6 +35255,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -34981,9 +35306,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -35056,7 +35383,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessSliderSolidJsProps &
       BaseProps<HelixHeadlessSlider> &
       BaseEvents
-  > & HelixHeadlessSliderControlledSolidJs;
+  >;
 
   /**
    * The one chart here that takes its numbers from an attribute, and the reversal
@@ -35304,6 +35631,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -35327,10 +35656,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -35346,7 +35676,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessSpeedDialSolidJsProps &
       BaseProps<HelixHeadlessSpeedDial> &
       BaseEvents
-  > & HelixHeadlessSpeedDialControlledSolidJs;
+  >;
 
   /**
    * **One axis, and nesting is how you get two.** The sandbox this was taken from
@@ -35578,7 +35908,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessSplitterSolidJsProps &
       BaseProps<HelixHeadlessSplitter> &
       BaseEvents
-  > & HelixHeadlessSplitterControlledSolidJs;
+  >;
 
   /**
    * A group rather than a list, because the figures are read together and their
@@ -35755,7 +36085,9 @@ export type CustomElementsSolidJs = {
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
-   * nothing to put back.
+   * nothing to put back. Nobody refusing means the set updates itself,
+   * whether or not a consumer declared `active`, a declared property being a
+   * seed and a correction. See 294.
    */
   "helix-headless-steps": Partial<
     HelixHeadlessStepsProps &
@@ -35952,10 +36284,10 @@ export type CustomElementsSolidJs = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-change` is a refusal and nothing moves. In uncontrolled mode
-   * the element then updates itself; in controlled mode it applies nothing
-   * and waits for the consumer to pass a new `checked`, which is what
-   * "controlled" means.
+   * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+   * declared the property: a declared property is a seed and a correction,
+   * the way `<input value>` is, and a consumer who wants the change for
+   * themselves refuses it and assigns their own. See 294.
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
    *
@@ -36023,7 +36355,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessSwitchSolidJsProps &
       BaseProps<HelixHeadlessSwitch> &
       BaseEvents
-  > & HelixHeadlessSwitchControlledSolidJs;
+  >;
 
   /**
    * Carries its own role, because a grid of divs is not a table to anything
@@ -36397,7 +36729,9 @@ export type CustomElementsSolidJs = {
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
-   * nothing to put back.
+   * nothing to put back. Nobody refusing means the set updates itself,
+   * whether or not a consumer declared `active`, a declared property being a
+   * seed and a correction. See 294.
    *
    * ## CSS Parts
    *
@@ -36565,6 +36899,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -36614,9 +36950,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -36676,7 +37014,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessTextareaSolidJsProps &
       BaseProps<HelixHeadlessTextarea> &
       BaseEvents
-  > & HelixHeadlessTextareaControlledSolidJs;
+  >;
 
   /**
    * **The list is `helix-time-picker`, not a second one written here.** It is worth
@@ -36764,6 +37102,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -36777,6 +37117,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -36835,17 +37177,20 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -36942,7 +37287,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessTimeInputSolidJsProps &
       BaseProps<HelixHeadlessTimeInput> &
       BaseEvents
-  > & HelixHeadlessTimeInputControlledSolidJs;
+  >;
 
   /**
    * **A list rather than three wheels**, and the reason is what a list already
@@ -37048,6 +37393,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -37109,9 +37456,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -37426,7 +37775,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessToastItemSolidJsProps &
       BaseProps<HelixHeadlessToastItem> &
       BaseEvents
-  > & HelixHeadlessToastItemControlledSolidJs;
+  >;
 
   /**
    * **The region is why this is one family rather than two.** A live region has
@@ -37553,6 +37902,8 @@ export type CustomElementsSolidJs = {
    *
    * The same shape as the other three mixins, which is the point of them
    * being four of a kind rather than four of three kinds.
+   *
+   * helix-input
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
@@ -37607,9 +37958,11 @@ export type CustomElementsSolidJs = {
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
+   * a refusal and nothing moves. Nobody refusing means the control updates
+   * itself, whether or not a consumer declared `value`: a declared property
+   * is a seed and a correction, the way `<input value>` is, and a consumer
+   * who wants the change for themselves refuses it and assigns their own.
+   * See 294.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -37807,9 +38160,8 @@ export type CustomElementsSolidJs = {
    * is the whole cost of the version that is correct before any JavaScript runs.
    *
    * Because it is the consumer's line to write, it is also theirs to forget, so
-   * `for` audits itself on first open and says so once. Same shape as
-   * `requestControlledChange` warning about a controlled property nothing
-   * answered.
+   * `for` audits itself on first open and says so once, rather than on every
+   * open, since a warning that repeats is one people learn to filter out.
    *
    * It shows on hover and on focus, and hides on leave, on blur, on Escape, and
    * once the trigger has been activated: the hint is spent when the control has
@@ -37915,6 +38267,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -37951,10 +38305,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -37969,7 +38324,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessTooltipSolidJsProps &
       BaseProps<HelixHeadlessTooltip> &
       BaseEvents
-  > & HelixHeadlessTooltipControlledSolidJs;
+  >;
 
   /**
    * The root owns the order and nothing else. Which stop is current, what Next
@@ -38016,16 +38371,16 @@ export type CustomElementsSolidJs = {
    * - `open`: Whether the tour is running.
    * - `index`: Which stop the reader is on.
    *
-   * **It said `@controlled` for two days and honoured none of it.** The tag is
-   * a claim that a consumer may own the value, and `index` was a plain property
-   * the tour wrote to directly: `move` assigned it and *then* announced, so
-   * `preventDefault` on the change arrived after the move it was refusing, and
-   * a consumer who declared `index` had it overwritten on the next press.
+   * **It announced after it moved for two days, which made refusing it
+   * impossible.** `index` was a plain property the tour wrote to directly:
+   * `move` assigned it and *then* announced, so `preventDefault` on the change
+   * arrived after the move it was refusing. It goes through `requestChange`
+   * now, which announces first and applies only if nobody refused, and refusing
+   * is how a consumer takes the decision. See 294.
    *
    * The shape is `Carousel`'s, which is the nearest thing in the library: a
-   * `default-index` for markup that only seeds, a held state that is
-   * `undefined` until somebody sets one, and a mode decided once at the first
-   * update so a later assignment cannot take the tour over.
+   * `default-index` for markup that only seeds and a held state that is
+   * `undefined` until somebody sets one.
    * - `default-index`/`defaultIndex`: Stop to start on, where nothing declared one.
    * - `label`: Accessible name for the run, such as "Getting started".
    * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
@@ -38073,7 +38428,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessTourSolidJsProps &
       BaseProps<HelixHeadlessTour> &
       BaseEvents
-  > & HelixHeadlessTourControlledSolidJs;
+  >;
 
   /**
    * A stop names a target with `for` and holds whatever the consumer puts in it.
@@ -38262,6 +38617,8 @@ export type CustomElementsSolidJs = {
    * cloned, serialised for hydration, or diffed by a framework, it would come
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
+   *
+   * helix-close
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    *
@@ -38302,10 +38659,11 @@ export type CustomElementsSolidJs = {
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
-   * element then updates itself; in controlled mode it applies nothing and
-   * waits for the consumer to pass a new `open`, which is what "controlled"
-   * means.
+   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * element opens or closes itself, whether or not a consumer declared
+   * `open`: a declared property is a seed and a correction, and a consumer
+   * who wants the decision for themselves refuses it and assigns their own.
+   * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Custom Properties
@@ -38329,7 +38687,7 @@ export type CustomElementsSolidJs = {
       HelixHeadlessTreeItemSolidJsProps &
       BaseProps<HelixHeadlessTreeItem> &
       BaseEvents
-  > & HelixHeadlessTreeItemControlledSolidJs;
+  >;
 
   /**
    * Focus is a single tab stop, moved with the arrow keys, which is what the tree
@@ -38389,7 +38747,9 @@ export type CustomElementsSolidJs = {
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
-   * nothing to put back.
+   * nothing to put back. Nobody refusing means the set updates itself,
+   * whether or not a consumer declared `active`, a declared property being a
+   * seed and a correction. See 294.
    *
    * ## CSS Parts
    *
@@ -38698,7 +39058,9 @@ export type CustomElementsSolidJs = {
    * Announces before it acts, so `preventDefault()` on the `helix-change` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
-   * nothing to put back.
+   * nothing to put back. Nobody refusing means the set updates itself,
+   * whether or not a consumer declared `active`, a declared property being a
+   * seed and a correction. See 294.
    *
    * ## CSS Parts
    *
@@ -39190,1125 +39552,3 @@ declare global {
   }
   export interface CSSProperties extends CustomCssProperties {}
 }
-
-/* Controlled properties, appended by `helix-controlled-props`.
-   Declaring one is a claim of ownership, so the type asks for the handler
-   that answers it. Intersected outside the generator's `Partial<>`, which
-   would otherwise make both arms optional again. */
-
-/**
- * helix-headless-carousel: a controlled `index` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessCarouselControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-select`. */
-        index: HelixHeadlessCarousel["index"];
-        "onhelix-select": (event: HelixHeadlessCarouselHelixSelectElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        index: HelixHeadlessCarousel["index"];
-        ref: import('react').Ref<HelixHeadlessCarousel>;
-      }
-    | { index?: undefined }
-  );
-
-/** helix-headless-carousel, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessCarouselControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-select`. */
-        index: HelixHeadlessCarousel["index"];
-        "on:helix-select": (event: HelixHeadlessCarouselHelixSelectElementEvent) => void;
-      }
-    | {
-        index: HelixHeadlessCarousel["index"];
-        ref: BaseProps<HelixHeadlessCarousel>["ref"];
-      }
-    | { index?: undefined }
-  );
-
-/**
- * helix-headless-chat: a controlled `pinned` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessChatControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        pinned: HelixHeadlessChat["pinned"];
-        "onhelix-change": (event: HelixHeadlessChatHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        pinned: HelixHeadlessChat["pinned"];
-        ref: import('react').Ref<HelixHeadlessChat>;
-      }
-    | { pinned?: undefined }
-  );
-
-/** helix-headless-chat, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessChatControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        pinned: HelixHeadlessChat["pinned"];
-        "on:helix-change": (event: HelixHeadlessChatHelixChangeElementEvent) => void;
-      }
-    | {
-        pinned: HelixHeadlessChat["pinned"];
-        ref: BaseProps<HelixHeadlessChat>["ref"];
-      }
-    | { pinned?: undefined }
-  );
-
-/**
- * helix-headless-checkbox: a controlled `checked` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessCheckboxControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-toggle`. */
-        checked: HelixHeadlessCheckbox["checked"];
-        "onhelix-toggle": (event: HelixHeadlessCheckboxHelixToggleElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        checked: HelixHeadlessCheckbox["checked"];
-        ref: import('react').Ref<HelixHeadlessCheckbox>;
-      }
-    | { checked?: undefined }
-  );
-
-/** helix-headless-checkbox, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessCheckboxControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-toggle`. */
-        checked: HelixHeadlessCheckbox["checked"];
-        "on:helix-toggle": (event: HelixHeadlessCheckboxHelixToggleElementEvent) => void;
-      }
-    | {
-        checked: HelixHeadlessCheckbox["checked"];
-        ref: BaseProps<HelixHeadlessCheckbox>["ref"];
-      }
-    | { checked?: undefined }
-  );
-
-/**
- * helix-headless-combobox: a controlled `open` or `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessComboboxControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessCombobox["open"];
-        "onhelix-open": (event: HelixHeadlessComboboxHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessComboboxHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessCombobox["open"];
-        ref: import('react').Ref<HelixHeadlessCombobox>;
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessCombobox["value"];
-        "onhelix-change": (event: HelixHeadlessComboboxHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessCombobox["value"];
-        ref: import('react').Ref<HelixHeadlessCombobox>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-combobox, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessComboboxControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessCombobox["open"];
-        "on:helix-open": (event: HelixHeadlessComboboxHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessComboboxHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessCombobox["open"];
-        ref: BaseProps<HelixHeadlessCombobox>["ref"];
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessCombobox["value"];
-        "on:helix-change": (event: HelixHeadlessComboboxHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessCombobox["value"];
-        ref: BaseProps<HelixHeadlessCombobox>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-command: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessCommandControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessCommand["open"];
-        "onhelix-open": (event: HelixHeadlessCommandHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessCommandHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessCommand["open"];
-        ref: import('react').Ref<HelixHeadlessCommand>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-command, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessCommandControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessCommand["open"];
-        "on:helix-open": (event: HelixHeadlessCommandHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessCommandHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessCommand["open"];
-        ref: BaseProps<HelixHeadlessCommand>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-headless-data-table: a controlled `sort` or `filter` or `page` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessDataTableControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-sort`. */
-        sort: HelixHeadlessDataTable["sort"];
-        "onhelix-sort": (event: HelixHeadlessDataTableHelixSortElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        sort: HelixHeadlessDataTable["sort"];
-        ref: import('react').Ref<HelixHeadlessDataTable>;
-      }
-    | { sort?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-filter`. */
-        filter: HelixHeadlessDataTable["filter"];
-        "onhelix-filter": (event: HelixHeadlessDataTableHelixFilterElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        filter: HelixHeadlessDataTable["filter"];
-        ref: import('react').Ref<HelixHeadlessDataTable>;
-      }
-    | { filter?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-navigate`. */
-        page: HelixHeadlessDataTable["page"];
-        "onhelix-navigate": (event: HelixHeadlessDataTableHelixNavigateElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        page: HelixHeadlessDataTable["page"];
-        ref: import('react').Ref<HelixHeadlessDataTable>;
-      }
-    | { page?: undefined }
-  );
-
-/** helix-headless-data-table, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessDataTableControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-sort`. */
-        sort: HelixHeadlessDataTable["sort"];
-        "on:helix-sort": (event: HelixHeadlessDataTableHelixSortElementEvent) => void;
-      }
-    | {
-        sort: HelixHeadlessDataTable["sort"];
-        ref: BaseProps<HelixHeadlessDataTable>["ref"];
-      }
-    | { sort?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-filter`. */
-        filter: HelixHeadlessDataTable["filter"];
-        "on:helix-filter": (event: HelixHeadlessDataTableHelixFilterElementEvent) => void;
-      }
-    | {
-        filter: HelixHeadlessDataTable["filter"];
-        ref: BaseProps<HelixHeadlessDataTable>["ref"];
-      }
-    | { filter?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-navigate`. */
-        page: HelixHeadlessDataTable["page"];
-        "on:helix-navigate": (event: HelixHeadlessDataTableHelixNavigateElementEvent) => void;
-      }
-    | {
-        page: HelixHeadlessDataTable["page"];
-        ref: BaseProps<HelixHeadlessDataTable>["ref"];
-      }
-    | { page?: undefined }
-  );
-
-/**
- * helix-headless-date-input: a controlled `open` or `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessDateInputControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessDateInput["open"];
-        "onhelix-open": (event: HelixHeadlessDateInputHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessDateInputHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessDateInput["open"];
-        ref: import('react').Ref<HelixHeadlessDateInput>;
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessDateInput["value"];
-        "onhelix-change": (event: HelixHeadlessDateInputHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessDateInput["value"];
-        ref: import('react').Ref<HelixHeadlessDateInput>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-date-input, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessDateInputControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessDateInput["open"];
-        "on:helix-open": (event: HelixHeadlessDateInputHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessDateInputHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessDateInput["open"];
-        ref: BaseProps<HelixHeadlessDateInput>["ref"];
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessDateInput["value"];
-        "on:helix-change": (event: HelixHeadlessDateInputHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessDateInput["value"];
-        ref: BaseProps<HelixHeadlessDateInput>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-dialog: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessDialogControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessDialog["open"];
-        "onhelix-open": (event: HelixHeadlessDialogHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessDialogHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessDialog["open"];
-        ref: import('react').Ref<HelixHeadlessDialog>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-dialog, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessDialogControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessDialog["open"];
-        "on:helix-open": (event: HelixHeadlessDialogHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessDialogHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessDialog["open"];
-        ref: BaseProps<HelixHeadlessDialog>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-headless-drawer: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessDrawerControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessDrawer["open"];
-        "onhelix-open": (event: HelixHeadlessDrawerHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessDrawerHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessDrawer["open"];
-        ref: import('react').Ref<HelixHeadlessDrawer>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-drawer, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessDrawerControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessDrawer["open"];
-        "on:helix-open": (event: HelixHeadlessDrawerHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessDrawerHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessDrawer["open"];
-        ref: BaseProps<HelixHeadlessDrawer>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-headless-input: a controlled `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessInputControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixHeadlessInput["value"];
-        "onhelix-input": (event: HelixHeadlessInputHelixInputElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessInput["value"];
-        ref: import('react').Ref<HelixHeadlessInput>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-input, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessInputControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixHeadlessInput["value"];
-        "on:helix-input": (event: HelixHeadlessInputHelixInputElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessInput["value"];
-        ref: BaseProps<HelixHeadlessInput>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-listbox: a controlled `filter` or `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessListboxControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-filter`. */
-        filter: HelixHeadlessListbox["filter"];
-        "onhelix-filter": (event: HelixHeadlessListboxHelixFilterElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        filter: HelixHeadlessListbox["filter"];
-        ref: import('react').Ref<HelixHeadlessListbox>;
-      }
-    | { filter?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessListbox["value"];
-        "onhelix-change": (event: HelixHeadlessListboxHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessListbox["value"];
-        ref: import('react').Ref<HelixHeadlessListbox>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-listbox, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessListboxControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-filter`. */
-        filter: HelixHeadlessListbox["filter"];
-        "on:helix-filter": (event: HelixHeadlessListboxHelixFilterElementEvent) => void;
-      }
-    | {
-        filter: HelixHeadlessListbox["filter"];
-        ref: BaseProps<HelixHeadlessListbox>["ref"];
-      }
-    | { filter?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessListbox["value"];
-        "on:helix-change": (event: HelixHeadlessListboxHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessListbox["value"];
-        ref: BaseProps<HelixHeadlessListbox>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-megamenu: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessMegamenuControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessMegamenu["open"];
-        "onhelix-open": (event: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessMegamenu["open"];
-        ref: import('react').Ref<HelixHeadlessMegamenu>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-megamenu, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessMegamenuControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessMegamenu["open"];
-        "on:helix-open": (event: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessMegamenu["open"];
-        ref: BaseProps<HelixHeadlessMegamenu>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-headless-menu: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessMenuControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessMenu["open"];
-        "onhelix-open": (event: HelixHeadlessMenuHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessMenuHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessMenu["open"];
-        ref: import('react').Ref<HelixHeadlessMenu>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-menu, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessMenuControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessMenu["open"];
-        "on:helix-open": (event: HelixHeadlessMenuHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessMenuHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessMenu["open"];
-        ref: BaseProps<HelixHeadlessMenu>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-headless-pin-input: a controlled `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessPinInputControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixHeadlessPinInput["value"];
-        "onhelix-input": (event: HelixHeadlessPinInputHelixInputElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessPinInput["value"];
-        ref: import('react').Ref<HelixHeadlessPinInput>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-pin-input, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessPinInputControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixHeadlessPinInput["value"];
-        "on:helix-input": (event: HelixHeadlessPinInputHelixInputElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessPinInput["value"];
-        ref: BaseProps<HelixHeadlessPinInput>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-popover: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessPopoverControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessPopover["open"];
-        "onhelix-open": (event: HelixHeadlessPopoverHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessPopoverHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessPopover["open"];
-        ref: import('react').Ref<HelixHeadlessPopover>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-popover, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessPopoverControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessPopover["open"];
-        "on:helix-open": (event: HelixHeadlessPopoverHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessPopoverHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessPopover["open"];
-        ref: BaseProps<HelixHeadlessPopover>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-headless-rating: a controlled `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessRatingControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessRating["value"];
-        "onhelix-change": (event: HelixHeadlessRatingHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessRating["value"];
-        ref: import('react').Ref<HelixHeadlessRating>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-rating, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessRatingControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessRating["value"];
-        "on:helix-change": (event: HelixHeadlessRatingHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessRating["value"];
-        ref: BaseProps<HelixHeadlessRating>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-select: a controlled `open` or `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessSelectControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessSelect["open"];
-        "onhelix-open": (event: HelixHeadlessSelectHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessSelectHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessSelect["open"];
-        ref: import('react').Ref<HelixHeadlessSelect>;
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessSelect["value"];
-        "onhelix-change": (event: HelixHeadlessSelectHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessSelect["value"];
-        ref: import('react').Ref<HelixHeadlessSelect>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-select, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessSelectControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessSelect["open"];
-        "on:helix-open": (event: HelixHeadlessSelectHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessSelectHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessSelect["open"];
-        ref: BaseProps<HelixHeadlessSelect>["ref"];
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessSelect["value"];
-        "on:helix-change": (event: HelixHeadlessSelectHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessSelect["value"];
-        ref: BaseProps<HelixHeadlessSelect>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-slider: a controlled `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessSliderControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixHeadlessSlider["value"];
-        "onhelix-input": (event: HelixHeadlessSliderHelixInputElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessSlider["value"];
-        ref: import('react').Ref<HelixHeadlessSlider>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-slider, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessSliderControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixHeadlessSlider["value"];
-        "on:helix-input": (event: HelixHeadlessSliderHelixInputElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessSlider["value"];
-        ref: BaseProps<HelixHeadlessSlider>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-speed-dial: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessSpeedDialControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessSpeedDial["open"];
-        "onhelix-open": (event: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessSpeedDial["open"];
-        ref: import('react').Ref<HelixHeadlessSpeedDial>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-speed-dial, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessSpeedDialControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessSpeedDial["open"];
-        "on:helix-open": (event: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessSpeedDial["open"];
-        ref: BaseProps<HelixHeadlessSpeedDial>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-headless-splitter: a controlled `position` or `collapsed` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessSplitterControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        position: HelixHeadlessSplitter["position"];
-        "onhelix-change": (event: HelixHeadlessSplitterHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        position: HelixHeadlessSplitter["position"];
-        ref: import('react').Ref<HelixHeadlessSplitter>;
-      }
-    | { position?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        collapsed: HelixHeadlessSplitter["collapsed"];
-        "onhelix-change": (event: HelixHeadlessSplitterHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        collapsed: HelixHeadlessSplitter["collapsed"];
-        ref: import('react').Ref<HelixHeadlessSplitter>;
-      }
-    | { collapsed?: undefined }
-  );
-
-/** helix-headless-splitter, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessSplitterControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        position: HelixHeadlessSplitter["position"];
-        "on:helix-change": (event: HelixHeadlessSplitterHelixChangeElementEvent) => void;
-      }
-    | {
-        position: HelixHeadlessSplitter["position"];
-        ref: BaseProps<HelixHeadlessSplitter>["ref"];
-      }
-    | { position?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        collapsed: HelixHeadlessSplitter["collapsed"];
-        "on:helix-change": (event: HelixHeadlessSplitterHelixChangeElementEvent) => void;
-      }
-    | {
-        collapsed: HelixHeadlessSplitter["collapsed"];
-        ref: BaseProps<HelixHeadlessSplitter>["ref"];
-      }
-    | { collapsed?: undefined }
-  );
-
-/**
- * helix-headless-switch: a controlled `checked` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessSwitchControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-toggle`. */
-        checked: HelixHeadlessSwitch["checked"];
-        "onhelix-toggle": (event: HelixHeadlessSwitchHelixToggleElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        checked: HelixHeadlessSwitch["checked"];
-        ref: import('react').Ref<HelixHeadlessSwitch>;
-      }
-    | { checked?: undefined }
-  );
-
-/** helix-headless-switch, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessSwitchControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-toggle`. */
-        checked: HelixHeadlessSwitch["checked"];
-        "on:helix-toggle": (event: HelixHeadlessSwitchHelixToggleElementEvent) => void;
-      }
-    | {
-        checked: HelixHeadlessSwitch["checked"];
-        ref: BaseProps<HelixHeadlessSwitch>["ref"];
-      }
-    | { checked?: undefined }
-  );
-
-/**
- * helix-headless-textarea: a controlled `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessTextareaControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixHeadlessTextarea["value"];
-        "onhelix-input": (event: HelixHeadlessTextareaHelixInputElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessTextarea["value"];
-        ref: import('react').Ref<HelixHeadlessTextarea>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-textarea, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessTextareaControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-input`. */
-        value: HelixHeadlessTextarea["value"];
-        "on:helix-input": (event: HelixHeadlessTextareaHelixInputElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessTextarea["value"];
-        ref: BaseProps<HelixHeadlessTextarea>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-time-input: a controlled `open` or `value` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessTimeInputControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessTimeInput["open"];
-        "onhelix-open": (event: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessTimeInput["open"];
-        ref: import('react').Ref<HelixHeadlessTimeInput>;
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessTimeInput["value"];
-        "onhelix-change": (event: HelixHeadlessTimeInputHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        value: HelixHeadlessTimeInput["value"];
-        ref: import('react').Ref<HelixHeadlessTimeInput>;
-      }
-    | { value?: undefined }
-  );
-
-/** helix-headless-time-input, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessTimeInputControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessTimeInput["open"];
-        "on:helix-open": (event: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessTimeInput["open"];
-        ref: BaseProps<HelixHeadlessTimeInput>["ref"];
-      }
-    | { open?: undefined }
-  ) &
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        value: HelixHeadlessTimeInput["value"];
-        "on:helix-change": (event: HelixHeadlessTimeInputHelixChangeElementEvent) => void;
-      }
-    | {
-        value: HelixHeadlessTimeInput["value"];
-        ref: BaseProps<HelixHeadlessTimeInput>["ref"];
-      }
-    | { value?: undefined }
-  );
-
-/**
- * helix-headless-toast-item: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessToastItemControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-dismiss`. */
-        open: HelixHeadlessToastItem["open"];
-        "onhelix-dismiss": (event: HelixHeadlessToastItemHelixDismissElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessToastItem["open"];
-        ref: import('react').Ref<HelixHeadlessToastItem>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-toast-item, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessToastItemControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-dismiss`. */
-        open: HelixHeadlessToastItem["open"];
-        "on:helix-dismiss": (event: HelixHeadlessToastItemHelixDismissElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessToastItem["open"];
-        ref: BaseProps<HelixHeadlessToastItem>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-headless-tooltip: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessTooltipControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessTooltip["open"];
-        "onhelix-open": (event: HelixHeadlessTooltipHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessTooltipHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessTooltip["open"];
-        ref: import('react').Ref<HelixHeadlessTooltip>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-tooltip, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessTooltipControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessTooltip["open"];
-        "on:helix-open": (event: HelixHeadlessTooltipHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessTooltipHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessTooltip["open"];
-        ref: BaseProps<HelixHeadlessTooltip>["ref"];
-      }
-    | { open?: undefined }
-  );
-
-/**
- * helix-headless-tour: a controlled `index` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessTourControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        index: HelixHeadlessTour["index"];
-        "onhelix-change": (event: HelixHeadlessTourHelixChangeElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        index: HelixHeadlessTour["index"];
-        ref: import('react').Ref<HelixHeadlessTour>;
-      }
-    | { index?: undefined }
-  );
-
-/** helix-headless-tour, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessTourControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
-        index: HelixHeadlessTour["index"];
-        "on:helix-change": (event: HelixHeadlessTourHelixChangeElementEvent) => void;
-      }
-    | {
-        index: HelixHeadlessTour["index"];
-        ref: BaseProps<HelixHeadlessTour>["ref"];
-      }
-    | { index?: undefined }
-  );
-
-/**
- * helix-headless-tree-item: a controlled `open` announces and waits, so the handler comes with it.
- */
-type HelixHeadlessTreeItemControlled =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessTreeItem["open"];
-        "onhelix-open": (event: HelixHeadlessTreeItemHelixOpenElementEvent) => void;
-        "onhelix-close": (event: HelixHeadlessTreeItemHelixCloseElementEvent) => void;
-      }
-    | {
-        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
-        open: HelixHeadlessTreeItem["open"];
-        ref: import('react').Ref<HelixHeadlessTreeItem>;
-      }
-    | { open?: undefined }
-  );
-
-/** helix-headless-tree-item, in Solid's dialect: `on:` and the event name. */
-type HelixHeadlessTreeItemControlledSolidJs =
-  (
-    | {
-        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
-        open: HelixHeadlessTreeItem["open"];
-        "on:helix-open": (event: HelixHeadlessTreeItemHelixOpenElementEvent) => void;
-        "on:helix-close": (event: HelixHeadlessTreeItemHelixCloseElementEvent) => void;
-      }
-    | {
-        open: HelixHeadlessTreeItem["open"];
-        ref: BaseProps<HelixHeadlessTreeItem>["ref"];
-      }
-    | { open?: undefined }
-  );

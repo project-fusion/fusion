@@ -1734,7 +1734,7 @@
                   "text": "void"
                 }
               },
-              "description": "Says once that the box cannot be measured, and why.\n\nA warning rather than a throw, because the list still works: it holds a\nwindow, it draws rows, and a reader can scroll. What it cannot do is choose\nthe window well, and that is the consumer's stylesheet to fix, not\nsomething this can decide on their behalf.\n\nOnce per controller, for the reason `requestControlledChange` gives about\nits own audit: a warning per frame is one people filter out."
+              "description": "Says once that the box cannot be measured, and why.\n\nA warning rather than a throw, because the list still works: it holds a\nwindow, it draws rows, and a reader can scroll. What it cannot do is choose\nthe window well, and that is the consumer's stylesheet to fix, not\nsomething this can decide on their behalf.\n\nOnce per controller, because a warning per frame is one people filter out\nand this one has to be believed the day it is right."
             }
           ],
           "helix": {}
@@ -3973,18 +3973,18 @@
         },
         {
           "kind": "js",
-          "name": "ControlledChangeOptions",
+          "name": "ChangeRequestOptions",
           "declaration": {
-            "name": "ControlledChangeOptions",
-            "module": "./utils/request-controlled-change/request-controlled-change.js"
+            "name": "ChangeRequestOptions",
+            "module": "./utils/request-change/request-change.js"
           }
         },
         {
           "kind": "js",
-          "name": "requestControlledChange",
+          "name": "requestChange",
           "declaration": {
-            "name": "requestControlledChange",
-            "module": "./utils/request-controlled-change/request-controlled-change.js"
+            "name": "requestChange",
+            "module": "./utils/request-change/request-change.js"
           }
         },
         {
@@ -4736,12 +4736,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Which item is current, by its `value`.\n\nReading gives the real one, in either mode. Writing hands ownership to the\nconsumer: from then on the set announces changes and applies none of them.",
-              "helix": {
-                "controlled": [
-                  "helix-change"
-                ]
-              }
+              "description": "Which item is current, by its `value`.\n\nReading gives the real one, in either mode. Writing hands ownership to the\nconsumer: from then on the set announces changes and applies none of them."
             },
             {
               "kind": "field",
@@ -4803,12 +4798,7 @@
                 "text": "string"
               },
               "description": "Which item is current, by its `value`.\n\nCalled `active`, which is what this mixin is named for and what it was\nnot: it declared `value`, so the one mixin whose whole subject is which\nitem is active had no such property, and `active` meant something else\nentirely elsewhere in the library. It still does, and only there now:\n`option.active` is the option the keyboard is on, which is a different\nquestion from which one is chosen.\n\nAn accessor pair, the same shape as the other three. Reading gives the\nreal item; writing hands ownership to the consumer, so `<helix-tabs\nactive=\"one\">` is a set that stays on that tab and `default-active` is\nhow markup says where to start.",
-              "attribute": "active",
-              "helix": {
-                "controlled": [
-                  "helix-change"
-                ]
-              }
+              "attribute": "active"
             },
             {
               "kind": "field",
@@ -4831,25 +4821,6 @@
               "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in."
             },
             {
-              "kind": "field",
-              "name": "activeMode",
-              "type": {
-                "text": "boolean | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `active` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously."
-            },
-            {
-              "kind": "field",
-              "name": "activeIsControlled",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "readonly": true
-            },
-            {
               "kind": "method",
               "name": "requestActive",
               "return": {
@@ -4865,7 +4836,7 @@
                   }
                 }
               ],
-              "description": "Requests a new current item, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. Unlike a native control, nothing has moved\nby the time this runs, so refusing is simply not writing: there is\nnothing to put back."
+              "description": "Requests a new current item, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. Unlike a native control, nothing has moved\nby the time this runs, so refusing is simply not writing: there is\nnothing to put back. Nobody refusing means the set updates itself,\nwhether or not a consumer declared `active`, a declared property being a\nseed and a correction. See 294."
             },
             {
               "kind": "method",
@@ -4950,12 +4921,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the control is checked.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them.",
-              "helix": {
-                "controlled": [
-                  "helix-toggle"
-                ]
-              }
+              "description": "Whether the control is checked.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them."
             },
             {
               "kind": "field",
@@ -5018,12 +4984,7 @@
                 "text": "boolean"
               },
               "description": "Whether the control is checked.\n\nOne property rather than two. Reading gives the real state whichever\nmode the control is in; writing hands ownership to the consumer, which\nis what the attribute in `<helix-checkbox checked>` does as well. The\nsame shape all four of these mixins have, for the reason given on\n`MixinControllerOpen.open`.\n\nNot reflected: the attribute is the consumer's input and stays as they\nwrote it, and `data-checked` carries the resolved state for stylesheets.",
-              "attribute": "checked",
-              "helix": {
-                "controlled": [
-                  "helix-toggle"
-                ]
-              }
+              "attribute": "checked"
             },
             {
               "kind": "field",
@@ -5046,25 +5007,6 @@
               "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in."
             },
             {
-              "kind": "field",
-              "name": "checkedMode",
-              "type": {
-                "text": "boolean | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `checked` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously."
-            },
-            {
-              "kind": "field",
-              "name": "checkedIsControlled",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "readonly": true
-            },
-            {
               "kind": "method",
               "name": "requestChecked",
               "return": {
@@ -5080,7 +5022,7 @@
                   }
                 }
               ],
-              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-change` is a refusal and nothing moves. In uncontrolled mode\nthe element then updates itself; in controlled mode it applies nothing\nand waits for the consumer to pass a new `checked`, which is what\n\"controlled\" means."
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer\ndeclared the property: a declared property is a seed and a correction,\nthe way `<input value>` is, and a consumer who wants the change for\nthemselves refuses it and assigns their own. See 294."
             },
             {
               "kind": "method",
@@ -5192,13 +5134,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the element announces changes and applies none\nof them, and waits to be told.",
-              "helix": {
-                "controlled": [
-                  "helix-open",
-                  "helix-close"
-                ]
-              }
+              "description": "Whether the element is open.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the element announces changes and applies none\nof them, and waits to be told."
             },
             {
               "kind": "method",
@@ -5242,14 +5178,8 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
-              "attribute": "open",
-              "helix": {
-                "controlled": [
-                  "helix-open",
-                  "helix-close"
-                ]
-              }
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "attribute": "open"
             },
             {
               "kind": "field",
@@ -5272,25 +5202,6 @@
               "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is."
             },
             {
-              "kind": "field",
-              "name": "openMode",
-              "type": {
-                "text": "boolean | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once."
-            },
-            {
-              "kind": "field",
-              "name": "openIsControlled",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "readonly": true
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -5306,7 +5217,7 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. In uncontrolled mode the\nelement then updates itself; in controlled mode it applies nothing and\nwaits for the consumer to pass a new `open`, which is what \"controlled\"\nmeans."
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294."
             },
             {
               "kind": "method",
@@ -5325,7 +5236,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
               "fieldName": "open"
             },
             {
@@ -5390,13 +5301,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "What the control holds now, and what its form submits.\n\nReading gives the real value, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them, and waits to be told.",
-              "helix": {
-                "controlled": [
-                  "helix-change",
-                  "helix-input"
-                ]
-              }
+              "description": "What the control holds now, and what its form submits.\n\nReading gives the real value, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them, and waits to be told."
             },
             {
               "kind": "field",
@@ -5478,14 +5383,8 @@
               "type": {
                 "text": "string"
               },
-              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
-              "attribute": "value",
-              "helix": {
-                "controlled": [
-                  "helix-change",
-                  "helix-input"
-                ]
-              }
+              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.\n\nhelix-input",
+              "attribute": "value"
             },
             {
               "kind": "field",
@@ -5495,26 +5394,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in."
-            },
-            {
-              "kind": "field",
-              "name": "valueMode",
-              "type": {
-                "text": "boolean | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously."
-            },
-            {
-              "kind": "field",
-              "name": "valueIsControlled",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "readonly": true
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it."
             },
             {
               "kind": "field",
@@ -5543,7 +5423,7 @@
                   }
                 }
               ],
-              "description": "Requests a new value, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. In uncontrolled mode the control then\nupdates itself; in controlled mode it applies nothing and waits for the\nconsumer to pass a new `value`, which is what controlled means."
+              "description": "Requests a new value, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. Nobody refusing means the control updates\nitself, whether or not a consumer declared `value`: a declared property\nis a seed and a correction, the way `<input value>` is, and a consumer\nwho wants the change for themselves refuses it and assigns their own.\nSee 294."
             },
             {
               "kind": "method",
@@ -5589,7 +5469,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
+              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.\n\nhelix-input",
               "fieldName": "value"
             }
           ],
@@ -6854,11 +6734,11 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/utils/request-controlled-change/request-controlled-change.ts",
+      "path": "src/utils/request-change/request-change.ts",
       "declarations": [
         {
           "kind": "function",
-          "name": "requestControlledChange",
+          "name": "requestChange",
           "return": {
             "type": {
               "text": "boolean"
@@ -6866,22 +6746,21 @@
           },
           "parameters": [
             {
-              "name": "{\n  apply,\n  controlled,\n  event,\n  host,\n  label,\n  next,\n  read,\n}",
+              "name": "{\n  apply,\n  event,\n  host,\n  next,\n}",
               "type": {
-                "text": "ControlledChangeOptions<T>"
+                "text": "ChangeRequestOptions<T>"
               }
             }
-          ],
-          "description": "Announces a change, then applies it if nobody refused.\n\nOne audited path for every stateful change in the system. The order is the\nwhole point: the event goes first and carries the state being *proposed*, so\na listener calling `preventDefault()` stops it before anything moves. A\ncomponent that mutated itself and then announced it would leave a consumer\nreacting to a decision already made.\n\nReturns whether the change was applied, so a caller that needs to know\n(a key handler deciding whether to also move focus) can ask.\n\n**There is one channel, and it is the event.** `onCheckedChange`,\n`onOpenChange`, `onValueChange` and `onActiveChange` were a second one,\ninvoked from here once the state had been applied. They were removed on\n19 Aug 2026, for working in fewer places than the thing they duplicated:\nReact takes any `on[A-Z]` prop into its own branch and calls\n`addEventListener('CheckedChange', …)` with it, an event nothing dispatches,\nso no consumer writing JSX could reach one. The justification written beside\nthem was that the generated React wrapper assigned them instead, and that\npackage was deleted in `06dbc54`, which left four documented properties that\nonly a consumer holding a reference could use. `helix-change` reaches every\nconsumer in every framework, hydration included."
+          ]
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "requestControlledChange",
+          "name": "requestChange",
           "declaration": {
-            "name": "requestControlledChange",
-            "module": "src/utils/request-controlled-change/request-controlled-change.ts"
+            "name": "requestChange",
+            "module": "src/utils/request-change/request-change.ts"
           }
         }
       ]
