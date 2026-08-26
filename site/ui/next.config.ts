@@ -111,6 +111,19 @@ const config: NextConfig = {
         permanent: true,
         source: '/helix/docs/for-coding-agents',
       },
+
+      /* Editor was never a component a reader could install. It is
+         `helix-sandbox-editor`, from `@helix-io/sandbox`, which is
+         `private: true` build tooling for this repository, and it reached the
+         reference only because the catalog was reading that package's manifest
+         alongside the two that publish. The page it should have been all along
+         is the Sandbox document, which is where the editor is actually
+         explained. */
+      {
+        destination: '/helix/docs/sandbox',
+        permanent: true,
+        source: '/helix/components/editor',
+      },
     ]
   },
 

@@ -37,11 +37,24 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const OUT = join(ROOT, 'site/ui/content/catalog/catalog.generated.json')
 const PUBLIC = join(ROOT, 'site/ui/public')
 
-const MANIFESTS = [
-  'helix/styled/custom-elements.json',
-  'helix/headless/custom-elements.json',
-  'helix/sandbox/custom-elements.json',
-]
+/**
+ * The manifests the reference is built from: the two published packages.
+ *
+ * **`helix/sandbox` is not among them, and the omission is the point.**
+ * `@helix-io/sandbox` is `private: true`, the editor and spec runner that build
+ * this repository. Reading its manifest put `helix-sandbox-editor` in the
+ * reference as a family of its own, called Editor, with no examples and a nav
+ * entry pointing at a component nobody can install, and slipped
+ * `helix-sandbox-specs` into the Sandbox family's element table beside six that
+ * do ship.
+ *
+ * A reference documents what a reader can take. The line to draw is whether a
+ * package publishes, and `check:publishable` already holds that flag, so this
+ * reads a list of publishing packages rather than filtering tag names
+ * downstream: a name filter would have to be updated every time the private
+ * package grew an element, and would be silent when it was not.
+ */
+const MANIFESTS = ['helix/styled/custom-elements.json', 'helix/headless/custom-elements.json']
 
 /**
  * Where the example files sit, one folder per family, in both tiers.
