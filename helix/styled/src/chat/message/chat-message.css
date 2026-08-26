@@ -31,7 +31,18 @@
 [part="body"] {
   display: grid;
   gap: var(--helix-space-2xs);
+  /* The bubble hugs its text rather than filling the column, which is what lets
+     `justify-items` put it against an edge at all. Filling, every turn starts at
+     the same place and the one thing this component uses to say whose turn it is
+     says nothing: measured in the first baseline, four turns all against the
+     leading edge with only their timestamps moving. */
+  justify-items: start;
   max-inline-size: var(--chat-message-measure, 42rem);
+}
+
+:host([author="me"]) [part="body"] {
+  justify-items: end;
+  justify-self: end;
 }
 
 [part="content"] {
@@ -59,6 +70,14 @@
 
 :host([author="me"]) [part="meta"] {
   justify-content: flex-end;
+}
+
+/* The bubble takes the width of what is in it, up to the measure the body sets.
+   `fit-content` rather than `max-content`, so a long turn still wraps at the
+   measure instead of running past it. */
+[part="content"] {
+  inline-size: fit-content;
+  max-inline-size: 100%;
 }
 
 /* A failure is the one state that has to be found rather than noticed, so it is
