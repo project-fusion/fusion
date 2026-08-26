@@ -87,7 +87,7 @@ export class HelixAppHeader extends HelixHeadlessAppHeader {
    * caught is a consumer's own hand-positioned element.
    */
   @property({ reflect: true })
-  material?: 'glass' | 'transparent'
+  material?: 'frosted' | 'glass' | 'transparent'
 
   /**
    * Whether the banner sticks to the top of the viewport.

@@ -70,6 +70,14 @@
   background-color: var(--app-header-background, var(--helix-material-translucent));
 }
 
+/* `frosted` is the same pair turned up: `translucent-strong` admits less, and
+   the heavier blur is what stops a ground that opaque reading as a smear. The
+   two move together because either without the other does nothing. See 270. */
+:host([material="frosted"]) {
+  backdrop-filter: var(--app-header-backdrop, blur(var(--helix-material-blur-lg)));
+  background-color: var(--app-header-background, var(--helix-material-translucent-strong));
+}
+
 /* Nothing behind it at all, until there is something to be legible over.
  *
  * For a banner over a hero: the art reaches the top of the window and the bar

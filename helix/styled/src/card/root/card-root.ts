@@ -37,7 +37,7 @@ import { styles } from './card-root.css.js'
  * @cssproperty --card-align - How the regions pack when the card is stretched
  *   taller than its content. `start` by default, so the slack is at the bottom;
  *   `space-between` puts a footer on the floor.
- * @cssproperty --card-backdrop - Filter applied behind a `material="glass"` card. Follows
+ * @cssproperty --card-backdrop - Filter applied behind a `frosted` or `glass` card. Follows
  *   the theme's material policy; set it to override the strength on one card.
  * @cssproperty --card-background-color - Surface behind the card.
  * @cssproperty --card-border-color - Border color of the surface.
@@ -105,9 +105,16 @@ export class HelixCard extends HelixHeadlessCard {
    *
    * Absent is opaque, per the rule that a reflected property takes no default,
    * so the stylesheet only describes the departure.
+   *
+   * **The whole axis, which it did not used to be.** `glass` shipped alone,
+   * so a card offered one point of a three-point language and said nothing
+   * about the other two. `frosted` is the same pair turned up, the heavier
+   * ground under the heavier blur, for a card that has to stay readable over
+   * a busy page; `transparent` drops both, for one that is structure and
+   * spacing with the page showing through. See 270.
    */
   @property({ reflect: true })
-  material?: 'glass'
+  material?: 'frosted' | 'glass' | 'transparent'
 
   /** Whether media sits above the content stack or beside it. */
   @property({ reflect: true })

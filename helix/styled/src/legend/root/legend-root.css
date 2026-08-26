@@ -126,6 +126,15 @@
 :host([material="glass"]) [part="entry"]:not([data-material]) [part="swatch"] {
   --_legend-through: calc(0.62 * var(--helix-material-opacity));
 }
+/* `frosted` admits less, which on a mark is more ink rather than more ground.
+   0.88 against glass's 0.62 is the same relationship the surface tokens carry,
+   `material-translucent` at 60% against `material-translucent-strong` at 88%,
+   so a chart and a card mean the same thing by the word. Absent is still fully
+   opaque, so the three points read glass, frosted, then no attribute at all. */
+[part="entry"][data-material="frosted"],
+:host([material="frosted"]) [part="entry"]:not([data-material]) [part="swatch"] {
+  --_legend-through: calc(0.88 * var(--helix-material-opacity));
+}
 
 /* Print: what the colours in the drawing beside it mean.
  *

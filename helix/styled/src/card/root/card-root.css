@@ -22,9 +22,9 @@
    * `align-content` computes to `stretch` on a grid, and a stretched grid with
    * `auto` rows gives every row an equal share of the free space. A card is
    * stretched whenever it sits in a grid beside a taller one, so a card with
-   * less in it than its neighbour was distributing the difference *between its
+   * less in it than its neighbor was distributing the difference *between its
    * own regions*: measured on the docs index, a header box 113px tall against
-   * its neighbour's 26px, which reads as a heading floating above a gap rather
+   * its neighbor's 26px, which reads as a heading floating above a gap rather
    * than as a card with room left at the end.
    *
    * The regions are bare slots and an unfilled one generates no row, so there is
@@ -196,6 +196,24 @@ slot[name="footer"]::slotted(*) {
 :host([material="glass"]) {
   backdrop-filter: var(--card-backdrop, var(--helix-material-backdrop));
   background-color: var(--card-background-color, var(--helix-material-translucent));
+}
+
+/* The same pair turned up. `translucent-strong` admits less and the heavier
+   blur is what keeps the ground from reading as a smear at that opacity: the
+   two move together for the reason the property's own note gives, that either
+   without the other does nothing. */
+:host([material="frosted"]) {
+  backdrop-filter: var(--card-backdrop, blur(var(--helix-material-blur-lg)));
+  background-color: var(--card-background-color, var(--helix-material-translucent-strong));
+}
+
+/* No ground and no filter, for a card that is structure and spacing over
+   whatever it is placed on. Not `separation="plain"`, which drops the *frame*:
+   a transparent card can still be outlined, and an opaque one can have no
+   border, so the two axes stay independent. */
+:host([material="transparent"]) {
+  backdrop-filter: none;
+  background-color: transparent;
 }
 
 /* Print: the lift is a shadow, which printers drop into a gray smear; the edge carries it.

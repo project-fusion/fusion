@@ -218,6 +218,14 @@
   background-color: var(--drawer-background-color, var(--helix-material-translucent));
 }
 
+/* `frosted` is the same pair turned up: `translucent-strong` admits less, and
+   the heavier blur is what stops a ground that opaque reading as a smear. The
+   two move together because either without the other does nothing. See 270. */
+:host([material="frosted"]) [part="panel"] {
+  backdrop-filter: var(--drawer-backdrop, blur(var(--helix-material-blur-lg)));
+  background-color: var(--drawer-background-color, var(--helix-material-translucent-strong));
+}
+
 :host(:not([placement])) [part="panel"],
 :host([placement="end"]) [part="panel"] {
   /* Square where it meets the window, curved where it meets the page. */

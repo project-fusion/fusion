@@ -51,9 +51,15 @@ export class HelixTooltip extends HelixHeadlessTooltip {
    * a *mark* claims, and this is a surface: what varies about a surface is where
    * it ends, which is `separation`, and a bubble in the top layer with a point on
    * it has one answer to that. A quiet tooltip is a tooltip that is not shown.
+   *
+   * **`transparent` is where this one stops, and that is the statement 270
+   * asks for rather than an omission.** A panel that floats over arbitrary page
+   * content is only readable because it has a ground; dropping it does not make
+   * a lighter tooltip, it makes an unreadable one. `frosted` and `glass` are the
+   * two honest points here.
    */
   @property({ reflect: true })
-  material?: 'glass'
+  material?: 'frosted' | 'glass'
 
   static override styles: CSSResultGroup = styles
 }

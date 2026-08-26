@@ -690,6 +690,15 @@
 :host([material="glass"]) [part="bar"]:not([data-material]) {
   --_bar-chart-through: calc(0.62 * var(--helix-material-opacity));
 }
+/* `frosted` admits less, which on a mark is more ink rather than more ground.
+   0.88 against glass's 0.62 is the same relationship the surface tokens carry,
+   `material-translucent` at 60% against `material-translucent-strong` at 88%,
+   so a chart and a card mean the same thing by the word. Absent is still fully
+   opaque, so the three points read glass, frosted, then no attribute at all. */
+[part="bar"][data-material="frosted"],
+:host([material="frosted"]) [part="bar"]:not([data-material]) {
+  --_bar-chart-through: calc(0.88 * var(--helix-material-opacity));
+}
 
 /* **Gradient, into the wash the headless tier already draws.** One per series,
    coloured through `--chart-series` so the stops read a token that tier never

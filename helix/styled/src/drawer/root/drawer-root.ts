@@ -57,9 +57,15 @@ export class HelixDrawer extends HelixHeadlessDrawer {
    *
    * Absent is opaque, per the rule that a reflected property takes no default,
    * so the stylesheet only describes the departure.
+   *
+   * **`transparent` is where this one stops, and that is the statement 270
+   * asks for rather than an omission.** A panel that floats over arbitrary page
+   * content is only readable because it has a ground; dropping it does not make
+   * a lighter drawer, it makes an unreadable one. `frosted` and `glass` are the
+   * two honest points here.
    */
   @property({ reflect: true })
-  material?: 'glass'
+  material?: 'frosted' | 'glass'
 
   static override styles: CSSResultGroup = styles
 }

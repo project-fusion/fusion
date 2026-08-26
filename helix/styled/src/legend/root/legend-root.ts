@@ -86,9 +86,21 @@ export class HelixLegend extends HelixHeadlessLegend {
    * legend beside a glass chart is in the same substance as the chart. Scaled by
    * `--helix-material-opacity`, so a theme that is more see-through everywhere is
    * more see-through here.
+   *
+   * **This paints a mark rather than a ground, and the axis still reads the
+   * same way.** On a surface the points are how much of the page shows through;
+   * on a series they are how much ink the mark has, and the order is the same:
+   * `glass` admits most, `frosted` admits less, absent is opaque. The two
+   * factors, 0.62 and 0.88, carry the relationship the surface tokens carry
+   * between `material-translucent` and `material-translucent-strong`, so a
+   * chart and a card mean the same thing by the word.
+   *
+   * **`transparent` is where this one stops.** A mark with no ink is not a
+   * material choice, it is an absent series, and a chart says that by not
+   * having the datum rather than by painting it invisibly. See 270.
    */
   @property({ reflect: true })
-  material?: 'glass'
+  material?: 'frosted' | 'glass'
 
   /**
    * Which entries are drawn as an outline rather than a fill, by name.
