@@ -29,6 +29,18 @@
  * used by four scripts here and added in 20.11, so it is the lower of the two
  * and this one covers it.
  *
+ * **It also holds `@types/node` to that floor**, which is a different failure
+ * with the same shape. The types declare what the standard library has, so
+ * `@types/node@26` against a floor of 22.18 type-checks code that uses APIs
+ * added after the oldest Node this repository supports: nothing fails here, and
+ * the consumer on the floor gets a `TypeError` at runtime for a call TypeScript
+ * approved. Dependabot proposes that bump every time Node ships a major, and it
+ * is right about the version and wrong about this repository, so the answer is a
+ * rule rather than a judgment repeated per pull request.
+ *
+ * The two move together: raise `engines.node` and the types follow, which is the
+ * order that keeps them honest.
+ *
  * **What it deliberately does not do** is check the Node that CI uses, which is
  * a different problem with a different fix: `verify.yml` pins it the way it
  * already pins bun. Before that it set up bun and Rust and never Node at all,
@@ -76,6 +88,27 @@ if (below) {
   process.exit(1)
 }
 
+/* The types describe a standard library, so they have to describe the oldest one
+   this repository supports rather than the newest one that exists. */
+const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
+const types =
+  manifest.devDependencies?.['@types/node'] ?? manifest.dependencies?.['@types/node'] ?? ''
+const typed = /(\d+)\./.exec(types)
+
+if (typed && Number(typed[1]) !== wantMajor) {
+  console.error(
+    `\`@types/node\` is ${types} and \`engines.node\` floors at ${wantMajor}.${wantMinor}.\n\n` +
+      '  The types describe what the standard library has, so a major ahead of the floor\n' +
+      '  type-checks calls that do not exist on the oldest Node this repository supports.\n' +
+      '  Nothing fails here; the consumer on the floor gets a `TypeError` for a call\n' +
+      '  TypeScript approved.\n\n' +
+      `  Either pin the types to ^${wantMajor}, or raise \`engines.node\` first and let them\n` +
+      '  follow. They move together, in that order.\n',
+  )
+  process.exit(1)
+}
+
 console.log(
-  `node: ${process.versions.node}, at or above the ${wantMajor}.${wantMinor} floor a TypeScript analyzer config needs`,
+  `node: ${process.versions.node}, at or above the ${wantMajor}.${wantMinor} floor a TypeScript analyzer config needs, ` +
+    `and \`@types/node\` is on ${wantMajor} with it`,
 )
