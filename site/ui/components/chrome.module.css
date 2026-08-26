@@ -97,7 +97,13 @@
  * do. What separates it is the space above it and the fact that nothing in it
  * is the page. */
 .siteFooter {
-  --site-inset: var(--helix-space-2xl);
+  /* The chrome's inset, not the page's, which is what keeps the logo here on the
+     same line down the left edge as the wordmark in the header. `2xl` was written
+     in place, so the footer stayed at 48 a side while the header narrowed to 16
+     below 48rem: at 320 that left 224 for three link groups needing 231, and
+     Legal wrapped alone onto a second row. One variable, so the two edges cannot
+     disagree again. */
+  --site-inset: var(--site-chrome-inset);
 
   /* A rule, because the footer now holds links rather than one quiet line and
      needs to read as its own region rather than as the end of the page. */
@@ -132,6 +138,30 @@
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
+}
+
+/* **Narrow: tighten the gaps so the three groups stay one row.** Measured at
+   375, `space-2xl` between them left Products and Company on the first line and
+   stranded Legal alone on a second, which reads as a fourth thing rather than
+   the third of three. The groups are 52, 55 and 76 wide, so a `space-lg` gap
+   fits all of them in the 279 the inset leaves.
+
+   A viewport query is honest here for the reason the responsiveness rule gives:
+   this is a consumer stylesheet laying out a page, not a component reading a
+   width it cannot know. 48rem is the breakpoint the rest of the site's chrome
+   already turns at. */
+@media (width < 48rem) {
+  .siteFooter {
+    padding-block: var(--helix-space-xl);
+  }
+
+  .footerInner {
+    gap: var(--helix-space-xl);
+  }
+
+  .footerNav {
+    gap: var(--helix-space-lg);
+  }
 }
 
 /* Quiet, because a legal link is something a reader finds when they go looking
