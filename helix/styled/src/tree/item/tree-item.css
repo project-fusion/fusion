@@ -173,9 +173,17 @@ slot[name="children"]::slotted(*) {
    link color, and neither belongs on something already shaped like a row: the
    selection wash and the hover say what it does, and a column of blue
    underlined rows reads as prose that has been marked up rather than as a list
-   to move around in. */
+   to move around in.
+
+   **The decoration only, because `color: inherit` was overshooting.** It took
+   the anchor out of the link color and out of the row color with it, so the
+   anchor inherited the page's foreground while every non-link row beside it
+   kept `foreground-muted`. Two rows in one tree then read at two brightnesses
+   for no reason a reader could see: reported as branches looking muted against
+   their leaves, which was really links looking lit against everything else.
+   Dropping the declaration lets `[part="row"]` apply to an anchor as it does to
+   a div, and an author rule beats the UA's `a:link` without being told to. */
 a[part="row"] {
-  color: inherit;
   text-decoration: none;
 }
 

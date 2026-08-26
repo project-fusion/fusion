@@ -323,6 +323,112 @@ describe('splitter while it moves', () => {
   })
 })
 
+describe('a splitter given a bound as a length', () => {
+  /* The box, stated. happy-dom lays nothing out, so a length has nothing to
+     resolve against and every one of these would fall back; the width is what
+     the arithmetic is about, so it is the thing to state. */
+  const sized = async (attrs: string, width: number): Promise<Splitter> => {
+    const host = await splitter(attrs)
+    host.getBoundingClientRect = () => ({ height: 400, width }) as DOMRect
+    return host
+  }
+
+  test('a percentage minimum is a different distance at different widths, which is the fault', async () => {
+    // Twenty per cent of 1400 is 280 and twenty per cent of 500 is 100. The
+    // number a consumer picked was about how much text fits, and only one of
+    // these two answers holds it.
+    const wide = await sized('min="20" default-position="0" step="5"', 1400)
+    const narrow = await sized('min="20" default-position="0" step="5"', 500)
+    await press(wide, 'Home')
+    await press(narrow, 'Home')
+    expect({
+      narrowPixels: (narrow.position / 100) * 500,
+      widePixels: (wide.position / 100) * 1400,
+    }).toEqual({ narrowPixels: 100, widePixels: 280 })
+  })
+
+  test('a length minimum is the same distance at both, which is the point', async () => {
+    const wide = await sized('min="280px" default-position="0" step="5"', 1400)
+    const narrow = await sized('min="280px" default-position="0" step="5"', 500)
+    await press(wide, 'Home')
+    await press(narrow, 'Home')
+    expect({
+      narrowPixels: Math.round((narrow.position / 100) * 500),
+      widePixels: Math.round((wide.position / 100) * 1400),
+    }).toEqual({ narrowPixels: 280, widePixels: 280 })
+  })
+
+  test("rem is resolved against the root, so a bound tracks the reader's text size", async () => {
+    const host = await sized('min="10rem" default-position="0" step="5"', 800)
+    await press(host, 'Home')
+    // 10rem at the default 16px root is 160px, which is a fifth of 800.
+    expect(Math.round(host.position)).toBe(20)
+  })
+})
+
+describe('a splitter told to choose its own axis', () => {
+  /* The observation, stated rather than laid out. happy-dom computes no
+     geometry, so a `ResizeObserver` here would report nothing and never fire;
+     what is under test is not the arithmetic of comparing a width to a
+     threshold but that a turn reaches all three of the things that have to turn
+     with it. The carousel specs state `offsetLeft` for the same reason. */
+  const stack = async (host: Splitter, stacked: boolean): Promise<void> => {
+    ;(host as unknown as { stacked: boolean }).stacked = stacked
+    await host.updateComplete
+  }
+
+  test('auto rests horizontal, so a splitter with room behaves as it always did', async () => {
+    const host = await splitter('orientation="auto" default-position="50" step="5"')
+    await press(host, 'ArrowRight')
+    expect({
+      announced: separator(host).getAttribute('aria-orientation'),
+      mirrored: host.dataset.axis,
+      position: host.position,
+    }).toEqual({ announced: 'vertical', mirrored: undefined, position: 55 })
+  })
+
+  /* The whole reason this is a value and not a media query: turning a splitter
+     is three changes at once, and a stylesheet can only make one of them. A
+     CSS-only version looks stacked and behaves side by side, with the arrow
+     keys moving the wrong way and the accessibility tree saying something
+     untrue. */
+  test('the arrow keys, the announcement and the mirrored axis turn together', async () => {
+    const host = await splitter('orientation="auto" default-position="50" step="5"')
+    await stack(host, true)
+    await press(host, 'ArrowRight')
+    const sideways = host.position
+    await press(host, 'ArrowDown')
+    expect({
+      announced: separator(host).getAttribute('aria-orientation'),
+      mirrored: host.dataset.axis,
+      movedOnTheNewAxis: host.position,
+      refusedTheOldOne: sideways,
+    }).toEqual({
+      announced: 'horizontal',
+      mirrored: 'vertical',
+      movedOnTheNewAxis: 55,
+      refusedTheOldOne: 50,
+    })
+  })
+
+  test('turning back takes the mirrored attribute off, a host keeping no stale state', async () => {
+    const host = await splitter('orientation="auto"')
+    await stack(host, true)
+    await stack(host, false)
+    expect({
+      announced: separator(host).getAttribute('aria-orientation'),
+      mirrored: host.dataset.axis,
+    }).toEqual({ announced: 'vertical', mirrored: undefined })
+  })
+
+  test('an explicit orientation is never mirrored, the attribute already saying it', async () => {
+    // Two sources for one truth on the host is the trap, and a page rendered
+    // before hydration would flash the wrong axis on its way through.
+    const host = await splitter('orientation="vertical"')
+    expect(host.dataset.axis).toBeUndefined()
+  })
+})
+
 describe('splitter collapsing', () => {
   test('a shut pane is gone, past whatever bounds a drag answers to', async () => {
     // The bounds keep a pane from vanishing by accident. This is the deliberate

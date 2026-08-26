@@ -10,6 +10,20 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /**
+ * The inline size under which `orientation="auto"` stacks, in pixels.
+ *
+ * 32rem at the default root size. Two panes side by side under this have about
+ * 240px each before the divider, which is narrower than the content anybody
+ * puts in one: the sandbox at 390 gave its source pane 237px and cut every line
+ * mid-token, which is the measurement this number comes from.
+ *
+ * A constant and not a property, until something wants a different one. The
+ * axis is the decision worth exposing; where it turns is a detail of this
+ * component doing what it was asked.
+ */
+const STACK_BELOW = 512
+
+/**
  * @summary Two panes and a divider the reader can move.
  *
  * @description
@@ -141,9 +155,24 @@ export class HelixHeadlessSplitter extends HelixElement {
    *
    * Unset is horizontal and stays unset, so a reflected default cannot appear on
    * a host whose server output never had it.
+   *
+   * **`auto` lays the panes out along whichever axis the splitter has room for**,
+   * stacking them once its own inline size falls under `STACK_BELOW`. It is a
+   * value rather than a default because turning a splitter is not a style
+   * change: the drag axis, the arrow keys and `aria-orientation` all turn with
+   * it, so a CSS-only version would look stacked and behave side by side, with
+   * the keyboard moving the wrong way and the accessibility tree saying
+   * something untrue. Everything here reads `vertical` rather than this
+   * property, which is what makes one getter enough to turn all three together.
+   *
+   * **Its own width and not the viewport**, per the responsiveness policy in
+   * `.claude/rules/helix.md`: a splitter in a 300px panel of a 1400px window has
+   * no room for two panes side by side, and a media query would hand it the
+   * desktop branch. A `ResizeObserver` on the host asks the only question that
+   * has an honest answer.
    */
   @property({ reflect: true })
-  orientation?: 'horizontal' | 'vertical'
+  orientation?: 'auto' | 'horizontal' | 'vertical'
 
   /**
    * Where the divider sits, as a percentage of the whole.
@@ -229,13 +258,74 @@ export class HelixHeadlessSplitter extends HelixElement {
   @property({ attribute: 'collapsed-size', type: Number })
   collapsedSize = 0
 
-  /** Nearest the divider may come to the start, as a percentage. */
-  @property({ type: Number })
-  min = 0
+  /**
+   * Nearest the divider may come to the start.
+   *
+   * A bare number is a percentage, which is what this always took. A CSS length
+   * is resolved against the splitter's own box along its axis, so `min="15rem"`
+   * means fifteen rem of pane whatever the container is doing.
+   *
+   * **The length is the one that holds.** A percentage minimum does not: twenty
+   * per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
+   * number a consumer picked was almost certainly about how much text fits
+   * rather than about a ratio. The pane that a percentage protects at desk
+   * width is squeezed past reading at half of it.
+   *
+   * **It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
+   * the class docstring says, so a pane can still be shut and reopened. What a
+   * minimum forbids is the space between shut and usable: a pane wide enough to
+   * be there and too narrow to read is the state nobody wants and every drag
+   * passes through.
+   */
+  @property()
+  min: number | string = 0
 
-  /** Nearest it may come to the end. */
-  @property({ type: Number })
-  max = 100
+  /** Nearest it may come to the end, on the same terms as `min`. */
+  @property()
+  max: number | string = 100
+
+  /**
+   * Either kind of bound as a percentage of the box.
+   *
+   * Measured rather than cached: a length is only meaningful against the size
+   * the splitter is right now, and the drag that asks is already reading layout.
+   * Falls back where there is nothing to measure, which is the server and an
+   * element that is not displayed, so `aria-valuemin` is a number either way.
+   */
+  private toPercent(value: number | string, fallback: number): number {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : fallback
+    }
+    const text = value.trim()
+    if (text === '') {
+      return fallback
+    }
+    const bare = Number(text)
+    if (Number.isFinite(bare)) {
+      return bare
+    }
+    const length = /^(-?[\d.]+)(em|px|rem)$/.exec(text)
+    if (!length || typeof window === 'undefined') {
+      return fallback
+    }
+    const amount = Number(length[1])
+    const root = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+    const own = Number.parseFloat(getComputedStyle(this).fontSize) || root
+    const pixels = length[2] === 'px' ? amount : amount * (length[2] === 'rem' ? root : own)
+    const box = this.getBoundingClientRect()
+    const extent = this.vertical ? box.height : box.width
+    return extent > 0 ? (pixels / extent) * 100 : fallback
+  }
+
+  /** `min` as a percentage, whichever way it was written. */
+  private get minPercent(): number {
+    return this.toPercent(this.min, 0)
+  }
+
+  /** `max` as a percentage, whichever way it was written. */
+  private get maxPercent(): number {
+    return this.toPercent(this.max, 100)
+  }
 
   /** How far one arrow press moves it, as a percentage. */
   @property({ type: Number })
@@ -417,14 +507,56 @@ export class HelixHeadlessSplitter extends HelixElement {
 
   /** Pulled between the bounds, which are the ends unless a consumer moved them. */
   private clamp(next: number): number {
-    const min = Math.max(0, Math.min(100, this.min))
-    const max = Math.max(min, Math.min(100, this.max))
+    const min = Math.max(0, Math.min(100, this.minPercent))
+    const max = Math.max(min, Math.min(100, this.maxPercent))
     return Math.min(max, Math.max(min, Number.isFinite(next) ? next : min))
   }
 
-  /** Public because a nested splitter compares axes with the one it is in. */
+  /** Whether `auto` has resolved to stacked, which only the observer sets. */
+  @state()
+  private stacked = false
+
+  /** Watches this element's own width while `auto` is what it was asked for. */
+  private sizes: ResizeObserver | undefined
+
+  /**
+   * Starts or stops watching, according to what the axis was asked to be.
+   *
+   * Called from `firstUpdated` and from `updated`, so a consumer switching to
+   * `auto` after mount is observed and one switching away stops being: an
+   * observer left running would keep writing `stacked` that nothing reads, and
+   * a splitter told `horizontal` has been given its answer already.
+   */
+  private watchWidth(): void {
+    if (this.orientation !== 'auto') {
+      this.sizes?.disconnect()
+      this.sizes = undefined
+      return
+    }
+    if (this.sizes) {
+      return
+    }
+    this.sizes = new ResizeObserver(([entry]) => {
+      const width = entry?.borderBoxSize?.[0]?.inlineSize ?? entry?.contentRect.width ?? 0
+      /* Zero while the element is `display: none` or not yet laid out, and a
+         zero is not a narrow splitter: taking it would stack every instance
+         that starts hidden and never turn it back. */
+      if (width > 0) {
+        this.stacked = width < STACK_BELOW
+      }
+    })
+    this.sizes.observe(this)
+  }
+
+  /**
+   * Public because a nested splitter compares axes with the one it is in.
+   *
+   * The one place the axis is decided, which is why `auto` costs a single line
+   * here rather than a pass over seventeen readers: the drag, the arrow keys and
+   * `aria-orientation` all ask this and all turn together.
+   */
   get vertical(): boolean {
-    return this.orientation === 'vertical'
+    return this.orientation === 'vertical' || (this.orientation === 'auto' && this.stacked)
   }
 
   /**
@@ -603,9 +735,9 @@ export class HelixHeadlessSplitter extends HelixElement {
     } else if (event.key === forward) {
       next = this.position + this.step
     } else if (event.key === 'Home') {
-      next = this.min
+      next = this.minPercent
     } else if (event.key === 'End') {
-      next = this.max
+      next = this.maxPercent
     } else {
       return
     }
@@ -850,12 +982,20 @@ export class HelixHeadlessSplitter extends HelixElement {
     // Only on a re-connect. The first pass waits for `firstUpdated`, which is
     // where a parent is guaranteed to have upgraded.
     if (this.hasUpdated) {
+      /* The width watch too, and it belongs here for a plainer reason than the
+         one above: `disconnectedCallback` drops the observer on every move, so
+         a splitter reordered in the DOM would stop watching its own width and
+         `auto` would freeze on whatever it last saw. `check:observers` is what
+         said so. */
+      this.watchWidth()
       this.findOuter()
     }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.sizes?.disconnect()
+    this.sizes = undefined
     this.outer?.uncross(this)
     this.outer = null
     this.crossedAt = undefined
@@ -863,12 +1003,16 @@ export class HelixHeadlessSplitter extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    this.watchWidth()
     this.findOuter()
   }
 
   /** Keeps the corner in step while this divider moves under it. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (changed.has('orientation')) {
+      this.watchWidth()
+    }
     /* The resolved collapse, mirrored for a consumer's own rules: a shut pane
        usually wants its contents to stop being read as well as stop being seen.
        `data-` and not `collapsed`, so a serialized host cannot be re-parsed with
@@ -879,6 +1023,20 @@ export class HelixHeadlessSplitter extends HelixElement {
       this.dataset.collapsed = this.collapsed
     } else {
       delete this.dataset.collapsed
+    }
+    /* The resolved axis, mirrored for the same reason and on the same terms: a
+       stylesheet selecting `[orientation="vertical"]` cannot see an `auto` that
+       has turned, so the layout would stay side by side while the drag, the keys
+       and `aria-orientation` had all gone the other way. That is the lie the
+       policy warns a CSS-only version tells, arrived at from the other side.
+
+       Only where `auto` produced it. An explicit `vertical` already carries an
+       attribute saying so, and writing a second would put two sources of one
+       truth on the host and a flash of the wrong axis before hydration. */
+    if (this.orientation === 'auto' && this.stacked) {
+      this.dataset.axis = 'vertical'
+    } else {
+      delete this.dataset.axis
     }
     /* `showing` rather than `position`, so a corner drawn on the splitter above
        follows this divider through a drag instead of catching up at the end. */
@@ -924,8 +1082,8 @@ export class HelixHeadlessSplitter extends HelixElement {
         tabindex="0"
         aria-label=${this.label}
         aria-orientation=${this.vertical ? 'horizontal' : 'vertical'}
-        aria-valuemax=${this.clamp(this.max)}
-        aria-valuemin=${this.clamp(this.min)}
+        aria-valuemax=${this.clamp(this.maxPercent)}
+        aria-valuemin=${this.clamp(this.minPercent)}
         aria-valuenow=${Math.round(position)}
         ?data-dragging=${this.dragging}
         ?data-flush=${this.flush}

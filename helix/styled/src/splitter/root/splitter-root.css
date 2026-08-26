@@ -17,7 +17,7 @@
   position: relative;
 }
 
-:host([orientation="vertical"]) {
+:host(:is([orientation="vertical"], [data-axis="vertical"])) {
   flex-direction: column;
 }
 
@@ -97,7 +97,7 @@
     inline-size var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host([orientation="vertical"]) [part="separator"] {
+:host(:is([orientation="vertical"], [data-axis="vertical"])) [part="separator"] {
   block-size: var(--splitter-target, var(--helix-space-xs));
   cursor: row-resize;
   inline-size: auto;
@@ -105,7 +105,7 @@
   margin-inline: 0;
 }
 
-:host([orientation="vertical"]) [part="separator"]::before {
+:host(:is([orientation="vertical"], [data-axis="vertical"])) [part="separator"]::before {
   block-size: var(--helix-border-thin);
   inline-size: auto;
   inset-block-start: 50%;
@@ -179,9 +179,12 @@
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }
 
-:host([orientation="vertical"]:not([variant="grip"])) [part="separator"]:hover::before,
-:host([orientation="vertical"]:not([variant="grip"])) [part="separator"]:focus-visible::before,
-:host([orientation="vertical"]:not([variant="grip"])) [part="separator"][data-dragging]::before {
+:host(:is([orientation="vertical"], [data-axis="vertical"]):not([variant="grip"]))
+  [part="separator"]:hover::before,
+:host(:is([orientation="vertical"], [data-axis="vertical"]):not([variant="grip"]))
+  [part="separator"]:focus-visible::before,
+:host(:is([orientation="vertical"], [data-axis="vertical"]):not([variant="grip"]))
+  [part="separator"][data-dragging]::before {
   block-size: var(--helix-border-thick);
   inline-size: auto;
 }
@@ -201,7 +204,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   [part="separator"]::before,
-  :host([orientation="vertical"]) [part="separator"]::before {
+  :host(:is([orientation="vertical"], [data-axis="vertical"])) [part="separator"]::before {
     transition: none;
   }
 }
@@ -255,7 +258,7 @@
 /* The axes swap with the divider: a horizontal splitter's own divider is an
    inline offset and the crossing is a distance down it, and the other way round
    for a vertical one. */
-:host([orientation="vertical"]) [part="corner"] {
+:host(:is([orientation="vertical"], [data-axis="vertical"])) [part="corner"] {
   inset-block-start: var(--splitter-position);
   inset-inline-start: var(--splitter-corner-at);
 }
@@ -316,14 +319,16 @@
 }
 
 /* Along the run, centered, and offset to the leading side of the line. */
-:host([variant="grip"]:not([orientation="vertical"])) [part="separator"]::after {
+:host([variant="grip"]:not(:is([orientation="vertical"], [data-axis="vertical"])))
+[part="separator"]::after {
   block-size: var(--splitter-grip-length, 2rem);
   inline-size: var(--helix-border-thick);
   inset-block-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
   inset-inline-start: calc(50% - var(--helix-border-thick) - var(--helix-space-2xs));
 }
 
-:host([variant="grip"][orientation="vertical"]) [part="separator"]::after {
+:host([variant="grip"]:is([orientation="vertical"], [data-axis="vertical"]))
+  [part="separator"]::after {
   block-size: var(--helix-border-thick);
   inline-size: var(--splitter-grip-length, 2rem);
   inset-block-start: calc(50% - var(--helix-border-thick) - var(--helix-space-2xs));
