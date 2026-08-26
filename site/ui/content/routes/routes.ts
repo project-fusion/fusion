@@ -114,6 +114,14 @@ const PROSE: Route[] = [
     title: 'Privacy',
   },
   {
+    description: findSitePage('/acceptable-use')?.description ?? '',
+    kind: 'page',
+    path: '/acceptable-use',
+    priority: 0.3,
+    section: 'Fusion',
+    title: 'Acceptable use',
+  },
+  {
     description: 'The design system: tokens, two component tiers, and a theme engine.',
     kind: 'page',
     path: '/helix',

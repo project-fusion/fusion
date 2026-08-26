@@ -38,6 +38,7 @@ const FOOTER_GROUPS = [
     items: [
       { href: '/terms', label: 'Terms of use' },
       { href: '/privacy', label: 'Privacy' },
+      { href: '/acceptable-use', label: 'Acceptable use' },
     ],
   },
 ]

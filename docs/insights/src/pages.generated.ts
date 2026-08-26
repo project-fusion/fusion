@@ -9,6 +9,13 @@ import type { SiteEssay, SitePage } from './index.js'
 
 export const generatedPages: SitePage[] = [
   {
+    description: 'What the sandbox will run, what it will not, and why the limits are so few.',
+    kicker: 'Acceptable use',
+    path: '/acceptable-use',
+    slug: 'acceptable-use',
+    title: 'What you may run here',
+  },
+  {
     description:
       'Three preference keys, no cookies, no analytics, and nothing that identifies you.',
     kicker: 'Privacy',
