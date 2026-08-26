@@ -256,3 +256,70 @@
 .insightNextRow > helix-flex:first-child {
   min-inline-size: 0;
 }
+
+/* The rays field behind the insights hero, added 25 Aug 2026.
+ *
+ * **Rays rather than the lattice the gallery wears**, because the two pages
+ * should not be interchangeable: one is a set of drawings and this is a set of
+ * arguments, and light being cast is what an insight looks like.
+ *
+ * **Two things about it are unsettled and are written here rather than left to
+ * be rediscovered.** The hero still carries the shared lattice underneath from
+ * `.pageHero::before`, so there are two textures where the page wants one; the
+ * dots are faint under the rays and it has not been decided whether they should
+ * be turned off here. And the frame cost of a WebGL context on a page that is
+ * otherwise text has not been measured: the 8.3ms figure on record is the
+ * landing page's field, not this one.
+ *
+ * Absolute against the band rather than fixed against the window, so it belongs
+ * to the hero and not to the page: the hero already establishes both the
+ * stacking context and the positioning, for the lattice it used to want.
+ *
+ * `base` under the content's `raised`, which is the pair `.pageHeroInner`
+ * already relies on. */
+.insightsAura {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+/* A ground for the masthead, and an edge for the band.
+ *
+ * **Two gradients rather than one, because they answer different things.** The
+ * linear one is the masthead's: `rays` puts its brightest light at the top
+ * center, which is exactly where the nav sits, and `Products` and `Services` are
+ * muted labels by design, so they lost against it while the current item kept
+ * its own filled pill. Two header heights of falloff, so the ground is gone
+ * before it reaches the eyebrow.
+ *
+ * The radial one is the vignette: it darkens the corners so the field ends
+ * rather than stopping at the filter bar's hairline, and it leaves the middle
+ * clear where the heading and the search are.
+ *
+ * Mixed from `--helix-color-background`, so this darkens on a dark page and
+ * lightens on a light one without a `light-dark()` pair, which is what the
+ * insights hero note above already says not to spread.
+ *
+ * `::after` rather than a rendered element: `::before` is the shared lattice,
+ * and a generated last child paints over an earlier sibling at the same layer,
+ * which is what puts this above the aura and under `.pageHeroInner`. */
+.insightsHero::after {
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--helix-color-background) 72%, transparent) 0,
+      color-mix(in srgb, var(--helix-color-background) 0%, transparent)
+        calc(var(--helix-size-header) * 2)
+    ),
+    radial-gradient(
+      ellipse 86% 72% at 50% 44%,
+      color-mix(in srgb, var(--helix-color-background) 0%, transparent) 0%,
+      color-mix(in srgb, var(--helix-color-background) 58%, transparent) 100%
+    );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}

@@ -6,6 +6,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { HeroField } from '@/components/hero-field/hero-field'
 import type { stageAppearance } from '@/content/verticals/verticals'
+import { useFocusOnLoad } from '@/hooks/use-focus-on-load/use-focus-on-load'
+import { useSearchKey } from '@/hooks/use-search-key/use-search-key'
 import browser from '../../browser.module.css'
 import styles from './gallery.module.css'
 
@@ -141,27 +143,6 @@ export function ComponentBrowser({
     window.history.replaceState(null, '', search ? `${pathname}?${search}` : pathname)
   }
 
-  /* Focus lands in the search on arrival.
-   *
-   * `preventScroll`, because focusing an element the browser thinks is out of
-   * view scrolls it into view, and a reader arriving back here from a component
-   * page has their old scroll position restored first. Without it the page
-   * would silently jump to the top on every return, undoing the restore.
-   *
-   * Mount, not every render. Sorting pushes a new URL on the same route, which
-   * re-renders this component without remounting it, so the effect does not run
-   * again and focus is not pulled out of wherever the reader put it. Arriving
-   * from another page does remount, which is the case being asked for.
-   *
-   * Worth knowing: focus on load means a screen reader starts at the search
-   * rather than at the top of the document, so the heading above it is skipped
-   * unless the reader goes back for it. That is the accepted trade on a page
-   * whose whole purpose is finding one of sixty-five things, and it is a trade
-   * rather than a free win. */
-  useEffect(() => {
-    search.current?.focus({ preventScroll: true })
-  }, [])
-
   /* Read off the families and nothing else.
    *
    * A declared list was wrong twice over. `beta` is not a value `@status` may
@@ -187,6 +168,26 @@ export function ComponentBrowser({
 
   // Still a ref: the search is focused on mount, which no prop can do.
   const search = useRef<HelixInput>(null)
+  const focusSearch = useSearchKey(search)
+
+  /* Focus lands in the search on arrival.
+   *
+   * `preventScroll`, because focusing an element the browser thinks is out of
+   * view scrolls it into view, and a reader arriving back here from a component
+   * page has their old scroll position restored first. Without it the page
+   * would silently jump to the top on every return, undoing the restore.
+   *
+   * Mount, not every render. Sorting pushes a new URL on the same route, which
+   * re-renders this component without remounting it, so the effect does not run
+   * again and focus is not pulled out of wherever the reader put it. Arriving
+   * from another page does remount, which is the case being asked for.
+   *
+   * Worth knowing: focus on load means a screen reader starts at the search
+   * rather than at the top of the document, so the heading above it is skipped
+   * unless the reader goes back for it. That is the accepted trade on a page
+   * whose whole purpose is finding one of sixty-five things, and it is a trade
+   * rather than a free win. */
+  useFocusOnLoad(search)
 
   /* A navigation rather than state, because the server owns the order. `scroll:
      false` so choosing a sort does not throw the reader back to the top of a
@@ -280,6 +281,12 @@ export function ComponentBrowser({
             ref={search}
             type="search"
           >
+            <helix-kbd
+              keys="/"
+              onhelix-shortcut={focusSearch}
+              slot="end"
+              within="document"
+            ></helix-kbd>
             <helix-icon name="magnifying-glass" slot="start"></helix-icon>
           </helix-input>
           <helix-flex align="center" className="pageHeroActions" direction="column" gap="lg">

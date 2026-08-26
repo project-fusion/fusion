@@ -1,8 +1,11 @@
 'use client'
 
+import type { HelixInput } from '@helix-io/styled'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { type ReactNode, useMemo, useState } from 'react'
+import { type ReactNode, useMemo, useRef, useState } from 'react'
 import { HeroField } from '@/components/hero-field/hero-field'
+import { useFocusOnLoad } from '@/hooks/use-focus-on-load/use-focus-on-load'
+import { useSearchKey } from '@/hooks/use-search-key/use-search-key'
 import type { Insight } from '../../../content/insights'
 import browser from '../browser.module.css'
 import styles from './insights.module.css'
@@ -82,6 +85,29 @@ export function InsightBrowser({
      control would go quiet, waiting to be told what to show by a consumer that
      is only listening. */
   const [query, setQuery] = useState(initialQuery)
+  /* A ref only so the shortcut can reach the field. Insights does not focus on
+     mount, unlike the gallery: the reasoning is beside the input. */
+  const searchField = useRef<HelixInput>(null)
+  const focusSearch = useSearchKey(searchField)
+
+  /* Focused on arrival, matching the gallery.
+   *
+   * **This page refused it until 25 Aug 2026, and the argument is worth keeping
+   * rather than deleting.** It ran: a reading page with six posts on it, where
+   * pulling a screen reader past the heading and into a text box skips the one
+   * line that says what the page is, to save a keystroke nobody was about to
+   * make. That cost is real and is unchanged by this.
+   *
+   * What changed is the count and the consistency. The two galleries are the
+   * same page shape and a reader should not have to learn which of them takes
+   * the keyboard, and six posts is a floor rather than a ceiling: the argument
+   * gets weaker with every piece published, and would have flipped on its own.
+   *
+   * `preventScroll`, as the gallery does, so focusing does not jump the page
+   * past the hero it is sitting in. The `/` beside the field stays: it is what
+   * gets a reader back to the search after they have scrolled away, which
+   * focusing on load never did. */
+  useFocusOnLoad(searchField)
   const [topic, setTopic] = useState(initialTopic || ALL)
   const [kind, setKind] = useState(initialKind || ALL)
   const router = useRouter()
@@ -158,7 +184,21 @@ export function InsightBrowser({
   return (
     <>
       <section className={`${browser.pageHero} ${styles.insightsHero}`}>
-        <HeroField />
+        {/* Rays, on the reading that light being cast is what an insight looks
+            like, and so that the two galleries do not read as one page twice.
+            Absolute against the hero, which
+            already isolates and positions itself for the lattice pseudo-element,
+            so the light stays inside the band and `.pageHeroInner` keeps its
+            raised layer above it. No `interactive`, so it never takes the hit
+            test off the search field. */}
+        <helix-aura
+          bloom={0.62}
+          class={styles.insightsAura}
+          gain={1.15}
+          scale={0.45}
+          speed={0.5}
+          variant="rays"
+        ></helix-aura>
         <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
           <helix-flex align="center" data-density="sm" direction="column" gap="sm">
             <helix-tag>Fusion Development Group</helix-tag>
@@ -167,14 +207,6 @@ export function InsightBrowser({
               The arguments behind what we build, written where they can be checked.
             </helix-text>
           </helix-flex>
-          {/* No `autofocus` here, unlike the Helix gallery.
-              
-              That page focuses its search on arrival because its whole purpose
-              is finding one of sixty-five things and a reader arrives knowing
-              the name. This is a reading page with six posts on it: pulling a
-              screen reader past the heading and into a text box would skip the
-              one line that says what the page is, to save a keystroke nobody
-              was about to make. */}
           <helix-input
             className={`${browser.heroSearch} ${browser.chromeControl}`}
             default-value={initialQuery}
@@ -184,8 +216,15 @@ export function InsightBrowser({
               mirror('q', event.detail.value)
             }}
             placeholder={`Search ${index.length} posts…`}
+            ref={searchField}
             type="search"
           >
+            <helix-kbd
+              keys="/"
+              onhelix-shortcut={focusSearch}
+              slot="end"
+              within="document"
+            ></helix-kbd>
             <helix-icon name="magnifying-glass" slot="start"></helix-icon>
           </helix-input>
         </helix-flex>

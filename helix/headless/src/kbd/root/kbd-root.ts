@@ -75,15 +75,22 @@ const onApple = (): boolean =>
  * keyboard does not have, and nothing catches it, a string being a string.
  * Given `mod` this renders `⌘K` on Apple and `Ctrl+K` everywhere else.
  *
- * **`scope` is what binds it, and it is absent by default.** Without it this
+ * **`within` is what binds it, and it is absent by default.** Without it this
  * draws a key and listens for nothing, which is what every existing use of this
  * component wants. The two values are the two honest lifetimes:
  *
- * - `self` listens within the element's own parent, which is the case this is
- *   mostly for: a hint sitting inside the control it belongs to, where the
+ * - `control` listens within the element's own parent, which is the case this
+ *   is mostly for: a hint sitting inside the control it belongs to, where the
  *   shortcut should work while that control has focus and stop existing when
  *   the control does.
- * - `global` listens on the document, for a chord that works from anywhere.
+ * - `document` listens on the document, for a chord that works from anywhere.
+ *
+ * *Corrected 25 Aug 2026: this said `scope`, `self` and `global` until then,
+ * naming a property that has never existed under that name. The rename is
+ * explained on the property itself, twenty lines below, and this paragraph
+ * above it went on teaching the old one. A reader who trusted the class doc
+ * wrote an attribute that binds nothing, which is also what an unset `within`
+ * does, so nothing about the mistake looked like one.*
  *
  * **A hidden `kbd` is a dead shortcut, and that is the point rather than a
  * trap.** Binding here ties the key to its own advertisement, so a hint that is
