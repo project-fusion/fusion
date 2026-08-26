@@ -21,6 +21,7 @@
     "/helix/components/callout",
     "/helix/components/card",
     "/helix/components/carousel",
+    "/helix/components/chat",
     "/helix/components/checkbox",
     "/helix/components/checkbox-group",
     "/helix/components/code",

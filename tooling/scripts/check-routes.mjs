@@ -33,6 +33,9 @@ import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+
+/** Whether to append to the published record, or to report that it is behind. */
+const write = process.argv.includes('--write')
 const PUBLIC = join(ROOT, 'site/ui/public')
 
 /** The shortest a document can be and still say anything. */
@@ -220,7 +223,34 @@ if (problems.length === 0) {
   const committed = [...live].filter((path) => !untracked.has(path.split('/').at(-1) ?? ''))
   const merged = [...new Set([...published.paths, ...committed])].sort()
   if (merged.join() !== published.paths.join()) {
-    writeFileSync(PUBLISHED, `${JSON.stringify({ paths: merged }, undefined, 2)}\n`)
+    /* **This is the one check here that wrote, and writing is what made it
+       fail.** `verify` asserts the tree is unchanged by verifying it, so a
+       check that appends a newly published address turns the next component
+       into a red build on a shard that names nothing: measured on the run
+       that added Chat, `checks (2)` and `checks (4)` failing on
+       `git diff --exit-code` with the whole of the diff being one path.
+    
+       `check` fixes and `verify` judges, which `CLAUDE.md` states and
+       `check:dialect` already follows. The record is written under `--write`,
+       which `bun run routes` and `bun run regen` pass; without it the check
+       says the file is behind and stops. */
+    if (write) {
+      writeFileSync(PUBLISHED, `${JSON.stringify({ paths: merged }, undefined, 2)}\n`)
+    } else {
+      /* Reported here rather than pushed onto `problems`, which is read and
+         acted on two hundred lines above this: appended to after the fact it
+         changes nothing and the check passes while saying so to nobody, which
+         is the shape of a check that cannot fail. Found by reverting the file
+         and watching this branch report clean. */
+      console.error(
+        'routes: docs/insights/published.json is behind the routes that exist. Run ' +
+          '`bun run routes` and commit the result.\n',
+      )
+      for (const path of merged.filter((one) => !published.paths.includes(one))) {
+        console.error(`  ${path}`)
+      }
+      process.exit(1)
+    }
   }
 }
 
