@@ -3,7 +3,7 @@
 import type { HelixInput } from '@helix-io/styled'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { type ReactNode, useMemo, useRef, useState } from 'react'
 import { HeroField } from '@/components/hero-field/hero-field'
 import type { stageAppearance } from '@/content/verticals/verticals'
 import { useFocusOnLoad } from '@/hooks/use-focus-on-load/use-focus-on-load'

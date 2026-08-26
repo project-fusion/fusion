@@ -3,7 +3,6 @@
 import type { HelixInput } from '@helix-io/styled'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useRef, useState } from 'react'
-import { HeroField } from '@/components/hero-field/hero-field'
 import { useFocusOnLoad } from '@/hooks/use-focus-on-load/use-focus-on-load'
 import { useSearchKey } from '@/hooks/use-search-key/use-search-key'
 import type { Insight } from '../../../content/insights'
