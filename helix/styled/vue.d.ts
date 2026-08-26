@@ -131,6 +131,7 @@ import type {
   HelixLoadEvent,
   HelixErrorEvent,
   HelixInputEvent,
+  HelixShortcutEvent,
   HelixFilterEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
@@ -3239,9 +3240,34 @@ export type HelixInputVueEvents = {
   change: HelixInputElementEvent;
 };
 
-export type HelixKbdVueProps = {};
+/** `HelixKbd` component event */
+export type HelixKbdElementEvent<E = Event> = TypedEvent<HelixKbd, E>;
+/** `helix-shortcut` event type */
+export type HelixKbdHelixShortcutElementEvent =
+  HelixKbdElementEvent<HelixShortcutEvent>;
 
-export type HelixKbdVueEvents = {};
+export type HelixKbdVueProps = {
+  /** The chord, written plainly: `mod+k`, `shift+?`, `/`.
+
+`mod` is the platform's own command modifier, which is the reason to write
+a chord here rather than a glyph: it is the one token whose right answer
+differs per reader. */
+  keys?: HelixKbd["keys"];
+  /** Where the chord is listened for, and whether it is listened for at all.
+
+Unset draws a key and binds nothing.
+
+**Named `within` because `scope` is taken.** `scope` is a real HTML
+attribute belonging to `<th>`, so putting one on anything else is both a
+lint failure and a word in the DOM that already means something narrower.
+`within` says the same thing and says it about this element. */
+  within?: HelixKbd["within"];
+};
+
+export type HelixKbdVueEvents = {
+  /** Fired when the chord is pressed, and cancelable. */
+  "helix-shortcut": HelixKbdHelixShortcutElementEvent;
+};
 
 export type HelixLegendVueProps = {
   /** Where the legend sits and which way its entries run.
@@ -5746,7 +5772,22 @@ so the two words are opposite each other here on purpose. The code had this
 right and the sentence beside it said the reverse.
 
 Unset is horizontal and stays unset, so a reflected default cannot appear on
-a host whose server output never had it. */
+a host whose server output never had it.
+
+**`auto` lays the panes out along whichever axis the splitter has room for**,
+stacking them once its own inline size falls under `STACK_BELOW`. It is a
+value rather than a default because turning a splitter is not a style
+change: the drag axis, the arrow keys and `aria-orientation` all turn with
+it, so a CSS-only version would look stacked and behave side by side, with
+the keyboard moving the wrong way and the accessibility tree saying
+something untrue. Everything here reads `vertical` rather than this
+property, which is what makes one getter enough to turn all three together.
+
+**Its own width and not the viewport**, per the responsiveness policy in
+`.claude/rules/helix.md`: a splitter in a 300px panel of a 1400px window has
+no room for two panes side by side, and a media query would hand it the
+desktop branch. A `ResizeObserver` on the host asks the only question that
+has an honest answer. */
   orientation?: HelixSplitter["orientation"];
   /** Where the divider sits, as a percentage of the whole.
 
@@ -5788,9 +5829,25 @@ that should survive its own collapse says how much of itself to keep, and
 only whoever put it there knows that, which is the same reason `min` is a
 consumer's to set. */
   collapsedSize?: HelixSplitter["collapsedSize"];
-  /** Nearest the divider may come to the start, as a percentage. */
+  /** Nearest the divider may come to the start.
+
+A bare number is a percentage, which is what this always took. A CSS length
+is resolved against the splitter's own box along its axis, so `min="15rem"`
+means fifteen rem of pane whatever the container is doing.
+
+**The length is the one that holds.** A percentage minimum does not: twenty
+per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
+number a consumer picked was almost certainly about how much text fits
+rather than about a ratio. The pane that a percentage protects at desk
+width is squeezed past reading at half of it.
+
+**It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
+the class docstring says, so a pane can still be shut and reopened. What a
+minimum forbids is the space between shut and usable: a pane wide enough to
+be there and too narrow to read is the state nobody wants and every drag
+passes through. */
   min?: HelixSplitter["min"];
-  /** Nearest it may come to the end. */
+  /** Nearest it may come to the end, on the same terms as `min`. */
   max?: HelixSplitter["max"];
   /** How far one arrow press moves it, as a percentage. */
   step?: HelixSplitter["step"];

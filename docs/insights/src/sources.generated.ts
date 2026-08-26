@@ -356,8 +356,8 @@ or rents.
 | [Interface](/helix) | the tools you build with |
 | [Cognitive](/cortex) | your intelligence, memory and reasoning |
 | [Informational](/cortex) | your records and where they came from |
-| [Energy](/energy) | your own power |
-| [Financial](/capital) | your own capital |
+| Energy | your own power |
+| Financial | your own capital |
 
 Energy is the missing floor, and every layer above it presumes power. It is
 also why the company is called Fusion: fuel from seawater, no import, no cartel,

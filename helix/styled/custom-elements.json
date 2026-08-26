@@ -30807,6 +30807,122 @@
           "members": [
             {
               "kind": "field",
+              "name": "keys",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The chord, written plainly: `mod+k`, `shift+?`, `/`.\n\n`mod` is the platform's own command modifier, which is the reason to write\na chord here rather than a glyph: it is the one token whose right answer\ndiffers per reader.",
+              "attribute": "keys",
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "within",
+              "type": {
+                "text": "'control' | 'document' | undefined"
+              },
+              "description": "Where the chord is listened for, and whether it is listened for at all.\n\nUnset draws a key and binds nothing.\n\n**Named `within` because `scope` is taken.** `scope` is a real HTML\nattribute belonging to `<th>`, so putting one on anything else is both a\nlint failure and a word in the DOM that already means something narrower.\n`within` says the same thing and says it about this element.",
+              "attribute": "within",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "listening",
+              "type": {
+                "text": "EventTarget | undefined"
+              },
+              "privacy": "private",
+              "description": "The element the listener is on, kept so it can be taken off the same one.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The chord as this reader's keyboard labels it.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "listen",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "deafen",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "matches_",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "press",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ],
+              "description": "Whether a press is this chord, modifiers and all.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "tier",
               "type": {
                 "text": "string"
@@ -30934,6 +31050,10 @@
               {
                 "description": "A key, and a chord of keys, as a reader would see them written.",
                 "slug": "preview"
+              },
+              {
+                "description": "A chord written once, drawn for whichever keyboard is reading it.",
+                "slug": "shortcut"
               }
             ],
             "source": "helix/styled/src/kbd"
@@ -30942,7 +31062,7 @@
           "customElement": true,
           "slots": [
             {
-              "description": "The key's label.",
+              "description": "The key's label, where `keys` is not set.",
               "name": "",
               "inheritedFrom": {
                 "name": "HelixHeadlessKbd",
@@ -30954,6 +31074,47 @@
             {
               "description": "The key.",
               "name": "kbd",
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "keys",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The chord, written plainly: `mod+k`, `shift+?`, `/`.\n\n`mod` is the platform's own command modifier, which is the reason to write\na chord here rather than a glyph: it is the one token whose right answer\ndiffers per reader.",
+              "fieldName": "keys",
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            },
+            {
+              "name": "within",
+              "type": {
+                "text": "'control' | 'document' | undefined"
+              },
+              "description": "Where the chord is listened for, and whether it is listened for at all.\n\nUnset draws a key and binds nothing.\n\n**Named `within` because `scope` is taken.** `scope` is a real HTML\nattribute belonging to `<th>`, so putting one on anything else is both a\nlint failure and a word in the DOM that already means something narrower.\n`within` says the same thing and says it about this element.",
+              "fieldName": "within",
+              "inheritedFrom": {
+                "name": "HelixHeadlessKbd",
+                "module": "src/kbd/root/kbd-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixShortcutEvent"
+              },
+              "description": "Fired when the chord is pressed, and cancelable.",
+              "name": "helix-shortcut",
+              "reactProp": "onhelix-shortcut",
               "inheritedFrom": {
                 "name": "HelixHeadlessKbd",
                 "module": "src/kbd/root/kbd-root.ts"
@@ -57075,9 +57236,9 @@
               "kind": "field",
               "name": "orientation",
               "type": {
-                "text": "'horizontal' | 'vertical' | undefined"
+                "text": "'auto' | 'horizontal' | 'vertical' | undefined"
               },
-              "description": "Which way the panes are laid out.\n\n`horizontal` is side by side with an upright divider between them, and\n`aria-orientation` on that divider is therefore `vertical`: a separator's\norientation is the direction it is *drawn* in, not the axis it moves along,\nso the two words are opposite each other here on purpose. The code had this\nright and the sentence beside it said the reverse.\n\nUnset is horizontal and stays unset, so a reflected default cannot appear on\na host whose server output never had it.",
+              "description": "Which way the panes are laid out.\n\n`horizontal` is side by side with an upright divider between them, and\n`aria-orientation` on that divider is therefore `vertical`: a separator's\norientation is the direction it is *drawn* in, not the axis it moves along,\nso the two words are opposite each other here on purpose. The code had this\nright and the sentence beside it said the reverse.\n\nUnset is horizontal and stays unset, so a reflected default cannot appear on\na host whose server output never had it.\n\n**`auto` lays the panes out along whichever axis the splitter has room for**,\nstacking them once its own inline size falls under `STACK_BELOW`. It is a\nvalue rather than a default because turning a splitter is not a style\nchange: the drag axis, the arrow keys and `aria-orientation` all turn with\nit, so a CSS-only version would look stacked and behave side by side, with\nthe keyboard moving the wrong way and the accessibility tree saying\nsomething untrue. Everything here reads `vertical` rather than this\nproperty, which is what makes one getter enough to turn all three together.\n\n**Its own width and not the viewport**, per the responsiveness policy in\n`.claude/rules/helix.md`: a splitter in a 300px panel of a 1400px window has\nno room for two panes side by side, and a media query would hand it the\ndesktop branch. A `ResizeObserver` on the host asks the only question that\nhas an honest answer.",
               "attribute": "orientation",
               "reflects": true,
               "inheritedFrom": {
@@ -57166,10 +57327,10 @@
               "kind": "field",
               "name": "min",
               "type": {
-                "text": "number"
+                "text": "number | string"
               },
               "default": "0",
-              "description": "Nearest the divider may come to the start, as a percentage.",
+              "description": "Nearest the divider may come to the start.\n\nA bare number is a percentage, which is what this always took. A CSS length\nis resolved against the splitter's own box along its axis, so `min=\"15rem\"`\nmeans fifteen rem of pane whatever the container is doing.\n\n**The length is the one that holds.** A percentage minimum does not: twenty\nper cent is 280px in a 1400px splitter and 100px in a 500px one, and the\nnumber a consumer picked was almost certainly about how much text fits\nrather than about a ratio. The pane that a percentage protects at desk\nwidth is squeezed past reading at half of it.\n\n**It does not fight `collapsed`.** Collapse overrides `min` and `max`, as\nthe class docstring says, so a pane can still be shut and reopened. What a\nminimum forbids is the space between shut and usable: a pane wide enough to\nbe there and too narrow to read is the state nobody wants and every drag\npasses through.",
               "attribute": "min",
               "inheritedFrom": {
                 "name": "HelixHeadlessSplitter",
@@ -57180,11 +57341,68 @@
               "kind": "field",
               "name": "max",
               "type": {
-                "text": "number"
+                "text": "number | string"
               },
               "default": "100",
-              "description": "Nearest it may come to the end.",
+              "description": "Nearest it may come to the end, on the same terms as `min`.",
               "attribute": "max",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toPercent",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number | string"
+                  }
+                },
+                {
+                  "name": "fallback",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Either kind of bound as a percentage of the box.\n\nMeasured rather than cached: a length is only meaningful against the size\nthe splitter is right now, and the drag that asks is already reading layout.\nFalls back where there is nothing to measure, which is the server and an\nelement that is not displayed, so `aria-valuemin` is a number either way.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "minPercent",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "`min` as a percentage, whichever way it was written.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "maxPercent",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "`max` as a percentage, whichever way it was written.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessSplitter",
                 "module": "src/splitter/root/splitter-root.ts"
@@ -57544,11 +57762,53 @@
             },
             {
               "kind": "field",
+              "name": "stacked",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether `auto` has resolved to stacked, which only the observer sets.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "sizes",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private",
+              "description": "Watches this element's own width while `auto` is what it was asked for.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "watchWidth",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Starts or stops watching, according to what the axis was asked to be.\n\nCalled from `firstUpdated` and from `updated`, so a consumer switching to\n`auto` after mount is observed and one switching away stops being: an\nobserver left running would keep writing `stacked` that nothing reads, and\na splitter told `horizontal` has been given its answer already.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "vertical",
               "type": {
                 "text": "boolean"
               },
-              "description": "Public because a nested splitter compares axes with the one it is in.",
+              "description": "Public because a nested splitter compares axes with the one it is in.\n\nThe one place the axis is decided, which is why `auto` costs a single line\nhere rather than a pass over seventeen readers: the drag, the arrow keys and\n`aria-orientation` all ask this and all turn together.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessSplitter",
@@ -57933,9 +58193,9 @@
             {
               "name": "orientation",
               "type": {
-                "text": "'horizontal' | 'vertical' | undefined"
+                "text": "'auto' | 'horizontal' | 'vertical' | undefined"
               },
-              "description": "Which way the panes are laid out.\n\n`horizontal` is side by side with an upright divider between them, and\n`aria-orientation` on that divider is therefore `vertical`: a separator's\norientation is the direction it is *drawn* in, not the axis it moves along,\nso the two words are opposite each other here on purpose. The code had this\nright and the sentence beside it said the reverse.\n\nUnset is horizontal and stays unset, so a reflected default cannot appear on\na host whose server output never had it.",
+              "description": "Which way the panes are laid out.\n\n`horizontal` is side by side with an upright divider between them, and\n`aria-orientation` on that divider is therefore `vertical`: a separator's\norientation is the direction it is *drawn* in, not the axis it moves along,\nso the two words are opposite each other here on purpose. The code had this\nright and the sentence beside it said the reverse.\n\nUnset is horizontal and stays unset, so a reflected default cannot appear on\na host whose server output never had it.\n\n**`auto` lays the panes out along whichever axis the splitter has room for**,\nstacking them once its own inline size falls under `STACK_BELOW`. It is a\nvalue rather than a default because turning a splitter is not a style\nchange: the drag axis, the arrow keys and `aria-orientation` all turn with\nit, so a CSS-only version would look stacked and behave side by side, with\nthe keyboard moving the wrong way and the accessibility tree saying\nsomething untrue. Everything here reads `vertical` rather than this\nproperty, which is what makes one getter enough to turn all three together.\n\n**Its own width and not the viewport**, per the responsiveness policy in\n`.claude/rules/helix.md`: a splitter in a 300px panel of a 1400px window has\nno room for two panes side by side, and a media query would hand it the\ndesktop branch. A `ResizeObserver` on the host asks the only question that\nhas an honest answer.",
               "fieldName": "orientation",
               "inheritedFrom": {
                 "name": "HelixHeadlessSplitter",
@@ -58007,10 +58267,10 @@
             {
               "name": "min",
               "type": {
-                "text": "number"
+                "text": "number | string"
               },
               "default": "0",
-              "description": "Nearest the divider may come to the start, as a percentage.",
+              "description": "Nearest the divider may come to the start.\n\nA bare number is a percentage, which is what this always took. A CSS length\nis resolved against the splitter's own box along its axis, so `min=\"15rem\"`\nmeans fifteen rem of pane whatever the container is doing.\n\n**The length is the one that holds.** A percentage minimum does not: twenty\nper cent is 280px in a 1400px splitter and 100px in a 500px one, and the\nnumber a consumer picked was almost certainly about how much text fits\nrather than about a ratio. The pane that a percentage protects at desk\nwidth is squeezed past reading at half of it.\n\n**It does not fight `collapsed`.** Collapse overrides `min` and `max`, as\nthe class docstring says, so a pane can still be shut and reopened. What a\nminimum forbids is the space between shut and usable: a pane wide enough to\nbe there and too narrow to read is the state nobody wants and every drag\npasses through.",
               "fieldName": "min",
               "inheritedFrom": {
                 "name": "HelixHeadlessSplitter",
@@ -58020,10 +58280,10 @@
             {
               "name": "max",
               "type": {
-                "text": "number"
+                "text": "number | string"
               },
               "default": "100",
-              "description": "Nearest it may come to the end.",
+              "description": "Nearest it may come to the end, on the same terms as `min`.",
               "fieldName": "max",
               "inheritedFrom": {
                 "name": "HelixHeadlessSplitter",

@@ -2669,11 +2669,24 @@ key.
 Sized in `em`, so it stays proportional to whatever it is set inside rather
 than holding one size and looking wrong in a heading.
 
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `keys` | `keys` | `string` | `''` | `HelixHeadlessKbd` | The chord, written plainly: `mod+k`, `shift+?`, `/`. |
+| `within` | `within` | `'control' \| 'document' \| undefined` | - | `HelixHeadlessKbd` | Where the chord is listened for, and whether it is listened for at all. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-shortcut` | `HelixShortcutEvent` | Fired when the chord is pressed, and cancelable. |
+
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| *(default)* | The key's label. |
+| *(default)* | The key's label, where `keys` is not set. |
 
 #### Parts
 
@@ -5061,9 +5074,9 @@ gesture.
 | `defaultCollapsed` | `default-collapsed` | `'end' \| 'start' \| undefined` | - | `HelixHeadlessSplitter` | Which pane starts shut, where nothing declared it. |
 | `defaultPosition` | `default-position` | `number` | `50` | `HelixHeadlessSplitter` | Where the divider starts, where nothing declared it. |
 | `label` | `label` | `string` | `'Resize panes'` | `HelixHeadlessSplitter` | Accessible name for the divider. |
-| `max` | `max` | `number` | `100` | `HelixHeadlessSplitter` | Nearest it may come to the end. |
-| `min` | `min` | `number` | `0` | `HelixHeadlessSplitter` | Nearest the divider may come to the start, as a percentage. |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessSplitter` | Which way the panes are laid out. |
+| `max` | `max` | `number \| string` | `100` | `HelixHeadlessSplitter` | Nearest it may come to the end, on the same terms as `min`. |
+| `min` | `min` | `number \| string` | `0` | `HelixHeadlessSplitter` | Nearest the divider may come to the start. |
+| `orientation` | `orientation` | `'auto' \| 'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessSplitter` | Which way the panes are laid out. |
 | `position` | `position` | `number` | - | `HelixHeadlessSplitter` | Where the divider sits, as a percentage of the whole. |
 | `step` | `step` | `number` | `2` | `HelixHeadlessSplitter` | How far one arrow press moves it, as a percentage. |
 | `variant` | `variant` | `'grip' \| 'line' \| undefined` | - | - | Whether the divider carries a grip. |

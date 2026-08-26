@@ -34,8 +34,8 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | 10 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 12 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 165 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 98 |
-| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 68 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 99 |
+| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 69 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 25 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 13 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 9 |
@@ -109,8 +109,8 @@ The spacing scale, used for gaps, padding and margins alike.
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 116 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 150 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 138 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 131 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 137 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 132 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 84 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 76 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 36 |
