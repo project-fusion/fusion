@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.ts`](../helix/styles/src/tokens.ts) by
 `bun run tokens`. Do not edit.*
 
-178 semantic tokens in 15 categories, every one in exactly
+179 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -34,7 +34,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | 10 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 12 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 172 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 104 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 105 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 78 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 26 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 13 |
@@ -112,9 +112,9 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 143 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 151 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 97 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 82 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 83 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 38 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 45 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 46 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 6 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
 
@@ -137,7 +137,7 @@ The three families.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-font-sans` | `var(--_helix-family-sans)` | 93 |
-| `--helix-font-mono` | `var(--_helix-family-mono)` | 15 |
+| `--helix-font-mono` | `var(--_helix-family-mono)` | 16 |
 | `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 8 |
 
 ## text
@@ -146,7 +146,7 @@ Font size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-text-xs` | `var(--_helix-size-12)` | 60 |
+| `--helix-text-xs` | `var(--_helix-size-12)` | 61 |
 | `--helix-text-sm` | `var(--_helix-size-13)` | 73 |
 | `--helix-text-md` | `var(--_helix-size-14)` | 27 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 13 |
@@ -185,6 +185,7 @@ Letter spacing.
 | `--helix-tracking-tight` | `-0.01em` | 19 |
 | `--helix-tracking-normal` | `0` | 13 |
 | `--helix-tracking-wide` | `0.02em` | 11 |
+| `--helix-tracking-wider` | `0.12em` | 1 |
 
 ## border
 

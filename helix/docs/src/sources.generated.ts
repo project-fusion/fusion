@@ -1780,7 +1780,7 @@ is the whole cost of adopting the base layer on its own.
 | \`elements.css\` | 8,300 | 1,890 | 1,608 | The components' own layer, generated from every family's stylesheet. |
 | \`all.css\` | 171 | 136 | 96 | The three above in one import, in the order they have to be in. |
 | \`primitives.css\` | 6,108 | 1,217 | 1,048 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
-| \`tokens.css\` | 19,337 | 2,364 | 1,981 | The 178 semantic tokens. Nothing paints without this. |
+| \`tokens.css\` | 19,371 | 2,371 | 1,989 | The 179 semantic tokens. Nothing paints without this. |
 
 ## What the numbers say
 
@@ -2083,7 +2083,7 @@ column is what was removed rather than part of what remains.
 | \`@helix-io/core\` | 815,095 | 105 | 145,800 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
 | \`@helix-io/headless\` | 8,094,283 | 420 | 692,129 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 63,768 | 11 | 19,847 | none |
-| \`@helix-io/styles\` | 79,772 | 5 | 0 | none |
+| \`@helix-io/styles\` | 79,995 | 5 | 0 | none |
 | \`@helix-io/theme\` | 465,772 | 8 | 4,793 | none |
 | \`@helix-io/styled\` | 8,731,954 | 711 | 289,792 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
@@ -4229,6 +4229,7 @@ For one-off text outside prose, \`[data-text]\` carries the ramp:
 | \`--helix-tracking-tight\` | \`-0.01em\` | Large type, which needs the letters closer than a paragraph does. |
 | \`--helix-tracking-normal\` | \`0\` | Body text, and the default. |
 | \`--helix-tracking-wide\` | \`0.02em\` | Small capitals and labels, which need the room. |
+| \`--helix-tracking-wider\` | \`0.12em\` | An uppercase eyebrow, which needs more room than a label. |
 
 [//]: # (/tokens)
 

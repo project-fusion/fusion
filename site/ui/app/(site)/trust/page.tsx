@@ -12,10 +12,16 @@ import { DocumentPage } from '../document-page'
  * one. Written down and counted, it converts an internal gate that can be moved
  * forever into a public commitment that can actually be reached.
  *
- * The six are `##` headings in the file rather than an array of six objects,
+ * The six are a numbered list in the file rather than an array of six objects,
  * which is the same count expressed in the form a person adding a seventh would
- * actually be editing. The numbering is a CSS counter for the same reason: the
- * count is a fact about the document, so the document should carry it.
+ * actually be editing, and the numbering is the list's own for the same reason:
+ * the count is a fact about the document, so the document carries it.
+ *
+ * **This said `##` headings and a CSS counter, and neither was true.** The file
+ * holds an ordered list, `renderMdx` turns it into a `helix-list`, the numbers
+ * are the platform's markers, and no counter existed anywhere in the site's CSS.
+ * A comment that describes an implementation the file no longer has is worse than
+ * no comment, because it is the thing a reader trusts instead of looking.
  *
  * The second half is the part most companies leave out and the reason this page
  * is worth having at all: none of it has been exercised yet, because nothing

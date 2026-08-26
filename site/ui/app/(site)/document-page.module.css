@@ -64,6 +64,24 @@
   padding-block: var(--helix-space-2xl) var(--site-band);
 }
 
+/* **The eyebrow, which is a register rather than a label.**
+ *
+ * `variant="label"` sets the kicker at `text-xs` with `tracking-wide`, which is
+ * right for a form label and too quiet for the line above a document's title: it
+ * read as a stray word rather than as the class of thing the page is. Capitals
+ * and `tracking-wider` are what make it an eyebrow, and the two go together, in
+ * that capitals at the narrower tracking look cramped rather than deliberate.
+ *
+ * Taken from the legacy marketing site's about page, which is where the
+ * treatment on this site started. Its 0.18em is looser than this: at four words
+ * a kicker set that wide starts to come apart, and `Acceptable use` is four
+ * words.
+ */
+.documentKicker {
+  letter-spacing: var(--helix-tracking-wider);
+  text-transform: uppercase;
+}
+
 /* **Left, with the prose under it.**
  *
  * This was centered, on the argument that a centered measure is a column the eye
@@ -112,6 +130,42 @@
      before the shell had one. It takes the column like everything else, and its
      own larger type is what keeps the line count down. */
   text-wrap: balance;
+}
+
+/* **A numbered document reads its numbers in a rail**, which the legacy about
+ * page did with `grid-template-columns: 7rem 1fr` and a mono number in the first
+ * column. That exact shape is not reachable from here and should not be faked:
+ * `helix-list` keeps its host a `list-item` so the marker is the platform's, and
+ * its own comment says why, that `list-item` cannot combine with `grid`. A
+ * document rule making the host a grid would kill both of the component's
+ * declarations, which is what `check:overruled` exists to refuse.
+ *
+ * What is reachable is the two things that make the rail read as one: room
+ * between the number and the words, through the documented `--list-marker-gutter`,
+ * and a number set apart from the prose it labels. `::marker` takes font and
+ * color and the component styles it nowhere, so nothing is being overruled.
+ *
+ * `letter-spacing` is deliberately absent: it is not in the property set
+ * `::marker` accepts, so it would be a declaration that parses and does nothing.
+ *
+ * The true rail, with the number at the block's own start edge, wants
+ * `helix-list` to render it into `[part="row"]`'s grid rather than leave it to
+ * the platform. That is a component change rather than a page one.
+ *
+ * In the shared shell rather than on Trust, because it is a fact about how this
+ * site sets a numbered argument rather than about that page: counted, Trust is
+ * the only document with an ordered list in it today, and an insight that grows
+ * one should get the same treatment without asking for it.
+ */
+.documentBody helix-list[kind="ordered"] {
+  --list-gap: var(--helix-space-lg);
+  --list-marker-gutter: var(--helix-space-2xl);
+}
+
+.documentBody helix-list[kind="ordered"] helix-list-item::marker {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
 }
 
 /* Air between the blocks, said once here rather than on every element: the base

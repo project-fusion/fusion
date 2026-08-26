@@ -54,7 +54,7 @@ export function DocumentPage({
         {trail}
         <helix-flex align="start" direction="column" gap="md">
           {kicker && (
-            <helix-text tone="subtle" variant="label">
+            <helix-text class={styles.documentKicker} tone="subtle" variant="label">
               {kicker}
             </helix-text>
           )}

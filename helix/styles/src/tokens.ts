@@ -697,6 +697,15 @@ export const TOKENS: Token[] = [
   ],
   ['tracking-normal', '0', 'Body text, and the default.'],
   ['tracking-wide', '0.02em', 'Small capitals and labels, which need the room.'],
+  /* **The eyebrow step, which is a different job from `wide`.** `wide` at 0.02em
+     is a nudge, for a label in sentence case that wants a little air. An eyebrow
+     is set in capitals, and capitals need more than a nudge: letterforms drawn to
+     sit inside words are being asked to stand apart, and at 0.02em they read as a
+     mistake rather than as a register. 0.12em is where a short uppercase line
+     stops looking cramped and starts looking deliberate, measured against the
+     0.18em on the legacy marketing site, which is loose enough that a four-word
+     kicker begins to come apart, and `Acceptable use` is two of four. */
+  ['tracking-wider', '0.12em', 'An uppercase eyebrow, which needs more room than a label.'],
   /* ======================================================== border ====== */
   ['border-thin', '1px'],
   ['border-thick', '2px'],
