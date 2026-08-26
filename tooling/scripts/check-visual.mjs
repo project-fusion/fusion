@@ -357,7 +357,19 @@ for (const { suffix, width } of WIDTHS) {
         await document.fonts.ready
       })
 
-      const shot = await tab.screenshot({ fullPage: true })
+      /* **`animations: 'disabled'` or the animated families can never settle.**
+         Loader carries three `infinite` animations, a 0.8s turn and two 2.4s
+         breathes, so a screenshot catches the spinner wherever it happened to be
+         and the comparison reports a difference that is only a phase. Measured on
+         26 Aug 2026: `styled/loader`, 17 pixels moved, against a baseline taken
+         from the same source minutes earlier.
+
+         Playwright cancels infinite animations to their initial state and
+         fast-forwards finite ones to completion, so every family is pictured at
+         one definite moment rather than at whatever moment the runner reached it.
+         That is what makes a baseline a fact about the component rather than
+         about the machine's timing. */
+      const shot = await tab.screenshot({ animations: 'disabled', fullPage: true })
       const baseline = join(tier.source, family, `.examples/preview${suffix}.png`)
       /* Both tiers, both widths, one name each. The pictures never collide
          because the tiers keep separate `src` trees, so the name says only
