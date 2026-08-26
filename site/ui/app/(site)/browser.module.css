@@ -193,18 +193,18 @@
  * dots read as interface rather than as texture, and the point of the field is
  * that a reader notices it without ever being asked to look at it. */
 @keyframes siteHeroShine {
-6% {
-  opacity: 0;
-  scale: 1;
-}
-11% {
-  opacity: 0.55;
-  scale: 1.45;
-}
-17% {
-  opacity: 0;
-  scale: 1;
-}
+  6% {
+    opacity: 0;
+    scale: 1;
+  }
+  11% {
+    opacity: 0.55;
+    scale: 1.45;
+  }
+  17% {
+    opacity: 0;
+    scale: 1;
+  }
 }
 
 .pageHeroShine {
