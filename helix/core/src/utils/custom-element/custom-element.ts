@@ -27,6 +27,22 @@
 const reported = new Set<string>()
 
 /**
+ * The tags this page registered twice, for a reader that is not a person.
+ *
+ * **The warning below is the right thing and it is not a readable output.** It
+ * fires at the moment of the second registration, which is the best possible
+ * position and better than anything a later pass can do, and it goes to a
+ * console: a CI job cannot see it, and a developer whose console already has
+ * forty lines in it will not. `@helix-io/diagnostics` reads this instead, so the
+ * same fault reaches a structured report without a second detector guessing at
+ * it from the outside. Detect once, at the source; surface twice.
+ */
+const duplicates = new Set<string>()
+
+/** Every tag registered twice by different classes, in registration order. */
+export const duplicateRegistrations = (): string[] => [...duplicates]
+
+/**
  * Says so when a second, different class asks for a tag that is already taken.
  *
  * **Returning quietly is right and saying nothing is not.** The registry keeps
@@ -60,6 +76,7 @@ const warnDuplicate = (tagName: string): void => {
     return
   }
   reported.add(tagName)
+  duplicates.add(tagName)
   console.warn(
     `<${tagName}> is already registered by a different class, so this page holds two copies of ` +
       'Helix. The first one keeps the tag: every element of this name is built from it, whatever ' +

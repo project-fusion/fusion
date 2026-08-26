@@ -22,6 +22,7 @@
     "check:contrast": "node tooling/scripts/check-contrast.mjs",
     "check:controlled": "node tooling/scripts/check-controlled.mjs",
     "check:dialect": "node tooling/scripts/check-dialect.mjs",
+    "check:diagnostics": "bun tooling/scripts/check-diagnostics.mjs",
     "check:disabled": "node tooling/scripts/check-disabled.mjs",
     "check:docs": "node tooling/scripts/build-docs.mjs --check",
     "check:documented": "node tooling/scripts/check-documented.mjs",

@@ -1,0 +1,46 @@
+{
+  "name": "@helix-io/diagnostics",
+  "description": "Finds the Helix mistakes that are valid CSS: dead parts, misnamed hooks, two copies of the library.",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "helix/diagnostics",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "bun test src"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "devDependencies": {
+    "@helix-io/testing": "workspace:*",
+    "@types/bun": "^1.3.0"
+  },
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "css",
+    "diagnostics",
+    "helix"
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

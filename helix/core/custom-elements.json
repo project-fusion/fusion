@@ -3719,6 +3719,14 @@
         },
         {
           "kind": "js",
+          "name": "duplicateRegistrations",
+          "declaration": {
+            "name": "duplicateRegistrations",
+            "module": "./utils/custom-element/custom-element.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "DrawIconOptions",
           "declaration": {
             "name": "DrawIconOptions",
@@ -6250,6 +6258,16 @@
       "declarations": [
         {
           "kind": "function",
+          "name": "duplicateRegistrations",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "description": "Every tag registered twice by different classes, in registration order."
+        },
+        {
+          "kind": "function",
           "name": "customElement",
           "parameters": [
             {
@@ -6262,6 +6280,14 @@
         }
       ],
       "exports": [
+        {
+          "kind": "js",
+          "name": "duplicateRegistrations",
+          "declaration": {
+            "name": "duplicateRegistrations",
+            "module": "src/utils/custom-element/custom-element.ts"
+          }
+        },
         {
           "kind": "js",
           "name": "customElement",

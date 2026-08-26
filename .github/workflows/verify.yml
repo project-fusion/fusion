@@ -232,6 +232,15 @@ jobs:
           # clean. See 148.
           - task: visual
             run: bun run check:visual
+          # The collector in `@helix-io/diagnostics`, against real components.
+          # Here and not in `verify` because the DOM `verify` runs under drops a
+          # `::part()` rule on the floor: happy-dom parses
+          # `helix-button::part(button) { }` to zero rules, so every spec for the
+          # part rules runs on hand-built objects, and the collector's central
+          # assumption, that CSSOM hands back what it reads, is asserted nowhere
+          # else.
+          - task: diagnostics
+            run: bun run check:diagnostics
     steps:
       - uses: actions/checkout@v4
 
