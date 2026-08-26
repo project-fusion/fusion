@@ -1403,7 +1403,7 @@
               "kind": "field",
               "name": "material",
               "type": {
-                "text": "'glass' | 'transparent' | undefined"
+                "text": "'frosted' | 'glass' | 'transparent' | undefined"
               },
               "description": "What the banner is made of, which is how much of what is behind it shows\nthrough.\n\nOne axis, three points, and absent is opaque, per the rule that a reflected\nproperty takes no default.\n\n- Absent is opaque. The page stops at the bar, which is what an application\n  wants: the bar is chrome and chrome does not need to be interesting.\n- `glass` is translucent and blurred, so content passing underneath stays\n  visible and goes soft. The page reads as one surface with a bar floating\n  over it.\n- `transparent` has no fill at all until something has scrolled under it,\n  and then it takes the glass. For a banner over a hero, where the art\n  should reach the top of the window and the bar should only become a\n  surface once it has to be legible over moving content.\n\n**This was `appearance`, and it was filed under the wrong axis from the\nstart.** The library's test is the one `Card` states: `separation` is where\na surface ends, `tone` is what it means, `material` is what it is made of,\nand a property belongs to `material` when it can be true at the same time\nas the other two. Every value here varies exactly one quantity, and that\nquantity is translucency. The proof is inside the component rather than in\nthe argument: scrolled, `transparent` emits the same two declarations\n`glass` does, so two of the three points are the same material arriving at\ndifferent times.\n\n**One axis rather than two, and that is the whole reason it stays an\nenum.** The three are mutually exclusive: a bar cannot be opaque and\nsee-through. Splitting the glass out and leaving `appearance=\"transparent\"`\nbeside it would make `material=\"glass\" appearance=\"transparent\"` sayable,\nwhich is a state with nothing to mean, where an enum makes it unsayable.\n\nThe vocabulary got more coherent on the way. `flat` is a word about shape,\n`material` was a word about categories and `transparent` a word about\nlight; opaque, glass and transparent are three points in one language.\n\n**`material` makes the header a containing block for `position: fixed`\ndescendants**, which is worth knowing and is narrower than it sounds. Every\noverlay in this library goes into the top layer through the popover API or\n`<dialog>`, and the top layer is not laid out against its DOM ancestors:\nmeasured, a popover inside a blurred bar opens at the window origin while a\nplain `position: fixed` child of the same bar opens at the bar's. So a\nmenu, a tooltip or a select in a material header is unaffected, and what is\ncaught is a consumer's own hand-positioned element.",
               "attribute": "material",
@@ -1569,7 +1569,7 @@
             {
               "name": "material",
               "type": {
-                "text": "'glass' | 'transparent' | undefined"
+                "text": "'frosted' | 'glass' | 'transparent' | undefined"
               },
               "description": "What the banner is made of, which is how much of what is behind it shows\nthrough.\n\nOne axis, three points, and absent is opaque, per the rule that a reflected\nproperty takes no default.\n\n- Absent is opaque. The page stops at the bar, which is what an application\n  wants: the bar is chrome and chrome does not need to be interesting.\n- `glass` is translucent and blurred, so content passing underneath stays\n  visible and goes soft. The page reads as one surface with a bar floating\n  over it.\n- `transparent` has no fill at all until something has scrolled under it,\n  and then it takes the glass. For a banner over a hero, where the art\n  should reach the top of the window and the bar should only become a\n  surface once it has to be legible over moving content.\n\n**This was `appearance`, and it was filed under the wrong axis from the\nstart.** The library's test is the one `Card` states: `separation` is where\na surface ends, `tone` is what it means, `material` is what it is made of,\nand a property belongs to `material` when it can be true at the same time\nas the other two. Every value here varies exactly one quantity, and that\nquantity is translucency. The proof is inside the component rather than in\nthe argument: scrolled, `transparent` emits the same two declarations\n`glass` does, so two of the three points are the same material arriving at\ndifferent times.\n\n**One axis rather than two, and that is the whole reason it stays an\nenum.** The three are mutually exclusive: a bar cannot be opaque and\nsee-through. Splitting the glass out and leaving `appearance=\"transparent\"`\nbeside it would make `material=\"glass\" appearance=\"transparent\"` sayable,\nwhich is a state with nothing to mean, where an enum makes it unsayable.\n\nThe vocabulary got more coherent on the way. `flat` is a word about shape,\n`material` was a word about categories and `transparent` a word about\nlight; opaque, glass and transparent are three points in one language.\n\n**`material` makes the header a containing block for `position: fixed`\ndescendants**, which is worth knowing and is narrower than it sounds. Every\noverlay in this library goes into the top layer through the popover API or\n`<dialog>`, and the top layer is not laid out against its DOM ancestors:\nmeasured, a popover inside a blurred bar opens at the window origin while a\nplain `position: fixed` child of the same bar opens at the bar's. So a\nmenu, a tooltip or a select in a material header is unaffected, and what is\ncaught is a consumer's own hand-positioned element.",
               "fieldName": "material"
@@ -1795,12 +1795,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "shape",
+              "name": "variant",
               "type": {
                 "text": "| 'aurora'\n    | 'braid'\n    | 'caustics'\n    | 'flow'\n    | 'fracture'\n    | 'lattice'\n    | 'particles'\n    | 'rays'\n    | 'streaks'\n    | 'threads'\n    | 'waves' | undefined"
               },
-              "description": "Which form the light takes. Absent is `braid`.\n\nReflected because the fallback gradient selects on it, and given no default\nfor the same reason every axis here has none: a default on a reflected\nproperty writes the attribute onto every host anybody renders.",
-              "attribute": "shape",
+              "description": "Which form the light takes. Absent is `braid`.\n\nReflected because the fallback gradient selects on it, and given no default\nfor the same reason every axis here has none: a default on a reflected\nproperty writes the attribute onto every host anybody renders.\n\n**`variant` and not `shape`, which it was until 26 Aug 2026.** `shape` is\nan axis about geometry, `circle` against `square`, `arc` against `ring`,\nand it is registered as one now. Aurora, braid and caustics are not\ngeometries; they are eleven names for a look, which is what `variant` is\nfor by the rule the registry already states. Renamed rather than\ngrandfathered because nothing is published yet: there is no `helix-v` tag,\nso this costs an edit today and a deprecation later. See 236.",
+              "attribute": "variant",
               "reflects": true
             },
             {
@@ -2415,12 +2415,12 @@
           ],
           "attributes": [
             {
-              "name": "shape",
+              "name": "variant",
               "type": {
                 "text": "| 'aurora'\n    | 'braid'\n    | 'caustics'\n    | 'flow'\n    | 'fracture'\n    | 'lattice'\n    | 'particles'\n    | 'rays'\n    | 'streaks'\n    | 'threads'\n    | 'waves' | undefined"
               },
-              "description": "Which form the light takes. Absent is `braid`.\n\nReflected because the fallback gradient selects on it, and given no default\nfor the same reason every axis here has none: a default on a reflected\nproperty writes the attribute onto every host anybody renders.",
-              "fieldName": "shape"
+              "description": "Which form the light takes. Absent is `braid`.\n\nReflected because the fallback gradient selects on it, and given no default\nfor the same reason every axis here has none: a default on a reflected\nproperty writes the attribute onto every host anybody renders.\n\n**`variant` and not `shape`, which it was until 26 Aug 2026.** `shape` is\nan axis about geometry, `circle` against `square`, `arc` against `ring`,\nand it is registered as one now. Aurora, braid and caustics are not\ngeometries; they are eleven names for a look, which is what `variant` is\nfor by the rule the registry already states. Renamed rather than\ngrandfathered because nothing is published yet: there is no `helix-v` tag,\nso this costs an edit today and a deprecation later. See 236.",
+              "fieldName": "variant"
             },
             {
               "name": "drift",
@@ -3913,9 +3913,9 @@
               "kind": "field",
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page.\n\n**`gradient` was here and is `wash` now, which is #156.** The two set\ndifferent properties, `fill-opacity` against `fill`, and a chart forced into\nboth renders as a translucent gradient that is distinct from either: one\nenum was holding two independent things, which is the mistake `Card`'s own\ndoc warns about arriving on the component that borrowed the word.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.",
+              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page.\n\n**`gradient` was here and is `wash` now, which is #156.** The two set\ndifferent properties, `fill-opacity` against `fill`, and a chart forced into\nboth renders as a translucent gradient that is distinct from either: one\nenum was holding two independent things, which is the mistake `Card`'s own\ndoc warns about arriving on the component that borrowed the word.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.\n\n**This paints a mark rather than a ground, and the axis still reads the\nsame way.** On a surface the points are how much of the page shows through;\non a series they are how much ink the mark has, and the order is the same:\n`glass` admits most, `frosted` admits less, absent is opaque. The two\nfactors, 0.62 and 0.88, carry the relationship the surface tokens carry\nbetween `material-translucent` and `material-translucent-strong`, so a\nchart and a card mean the same thing by the word.\n\n**`transparent` is where this one stops.** A mark with no ink is not a\nmaterial choice, it is an absent series, and a chart says that by not\nhaving the datum rather than by painting it invisibly. See 270.",
               "attribute": "material",
               "reflects": true
             },
@@ -4558,9 +4558,9 @@
             {
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page.\n\n**`gradient` was here and is `wash` now, which is #156.** The two set\ndifferent properties, `fill-opacity` against `fill`, and a chart forced into\nboth renders as a translucent gradient that is distinct from either: one\nenum was holding two independent things, which is the mistake `Card`'s own\ndoc warns about arriving on the component that borrowed the word.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.",
+              "description": "What the columns are made of.\n\n**A third axis on the chart, not on the bar.** A bar is a mark inside a\ndrawing and nobody writes markup for one; the chart is what a consumer\naddresses, so the choice belongs here and reaches every column at once.\n\n`glass` lets the gridlines read through the columns, which is what puts a\nchart in the same language as a glass header rather than leaving it the one\nopaque slab on the page.\n\n**`gradient` was here and is `wash` now, which is #156.** The two set\ndifferent properties, `fill-opacity` against `fill`, and a chart forced into\nboth renders as a translucent gradient that is distinct from either: one\nenum was holding two independent things, which is the mistake `Card`'s own\ndoc warns about arriving on the component that borrowed the word.\n\nAbsent is solid, per the rule that a reflected property takes no default,\nso the stylesheet describes only the departure. The strength is the\ntheme's: `glass` scales with `--helix-material-opacity`, so a language that\nis more see-through everywhere is more see-through here.\n\nStyled rather than headless, because what a bar is filled with is a\ntreatment and this tier is where treatments live. The gradient it points at\nis drawn below, which is an element and therefore that tier's business.\n\n**This paints a mark rather than a ground, and the axis still reads the\nsame way.** On a surface the points are how much of the page shows through;\non a series they are how much ink the mark has, and the order is the same:\n`glass` admits most, `frosted` admits less, absent is opaque. The two\nfactors, 0.62 and 0.88, carry the relationship the surface tokens carry\nbetween `material-translucent` and `material-translucent-strong`, so a\nchart and a card mean the same thing by the word.\n\n**`transparent` is where this one stops.** A mark with no ink is not a\nmaterial choice, it is an absent series, and a chart says that by not\nhaving the datum rather than by painting it invisibly. See 270.",
               "fieldName": "material"
             },
             {
@@ -7285,7 +7285,7 @@
               "name": "--card-align"
             },
             {
-              "description": "Filter applied behind a `material=\"glass\"` card. Follows the theme's material policy; set it to override the strength on one card.",
+              "description": "Filter applied behind a `frosted` or `glass` card. Follows the theme's material policy; set it to override the strength on one card.",
               "name": "--card-backdrop"
             },
             {
@@ -7370,9 +7370,9 @@
               "kind": "field",
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | 'transparent' | undefined"
               },
-              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`separation` is where the surface ends and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`separation` is where the surface ends and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.\n\n**The whole axis, which it did not used to be.** `glass` shipped alone,\nso a card offered one point of a three-point language and said nothing\nabout the other two. `frosted` is the same pair turned up, the heavier\nground under the heavier blur, for a card that has to stay readable over\na busy page; `transparent` drops both, for one that is structure and\nspacing with the page showing through. See 270.",
               "attribute": "material",
               "reflects": true
             },
@@ -7519,9 +7519,9 @@
             {
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | 'transparent' | undefined"
               },
-              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`separation` is where the surface ends and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "description": "What the card is made of.\n\n**A third axis, and it passes the test the other two answer to.**\n`separation` is where the surface ends and `tone` is what it means; both of\nthose can be true at once with this, an elevated glass card being a\nperfectly ordinary thing to want, so it is not a value of either.\n\n**An attribute rather than a hook, because glass is not one declaration.**\nIt is a translucent ground *and* a backdrop filter, and either without the\nother does nothing: a blur behind an opaque background is invisible, and a\ntranslucent card over an unfiltered page is a smear. `--card-backdrop`\nshipped on its own for exactly one commit and was that trap, a published\nhook a consumer could set and see nothing happen. The component owns the\npair; a theme owns how strong it is.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.\n\n**The whole axis, which it did not used to be.** `glass` shipped alone,\nso a card offered one point of a three-point language and said nothing\nabout the other two. `frosted` is the same pair turned up, the heavier\nground under the heavier blur, for a card that has to stay readable over\na busy page; `transparent` drops both, for one that is structure and\nspacing with the page showing through. See 270.",
               "fieldName": "material"
             },
             {
@@ -22484,9 +22484,9 @@
               "kind": "field",
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the ring is made of.\n\n`glass` lets the page read through the slices, for a chart sitting on a\nsurface that is itself translucent: a glass card with an opaque ring on it is\nthe two-designs-sharing-a-window failure a material policy exists to stop.\nThe track keeps its fill, a see-through groove being a missing one.\n\nThe strength is the theme's, scaled by `--helix-material-opacity`.",
+              "description": "What the ring is made of.\n\n`glass` lets the page read through the slices, for a chart sitting on a\nsurface that is itself translucent: a glass card with an opaque ring on it is\nthe two-designs-sharing-a-window failure a material policy exists to stop.\nThe track keeps its fill, a see-through groove being a missing one.\n\nThe strength is the theme's, scaled by `--helix-material-opacity`.\n\n**This paints a mark rather than a ground, and the axis still reads the\nsame way.** On a surface the points are how much of the page shows through;\non a series they are how much ink the mark has, and the order is the same:\n`glass` admits most, `frosted` admits less, absent is opaque. The two\nfactors, 0.62 and 0.88, carry the relationship the surface tokens carry\nbetween `material-translucent` and `material-translucent-strong`, so a\nchart and a card mean the same thing by the word.\n\n**`transparent` is where this one stops.** A mark with no ink is not a\nmaterial choice, it is an absent series, and a chart says that by not\nhaving the datum rather than by painting it invisibly. See 270.",
               "attribute": "material",
               "reflects": true
             },
@@ -22911,9 +22911,9 @@
             {
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the ring is made of.\n\n`glass` lets the page read through the slices, for a chart sitting on a\nsurface that is itself translucent: a glass card with an opaque ring on it is\nthe two-designs-sharing-a-window failure a material policy exists to stop.\nThe track keeps its fill, a see-through groove being a missing one.\n\nThe strength is the theme's, scaled by `--helix-material-opacity`.",
+              "description": "What the ring is made of.\n\n`glass` lets the page read through the slices, for a chart sitting on a\nsurface that is itself translucent: a glass card with an opaque ring on it is\nthe two-designs-sharing-a-window failure a material policy exists to stop.\nThe track keeps its fill, a see-through groove being a missing one.\n\nThe strength is the theme's, scaled by `--helix-material-opacity`.\n\n**This paints a mark rather than a ground, and the axis still reads the\nsame way.** On a surface the points are how much of the page shows through;\non a series they are how much ink the mark has, and the order is the same:\n`glass` admits most, `frosted` admits less, absent is opaque. The two\nfactors, 0.62 and 0.88, carry the relationship the surface tokens carry\nbetween `material-translucent` and `material-translucent-strong`, so a\nchart and a card mean the same thing by the word.\n\n**`transparent` is where this one stops.** A mark with no ink is not a\nmaterial choice, it is an absent series, and a chart says that by not\nhaving the datum rather than by painting it invisibly. See 270.",
               "fieldName": "material"
             },
             {
@@ -23296,9 +23296,9 @@
               "kind": "field",
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "Whether the panel is glass rather than opaque.\n\n**The same pair `Card` and `App Header` draw**, and one attribute for the\nsame reason: a backdrop filter behind an opaque ground filters nothing and a\ntranslucent ground with no filter is a tint, so a consumer says what it\nwants rather than assembling it out of two hooks.\n\nA drawer is the case where the pair earns the most, because there is already\nsomething behind it worth seeing: the page it covers, under its own scrim.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "description": "Whether the panel is glass rather than opaque.\n\n**The same pair `Card` and `App Header` draw**, and one attribute for the\nsame reason: a backdrop filter behind an opaque ground filters nothing and a\ntranslucent ground with no filter is a tint, so a consumer says what it\nwants rather than assembling it out of two hooks.\n\nA drawer is the case where the pair earns the most, because there is already\nsomething behind it worth seeing: the page it covers, under its own scrim.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.\n\n**`transparent` is where this one stops, and that is the statement 270\nasks for rather than an omission.** A panel that floats over arbitrary page\ncontent is only readable because it has a ground; dropping it does not make\na lighter drawer, it makes an unreadable one. `frosted` and `glass` are the\ntwo honest points here.",
               "attribute": "material",
               "reflects": true
             },
@@ -23655,9 +23655,9 @@
             {
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "Whether the panel is glass rather than opaque.\n\n**The same pair `Card` and `App Header` draw**, and one attribute for the\nsame reason: a backdrop filter behind an opaque ground filters nothing and a\ntranslucent ground with no filter is a tint, so a consumer says what it\nwants rather than assembling it out of two hooks.\n\nA drawer is the case where the pair earns the most, because there is already\nsomething behind it worth seeing: the page it covers, under its own scrim.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "description": "Whether the panel is glass rather than opaque.\n\n**The same pair `Card` and `App Header` draw**, and one attribute for the\nsame reason: a backdrop filter behind an opaque ground filters nothing and a\ntranslucent ground with no filter is a tint, so a consumer says what it\nwants rather than assembling it out of two hooks.\n\nA drawer is the case where the pair earns the most, because there is already\nsomething behind it worth seeing: the page it covers, under its own scrim.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.\n\n**`transparent` is where this one stops, and that is the statement 270\nasks for rather than an omission.** A panel that floats over arbitrary page\ncontent is only readable because it has a ground; dropping it does not make\na lighter drawer, it makes an unreadable one. `frosted` and `glass` are the\ntwo honest points here.",
               "fieldName": "material"
             },
             {
@@ -31290,9 +31290,9 @@
               "kind": "field",
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the swatches are made of.\n\n`glass` thins whatever emphasis drew, the way it does on a column, so a\nlegend beside a glass chart is in the same substance as the chart. Scaled by\n`--helix-material-opacity`, so a theme that is more see-through everywhere is\nmore see-through here.",
+              "description": "What the swatches are made of.\n\n`glass` thins whatever emphasis drew, the way it does on a column, so a\nlegend beside a glass chart is in the same substance as the chart. Scaled by\n`--helix-material-opacity`, so a theme that is more see-through everywhere is\nmore see-through here.\n\n**This paints a mark rather than a ground, and the axis still reads the\nsame way.** On a surface the points are how much of the page shows through;\non a series they are how much ink the mark has, and the order is the same:\n`glass` admits most, `frosted` admits less, absent is opaque. The two\nfactors, 0.62 and 0.88, carry the relationship the surface tokens carry\nbetween `material-translucent` and `material-translucent-strong`, so a\nchart and a card mean the same thing by the word.\n\n**`transparent` is where this one stops.** A mark with no ink is not a\nmaterial choice, it is an absent series, and a chart says that by not\nhaving the datum rather than by painting it invisibly. See 270.",
               "attribute": "material",
               "reflects": true
             },
@@ -31504,9 +31504,9 @@
             {
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the swatches are made of.\n\n`glass` thins whatever emphasis drew, the way it does on a column, so a\nlegend beside a glass chart is in the same substance as the chart. Scaled by\n`--helix-material-opacity`, so a theme that is more see-through everywhere is\nmore see-through here.",
+              "description": "What the swatches are made of.\n\n`glass` thins whatever emphasis drew, the way it does on a column, so a\nlegend beside a glass chart is in the same substance as the chart. Scaled by\n`--helix-material-opacity`, so a theme that is more see-through everywhere is\nmore see-through here.\n\n**This paints a mark rather than a ground, and the axis still reads the\nsame way.** On a surface the points are how much of the page shows through;\non a series they are how much ink the mark has, and the order is the same:\n`glass` admits most, `frosted` admits less, absent is opaque. The two\nfactors, 0.62 and 0.88, carry the relationship the surface tokens carry\nbetween `material-translucent` and `material-translucent-strong`, so a\nchart and a card mean the same thing by the word.\n\n**`transparent` is where this one stops.** A mark with no ink is not a\nmaterial choice, it is an absent series, and a chart says that by not\nhaving the datum rather than by painting it invisibly. See 270.",
               "fieldName": "material"
             },
             {
@@ -31743,9 +31743,9 @@
               "kind": "field",
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the lines are made of.\n\n`glass` lets the gridlines read through them, which is what translucency is\nfor on a chart rather than decoration.\n\nOn the lines and not the wash: the wash is already scaled by\n`--helix-material-opacity` whatever this says, being a wash by nature, and\nscaling it twice would compound the policy against itself.",
+              "description": "What the lines are made of.\n\n`glass` lets the gridlines read through them, which is what translucency is\nfor on a chart rather than decoration.\n\nOn the lines and not the wash: the wash is already scaled by\n`--helix-material-opacity` whatever this says, being a wash by nature, and\nscaling it twice would compound the policy against itself.\n\n**This paints a mark rather than a ground, and the axis still reads the\nsame way.** On a surface the points are how much of the page shows through;\non a series they are how much ink the mark has, and the order is the same:\n`glass` admits most, `frosted` admits less, absent is opaque. The two\nfactors, 0.62 and 0.88, carry the relationship the surface tokens carry\nbetween `material-translucent` and `material-translucent-strong`, so a\nchart and a card mean the same thing by the word.\n\n**`transparent` is where this one stops.** A mark with no ink is not a\nmaterial choice, it is an absent series, and a chart says that by not\nhaving the datum rather than by painting it invisibly. See 270.",
               "attribute": "material",
               "reflects": true
             },
@@ -32292,9 +32292,9 @@
             {
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the lines are made of.\n\n`glass` lets the gridlines read through them, which is what translucency is\nfor on a chart rather than decoration.\n\nOn the lines and not the wash: the wash is already scaled by\n`--helix-material-opacity` whatever this says, being a wash by nature, and\nscaling it twice would compound the policy against itself.",
+              "description": "What the lines are made of.\n\n`glass` lets the gridlines read through them, which is what translucency is\nfor on a chart rather than decoration.\n\nOn the lines and not the wash: the wash is already scaled by\n`--helix-material-opacity` whatever this says, being a wash by nature, and\nscaling it twice would compound the policy against itself.\n\n**This paints a mark rather than a ground, and the axis still reads the\nsame way.** On a surface the points are how much of the page shows through;\non a series they are how much ink the mark has, and the order is the same:\n`glass` admits most, `frosted` admits less, absent is opaque. The two\nfactors, 0.62 and 0.88, carry the relationship the surface tokens carry\nbetween `material-translucent` and `material-translucent-strong`, so a\nchart and a card mean the same thing by the word.\n\n**`transparent` is where this one stops.** A mark with no ink is not a\nmaterial choice, it is an absent series, and a chart says that by not\nhaving the datum rather than by painting it invisibly. See 270.",
               "fieldName": "material"
             },
             {
@@ -55241,12 +55241,13 @@
                 "slug": "markers"
               },
               {
-                "description": "Two thumbs on one track, for a span rather than a point.",
-                "slug": "range"
+                "description": "A track given thickness and a handle given two dimensions.",
+                "layout": "hug",
+                "slug": "proportions"
               },
               {
-                "description": "A track given thickness and a handle given two dimensions.",
-                "slug": "shape"
+                "description": "Two thumbs on one track, for a span rather than a point.",
+                "slug": "range"
               },
               {
                 "description": "A value that moves in named steps rather than continuously.",
@@ -72383,9 +72384,9 @@
               "kind": "field",
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the bubble is made of.\n\nAbsent is the inverse bubble, a dark surface over a light page, which is\nwhat a hint over content the theme cannot know has always been here. `glass`\nmakes it the page's own translucent ground instead, for a page whose surfaces\nare glass, so a hint over a glass header is not the one opaque slab on it.\n\n**It flips the ink and adds an edge, which no other family carrying this axis\nhas to do.** A card is already the page's surface, so glass swaps one ground\nfor another; this one starts inverse, and `--helix-material-translucent` is\nthe page's ground, so taking it without the foreground would put light ink on\na light bubble. An inverse bubble is told from the page by being its\nopposite and a glass one has to be told from what is behind it, which is why\nthe border arrives with the material rather than being there all along.\n\nThe strength is the theme's: `--helix-material-translucent` and\n`--helix-material-backdrop` are what the policy moves.\n\n**`emphasis` is not here and that is not an omission.** It says how much ink\na *mark* claims, and this is a surface: what varies about a surface is where\nit ends, which is `separation`, and a bubble in the top layer with a point on\nit has one answer to that. A quiet tooltip is a tooltip that is not shown.",
+              "description": "What the bubble is made of.\n\nAbsent is the inverse bubble, a dark surface over a light page, which is\nwhat a hint over content the theme cannot know has always been here. `glass`\nmakes it the page's own translucent ground instead, for a page whose surfaces\nare glass, so a hint over a glass header is not the one opaque slab on it.\n\n**It flips the ink and adds an edge, which no other family carrying this axis\nhas to do.** A card is already the page's surface, so glass swaps one ground\nfor another; this one starts inverse, and `--helix-material-translucent` is\nthe page's ground, so taking it without the foreground would put light ink on\na light bubble. An inverse bubble is told from the page by being its\nopposite and a glass one has to be told from what is behind it, which is why\nthe border arrives with the material rather than being there all along.\n\nThe strength is the theme's: `--helix-material-translucent` and\n`--helix-material-backdrop` are what the policy moves.\n\n**`emphasis` is not here and that is not an omission.** It says how much ink\na *mark* claims, and this is a surface: what varies about a surface is where\nit ends, which is `separation`, and a bubble in the top layer with a point on\nit has one answer to that. A quiet tooltip is a tooltip that is not shown.\n\n**`transparent` is where this one stops, and that is the statement 270\nasks for rather than an omission.** A panel that floats over arbitrary page\ncontent is only readable because it has a ground; dropping it does not make\na lighter tooltip, it makes an unreadable one. `frosted` and `glass` are the\ntwo honest points here.",
               "attribute": "material",
               "reflects": true
             },
@@ -73075,9 +73076,9 @@
             {
               "name": "material",
               "type": {
-                "text": "'glass' | undefined"
+                "text": "'frosted' | 'glass' | undefined"
               },
-              "description": "What the bubble is made of.\n\nAbsent is the inverse bubble, a dark surface over a light page, which is\nwhat a hint over content the theme cannot know has always been here. `glass`\nmakes it the page's own translucent ground instead, for a page whose surfaces\nare glass, so a hint over a glass header is not the one opaque slab on it.\n\n**It flips the ink and adds an edge, which no other family carrying this axis\nhas to do.** A card is already the page's surface, so glass swaps one ground\nfor another; this one starts inverse, and `--helix-material-translucent` is\nthe page's ground, so taking it without the foreground would put light ink on\na light bubble. An inverse bubble is told from the page by being its\nopposite and a glass one has to be told from what is behind it, which is why\nthe border arrives with the material rather than being there all along.\n\nThe strength is the theme's: `--helix-material-translucent` and\n`--helix-material-backdrop` are what the policy moves.\n\n**`emphasis` is not here and that is not an omission.** It says how much ink\na *mark* claims, and this is a surface: what varies about a surface is where\nit ends, which is `separation`, and a bubble in the top layer with a point on\nit has one answer to that. A quiet tooltip is a tooltip that is not shown.",
+              "description": "What the bubble is made of.\n\nAbsent is the inverse bubble, a dark surface over a light page, which is\nwhat a hint over content the theme cannot know has always been here. `glass`\nmakes it the page's own translucent ground instead, for a page whose surfaces\nare glass, so a hint over a glass header is not the one opaque slab on it.\n\n**It flips the ink and adds an edge, which no other family carrying this axis\nhas to do.** A card is already the page's surface, so glass swaps one ground\nfor another; this one starts inverse, and `--helix-material-translucent` is\nthe page's ground, so taking it without the foreground would put light ink on\na light bubble. An inverse bubble is told from the page by being its\nopposite and a glass one has to be told from what is behind it, which is why\nthe border arrives with the material rather than being there all along.\n\nThe strength is the theme's: `--helix-material-translucent` and\n`--helix-material-backdrop` are what the policy moves.\n\n**`emphasis` is not here and that is not an omission.** It says how much ink\na *mark* claims, and this is a surface: what varies about a surface is where\nit ends, which is `separation`, and a bubble in the top layer with a point on\nit has one answer to that. A quiet tooltip is a tooltip that is not shown.\n\n**`transparent` is where this one stops, and that is the statement 270\nasks for rather than an omission.** A panel that floats over arbitrary page\ncontent is only readable because it has a ground; dropping it does not make\na lighter tooltip, it makes an unreadable one. `frosted` and `glass` are the\ntwo honest points here.",
               "fieldName": "material"
             },
             {

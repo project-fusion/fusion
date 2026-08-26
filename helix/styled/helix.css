@@ -25,7 +25,7 @@
  * directly takes the four files by path.
  *
  * The individual files keep their exports. `@helix-io/styles/all.css` is the
- * three that package owns, for a page that wants Helix's type and colour
+ * three that package owns, for a page that wants Helix's type and color
  * without any custom elements; the four singles are there for anyone
  * substituting a layer.
  */

@@ -182,7 +182,7 @@ no shadow: the rule is the whole of it.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `contentAlign` | `content-align` | `'start' \| undefined` | - | `HelixHeadlessAppHeader` | Where the middle region sits in the bar. |
-| `material` | `material` | `'glass' \| 'transparent' \| undefined` | - | - | What the banner is made of, which is how much of what is behind it shows through. |
+| `material` | `material` | `'frosted' \| 'glass' \| 'transparent' \| undefined` | - | - | What the banner is made of, which is how much of what is behind it shows through. |
 | `sticky` | `sticky` | `boolean` | `false` | - | Whether the banner sticks to the top of the viewport. |
 
 #### Slots
@@ -273,7 +273,11 @@ takes no pointer events.
 | `interactive` | `interactive` | `boolean` | `false` | - | Whether the pointer shifts and lifts the field. |
 | `reach` | `reach` | `number` | `1` | - | How far the pointer reaches into the field, `0` upward. |
 | `scale` | `scale` | `number` | `1` | - | Feature size, as a multiplier on the sampled coordinates. |
-| `shape` | `shape` | `\| 'aurora'
+| `speed` | `speed` | `number` | `1` | - | How fast it drifts, as a multiplier on time. |
+| `terminus` | `terminus` | `number \| undefined` | - | - | Where the axis crosses the top edge, as a fraction of the width. |
+| `tilt` | `tilt` | `number` | `14` | - | The field's rotation, in degrees. |
+| `variance` | `variance` | `number` | `1` | - | How much the members of a population differ from one another, `0` a set that is uniform and `1` the resting amount. Clamped to that range: these are interpolations, so a larger number extrapolates rather than exaggerating, and a streak whose length has passed through zero is drawn as a bar across the whole frame. |
+| `variant` | `variant` | `\| 'aurora'
     \| 'braid'
     \| 'caustics'
     \| 'flow'
@@ -284,10 +288,6 @@ takes no pointer events.
     \| 'streaks'
     \| 'threads'
     \| 'waves' \| undefined` | - | - | Which form the light takes. Absent is `braid`. |
-| `speed` | `speed` | `number` | `1` | - | How fast it drifts, as a multiplier on time. |
-| `terminus` | `terminus` | `number \| undefined` | - | - | Where the axis crosses the top edge, as a fraction of the width. |
-| `tilt` | `tilt` | `number` | `14` | - | The field's rotation, in degrees. |
-| `variance` | `variance` | `number` | `1` | - | How much the members of a population differ from one another, `0` a set that is uniform and `1` the resting amount. Clamped to that range: these are interpolations, so a larger number extrapolates rather than exaggerating, and a streak whose length has passed through zero is drawn as a bar across the whole frame. |
 
 #### Parts
 
@@ -455,7 +455,7 @@ it is measured against.
 | `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixHeadlessBarChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `lines` | `lines` | `string \| undefined` | - | `HelixHeadlessBarChart` | Which series are drawn as a line instead of as columns, by name. |
-| `material` | `material` | `'glass' \| undefined` | - | - | What the columns are made of. |
+| `material` | `material` | `'frosted' \| 'glass' \| undefined` | - | - | What the columns are made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `outlined` | `outlined` | `string \| undefined` | - | - | Which series are drawn as an outline rather than a fill, by name. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
@@ -804,7 +804,7 @@ element you slotted, not a wrapper around it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `material` | `material` | `'glass' \| undefined` | - | - | What the card is made of. |
+| `material` | `material` | `'frosted' \| 'glass' \| 'transparent' \| undefined` | - | - | What the card is made of. |
 | `mediaPlacement` | `media-placement` | `'end' \| undefined` | - | `HelixHeadlessCard` | Puts the media after the content instead of before it. |
 | `orientation` | `orientation` | `'vertical' \| 'horizontal' \| undefined` | - | - | Whether media sits above the content stack or beside it. |
 | `separation` | `separation` | `'elevated' \| 'filled' \| 'outlined' \| 'plain' \| undefined` | - | - | How the card separates itself from the page. |
@@ -823,7 +823,7 @@ element you slotted, not a wrapper around it.
 | Property | Description |
 | --- | --- |
 | `--card-align` | How the regions pack when the card is stretched taller than its content. `start` by default, so the slack is at the bottom; `space-between` puts a footer on the floor. |
-| `--card-backdrop` | Filter applied behind a `material="glass"` card. Follows the theme's material policy; set it to override the strength on one card. |
+| `--card-backdrop` | Filter applied behind a `frosted` or `glass` card. Follows the theme's material policy; set it to override the strength on one card. |
 | `--card-background-color` | Surface behind the card. |
 | `--card-border-color` | Border color of the surface. |
 | `--card-border-width` | Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. |
@@ -1984,7 +1984,7 @@ larger than the default.
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `hole` | `hole` | `'large' \| 'none' \| 'small' \| undefined` | - | `HelixHeadlessDonutChart` | How much is left open in the middle. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
-| `material` | `material` | `'glass' \| undefined` | - | - | What the ring is made of. |
+| `material` | `material` | `'frosted' \| 'glass' \| undefined` | - | - | What the ring is made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
@@ -2042,7 +2042,7 @@ rest is flat and the movement is what says something happened.
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessDrawer` | Accessible name for the panel. |
-| `material` | `material` | `'glass' \| undefined` | - | - | Whether the panel is glass rather than opaque. |
+| `material` | `material` | `'frosted' \| 'glass' \| undefined` | - | - | Whether the panel is glass rather than opaque. |
 | `modal` | `modal` | `boolean` | `true` | `HelixHeadlessDrawer` | Whether the drawer blocks the page behind it. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `'start' \| 'end' \| 'top' \| 'bottom' \| undefined` | - | `HelixHeadlessDrawer` | Which edge the drawer comes from. |
@@ -2731,7 +2731,7 @@ custom property set inline would be the headless tier naming a color.
 | `entries` | `entries` | `'categories' \| 'series' \| undefined` | - | `HelixHeadlessLegend` | Which way to read the table. |
 | `for` | `for` | `string` | `''` | `HelixHeadlessLegend` | The id of the table to take the names from. |
 | `glass` | `glass` | `string \| undefined` | - | - | Which entries are glass rather than solid, by name. Matched as `outlined` is. |
-| `material` | `material` | `'glass' \| undefined` | - | - | What the swatches are made of. |
+| `material` | `material` | `'frosted' \| 'glass' \| undefined` | - | - | What the swatches are made of. |
 | `outlined` | `outlined` | `string \| undefined` | - | - | Which entries are drawn as an outline rather than a fill, by name. |
 | `placement` | `placement` | `'end' \| 'start' \| undefined` | - | - | Where the legend sits and which way its entries run. |
 | `subtle` | `subtle` | `string \| undefined` | - | - | Which entries are drawn as a wash of their color, by name. Matched as `outlined` is. |
@@ -2784,7 +2784,7 @@ answers for a shape.
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixHeadlessLineChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
-| `material` | `material` | `'glass' \| undefined` | - | - | What the lines are made of. |
+| `material` | `material` | `'frosted' \| 'glass' \| undefined` | - | - | What the lines are made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
@@ -6413,7 +6413,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 | `delayOut` | `delay-out` | `number` | `100` | `HelixHeadlessTooltip` | How long the bubble stays after the pointer leaves, in milliseconds. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessTooltip` | Whether the tooltip never shows. |
 | `for` | `for` | `string` | `''` | `HelixHeadlessTooltip` | The id of the element this describes, in this tooltip's own tree. |
-| `material` | `material` | `'glass' \| undefined` | - | - | What the bubble is made of. |
+| `material` | `material` | `'frosted' \| 'glass' \| undefined` | - | - | What the bubble is made of. |
 | `offset` | `offset` | `number` | `8` | `HelixHeadlessTooltip` | Space between the trigger and the point of the bubble, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `persist` | `persist` | `boolean` | `false` | `HelixHeadlessTooltip` | Whether the bubble survives the trigger being used. |

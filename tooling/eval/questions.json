@@ -3731,17 +3731,17 @@
       "tag": "helix-slider"
     },
     {
-      "answer": "slider/range",
+      "answer": "slider/proportions",
       "id": "example-533",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"Two thumbs on one track, for a span rather than a point.\"",
+      "prompt": "Which Helix example shows this? \"A track given thickness and a handle given two dimensions.\"",
       "tag": "helix-slider"
     },
     {
-      "answer": "slider/shape",
+      "answer": "slider/range",
       "id": "example-534",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A track given thickness and a handle given two dimensions.\"",
+      "prompt": "Which Helix example shows this? \"Two thumbs on one track, for a span rather than a point.\"",
       "tag": "helix-slider"
     },
     {

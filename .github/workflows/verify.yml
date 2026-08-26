@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
-      # **Never fail fast.** A shard that fails while five are cancelled is the
+      # **Never fail fast.** A shard that fails while five are canceled is the
       # serial chain again, one failure at a time, which is the whole thing this
       # split exists to stop.
       fail-fast: false
@@ -311,7 +311,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')  # dialect:quoted, GitHub's own job result spelled its way
         run: |
           echo "::error::A job in this workflow did not pass."
           exit 1

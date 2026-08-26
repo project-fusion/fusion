@@ -432,8 +432,16 @@ export type HelixAuraVueProps = {
 
 Reflected because the fallback gradient selects on it, and given no default
 for the same reason every axis here has none: a default on a reflected
-property writes the attribute onto every host anybody renders. */
-  shape?: HelixAura["shape"];
+property writes the attribute onto every host anybody renders.
+
+**`variant` and not `shape`, which it was until 26 Aug 2026.** `shape` is
+an axis about geometry, `circle` against `square`, `arc` against `ring`,
+and it is registered as one now. Aurora, braid and caustics are not
+geometries; they are eleven names for a look, which is what `variant` is
+for by the rule the registry already states. Renamed rather than
+grandfathered because nothing is published yet: there is no `helix-v` tag,
+so this costs an edit today and a deprecation later. See 236. */
+  variant?: HelixAura["variant"];
   /** How far the settings wander on their own, `0` still and `1` restless.
 
 **One property rather than a range on each of the five.** A range per axis
@@ -605,7 +613,19 @@ is more see-through everywhere is more see-through here.
 
 Styled rather than headless, because what a bar is filled with is a
 treatment and this tier is where treatments live. The gradient it points at
-is drawn below, which is an element and therefore that tier's business. */
+is drawn below, which is an element and therefore that tier's business.
+
+**This paints a mark rather than a ground, and the axis still reads the
+same way.** On a surface the points are how much of the page shows through;
+on a series they are how much ink the mark has, and the order is the same:
+`glass` admits most, `frosted` admits less, absent is opaque. The two
+factors, 0.62 and 0.88, carry the relationship the surface tokens carry
+between `material-translucent` and `material-translucent-strong`, so a
+chart and a card mean the same thing by the word.
+
+**`transparent` is where this one stops.** A mark with no ink is not a
+material choice, it is an absent series, and a chart says that by not
+having the datum rather than by painting it invisibly. See 270. */
   material?: HelixBarChart["material"];
   /** How a column's fill is distributed across it.
 
@@ -1024,7 +1044,14 @@ hook a consumer could set and see nothing happen. The component owns the
 pair; a theme owns how strong it is.
 
 Absent is opaque, per the rule that a reflected property takes no default,
-so the stylesheet only describes the departure. */
+so the stylesheet only describes the departure.
+
+**The whole axis, which it did not used to be.** `glass` shipped alone,
+so a card offered one point of a three-point language and said nothing
+about the other two. `frosted` is the same pair turned up, the heavier
+ground under the heavier blur, for a card that has to stay readable over
+a busy page; `transparent` drops both, for one that is structure and
+spacing with the page showing through. See 270. */
   material?: HelixCard["material"];
   /** Whether media sits above the content stack or beside it. */
   orientation?: HelixCard["orientation"];
@@ -2590,7 +2617,19 @@ surface that is itself translucent: a glass card with an opaque ring on it is
 the two-designs-sharing-a-window failure a material policy exists to stop.
 The track keeps its fill, a see-through groove being a missing one.
 
-The strength is the theme's, scaled by `--helix-material-opacity`. */
+The strength is the theme's, scaled by `--helix-material-opacity`.
+
+**This paints a mark rather than a ground, and the axis still reads the
+same way.** On a surface the points are how much of the page shows through;
+on a series they are how much ink the mark has, and the order is the same:
+`glass` admits most, `frosted` admits less, absent is opaque. The two
+factors, 0.62 and 0.88, carry the relationship the surface tokens carry
+between `material-translucent` and `material-translucent-strong`, so a
+chart and a card mean the same thing by the word.
+
+**`transparent` is where this one stops.** A mark with no ink is not a
+material choice, it is an absent series, and a chart says that by not
+having the datum rather than by painting it invisibly. See 270. */
   material?: HelixDonutChart["material"];
   /** The id of the table to read.
 
@@ -2672,7 +2711,13 @@ A drawer is the case where the pair earns the most, because there is already
 something behind it worth seeing: the page it covers, under its own scrim.
 
 Absent is opaque, per the rule that a reflected property takes no default,
-so the stylesheet only describes the departure. */
+so the stylesheet only describes the departure.
+
+**`transparent` is where this one stops, and that is the statement 270
+asks for rather than an omission.** A panel that floats over arbitrary page
+content is only readable because it has a ground; dropping it does not make
+a lighter drawer, it makes an unreadable one. `frosted` and `glass` are the
+two honest points here. */
   material?: HelixDrawer["material"];
   /** Whether the element is open.
 
@@ -3330,7 +3375,19 @@ is the honest cost of the legend being a sibling. */
 `glass` thins whatever emphasis drew, the way it does on a column, so a
 legend beside a glass chart is in the same substance as the chart. Scaled by
 `--helix-material-opacity`, so a theme that is more see-through everywhere is
-more see-through here. */
+more see-through here.
+
+**This paints a mark rather than a ground, and the axis still reads the
+same way.** On a surface the points are how much of the page shows through;
+on a series they are how much ink the mark has, and the order is the same:
+`glass` admits most, `frosted` admits less, absent is opaque. The two
+factors, 0.62 and 0.88, carry the relationship the surface tokens carry
+between `material-translucent` and `material-translucent-strong`, so a
+chart and a card mean the same thing by the word.
+
+**`transparent` is where this one stops.** A mark with no ink is not a
+material choice, it is an absent series, and a chart says that by not
+having the datum rather than by painting it invisibly. See 270. */
   material?: HelixLegend["material"];
   /** Which entries are drawn as an outline rather than a fill, by name.
 
@@ -3390,7 +3447,19 @@ for on a chart rather than decoration.
 
 On the lines and not the wash: the wash is already scaled by
 `--helix-material-opacity` whatever this says, being a wash by nature, and
-scaling it twice would compound the policy against itself. */
+scaling it twice would compound the policy against itself.
+
+**This paints a mark rather than a ground, and the axis still reads the
+same way.** On a surface the points are how much of the page shows through;
+on a series they are how much ink the mark has, and the order is the same:
+`glass` admits most, `frosted` admits less, absent is opaque. The two
+factors, 0.62 and 0.88, carry the relationship the surface tokens carry
+between `material-translucent` and `material-translucent-strong`, so a
+chart and a card mean the same thing by the word.
+
+**`transparent` is where this one stops.** A mark with no ink is not a
+material choice, it is an absent series, and a chart says that by not
+having the datum rather than by painting it invisibly. See 270. */
   material?: HelixLineChart["material"];
   /** The id of the table to read.
 
@@ -7052,7 +7121,13 @@ The strength is the theme's: `--helix-material-translucent` and
 **`emphasis` is not here and that is not an omission.** It says how much ink
 a *mark* claims, and this is a surface: what varies about a surface is where
 it ends, which is `separation`, and a bubble in the top layer with a point on
-it has one answer to that. A quiet tooltip is a tooltip that is not shown. */
+it has one answer to that. A quiet tooltip is a tooltip that is not shown.
+
+**`transparent` is where this one stops, and that is the statement 270
+asks for rather than an omission.** A panel that floats over arbitrary page
+content is only readable because it has a ground; dropping it does not make
+a lighter tooltip, it makes an unreadable one. `frosted` and `glass` are the
+two honest points here. */
   material?: HelixTooltip["material"];
   /** Whether the element is open.
 
@@ -7900,7 +7975,7 @@ export type CustomCssProperties = {
   "--callout-radii"?: string;
   /** How the regions pack when the card is stretched taller than its content. `start` by default, so the slack is at the bottom; `space-between` puts a footer on the floor. */
   "--card-align"?: string;
-  /** Filter applied behind a `material="glass"` card. Follows the theme's material policy; set it to override the strength on one card. */
+  /** Filter applied behind a `frosted` or `glass` card. Follows the theme's material policy; set it to override the strength on one card. */
   "--card-backdrop"?: string;
   /** Surface behind the card. */
   "--card-background-color"?: string;

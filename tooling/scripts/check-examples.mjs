@@ -195,7 +195,7 @@ for (const family of families) {
     /* `@layout`, where an example asks for one.
      *
      * The value reaches the frame through the manifest and is applied as an
-     * attribute, so a typo does not throw: it sets `data-layout="centred"`, no
+     * attribute, so a typo does not throw: it sets `data-layout="centred"`, no  (dialect:quoted)
      * rule matches, the example renders unstyled by any mode and looks merely
      * wrong. Three modes exist and they are named here so the misspelling fails
      * at the check rather than in a picture somebody has to notice.

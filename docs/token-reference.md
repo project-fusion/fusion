@@ -26,7 +26,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 76 |
+| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 80 |
 | `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 32 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 19 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 23 |
@@ -217,12 +217,12 @@ Blur and translucency, for a surface that lets the page through.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | 6 |
-| `--helix-material-opacity` | `1` | 9 |
+| `--helix-material-opacity` | `1` | 13 |
 | `--helix-material-blur-sm` | `8px` | 0 |
 | `--helix-material-blur-md` | `16px` | 2 |
-| `--helix-material-blur-lg` | `32px` | 4 |
+| `--helix-material-blur-lg` | `32px` | 8 |
 | `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 60%, transparent )` | 11 |
-| `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 1 |
+| `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 5 |
 | `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 3 |
 
 ## duration
@@ -281,7 +281,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-md` | `calc(1.5rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-loader-sm` | `calc(1rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 4 |
-| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 20 |
+| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 21 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 46 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 25 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 12 |
@@ -297,7 +297,7 @@ Position in the stack. Positional, never named after a component.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-layer-beneath` | `-1` | 2 |
-| `--helix-layer-base` | `0` | 5 |
+| `--helix-layer-base` | `0` | 7 |
 | `--helix-layer-raised` | `10` | 17 |
 | `--helix-layer-sticky` | `100` | 4 |
 | `--helix-layer-overlay` | `1000` | 2 |

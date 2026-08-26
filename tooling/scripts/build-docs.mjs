@@ -172,18 +172,18 @@ const table = (name) => {
      Half a column is a table with holes in it, and the registry's own rule is
      that a category is described or it is not. */
   const described = rows.every((token) => token.description)
-  /* **A colour is shown, and every other kind is written.**
+  /* **A color is shown, and every other kind is written.**
    *
-   * The value column held the declaration, which for a colour is the
+   * The value column held the declaration, which for a color is the
    * derivation and not the answer: `light-dark(oklch(0.985 var(--helix-seed-
    * neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)), oklch(0.21 ...))`
-   * wrapped to six lines and asked a reader to evaluate a colour function in
+   * wrapped to six lines and asked a reader to evaluate a color function in
    * their head, on a page where only one arm of the `light-dark()` even
    * applies. A swatch answers it at a glance, and answers it *live*: it reads
-   * the token, so it follows the reader's own colour mode and any theme over
+   * the token, so it follows the reader's own color mode and any theme over
    * it, which no string in a table can do.
    *
-   * Only colour. A space, a radius and a duration are already one short token
+   * Only color. A space, a radius and a duration are already one short token
    * long, and a swatch of `0.75rem` would be a worse answer than the text.
    *
    * The derivation is not lost, it moves to where it is explained: `theming`
@@ -199,10 +199,10 @@ const table = (name) => {
    * An attribute is not rewritten, so what is generated here is what the
    * stylesheet can name, and `site.css` keys on `data-` for exactly this reason
    * everywhere else. */
-  const colour = rows.every((token) => token.category === 'color')
-  const heading = colour ? 'Sample' : 'Value'
+  const color = rows.every((token) => token.category === 'color')
+  const heading = color ? 'Sample' : 'Value'
   const cell = (token) =>
-    colour
+    color
       ? `<span data-token-swatch style={{ background: 'var(${token.name})' }} />`
       : `\`${resolve(token.value, primitives)}\``
   return [
