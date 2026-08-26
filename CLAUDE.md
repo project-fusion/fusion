@@ -45,6 +45,25 @@ Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 that edits your files cannot tell you whether they were correct. `check` fixes;
 `verify` judges.
 
+**`verify` is CI's job, not a local ritual.** `verify.yml` runs all of it on every
+push, sharded across `plan`, `checks`, `lint`, `types`, `tests` and four `browser`
+jobs, on a clean checkout, and it is better at every part of that than a laptop
+is. Running it locally before pushing duplicates a ten minute gate that already
+exists.
+
+**What CI cannot do is regenerate**, which is the one thing worth checking before
+a push. `docs/token-reference.md is behind helix/styles/tokens.json` is a red
+build that stays red until somebody runs `bun run tokens` and pushes again, so
+`.githooks/pre-push` runs `biome ci` and the seven staleness checks and nothing
+else: 8 seconds against ten minutes. It judges and never writes, because a hook
+that edits the tree during `git push` produces a push that does not contain the
+edits. `git push --no-verify` skips it.
+
+Installed by `git config core.hooksPath .githooks`, which the `prepare` script
+runs on `bun install`. No hook manager: husky and lefthook would each be a
+dependency whose job is that one line, and lefthook's parallelism buys nothing
+against seven checks that finish in seconds.
+
 ## Stack
 
 Rust for backend and substrate cores. TypeScript for frontend.

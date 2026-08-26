@@ -1,0 +1,43 @@
+#!/bin/sh
+# Refuses a push whose generated files are behind their sources.
+#
+# **This is the one class CI cannot fix for you.** `verify.yml` runs everything
+# on every push, sharded, on a clean checkout, and it is better at all of it than
+# a laptop is: types, specs, browsers, Rust. What it cannot do is regenerate.
+# `docs/token-reference.md is behind helix/styles/tokens.json` is a red build that
+# stays red until somebody runs `bun run tokens` and pushes again, so catching it
+# here saves a round trip rather than duplicating a gate.
+#
+# **It judges and never writes.** `bun run check` rewrites files, and a hook that
+# edits the tree during `git push` produces a push that does not contain the
+# edits, which is worse than the failure it was avoiding. So this reports and
+# names the command to run.
+#
+# Everything else is CI's. There is deliberately no typecheck, no test run and no
+# browser here: they are slow, they are already covered, and a hook that takes
+# minutes is a hook people pass `--no-verify` to, which costs the checks that
+# were worth having.
+#
+# Installed by `git config core.hooksPath .githooks`, which the `prepare` script
+# runs on `bun install`. Skip once with `git push --no-verify`.
+set -e
+
+printf 'pre-push: formatting and lint\n'
+bunx biome ci . >/dev/null 2>&1 || {
+  printf '\n  biome refuses this tree. Run `bun run check` and commit the result.\n\n'
+  exit 1
+}
+
+printf 'pre-push: generated files\n'
+for task in reference tokens-reference metrics docs content eval queue; do
+  bun run "check:$task" >/tmp/pre-push-$$.log 2>&1 || {
+    printf '\n'
+    grep -v '^\$' /tmp/pre-push-$$.log | tail -3 | sed 's/^/  /'
+    printf '\n'
+    rm -f /tmp/pre-push-$$.log
+    exit 1
+  }
+done
+rm -f /tmp/pre-push-$$.log
+
+printf 'pre-push: clear\n'

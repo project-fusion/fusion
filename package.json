@@ -93,6 +93,7 @@
     "metrics:peers": "bun tooling/scripts/build-peers.mjs",
     "metrics:timing": "bun tooling/scripts/build-timings.mjs",
     "order": "node tooling/scripts/order-manifests.mjs",
+    "prepare": "git config core.hooksPath .githooks",
     "probe:stuck": "bun tooling/scripts/probe-stuck-spec.mjs",
     "reference": "bun tooling/scripts/build-reference.mjs",
     "rs:build": "cargo build --workspace",
