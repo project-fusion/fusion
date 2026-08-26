@@ -10,10 +10,60 @@ import { useEffect, useRef, useState } from 'react'
 import { useSandboxEditor } from '@/hooks/use-sandbox-editor/use-sandbox-editor'
 import docs from '../docs.module.css'
 
+/**
+ * The cycle order, which is deliberate rather than alphabetical.
+ *
+ * `hug` to `centered` to `padded` to `fullscreen` is least room to most, so pressing
+ * the control repeatedly walks one direction and arrives back where it started.
+ * Ordered by what the modes do, so it is not sorted with the rest of this file.
+ */
+const LAYOUTS: PreviewLayout[] = ['hug', 'centered', 'padded', 'fullscreen']
+
+/**
+ * What each mode is called and what it is drawn as.
+ *
+ * The tooltip names the mode the reader is *in*, not the one the next press
+ * would bring, because the control is showing a state rather than promising an
+ * action: the icon and the words have to agree about which of the three is
+ * currently true.
+ */
+const LAYOUT_LABEL: Record<PreviewLayout, string> = {
+  centered: 'Centered layout',
+  fullscreen: 'Fullscreen layout',
+  hug: 'Hugged layout',
+  padded: 'Padded layout',
+}
+
+const LAYOUT_ICON: Record<PreviewLayout, string> = {
+  centered: 'corners-in',
+  fullscreen: 'corners-out',
+  hug: 'arrows-in-line-vertical',
+  padded: 'layout',
+}
+
+/** The frame's three layout modes, which the example may pick from. */
+export type PreviewLayout = 'centered' | 'fullscreen' | 'hug' | 'padded'
+
 interface Props {
   /** The example's stylesheet, or empty where it needs none. */
   css: string
   html: string
+  /**
+   * What the example asked for with `@layout`, where it asked for anything.
+   *
+   * `centered` when it did not, because that is what suits most of the
+   * library: only the examples the default is wrong for carry an annotation.
+   */
+  layout?: PreviewLayout
+  /**
+   * A floor for the pane, from `@min`, where measurement cannot answer.
+   *
+   * The overlay families and nothing else: they draw a trigger, and what they
+   * open is `position: fixed` and excluded from the frame's measurement on
+   * purpose, so the pane has to be given room to open into rather than fitted
+   * to what it can see.
+   */
+  min?: number
   /** Where the same example opens for real, with its siblings beside it. */
   sandboxHref: string
 }
@@ -40,8 +90,8 @@ const PREVIEW_MAX = 720
 const EDITOR = 256
 
 /** What the preview pane should be, given what the frame says it drew. */
-const previewSize = (drawn: number | undefined): number =>
-  Math.min(PREVIEW_MAX, Math.max(PREVIEW_MIN, drawn ?? PREVIEW_MIN))
+const previewSize = (drawn: number | undefined, min = PREVIEW_MIN): number =>
+  Math.min(PREVIEW_MAX, Math.max(min, drawn ?? min))
 
 /**
  * The headline example, running.
@@ -61,7 +111,19 @@ const previewSize = (drawn: number | undefined): number =>
  * *between* the preview and the editor. Slotting a wrapper is the same shape
  * the workbench already uses for its own file tabs.
  */
-export function ComponentPreview({ css, html, sandboxHref }: Props) {
+export function ComponentPreview({
+  css,
+  html,
+  layout: declared = 'centered',
+  min = PREVIEW_MIN,
+  sandboxHref,
+}: Props) {
+  /* **What the example asked for is the starting point, not the whole answer.**
+     `@layout` is authored knowledge about the component and belongs in the
+     file; which of the three a reader wants to look at right now is theirs and
+     cannot be predicted. The annotation seeds the state and the control moves
+     it. */
+  const [layout, setLayout] = useState<PreviewLayout>(declared)
   /* **The editor is a subpath and it is asked for after hydration**, which is
      two decisions rather than one. The subpath because it carries CodeMirror
      and a page showing a sandbox without an editable pane should not pay for
@@ -150,8 +212,8 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
       onhelix-change={sourceEdited}
       orientation="vertical"
       ref={sandbox}
-      split={Math.round((previewSize(drawn) / (previewSize(drawn) + EDITOR)) * 100)}
-      style={{ blockSize: `${previewSize(drawn) + EDITOR}px` }}
+      split={Math.round((previewSize(drawn, min) / (previewSize(drawn, min) + EDITOR)) * 100)}
+      style={{ blockSize: `${previewSize(drawn, min) + EDITOR}px` }}
     >
       {/* Laid out by the frame, not by this page. The preview renders into a
           document with its own layout modes; styling the pane from out here
@@ -177,7 +239,7 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
           the floor looking exactly like the fixed pane it replaced. */}
       <helix-sandbox-preview
         label="Example preview"
-        layout="centered"
+        layout={layout}
         onhelix-resize={measured}
         ref={preview}
         slot="preview"
@@ -213,6 +275,28 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
             label={`Copy ${file}`}
             value={file === 'styles.css' ? styles : source}
           ></helix-copy-button>
+          {/* Cycles the three frame layouts, showing the one it is in.
+              **A cycle rather than a menu**, because three is few enough that
+              pressing twice is faster than opening anything, and the control
+              stays one icon wide in a bar that already holds two. The order
+              runs least framing to most, so repeated presses walk one way and
+              come back round.
+
+              The tooltip and the `aria-label` say the same words, so what a
+              pointer reveals and what a screen reader announces cannot
+              disagree. */}
+          <helix-tooltip content={LAYOUT_LABEL[layout]}>
+            <button
+              aria-label={LAYOUT_LABEL[layout]}
+              className={docs.docsPreviewOpen}
+              onClick={() =>
+                setLayout(LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length] as PreviewLayout)
+              }
+              type="button"
+            >
+              <helix-icon name={LAYOUT_ICON[layout]}></helix-icon>
+            </button>
+          </helix-tooltip>
           {/* The way out to the real thing. An anchor rather than a button,
               because it goes somewhere: middle click and open-in-new-tab are
               free, and a button would have had to reimplement both badly. */}

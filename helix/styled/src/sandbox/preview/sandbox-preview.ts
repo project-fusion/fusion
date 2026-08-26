@@ -23,7 +23,7 @@ export interface PreviewReady {
 export interface PreviewRender {
   colorMode?: 'dark' | 'light'
   direction: 'ltr' | 'rtl'
-  layout: 'padded' | 'centered' | 'fullscreen'
+  layout: 'padded' | 'centered' | 'fullscreen' | 'hug'
   source: string
   styles: string
   type: 'helix-preview-render'
@@ -144,7 +144,7 @@ export class HelixSandboxPreview extends HelixElement {
 
   /** How the example is placed in the frame. */
   @property({ reflect: true })
-  layout?: 'padded' | 'centered' | 'fullscreen'
+  layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
 
   /** Whether the frame has said it is listening. */
   private ready = false

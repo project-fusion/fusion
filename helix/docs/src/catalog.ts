@@ -101,6 +101,25 @@ export interface Example {
   description: string
   html: string
   label: string
+  /**
+   * The frame layout this example asks for, where it asks for one.
+   *
+   * Absent on almost every example, which is the design rather than an
+   * oversight: the reference picks `centered` and only the exceptions say
+   * otherwise, so what is written down is the handful of facts that differ
+   * rather than a table of defaults kept by hand. A consumer that has no
+   * layouts can ignore it.
+   */
+  layout?: string
+  /**
+   * The least height the preview pane should give this example, in pixels.
+   *
+   * Present on the six overlay families and nowhere else. Height is derived
+   * from what the frame drew, so a declared one is a fact that can go stale;
+   * these are the examples where there is nothing to derive, because what they
+   * open is `position: fixed` and excluded from measurement by design.
+   */
+  min?: number
   slug: string
   /**
    * Which tier the example shows, read from what it renders.
@@ -262,6 +281,34 @@ const members = (
   }))
 
 /**
+ * An annotation comment: a leading `@` inside an HTML comment, and its line.
+ *
+ * **Only comments that begin with `@`.** An example is allowed one comment
+ * about its own scaffolding, and those are written for the reader:
+ * `<!-- Preview frame: the submit is swallowed. -->` exists so nobody copies
+ * `onsubmit="event.preventDefault()"` into production. Stripping every comment
+ * would take that note with it. The sigil is what separates a line addressed to
+ * this documentation system from a line addressed to a person.
+ */
+const ANNOTATION = /^[^\S\n]*<!--\s*@[\s\S]*?-->[^\S\n]*\n?/gm
+
+/**
+ * The example's markup as a reader should receive it.
+ *
+ * `@summary` is metadata about the example rather than part of it: the cem
+ * plugin lifts it into the manifest, the reference prints it as the
+ * description, and it was *also* left sitting on line one of every example, so
+ * the copy button handed back a comment describing the thing you had just
+ * copied. Ninety-odd examples, each one telling a reader that a Helix component
+ * needs a docs annotation above it.
+ *
+ * Stripped here rather than at the reader, because every consumer of the
+ * catalog wants the same thing and a site that trimmed it in its own renderer
+ * would leave the sandbox and any other consumer showing it.
+ */
+const withoutAnnotations = (html: string): string => html.replace(ANNOTATION, '').trimStart()
+
+/**
  * The examples of one family, named and ordered.
  *
  * The prose comes from the manifest and the markup from the caller. The
@@ -277,6 +324,15 @@ const examplesOf = (
 ): Example[] => {
   const described = new Map(
     (declared?.examples ?? []).map((entry) => [entry.slug ?? '', entry.description ?? '']),
+  )
+  /* Keyed on slug the same way the descriptions are, and for the same reason:
+     the manifest half and the on-disk half are matched rather than zipped, so
+     the two cannot drift into each other's order. */
+  const layouts = new Map(
+    (declared?.examples ?? []).map((entry) => [entry.slug ?? '', entry.layout ?? '']),
+  )
+  const minimums = new Map(
+    (declared?.examples ?? []).map((entry) => [entry.slug ?? '', entry.min ?? 0]),
   )
   return (
     sources
@@ -318,12 +374,18 @@ const examplesOf = (
          have moved: the tier was `base` and the canonical example was
          `default`, and this line is the one place that has to know the pairing
          because a headless example is not named for itself. */
+        /* Read once and narrowed here rather than spread from the map
+           directly: `get` answers `string | undefined`, and under
+           `exactOptionalPropertyTypes` an optional property will not take the
+           `undefined`. */
+        const layout = layouts.get(source.slug)
+        const min = minimums.get(source.slug)
         const mirrored =
           source.slug === HEADLESS ? CANONICAL : source.slug.replace(HEADLESS_SUFFIX, '')
         return {
           css: source.css,
           description: described.get(source.slug) ?? '',
-          html: source.html,
+          html: withoutAnnotations(source.html),
           /* **The label is the file's name, with no special case left.** The
            canonical example was called `default` and read as "Preview", a
            translation that existed only because the name did not say what the
@@ -336,6 +398,8 @@ const examplesOf = (
            screen, the tier deciding which, so a differing name would be the only
            thing suggesting they are different examples. */
           label: startCase(mirrored),
+          ...(layout ? { layout } : {}),
+          ...(min ? { min } : {}),
           slug: source.slug,
           tier: (source.html.includes('<helix-headless-') ? 'headless' : 'styled') as
             | 'headless'

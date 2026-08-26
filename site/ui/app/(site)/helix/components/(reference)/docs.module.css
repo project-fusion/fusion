@@ -226,8 +226,14 @@
  * because the page needed it today. It is worth doing properly the next time an
  * anchor has to be an icon button, which will not be long: the sandbox toolbar
  * and the docs title row both want one. */
+/* Serves an anchor and a button both, which is why `border` and `cursor` are
+   here: the layout control beside the sandbox link is a `<button>`, and a bar
+   whose two icon controls came from two boxes would drift the first time one
+   was touched. */
 .docsPreviewOpen {
   aspect-ratio: 1;
+  border: none;
+  cursor: pointer;
   /* The same token the icon button beside it reads, so `data-density` moves
      both together rather than shrinking one and leaving the other. */
   background-color: transparent;

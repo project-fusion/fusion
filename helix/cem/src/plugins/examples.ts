@@ -22,6 +22,47 @@ import { eachComponent } from '../types.js'
  */
 const SUMMARY = /<!--\s*@summary\s+([\s\S]*?)\s*-->/
 
+/**
+ * Which frame layout the example wants, when it wants one it would not get.
+ *
+ * **Authored knowledge, not a preference.** Whether a component is worth
+ * centering, or wants the whole frame, is a fact about the component that
+ * somebody has to know once; rediscovering it per reader is what a default is
+ * for. The frame offers three modes and the reference picks `centered`, so this
+ * exists for the examples that mode is wrong for: a component that draws to the
+ * viewport edge wants `fullscreen`, and one being shown in page context wants
+ * `padded`.
+ *
+ * Absent on almost every example, which is the shape to keep. An annotation on
+ * all ninety is a table of defaults maintained by hand; an annotation on the
+ * six that differ is six facts.
+ *
+ * Read here rather than at the site, for the same reason the summary is: the
+ * manifest is where a component says what it has, and a second reader parsing
+ * the same comment would be a second convention to keep in step.
+ */
+const LAYOUT = /<!--\s*@layout\s+([a-z]+)\s*-->/
+
+/**
+ * The least height the preview pane should give this example, in pixels.
+ *
+ * **The one thing measurement cannot answer, and only for one group.** The
+ * frame reports what it drew and the pane follows, which is why almost nothing
+ * needs a number here: a declared height freezes what is otherwise derived and
+ * goes stale the first time the example changes. Dialog, Drawer, Megamenu,
+ * Menu, Popover and Tour are the exception, and not by preference. They draw a
+ * trigger and nothing else until somebody presses it, so what is measured is a
+ * 40 pixel button; what they open is `position: fixed`, which the frame's
+ * measurement deliberately refuses to count, because an open Drawer is
+ * `100dvh` and counting it would make the frame taller, which makes the drawer
+ * taller, forever.
+ *
+ * So the pane gets room to open into, and the example stays closed. Marking
+ * them `default-open` instead would have made the pictures taller and taught
+ * every reader who copied one that a dialog is a thing that starts open.
+ */
+const MIN = /<!--\s*@min\s+(\d{2,4})\s*-->/
+
 /** Collapses the wrapped lines of a comment into the single line it is. */
 const oneLine = (value: string): string => value.replace(/\s+/g, ' ').trim()
 
@@ -78,8 +119,16 @@ export const examples = (): Plugin => ({
         .sort((a, b) => (a === 'preview.html' ? -1 : b === 'preview.html' ? 1 : a.localeCompare(b)))
         .map((file) => {
           const slug = file.replace(/\.html$/, '')
-          const summary = SUMMARY.exec(readFileSync(join(dir, file), 'utf8'))?.[1]
-          return summary ? { description: oneLine(summary), slug } : { slug }
+          const text = readFileSync(join(dir, file), 'utf8')
+          const summary = SUMMARY.exec(text)?.[1]
+          const layout = LAYOUT.exec(text)?.[1]
+          const min = MIN.exec(text)?.[1]
+          return {
+            ...(summary ? { description: oneLine(summary) } : {}),
+            ...(layout ? { layout } : {}),
+            ...(min ? { min: Number(min) } : {}),
+            slug,
+          }
         })
 
       if (found.length > 0) {

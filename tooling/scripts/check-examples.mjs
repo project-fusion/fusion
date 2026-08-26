@@ -11,6 +11,10 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
+/* The frame's layout modes, from `preview-frame.css`. Named here because an
+   example may ask for one by name and a name that matches no rule is silent. */
+const LAYOUTS = ['centered', 'fullscreen', 'hug', 'padded']
+
 /* Both tiers, because an example may show either.
  *
  * The examples live beside the styled components and most of them use styled
@@ -186,6 +190,23 @@ for (const family of families) {
       problems.push(
         `${family}/${file}: has no \`<!-- @summary … -->\`. The Examples table will print its ` +
           'slug against a blank.',
+      )
+    }
+    /* `@layout`, where an example asks for one.
+     *
+     * The value reaches the frame through the manifest and is applied as an
+     * attribute, so a typo does not throw: it sets `data-layout="centred"`, no
+     * rule matches, the example renders unstyled by any mode and looks merely
+     * wrong. Three modes exist and they are named here so the misspelling fails
+     * at the check rather than in a picture somebody has to notice.
+     *
+     * Only the shape is checked, not whether the annotation is present: absent
+     * is the ordinary case and means the default. */
+    const layout = /<!--\s*@layout\s+([^\s>-]+)\s*-->/.exec(markup)
+    if (layout && !LAYOUTS.includes(layout[1])) {
+      problems.push(
+        `${family}/${file}: \`@layout ${layout[1]}\` is not a frame layout. ` +
+          `Use one of ${LAYOUTS.join(', ')}.`,
       )
     }
     const link = /<link\b[^>]*\brel=(["'])stylesheet\1[^>]*>/is.exec(markup)

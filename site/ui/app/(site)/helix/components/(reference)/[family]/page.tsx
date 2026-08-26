@@ -20,7 +20,7 @@ import {
 import { sourceUrl } from '../../../../../../utils/source/source'
 import styles from '../docs.module.css'
 import { DocumentActions } from './document-actions'
-import { ComponentPreview } from './preview'
+import { ComponentPreview, type PreviewLayout } from './preview'
 import { TierAddress } from './tier-address'
 
 /**
@@ -712,6 +712,8 @@ export default async function FamilyDocs({
                   <ComponentPreview
                     css={example.css}
                     html={example.html}
+                    {...(example.layout ? { layout: example.layout as PreviewLayout } : {})}
+                    {...(example.min ? { min: example.min } : {})}
                     /* **The tier travels with the link.** A reader on the base
                        reference who opens the sandbox was looking at the headless
                        API and arrived at the styled example, because the sandbox
@@ -765,8 +767,12 @@ export default async function FamilyDocs({
               <helix-table label="Examples">
                 <helix-table-column>Name</helix-table-column>
                 <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
+                {/* Rows are keyed on the tier as well as the slug. Both
+                    tiers name their canonical example `preview.html`, so the
+                    slug alone collided the moment the catalog began reading
+                    both, and React was handed two children called `preview`. */}
                 {byExample(family.examples).map((example) => (
-                  <helix-table-row data-tier={example.tier} key={example.slug}>
+                  <helix-table-row data-tier={example.tier} key={`${example.tier}.${example.slug}`}>
                     <helix-table-cell header>
                       {/* `quiet`: a column where every row is a link does not
                           need every row underlined and blue. The variant carries

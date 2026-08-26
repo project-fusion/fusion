@@ -48,7 +48,7 @@
  */
 
 /** How the preview lays the example out. */
-export type Layout = 'padded' | 'centered' | 'fullscreen'
+export type Layout = 'padded' | 'centered' | 'fullscreen' | 'hug'
 
 /** Which way the preview reads. */
 export type Direction = 'ltr' | 'rtl'
@@ -100,7 +100,7 @@ export const DEFAULTS: SandboxUrlState = {
   tier: null,
 }
 
-const LAYOUTS: Layout[] = ['padded', 'centered', 'fullscreen']
+const LAYOUTS: Layout[] = ['padded', 'centered', 'fullscreen', 'hug']
 const DIRECTIONS: Direction[] = ['ltr', 'rtl']
 const SYNTAXES: Syntax[] = ['html', 'tsx']
 const TIERS: Tier[] = ['headless', 'styled']

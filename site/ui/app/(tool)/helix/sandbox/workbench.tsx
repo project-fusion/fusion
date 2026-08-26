@@ -73,6 +73,10 @@ const CSS_START = '/* Styles for this example. They apply to the preview. */\n'
 const LAYOUTS = [
   { label: 'Padded', value: 'padded' },
   { label: 'Centered', value: 'centered' },
+  /* Shrinks the example to its content and centers that, rather than centering
+     a full-width box whose ink sits at the start. Most Helix roots are
+     full-width blocks, so the two read very differently for a third of them. */
+  { label: 'Hugged', value: 'hug' },
   { label: 'Fullscreen', value: 'fullscreen' },
 ] as const
 
@@ -140,7 +144,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   const sandbox = useRef<HelixSandbox>(null)
   const panelTabs = useRef<HelixTabs>(null)
   const _settings = useRef<HelixMenu>(null)
-  const [layout, setLayout] = useState<'padded' | 'centered' | 'fullscreen'>('padded')
+  const [layout, setLayout] = useState<'padded' | 'centered' | 'fullscreen' | 'hug'>('padded')
   const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
   const [showEditor, setShowEditor] = useState(true)
   const [showPanel, setShowPanel] = useState(true)
@@ -505,7 +509,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       }
       applySyntax(next)
     } else if (setting === 'layout' && option) {
-      setLayout(option as 'padded' | 'centered' | 'fullscreen')
+      setLayout(option as 'padded' | 'centered' | 'fullscreen' | 'hug')
     } else if (setting === 'direction' && option) {
       setDirection(option as 'ltr' | 'rtl')
     } else if (setting === 'color' && option) {
