@@ -3154,6 +3154,7 @@ answers for a shape.
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 | `sourceRows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
+| `terminus` | `terminus` | `'none' \| 'ring' \| 'square' \| 'triangle' \| undefined` | - | `HelixHeadlessLineChart` | The shape of the mark on each series' last reading. |
 | `zero` | `zero` | `boolean` | `false` | `HelixHeadlessLineChart` | Whether zero is forced into the range. |
 
 #### Parts
@@ -3171,6 +3172,7 @@ answers for a shape.
 | `mark` | The invisible point the tooltip is anchored to. |
 | `plot` | The drawing. |
 | `svg` | The drawing surface the lines and areas sit on. |
+| `terminus` | The mark on one series' last reading. |
 | `tooltip` | The bubble, forwarded from `Tooltip`. |
 | `tooltip-anchor` | The `Tooltip` element itself. |
 | `tooltip-cell` | One column's name and value inside the tooltip. |

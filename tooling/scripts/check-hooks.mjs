@@ -324,6 +324,51 @@ for (const [name, where] of [...privateDeclared].sort()) {
   }
 }
 
+/**
+ * A sheet in a shared folder is imported by more than one family.
+ *
+ * **`SHARED` states that bar in prose and nothing held anything to it**, so a
+ * sheet drifted in and stayed. `chart/terminus.css` sat there read by
+ * `Sparkline` alone, which made `--chart-terminus-*` a hook exempted from the
+ * family-naming rule as shared while being read by one family: the same
+ * paragraph that grants the exemption calls that "a family hook that has
+ * drifted". Worse, the claim reached a consumer, because Sparkline's `terminus`
+ * documentation says the shapes are "shared with every other chart that ends a
+ * line", which is on the published API page and was not true.
+ *
+ * So the folder is asked the question its own comment asks. One importer means
+ * the sheet belongs inside that family, and the hooks belong to it too.
+ */
+for (const folder of SHARED) {
+  let sheets
+  try {
+    sheets = readdirSync(join('helix/styled/src', folder)).filter((one) => one.endsWith('.css'))
+  } catch {
+    problems.push(`helix/styled/src/${folder}: is registered as shared and does not exist.`)
+    continue
+  }
+  for (const sheet of sheets) {
+    const readers = new Set()
+    for (const path of walk('helix/styled/src')) {
+      if (!path.endsWith('.ts') || path.endsWith('.css.ts') || path.includes(`/${folder}/`)) {
+        continue
+      }
+      if (readFileSync(path, 'utf8').includes(`${folder}/${sheet}.js`)) {
+        readers.add(path.split('/')[3])
+      }
+    }
+    if (readers.size < 2) {
+      problems.push(
+        `helix/styled/src/${folder}/${sheet}: is in a shared folder and ${
+          readers.size === 0 ? 'no family imports it' : `only \`${[...readers][0]}\` imports it`
+        }. \`SHARED\` exempts \`--${folder}-*\` from being named after the family that reads it, and ` +
+          'the bar for that is a file more than one family imports. Move the sheet into the family, ' +
+          'or give the other families the part it draws.',
+      )
+    }
+  }
+}
+
 if (problems.length > 0) {
   console.error(
     `CSS hooks that do not hold up, declared without a reader, read without a declaration, or declared twice (${problems.length}):\n`,

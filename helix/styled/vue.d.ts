@@ -3886,6 +3886,28 @@ Set it where the distance from nothing is the point rather than the shape,
 and accept that a series which never approaches zero becomes a flat rule
 near the top of the box. */
   zero?: HelixLineChart["zero"];
+  /** The shape of the mark on each series' last reading.
+
+Absent is a dot, and absent rather than defaulted because a reflecting
+property with a default writes its attribute onto a host the consumer
+rendered, which React reports as a hydration mismatch.
+
+**One per series, in a column at the right edge**, because every series here
+shares an x-axis and therefore ends at the same reading. That column is the
+useful thing: it is where a reader looks for "and what is it now", which is
+the question a sparkline's single mark answers too.
+
+`none` lets the lines stop on their own, which suits a chart read for its
+shape rather than for where it finished. The shapes come from
+`helix/styled/src/chart/terminus.css`, the same sheet `Sparkline` takes, so
+the set is identical wherever one appears.
+
+`ring` is the one that asks something of the drawing. It leaves a hole and a
+line ends at the reading, which is the hole's center, so the `<svg>` is
+masked with one disc per series and every stroke stops at its own ring's
+inner edge. `mask-composite: intersect` is what makes N holes out of N
+layers; a single `mask-image` would only ever cut the last one. */
+  terminus?: HelixLineChart["terminus"];
 };
 
 export type HelixLineChartVueEvents = {};
@@ -6111,8 +6133,8 @@ as "and onward" rather than as a second claim about the data.
 A `bar` plot draws none of them: the last column already is the last
 reading, and a mark on top of it would say the same thing twice.
 
-The shapes come from `helix/styled/src/chart/terminus.css`, shared with every other chart
-that ends a line, so the set is the same wherever one appears. `ring` is the
+The shapes come from `helix/styled/src/chart/terminus.css`, shared with
+`LineChart`, so the set is the same wherever a line ends. `ring` is the
 one that asks anything of the drawing: the disc it leaves open is masked out
 of the `<svg>`, so the line stops at the ring's inner edge rather than
 running on to the reading at its center, and the middle shows whatever the

@@ -73,6 +73,81 @@ const lines = (host: HTMLElement): Element[] => [
 
 const d = (one: Element | null | undefined): string => one?.getAttribute('d') ?? ''
 
+const termini = (host: HTMLElement): Element[] => [
+  ...(host.shadowRoot?.querySelectorAll('[part="terminus"]') ?? []),
+]
+
+/**
+ * The mark on where each series ends.
+ *
+ * **One per series rather than one per chart**, which is the difference from
+ * `Sparkline` and the whole of why the shared sheet needed a second reader: the
+ * shapes are `chart/terminus.css` either way, and only the count and the color
+ * are this component's.
+ */
+describe('termini', () => {
+  test('one per series, absent meaning a dot', async () => {
+    const host = await chart(CHANNELS, 'for="channels"')
+    expect(termini(host)).toHaveLength(2)
+    expect(host.hasAttribute('terminus')).toBe(false)
+  })
+
+  /**
+   * Every series here shares an x-axis, so they all end at the same reading and
+   * the marks form a column. That column is the useful thing, and a mark drifting
+   * off it would mean the x was computed per series rather than from the axis.
+   */
+  test('they sit in one column, because the series share an axis', async () => {
+    const host = await chart(CHANNELS, 'for="channels"')
+    const xs = termini(host).map(
+      (one) => /--chart-terminus-x:\s*([^;]+)/.exec(one.getAttribute('style') ?? '')?.[1],
+    )
+    expect(new Set(xs).size).toBe(1)
+  })
+
+  test('each takes its own series color, so a mark matches its line', async () => {
+    const host = await chart(CHANNELS, 'for="channels"')
+    const series = termini(host).map(
+      (one) => /--chart-series:\s*var\(([^)]+)\)/.exec(one.getAttribute('style') ?? '')?.[1],
+    )
+    expect(series).toEqual(['--chart-series-1', '--chart-series-2'])
+  })
+
+  test('`none` draws none of them', async () => {
+    const host = await chart(CHANNELS, 'for="channels" terminus="none"')
+    expect(termini(host)).toHaveLength(0)
+  })
+
+  /** A mark on the end of something with no length is a mark on nothing. */
+  test('a series of one reading gets no mark', async () => {
+    const single = `<table id="single">
+      <caption>One</caption>
+      <tbody><tr><th scope="row">Jan</th><td data-value="5">5</td></tr></tbody>
+    </table>`
+    const host = await chart(single, 'for="single"')
+    expect(termini(host)).toHaveLength(0)
+  })
+
+  /**
+   * The hole a ring leaves is cut out of the drawing, so the stroke stops at the
+   * ring's inner edge rather than running to the reading at its center. One layer
+   * per series: a single `mask-image` would only ever cut the last one, which is
+   * what `mask-composite: intersect` in the stylesheet is for.
+   */
+  test('`ring` asks the drawing for one hole per series', async () => {
+    const host = await chart(CHANNELS, 'for="channels" terminus="ring"')
+    const holes = part(host, 'plot')?.getAttribute('style') ?? ''
+    expect(holes.match(/radial-gradient/g)).toHaveLength(2)
+  })
+
+  test('and no other shape asks the drawing for anything', async () => {
+    for (const shape of ['', 'terminus="square"', 'terminus="triangle"', 'terminus="none"']) {
+      const host = await chart(CHANNELS, `for="channels" ${shape}`)
+      expect(part(host, 'plot')?.getAttribute('style') ?? '').not.toContain('radial-gradient')
+    }
+  })
+})
+
 describe('line chart', () => {
   test('reads the table it names and draws one line per series', async () => {
     const host = await chart(CHANNELS, 'for="channels"')

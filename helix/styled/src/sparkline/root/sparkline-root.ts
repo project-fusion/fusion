@@ -109,8 +109,8 @@ export class HelixSparkline extends HelixHeadlessSparkline {
    * A `bar` plot draws none of them: the last column already is the last
    * reading, and a mark on top of it would say the same thing twice.
    *
-   * The shapes come from `helix/styled/src/chart/terminus.css`, shared with every other chart
-   * that ends a line, so the set is the same wherever one appears. `ring` is the
+   * The shapes come from `helix/styled/src/chart/terminus.css`, shared with
+   * `LineChart`, so the set is the same wherever a line ends. `ring` is the
    * one that asks anything of the drawing: the disc it leaves open is masked out
    * of the `<svg>`, so the line stops at the ring's inner edge rather than
    * running on to the reading at its center, and the middle shows whatever the

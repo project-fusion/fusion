@@ -3039,6 +3039,28 @@ Set it where the distance from nothing is the point rather than the shape,
 and accept that a series which never approaches zero becomes a flat rule
 near the top of the box. */
   zero?: HelixHeadlessLineChart["zero"];
+  /** The shape of the mark on each series' last reading.
+
+Absent is a dot, and absent rather than defaulted because a reflecting
+property with a default writes its attribute onto a host the consumer
+rendered, which React reports as a hydration mismatch.
+
+**One per series, in a column at the right edge**, because every series here
+shares an x-axis and therefore ends at the same reading. That column is the
+useful thing: it is where a reader looks for "and what is it now", which is
+the question a sparkline's single mark answers too.
+
+`none` lets the lines stop on their own, which suits a chart read for its
+shape rather than for where it finished. The shapes come from
+`helix/styled/src/chart/terminus.css`, the same sheet `Sparkline` takes, so
+the set is identical wherever one appears.
+
+`ring` is the one that asks something of the drawing. It leaves a hole and a
+line ends at the reading, which is the hole's center, so the `<svg>` is
+masked with one disc per series and every stroke stops at its own ring's
+inner edge. `mask-composite: intersect` is what makes N holes out of N
+layers; a single `mask-image` would only ever cut the last one. */
+  terminus?: HelixHeadlessLineChart["terminus"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's

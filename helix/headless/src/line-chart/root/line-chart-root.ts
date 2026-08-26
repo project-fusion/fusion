@@ -65,6 +65,7 @@ const HEIGHT = 100
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
  * @csspart svg - The drawing surface the lines and areas sit on.
+ * @csspart terminus - The mark on one series' last reading.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
@@ -164,6 +165,62 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     return this.zero ? [Math.min(0, low), Math.max(0, high)] : [low, high]
   }
 
+  /**
+   * The shape of the mark on each series' last reading.
+   *
+   * Absent is a dot, and absent rather than defaulted because a reflecting
+   * property with a default writes its attribute onto a host the consumer
+   * rendered, which React reports as a hydration mismatch.
+   *
+   * **One per series, in a column at the right edge**, because every series here
+   * shares an x-axis and therefore ends at the same reading. That column is the
+   * useful thing: it is where a reader looks for "and what is it now", which is
+   * the question a sparkline's single mark answers too.
+   *
+   * `none` lets the lines stop on their own, which suits a chart read for its
+   * shape rather than for where it finished. The shapes come from
+   * `helix/styled/src/chart/terminus.css`, the same sheet `Sparkline` takes, so
+   * the set is identical wherever one appears.
+   *
+   * `ring` is the one that asks something of the drawing. It leaves a hole and a
+   * line ends at the reading, which is the hole's center, so the `<svg>` is
+   * masked with one disc per series and every stroke stops at its own ring's
+   * inner edge. `mask-composite: intersect` is what makes N holes out of N
+   * layers; a single `mask-image` would only ever cut the last one.
+   */
+  @property({ reflect: true })
+  terminus?: 'none' | 'ring' | 'square' | 'triangle'
+
+  /**
+   * Where each series ends, as percentages of the drawing's own box.
+   *
+   * Percentages rather than user units, for the reason the mark is a `<span>`
+   * rather than a `<circle>`: `preserveAspectRatio="none"` stretches the
+   * coordinate space, so a length in there means two different things depending
+   * on how wide the consumer made the chart. The host's box stretches nothing.
+   */
+  private ends(
+    series: Series[],
+    x: (value: number) => number,
+    y: (value: number) => number,
+  ): Array<{ index: number; x: number; y: number }> {
+    return series.flatMap((one, depth) => {
+      const last = one.points.at(-1)
+      /* A single reading is a point rather than a line, and a mark on the end of
+         something with no length is a mark on nothing. */
+      if (!last || one.points.length < 2) {
+        return []
+      }
+      return [
+        {
+          index: seriesIndex(depth),
+          x: (x(one.points.length - 1) / WIDTH) * 100,
+          y: (y(last.value) / HEIGHT) * 100,
+        },
+      ]
+    })
+  }
+
   protected override render(): TemplateResult {
     const series = this.series
     const readings = series[0]?.points.map((point) => point.label) ?? []
@@ -213,7 +270,28 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
        box wearing the zero line's clothes, and a reader takes it for one. */
     const floor = domain[0] <= 0 && domain[1] >= 0 ? y(0) : undefined
 
-    return html`<div aria-hidden="true" id="helix-chart-plot" part="plot" title=${named || nothing}>
+    const ends = this.terminus === 'none' ? [] : this.ends(series, x, y)
+    /* Built here rather than in the sheet, because a stylesheet cannot count
+       series and a mask needs one layer per hole. Each layer is transparent
+       inside its own ring and opaque everywhere else, so intersecting them
+       removes the union of the holes and nothing besides. */
+    const holes =
+      this.terminus === 'ring' && ends.length > 0
+        ? ends
+            .map(
+              (end) =>
+                `radial-gradient(circle at ${end.x}% ${end.y}%, #0000 calc(var(--_chart-terminus-inner) - 0.5px), #000 var(--_chart-terminus-inner))`,
+            )
+            .join(', ')
+        : undefined
+
+    return html`<div
+      aria-hidden="true"
+      id="helix-chart-plot"
+      part="plot"
+      style=${holes ? `--_line-chart-holes: ${holes}` : nothing}
+      title=${named || nothing}
+    >
       <svg part="svg"
         preserveAspectRatio="none"
         viewBox="0 0 ${WIDTH} ${HEIGHT}"
@@ -229,6 +307,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
         ${this.renderGuide(x)}
         ${series.map((one, depth) => this.renderSeries(one, depth, x, y))}
       </svg>
+      ${this.renderTermini(ends)}
       ${this.renderTooltip()}
     </div>`
   }
@@ -308,6 +387,28 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       return nothing
     }
     return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${HEIGHT} />`
+  }
+
+  /**
+   * The marks, as elements beside the drawing rather than shapes inside it.
+   *
+   * A seam of its own, so a tier or a consumer's subclass can draw them
+   * differently without reimplementing the plot.
+   */
+  protected renderTermini(
+    ends: Array<{ index: number; x: number; y: number }>,
+  ): TemplateResult | typeof nothing {
+    if (ends.length === 0) {
+      return nothing
+    }
+    return html`${ends.map(
+      (end) =>
+        html`<span
+          aria-hidden="true"
+          part="terminus"
+          style=${`--chart-series: var(--chart-series-${end.index}); --chart-terminus-x: ${end.x}%; --chart-terminus-y: ${end.y}%`}
+        ></span>`,
+    )}`
   }
 
   /** One series, its wash first so the line is drawn over its own fill. */

@@ -36004,6 +36004,55 @@
               }
             },
             {
+              "kind": "field",
+              "name": "terminus",
+              "type": {
+                "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
+              },
+              "description": "The shape of the mark on each series' last reading.\n\nAbsent is a dot, and absent rather than defaulted because a reflecting\nproperty with a default writes its attribute onto a host the consumer\nrendered, which React reports as a hydration mismatch.\n\n**One per series, in a column at the right edge**, because every series here\nshares an x-axis and therefore ends at the same reading. That column is the\nuseful thing: it is where a reader looks for \"and what is it now\", which is\nthe question a sparkline's single mark answers too.\n\n`none` lets the lines stop on their own, which suits a chart read for its\nshape rather than for where it finished. The shapes come from\n`helix/styled/src/chart/terminus.css`, the same sheet `Sparkline` takes, so\nthe set is identical wherever one appears.\n\n`ring` is the one that asks something of the drawing. It leaves a hole and a\nline ends at the reading, which is the hole's center, so the `<svg>` is\nmasked with one disc per series and every stroke stops at its own ring's\ninner edge. `mask-composite: intersect` is what makes N holes out of N\nlayers; a single `mask-image` would only ever cut the last one.",
+              "attribute": "terminus",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "ends",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Array<{ index: number; x: number; y: number }>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "series",
+                  "type": {
+                    "text": "Series[]"
+                  }
+                },
+                {
+                  "name": "x",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                }
+              ],
+              "description": "Where each series ends, as percentages of the drawing's own box.\n\nPercentages rather than user units, for the reason the mark is a `<span>`\nrather than a `<circle>`: `preserveAspectRatio=\"none\"` stretches the\ncoordinate space, so a length in there means two different things depending\non how wide the consumer made the chart. The host's box stretches nothing.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "renderPlot",
               "privacy": "protected",
@@ -36132,6 +36181,29 @@
                 }
               ],
               "description": "A rule down the reading the tooltip is about.\n\nWithout it the tooltip is a box of numbers floating over a drawing, and a\nreader has to match its heading against the row of names to find out which\ncolumn it means. The rule is the whole of what connects the two, and it\nmatters most on a line, where there is no marker under the pointer to\nstand in for one.\n\nDrawn before the series so a line is never cut by it.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTermini",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "ends",
+                  "type": {
+                    "text": "Array<{ index: number; x: number; y: number }>"
+                  }
+                }
+              ],
+              "description": "The marks, as elements beside the drawing rather than shapes inside it.\n\nA seam of its own, so a tier or a consumer's subclass can draw them\ndifferently without reimplementing the plot.",
               "inheritedFrom": {
                 "name": "HelixHeadlessLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -36415,6 +36487,18 @@
                 "name": "HelixHeadlessLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
               }
+            },
+            {
+              "name": "terminus",
+              "type": {
+                "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
+              },
+              "description": "The shape of the mark on each series' last reading.\n\nAbsent is a dot, and absent rather than defaulted because a reflecting\nproperty with a default writes its attribute onto a host the consumer\nrendered, which React reports as a hydration mismatch.\n\n**One per series, in a column at the right edge**, because every series here\nshares an x-axis and therefore ends at the same reading. That column is the\nuseful thing: it is where a reader looks for \"and what is it now\", which is\nthe question a sparkline's single mark answers too.\n\n`none` lets the lines stop on their own, which suits a chart read for its\nshape rather than for where it finished. The shapes come from\n`helix/styled/src/chart/terminus.css`, the same sheet `Sparkline` takes, so\nthe set is identical wherever one appears.\n\n`ring` is the one that asks something of the drawing. It leaves a hole and a\nline ends at the reading, which is the hole's center, so the `<svg>` is\nmasked with one disc per series and every stroke stops at its own ring's\ninner edge. `mask-composite: intersect` is what makes N holes out of N\nlayers; a single `mask-image` would only ever cut the last one.",
+              "fieldName": "terminus",
+              "inheritedFrom": {
+                "name": "HelixHeadlessLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
             }
           ],
           "superclass": {
@@ -36471,6 +36555,10 @@
               {
                 "description": "The same chart given different numbers, moving to the new shape rather than snapping to it.",
                 "slug": "taking-new-data"
+              },
+              {
+                "description": "Each series marked where it ends, which is the column a reader checks for the current value.",
+                "slug": "termini"
               },
               {
                 "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
@@ -36569,6 +36657,14 @@
             {
               "description": "The drawing surface the lines and areas sit on.",
               "name": "svg",
+              "inheritedFrom": {
+                "name": "HelixHeadlessLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "The mark on one series' last reading.",
+              "name": "terminus",
               "inheritedFrom": {
                 "name": "HelixHeadlessLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -61074,7 +61170,7 @@
               "type": {
                 "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
               },
-              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/styled/src/chart/terminus.css`, shared with every other chart\nthat ends a line, so the set is the same wherever one appears. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its center, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
+              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/styled/src/chart/terminus.css`, shared with\n`LineChart`, so the set is the same wherever a line ends. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its center, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
               "attribute": "terminus",
               "reflects": true
             },
@@ -61303,7 +61399,7 @@
               "type": {
                 "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
               },
-              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/styled/src/chart/terminus.css`, shared with every other chart\nthat ends a line, so the set is the same wherever one appears. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its center, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
+              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/styled/src/chart/terminus.css`, shared with\n`LineChart`, so the set is the same wherever a line ends. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its center, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
               "fieldName": "terminus"
             },
             {

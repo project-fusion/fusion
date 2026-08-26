@@ -1,10 +1,16 @@
-/* The mark on where a series ended, shared by every chart that draws one.
+/* The mark on where a series ended, shared by `Sparkline` and `LineChart`.
  *
  * Here rather than in the sparkline for the reason the field stylesheets are
  * shared: a line chart's terminus and a sparkline's are the same mark on the
  * same kind of thing, and two copies drift. A chart takes this sheet, renders
  * `part="terminus"` positioned by its own two custom properties, and gets the
  * shapes with it.
+ *
+ * **It was here for weeks before the second chart existed**, which made every
+ * `--chart-terminus-*` hook a shared name read by one family: the condition
+ * `check:hooks` calls a family hook that has drifted, while its own `SHARED`
+ * exemption was what allowed it. `check:hooks` asks the question now, so a sheet
+ * in this folder has to have the second reader the folder exists for.
  *
  * An element rather than a shape inside the drawing, and that is not a
  * preference. A chart that fills its box uses `preserveAspectRatio="none"`,

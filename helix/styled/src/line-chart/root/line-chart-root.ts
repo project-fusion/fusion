@@ -3,6 +3,7 @@ import { HelixHeadlessLineChart } from '@helix-io/headless/line-chart'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../chart/series.css.js'
+import { styles as terminusStyles } from '../../chart/terminus.css.js'
 import { styles } from './line-chart-root.css.js'
 import '../../tooltip/index.js'
 
@@ -89,7 +90,7 @@ export class HelixLineChart extends HelixHeadlessLineChart {
   @property({ reflect: true })
   material?: 'frosted' | 'glass'
 
-  static override styles: CSSResultGroup = [seriesStyles, styles]
+  static override styles: CSSResultGroup = [seriesStyles, terminusStyles, styles]
 }
 
 declare global {

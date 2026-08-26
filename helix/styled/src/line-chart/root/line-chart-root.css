@@ -102,6 +102,32 @@
   stroke: var(--chart-series);
 }
 
+/* The mark takes its series' color the same way the line does. `color` rather
+   than `background-color`, because `chart/terminus.css` paints every shape from
+   `currentColor` and a ring needs its border to match its fill. */
+[part="terminus"] {
+  color: var(--chart-series);
+}
+
+/* One hole per series, which is why the list is written by the component.
+ *
+ * `mask-image` takes as many layers as it is given and composites them
+ * `add` by default, which unions the *opaque* parts and so cuts nothing: with
+ * four series the drawing came back whole. `intersect` keeps only what every
+ * layer keeps, and every layer keeps everything except its own ring, so what is
+ * removed is the union of the rings. That is the one line that makes this work
+ * for more than a single line.
+ *
+ * On the `<svg>` rather than on `[part="line"]`, which is Sparkline's trick and
+ * the same reason: the ring is an HTML element in CSS pixels and the line is in
+ * a space `preserveAspectRatio="none"` stretches, so a radius means two
+ * different things in the two places. The `<svg>` element's own border box is
+ * the one surface where both are measured the same way. */
+:host([terminus="ring"]) [part="svg"] {
+  mask-composite: intersect;
+  mask-image: var(--_line-chart-holes);
+}
+
 [part="area"] {
   fill: var(--chart-series);
 }
