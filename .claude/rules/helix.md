@@ -1299,21 +1299,36 @@ viewport. Everything else in here is `@media print` or
   cannot come from a media query. It is a component decision driven by a
   `ResizeObserver`, and it is opted into rather than defaulted on: an
   `orientation="auto"` value keeps the resting state explicit, which is the rule
-  the reflected properties already follow. Carousel is the same shape, a
-  `per-view` of four being a bug on a narrow container rather than a style.
+  the reflected properties already follow. Splitter and Button Group carry it;
+  Carousel is the same shape, a `per-view` of four being a bug on a narrow
+  container rather than a style.
+- **The input device.** A fourth category, and the one exception to the rule at
+  the top of this section. `@media (hover: none) and (pointer: coarse)` is
+  honest inside a component because it describes the *pointer*, not the box: a
+  touch device is a touch device whether the component sits in a 300px sidebar
+  or fills the window, so nothing about the containing element can contradict
+  it. Carousel uses it to drop its arrows where a swipe already does the job.
+  This is the only media feature a component may read.
 
-**What narrow currently looks like, measured at 390 rather than asserted.**
-Splitter keeps its horizontal orientation and renders a titled box, a stray drag
-handle and an untitled second pane. Table overflows instead of scrolling, with
-`us-east-1` broken mid-token and the last column clipped off the edge. Carousel
-collapses to its items inline on one line with no slide framing. None of this is
-a regression; it is what never having a policy looks like.
+**What narrow looks like now, measured rather than asserted.** Every styled
+family was rendered at 390 and at 320 on 25 Aug 2026. At 390 the library is
+clean. At 320 exactly two families overflowed, Button Group by 26 pixels and
+Pagination by 24, and both are fixed: Button Group gained `orientation="auto"`
+and the per-corner Button hooks a stacked group needs to say what it means, and
+Pagination needed no new API at all, because `siblings` and `boundaries` already
+existed and the default simply asked for one slot more than a 272 pixel row
+holds.
 
-**`check:visual` renders every family at two widths**, 640 and 390, so a change
-to the narrow rendering is visible. That is the half of this that stays fixed
-without anybody remembering to look. The narrow baselines record the state above
-deliberately: a baseline is what makes a change visible, not a claim that what it
-pictures is good.
+**The faults that sweep found were the site's, not the library's**, which is the
+result worth keeping. Category one stays unbuilt because almost nothing asks for
+it: three families declare `container-type`, Donut Chart, Table and Video, and
+no `@container` rule exists yet. That is a measurement rather than a plan.
+
+**`check:visual` renders every family at two widths**, 640 and 390, on both
+tiers, so a change to the narrow rendering is visible. That is the half of this
+that stays fixed without anybody remembering to look. A baseline is what makes a
+change visible, not a claim that what it pictures is good.
+
 
 ## The sandbox
 
