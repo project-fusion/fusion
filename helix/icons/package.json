@@ -3,6 +3,7 @@
   "description": "Helix icon set.",
   "version": "0.0.0-dev",
   "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
     "directory": "helix/icons",
     "type": "git",
@@ -27,9 +28,17 @@
     "icons": "node ../../tooling/scripts/build-icons.mjs",
     "typecheck": "bun run icons && tsc -p tsconfig.json --noEmit"
   },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
   "devDependencies": {
     "@phosphor-icons/core": "^2.1.1"
   },
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "icons",
+    "svg",
+    "web-components",
+    "design-system"
+  ],
   "publishConfig": {
     "access": "restricted"
   }

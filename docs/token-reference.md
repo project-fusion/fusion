@@ -33,15 +33,15 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 49 |
 | `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | 10 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 12 |
-| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 165 |
+| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 166 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 99 |
-| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 70 |
+| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 71 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 25 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 13 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 9 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 3 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 4 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 126 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 127 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 77 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 5 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
@@ -108,13 +108,13 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 115 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 152 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 138 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 154 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 139 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 133 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 85 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 78 |
-| `--helix-space-xl` | `var(--_helix-scale-8)` | 36 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 43 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 86 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 80 |
+| `--helix-space-xl` | `var(--_helix-scale-8)` | 37 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 45 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 6 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
 
@@ -125,7 +125,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 32 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 120 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 121 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 12 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 8 |
 | `--helix-radii-full` | `9999px` | 39 |
@@ -147,7 +147,7 @@ Font size.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-text-xs` | `var(--_helix-size-12)` | 55 |
-| `--helix-text-sm` | `var(--_helix-size-13)` | 60 |
+| `--helix-text-sm` | `var(--_helix-size-13)` | 61 |
 | `--helix-text-md` | `var(--_helix-size-14)` | 26 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 13 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 11 |
@@ -192,7 +192,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 131 |
+| `--helix-border-thin` | `1px` | 132 |
 | `--helix-border-thick` | `2px` | 37 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 1 |
 | `--helix-border-floating` | `0` | 10 |

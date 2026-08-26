@@ -3,6 +3,7 @@
   "description": "Theme derivation engine. Computes a complete, contrast-guaranteed token set from intent inputs.",
   "version": "0.0.0-dev",
   "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
     "directory": "helix/theme",
     "type": "git",
@@ -27,6 +28,15 @@
     "test": "cargo test -p fusion-helix-theme --manifest-path ../../Cargo.toml",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "theming",
+    "design-tokens",
+    "color",
+    "oklch",
+    "contrast"
+  ],
   "publishConfig": {
     "access": "restricted"
   }

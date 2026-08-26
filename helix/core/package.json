@@ -3,6 +3,7 @@
   "description": "Helix element primitives: base classes, mixins, decorators, utilities.",
   "version": "0.0.0-dev",
   "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
     "directory": "helix/core",
     "type": "git",
@@ -29,6 +30,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "bun test src"
   },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",
     "@helix-io/icons": "workspace:*"
@@ -39,6 +41,14 @@
     "@helix-io/testing": "workspace:*",
     "lit": "^3.2.1"
   },
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "lit",
+    "design-system",
+    "helix"
+  ],
   "peerDependencies": {
     "lit": "^3.2.1"
   },
