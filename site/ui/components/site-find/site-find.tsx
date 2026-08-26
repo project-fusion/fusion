@@ -223,7 +223,7 @@ export function SiteFind({
         >
           <helix-icon name="magnifying-glass" slot="start"></helix-icon>
           Search
-          <helix-kbd slot="end">⌘K</helix-kbd>
+          <helix-kbd keys="mod+k" slot="end"></helix-kbd>
         </helix-button>
       )}
 
@@ -294,8 +294,7 @@ export function SiteFind({
             Go
           </span>
           <span>
-            <helix-kbd>⌘</helix-kbd>
-            <helix-kbd>↵</helix-kbd>
+            <helix-kbd keys="mod+enter"></helix-kbd>
             Sandbox
           </span>
           <span>

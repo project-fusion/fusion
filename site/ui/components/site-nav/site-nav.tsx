@@ -8,6 +8,7 @@ import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { Wordmark } from '@/components/wordmark/wordmark'
 import { PRODUCTS } from '@/content/products/products'
+import { stageAppearance } from '@/content/verticals/verticals'
 import styles from '../chrome.module.css'
 
 /**
@@ -146,11 +147,15 @@ export function SiteMenu({
                    renders as a `div` and is not a link to nowhere. It keeps its
                    place in the tree because the shape of the product is the
                    point. */
-                destination.soon ? (
+                destination.stage ? (
                   <helix-tree-item key={destination.title} slot="children">
                     {destination.title}
-                    <helix-tag data-density="sm" slot="end">
-                      Coming soon
+                    <helix-tag
+                      data-density="sm"
+                      slot="end"
+                      tone={stageAppearance(destination.stage)}
+                    >
+                      {destination.stage}
                     </helix-tag>
                   </helix-tree-item>
                 ) : (
@@ -416,11 +421,13 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                        `aria-disabled` on a real link leaves it in the tab order
                        announcing itself as somewhere you cannot follow. A row
                        that is not interactive simply is not one. */
-                    destination.soon ? (
+                    destination.stage ? (
                       <div data-megamenu-item data-soon key={destination.title}>
                         <strong>
                           {destination.title}
-                          <helix-tag data-density="sm">Coming soon</helix-tag>
+                          <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
+                            {destination.stage}
+                          </helix-tag>
                         </strong>
                         <span>{destination.summary}</span>
                       </div>

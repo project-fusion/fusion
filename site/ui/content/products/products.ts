@@ -17,15 +17,21 @@ export interface Destination {
    */
   summary: string
   /**
-   * Whether it is named but not yet there.
+   * The stage it is at, where it is named and not yet there.
    *
-   * A row with this set says what is coming and does not pretend to be a link:
-   * nothing is followed and it leaves the tab order, rather than being
+   * A row with this set says where the work stands and does not pretend to be a
+   * link: nothing is followed and it leaves the tab order, rather than being
    * focusable and inert. Naming the modules before they exist is the point,
    * since the division of the product is the argument; letting one be pressed
    * would be the part that lied.
+   *
+   * **The stage rather than "Coming soon", which said one thing three times.**
+   * `CLAUDE.md` keeps the vocabulary honest and says never to soften it, and the
+   * Cortex page two clicks away already reports Engram and Trace as Building and
+   * Recall as Declared. A menu calling all three the same thing is the softening
+   * that rule exists to refuse, and it disagreed with the page besides.
    */
-  soon?: boolean
+  stage?: 'Building' | 'Declared'
   /**
    * The name on the row.
    */
@@ -215,19 +221,19 @@ export const PRODUCTS: Product[] = [
       },
       {
         href: '/cortex',
-        soon: true,
+        stage: 'Building',
         summary: 'Memory. What the system holds on to, and for how long.',
         title: 'Engram',
       },
       {
         href: '/cortex',
-        soon: true,
+        stage: 'Building',
         summary: 'Provenance. Where a fact came from, all the way back.',
         title: 'Trace',
       },
       {
         href: '/cortex',
-        soon: true,
+        stage: 'Declared',
         summary: 'Context. What to put in front of a model, and why that.',
         title: 'Recall',
       },
