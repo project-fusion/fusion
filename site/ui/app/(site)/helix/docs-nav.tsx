@@ -30,9 +30,9 @@ import styles from './components/(reference)/docs.module.css'
  * link, which is the largest element on the page doing the exact thing
  * `server-rendering.mdx` documents.
  *
- * `default-open` and never `open`. `open` is the controlled half of
- * `MixinControllerOpen`, and declaring it would freeze a branch where a reader
- * cannot collapse it. Seeding is what markup is for.
+ * `default-open` and never `open`, because what this wants to say is where the
+ * nav starts rather than where it is. Both seed, and `default-open` is the one
+ * a reset returns to.
  *
  * Rows stay real anchors, so Enter, middle click and the status bar work, with
  * Next's routing over the top and prefetch on approach rather than on sight:

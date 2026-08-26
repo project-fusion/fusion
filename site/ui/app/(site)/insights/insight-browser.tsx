@@ -79,10 +79,9 @@ export function InsightBrowser({
   /** The sorts it will accept, so the options cannot name one it ignores. */
   sorts: string[]
 }) {
-  /* Seeded, not controlled. `default-value` hands the control its opening value
-     and leaves it owning its own display; `value` would claim ownership and the
-     control would go quiet, waiting to be told what to show by a consumer that
-     is only listening. */
+  /* Seeded with `default-value` rather than `value`, because what this wants to
+     say is where the field starts. Both seed now; `default-value` is the one a
+     reset returns to, which is the honest word for an opening value. */
   const [query, setQuery] = useState(initialQuery)
   /* A ref only so the shortcut can reach the field. Insights does not focus on
      mount, unlike the gallery: the reasoning is beside the input. */

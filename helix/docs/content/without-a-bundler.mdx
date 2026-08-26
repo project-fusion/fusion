@@ -81,9 +81,10 @@ import '@helix-io/styled/dialog'
 Each still pulls its own dependencies, so this is a reduction rather than a
 minimum, but for a page using five components it is a large one.
 
-**No TypeScript, so no controlled-property constraint.** The type error that
-catches `value` without a handler is a compile-time thing, and there is no
-compile. The rule still applies, silently: see [State and
+**No TypeScript, so no typings.** A misspelled property is silent here where it
+is a compile error in React, Vue and Svelte, which is worth a note in review.
+Nothing else about writing Helix changes: a declared property is a seed and the
+element applies its own changes. See [State and
 control](./state-and-control).
 
 ## The stylesheets are the same

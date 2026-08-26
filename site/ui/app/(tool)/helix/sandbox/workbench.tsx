@@ -447,11 +447,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
   /* The proposed value, off the event, not `event.target.value` off the host.
    *
-   * `value` makes this field controlled, and a controlled element reports the
-   * value the consumer holds rather than the one the reader just typed: reading
-   * the host set the filter to what it already was, the element put the text
-   * back, and the field could not be typed into at all. The sandbox's own
-   * examples were unfilterable in the sandbox.
+   * The before event announces the value being *proposed*, so the element has
+   * not applied it yet and `event.target.value` is still the previous one.
+   * Reading the host set the filter to what it already was, the element put the
+   * text back, and the field could not be typed into at all: the sandbox's own
+   * examples were unfilterable in the sandbox. The detail is the channel.
    */
   const filterChanged = (event: HelixInputEvent) => {
     setFilter(event.detail.value)
@@ -809,10 +809,10 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
   /* Driven, not owned, and the second half of that took two goes to get right.
    *
-   * It was a prop on each row, and a prop set at mount is how a consumer says
-   * the state is theirs: those rows had dead chevrons, because a controlled
-   * item announces and waits to be told. So it became an effect writing the
-   * elements, which fixed the chevrons and broke something worse. The effect
+   * It was a prop on each row, re-set on every render, so a reader opening a
+   * branch had it closed again by the next one and the chevrons read as dead.
+   * So it became an effect writing the elements, which fixed the chevrons and
+   * broke something worse. The effect
    * had no dependency array, so it ran after *every* render and put every
    * branch back to what this file thought it should be. Opening a branch
    * re-rendered the page, the effect ran, and the branch shut again before the

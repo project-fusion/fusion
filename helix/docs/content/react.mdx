@@ -1,5 +1,5 @@
 ---
-description: The typings, the hydration bridge, and the controlled-property constraint.
+description: The typings, the hydration bridge, and how state moves.
 parent: installation
 section: Getting started
 title: React
@@ -54,28 +54,40 @@ it is a compile error rather than a surprise at runtime:
 <helix-input label="Name" value="Ada" />
 ```
 
-In React, `value` on a native `<input>` without `onChange` is a warning. In
-Helix it is a type error, and for the same underlying reason stated more
-strictly: **writing a controlled property hands ownership to you.** From then on
-the element announces changes and applies none of them. A consumer who meant to
-seed a value gets a control that ignores every keystroke, with nothing logged
-and nothing visibly wrong.
-
-Two ways to write it, depending on which you meant:
+In React, `value` on a native `<input>` without `onChange` renders a read-only
+field and warns. **A Helix element is not read-only**: `value` is a seed and the
+element goes on applying its own changes, so the markup below works and needs no
+handler beside it.
 
 ```tsx
-// Controlled: you own it, so you answer it.
-<helix-input label="Name" onhelix-input={(event) => setName(event.detail.value)} value={name} />
-
-// Uncontrolled: the element owns it, and you say where it starts.
+// Seeded: the element owns it from there.
 <helix-input default-value="Ada" label="Name" />
+
+// Mirrored: bind the notification and let the element apply.
+<helix-input label="Name" onChange={(event) => setName(event.currentTarget.value)} />
+
+// Refused: you take the decision for this one change.
+<helix-input
+  label="Name"
+  onhelix-before-change={(event) => {
+    event.preventDefault()
+    setName(clean(event.detail.value))
+  }}
+  value={name}
+/>
 ```
 
-The constraint is generated from the manifest and covers every controlled
-property in the library. It is regression tested in both directions, so an error
-here is real and an absent one means you answered.
+**The one habit to unlearn is refusing by not answering.** React force-restores
+a native `<input>` whose state did not move and does not do this for a custom
+element, so a handler that declines to call `setState` leaves the element
+holding the new value. `preventDefault()` is the refusal.
 
-See [State and control](./state-and-control) for what the two modes actually do.
+*Until 26 Aug 2026 this page described the opposite, and the typings enforced
+it: writing `value` was a claim of ownership, the element applied nothing until
+told, and `<helix-input value="Ada" />` was a compile error without an answering
+handler. The constraint is deleted along with the mode.*
+
+See [State and control](./state-and-control) for the whole of it.
 
 ## Register in a client component
 

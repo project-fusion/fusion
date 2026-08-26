@@ -143,7 +143,7 @@ export const docPages: DocPage[] = [
     title: 'Overriding a component',
   },
   {
-    description: 'The typings, the hydration bridge, and the controlled-property constraint.',
+    description: 'The typings, the hydration bridge, and how state moves.',
     parent: 'installation',
     section: 'Getting started',
     slug: 'react',
@@ -193,7 +193,7 @@ export const docPages: DocPage[] = [
     title: 'Space and size',
   },
   {
-    description: 'Why writing a property hands the element to you, and what to write instead.',
+    description: 'Why a declared property is a seed, and how to take a decision when you want it.',
     section: 'Essentials',
     slug: 'state-and-control',
     title: 'State and control',

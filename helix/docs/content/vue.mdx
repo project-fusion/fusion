@@ -58,17 +58,23 @@ string would be ambiguous:
 
 Rarely necessary, and it exists so you do not go looking for it.
 
-## The controlled-property rule still applies
+## Seeding, mirroring and refusing
 
-`value`, `open`, `checked` and `active` are claims of ownership in Helix, and
-declaring one without answering it gives you a control that ignores input. Vue
-has no type-level constraint for this the way the React types do, so read
-[State and control](./state-and-control) before writing a form.
+`value`, `open`, `checked` and `active` are seeds. The element applies its own
+changes from there, so all three of these work. See [State and
+control](./state-and-control).
 
 ```vue
-<!-- Uncontrolled: the element owns it. -->
+<!-- Seeded: the element owns it from there. -->
 <helix-input default-value="Ada" label="Name" />
 
-<!-- Controlled: you own it, so you answer it. -->
-<helix-input :value="name" label="Name" @helix-input="name = $event.detail.value" />
+<!-- Mirrored: bind the notification and let the element apply. -->
+<helix-input label="Name" @change="name = $event.target.value" />
+
+<!-- Refused: you take the decision for this one change. -->
+<helix-input
+  :value="name"
+  label="Name"
+  @helix-before-change="$event.preventDefault(); name = clean($event.detail.value)"
+/>
 ```

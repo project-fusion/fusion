@@ -38,9 +38,9 @@ template it is on, so scoping it keeps the check for your own typos.
 `[prop]` sets a property, which is what a non-string value needs, and `(event)`
 binds with `addEventListener`, so the event name is its own.
 
-**Do not use `attr.` for a controlled property.** `[attr.value]="name"` writes
-the attribute, which Helix reads once as a claim of ownership and then ignores;
-the property is the live channel.
+**Do not use `attr.` for a stateful property.** `[attr.value]="name"` writes
+the attribute, which seeds the control and is then out of date the moment a
+reader types; the property is the live channel.
 
 ## No typings ship for Angular
 
@@ -53,9 +53,8 @@ own codebase from it.
 The practical consequence is that a misspelled property fails silently here
 where it is a compile error in React, Vue and Svelte. Worth a note in review.
 
-## The controlled-property rule still applies
+## Taking a decision
 
-A declared `value`, `open`, `checked` or `active` hands ownership to you: the
-element announces the change and applies none of it. Use `default-value` and its
-siblings for a control that owns its own state. See [State and
-control](./state-and-control).
+`value`, `open`, `checked` and `active` are seeds: the element applies its own
+changes from there. To take one decision, listen for the `helix-before-*` event
+and call `preventDefault()`. See [State and control](./state-and-control).

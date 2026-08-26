@@ -100,10 +100,8 @@ export function ComponentBrowser({
   stageTone: ReturnType<typeof stageAppearance>
   title: string
 }) {
-  /* Seeded, not controlled. `default-value` hands the control its opening
-     value and leaves it owning its own display; `value` would claim ownership
-     and the control would go quiet, waiting to be told what to show by a
-     consumer that is only listening. The filtering already worked from the URL
+  /* Seeded with `default-value` rather than `value`, because what this wants to
+     say is where the controls start. The filtering already worked from the URL
      before this: what was missing was the controls saying so, so a shared link
      filtered the grid while both selects read "All". */
   const [query, setQuery] = useState(initialQuery)

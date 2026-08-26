@@ -229,9 +229,9 @@ export function SiteFind({
 
       {/* **The palette listens for its own hotkey from the document**, so it
           answers from wherever the reader is, including from inside another
-          field. `open` is controlled here because the button opens it too, and
-          a controlled property that is not answered is a control that goes
-          quiet: both events are bound. */}
+          field. `open` is bound here because the button opens it too, so the
+          palette and the React state have to agree about which it is: both
+          events are bound so neither can drift from the other. */}
       <helix-command
         class={styles.siteCommand}
         hotkey="mod+k"

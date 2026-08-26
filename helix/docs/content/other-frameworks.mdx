@@ -45,7 +45,7 @@ its own state. This is the rule most likely to look like a bug, and
 | Qwik | Works as JSX. Bind with `document:on…` or a ref, since a plain `on*` prop is normalized |
 | Lit | `.prop=`, `?bool=` and `@helix-change=` are already the right three channels |
 | Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |
-| Alpine, htmx | Markup and attributes only, which reaches every uncontrolled component. A controlled one needs script |
+| Alpine, htmx | Markup and attributes only, which reaches every component. Refusing a change needs script |
 
 Nothing here is tested by us, which is the honest reason it is one page. If your
 framework needs something the three rules above do not cover, that is worth

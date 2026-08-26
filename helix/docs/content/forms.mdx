@@ -153,11 +153,11 @@ the same reasoning applies to yours.
 the accessibility tree, so a screen reader can still announce that the control
 exists and is currently off.
 
-## Controlled and uncontrolled
+## Seeding a form
 
-Every form control follows the ownership rule: a declared `value` or `checked`
-is a claim, and the element will announce and wait rather than apply. In a form
-you usually want the uncontrolled shape and to read the values at submit:
+A declared `value` or `checked` is a seed and the control goes on managing
+itself, so a form needs nothing wired to work. `default-value` is what a reset
+returns to, which is usually what a seed in a form means:
 
 ```html
 <helix-input
