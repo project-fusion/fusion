@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixErrorEvent, HelixLoadEvent } from '@helix-io/core'
+import { customElement, HelixElement } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -42,8 +42,8 @@ import { property, state } from 'lit/decorators.js'
  * @slot placeholder - Shown until the picture arrives.
  * @slot fallback - Shown instead of it, if it never does.
  *
- * @event {HelixLoadEvent} helix-load - The picture arrived.
- * @event {HelixErrorEvent} helix-error - It is not coming.
+ * @event {Event} load - Relayed, because the platform's own does not escape.
+ * @event {Event} error - Relayed for the same reason.
  *
  * @csspart image - The picture itself.
  * @csspart placeholder - What stands in until it arrives.
@@ -119,27 +119,52 @@ export class HelixHeadlessImage extends HelixElement {
   private answered = ''
 
   /**
-   * Says so, because the platform's own saying of it cannot be heard.
+   * Says so under the platform's own name, because the platform's cannot escape.
    *
    * `load` and `error` on an `<img>` neither bubble nor compose, so the ones
    * fired inside this shadow root reach nobody outside it. A consumer had a
-   * reflected attribute and a `MutationObserver` and nothing else.
+   * reflected attribute and a `MutationObserver` and nothing else. Re-emitting
+   * from the host is what `relayNativeEvent` is for, and it is what `Avatar`
+   * already did for the same pair on the same element.
+   *
+   * **These were `helix-load` and `helix-error`, and the rename is the fix.**
+   * The argument for a prefix is a collision with a native name, and there was
+   * none to collide with here: the native events cannot reach a consumer at
+   * all. So the prefix bought nothing and cost the two spellings this library
+   * had for one idea, `Avatar` relaying `load` while `Image` invented one. See
+   * 294 and 295.
+   *
+   * **Not bubbling, and that is not a small point.** The retired events were
+   * `bubbles: true, composed: true` deliberately, so a gallery could count its
+   * pictures with one listener. A bubbling relay of `load` reaches nothing in
+   * React: `load` is in react-dom's `nonDelegatedEvents`, so there is no root
+   * listener to catch it, and React attaches a direct one for `<img>` and never
+   * for a custom element. `bindReactHandler` binds exactly the non-bubbling
+   * ones, so matching the native propagation is what makes `onLoad` work at
+   * all. A gallery does here what it already does for `<img>`, which is listen
+   * in the capture phase or listen per picture.
    */
-  private announce(status: 'error' | 'loaded'): void {
+  private announce(status: 'error' | 'loaded', event?: Event): void {
     this.status = status
-    const event =
-      status === 'loaded'
-        ? new HelixLoadEvent({ src: this.src })
-        : new HelixErrorEvent({ src: this.src })
-    this.dispatchEvent(event)
+    const name = status === 'loaded' ? 'load' : 'error'
+    if (event) {
+      this.relayNativeEvent(event)
+      return
+    }
+    /* No original to relay: `settle` catches a picture that was already
+       complete when the listener attached, which is the cached case, and the
+       platform fired its `load` before anyone was listening. The synthesized
+       one carries the native propagation rather than defaults, so a consumer
+       cannot tell the two paths apart. */
+    this.dispatchEvent(new Event(name, { bubbles: false, cancelable: false, composed: false }))
   }
 
-  private readonly handleLoad = (): void => {
-    this.announce('loaded')
+  private readonly handleLoad = (event: Event): void => {
+    this.announce('loaded', event)
   }
 
-  private readonly handleError = (): void => {
-    this.announce('error')
+  private readonly handleError = (event: Event): void => {
+    this.announce('error', event)
   }
 
   /**

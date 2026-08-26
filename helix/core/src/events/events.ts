@@ -648,62 +648,6 @@ export interface CompleteDetail {
 }
 
 /**
- * What a picture reports when it settles, either way.
- */
-export interface LoadDetail {
-  /** The source that settled, so a listener can tell which one answered. */
-  src: string
-}
-
-/**
- * A picture arrived.
- *
- * **The reason this exists at all is that the platform's own is unreachable.**
- * `load` and `error` on an `<img>` do not bubble and are not composed, so an
- * image inside a shadow root fires them where nobody outside can hear. A
- * consumer wanting to know when a picture landed had a reflected attribute and
- * a `MutationObserver`, which is a worse answer to a question the platform
- * already answers well.
- *
- * Bubbling and composed, unlike `helix-close`, because these are worth hearing
- * from a container: a gallery counting how many of its pictures have settled is
- * the ordinary case, and asking it to bind a listener per picture is the thing
- * delegation exists to avoid.
- */
-export class HelixLoadEvent extends CustomEvent<LoadDetail> {
-  static readonly eventName = 'helix-load'
-
-  constructor(detail: LoadDetail) {
-    super(HelixLoadEvent.eventName, {
-      bubbles: true,
-      cancelable: false,
-      composed: true,
-      detail,
-    })
-  }
-}
-
-/**
- * A picture is not coming.
- *
- * The counterpart, and the more useful of the two: a consumer swapping to
- * another source, hiding a section that has nothing to show, or reporting a
- * broken asset can do none of it without hearing this.
- */
-export class HelixErrorEvent extends CustomEvent<LoadDetail> {
-  static readonly eventName = 'helix-error'
-
-  constructor(detail: LoadDetail) {
-    super(HelixErrorEvent.eventName, {
-      bubbles: true,
-      cancelable: false,
-      composed: true,
-      detail,
-    })
-  }
-}
-
-/**
  * Fired when a control that fills up has filled.
  *
  * The moment a code entry exists for: a six-character field is worth submitting
@@ -912,10 +856,8 @@ const registry = {
   HelixCopyEvent,
   HelixCreateEvent,
   HelixDismissEvent,
-  HelixErrorEvent,
   HelixFilterEvent,
   HelixInputEvent,
-  HelixLoadEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixOpenEvent,
