@@ -159,23 +159,16 @@
     gap: var(--helix-space-xl);
   }
 
-  /* **Centered brand, distributed groups, left-aligned links.** Narrow, the
-     brand and the nav each take a line of their own, and left-aligning both left
-     the nav ending 128 pixels short of the right edge at 375: it read as
-     something that had wrapped rather than as a layout. Centering the brand and
-     spreading the three groups across the full width makes the stack look
-     deliberate.
+  /* **The groups spread to both edges; nothing is centered.** Left-aligning
+     the nav as well left it ending 128 pixels short of the right edge at 375,
+     so a footer that had wrapped onto two lines looked like it had wrapped
+     rather than like a layout. Distributing the three groups across the full
+     width is what fixes that, and it is the only thing that needed to change.
 
-     The links themselves stay at the start. A column of centered links has a
-     ragged left edge and is measurably harder to scan, which is the same fault
-     the underlines had: it would be centering for the sake of symmetry at the
-     cost of the one thing a footer is for. */
-  .footerBrand {
-    align-items: center;
-    inline-size: 100%;
-    text-align: center;
-  }
-
+     The brand reads as the start of the block the way it does at every other
+     width, and a column of centered links would have a ragged left edge, which
+     is harder to scan and the same fault the underlines were. The columns get
+     distributed; their contents and the brand beside them do not. */
   .footerNav {
     gap: var(--helix-space-lg);
     inline-size: 100%;
