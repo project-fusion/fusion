@@ -4452,6 +4452,8 @@ helix-close */
   "onhelix-open"?: (e: HelixHeadlessDialogHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "onhelix-close"?: (e: HelixHeadlessDialogHelixCloseElementEvent) => void;
+  /** Relayed, because the platform's own does not escape. */
+  onclose?: (e: HelixHeadlessDialogElementEvent) => void;
 };
 
 export type HelixHeadlessDialogSolidJsProps = {
@@ -4506,6 +4508,8 @@ helix-close */
   "on:helix-open"?: (e: HelixHeadlessDialogHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "on:helix-close"?: (e: HelixHeadlessDialogHelixCloseElementEvent) => void;
+  /** Relayed, because the platform's own does not escape. */
+  "on:close"?: (e: HelixHeadlessDialogElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4741,6 +4745,8 @@ helix-close */
 
   /** Fired before the panel closes, and cancelable. */
   "onhelix-close"?: (e: HelixHeadlessDrawerHelixCloseElementEvent) => void;
+  /** Relayed, because the platform's own does not escape. */
+  onclose?: (e: HelixHeadlessDrawerElementEvent) => void;
   /** Fired when the drawer opens or closes. */
   "onhelix-open"?: (e: HelixHeadlessDrawerHelixOpenElementEvent) => void;
 };
@@ -4798,6 +4804,8 @@ helix-close */
   "prop:defaultOpen"?: HelixHeadlessDrawer["defaultOpen"];
   /** Fired before the panel closes, and cancelable. */
   "on:helix-close"?: (e: HelixHeadlessDrawerHelixCloseElementEvent) => void;
+  /** Relayed, because the platform's own does not escape. */
+  "on:close"?: (e: HelixHeadlessDrawerElementEvent) => void;
   /** Fired when the drawer opens or closes. */
   "on:helix-open"?: (e: HelixHeadlessDrawerHelixOpenElementEvent) => void;
 
@@ -17710,6 +17718,7 @@ export type CustomElements = {
    *
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
+   * - `close`: Relayed, because the platform's own does not escape.
    *
    * ## Slots
    *
@@ -18025,6 +18034,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-close`: Fired before the panel closes, and cancelable.
+   * - `close`: Relayed, because the platform's own does not escape.
    * - `helix-open`: Fired when the drawer opens or closes.
    *
    * ## Slots
@@ -30475,6 +30485,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
+   * - `close`: Relayed, because the platform's own does not escape.
    *
    * ## Slots
    *
@@ -30797,6 +30808,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-close`: Fired before the panel closes, and cancelable.
+   * - `close`: Relayed, because the platform's own does not escape.
    * - `helix-open`: Fired when the drawer opens or closes.
    *
    * ## Slots

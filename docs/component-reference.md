@@ -2187,6 +2187,7 @@ dialog rather than being a div somebody positioned.
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+| `close` | `Event` | Relayed, because the platform's own does not escape. |
 
 #### Slots
 
@@ -2370,6 +2371,7 @@ rest is flat and the movement is what says something happened.
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired when the drawer opens or closes. |
 | `helix-close` | `HelixCloseEvent` | Fired before the panel closes, and cancelable. |
+| `close` | `Event` | Relayed, because the platform's own does not escape. |
 
 #### Slots
 

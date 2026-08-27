@@ -2337,6 +2337,8 @@ export type HelixHeadlessDialogVueEvents = {
   "helix-open": HelixHeadlessDialogHelixOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-close": HelixHeadlessDialogHelixCloseElementEvent;
+  /** Relayed, because the platform's own does not escape. */
+  close: HelixHeadlessDialogElementEvent;
 };
 
 export type HelixHeadlessDividerVueProps = {
@@ -2487,6 +2489,8 @@ helix-close */
 export type HelixHeadlessDrawerVueEvents = {
   /** Fired before the panel closes, and cancelable. */
   "helix-close": HelixHeadlessDrawerHelixCloseElementEvent;
+  /** Relayed, because the platform's own does not escape. */
+  close: HelixHeadlessDrawerElementEvent;
   /** Fired when the drawer opens or closes. */
   "helix-open": HelixHeadlessDrawerHelixOpenElementEvent;
 };

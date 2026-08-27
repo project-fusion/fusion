@@ -18835,6 +18835,14 @@
               "description": "Fired before it closes, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed, because the platform's own does not escape.",
+              "name": "close",
+              "reactProp": "onclose"
             }
           ],
           "attributes": [
@@ -20055,6 +20063,14 @@
               "description": "Fired before the panel closes, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed, because the platform's own does not escape.",
+              "name": "close",
+              "reactProp": "onclose"
             },
             {
               "type": {

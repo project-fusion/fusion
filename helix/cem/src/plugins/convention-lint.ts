@@ -17,10 +17,20 @@ const APPEARANCE_OPENERS = ['themed', 'a styled', 'styled', 'a themed']
  *
  * Relaying is what makes a component behave like the control it wraps, and the
  * name has to be the native one for a consumer, and for React, to hear it.
+ *
+ * `close`, `cancel`, `toggle` and `beforetoggle` joined on 26 Aug 2026 with the
+ * lifecycle work in 296. A `<dialog>` opened with `showModal()` and a panel
+ * shown with `showPopover()` both have the browser firing these already, on an
+ * element inside a shadow root, where they neither bubble nor compose and so
+ * reach nobody. Relaying is the platform doing the work rather than an
+ * invention.
  */
 const RELAYED_NATIVE = new Set([
+  'beforetoggle',
   'blur',
+  'cancel',
   'change',
+  'close',
   'ended',
   'error',
   'focus',
@@ -29,6 +39,7 @@ const RELAYED_NATIVE = new Set([
   'load',
   'pause',
   'play',
+  'toggle',
 ])
 
 const EM_DASH = /[—–]/

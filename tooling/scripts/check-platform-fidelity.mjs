@@ -294,6 +294,13 @@ const EXCUSED = {
     autocomplete:
       'Renders a calendar of `<button>`s and no text entry, so there is nothing for a browser to fill. A property the platform cannot act on is worse than an absent one.',
   },
+  'helix-dialog': {
+    cancel:
+      'Intercepted rather than relayed. `handleCancel` prevents the native one so Escape is a request the element can refuse, so it never completes: relaying it would announce a dismissal that was refused. `helix-close` carries the ask. See 296.',
+  },
+  'helix-drawer': {
+    cancel: 'Intercepted rather than relayed, as on `helix-dialog`.',
+  },
   'helix-file-input': {
     value:
       'The native `value` is `C:\\fakepath\\name`, a lie the platform tells for privacy. `files` is the real surface.',
@@ -401,8 +408,8 @@ const EXPECTED_EVENTS = {
   'helix-combobox': VALUE_EVENTS,
   'helix-date-input': VALUE_EVENTS,
   'helix-date-picker': VALUE_EVENTS,
-  'helix-dialog': ['cancel', 'close'],
-  'helix-drawer': ['cancel', 'close'],
+  'helix-dialog': ['close'],
+  'helix-drawer': ['close'],
   'helix-file-input': VALUE_EVENTS,
   'helix-image': ['error', 'load'],
   'helix-input': VALUE_EVENTS,

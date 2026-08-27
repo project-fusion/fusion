@@ -59,6 +59,7 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
+ * @event {Event} close - Relayed, because the platform's own does not escape.
  *
  * @csspart dialog - The native dialog element.
  */
@@ -137,10 +138,20 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    * to prevent. Rather than fight it, the state follows: the dialog is shut, so
    * saying otherwise would be a lie the next `showModal()` would trip over.
    */
-  private readonly handleClose = (): void => {
+  private readonly handleClose = (event: Event): void => {
     if (this.open) {
       this.requestOpen(false)
     }
+    /* And under the platform's own name, from the host. `close` on a `<dialog>`
+       neither bubbles nor is composed, so the one the browser just fired reaches
+       nobody outside this shadow root, which is the same reason `Avatar` relays
+       `load`. Announced after the state has moved, so a consumer binding
+       `onClose` reads a dialog that is already shut.
+
+       `cancel` is deliberately not relayed. `handleCancel` prevents it so that
+       Escape is a request rather than an act, so the native one never completes:
+       relaying it would announce a dismissal that was refused. See 296. */
+    this.relayNativeEvent(event)
   }
 
   protected override willUpdate(changed: PropertyValues): void {

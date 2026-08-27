@@ -2926,6 +2926,8 @@ export type HelixDialogVueEvents = {
   "helix-open": HelixDialogHelixOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-close": HelixDialogHelixCloseElementEvent;
+  /** Relayed, because the platform's own does not escape. */
+  close: HelixDialogElementEvent;
 };
 
 export type HelixDividerVueProps = {
@@ -3139,6 +3141,8 @@ export type HelixDrawerVueEvents = {
   "helix-open": HelixDrawerHelixOpenElementEvent;
   /** Fired before the panel closes, and cancelable. */
   "helix-close": HelixDrawerHelixCloseElementEvent;
+  /** Relayed, because the platform's own does not escape. */
+  close: HelixDrawerElementEvent;
 };
 
 /** `HelixDrilldownItem` component event */

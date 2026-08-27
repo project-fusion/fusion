@@ -25050,6 +25050,18 @@
                 "name": "HelixHeadlessDialog",
                 "module": "src/dialog/root/dialog-root.ts"
               }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed, because the platform's own does not escape.",
+              "name": "close",
+              "reactProp": "onclose",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDialog",
+                "module": "src/dialog/root/dialog-root.ts"
+              }
             }
           ],
           "modulePath": "src/dialog/root/dialog-root.ts",
@@ -26621,6 +26633,18 @@
               "description": "Fired before the panel closes, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDrawer",
+                "module": "src/drawer/root/drawer-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed, because the platform's own does not escape.",
+              "name": "close",
+              "reactProp": "onclose",
               "inheritedFrom": {
                 "name": "HelixHeadlessDrawer",
                 "module": "src/drawer/root/drawer-root.ts"
