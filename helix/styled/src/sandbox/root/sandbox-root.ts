@@ -1,7 +1,9 @@
 import {
   customElement,
   type HelixBeforeEditEvent,
-  HelixBeforeResizeEvent,
+  HelixBeforePanelResizeEvent,
+  type HelixBeforeResizeEvent,
+  HelixBeforeSplitEvent,
   type HelixCaretEvent,
   type HelixConsoleEvent,
   HelixElement,
@@ -78,7 +80,8 @@ const PANEL_MAX = 0.8
  * @aliases Playground, REPL, Editor
  * @documentation https://helix.fusion.dev/sandbox
  *
- * @event {HelixBeforeResizeEvent} helix-before-resize - Fired when a divider is let go, with the new arrangement.
+ * @event {HelixBeforePanelResizeEvent} helix-before-panel-resize - Fired when the panel's divider is let go, with its height in pixels.
+ * @event {HelixBeforeSplitEvent} helix-before-split - Fired when the panes' divider is let go, with the lead pane's share.
  *
  * @slot source - The editable source pane. First unless `lead` says otherwise.
  * @slot preview - The live preview. Second unless `lead` says otherwise.
@@ -389,7 +392,7 @@ export class HelixSandbox extends HelixElement {
   }
 
   /**
-   * Says the arrangement has settled, so a consumer can keep it.
+   * Says the panes' divider has settled, so a consumer can keep it.
    *
    * When it settles, not while it moves. A drag is a stream of positions and
    * only the one it ends at is a preference; announcing each would ask whoever
@@ -399,14 +402,20 @@ export class HelixSandbox extends HelixElement {
    * should be kept at all, is the consumer's to decide, and a component that
    * wrote to storage on its own would be deciding for all of them under a key
    * it chose.
+   *
+   * **A verb each, where this was one `helix-before-resize` carrying which of the
+   * two had moved.** Both dividers are this element's, so `composedPath()[0]` is
+   * the same host for either and the name is the only thing that can separate
+   * them. It was the last caller of a field every request in the library carried
+   * for it. See 306.
    */
-  private settled(property: 'panelSize' | 'split'): void {
-    this.dispatchEvent(
-      new HelixBeforeResizeEvent({
-        property,
-        value: String(property === 'split' ? this.split : this.panelSize),
-      }),
-    )
+  private splitSettled(): void {
+    this.dispatchEvent(new HelixBeforeSplitEvent({ value: String(this.split) }))
+  }
+
+  /** As `splitSettled`, for the panel, whose value is pixels rather than a share. */
+  private panelSettled(): void {
+    this.dispatchEvent(new HelixBeforePanelResizeEvent({ value: String(this.panelSize) }))
   }
 
   /**
@@ -426,29 +435,26 @@ export class HelixSandbox extends HelixElement {
     if (event.target !== event.currentTarget) {
       return
     }
-    const { property, value } = (event as HelixBeforeResizeEvent).detail
+    const { value } = (event as HelixBeforeResizeEvent).detail
     event.stopPropagation()
-    if (property !== 'position') {
-      return
-    }
     this.split = Number(value)
-    this.settled('split')
+    this.splitSettled()
   }
 
   private readonly handlePanelChange = (event: Event): void => {
     if (event.target !== event.currentTarget) {
       return
     }
-    const { property, value } = (event as HelixBeforeResizeEvent).detail
+    const { value } = (event as HelixBeforeResizeEvent).detail
     event.stopPropagation()
-    if (property !== 'position' || this.bodyHeight <= 0) {
+    if (this.bodyHeight <= 0) {
       return
     }
     // Back into pixels, which is what this element promises and what a consumer
     // stored. The divider's position is the panes' share, so the panel is the
     // rest of it.
     this.panelSize = Math.max(0, ((100 - Number(value)) / 100) * this.bodyHeight)
-    this.settled('panelSize')
+    this.panelSettled()
   }
 
   override connectedCallback(): void {

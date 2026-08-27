@@ -167,7 +167,7 @@ export class HelixSandboxEditor extends HelixElement {
               return transaction
             }
             const next = transaction.newDoc.toString()
-            const request = new HelixBeforeEditEvent({ property: 'value', value: next })
+            const request = new HelixBeforeEditEvent({ value: next })
             return this.dispatchEvent(request) ? transaction : []
           }),
           EditorView.updateListener.of((update) => {

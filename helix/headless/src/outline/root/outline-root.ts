@@ -226,7 +226,7 @@ export class HelixHeadlessOutline extends HelixElement {
     const next = active?.target.id ?? ''
     if (next !== this.reading) {
       this.reading = next
-      this.dispatchEvent(new HelixBeforeActivateEvent({ property: 'reading', value: next }))
+      this.dispatchEvent(new HelixBeforeActivateEvent({ value: next }))
     }
   }
 

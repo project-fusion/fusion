@@ -151,7 +151,7 @@ export class HelixHeadlessPaginationSize extends HelixElement {
         this.valueState = size
         this.requestUpdate('value', previous)
       },
-      event: (size) => new HelixBeforeChangeEvent({ property: 'value', value: String(size) }),
+      event: (size) => new HelixBeforeChangeEvent({ value: String(size) }),
       host: this,
       next,
     })

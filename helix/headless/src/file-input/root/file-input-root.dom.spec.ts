@@ -81,7 +81,7 @@ describe('input file', () => {
       said.push((event as CustomEvent<{ property: string; value: string }>).detail)
     })
     await choose(host, 'one.txt', 'two.txt')
-    expect(said).toEqual([{ property: 'files', value: 'one.txt, two.txt' }])
+    expect(said).toEqual([{ value: 'one.txt, two.txt' }])
   })
 
   test('each file carries its size and its kind', async () => {

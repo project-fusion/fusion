@@ -218,7 +218,7 @@ describe('the pin', () => {
     element.pinned = false
     await element.updateComplete
     element.resume()
-    expect(seen).toEqual([{ property: 'pinned', value: 'true' }])
+    expect(seen).toEqual([{ value: 'true' }])
   })
 
   /**

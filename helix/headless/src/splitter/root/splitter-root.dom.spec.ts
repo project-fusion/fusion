@@ -460,17 +460,12 @@ describe('splitter collapsing', () => {
 
   test('a drag that lands on the edge latches shut, and says which pane', async () => {
     const host = await splitter('default-position="40"')
-    let named = ''
     let value = ''
     host.addEventListener('helix-before-collapse', (event) => {
-      const detail = (event as CustomEvent<{ property: string; value: string }>).detail
-      if (detail.property === 'collapsed') {
-        named = detail.property
-        value = detail.value
-      }
+      value = (event as CustomEvent<{ value: string }>).detail.value
     })
     await press(host, 'Home')
-    expect([named, value]).toEqual(['collapsed', 'start'])
+    expect(value).toBe('start')
     expect(host.hasAttribute('data-collapsed')).toBe(true)
   })
 
@@ -528,10 +523,7 @@ describe('splitter collapsing', () => {
     const host = (await splitter('collapsed="start"')) as Splitter & { collapsed?: 'end' | 'start' }
     let asked = ''
     host.addEventListener('helix-before-collapse', (event) => {
-      const detail = (event as CustomEvent<{ property: string; value: string }>).detail
-      if (detail.property === 'collapsed') {
-        asked = detail.value
-      }
+      asked = (event as CustomEvent<{ value: string }>).detail.value
     })
     await press(host, 'End')
     expect(asked).toBe('end')
@@ -579,10 +571,7 @@ describe('splitter under a consumer that owns the position', () => {
     })
     let asked = ''
     host.addEventListener('helix-before-resize', (event) => {
-      const detail = (event as CustomEvent<{ property: string; value: string }>).detail
-      if (detail.property === 'position') {
-        asked = detail.value
-      }
+      asked = (event as CustomEvent<{ value: string }>).detail.value
     })
     await drag(host, 0.5, 0.25)
     expect(asked).toBe('25')

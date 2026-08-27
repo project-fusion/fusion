@@ -381,7 +381,8 @@ export function ThemeBuilder({
      gone. Two per cent rather than zero, because a drag that lands a pixel short
      of the edge is still a reader shutting it. */
   const controlsMoved = (event: HelixBeforeResizeEvent) => {
-    if (event.detail.property === 'position') {
+    // The splitter's own, rather than one sent by something inside it.
+    if (event.target === event.currentTarget) {
       setControlsShown(Number(event.detail.value) > 2)
     }
   }
@@ -1241,10 +1242,8 @@ export function ThemeBuilder({
                one word to a line, which is the same measurement 244 made of the
                sandbox's source pane. Only the axis changes: `lead` above already says
                preview, at every width, because that is what this tool is for. */
-            onhelix-before-resize={(event) => {
-              if (event.detail.property === 'split') {
-                setSplit((event.target as HTMLElement & { split: number }).split)
-              }
+            onhelix-before-split={(event) => {
+              setSplit((event.target as HTMLElement & { split: number }).split)
             }}
             orientation={narrow ? 'vertical' : 'horizontal'}
             panel-label="The audit"

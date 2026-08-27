@@ -294,7 +294,10 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   const railHome = bodyWidth > 0 ? Math.max(0, 100 - (RAIL_OPEN / bodyWidth) * 100) : 100
 
   const railMoved = (event: HelixBeforeResizeEvent) => {
-    if (event.detail.property !== 'position' || bodyWidth <= 0) {
+    /* The splitter's own, not one from inside it. The sandbox below sends its
+       two under names of their own now, so nothing else arrives here, and the
+       target check is what keeps that true if something later does. */
+    if (event.target !== event.currentTarget || bodyWidth <= 0) {
       return
     }
     const width = ((100 - Number(event.detail.value)) / 100) * bodyWidth
@@ -342,14 +345,12 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
   // Written back when a divider is let go, not while it is moving: a drag is a
   // stream of positions and only the one it ends at is a preference.
-  const sandboxChanged = (event: HelixBeforeResizeEvent) => {
-    /* Both dividers report themselves now, where this was one `arrangement`
-       event carrying a JSON blob nothing read: the handler has always taken the
-       numbers off the element below. */
-    const settled = event.detail.property
-    if (settled !== 'split' && settled !== 'panelSize') {
-      return
-    }
+  const sandboxChanged = () => {
+    /* Bound to both of the sandbox's dividers, and asked which one moved by
+       neither: this has always taken the numbers off the element below, so two
+       verbs bind to one function and the detail is never read. It was one
+       `arrangement` event carrying a JSON blob nothing read, then one
+       `helix-before-resize` naming which property settled. */
     const element = sandbox.current
     if (!element) {
       return
@@ -1225,7 +1226,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                written here. */
             lead={narrow ? 'preview' : 'source'}
             onhelix-before-edit={paneEdited}
-            onhelix-before-resize={sandboxChanged}
+            onhelix-before-panel-resize={sandboxChanged}
+            onhelix-before-split={sandboxChanged}
             orientation={narrow ? 'vertical' : 'horizontal'}
             ref={sandbox}
             split={showEditor ? split : 0}

@@ -383,16 +383,21 @@ describe('sandbox dividers', () => {
     /* A consumer stores one arrangement. What the two elements inside said to
        each other on the way there is not their business.
 
-       It names the property that settled rather than the word `arrangement`,
-       which named nothing on this element and carried both numbers as JSON that
-       every consumer of it then ignored in favor of reading the element. */
+       Each divider has its own verb, where this was one `helix-before-resize`
+       naming the property that settled, and that was one `arrangement` carrying
+       both numbers as JSON every consumer ignored in favor of reading the
+       element. `helix-before-resize` is listened for here precisely because the
+       sandbox must never send one: a splitter inside it that got out would land
+       under that name. */
     const sandbox = (await mount(wired)) as Updatable & { split: number }
     const named: string[] = []
-    sandbox.addEventListener('helix-before-resize', (event) => {
-      named.push((event as CustomEvent<{ property: string }>).detail.property)
-    })
+    for (const name of ['helix-before-panel-resize', 'helix-before-resize', 'helix-before-split']) {
+      sandbox.addEventListener(name, (event) => {
+        named.push(event.type)
+      })
+    }
     await press(sandbox, panes(sandbox), 'ArrowRight')
-    expect(named).toEqual(['split'])
+    expect(named).toEqual(['helix-before-split'])
   })
 
   test('an unrelated key is left alone', async () => {
@@ -457,7 +462,7 @@ describe('sandbox source editing', () => {
         new CustomEvent('helix-before-edit', {
           bubbles: true,
           composed: true,
-          detail: { property: 'value', value: 'export function Example() {}' },
+          detail: { value: 'export function Example() {}' },
         }),
       )
       await sandbox.updateComplete

@@ -13,7 +13,6 @@
     <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
   </helix-sandbox>
 
-
   <helix-list
     divided
     id="log"
@@ -57,8 +56,8 @@
   pad.addEventListener('helix-caret', (event) => {
     say('helix-caret', `line ${event.detail.line}, column ${event.detail.column}`)
   })
-  pad.addEventListener('helix-before-resize', (event) => {
-    say('helix-before-resize', `${event.detail.property} settling at ${event.detail.value}`)
+  pad.addEventListener('helix-before-split', (event) => {
+    say('helix-before-split', `the panes settling at ${event.detail.value} percent`)
   })
   pad.addEventListener('helix-resize', (event) => {
     say('helix-resize', `the frame measured itself at ${event.detail.size}`)

@@ -81,22 +81,19 @@ describe('pagination size', () => {
 
   test('the select’s own event does not escape as this one’s', async () => {
     /* `Select`'s `helix-change` bubbles and is composed, so a consumer would
-       have heard two per change, one of them carrying `Select`'s idea of what a
-       name and a value are. */
+       have heard two per change. The count is what catches it: both would now
+       arrive under one name carrying one value, where the escaped one used to be
+       told by `Select`'s idea of what a property is called. */
     const it = (await mount(
       '<helix-headless-pagination-size default-value="10" sizes="10,25"></helix-headless-pagination-size>',
     )) as Size
     const heard: string[] = []
     it.addEventListener('helix-before-change', (event) => {
-      heard.push(
-        `${(event as CustomEvent<{ property: string }>).detail.property}=${
-          (event as CustomEvent<{ value: string }>).detail.value
-        }`,
-      )
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     control(it).dispatchEvent(choose(it, '25'))
     await it.updateComplete
-    expect(heard).toEqual(['value=25'])
+    expect(heard).toEqual(['25'])
   })
 
   test('announces before it moves, so a listener can refuse', async () => {

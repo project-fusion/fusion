@@ -591,7 +591,7 @@ export class HelixHeadlessSplitter extends HelixElement {
         this.positionState = value
         this.requestUpdate('position', previous)
       },
-      event: (value) => new HelixBeforeResizeEvent({ property: 'position', value: String(value) }),
+      event: (value) => new HelixBeforeResizeEvent({ value: String(value) }),
       host: this,
       next: wanted,
     })
@@ -610,7 +610,7 @@ export class HelixHeadlessSplitter extends HelixElement {
           this.collapsedState = value === '' ? 'none' : (value as 'end' | 'start')
           this.requestUpdate('collapsed', previous)
         },
-        event: (value) => new HelixBeforeCollapseEvent({ property: 'collapsed', value }),
+        event: (value) => new HelixBeforeCollapseEvent({ value }),
         host: this,
         next: shut ?? '',
       })

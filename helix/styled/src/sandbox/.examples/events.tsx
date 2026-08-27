@@ -27,8 +27,8 @@ export function Example() {
     say('helix-caret', `line ${event.detail.line}, column ${event.detail.column}`)
   }
 
-  const dragged = (event: CustomEvent<{ property: string; value: string }>) => {
-    say('helix-before-resize', `${event.detail.property} settling at ${event.detail.value}`)
+  const dragged = (event: CustomEvent<{ value: string }>) => {
+    say('helix-before-split', `the panes settling at ${event.detail.value} percent`)
   }
 
   const measured = (event: CustomEvent<{ size: number }>) => {
@@ -43,7 +43,7 @@ export function Example() {
     <helix-flex direction="column" gap="md">
       <helix-sandbox
         onhelix-before-edit={edited}
-        onhelix-before-resize={dragged}
+        onhelix-before-split={dragged}
         onhelix-caret={caret}
         onhelix-console={logged}
         onhelix-resize={measured}

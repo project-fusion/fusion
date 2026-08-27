@@ -233,7 +233,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         this.pinnedState = value
         this.requestUpdate('pinned', previous)
       },
-      event: (value) => new HelixBeforePinEvent({ property: 'pinned', value: String(value) }),
+      event: (value) => new HelixBeforePinEvent({ value: String(value) }),
       host: this,
       next,
     })

@@ -175,7 +175,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
       .map((box) => box.value)
       .join(',')
 
-    if (!this.dispatchEvent(new HelixBeforeChangeEvent({ property: 'value', value: next }))) {
+    if (!this.dispatchEvent(new HelixBeforeChangeEvent({ value: next }))) {
       return
     }
     this.value = next

@@ -322,30 +322,21 @@ export class HelixDismissEvent extends CustomEvent<DismissDetail> {
  * it is the line to hold: **stringify a value, never a fact.** A new control
  * whose state is a boolean wants an event with a typed detail, not a `String()`
  * call here.
+ *
+ * **There is no `property` field, and there was one until 27 Aug 2026.** It named
+ * which property a request was about, which every verb in this file now says by
+ * itself: `helix-before-pin` carried `'pinned'`, `helix-before-collapse` carried
+ * `'collapsed'`, the active mixin carried `'active'`. Two families sharing a verb
+ * are told apart by the element rather than by a field, `composedPath()[0]`
+ * surviving the retarget that `event.target` does not.
+ *
+ * The one element that sent one verb for two facts was the sandbox root, whose
+ * split and whose panel both settled through `helix-before-resize`. They have a
+ * verb each now, `helix-before-split` and `helix-before-panel-resize`, which is
+ * 294's argument one level down: a name says what moved, and a field that repeats
+ * the name is eleven dispatch sites paying for one that needed it. See 306.
  */
 export interface ChangeDetail {
-  /**
-   * The property that changed, named as the element declares it.
-   *
-   * **One provenance, which it did not have.** This was `name`, and it carried
-   * three different things depending on who dispatched: the property for the
-   * splitter's `position`, the form control's name for a checkbox group, a
-   * pane's identity for the sandbox, a literal nobody could derive for
-   * `page-size`, and the empty string from the active mixin, which is no
-   * identification at all. A listener switching on it was switching on a value
-   * with four meanings.
-   *
-   * It answers one question now: *which property*. The other question, *which
-   * element*, is `composedPath()[0]`, which is the one that survives a shadow
-   * boundary where `event.target` is retargeted to the outermost host. Both
-   * sandbox panes report `value` and are told apart by the element, which is
-   * what the old comment here described doing by reference and dismissed.
-   *
-   * A form control's name is on the element too, so a form-level listener reads
-   * it from the element it just identified rather than from a field that might
-   * have been empty.
-   */
-  property: string
   /** The value after the change. */
   value: string
 }
@@ -398,6 +389,47 @@ export class HelixBeforeResizeEvent extends CustomEvent<ChangeDetail> {
 
   constructor(detail: ChangeDetail) {
     super(HelixBeforeResizeEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * The divider between a sandbox's panes is about to move, and can be refused.
+ *
+ * Its own verb rather than a `helix-before-resize` carrying which divider moved:
+ * a sandbox has two, and they were told apart by a field on a detail every other
+ * request in this file also carries. See 306.
+ */
+export class HelixBeforeSplitEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-before-split'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixBeforeSplitEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A sandbox's panel is about to change height, and can be refused.
+ *
+ * The sibling of `helix-before-split`, and named for the divider rather than for
+ * the axis because a reader binding one of the two is choosing which divider they
+ * care about. `value` is pixels here and a percentage there, which is what each
+ * property already publishes.
+ */
+export class HelixBeforePanelResizeEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-before-panel-resize'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixBeforePanelResizeEvent.eventName, {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -924,8 +956,10 @@ const registry = {
   HelixBeforeCollapseEvent,
   HelixBeforeEditEvent,
   HelixBeforeOpenEvent,
+  HelixBeforePanelResizeEvent,
   HelixBeforePinEvent,
   HelixBeforeResizeEvent,
+  HelixBeforeSplitEvent,
   HelixBeforeToggleEvent,
   HelixCaretEvent,
   HelixCompleteEvent,

@@ -240,7 +240,6 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     this.requestUpdate()
     this.dispatchEvent(
       new HelixBeforeChangeEvent({
-        property: 'files',
         value: this.files.map((file) => file.name).join(', '),
       }),
     )

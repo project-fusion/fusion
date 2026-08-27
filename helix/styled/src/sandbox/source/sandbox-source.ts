@@ -125,7 +125,7 @@ export class HelixSandboxSource extends HelixElement {
    * the same fault as the first with its own copy of the code.
    */
   private edit(field: HTMLTextAreaElement, next: string): void {
-    const request = new HelixBeforeEditEvent({ property: 'value', value: next })
+    const request = new HelixBeforeEditEvent({ value: next })
     if (this.dispatchEvent(request)) {
       this.value = next
     }

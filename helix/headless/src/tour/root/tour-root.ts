@@ -204,7 +204,7 @@ export class HelixHeadlessTour extends HelixElement {
       apply: (value) => {
         this.index = value
       },
-      event: (value) => new HelixBeforeActivateEvent({ property: 'index', value: String(value) }),
+      event: (value) => new HelixBeforeActivateEvent({ value: String(value) }),
       host: this,
       next: to,
     })
