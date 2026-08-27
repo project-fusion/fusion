@@ -24341,7 +24341,7 @@ export type CustomElements = {
    * cells reads as a period with nothing in it, which is what it is.
    *
    * **This tier is what a tone name is worth.** `tones="success"` and
-   * `data-tone="danger"` reach the theme's status colours; `tones="1 2 3 4 5"`
+   * `data-tone="danger"` reach the theme's status colors; `tones="1 2 3 4 5"`
    * reaches a five step ramp of one hue, which is the only thing a reader can
    * compare two cells by. Both are hooks, so a page may answer differently.
    *
@@ -24491,6 +24491,13 @@ export type CustomElements = {
    * - `--heatmap-cell-size`: The size a cell wants. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
+   * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
+   * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
+   * - `--heatmap-tone-danger`: What `danger` is worth. (default: `undefined`)
+   * - `--heatmap-tone-info`: What `info` is worth. (default: `undefined`)
+   * - `--heatmap-tone-accent`: What `accent` is worth. (default: `undefined`)
+   * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
+   * - `--heatmap-tone-muted`: What `muted` is worth: the quiet ground, for a bucket that means nothing happened. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-3`: The third step of the magnitude ramp. (default: `undefined`)
@@ -26794,14 +26801,27 @@ export type CustomElements = {
   >;
 
   /**
-   * A three-column grid: media, body, actions. A grid rather than a flex row,
-   * because the media column has to line up down the feed whether or not every
-   * item has one, and a flex row collapses the empty ones so every line of text
-   * starts somewhere different.
+   * A four-column grid: media, body, actions, dismiss.
+   *
+   * **The media column is held open by the feed, not by the item.** Each item is
+   * its own grid, so nothing about one row's tracks reaches the row below it: a
+   * feed where some items had an avatar and some did not drew its text at two
+   * different left edges, which is the fault a grid was chosen to prevent. The
+   * root publishes whether anything in it has media and every item reserves that
+   * much, so a mixed feed reads down one edge and a feed with no media anywhere
+   * pays nothing for the column.
    *
    * **Unread is weight and a mark on the inline start edge, not a fill.** Depth
    * comes from a single border in this library, and a filled row is elevation
    * spelled differently; a feed of filled rows is a striped list nobody can read.
+   * The mark is a fixed height on the first line rather than the height of the
+   * row, so it says the same thing about a one line notification and a five line
+   * one.
+   *
+   * **Narrow, the actions go under the body.** How much room the row was given is
+   * a fact about this box and about nothing else, so it is a container query: a
+   * feed in a 320 pixel side panel is narrow inside a 1400 pixel window, and a
+   * viewport rule would hand it the wide branch.
    *
    * ## Attributes & Properties
    *
@@ -26900,6 +26920,7 @@ export type CustomElements = {
    * - `item`: The whole notification.
    * - `time`: When it happened.
    * - `dismiss`: The control that removes it.
+   * - `dismiss-mark`: The glyph on that control, where none is slotted.
    * - `media`: The leading slot's box.
    * - `body`: Content and timestamp together.
    * - `content`: The consumer's own markup.
@@ -41105,7 +41126,7 @@ export type CustomElementsSolidJs = {
    * cells reads as a period with nothing in it, which is what it is.
    *
    * **This tier is what a tone name is worth.** `tones="success"` and
-   * `data-tone="danger"` reach the theme's status colours; `tones="1 2 3 4 5"`
+   * `data-tone="danger"` reach the theme's status colors; `tones="1 2 3 4 5"`
    * reaches a five step ramp of one hue, which is the only thing a reader can
    * compare two cells by. Both are hooks, so a page may answer differently.
    *
@@ -41255,6 +41276,13 @@ export type CustomElementsSolidJs = {
    * - `--heatmap-cell-size`: The size a cell wants. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
+   * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
+   * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
+   * - `--heatmap-tone-danger`: What `danger` is worth. (default: `undefined`)
+   * - `--heatmap-tone-info`: What `info` is worth. (default: `undefined`)
+   * - `--heatmap-tone-accent`: What `accent` is worth. (default: `undefined`)
+   * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
+   * - `--heatmap-tone-muted`: What `muted` is worth: the quiet ground, for a bucket that means nothing happened. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-3`: The third step of the magnitude ramp. (default: `undefined`)
@@ -43611,14 +43639,27 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * A three-column grid: media, body, actions. A grid rather than a flex row,
-   * because the media column has to line up down the feed whether or not every
-   * item has one, and a flex row collapses the empty ones so every line of text
-   * starts somewhere different.
+   * A four-column grid: media, body, actions, dismiss.
+   *
+   * **The media column is held open by the feed, not by the item.** Each item is
+   * its own grid, so nothing about one row's tracks reaches the row below it: a
+   * feed where some items had an avatar and some did not drew its text at two
+   * different left edges, which is the fault a grid was chosen to prevent. The
+   * root publishes whether anything in it has media and every item reserves that
+   * much, so a mixed feed reads down one edge and a feed with no media anywhere
+   * pays nothing for the column.
    *
    * **Unread is weight and a mark on the inline start edge, not a fill.** Depth
    * comes from a single border in this library, and a filled row is elevation
    * spelled differently; a feed of filled rows is a striped list nobody can read.
+   * The mark is a fixed height on the first line rather than the height of the
+   * row, so it says the same thing about a one line notification and a five line
+   * one.
+   *
+   * **Narrow, the actions go under the body.** How much room the row was given is
+   * a fact about this box and about nothing else, so it is a container query: a
+   * feed in a 320 pixel side panel is narrow inside a 1400 pixel window, and a
+   * viewport rule would hand it the wide branch.
    *
    * ## Attributes & Properties
    *
@@ -43717,6 +43758,7 @@ export type CustomElementsSolidJs = {
    * - `item`: The whole notification.
    * - `time`: When it happened.
    * - `dismiss`: The control that removes it.
+   * - `dismiss-mark`: The glyph on that control, where none is slotted.
    * - `media`: The leading slot's box.
    * - `body`: Content and timestamp together.
    * - `content`: The consumer's own markup.
@@ -52308,6 +52350,20 @@ export type CustomCssProperties = {
   "--heatmap-gap"?: string;
   /** How far a cell's corners are rounded. */
   "--heatmap-cell-radius"?: string;
+  /** What `success` is worth, as a name or a `data-tone`. */
+  "--heatmap-tone-success"?: string;
+  /** What `warning` is worth. */
+  "--heatmap-tone-warning"?: string;
+  /** What `danger` is worth. */
+  "--heatmap-tone-danger"?: string;
+  /** What `info` is worth. */
+  "--heatmap-tone-info"?: string;
+  /** What `accent` is worth. */
+  "--heatmap-tone-accent"?: string;
+  /** What `primary` is worth. */
+  "--heatmap-tone-primary"?: string;
+  /** What `muted` is worth: the quiet ground, for a bucket that means nothing happened. */
+  "--heatmap-tone-muted"?: string;
   /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */
   "--heatmap-tone-1"?: string;
   /** The second step of the magnitude ramp. */

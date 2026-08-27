@@ -1,0 +1,70 @@
+<!-- @summary A move announced before it happens, and one tab that refuses to be moved to. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-tabs
+    default-active="usage"
+    id="strip"
+    label="Account"
+  >
+    <helix-tabs-tab value="usage">Usage</helix-tabs-tab>
+    <helix-tabs-tab value="billing">Billing</helix-tabs-tab>
+    <helix-tabs-tab value="danger">Danger</helix-tabs-tab>
+    <helix-tabs-panel
+      slot="panels"
+      value="usage"
+    >Requests, storage and egress.</helix-tabs-panel>
+    <helix-tabs-panel
+      slot="panels"
+      value="billing"
+    >Invoices and the card on file.</helix-tabs-panel>
+    <helix-tabs-panel
+      slot="panels"
+      value="danger"
+    >Nothing reaches here.</helix-tabs-panel>
+  </helix-tabs>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Move between the tabs</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const strip = document.getElementById('strip')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  strip.addEventListener('helix-before-activate', (event) => {
+    if (event.detail.value === 'danger') {
+      event.preventDefault()
+      say('helix-before-activate', 'refused, so the strip did not move')
+      return
+    }
+    say('helix-before-activate', `moving to "${event.detail.value}"`)
+  })
+</script>

@@ -1,0 +1,52 @@
+<!-- @summary The platform's own media names, relayed out of the shadow root so a page can hear them. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-video
+    id="clip"
+    label="A short clip"
+    poster="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=960"
+    src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
+  ></helix-video>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Press play</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const clip = document.getElementById('clip')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  const at = () => `${Math.round(clip.currentTime)}s of ${Math.round(clip.duration) || 0}s`
+
+  clip.addEventListener('play', () => say('play', at()))
+  clip.addEventListener('pause', () => say('pause', at()))
+  clip.addEventListener('ended', () => say('ended', at()))
+</script>

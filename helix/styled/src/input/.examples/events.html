@@ -1,0 +1,56 @@
+<!-- @summary Every announcement a text field makes, in the order it makes them. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-input
+    id="field"
+    label="Name"
+    placeholder="Type, then click away"
+  ></helix-input>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Type in the field</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const field = document.getElementById('field')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const say = (name, detail) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const carried = document.createElement('span')
+    carried.slot = 'supporting'
+    carried.textContent = detail
+    row.append(carried)
+    log.append(row)
+    // The last few, so a long sentence does not push the field off the preview.
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  field.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  field.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}" so far`)
+  })
+  field.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the reader is done`)
+  })
+</script>

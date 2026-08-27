@@ -270,9 +270,30 @@ for (const tier of TIERS) {
 
 const problems = []
 
+/**
+ * A member of a family something reads through an interpolation.
+ *
+ * **The suffix used to have to be a number, and the family is what was
+ * recorded.** `--chart-series-${n}` was the only case when this was written, and
+ * an index is what a series has, so the two facts were conflated into one test.
+ * Heatmap reads `--heatmap-tone-${tone}` where a tone is a name: `success` and
+ * `danger` for a status strip, `1` through `5` for the ramp, and whatever a
+ * consumer invents for their own. Under the digit test the ramp members passed
+ * and the semantic ones did not, from one interpolation, so the family could be
+ * published only in the half that happened to be numbered and the rest were API
+ * nothing named.
+ *
+ * The collector above already records exactly the right thing, which is the
+ * prefix a component says it reads the whole of. This now trusts it. It is a
+ * real widening: any `--foo-bar-*` counts as read once something interpolates
+ * `var(--foo-bar-${…})`. That is what "reads the whole family" means, and the
+ * two directions this file exists for both survive it, because a name still has
+ * to be declared by a rule somebody wrote and a family prefix still has to be
+ * interpolated by a component somebody wrote.
+ */
 const inFamily = (name) => {
   const at = name.lastIndexOf('-')
-  return at > 0 && /^\d+$/.test(name.slice(at + 1)) && families.has(name.slice(0, at))
+  return at > 0 && families.has(name.slice(0, at))
 }
 
 /* A duplicate pairs with a rule exactly as a single declaration does, so it

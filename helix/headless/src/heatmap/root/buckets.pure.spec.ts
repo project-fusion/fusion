@@ -88,6 +88,32 @@ describe('fits', () => {
     expect(fits(90, 2, 8, 2)).toBe(1)
   })
 
+  /**
+   * What crosses the width is a column, so `rows` multiplies the answer. Counted
+   * as cells, a ten week graph in a 592px box came back with fifty-nine of
+   * seventy readings: eleven days dropped to fit a strip that wanted 156 pixels.
+   */
+  test('a column is what fits, and rows is how many cells are in one', () => {
+    expect(fits(70, 592, 12, 4, 7)).toBe(70)
+    expect(fits(70, 100, 12, 4, 7)).toBe(42)
+  })
+
+  /**
+   * The count is always a whole number of columns, and on a calendar that is
+   * what keeps a weekday on its own row: cut to fifty-nine, a seven row strip
+   * put Monday's readings on four different rows down the graph and nothing in
+   * the picture said so.
+   */
+  test('the count is a whole number of columns, so the tail stays aligned', () => {
+    for (const width of [40, 97, 100, 260, 592]) {
+      expect(fits(70, width, 12, 4, 7) % 7).toBe(0)
+    }
+  })
+
+  test('rows defaults to one, so a strip counts cells', () => {
+    expect(fits(90, 100, 8, 2)).toBe(fits(90, 100, 8, 2, 1))
+  })
+
   test('an unmeasured container shows everything, rather than one cell on first paint', () => {
     expect(fits(90, 0, 8, 2)).toBe(90)
     expect(fits(90, Number.NaN, 8, 2)).toBe(90)

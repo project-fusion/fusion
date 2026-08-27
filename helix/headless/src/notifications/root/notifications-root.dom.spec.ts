@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom, role } from '@helix-io/testing/dom'
 
 /* The feed, after hydration.
  *
@@ -153,11 +153,54 @@ describe('marking everything read', () => {
     expect(part(element, 'header')?.hasAttribute('data-empty')).toBe(true)
   })
 
+  /**
+   * The empty feed is the one state where the header is all there is, and it was
+   * the one state that lost it.
+   *
+   * `markEmpty` reads what is assigned and `assign` is what assigns it, and they
+   * ran in that order. A feed with items is saved by its own `slotchange`, which
+   * schedules a second update that asks again after the first assignment; a feed
+   * with no items schedules nothing, so the answer from before anything was
+   * assigned stood for the life of the element.
+   */
+  test('a feed with a header and no items keeps its header', async () => {
+    const element = await feed(`
+      <helix-headless-notifications label="Activity">
+        <h2 slot="header">Activity</h2>
+      </helix-headless-notifications>`)
+    expect(part(element, 'header')?.hasAttribute('hidden')).toBe(false)
+    expect(part(element, 'empty')).not.toBeNull()
+  })
+
   test('the control is drawn only while something is unread', async () => {
     const element = await feed()
     expect(part(element, 'mark-all')).not.toBeNull()
     element.markEveryoneRead()
     await element.updateComplete
     expect(part(element, 'mark-all')).toBeNull()
+  })
+})
+
+/* Whether anything in the feed has media is the feed's to answer, because no
+   item can: an item knows about its own media slot and nothing about its
+   neighbors, and a row whose text starts further in than the row above it is a
+   fault of the feed rather than of either row. The styled tier turns this into a
+   reserved column; this tier ships no stylesheet and only has to be right. */
+describe('the media column', () => {
+  test('a feed where something has media says so', async () => {
+    const element = await feed(`
+      <helix-headless-notifications label="Activity">
+        <helix-headless-notifications-item>
+          <span slot="media">A</span>
+          One
+        </helix-headless-notifications-item>
+        <helix-headless-notifications-item>Two</helix-headless-notifications-item>
+      </helix-headless-notifications>`)
+    expect(hasState(element, 'media')).toBe(true)
+  })
+
+  test('a feed where nothing does reserves nothing', async () => {
+    const element = await feed()
+    expect(hasState(element, 'media')).toBe(false)
   })
 })

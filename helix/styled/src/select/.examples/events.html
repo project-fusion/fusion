@@ -1,0 +1,59 @@
+<!-- @summary One choice, one announcement, whatever this control renders inside itself. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-select
+    id="choice"
+    label="Plan"
+    name="plan"
+  >
+    <helix-option value="free">Free</helix-option>
+    <helix-option value="team">Team</helix-option>
+    <helix-option value="scale">Scale</helix-option>
+  </helix-select>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Choose a plan</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const choice = document.getElementById('choice')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  choice.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  choice.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}", once and not once per element`)
+  })
+  choice.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the choice is made`)
+  })
+</script>

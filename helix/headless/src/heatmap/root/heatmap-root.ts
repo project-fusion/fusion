@@ -41,7 +41,7 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * **A tone is a name this tier never resolves.** `tone="success"` writes
  * `--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,
  * so what a name is worth is the answering tier's to say: `helix/styled` points
- * the semantic names at the theme's status colours and the numbered ones at a
+ * the semantic names at the theme's status colors and the numbered ones at a
  * ramp, and a consumer on `headless` declares the same names as whatever they
  * like. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the
  * dependency the tiers exist to prevent and which failed loudly rather than
@@ -81,6 +81,13 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @cssproperty --heatmap-gap - Space between cells.
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-tone - The tone of the cell this is set on. Written by the component, read by the sheet that paints.
+ * @cssproperty --heatmap-tone-success - What `success` is worth, as a name or a `data-tone`.
+ * @cssproperty --heatmap-tone-warning - What `warning` is worth.
+ * @cssproperty --heatmap-tone-danger - What `danger` is worth.
+ * @cssproperty --heatmap-tone-info - What `info` is worth.
+ * @cssproperty --heatmap-tone-accent - What `accent` is worth.
+ * @cssproperty --heatmap-tone-primary - What `primary` is worth.
+ * @cssproperty --heatmap-tone-muted - What `muted` is worth: the quiet ground, for a bucket that means nothing happened.
  * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
  * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
  * @cssproperty --heatmap-tone-3 - The third step of the magnitude ramp.

@@ -21281,7 +21281,7 @@ export type CustomElements = {
    * **A tone is a name this tier never resolves.** `tone="success"` writes
    * `--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,
    * so what a name is worth is the answering tier's to say: `helix/styled` points
-   * the semantic names at the theme's status colours and the numbered ones at a
+   * the semantic names at the theme's status colors and the numbered ones at a
    * ramp, and a consumer on `headless` declares the same names as whatever they
    * like. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the
    * dependency the tiers exist to prevent and which failed loudly rather than
@@ -21445,6 +21445,13 @@ export type CustomElements = {
    * - `--heatmap-gap`: Space between cells. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
+   * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
+   * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
+   * - `--heatmap-tone-danger`: What `danger` is worth. (default: `undefined`)
+   * - `--heatmap-tone-info`: What `info` is worth. (default: `undefined`)
+   * - `--heatmap-tone-accent`: What `accent` is worth. (default: `undefined`)
+   * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
+   * - `--heatmap-tone-muted`: What `muted` is worth: the quiet ground, for a bucket that means nothing happened. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-3`: The third step of the magnitude ramp. (default: `undefined`)
@@ -23851,6 +23858,7 @@ export type CustomElements = {
    * - `time`: When it happened, read the way a person reads one.
    * - `actions`: The trailing slot's box.
    * - `dismiss`: The control that removes it.
+   * - `dismiss-mark`: The glyph on that control, where none is slotted.
    */
   "helix-headless-notifications-item": Partial<
     HelixHeadlessNotificationsItemProps &
@@ -37434,7 +37442,7 @@ export type CustomElementsSolidJs = {
    * **A tone is a name this tier never resolves.** `tone="success"` writes
    * `--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,
    * so what a name is worth is the answering tier's to say: `helix/styled` points
-   * the semantic names at the theme's status colours and the numbered ones at a
+   * the semantic names at the theme's status colors and the numbered ones at a
    * ramp, and a consumer on `headless` declares the same names as whatever they
    * like. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the
    * dependency the tiers exist to prevent and which failed loudly rather than
@@ -37598,6 +37606,13 @@ export type CustomElementsSolidJs = {
    * - `--heatmap-gap`: Space between cells. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
+   * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
+   * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
+   * - `--heatmap-tone-danger`: What `danger` is worth. (default: `undefined`)
+   * - `--heatmap-tone-info`: What `info` is worth. (default: `undefined`)
+   * - `--heatmap-tone-accent`: What `accent` is worth. (default: `undefined`)
+   * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
+   * - `--heatmap-tone-muted`: What `muted` is worth: the quiet ground, for a bucket that means nothing happened. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-3`: The third step of the magnitude ramp. (default: `undefined`)
@@ -40051,6 +40066,7 @@ export type CustomElementsSolidJs = {
    * - `time`: When it happened, read the way a person reads one.
    * - `actions`: The trailing slot's box.
    * - `dismiss`: The control that removes it.
+   * - `dismiss-mark`: The glyph on that control, where none is slotted.
    */
   "helix-headless-notifications-item": Partial<
     HelixHeadlessNotificationsItemProps &
@@ -48103,6 +48119,20 @@ export type CustomCssProperties = {
   "--heatmap-cell-radius"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
   "--heatmap-tone"?: string;
+  /** What `success` is worth, as a name or a `data-tone`. */
+  "--heatmap-tone-success"?: string;
+  /** What `warning` is worth. */
+  "--heatmap-tone-warning"?: string;
+  /** What `danger` is worth. */
+  "--heatmap-tone-danger"?: string;
+  /** What `info` is worth. */
+  "--heatmap-tone-info"?: string;
+  /** What `accent` is worth. */
+  "--heatmap-tone-accent"?: string;
+  /** What `primary` is worth. */
+  "--heatmap-tone-primary"?: string;
+  /** What `muted` is worth: the quiet ground, for a bucket that means nothing happened. */
+  "--heatmap-tone-muted"?: string;
   /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */
   "--heatmap-tone-1"?: string;
   /** The second step of the magnitude ramp. */

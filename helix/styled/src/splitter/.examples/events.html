@@ -1,0 +1,70 @@
+<!-- @summary One gesture, two facts, and each says which one it is. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-splitter
+    collapsed-size="8"
+    default-position="50"
+    id="panes"
+  >
+    <helix-card
+      separation="plain"
+      slot="start"
+    >
+      <helix-text>Navigator</helix-text>
+    </helix-card>
+    <helix-card
+      separation="plain"
+      slot="end"
+    >
+      <helix-text>Editor</helix-text>
+    </helix-card>
+  </helix-splitter>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Drag the divider, then drag it to an edge</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const panes = document.getElementById('panes')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  panes.addEventListener('helix-before-resize', (event) => {
+    say('helix-before-resize', `settling at ${event.detail.value} percent`)
+  })
+  panes.addEventListener('helix-before-collapse', (event) => {
+    say('helix-before-collapse', event.detail.value === '' ? 'reopened' : `shut the ${event.detail.value} pane`)
+  })
+</script>

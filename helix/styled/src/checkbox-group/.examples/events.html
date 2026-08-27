@@ -1,0 +1,60 @@
+<!-- @summary The group answers for the set, and one box answering for itself is not the same fact. -->
+<!-- @min 240 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-checkbox-group
+    id="scopes"
+    label="Scopes"
+    name="scopes"
+  >
+    <helix-checkbox value="read">Read</helix-checkbox>
+    <helix-checkbox value="write">Write</helix-checkbox>
+    <helix-checkbox value="admin">Admin</helix-checkbox>
+  </helix-checkbox-group>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Tick a scope</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const scopes = document.getElementById('scopes')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  scopes.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  scopes.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value || 'nothing'}", the group and not the box`)
+  })
+  scopes.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value || 'nothing'}", the whole set`)
+  })
+</script>

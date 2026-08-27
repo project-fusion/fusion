@@ -1,20 +1,34 @@
 import { customElement } from '@helix-io/core'
 import { HelixHeadlessNotificationsItem } from '@helix-io/headless/notifications'
 import type { CSSResultGroup } from 'lit'
+import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './notifications-item.css.js'
 
 /**
  * @summary One thing that happened, which a reader may not have seen yet.
  *
  * @description
- * A three-column grid: media, body, actions. A grid rather than a flex row,
- * because the media column has to line up down the feed whether or not every
- * item has one, and a flex row collapses the empty ones so every line of text
- * starts somewhere different.
+ * A four-column grid: media, body, actions, dismiss.
+ *
+ * **The media column is held open by the feed, not by the item.** Each item is
+ * its own grid, so nothing about one row's tracks reaches the row below it: a
+ * feed where some items had an avatar and some did not drew its text at two
+ * different left edges, which is the fault a grid was chosen to prevent. The
+ * root publishes whether anything in it has media and every item reserves that
+ * much, so a mixed feed reads down one edge and a feed with no media anywhere
+ * pays nothing for the column.
  *
  * **Unread is weight and a mark on the inline start edge, not a fill.** Depth
  * comes from a single border in this library, and a filled row is elevation
  * spelled differently; a feed of filled rows is a striped list nobody can read.
+ * The mark is a fixed height on the first line rather than the height of the
+ * row, so it says the same thing about a one line notification and a five line
+ * one.
+ *
+ * **Narrow, the actions go under the body.** How much room the row was given is
+ * a fact about this box and about nothing else, so it is a container query: a
+ * feed in a 320 pixel side panel is narrow inside a 1400 pixel window, and a
+ * viewport rule would hand it the wide branch.
  *
  * @since 0.1.0
  * @status experimental
@@ -28,6 +42,7 @@ import { styles } from './notifications-item.css.js'
  * @csspart item - The whole notification.
  * @csspart time - When it happened.
  * @csspart dismiss - The control that removes it.
+ * @csspart dismiss-mark - The glyph on that control, where none is slotted.
  *
  * @cssproperty --notifications-rule - The hairline between items.
  * @cssproperty --notifications-color - Ink in an item that has been read.
@@ -39,7 +54,7 @@ import { styles } from './notifications-item.css.js'
 export class HelixNotificationsItem extends HelixHeadlessNotificationsItem {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [glyphStyles, styles]
 }
 
 declare global {

@@ -42,10 +42,10 @@
   display: grid;
   grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr) auto auto;
   padding-block: var(--notifications-padding-block, var(--helix-space-sm));
+  padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
   /* The containing block for the unread mark, which is placed against the row
      rather than flowing in it. */
   position: relative;
-  padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
 }
 
 /* Unread is a state a reader scans for, so it is weight and a mark rather than
@@ -105,8 +105,6 @@
   line-height: var(--_notifications-line);
 }
 
-/* The timestamp is the quietest thing in the row and is never the reason
-   somebody looked, so it takes the smallest size and the subtlest ink. */
 /* After the base rule rather than before it, which is not a preference: a
    selector of (0, 3, 0) written above one of (0, 1, 0) that it overrides is a
    rule whose specificity says it wins and whose order says nothing, and
@@ -117,10 +115,13 @@
   font-weight: var(--helix-weight-medium);
 }
 
-/* **`foreground-subtle` is lighter than `foreground-muted`, and this had them
+/* The timestamp is the quietest thing in the row and is never the reason
+   somebody looked, so it takes the smallest size and the subtlest ink.
+
+   **`foreground-subtle` is lighter than `foreground-muted`, and this had them
    the wrong way round.** The two are 0.53 and 0.50 in oklch, so the timestamp,
-   the thing this file calls the quietest in the row, was drawn darker than the
-   content it belongs to: on a read item the ink went `subtle` for the content
+   the thing the line above calls the quietest in the row, was drawn darker than
+   the content it belongs to: on a read item the ink went `subtle` for the content
    and `muted` for the time, and a row whose least important element is its
    darkest has no hierarchy left to read. Three pounds now, and they descend:
    `foreground` for unread content, `foreground-muted` for read content,
@@ -155,8 +156,12 @@
    It measured 15 by 22, which is under any target anybody recommends and under
    half the area of the button sitting next to it; the mark inside it is centered
    rather than laid out, so a consumer replacing it with an icon gets the same
-   box. The negative start margin is what centers that box on the first line,
-   the trailing boxes being one line tall by the rule above. */
+   box. The negative block-start margin is what centers that box on the first
+   line, the trailing boxes being one line tall by the rule above.
+
+   No `font-size` and no `line-height`, which is what a text glyph needed. The
+   mark is an `<svg>` now and takes the icon step from `glyph.css`, which the
+   root has already set to `sm` along with the rest of the row's density. */
 [part="dismiss"] {
   background: none;
   border: 0;
@@ -165,14 +170,20 @@
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: grid;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-md);
   inline-size: var(--helix-size-control);
-  line-height: 1;
   margin-block-start: calc((var(--_notifications-line) - var(--helix-size-control)) / 2);
   margin-inline-start: var(--helix-space-2xs);
   padding: var(--helix-space-none);
   place-items: center;
+}
+
+/* A mark a consumer slots and the one drawn here come out the same size, on the
+   same expression. `::slotted()` never matches fallback content, so the two
+   paths have to be written separately or the component's own glyph is the only
+   one anything sizes. */
+[part="dismiss"] ::slotted(*) {
+  block-size: var(--icon-size, var(--helix-size-icon));
+  inline-size: var(--icon-size, var(--helix-size-icon));
 }
 
 [part="dismiss"]:hover {
@@ -213,7 +224,7 @@
     block-size: auto;
     grid-column: 2 / -1;
     grid-row: 2;
-    margin-block-start: var(--helix-space-xs);
+    margin-block-start: var(--helix-space-2xs);
     margin-inline-start: var(--helix-space-none);
   }
 }

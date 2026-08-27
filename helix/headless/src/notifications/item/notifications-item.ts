@@ -7,8 +7,10 @@ import {
   relativeTime,
   requestChange,
 } from '@helix-io/core'
+import { x } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { subscribe } from './ticker.js'
 
 /**
@@ -51,6 +53,7 @@ import { subscribe } from './ticker.js'
  * @csspart time - When it happened, read the way a person reads one.
  * @csspart actions - The trailing slot's box.
  * @csspart dismiss - The control that removes it.
+ * @csspart dismiss-mark - The glyph on that control, where none is slotted.
  *
  * @event {HelixReadEvent} helix-read - Fired when the item is marked read or unread, and cancelable.
  * @event {HelixDismissEvent} helix-dismiss - Fired when a reader asks to remove it, and cancelable.
@@ -239,6 +242,16 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
    * written inline the only way to change it is to reimplement the whole
    * template. `check:fallbacks` holds that, and moving only the fallback out was
    * not enough, which is the right rule: the slot is the thing a tier redraws.
+   *
+   * **The mark is drawn rather than typed, which is what lets it align.** It was
+   * `&times;`, and a character is placed by its font rather than by its box:
+   * measured against the ghost button beside it at 8x, the cross carried 6
+   * pixels of ink to the label's 9.5 and sat 1.5 pixels below its center, in two
+   * boxes whose own centers agreed to a tenth of a pixel. No stylesheet can
+   * correct that, because the offset is inside the glyph. An `<svg>` is centered
+   * on its own viewBox, so it lands where the box says and takes the icon step
+   * the row is already set in. It is the `x` the Tag's dismiss draws, so two
+   * controls that mean "take this away" are one mark.
    */
   protected renderDismiss(): TemplateResult | typeof nothing {
     if (!this.dismissible) {
@@ -250,7 +263,17 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
       aria-label=${this.dismissLabel}
       @click=${this.handleDismiss}
     >
-      <slot name="dismiss"><span aria-hidden="true">&times;</span></slot>
+      <slot name="dismiss">
+        <svg
+          aria-hidden="true"
+          data-glyph
+          fill="currentColor"
+          part="dismiss-mark"
+          viewBox=${x.viewBox}
+        >
+          ${unsafeSVG(x.content)}
+        </svg>
+      </slot>
     </button>`
   }
 

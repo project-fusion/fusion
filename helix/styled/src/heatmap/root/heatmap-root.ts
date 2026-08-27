@@ -17,7 +17,7 @@ import { styles } from './heatmap-root.css.js'
  * cells reads as a period with nothing in it, which is what it is.
  *
  * **This tier is what a tone name is worth.** `tones="success"` and
- * `data-tone="danger"` reach the theme's status colours; `tones="1 2 3 4 5"`
+ * `data-tone="danger"` reach the theme's status colors; `tones="1 2 3 4 5"`
  * reaches a five step ramp of one hue, which is the only thing a reader can
  * compare two cells by. Both are hooks, so a page may answer differently.
  *
@@ -38,6 +38,13 @@ import { styles } from './heatmap-root.css.js'
  * @cssproperty --heatmap-cell-size - The size a cell wants. The strip fits as many as the container allows.
  * @cssproperty --heatmap-gap - Space between cells.
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
+ * @cssproperty --heatmap-tone-success - What `success` is worth, as a name or a `data-tone`.
+ * @cssproperty --heatmap-tone-warning - What `warning` is worth.
+ * @cssproperty --heatmap-tone-danger - What `danger` is worth.
+ * @cssproperty --heatmap-tone-info - What `info` is worth.
+ * @cssproperty --heatmap-tone-accent - What `accent` is worth.
+ * @cssproperty --heatmap-tone-primary - What `primary` is worth.
+ * @cssproperty --heatmap-tone-muted - What `muted` is worth: the quiet ground, for a bucket that means nothing happened.
  * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
  * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
  * @cssproperty --heatmap-tone-3 - The third step of the magnitude ramp.

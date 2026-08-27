@@ -1,0 +1,79 @@
+<!-- @summary The first close is refused and the second is not, which is what cancelable means. -->
+<!-- @min 420 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-button
+    command="--show"
+    commandfor="unsaved"
+    emphasis="solid"
+    tone="primary"
+  >Open</helix-button>
+
+  <helix-dialog
+    id="unsaved"
+    label="Unsaved work"
+  >
+    <helix-text>There are changes that have not been written yet.</helix-text>
+    <helix-button
+      command="--close"
+      commandfor="unsaved"
+      slot="footer"
+    >Close</helix-button>
+  </helix-dialog>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Open it, then try to close it twice</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const unsaved = document.getElementById('unsaved')
+  const log = document.getElementById('log')
+  let empty = true
+  let refused = false
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  unsaved.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'about to open, refusable')
+  })
+  unsaved.addEventListener('helix-before-close', (event) => {
+    if (refused) {
+      say('helix-before-close', 'let through this time')
+      return
+    }
+    refused = true
+    event.preventDefault()
+    say('helix-before-close', 'refused, so nothing moved')
+  })
+  unsaved.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+  })
+  unsaved.addEventListener('close', () => {
+    say('close', 'the platform name, once it is shut')
+  })
+</script>

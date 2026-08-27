@@ -12966,6 +12966,11 @@
                 "slug": "disabled"
               },
               {
+                "description": "The group answers for the set, and one box answering for itself is not the same fact.",
+                "min": 240,
+                "slug": "events"
+              },
+              {
                 "description": "The members in a row rather than a column.",
                 "slug": "horizontal"
               },
@@ -28301,6 +28306,11 @@
                 "slug": "centered"
               },
               {
+                "description": "The first close is refused and the second is not, which is what cancelable means.",
+                "min": 420,
+                "slug": "events"
+              },
+              {
                 "description": "Filling the viewport, for something that needs the whole screen.",
                 "slug": "full"
               },
@@ -34145,7 +34155,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "One grid, filled down the column and then across, which is what a calendar\nheatmap is: a week is a column, so the strip reads left to right in weeks and\ntop to bottom in days. `rows=\"1\"` makes it a single row without a second\nlayout.\n\nAn empty cell takes the quietest ground the palette has rather than being\ntransparent. A strip of holes reads as a broken picture; a strip of empty\ncells reads as a period with nothing in it, which is what it is.\n\n**This tier is what a tone name is worth.** `tones=\"success\"` and\n`data-tone=\"danger\"` reach the theme's status colours; `tones=\"1 2 3 4 5\"`\nreaches a five step ramp of one hue, which is the only thing a reader can\ncompare two cells by. Both are hooks, so a page may answer differently.",
+          "description": "One grid, filled down the column and then across, which is what a calendar\nheatmap is: a week is a column, so the strip reads left to right in weeks and\ntop to bottom in days. `rows=\"1\"` makes it a single row without a second\nlayout.\n\nAn empty cell takes the quietest ground the palette has rather than being\ntransparent. A strip of holes reads as a broken picture; a strip of empty\ncells reads as a period with nothing in it, which is what it is.\n\n**This tier is what a tone name is worth.** `tones=\"success\"` and\n`data-tone=\"danger\"` reach the theme's status colors; `tones=\"1 2 3 4 5\"`\nreaches a five step ramp of one hue, which is the only thing a reader can\ncompare two cells by. Both are hooks, so a page may answer differently.",
           "name": "HelixHeatmap",
           "cssProperties": [
             {
@@ -34167,6 +34177,62 @@
             {
               "description": "How far a cell's corners are rounded.",
               "name": "--heatmap-cell-radius",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "What `success` is worth, as a name or a `data-tone`.",
+              "name": "--heatmap-tone-success",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "What `warning` is worth.",
+              "name": "--heatmap-tone-warning",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "What `danger` is worth.",
+              "name": "--heatmap-tone-danger",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "What `info` is worth.",
+              "name": "--heatmap-tone-info",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "What `accent` is worth.",
+              "name": "--heatmap-tone-accent",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "What `primary` is worth.",
+              "name": "--heatmap-tone-primary",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "What `muted` is worth: the quiet ground, for a bucket that means nothing happened.",
+              "name": "--heatmap-tone-muted",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
                 "module": "src/heatmap/root/heatmap-root.ts"
@@ -34846,7 +34912,7 @@
             "part": "Root",
             "examples": [
               {
-                "description": "Ninety days of uptime, each cell coloured by how that day went.",
+                "description": "Thirty days of uptime, each cell coloured by how that day went.",
                 "slug": "preview"
               },
               {
@@ -39051,6 +39117,10 @@
               {
                 "description": "Disabled, filled and empty, since the two read differently.",
                 "slug": "disabled"
+              },
+              {
+                "description": "Every announcement a text field makes, in the order it makes them.",
+                "slug": "events"
               },
               {
                 "description": "A field reporting what is wrong with what is in it.",
@@ -48685,7 +48755,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A three-column grid: media, body, actions. A grid rather than a flex row,\nbecause the media column has to line up down the feed whether or not every\nitem has one, and a flex row collapses the empty ones so every line of text\nstarts somewhere different.\n\n**Unread is weight and a mark on the inline start edge, not a fill.** Depth\ncomes from a single border in this library, and a filled row is elevation\nspelled differently; a feed of filled rows is a striped list nobody can read.",
+          "description": "A four-column grid: media, body, actions, dismiss.\n\n**The media column is held open by the feed, not by the item.** Each item is\nits own grid, so nothing about one row's tracks reaches the row below it: a\nfeed where some items had an avatar and some did not drew its text at two\ndifferent left edges, which is the fault a grid was chosen to prevent. The\nroot publishes whether anything in it has media and every item reserves that\nmuch, so a mixed feed reads down one edge and a feed with no media anywhere\npays nothing for the column.\n\n**Unread is weight and a mark on the inline start edge, not a fill.** Depth\ncomes from a single border in this library, and a filled row is elevation\nspelled differently; a feed of filled rows is a striped list nobody can read.\nThe mark is a fixed height on the first line rather than the height of the\nrow, so it says the same thing about a one line notification and a five line\none.\n\n**Narrow, the actions go under the body.** How much room the row was given is\na fact about this box and about nothing else, so it is a container query: a\nfeed in a 320 pixel side panel is narrow inside a 1400 pixel window, and a\nviewport rule would hand it the wide branch.",
           "name": "HelixNotificationsItem",
           "cssProperties": [
             {
@@ -48729,6 +48799,14 @@
             {
               "description": "The control that removes it.",
               "name": "dismiss",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNotificationsItem",
+                "module": "src/notifications/item/notifications-item.ts"
+              }
+            },
+            {
+              "description": "The glyph on that control, where none is slotted.",
+              "name": "dismiss-mark",
               "inheritedFrom": {
                 "name": "HelixHeadlessNotificationsItem",
                 "module": "src/notifications/item/notifications-item.ts"
@@ -49006,7 +49084,7 @@
                   "text": "TemplateResult | typeof nothing"
                 }
               },
-              "description": "The control that removes the item, with the mark a consumer can replace.\n\n**A method rather than markup inside `render`, and the slot moves with\nit.** A fallback answers a consumer and a seam answers the tier above, which\nare different people: the styled tier wants an icon here, and with the slot\nwritten inline the only way to change it is to reimplement the whole\ntemplate. `check:fallbacks` holds that, and moving only the fallback out was\nnot enough, which is the right rule: the slot is the thing a tier redraws.",
+              "description": "The control that removes the item, with the mark a consumer can replace.\n\n**A method rather than markup inside `render`, and the slot moves with\nit.** A fallback answers a consumer and a seam answers the tier above, which\nare different people: the styled tier wants an icon here, and with the slot\nwritten inline the only way to change it is to reimplement the whole\ntemplate. `check:fallbacks` holds that, and moving only the fallback out was\nnot enough, which is the right rule: the slot is the thing a tier redraws.\n\n**The mark is drawn rather than typed, which is what lets it align.** It was\n`&times;`, and a character is placed by its font rather than by its box:\nmeasured against the ghost button beside it at 8x, the cross carried 6\npixels of ink to the label's 9.5 and sat 1.5 pixels below its center, in two\nboxes whose own centers agreed to a tenth of a pixel. No stylesheet can\ncorrect that, because the offset is inside the glyph. An `<svg>` is centered\non its own viewBox, so it lands where the box says and takes the icon step\nthe row is already set in. It is the `x` the Tag's dismiss draws, so two\ncontrols that mean \"take this away\" are one mark.",
               "inheritedFrom": {
                 "name": "HelixHeadlessNotificationsItem",
                 "module": "src/notifications/item/notifications-item.ts"
@@ -66338,6 +66416,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "One choice, one announcement, whatever this control renders inside itself.",
+                "slug": "events"
+              },
+              {
                 "description": "A search box in the list, for a set too long to scan.",
                 "slug": "filterable"
               },
@@ -71797,6 +71879,10 @@
               {
                 "description": "A divider the page owns, answering the event and assigning `position` and `collapsed`.",
                 "slug": "controlled"
+              },
+              {
+                "description": "One gesture, two facts, and each says which one it is.",
+                "slug": "events"
               },
               {
                 "description": "A divider with a visible grip rather than a bare rule.",
@@ -77265,6 +77351,10 @@
               {
                 "description": "A strip the page owns, answering the event and assigning `active`.",
                 "slug": "controlled"
+              },
+              {
+                "description": "A move announced before it happens, and one tab that refuses to be moved to.",
+                "slug": "events"
               },
               {
                 "description": "Arrow keys move between tabs without opening them, so a reader can look before choosing.",
@@ -95975,6 +96065,10 @@
               {
                 "description": "A clip with subtitle tracks and the control that chooses between them.",
                 "slug": "captions"
+              },
+              {
+                "description": "The platform's own media names, relayed out of the shadow root so a page can hear them.",
+                "slug": "events"
               },
               {
                 "description": "Skip, speed and download added to the bar.",

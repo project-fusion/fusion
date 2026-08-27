@@ -9687,6 +9687,20 @@ export type CustomCssProperties = {
   "--heatmap-gap"?: string;
   /** How far a cell's corners are rounded. */
   "--heatmap-cell-radius"?: string;
+  /** What `success` is worth, as a name or a `data-tone`. */
+  "--heatmap-tone-success"?: string;
+  /** What `warning` is worth. */
+  "--heatmap-tone-warning"?: string;
+  /** What `danger` is worth. */
+  "--heatmap-tone-danger"?: string;
+  /** What `info` is worth. */
+  "--heatmap-tone-info"?: string;
+  /** What `accent` is worth. */
+  "--heatmap-tone-accent"?: string;
+  /** What `primary` is worth. */
+  "--heatmap-tone-primary"?: string;
+  /** What `muted` is worth: the quiet ground, for a bucket that means nothing happened. */
+  "--heatmap-tone-muted"?: string;
   /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */
   "--heatmap-tone-1"?: string;
   /** The second step of the magnitude ramp. */
@@ -10475,7 +10489,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixGridVueProps,
     HelixGridVueEvents
   >;
-  /** One grid, filled down the column and then across, which is what a calendar heatmap is: a week is a column, so the strip reads left to right in weeks and top to bottom in days. 'rows="1"' makes it a single row without a second layout.  An empty cell takes the quietest ground the palette has rather than being transparent. A strip of holes reads as a broken picture; a strip of empty cells reads as a period with nothing in it, which is what it is.  **This tier is what a tone name is worth.** 'tones="success"' and 'data-tone="danger"' reach the theme's status colours; 'tones="1 2 3 4 5"' reaches a five step ramp of one hue, which is the only thing a reader can compare two cells by. Both are hooks, so a page may answer differently. */
+  /** One grid, filled down the column and then across, which is what a calendar heatmap is: a week is a column, so the strip reads left to right in weeks and top to bottom in days. 'rows="1"' makes it a single row without a second layout.  An empty cell takes the quietest ground the palette has rather than being transparent. A strip of holes reads as a broken picture; a strip of empty cells reads as a period with nothing in it, which is what it is.  **This tier is what a tone name is worth.** 'tones="success"' and 'data-tone="danger"' reach the theme's status colors; 'tones="1 2 3 4 5"' reaches a five step ramp of one hue, which is the only thing a reader can compare two cells by. Both are hooks, so a page may answer differently. */
   "helix-heatmap": DefineCustomElement<
     HelixHeatmap,
     HelixHeatmapVueProps,
@@ -10577,7 +10591,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixNavigationVueProps,
     HelixNavigationVueEvents
   >;
-  /** A three-column grid: media, body, actions. A grid rather than a flex row, because the media column has to line up down the feed whether or not every item has one, and a flex row collapses the empty ones so every line of text starts somewhere different.  **Unread is weight and a mark on the inline start edge, not a fill.** Depth comes from a single border in this library, and a filled row is elevation spelled differently; a feed of filled rows is a striped list nobody can read. */
+  /** A four-column grid: media, body, actions, dismiss.  **The media column is held open by the feed, not by the item.** Each item is its own grid, so nothing about one row's tracks reaches the row below it: a feed where some items had an avatar and some did not drew its text at two different left edges, which is the fault a grid was chosen to prevent. The root publishes whether anything in it has media and every item reserves that much, so a mixed feed reads down one edge and a feed with no media anywhere pays nothing for the column.  **Unread is weight and a mark on the inline start edge, not a fill.** Depth comes from a single border in this library, and a filled row is elevation spelled differently; a feed of filled rows is a striped list nobody can read. The mark is a fixed height on the first line rather than the height of the row, so it says the same thing about a one line notification and a five line one.  **Narrow, the actions go under the body.** How much room the row was given is a fact about this box and about nothing else, so it is a container query: a feed in a 320 pixel side panel is narrow inside a 1400 pixel window, and a viewport rule would hand it the wide branch. */
   "helix-notifications-item": DefineCustomElement<
     HelixNotificationsItem,
     HelixNotificationsItemVueProps,

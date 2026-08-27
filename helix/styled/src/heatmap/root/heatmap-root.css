@@ -3,7 +3,14 @@
    and top to bottom in days. `grid-auto-flow: column` is the whole of that, and
    `rows="1"` makes it a single row without a second layout. */
 :host {
-  display: block;
+  /* **A grid of one column, so the footer is as wide as the strip and not as
+     wide as the box.** The labels annotate the picture: "Jun" under the first
+     week and "Aug" under the last is the whole of what they say, and a block
+     host stretched the footer to its own width, so a ten week graph 156 pixels
+     across carried an "Aug" floating 400 pixels past its last cell. The track is
+     the strip's max-content, and both children take it. */
+  display: grid;
+  grid-template-columns: minmax(0, max-content);
 
   /* Read by the three rules that draw a cell: the track it sits in, the row it
      sits on, and the box itself. One name so a consumer moving the hook moves
@@ -16,7 +23,7 @@
      tier knows which bucket a reading fell in and has no tokens to spend on it.
      Answering here is what lets a headless consumer answer differently.
 
-     The semantic names are the theme's status colours, so a strip that already
+     The semantic names are the theme's status colors, so a strip that already
      knows a day was degraded gets the same red as everything else that means
      degraded, and a page that restyles danger restyles this with it. */
   --heatmap-tone-accent: var(--helix-color-accent);
@@ -29,19 +36,42 @@
 
   /* **The numbered ones are a ramp, and a ramp is one hue getting louder.**
      A reader compares two cells by weight and cannot compare two hues at all,
-     so magnitude has to be a single colour walked toward the ground it sits on.
+     so magnitude has to be a single color walked toward the ground it sits on.
      Mixed rather than picked off the scale because the steps have to be even:
      the nearest four semantic tokens are `primary-subtle`, `primary`,
      `primary-hover` and `primary-active`, which is the 50 then 500, 600, 700 of
      the ramp, one chasm and three hairs.
 
+     **`primary-active` is the far end rather than `primary`, because a ramp is
+     only as legible as the distance it spans.** Walked to the mid weight, the
+     top three steps came out within a few percent of each other and a busy week
+     was indistinguishable from a quiet one; the active weight is the 700 in
+     light and the 200 in dark, so the run is light-gray-to-deep in one mode and
+     near-black-to-bright in the other, and five steps have room to be five.
+
      Both ends resolve through `light-dark()`, so the mix inverts with the page
      and the ramp runs quiet-to-loud in either mode without a second declaration. */
-  --heatmap-tone-1: color-mix(in oklab, var(--helix-color-primary) 22%, var(--helix-color-surface-sunken));
-  --heatmap-tone-2: color-mix(in oklab, var(--helix-color-primary) 44%, var(--helix-color-surface-sunken));
-  --heatmap-tone-3: color-mix(in oklab, var(--helix-color-primary) 66%, var(--helix-color-surface-sunken));
-  --heatmap-tone-4: color-mix(in oklab, var(--helix-color-primary) 88%, var(--helix-color-surface-sunken));
-  --heatmap-tone-5: var(--helix-color-primary);
+  --heatmap-tone-1: color-mix(
+    in oklab,
+    var(--helix-color-primary-active) 20%,
+    var(--helix-color-surface-sunken)
+  );
+  --heatmap-tone-2: color-mix(
+    in oklab,
+    var(--helix-color-primary-active) 40%,
+    var(--helix-color-surface-sunken)
+  );
+  --heatmap-tone-3: color-mix(
+    in oklab,
+    var(--helix-color-primary-active) 60%,
+    var(--helix-color-surface-sunken)
+  );
+  --heatmap-tone-4: color-mix(
+    in oklab,
+    var(--helix-color-primary-active) 80%,
+    var(--helix-color-surface-sunken)
+  );
+  --heatmap-tone-5: var(--helix-color-primary-active);
 }
 
 /* **`grid-auto-columns`, or the weeks splay.** Implicit tracks are `auto`, and

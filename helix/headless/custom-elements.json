@@ -26077,7 +26077,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**One family covers both readings, and the split people expect does not\nexist.** It was filed as two on the argument that a contribution graph needs a\ncontinuous ramp where uptime needs a category. GitHub's contribution graph is\nfive discrete levels rather than a gradient, so a cell that takes a tone\ncovers both: `rows=\"1\"` is a status strip, `rows=\"7\"` is a contribution graph,\nand heatmap is the name of that.\n\n**What it cannot be is a bar chart with flat values**, and the data model is\nwhat closes that rather than taste: chart color is per *series* everywhere\nelse here, `--chart-series-1` through `-15`, so ninety differently coloured\ncells would be ninety series.\n\nThe data is a real `<table>` named by `for`, the same convention every chart\nin this library uses, which also answers the accessibility question without\ninventing anything: **the table is the accessible representation**, it is\nalready in the markup, and the drawing is a picture of it. Hide it with\n`data-hidden-visually` and the reading is still there for anyone who needs it.\n\nA cell takes its tone from its own `data-tone`, or from `thresholds` and\n`tones` bucketing its value. The first is what a status page wants and the\nsecond is what a contribution graph wants; the cell's own wins, so a page that\nalready knows a day was degraded does not have to encode that as a number for\nthis component to decode again.\n\n**A tone is a name this tier never resolves.** `tone=\"success\"` writes\n`--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,\nso what a name is worth is the answering tier's to say: `helix/styled` points\nthe semantic names at the theme's status colours and the numbered ones at a\nramp, and a consumer on `headless` declares the same names as whatever they\nlike. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the\ndependency the tiers exist to prevent and which failed loudly rather than\nquietly: off-tier that property is not undefined, it is *invalid*, so\n`background-color: var(--heatmap-tone, …)` declined its own fallback and every\ncell came out transparent. The headless baseline was a blank page under a row\nof footer text. `shared/chart/series.css` records Bar Chart having had the\nsame fault for the same reason.\n\n**On a narrow container it draws fewer cells rather than thinner ones.**\nNinety cells in 320 pixels is three and a half pixels each, which is a smear\nand not a strip. The cells it drops are the oldest, and it reflects `visible`\nand fires `helix-resize` when the number changes, because **a summary saying\n\"99.2% over 90 days\" above a strip drawing 45 of them is telling the reader\nsomething false about the picture in front of them** and nothing about the\npicture says so.",
+          "description": "**One family covers both readings, and the split people expect does not\nexist.** It was filed as two on the argument that a contribution graph needs a\ncontinuous ramp where uptime needs a category. GitHub's contribution graph is\nfive discrete levels rather than a gradient, so a cell that takes a tone\ncovers both: `rows=\"1\"` is a status strip, `rows=\"7\"` is a contribution graph,\nand heatmap is the name of that.\n\n**What it cannot be is a bar chart with flat values**, and the data model is\nwhat closes that rather than taste: chart color is per *series* everywhere\nelse here, `--chart-series-1` through `-15`, so ninety differently coloured\ncells would be ninety series.\n\nThe data is a real `<table>` named by `for`, the same convention every chart\nin this library uses, which also answers the accessibility question without\ninventing anything: **the table is the accessible representation**, it is\nalready in the markup, and the drawing is a picture of it. Hide it with\n`data-hidden-visually` and the reading is still there for anyone who needs it.\n\nA cell takes its tone from its own `data-tone`, or from `thresholds` and\n`tones` bucketing its value. The first is what a status page wants and the\nsecond is what a contribution graph wants; the cell's own wins, so a page that\nalready knows a day was degraded does not have to encode that as a number for\nthis component to decode again.\n\n**A tone is a name this tier never resolves.** `tone=\"success\"` writes\n`--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,\nso what a name is worth is the answering tier's to say: `helix/styled` points\nthe semantic names at the theme's status colors and the numbered ones at a\nramp, and a consumer on `headless` declares the same names as whatever they\nlike. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the\ndependency the tiers exist to prevent and which failed loudly rather than\nquietly: off-tier that property is not undefined, it is *invalid*, so\n`background-color: var(--heatmap-tone, …)` declined its own fallback and every\ncell came out transparent. The headless baseline was a blank page under a row\nof footer text. `shared/chart/series.css` records Bar Chart having had the\nsame fault for the same reason.\n\n**On a narrow container it draws fewer cells rather than thinner ones.**\nNinety cells in 320 pixels is three and a half pixels each, which is a smear\nand not a strip. The cells it drops are the oldest, and it reflects `visible`\nand fires `helix-resize` when the number changes, because **a summary saying\n\"99.2% over 90 days\" above a strip drawing 45 of them is telling the reader\nsomething false about the picture in front of them** and nothing about the\npicture says so.",
           "name": "HelixHeadlessHeatmap",
           "cssProperties": [
             {
@@ -26095,6 +26095,34 @@
             {
               "description": "The tone of the cell this is set on. Written by the component, read by the sheet that paints.",
               "name": "--heatmap-tone"
+            },
+            {
+              "description": "What `success` is worth, as a name or a `data-tone`.",
+              "name": "--heatmap-tone-success"
+            },
+            {
+              "description": "What `warning` is worth.",
+              "name": "--heatmap-tone-warning"
+            },
+            {
+              "description": "What `danger` is worth.",
+              "name": "--heatmap-tone-danger"
+            },
+            {
+              "description": "What `info` is worth.",
+              "name": "--heatmap-tone-info"
+            },
+            {
+              "description": "What `accent` is worth.",
+              "name": "--heatmap-tone-accent"
+            },
+            {
+              "description": "What `primary` is worth.",
+              "name": "--heatmap-tone-primary"
+            },
+            {
+              "description": "What `muted` is worth: the quiet ground, for a bucket that means nothing happened.",
+              "name": "--heatmap-tone-muted"
             },
             {
               "description": "The quietest step of the magnitude ramp, reached by `tones=\"1 …\"`.",
@@ -26738,7 +26766,7 @@
             "part": "Root",
             "examples": [
               {
-                "description": "Ninety days of uptime, each cell coloured by how that day went.",
+                "description": "Thirty days of uptime, each cell coloured by how that day went.",
                 "layout": "padded",
                 "slug": "preview"
               }
@@ -37635,6 +37663,10 @@
             {
               "description": "The control that removes it.",
               "name": "dismiss"
+            },
+            {
+              "description": "The glyph on that control, where none is slotted.",
+              "name": "dismiss-mark"
             }
           ],
           "slots": [
@@ -37798,7 +37830,7 @@
                   "text": "TemplateResult | typeof nothing"
                 }
               },
-              "description": "The control that removes the item, with the mark a consumer can replace.\n\n**A method rather than markup inside `render`, and the slot moves with\nit.** A fallback answers a consumer and a seam answers the tier above, which\nare different people: the styled tier wants an icon here, and with the slot\nwritten inline the only way to change it is to reimplement the whole\ntemplate. `check:fallbacks` holds that, and moving only the fallback out was\nnot enough, which is the right rule: the slot is the thing a tier redraws."
+              "description": "The control that removes the item, with the mark a consumer can replace.\n\n**A method rather than markup inside `render`, and the slot moves with\nit.** A fallback answers a consumer and a seam answers the tier above, which\nare different people: the styled tier wants an icon here, and with the slot\nwritten inline the only way to change it is to reimplement the whole\ntemplate. `check:fallbacks` holds that, and moving only the fallback out was\nnot enough, which is the right rule: the slot is the thing a tier redraws.\n\n**The mark is drawn rather than typed, which is what lets it align.** It was\n`&times;`, and a character is placed by its font rather than by its box:\nmeasured against the ghost button beside it at 8x, the cross carried 6\npixels of ink to the label's 9.5 and sat 1.5 pixels below its center, in two\nboxes whose own centers agreed to a tenth of a pixel. No stylesheet can\ncorrect that, because the offset is inside the glyph. An `<svg>` is centered\non its own viewBox, so it lands where the box says and takes the icon step\nthe row is already set in. It is the `x` the Tag's dismiss draws, so two\ncontrols that mean \"take this away\" are one mark."
             },
             {
               "kind": "field",
