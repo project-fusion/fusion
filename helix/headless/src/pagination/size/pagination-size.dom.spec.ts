@@ -20,7 +20,7 @@ const options = (host: HTMLElement): string[] =>
    is the half of this worth asserting on: left alone it would cross this
    element's shadow boundary and be retargeted to look like its own. */
 const choose = (_host: HTMLElement, value: string): CustomEvent =>
-  new CustomEvent('helix-change', {
+  new CustomEvent('helix-before-change', {
     bubbles: true,
     cancelable: true,
     composed: true,

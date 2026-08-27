@@ -1,6 +1,6 @@
 import {
   customElement,
-  type HelixChangeEvent,
+  type HelixBeforeChangeEvent,
   HelixCreateEvent,
   HelixFormElement,
   MixinControllerOpen,
@@ -147,7 +147,9 @@ const isInsertion = (event: Event): boolean =>
  * @csspart listbox-loading - Shown while the options are still on their way.
  * from the listbox.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the chosen option changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the chosen option changes.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixCreateEvent} helix-create - Fired when the reader asks for something the list does not hold, and cancelable.
  * @event {HelixOpenEvent} helix-open - Fired when the panel opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
@@ -529,7 +531,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        which is what makes it refusable. The listbox never applies it anyway,
        since this element passes `.value` down and that is a consumer declaring
        ownership. Select was fixed for exactly this. */
-    const { value } = (event as HelixChangeEvent).detail
+    const { value } = (event as HelixBeforeChangeEvent).detail
     /* And nothing happens on a refusal. Refusing a change should leave the
        control where it was, not clear the filter and shut the panel as though
        it had been taken. */
@@ -682,7 +684,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       ?loading=${this.loading}
       ?multiple=${this.multiple}
       .value=${this.value}
-      @helix-change=${this.handleChange}
+      @helix-before-change=${this.handleChange}
     >
       <!-- The field's words are read off the options, and on the first
            render there are none: the slot has not been assigned yet, so a

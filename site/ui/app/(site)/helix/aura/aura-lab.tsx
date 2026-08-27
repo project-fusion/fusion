@@ -196,7 +196,7 @@ export function AuraLab(): React.ReactElement {
               class="auraShapes"
               label="Shape"
               label-placement="start"
-              onhelix-change={(event: CustomEvent<{ value: string }>) => {
+              onhelix-before-change={(event: CustomEvent<{ value: string }>) => {
                 const next = SHAPES.findIndex((entry) => entry.name === event.detail.value)
                 if (next >= 0) {
                   setShape(next)
@@ -215,7 +215,7 @@ export function AuraLab(): React.ReactElement {
             <helix-toggle-group
               label="Pointer"
               label-placement="start"
-              onhelix-change={(event: CustomEvent<{ value: string }>) => {
+              onhelix-before-change={(event: CustomEvent<{ value: string }>) => {
                 const next = INTERACTIONS.find((one) => one === event.detail.value)
                 if (next) {
                   setInteraction(next)
@@ -239,7 +239,7 @@ export function AuraLab(): React.ReactElement {
             <helix-toggle-group
               label="Aim"
               label-placement="start"
-              onhelix-change={(event: CustomEvent<{ value: string }>) => {
+              onhelix-before-change={(event: CustomEvent<{ value: string }>) => {
                 const next = AIMS.find((one) => one === event.detail.value)
                 if (next) {
                   setAim(next)
@@ -260,7 +260,7 @@ export function AuraLab(): React.ReactElement {
             <helix-switch
               checked={interactive}
               label="Follow"
-              onhelix-toggle={(event: CustomEvent<{ checked: boolean }>) => {
+              onhelix-before-toggle={(event: CustomEvent<{ checked: boolean }>) => {
                 setInteractive(event.detail.checked)
               }}
             ></helix-switch>
@@ -308,7 +308,7 @@ export function AuraLab(): React.ReactElement {
                     label={knob.label}
                     max={knob.max}
                     min={knob.min}
-                    onhelix-input={(event: CustomEvent<{ value: string }>) => {
+                    onhelix-before-change={(event: CustomEvent<{ value: string }>) => {
                       const next = Number(event.detail.value)
                       setKnobs((held) => ({ ...held, [knob.key]: next }))
                     }}

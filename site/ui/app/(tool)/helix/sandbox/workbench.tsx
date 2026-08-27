@@ -989,7 +989,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
         <helix-input
           aria-label="Filter examples"
           class={styles.examplesFilter}
-          onhelix-input={filterChanged}
+          onhelix-before-change={filterChanged}
           placeholder="Filter"
           ref={filterRef}
           type="search"
@@ -1220,7 +1220,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                 not pointing. This is a choice among files, and it says so. */}
               <helix-toggle-group
                 aria-label="Files"
-                onhelix-change={paneChosen}
+                onhelix-before-change={paneChosen}
                 separation="plain"
                 value={pane}
               >

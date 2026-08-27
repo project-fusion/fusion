@@ -208,7 +208,7 @@ export class HelixHeadlessPaginationSize extends HelixElement {
       exportparts="label, trigger, value"
       label=${this.label}
       .value=${String(this.current)}
-      @helix-change=${this.handleChange}
+      @helix-before-change=${this.handleChange}
     >
       ${this.options.map(
         (size) => html`<${option} value=${String(size)}>${this.numbers(size)}</${option}>`,

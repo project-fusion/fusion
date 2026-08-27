@@ -141,7 +141,7 @@ describe('date picker', () => {
   test('choosing a day reports it as an ISO date', async () => {
     const cal = await calendar()
     let seen = ''
-    cal.addEventListener('helix-change', (event) => {
+    cal.addEventListener('helix-before-change', (event) => {
       seen = (event as CustomEvent<{ value: string }>).detail.value
     })
     days(cal)
@@ -212,7 +212,7 @@ describe('date picker', () => {
     expect(blocked?.getAttribute('aria-disabled')).toBe('true')
 
     let fired = false
-    cal.addEventListener('helix-change', () => {
+    cal.addEventListener('helix-before-change', () => {
       fired = true
     })
     blocked?.click()
@@ -236,7 +236,7 @@ describe('date picker selection can be refused', () => {
 
   test('a listener that refuses leaves the date where it was', async () => {
     const cal = await calendar()
-    cal.addEventListener('helix-change', (event) => event.preventDefault())
+    cal.addEventListener('helix-before-change', (event) => event.preventDefault())
     press(cal, 'August 20')
     expect(cal.value).toBe('2026-08-14')
   })
@@ -251,7 +251,7 @@ describe('date picker selection can be refused', () => {
   test('the announcement carries the date being proposed, not the one held', async () => {
     const cal = await calendar()
     let seen = ''
-    cal.addEventListener('helix-change', (event) => {
+    cal.addEventListener('helix-before-change', (event) => {
       seen = (event as CustomEvent<{ value: string }>).detail.value
       event.preventDefault()
     })

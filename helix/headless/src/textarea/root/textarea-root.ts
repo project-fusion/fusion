@@ -34,7 +34,8 @@ import { property } from 'lit/decorators.js'
  * @aliases Multiline, TextArea
  * @documentation https://helix.fusion.dev/components/textarea
  *
- * @event {HelixInputEvent} helix-input - Fired as the text changes, and cancelable.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Relayed from the textarea once the reader has finished.
  *
  * @csspart field - The box holding the control.

@@ -1,9 +1,9 @@
 import {
   customElement,
   DisabledCascadeController,
-  HelixChangeEvent,
+  HelixBeforeChangeEvent,
+  type HelixBeforeToggleEvent,
   HelixFormElement,
-  type HelixToggleEvent,
   hostAria,
   MixinField,
 } from '@helix-io/core'
@@ -49,7 +49,9 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @csspart hint - Help under the set.
  * @csspart feedback - What is wrong with it.
  *
- * @event {HelixChangeEvent} helix-change - Fired when any box changes, with the whole set.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when any box changes, with the whole set.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  */
 @customElement('helix-headless-checkbox-group')
 export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
@@ -152,7 +154,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
        received both. */
     event.stopImmediatePropagation()
 
-    const wanted = (event as HelixToggleEvent).detail.checked
+    const wanted = (event as HelixBeforeToggleEvent).detail.checked
     /* Announced before it is written, which is the way round it was not: the
        group set its value and then dispatched, so `preventDefault()` refused a
        set that had already changed.
@@ -173,20 +175,23 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
       .map((box) => box.value)
       .join(',')
 
-    if (!this.dispatchEvent(new HelixChangeEvent({ property: 'value', value: next }))) {
+    if (!this.dispatchEvent(new HelixBeforeChangeEvent({ property: 'value', value: next }))) {
       return
     }
     this.value = next
+    /* Under the platform's own name, after the value has moved, so a consumer
+       binding `onChange` reads the group's new value off the target. */
+    this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
   }
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-toggle', this.handleToggle)
+    this.addEventListener('helix-before-toggle', this.handleToggle)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-toggle', this.handleToggle)
+    this.removeEventListener('helix-before-toggle', this.handleToggle)
   }
 
   protected override willUpdate(changed: PropertyValues): void {

@@ -34,7 +34,7 @@ describe('switch', () => {
     const host = (await mount(
       '<helix-headless-switch name="a">A</helix-headless-switch>',
     )) as Updatable
-    host.addEventListener('helix-toggle', (event) => event.preventDefault())
+    host.addEventListener('helix-before-toggle', (event) => event.preventDefault())
     const field = control(host)
     field.checked = true
     field.dispatchEvent(new Event('change', { bubbles: true }))

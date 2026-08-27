@@ -37,7 +37,7 @@
   /* `search` rather than writing `filter`, because it goes through the same
      request the component makes for itself: the page hears `helix-filter` and
      can refuse it, which is what a server-side search would do. */
-  document.getElementById('query').addEventListener('helix-input', (event) => {
+  document.getElementById('query').addEventListener('helix-before-change', (event) => {
     people.search(event.detail.value)
   })
 </script>

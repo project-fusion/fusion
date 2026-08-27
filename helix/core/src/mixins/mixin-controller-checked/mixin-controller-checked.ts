@@ -1,6 +1,6 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixToggleEvent } from '../../events/events.js'
+import { HelixBeforeToggleEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { requestChange } from '../../utils/request-change/request-change.js'
 
@@ -129,16 +129,23 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
       if (this.checked === next) {
         return true
       }
-      return requestChange({
+      const applied = requestChange({
         apply: (checked) => {
           const previous = this.checked
           this.checkedState = checked
           this.requestUpdate('checked', previous)
         },
-        event: (checked) => new HelixToggleEvent({ checked }),
+        event: (checked) => new HelixBeforeToggleEvent({ checked }),
         host: this,
         next,
       })
+      if (applied) {
+        /* `input` here and `change` relayed from the inner control, which is
+           the pair a native checkbox sends. Announced after `apply`, so a
+           handler reading `currentTarget.checked` reads the new state. */
+        this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+      }
+      return applied
     }
 
     /** Requests the opposite of the current state. */

@@ -151,8 +151,9 @@ if (hasLayout()) {
     })
 
     test('choosing says so under this element"s name, once', async () => {
-      /* The listbox says `helix-change`, which is right for a control that holds
-         a value and wrong for a palette: nothing changed, a command ran. */
+      /* The listbox says `helix-before-change`, which is right for a control
+         that holds a value and wrong for a palette: nothing changed, a command
+         ran. */
       const host = await palette()
       /* Values and identities kept apart, and the identity compared with `toBe`.
          A deep equality against an object holding a DOM node walks the node, and
@@ -165,7 +166,7 @@ if (hasLayout()) {
         targets.push(event.target as EventTarget)
       })
       let changes = 0
-      host.addEventListener('helix-change', () => {
+      host.addEventListener('helix-before-change', () => {
         changes += 1
       })
 

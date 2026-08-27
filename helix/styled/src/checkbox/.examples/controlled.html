@@ -8,7 +8,7 @@
 <script>
   const terms = document.getElementById('terms')
 
-  terms.addEventListener('helix-toggle', (event) => {
+  terms.addEventListener('helix-before-toggle', (event) => {
     terms.checked = event.detail.checked
   })
 </script>

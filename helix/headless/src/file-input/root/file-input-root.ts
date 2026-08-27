@@ -1,7 +1,7 @@
 import {
   customElement,
   drawIcon,
-  HelixChangeEvent,
+  HelixBeforeChangeEvent,
   HelixFormElement,
   MixinField,
   restoreValue,
@@ -102,7 +102,9 @@ const kind = (file: File): string => {
  * @slot hint - Help under the field.
  * @slot feedback - What is wrong with it.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the chosen files change, with their names.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the chosen files change, with their names.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  *
  * @csspart field - The box that is pressed and dropped on.
  * @csspart control - The file input itself, which carries the label and validity.
@@ -237,11 +239,14 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     this.sync()
     this.requestUpdate()
     this.dispatchEvent(
-      new HelixChangeEvent({
+      new HelixBeforeChangeEvent({
         property: 'files',
         value: this.files.map((file) => file.name).join(', '),
       }),
     )
+    /* And under the platform's own name, which is what `onChange` binds and
+       what a native file input sends when the chosen files move. */
+    this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
   }
 
   /**

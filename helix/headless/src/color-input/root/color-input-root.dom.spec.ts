@@ -83,7 +83,7 @@ describe('input color', () => {
     expect(picker.value).toBe('#ff0000')
 
     picker.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'color', value: '#00ff00' },
@@ -97,11 +97,11 @@ describe('input color', () => {
   test('the picker says nothing under its own name, so a consumer hears one control', async () => {
     const host = await field('default-value="#ff0000"')
     const said: string[] = []
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-change', (event) => {
       said.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     part(host, 'picker')?.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'color', value: '#00ff00' },

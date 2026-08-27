@@ -55,12 +55,15 @@ const heard = async (host: Probe, act: () => void): Promise<string[]> => {
   const listen = (event: Event): void => {
     names.push(event.type)
   }
-  host.addEventListener('helix-change', listen)
-  host.addEventListener('helix-input', listen)
+  const names_ = ['helix-before-change', 'input', 'change']
+  for (const name of names_) {
+    host.addEventListener(name, listen)
+  }
   act()
   await host.updateComplete
-  host.removeEventListener('helix-change', listen)
-  host.removeEventListener('helix-input', listen)
+  for (const name of names_) {
+    host.removeEventListener(name, listen)
+  }
   return names
 }
 
@@ -87,13 +90,13 @@ describe('an uncontrolled control', () => {
     const names = await heard(host, () => {
       expect(host.requestValue('two')).toBe(true)
     })
-    expect(names).toEqual(['helix-change'])
+    expect(names).toEqual(['helix-before-change', 'input', 'change'])
     expect(host.value).toBe('two')
   })
 
   test('and a refusal leaves it exactly where it was', async () => {
     const host = await mount(`<${tag} default-value="one"></${tag}>`)
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-change', (event) => {
       event.preventDefault()
     })
     expect(host.requestValue('two')).toBe(false)
@@ -112,13 +115,13 @@ describe('a control whose consumer declared a value', () => {
     const names = await heard(host, () => {
       host.requestValue('ours')
     })
-    expect(names).toEqual(['helix-change'])
+    expect(names).toEqual(['helix-before-change', 'input', 'change'])
     expect(host.value).toBe('ours')
   })
 
   test('and refusing is what keeps it where they put it', async () => {
     const host = await mount(`<${tag} value="theirs"></${tag}>`)
-    host.addEventListener('helix-change', (event: Event) => {
+    host.addEventListener('helix-before-change', (event: Event) => {
       event.preventDefault()
     })
     host.requestValue('ours')
@@ -159,18 +162,27 @@ describe('writing the property', () => {
   })
 })
 
-describe('the name the change arrives under', () => {
-  /* It selects the event and not the timing: `requestValue` is called whenever
-     the value moves either way, and this decides what a consumer hears, so the
-     name tells them how often to expect it. */
-  test('is `helix-change` for a control that moves in steps', async () => {
+describe('the names a change arrives under', () => {
+  /* One request event whatever the control, and the native pair after it.
+     `announcesInput` used to pick between `helix-change` and `helix-input`,
+     which was one mechanism under two names: the name said *phase* and the flag
+     meant *granularity*. It now picks which native event reports the result,
+     which is the distinction the platform already draws. See 294. */
+  test('is `helix-before-change` and then `input` and `change`, in steps', async () => {
     const host = await mount(`<${tag}></${tag}>`)
-    expect(await heard(host, () => host.requestValue('x'))).toEqual(['helix-change'])
+    expect(await heard(host, () => host.requestValue('x'))).toEqual([
+      'helix-before-change',
+      'input',
+      'change',
+    ])
   })
 
-  test('and `helix-input` for one the reader moves continuously', async () => {
+  test('and `change` is withheld while a reader is still editing', async () => {
     const host = await mount(`<${inputTag}></${inputTag}>`)
-    expect(await heard(host, () => (host as Probe).requestValue('x'))).toEqual(['helix-input'])
+    expect(await heard(host, () => (host as Probe).requestValue('x'))).toEqual([
+      'helix-before-change',
+      'input',
+    ])
   })
 })
 

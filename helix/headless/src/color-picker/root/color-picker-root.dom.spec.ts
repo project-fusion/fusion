@@ -25,14 +25,24 @@ const axis = async (host: Color, which: string, to: number): Promise<void> => {
 }
 
 /** Moves one of the ramps, which announce rather than being driven directly. */
+/**
+ * Moves a channel the way its slider does: apply, then announce natively.
+ *
+ * This dispatched `helix-change` carrying the value in a detail until 26 Aug
+ * 2026, which is what the picker read. That event is a *request* now, announced
+ * before the slider has moved and while a listener may still refuse it, so
+ * acting on it would act on a decision not yet taken. The picker reads the
+ * applied value off the slider instead, which is what the native pair reports.
+ * See 294.
+ */
 const ramp = async (host: Color, channel: string, to: number): Promise<void> => {
-  host.shadowRoot?.querySelector(`[data-channel="${channel}"]`)?.dispatchEvent(
-    new CustomEvent('helix-change', {
-      bubbles: true,
-      composed: true,
-      detail: { name: channel, value: String(to) },
-    }),
-  )
+  const slider = host.shadowRoot?.querySelector(`[data-channel="${channel}"]`) as
+    | (HTMLElement & { value: string })
+    | null
+  if (slider) {
+    slider.value = String(to)
+    slider.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+  }
   await host.updateComplete
 }
 

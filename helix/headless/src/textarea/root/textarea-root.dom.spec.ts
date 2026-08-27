@@ -46,7 +46,7 @@ describe('textarea', () => {
     const host = (await mount(
       '<helix-headless-textarea label="A" name="q"></helix-headless-textarea>',
     )) as Updatable
-    host.addEventListener('helix-input', (event) => event.preventDefault())
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
     const field = control(host)
     field.value = 'nope'
     field.dispatchEvent(new Event('input', { bubbles: true }))

@@ -98,7 +98,7 @@ describe('input time', () => {
     host.open = true
     await host.updateComplete
     part(host, 'picker')?.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'time', value: '09:15' },

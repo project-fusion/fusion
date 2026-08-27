@@ -1,6 +1,6 @@
 import {
   customElement,
-  type HelixChangeEvent,
+  type HelixBeforeChangeEvent,
   HelixElement,
   HelixSelectEvent,
   MixinControllerOpen,
@@ -166,7 +166,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
-    const { value } = (event as HelixChangeEvent).detail
+    const { value } = (event as HelixBeforeChangeEvent).detail
     if (!this.dispatchEvent(new HelixSelectEvent({ value }))) {
       return
     }
@@ -325,7 +325,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         empty-text=${this.emptyText}
         filter-label=${this.placeholder}
         filterable
-        @helix-change=${this.handleChange}
+        @helix-before-change=${this.handleChange}
       >
         <slot></slot>
       </${this.tag('listbox')}>

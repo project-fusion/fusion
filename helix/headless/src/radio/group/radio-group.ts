@@ -44,7 +44,9 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * @slot label - Richer than a string, where the question is more than one.
  * @slot hint - Richer than a string.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the answer changes, and cancelable.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the answer changes, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  *
  * @csspart label - The question, over the set.
  * @csspart items - The choices, which is what `orientation` lays out.

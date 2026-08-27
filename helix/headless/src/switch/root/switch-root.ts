@@ -36,7 +36,8 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The words naming what this turns on.
  *
- * @event {HelixToggleEvent} helix-toggle - Fired before the state changes, and cancelable.
+ * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired before the state changes, and cancelable.
+ * @event {Event} input - Announced once the state has moved.
  * @event {Event} change - Relayed from the input once the state has changed.
  *
  * @csspart field - The row: the track and its label.

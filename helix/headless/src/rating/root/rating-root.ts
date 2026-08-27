@@ -57,7 +57,9 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Stars, Score, Review score
  * @documentation https://helix.fusion.dev/components/rating
  *
- * @event {HelixChangeEvent} helix-change - Fired before the score changes, and cancelable.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the score changes, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced with it, the choice being the commit.
  *
  * @csspart marks - The row of marks.
  * @csspart track - The unfilled marks.

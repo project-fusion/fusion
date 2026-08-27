@@ -137,7 +137,9 @@ const addMonths = (date: Date, months: number): Date => {
  * @aliases Calendar, Date grid, Month view
  * @documentation https://helix.fusion.dev/components/date-picker
  *
- * @event {HelixChangeEvent} helix-change - Fired before the dates change, and cancelable.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the dates change, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixNavigateEvent} helix-navigate - Fired before the month on show changes, and cancelable.
  *
  * @csspart cell - One column of a row, which is what a range paints.

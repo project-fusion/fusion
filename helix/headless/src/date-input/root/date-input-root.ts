@@ -1,6 +1,6 @@
 import {
   customElement,
-  type HelixChangeEvent,
+  type HelixBeforeChangeEvent,
   HelixFormElement,
   MixinControllerOpen,
   MixinControllerValue,
@@ -77,7 +77,9 @@ const dates = (value: string): string[] =>
  * @slot hint - Help under the field.
  * @slot feedback - What is wrong with it.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the date changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the date changes.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixOpenEvent} helix-open - Fired when the calendar opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
  *
@@ -401,7 +403,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
 
   private readonly handleCalendarChange = (event: Event): void => {
     event.stopPropagation()
-    const { value } = (event as HelixChangeEvent).detail
+    const { value } = (event as HelixBeforeChangeEvent).detail
     this.requestValue(value)
     this.restore()
     /* A single date has nothing more to say, so the panel gets out of the way.
@@ -613,7 +615,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
       locale=${this.locale || nothing}
       max=${this.max || nothing}
       min=${this.min || nothing}
-      @helix-change=${this.handleCalendarChange}
+      @helix-before-change=${this.handleCalendarChange}
     ></${this.tag('date-picker')}>`
   }
 

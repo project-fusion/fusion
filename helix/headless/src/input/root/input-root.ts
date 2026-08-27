@@ -71,7 +71,8 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @slot start - Before the text, for an icon or a prefix.
  * @slot end - After the text, for an icon or a unit.
  *
- * @event {HelixInputEvent} helix-input - Fired as the text changes, and cancelable.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Relayed from the input once the reader has finished.
  *
  * @csspart field - The box holding everything.

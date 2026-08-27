@@ -46,7 +46,9 @@ import '../../listbox/index.js'
  * @slot label - Richer than a string.
  * @slot hint - Richer than a string.
  *
- * @event {HelixChangeEvent} helix-change - Relayed from the listbox when the answer changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Relayed from the listbox when the answer changes.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixOpenEvent} helix-open - Fired when the list opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
  *
@@ -305,7 +307,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}
       aria-label=${this.label || nothing}
-      @helix-change=${this.handleChange}
+      @helix-before-change=${this.handleChange}
     >
       <!-- The trigger's words are read off the options, and on the first
            render there are none: the slot has not been assigned yet, so a

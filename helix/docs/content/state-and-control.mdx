@@ -11,7 +11,10 @@ title: State and control
 managing itself, exactly as `<input value="Ada">` does.
 
 ```html
-<helix-input label="Name" value="Ada"></helix-input>
+<helix-input
+  label="Name"
+  value="Ada"
+></helix-input>
 ```
 
 That works. Type in it and the value moves. Assign to it later and the value
@@ -73,7 +76,10 @@ element apply:
 ```
 
 ```html
-<helix-input label="Name" onchange="save(this.value)"></helix-input>
+<helix-input
+  label="Name"
+  onchange="save(this.value)"
+></helix-input>
 ```
 
 The native event carries no detail because it does not need one: the element has
@@ -83,7 +89,10 @@ where every handler ever written expects to find it.
 ## `default-` still means something
 
 ```html
-<helix-input default-value="Ada" label="Name"></helix-input>
+<helix-input
+  default-value="Ada"
+  label="Name"
+></helix-input>
 ```
 
 `default-value` is what a reset returns to. `value` is where the control is now.

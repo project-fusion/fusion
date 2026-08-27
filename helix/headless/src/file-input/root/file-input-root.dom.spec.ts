@@ -77,7 +77,7 @@ describe('input file', () => {
     // from one element rather than two from two.
     const host = await field('multiple')
     const said: { property: string; value: string }[] = []
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-change', (event) => {
       said.push((event as CustomEvent<{ property: string; value: string }>).detail)
     })
     await choose(host, 'one.txt', 'two.txt')

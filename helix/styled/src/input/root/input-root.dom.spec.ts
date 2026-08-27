@@ -66,7 +66,7 @@ describe('input', () => {
        the form would submit disagree, which is the one thing a field must never
        do. */
     const host = (await mount('<helix-input label="A" name="q"></helix-input>')) as Updatable
-    host.addEventListener('helix-input', (event) => event.preventDefault())
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
     const field = control(host) as HTMLInputElement
     field.value = 'nope'
     field.dispatchEvent(new Event('input', { bubbles: true }))
@@ -414,7 +414,7 @@ describe('input, controlled and uncontrolled', () => {
     const host = (await mount(
       '<helix-input label="Name" value="fixed"></helix-input>',
     )) as HTMLElement & { value: string }
-    host.addEventListener('helix-input', (event: Event) => {
+    host.addEventListener('helix-before-change', (event: Event) => {
       event.preventDefault()
     })
     await typed(host, 'tried')
@@ -484,7 +484,7 @@ describe('input clears itself', () => {
        runs, so a refusal has to put it back, or the text and the value the form
        would submit disagree. */
     const host = await cleared('<helix-input clearable label="Search" value="owned"></helix-input>')
-    host.addEventListener('helix-input', (event) => event.preventDefault())
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
     ;(part(host, 'clear') as HTMLElement).click()
     await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
     expect(host.value).toBe('owned')

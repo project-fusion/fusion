@@ -75,7 +75,7 @@ describe('input date', () => {
     expect(host.open).toBe(true)
 
     picker(host).dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'value', value: '2026-12-25' },
@@ -90,11 +90,11 @@ describe('input date', () => {
     // One control, one announcement, whichever half of it the reader used.
     const host = await field()
     const said: string[] = []
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-change', (event) => {
       said.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     picker(host).dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'value', value: '2026-12-25' },
@@ -128,7 +128,7 @@ describe('input date', () => {
        See 294. */
     const host = await field('value="2026-01-01"')
     let asked = ''
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-change', (event) => {
       asked = (event as CustomEvent<{ value: string }>).detail.value
     })
     await type(host, '2026-02-02')
@@ -240,7 +240,7 @@ describe('input date holds more than one', () => {
     host.open = true
     await host.updateComplete
     part(host, 'picker')?.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'date', value: '2026-08-04' },
@@ -255,7 +255,7 @@ describe('input date holds more than one', () => {
     host.open = true
     await host.updateComplete
     part(host, 'picker')?.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'date', value: '2026-08-04' },

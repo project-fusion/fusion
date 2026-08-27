@@ -32,7 +32,8 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The label.
  *
- * @event {HelixToggleEvent} helix-toggle - Fired before the state changes, and cancelable.
+ * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired before the state changes, and cancelable.
+ * @event {Event} input - Announced once the state has moved.
  * @event {Event} change - Relayed from the input once the state has changed.
  *
  * @csspart field - The row the box and its label share, and the surface the card appearance draws.

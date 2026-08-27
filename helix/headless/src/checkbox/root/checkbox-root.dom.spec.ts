@@ -34,7 +34,7 @@ describe('checkbox', () => {
 
   test('changing announces before it acts, and a refusal holds the state', async () => {
     const box = await checkbox()
-    box.addEventListener('helix-toggle', (event) => {
+    box.addEventListener('helix-before-toggle', (event) => {
       event.preventDefault()
     })
     control(box).click()
@@ -53,7 +53,7 @@ describe('checkbox', () => {
   test('announces a boolean, and not a word that reads like one', async () => {
     const box = await checkbox()
     let seen: unknown = 'unset'
-    box.addEventListener('helix-toggle', (event) => {
+    box.addEventListener('helix-before-toggle', (event) => {
       seen = event.detail.checked
     })
 
@@ -77,7 +77,7 @@ describe('checkbox', () => {
 
   test('and refusing the toggle is what holds it, whoever declared it', async () => {
     const box = await checkbox('checked')
-    box.addEventListener('helix-toggle', (event: Event) => {
+    box.addEventListener('helix-before-toggle', (event: Event) => {
       event.preventDefault()
     })
     control(box).click()

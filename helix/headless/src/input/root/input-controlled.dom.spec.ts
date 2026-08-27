@@ -40,7 +40,7 @@ describe('a control whose markup declared a value', () => {
 
   test('and refusing is what holds it where they put it', async () => {
     const host = await input('value="Ada"')
-    host.addEventListener('helix-input', (event: Event) => {
+    host.addEventListener('helix-before-change', (event: Event) => {
       event.preventDefault()
     })
     expect(host.requestValue('Grace')).toBe(false)

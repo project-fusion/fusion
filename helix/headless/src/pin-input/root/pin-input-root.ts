@@ -42,8 +42,10 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
  * @documentation https://helix.fusion.dev/components/pin-input
  *
- * @event {HelixInputEvent} helix-input - Fired as the code changes, and cancelable.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the code changes, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last box is filled.
+ * @event {Event} change - Announced with it, a filled code being the commit.
  *
  * @csspart field - The row of boxes.
  * @csspart cell - One box.
@@ -196,6 +198,10 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
       this.cells[filled]?.select()
       if (next.length === this.count) {
         this.dispatchEvent(new HelixCompleteEvent({ value: next }))
+        /* And a native `change`, because a filled code is this control's
+           commit. There is no inner control to relay one from: six boxes each
+           fire their own, and none of them means the code is entered. */
+        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
       }
     })
   }

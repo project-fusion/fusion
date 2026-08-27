@@ -89,7 +89,7 @@ describe('checkbox group', () => {
     // them carrying a lone boolean.
     const g = await group()
     const seen: string[] = []
-    g.addEventListener('helix-change', (event) => {
+    g.addEventListener('helix-before-change', (event) => {
       seen.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     await tick(g, 2)
@@ -101,7 +101,7 @@ describe('checkbox group', () => {
     // target it hears itself and answers until the stack gives out.
     const g = await group()
     let count = 0
-    g.addEventListener('helix-change', () => {
+    g.addEventListener('helix-before-change', () => {
       count += 1
     })
     await tick(g, 2)

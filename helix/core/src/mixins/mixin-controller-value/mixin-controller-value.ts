@@ -1,5 +1,5 @@
 import { property } from 'lit/decorators.js'
-import { HelixChangeEvent, HelixInputEvent } from '../../events/events.js'
+import { HelixBeforeChangeEvent } from '../../events/events.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import { requestChange } from '../../utils/request-change/request-change.js'
 
@@ -125,8 +125,41 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      */
     private valueState: string | undefined = undefined
 
-    /** Discrete by default: only a control the reader edits continuously says otherwise. */
+    /**
+     * Whether a reader edits this continuously, which decides the native name.
+     *
+     * **It used to pick between `helix-input` and `helix-change`**, which was
+     * one mechanism under two names and said *phase* where it meant
+     * *granularity*. The request event is `helix-before-change` whatever the
+     * answer; this decides which native event announces the result, `input`
+     * while a reader is editing against `change` when they are done, which is
+     * the distinction the platform already draws. See 294.
+     *
+     * Discrete by default: only a control the reader edits continuously says
+     * otherwise.
+     */
     protected readonly announcesInput: boolean = false
+
+    /**
+     * Announces the applied value under the platform's own name.
+     *
+     * **After `apply`, never before**, which is the whole reason this is
+     * separate from the request event: a native handler reads
+     * `event.target.value`, and it has to be the value that was just applied.
+     *
+     * **Both, for a discrete control, because that is what the platform does.**
+     * A native `<select>` sends `input` and then `change` from one choice: the
+     * value moved, and the reader is also done. A continuous control announces
+     * `input` here and relays `change` from its inner control when the reader
+     * is done, so the pair keeps the platform's timings rather than reporting a
+     * commit on every keystroke.
+     */
+    private announceNatively(): void {
+      this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+      if (!this.announcesInput) {
+        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+      }
+    }
 
     /**
      * Requests a new value, and reports whether the request stood.
@@ -142,20 +175,20 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
       if (this.value === next) {
         return true
       }
-      return requestChange({
+      const applied = requestChange({
         apply: (value) => {
           const previous = this.value
           this.valueState = value
           this.requestUpdate('value', previous)
         },
-        event: (value) =>
-          new (this.announcesInput ? HelixInputEvent : HelixChangeEvent)({
-            property: 'value',
-            value,
-          }),
+        event: (value) => new HelixBeforeChangeEvent({ property: 'value', value }),
         host: this,
         next,
       })
+      if (applied) {
+        this.announceNatively()
+      }
+      return applied
     }
 
     /**

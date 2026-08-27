@@ -1,6 +1,6 @@
 import {
   customElement,
-  type HelixChangeEvent,
+  type HelixBeforeChangeEvent,
   HelixFormElement,
   MixinControllerOpen,
   MixinControllerValue,
@@ -51,7 +51,9 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @slot hint - Help under the field.
  * @slot feedback - What is wrong with it.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the time changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the time changes.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixOpenEvent} helix-open - Fired when the list opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
  *
@@ -336,7 +338,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
 
   private readonly handlePicked = (event: Event): void => {
     event.stopPropagation()
-    this.requestValue((event as HelixChangeEvent).detail.value)
+    this.requestValue((event as HelixBeforeChangeEvent).detail.value)
     this.restore()
     /* One time has nothing more to say, so the list gets out of the way. A range
        or a multiple has: the reader is still choosing, and shutting the list
@@ -522,7 +524,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
       min=${this.min}
       step=${this.step}
       .value=${this.picked}
-      @helix-change=${this.handlePicked}
+      @helix-before-change=${this.handlePicked}
     ></${this.tag('time-picker')}>`
   }
 

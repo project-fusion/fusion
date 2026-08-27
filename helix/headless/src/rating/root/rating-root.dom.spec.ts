@@ -308,7 +308,7 @@ if (hasLayout()) {
          the consumer passes a new value back. */
       const host = (await rating('value="1"')) as Rating
       let asked: string | undefined
-      host.addEventListener('helix-change', (event) => {
+      host.addEventListener('helix-before-change', (event) => {
         asked = (event as CustomEvent<{ value: string }>).detail?.value
       })
       await send(host, 'pointerdown', center(host, 4))

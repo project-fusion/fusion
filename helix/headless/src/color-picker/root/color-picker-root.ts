@@ -3,9 +3,7 @@ import {
   capturePointer,
   customElement,
   drawIcon,
-  type HelixChangeEvent,
   HelixFormElement,
-  type HelixInputEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   MixinControllerValue,
@@ -95,7 +93,9 @@ interface EyeDropperConstructor {
  * @event {HelixSampleEndEvent} helix-sample-end - The eyedropper has closed, whether or not a color was taken.
  * @event {HelixSampleStartEvent} helix-sample-start - The eyedropper is opening, so anything covering the page should get out of the way.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the color changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the color changes.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixCopyEvent} helix-copy - Fired when the color is put on the clipboard.
  *
  * @csspart grid - The saturation and brightness square.
@@ -424,29 +424,33 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       min="0"
       .value=${String(value)}
       ?disabled=${this.isDisabled}
-      @helix-input=${(event: Event) => this.takeChannel(channel, event)}
-      @helix-change=${(event: Event) => this.takeChannel(channel, event)}
+      @input=${(event: Event) => this.takeChannel(channel, event)}
+      @change=${(event: Event) => this.takeChannel(channel, event)}
     ></${this.tag('slider')}>`
   }
 
   /**
-   * A channel's new value, from whichever of the two events carried it.
+   * A channel's new value, read off the slider that just applied it.
    *
-   * **Both, because a slider announces both and at different moments.** It is
-   * one of the five controls a reader edits continuously, so it sends
-   * `helix-input` all the way through a drag and `helix-change` when the drag
+   * **Both native events, because a slider sends both and at different
+   * moments.** It is one of the controls a reader edits continuously, so it
+   * announces `input` all the way through a drag and `change` when the drag
    * ends. Listening only for the commit meant the picker heard nothing while a
-   * handle moved, and since it binds `.value` the slider is controlled: asked
-   * and not answered, it snapped back to the value the picker still held. The
-   * hue and alpha handles did not move at all.
+   * handle moved and the hue and alpha handles did not move at all.
    *
-   * Taking both is not belt and braces. The drag needs the first and a keyboard
-   * step or a programmatic set is only guaranteed the second, and the handler
-   * is idempotent: the same value applied twice is the same color.
+   * **Read off the target rather than out of a detail**, which is what changed
+   * on 26 Aug 2026. This bound `helix-input` and `helix-change` and took the
+   * proposed value out of the event. Those are requests: they announce what the
+   * slider is *about* to do, before anything has moved and while a listener may
+   * still refuse it. The native pair fires after the slider applied, so the
+   * value is on the element and cannot disagree with it. See 294.
+   *
+   * Idempotent, so taking both costs nothing: the same value applied twice is
+   * the same color.
    */
   private takeChannel(channel: 'alpha' | 'hue', event: Event): void {
     event.stopPropagation()
-    const { value } = (event as HelixInputEvent | HelixChangeEvent).detail
+    const { value } = event.target as unknown as { value: number }
     this.move({ [channel]: Number(value) })
   }
 

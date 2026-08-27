@@ -54,7 +54,7 @@ describe('radio group', () => {
 
   test('a refused change leaves the answer alone', async () => {
     const host = await group()
-    host.addEventListener('helix-change', (event) => event.preventDefault())
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
     ;(options(host)[1] as unknown as { select: () => void }).select()
     await settle(host)
     expect((host as Updatable & { value: string }).value).toBe('')

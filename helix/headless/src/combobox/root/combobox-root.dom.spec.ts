@@ -143,15 +143,23 @@ describe('combobox', () => {
   })
 
   test('one choice is one change, under this element"s name', async () => {
-    /* The listbox announces `helix-change` too, and a consumer listening here
-       would otherwise hear two for one choice, one of them naming a control
+    /* The listbox announces `helix-before-change` too, and a consumer listening
+       here would otherwise hear two for one choice, one of them naming a control
        they never put on the page. */
     const host = await combobox()
+    /* Counted and identified separately, and the identity compared with `toBe`.
+       A deep equality against an array holding a DOM node walks the node, and a
+       rendered element is a graph with cycles in it: this assertion was
+       `toEqual([host])` until 26 Aug 2026, and when it started failing it did
+       not fail, it exhausted the machine's memory and took the runner with it.
+       `Command` had already learned this and said so; the lesson was in a
+       comment and not in a check. See 297. */
     const heard: EventTarget[] = []
-    host.addEventListener('helix-change', (event) => heard.push(event.target as EventTarget))
+    host.addEventListener('helix-before-change', (event) => heard.push(event.target as EventTarget))
     await type(host, 'go')
     await press(host, 'Enter')
-    expect(heard).toEqual([host as EventTarget])
+    expect(heard.length).toBe(1)
+    expect(heard[0]).toBe(host as EventTarget)
   })
 
   test('required says so in its own words once asked', async () => {
@@ -258,7 +266,7 @@ describe('combobox holding several', () => {
     /* Everything used to happen anyway: the filter cleared and the panel shut
        as though the option had been taken. Select was fixed for the same. */
     const host = await many()
-    host.addEventListener('helix-change', (event) => event.preventDefault())
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
     await type(host, 'ru')
     await press(host, 'Enter')
     expect((host as unknown as { value: string }).value).toBe('')

@@ -1,6 +1,6 @@
 import {
   customElement,
-  type HelixChangeEvent,
+  type HelixBeforeChangeEvent,
   HelixFormElement,
   MixinControllerValue,
 } from '@helix-io/core'
@@ -99,7 +99,9 @@ const isTwelveHour = (locale?: string): boolean =>
  * @aliases Time, TimeList
  * @documentation https://helix.fusion.dev/components/time-picker
  *
- * @event {HelixChangeEvent} helix-change - Fired when the time changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the time changes.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  *
  * @csspart list - The listbox holding the times, in `list`.
  * @csspart columns - The row of columns, in `wheels`.
@@ -325,7 +327,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     if (this.isDisabled) {
       return
     }
-    const announced = (event as HelixChangeEvent).detail.value
+    const announced = (event as HelixBeforeChangeEvent).detail.value
     /* The listbox already skips a disabled option, so this is the second lock
        rather than the first: it covers a value arriving from a consumer's own
        dispatch, and it is what makes the refusal a fact about the component
@@ -520,9 +522,9 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       aria-label=${label}
       ?disabled=${this.isDisabled}
       .value=${value}
-      @helix-change=${(event: Event) => {
+      @helix-before-change=${(event: Event) => {
         event.stopPropagation()
-        this.moveColumn(part, (event as HelixChangeEvent).detail.value)
+        this.moveColumn(part, (event as HelixBeforeChangeEvent).detail.value)
       }}
     >
       ${values.map(
@@ -600,7 +602,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       ?disabled=${this.isDisabled}
       ?multiple=${this.mode !== undefined}
       .value=${this.value}
-      @helix-change=${this.handleChange}
+      @helix-before-change=${this.handleChange}
     >
       ${this.times.map((minutes) => {
         const at = fromMinutes(minutes)

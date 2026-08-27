@@ -62,7 +62,8 @@ import { property } from 'lit/decorators.js'
  * @aliases Range, Range input
  * @documentation https://helix.fusion.dev/components/slider
  *
- * @event {HelixInputEvent} helix-input - Fired as the value changes, and cancelable.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Relayed once the reader has let go.
  *
  * @csspart field - The row: the control and its readout.

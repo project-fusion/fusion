@@ -80,7 +80,8 @@ const SCRUB_FINE = 16
  * @slot start - Before the number, for a unit or an icon.
  * @slot end - After it.
  *
- * @event {HelixInputEvent} helix-input - Fired as the value changes, and cancelable.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Relayed from the field once the reader has finished.
  *
  * @csspart control - The field itself.

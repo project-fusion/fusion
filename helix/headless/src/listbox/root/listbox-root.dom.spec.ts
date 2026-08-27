@@ -82,7 +82,7 @@ describe('listbox', () => {
 
   test('a refused change leaves the answer alone', async () => {
     const host = (await list('default-value="one"')) as Updatable & { value: string }
-    host.addEventListener('helix-change', (event) => event.preventDefault())
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
     await press(host, 'ArrowDown')
     expect(host.value).toBe('one')
   })
@@ -238,7 +238,7 @@ describe('the keyboard in a filterable list', () => {
        palette that navigated away on the first arrow press. */
     const host = (await list('filterable')) as Updatable & { value: string }
     const chosen: string[] = []
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-change', (event) => {
       chosen.push((event as CustomEvent<{ value: string }>).detail.value)
       event.preventDefault()
     })

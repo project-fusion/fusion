@@ -333,6 +333,72 @@ export interface ChangeDetail {
 }
 
 /**
+ * A value is about to change, and the change can be refused.
+ *
+ * **The request half of every value control.** It announces the value being
+ * *proposed*, before anything moves, so a listener calling `preventDefault()`
+ * refuses it and the control stays where it was. That is how a consumer takes
+ * one decision without declaring a mode, which is what 294 settled: the element
+ * always owns and applies its state, and refusing is the way to take it over.
+ *
+ * **The notification is native and separate.** Once this has gone out and the
+ * value has moved, the control announces it again under the platform's own
+ * name, `input` while a reader is editing and `change` when they are done, so
+ * `onChange` in React and `onchange=` in HTML both reach it and
+ * `currentTarget.value` is correct by the time a handler reads it. This event
+ * carries the detail because at the moment it fires the value is not on the
+ * element yet.
+ *
+ * **It replaced `helix-change` and `helix-input` on the value controls**, which
+ * were one mechanism under two names chosen by `announcesInput`. The name said
+ * *phase* and the flag meant *granularity*, so a consumer reading "change" as
+ * "the reader is done" wired a request to `onhelix-change` and got one per
+ * character. Granularity is now what the platform already says it is, `input`
+ * against `change`, and `announcesInput` picks which native one fires rather
+ * than which name this carries. See 294.
+ */
+export class HelixBeforeChangeEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-before-change'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixBeforeChangeEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A checked state is about to change, and the change can be refused.
+ *
+ * **Its own event rather than a `helix-before-change` carrying a boolean**, and
+ * the reason is recorded rather than aesthetic. Reported through the value
+ * event the state arrived as `String(checked)`, so a consumer received the
+ * string `"false"`, which is truthy, and this library's own checkbox group
+ * decoded it with `detail.value === 'true'`. A test asserting the value would
+ * have passed on that bug. A control whose state is a boolean wants an event
+ * with a typed boolean in it.
+ *
+ * The notification is native, as it is for a value: the control relays `change`
+ * from the inner input and announces `input` beside it, so `onChange` reads
+ * `currentTarget.checked` and gets a boolean from the platform.
+ */
+export class HelixBeforeToggleEvent extends CustomEvent<ToggleDetail> {
+  static readonly eventName = 'helix-before-toggle'
+
+  constructor(detail: ToggleDetail) {
+    super(HelixBeforeToggleEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
  * Fired when a value changes on something that is not a native input.
  *
  * `helix-change` rather than the `helix-value-change` this was called. The
@@ -848,6 +914,8 @@ export class HelixSelectEvent extends CustomEvent<SelectDetail> {
  * only step left that can be forgotten.
  */
 const registry = {
+  HelixBeforeChangeEvent,
+  HelixBeforeToggleEvent,
   HelixCaretEvent,
   HelixChangeEvent,
   HelixCloseEvent,

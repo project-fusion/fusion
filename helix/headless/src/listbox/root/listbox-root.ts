@@ -173,7 +173,9 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @slot label - Richer than a string.
  * @slot hint - Richer than a string.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the answer changes, and cancelable.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the answer changes, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixFilterEvent} helix-filter - Fired before the list narrows, and cancelable.
  *
  * @csspart empty - Shown when a filter has hidden everything.

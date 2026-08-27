@@ -61,11 +61,11 @@ describe('time', () => {
   test('choosing a time announces it under this element name', async () => {
     const host = await picker('min="09:00" max="09:15"')
     const said: string[] = []
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-change', (event) => {
       said.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     part(host, 'list')?.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'time', value: '09:15' },
@@ -125,7 +125,7 @@ describe('time as wheels', () => {
   test('the columns recombine into one value', async () => {
     const host = await wheels('default-value="09:15" locale="en-GB"')
     column(host, 'minute').dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'minute', value: '45' },
@@ -140,7 +140,7 @@ describe('time as wheels', () => {
        has to be recombined with the meridiem rather than read straight. */
     const host = await wheels('default-value="00:30" locale="en-US"')
     column(host, 'meridiem').dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'meridiem', value: 'PM' },
@@ -151,7 +151,7 @@ describe('time as wheels', () => {
 
     const noon = await wheels('default-value="12:30" locale="en-US"')
     column(noon, 'meridiem').dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'meridiem', value: 'AM' },
@@ -178,7 +178,7 @@ describe('time holds more than one', () => {
 
   const announce = async (host: Time, value: string): Promise<void> => {
     part(host, 'list')?.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'time', value },
@@ -252,7 +252,7 @@ describe('time is off', () => {
     expect(list.hasAttribute('disabled')).toBe(true)
 
     list.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'time', value: '17:00' },
@@ -270,7 +270,7 @@ describe('time is off', () => {
     expect(column.hasAttribute('disabled')).toBe(true)
 
     column.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'time', value: '17' },
@@ -311,7 +311,7 @@ describe('times can be taken out of the list by name', () => {
   test('and a barred time is refused even when something announces it directly', async () => {
     const host = await picker('default-value="09:00" disable-times="09:30" max="12:00" min="09:00"')
     part(host, 'list')?.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'time', value: '09:30' },
@@ -330,7 +330,7 @@ describe('times can be taken out of the list by name', () => {
     )
     const hour = host.shadowRoot?.querySelector('[data-column="hour"]') as HTMLElement
     hour.dispatchEvent(
-      new CustomEvent('helix-change', {
+      new CustomEvent('helix-before-change', {
         bubbles: true,
         composed: true,
         detail: { name: 'time', value: '10' },
