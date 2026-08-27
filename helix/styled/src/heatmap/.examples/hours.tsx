@@ -1,0 +1,303 @@
+export function Example() {
+  return (
+    <helix-heatmap className="day" for="hours" label="Uptime, 21 August">
+      <table data-hidden-visually id="hours">
+        <caption>Uptime by half hour</caption>
+        <tbody>
+          <tr>
+            <th scope="row">00:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">00:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">01:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">01:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">02:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">02:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">03:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">03:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">04:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">04:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">05:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">05:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">06:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">06:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">07:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">07:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">08:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">08:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">09:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">09:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">10:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">10:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">11:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">11:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">12:00</th>
+            <td data-tone="warning" data-value="0.91">
+              91.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">12:30</th>
+            <td data-tone="warning" data-value="0.91">
+              91.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">13:00</th>
+            <td data-tone="danger" data-value="0.0">
+              Down
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">13:30</th>
+            <td data-tone="danger" data-value="0.0">
+              Down
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">14:00</th>
+            <td data-tone="danger" data-value="0.0">
+              Down
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">14:30</th>
+            <td data-tone="danger" data-value="0.0">
+              Down
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">15:00</th>
+            <td data-tone="warning" data-value="0.91">
+              91.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">15:30</th>
+            <td data-tone="warning" data-value="0.91">
+              91.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">16:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">16:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">17:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">17:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">18:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">18:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">19:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">19:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">20:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">20:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">21:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">21:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">22:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">22:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">23:00</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">23:30</th>
+            <td data-tone="success" data-value="1.0">
+              100.0%
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <span slot="start">00:00</span>
+      <span slot="summary">One outage, 13:00 to 15:00</span>
+      <span slot="end">23:30</span>
+    </helix-heatmap>
+  )
+}

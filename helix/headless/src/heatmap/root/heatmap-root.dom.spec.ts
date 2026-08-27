@@ -142,9 +142,57 @@ describe('tones', () => {
     expect(cells(element)[0]?.hasAttribute('data-tone')).toBe(false)
   })
 
-  test('every cell says what it is worth, so a pointer resting on one has an answer', async () => {
-    const element = await strip('', [['Mon', 0.81]])
-    expect(cells(element)[0]?.getAttribute('title')).toBe('Mon: 0.81')
+  /**
+   * **The bubble is one element that moves, not one per cell.** This asserted a
+   * `title` attribute until 27 Aug 2026, which was the whole of what a pointer
+   * used to get: the platform's own box, after a second of delay, carrying the
+   * two values this component happens to hold rather than the row the table
+   * holds. Every other chart here anchors a single `Tooltip` to an invisible
+   * mark, so this does too.
+   */
+  test('a pointer resting on a cell summons one bubble, over that cell', async () => {
+    const element = await strip('', [
+      ['Mon', 0.81],
+      ['Tue', 1],
+    ])
+    expect(element.shadowRoot?.querySelector('[part="mark"]')).toBeNull()
+
+    cells(element)[1]?.dispatchEvent(new Event('pointerover', { bubbles: true, composed: true }))
+    await element.updateComplete
+
+    const marks = element.shadowRoot?.querySelectorAll('[part="mark"]') ?? []
+    expect(marks).toHaveLength(1)
+    expect(part(element, 'tooltip-label')?.textContent).toBe('Tue')
+
+    part(element, 'strip')?.dispatchEvent(new Event('pointerleave'))
+    await element.updateComplete
+    expect(element.shadowRoot?.querySelector('[part="mark"]')).toBeNull()
+  })
+
+  /**
+   * The strip draws a tail of the readings and `sourceRows` is indexed over all
+   * of them, so the two agree only when nothing was dropped. Off by the length
+   * of the cut, the bubble names a day that is still on screen, so nothing about
+   * it looks wrong.
+   */
+  test('the bubble names the reading under the pointer, not the one that index was before the cut', async () => {
+    const element = await strip('min-cell="10" gap="0"', [
+      ['Mon', 1],
+      ['Tue', 2],
+      ['Wed', 3],
+      ['Thu', 4],
+    ])
+    /* Two cells' worth of room, so the first two readings are dropped. */
+    Object.defineProperty(element, 'clientWidth', { configurable: true, value: 20 })
+    element.minCell = 10
+    await element.updateComplete
+
+    const drawn = cells(element)
+    cells(element)[drawn.length - 1]?.dispatchEvent(
+      new Event('pointerover', { bubbles: true, composed: true }),
+    )
+    await element.updateComplete
+    expect(part(element, 'tooltip-label')?.textContent).toBe('Thu')
   })
 })
 

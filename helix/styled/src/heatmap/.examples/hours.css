@@ -1,0 +1,14 @@
+/* **A status page's bar is not a square, and one size cannot say both.** A
+   calendar cell is a day and is square; a bar here is half an hour, and the
+   strip's whole job is to fit a day of them into a row, so it is drawn the way
+   every status page draws it: narrow, tall, and read as a column of time rather
+   than as a tile.
+
+   `--heatmap-cell-width` is what the fit arithmetic counts in, and it is
+   measured off the strip rather than declared twice, so nothing here has to
+   restate it as a `min-cell` attribute for the count to stay true. */
+.day {
+  --heatmap-cell-width: 0.3125rem;
+  --heatmap-cell-height: 2rem;
+  --heatmap-gap: 0.1875rem;
+}

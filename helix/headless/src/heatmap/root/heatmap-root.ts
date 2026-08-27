@@ -1,13 +1,15 @@
 import {
   customElement,
+  drawTooltip,
   HelixElement,
   HelixResizeEvent,
   hostAria,
   MixinChartSource,
   slotFilled,
 } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import '../../tooltip/index.js'
 import { fits, numbers, toneOf, words } from './buckets.js'
 
 /**
@@ -76,9 +78,18 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @csspart summary - The middle slot's box.
  * @csspart end - The trailing slot's box.
  * @csspart empty - Shown when the table has no readings in it.
+ * @csspart mark - The invisible point the tooltip is anchored to.
+ * @csspart tooltip - The bubble, forwarded from `Tooltip`.
+ * @csspart tooltip-anchor - The `Tooltip` element itself.
+ * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-label - The reading's own name inside the tooltip.
+ * @csspart tooltip-name - A column's name inside the tooltip.
+ * @csspart tooltip-value - A column's value inside the tooltip.
  *
- * @cssproperty --heatmap-cell-size - The size a cell wants. The strip fits as many as the container allows.
- * @cssproperty --heatmap-gap - Space between cells.
+ * @cssproperty --heatmap-cell-size - The size a cell wants on both axes, where neither is given its own.
+ * @cssproperty --heatmap-cell-width - How wide a cell is. The strip fits as many as the container allows.
+ * @cssproperty --heatmap-cell-height - How tall a cell is. A row of a tall thin cell is what a status page draws.
+ * @cssproperty --heatmap-gap - Space between cells. Zero is a continuous field rather than a grid of tiles.
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-tone - The tone of the cell this is set on. Written by the component, read by the sheet that paints.
  * @cssproperty --heatmap-tone-success - What `success` is worth, as a name or a `data-tone`.
@@ -136,19 +147,22 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   tones = ''
 
   /**
-   * The smallest a cell may get before the strip draws fewer of them.
+   * The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
    *
-   * In CSS pixels, because this is arithmetic against a measured width rather
-   * than a length the stylesheet resolves.
+   * **Set this only to overrule what the strip actually draws.** The arithmetic
+   * needs a width in pixels and the width is a length the stylesheet resolves,
+   * so for as long as this was the only answer it was a promise the consumer had
+   * to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+   * believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+   * 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+   * number a summary is told to trust was the number that was wrong.
    *
-   * **Which makes it a statement about the sheet, and it has to agree with
-   * one.** These two defaults are a bare strip's, and `helix/styled` overrides
-   * both because it draws something bigger: it was 8 and 2 against a sheet
-   * drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-   * cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-   * width measured. `visible` said 59 the whole time, so the one number a
-   * summary is told to trust was the number that was wrong. A consumer who moves
-   * `--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+   * The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+   * enough on their own and these two are the estimate used until the first
+   * measurement lands. Writing the attribute pins the value and stops the
+   * measurement being consulted, which is what a container query or a transition
+   * on the cell size wants, where what is drawn this frame is not what the
+   * arithmetic should plan around.
    *
    * Zero turns the dropping off altogether, which is right for a strip in a
    * container that cannot get narrow.
@@ -194,6 +208,28 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   @state()
   private width: number | undefined = undefined
 
+  /**
+   * The cell and gap the strip is drawing, in pixels, once it has been read.
+   *
+   * **The arithmetic's inputs are a stylesheet's decisions, so the honest way to
+   * learn them is to ask the stylesheet.** A cell's size is a length that only
+   * the cascade can resolve: it may be a `rem` against a root font size, a
+   * percentage of a container, or whatever a container query chose this frame.
+   * Every one of those is invisible to a number typed into an attribute, and
+   * each of `--heatmap-cell-width`, `--heatmap-cell-height` and `--heatmap-gap`
+   * added one more way for the two to drift apart silently.
+   *
+   * Reading it back is not styling and does not breach the tier: this asks what
+   * was decided rather than deciding, which is the same direction as the facts
+   * this component writes out as custom properties, run backwards.
+   */
+  @state()
+  private metrics: { cell: number; gap: number } | undefined = undefined
+
+  /** Which drawn cell the pointer is on, as an index into `drawn`, or -1 for none. */
+  @state()
+  private hovered = -1
+
   private observer: ResizeObserver | undefined = undefined
 
   private announced: number | undefined = undefined
@@ -220,9 +256,71 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     return Math.max(1, Math.floor(this.rows) || 1)
   }
 
+  /**
+   * The cell width the arithmetic should plan around, in pixels.
+   *
+   * The attribute wins where a consumer wrote one, because that is what writing
+   * it is for; otherwise what the strip draws, and the declared default only
+   * until the first measurement lands.
+   */
+  private get cellPx(): number {
+    return this.hasAttribute('min-cell') ? this.minCell : (this.metrics?.cell ?? this.minCell)
+  }
+
+  /** The gap the arithmetic should plan around, on the same terms as `cellPx`. */
+  private get gapPx(): number {
+    return this.hasAttribute('gap') ? this.gap : (this.metrics?.gap ?? this.gap)
+  }
+
   /** How many cells the container has room for, as a whole number of columns. */
   private get room(): number {
-    return fits(this.points.length, this.width ?? Number.NaN, this.minCell, this.gap, this.rowCount)
+    return fits(
+      this.points.length,
+      this.width ?? Number.NaN,
+      this.cellPx,
+      this.gapPx,
+      this.rowCount,
+    )
+  }
+
+  /**
+   * Reads back the cell and the gap the strip resolved.
+   *
+   * `gridAutoColumns` and `columnGap` rather than a cell's own box, and the
+   * difference matters on the frame it matters: a cell exists only once some
+   * have been drawn, and how many are drawn is what this is measuring *for*.
+   * Asking the track instead breaks the circle, since a track is sized whether
+   * or not anything sits in it. Neither property forces layout, so this stays a
+   * style read on every update rather than a reflow.
+   *
+   * Anything that does not parse to a positive number leaves the estimate alone:
+   * `columnGap` computes to `normal` where no gap is set, and a track given a
+   * keyword or a `repeat()` has no single width to report. A wrong number here
+   * is worse than no number, because it is the one the count is published from.
+   */
+  private measure(): void {
+    const strip = this.renderRoot?.querySelector('[part="strip"]')
+    if (!strip || typeof getComputedStyle !== 'function') {
+      return
+    }
+    const style = getComputedStyle(strip)
+    const cell = Number.parseFloat(style.gridAutoColumns)
+    const gap = Number.parseFloat(style.columnGap)
+    if (!Number.isFinite(cell) || cell <= 0 || !Number.isFinite(gap) || gap < 0) {
+      return
+    }
+    if (this.metrics?.cell !== cell || this.metrics?.gap !== gap) {
+      /* A new object rather than a mutation, because `@state` compares by
+         identity and a mutated one schedules nothing. */
+      this.metrics = { cell, gap }
+    }
+    /* **Whether there is anything between the cells, which CSS cannot ask.**
+       A sheet can set the gap and cannot read it back, so a rule that wants to
+       know whether a strip is a grid of tiles or one continuous field has no
+       selector for it. The measurement is already here, so saying so costs
+       nothing. It is a fact rather than a decision, which is the line a base
+       component's custom properties are on the right side of too. */
+    strip.toggleAttribute('data-spaced', gap > 0)
   }
 
   /**
@@ -299,6 +397,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.markEmpty()
+    this.measure()
     /* Written here rather than reflected, and announced only on a change: a
        consumer recomputing a summary from this is doing work, and an event per
        resize frame is work per frame.
@@ -332,17 +431,18 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     const palette = words(this.tones)
     const cells = this.drawn
 
-    return html`<div part="strip" style="--_heatmap-rows: ${this.rowCount}">
+    return html`<div
+        part="strip"
+        id="helix-chart-plot"
+        style="--_heatmap-rows: ${this.rowCount}"
+        @pointerover=${this.onPointerOver}
+        @pointerleave=${this.onPointerLeave}
+      >
         ${
           cells.length === 0
-            ? html`<p part="empty">${this.emptyText}</p>`
-            : cells.map((reading) => {
+            ? nothing
+            : cells.map((reading, index) => {
                 const tone = toneOf(reading, bounds, palette)
-                const title = `${reading.label}: ${reading.value}`
-                /* The title is the only tooltip here, and one delegated handler
-                 would still be ninety elements' worth of markup to hang it on.
-                 Ninety `helix-tooltip` elements is what this avoids; the native
-                 one costs nothing and works on a touch device's long press. */
                 /* **Two templates rather than one with a conditional style, and
                    the reason is that an absent tone has to mean an absent
                    declaration.** `--heatmap-tone: var(--heatmap-tone-undefined)`
@@ -352,21 +452,86 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
                    set. An untoned cell came out transparent rather than taking
                    the quiet ground the sheet has for it. */
                 return tone === undefined
-                  ? html`<span part="cell" title=${title}></span>`
+                  ? html`<span part="cell" data-index=${index}></span>`
                   : html`<span
                 part="cell"
-                title=${title}
+                data-index=${index}
                 data-tone=${tone}
                 style="--heatmap-tone: var(--heatmap-tone-${tone})"
               ></span>`
               })
         }
+        ${this.renderTooltip()}
       </div>
+      ${cells.length === 0 ? html`<p part="empty">${this.emptyText}</p>` : nothing}
       <div part="footer">
         <span part="start"><slot name="start"></slot></span>
         <span part="summary"><slot name="summary"></slot></span>
         <span part="end"><slot name="end"></slot></span>
       </div>`
+  }
+
+  /**
+   * The bubble over the cell a pointer is resting on.
+   *
+   * **One tooltip that moves, which is what every other chart here does and is
+   * the thing the `title` attribute was kept to avoid.** The note this replaces
+   * read that ninety `helix-tooltip` elements was the cost of a real one, and
+   * that was never the shape: Bar Chart, Line Chart and Donut Chart each render
+   * a single anchor against an invisible mark and move the mark, so the count is
+   * one however many readings there are. `drawTooltip` is their shared markup
+   * and this is the fourth caller.
+   *
+   * What it buys over the native one is the row rather than the reading.
+   * `sourceRows` carries every column of the table including the ones nothing
+   * was plotted from, so a cell reads "11 Jun 2026 / Uptime 81.2% / Note Partial
+   * outage" where `title` could only ever say the two values this component
+   * happens to hold. It is also styleable, appears at once rather than after the
+   * platform's second of delay, and cannot be truncated by the window edge.
+   *
+   * The mark is placed in pixels rather than in percent, which is the one thing
+   * this does differently from its siblings: they divide a plot into equal
+   * slots, and a strip's cells are a fixed size with a fixed gap inside a box
+   * that is usually wider, so a percentage of the box lands between cells. The
+   * pitch is `cell + gap` and both are measured.
+   */
+  protected renderTooltip(): TemplateResult | typeof nothing {
+    const at = this.hovered
+    if (at < 0) {
+      return nothing
+    }
+    /* `sourceRows` is indexed over every reading and the strip draws a tail of
+       them, so the two agree only when nothing was dropped. Off by the length of
+       what was cut, a tooltip names the wrong day, and it names one that is
+       still on screen, so nothing about it looks wrong. */
+    const offset = this.points.length - this.drawn.length
+    const cell = this.cellPx
+    const gap = this.gapPx
+    const column = Math.floor(at / this.rowCount)
+    const row = at % this.rowCount
+    return drawTooltip(this.sourceRows, offset + at, this.tag('tooltip'), {
+      placement: 'top',
+      x: `${column * (cell + gap) + cell / 2}px`,
+      y: `${row * (cell + gap)}px`,
+    })
+  }
+
+  /**
+   * Which drawn cell the pointer is over, or -1.
+   *
+   * `pointerover` on the strip rather than a listener per cell: the event
+   * bubbles, so one handler covers however many cells there are, and unlike
+   * `mouseover` it is delivered for a pen and for the touch that follows a long
+   * press.
+   */
+  private readonly onPointerOver = (event: PointerEvent): void => {
+    const cell = (event.target as Element | null)?.closest?.('[part="cell"]')
+    const index = Number(cell?.getAttribute('data-index') ?? -1)
+    this.hovered = Number.isInteger(index) ? index : -1
+  }
+
+  private readonly onPointerLeave = (): void => {
+    this.hovered = -1
   }
 }
 

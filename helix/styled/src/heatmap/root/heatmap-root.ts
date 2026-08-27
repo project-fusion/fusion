@@ -34,9 +34,18 @@ import { styles } from './heatmap-root.css.js'
  * @csspart strip - The grid of cells.
  * @csspart cell - One reading.
  * @csspart footer - The three-slot row under the strip.
+ * @csspart mark - The invisible point the tooltip is anchored to.
+ * @csspart tooltip - The bubble, forwarded from `Tooltip`.
+ * @csspart tooltip-anchor - The `Tooltip` element itself.
+ * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-label - The reading's own name inside the tooltip.
+ * @csspart tooltip-name - A column's name inside the tooltip.
+ * @csspart tooltip-value - A column's value inside the tooltip.
  *
- * @cssproperty --heatmap-cell-size - The size a cell wants. The strip fits as many as the container allows.
- * @cssproperty --heatmap-gap - Space between cells.
+ * @cssproperty --heatmap-cell-size - The size a cell wants on both axes, where neither is given its own.
+ * @cssproperty --heatmap-cell-width - How wide a cell is. The strip fits as many as the container allows.
+ * @cssproperty --heatmap-cell-height - How tall a cell is. A row of a tall thin cell is what a status page draws.
+ * @cssproperty --heatmap-gap - Space between cells. Zero is a continuous field rather than a grid of tiles.
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-tone-success - What `success` is worth, as a name or a `data-tone`.
  * @cssproperty --heatmap-tone-warning - What `warning` is worth.
@@ -58,26 +67,24 @@ export class HelixHeatmap extends HelixHeadlessHeatmap {
   static override styles: CSSResultGroup = styles
 
   /**
-   * What the sheet beside this actually draws, in the pixels the fit arithmetic
-   * counts in.
+   * The first guess at what this sheet draws, before it has been measured.
    *
-   * **The base tier's numbers are a bare strip's and this tier draws something
-   * bigger, so somebody has to say so.** `fits()` works against a measured width
-   * and cannot resolve `--helix-space-2xs`; this sheet chose that gap and a
-   * `0.75rem` cell, so this is the one place that knows both halves. Left at the
-   * inherited 8 and 2, the arithmetic believed a cell cost 10 pixels where it
-   * cost 16: measured 27 Aug 2026, a ninety day strip drew 940 pixels of cells
-   * into a 592 pixel box at 640 and 540 into 342 at 390, overflowing the
-   * document both times, while `visible` reported 59 and 34. The number a
-   * summary is told to trust was the number that was wrong, which is the exact
-   * failure the property exists to prevent.
+   * **Not a contract any more, and it was a bad one.** `fits()` works against a
+   * measured width and a cell size it has to be told, and being told by hand
+   * meant these sat at the base tier's 8 and 2 against a sheet drawing 12 and 4:
+   * the arithmetic believed a cell cost 10 pixels where it cost 16, so a ninety
+   * day strip drew 940 pixels of cells into a 592 pixel box at 640 and 540 into
+   * 342 at 390, overflowing the document both times while `visible` reported 59
+   * and 34. The number a summary is told to trust was the number that was wrong.
    *
-   * A consumer who moves `--heatmap-cell-size` or `--heatmap-gap` sets `min-cell`
-   * and `gap` to match, and the attributes are how they say it.
+   * The strip is read back now, so nothing has to be kept in step and
+   * `--heatmap-cell-width` on its own is enough. These two remain because a
+   * measurement arrives one frame after the first paint, and a first paint from
+   * numbers that match the sheet is one that does not move.
    */
   override gap = 4
 
-  /** The drawn cell, for the reason `gap` is the drawn gap. `0.75rem` at the root font size. */
+  /** The drawn cell width, for the reason `gap` is the drawn gap. `0.75rem` at the root font size. */
   override minCell = 12
 }
 

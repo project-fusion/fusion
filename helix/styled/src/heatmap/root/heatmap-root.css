@@ -12,10 +12,18 @@
   display: grid;
   grid-template-columns: minmax(0, max-content);
 
-  /* Read by the three rules that draw a cell: the track it sits in, the row it
-     sits on, and the box itself. One name so a consumer moving the hook moves
-     all three, and so the fallback is written once rather than three times. */
-  --_heatmap-cell: var(--heatmap-cell-size, 0.75rem);
+  /* **Two axes, because a square is a contribution graph's shape and not a
+     status page's.** A calendar cell is a day and is square; an uptime bar is a
+     minute or an hour, and every status page draws those tall and thin, four
+     pixels by twenty, because the strip's whole job is to fit a long stretch of
+     time into a row. One `--heatmap-cell-size` could say either and not both.
+
+     Each axis falls back to the shared hook, so `--heatmap-cell-size` still sets
+     both and existing markup is untouched, and the private is what the rules
+     read: a consumer moving one hook moves every rule that draws with it, and
+     the fallback chain is written twice rather than five times. */
+  --_heatmap-cell-width: var(--heatmap-cell-width, var(--heatmap-cell-size, 0.75rem));
+  --_heatmap-cell-height: var(--heatmap-cell-height, var(--heatmap-cell-size, 0.75rem));
 
   /* **What a tone name is worth, which the tier below cannot say.**
      `helix/headless` writes `--heatmap-tone: var(--heatmap-tone-success)` onto a
@@ -83,10 +91,12 @@
 [part="strip"] {
   display: grid;
   gap: var(--heatmap-gap, var(--helix-space-2xs));
-  grid-auto-columns: var(--_heatmap-cell);
+  grid-auto-columns: var(--_heatmap-cell-width);
   grid-auto-flow: column;
-  grid-template-rows: repeat(var(--_heatmap-rows, 1), var(--_heatmap-cell));
+  grid-template-rows: repeat(var(--_heatmap-rows, 1), var(--_heatmap-cell-height));
   justify-content: start;
+  /* The tooltip's mark is placed against this box. */
+  position: relative;
 }
 
 /* A cell is a square with a tone in it and nothing else. The default is the
@@ -102,19 +112,65 @@
 [part="cell"] {
   background-color: var(--heatmap-tone, var(--helix-color-surface-sunken));
   border-radius: var(--heatmap-cell-radius, calc(var(--helix-radii-sm) * 0.5));
-  inline-size: var(--_heatmap-cell);
+  inline-size: var(--_heatmap-cell-width);
 }
 
-/* Every cell carries a `title` and nothing said so. A ring on hover is what
-   ties the tooltip that appears to the day it came from, which on a strip of
-   ninety near-identical squares is the whole difficulty. `outline` rather than a
-   border or an inset shadow: it is outside the box model, so a cell does not
-   move or change size when the pointer reaches it, and one token of offset keeps
-   the ring clear of both neighbours inside the gap. */
+/* The tooltip, on the terms the other charts already set. The mark is a point
+   with no size that the bubble hangs off; the anchor covers the strip and takes
+   no pointer events, so it can never eat the hover that summoned it. */
+[part="mark"] {
+  block-size: 0;
+  inline-size: 0;
+  position: absolute;
+}
+
+[part="tooltip-anchor"] {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+[part="tooltip-label"] {
+  color: var(--helix-color-foreground-muted);
+  display: block;
+  font-weight: var(--helix-weight-medium);
+}
+
+/* Name and value on one line, the value pushed to the end so a column of them
+   lines up whatever the names are. */
+[part="tooltip-cell"] {
+  align-items: baseline;
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+}
+
+[part="tooltip-name"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[part="tooltip-value"] {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-medium);
+}
+
+/* A ring on hover is what ties the bubble that appears to the day it came from,
+   which on a strip of ninety near-identical squares is the whole difficulty.
+   `outline` rather than a border or an inset shadow: it is outside the box
+   model, so a cell does not move or change size when the pointer reaches it, and
+   one token of offset keeps the ring clear of both neighbors inside the gap.
+
+   Where the gap is zero the offset would put the ring under the neighboring
+   cell, so it goes inside: a continuous field has no room between tiles to draw
+   in, and an inset ring is what a spreadsheet does for the same reason. */
 @media (hover: hover) {
   [part="cell"]:hover {
     outline: var(--helix-border-thin) solid var(--helix-color-foreground);
     outline-offset: var(--helix-border-thin);
+  }
+
+  [part="strip"]:not([data-spaced]) [part="cell"]:hover {
+    outline-offset: calc(var(--helix-border-thin) * -1);
   }
 }
 
@@ -148,11 +204,16 @@
   display: none;
 }
 
+/* A sibling of the strip rather than a cell inside it, which is what lets both
+   tiers say this in one rule. Inside, it was a grid item spanning `1 / -1` in a
+   grid whose columns are the width of a cell, so "No readings" wrapped one
+   character per line down a twelve pixel column; and the fix a document sheet
+   would need, selecting the strip by what it contains, is one `::part()` cannot
+   express. Out of the grid, neither tier needs a rule at all. */
 [part="empty"] {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
-  grid-column: 1 / -1;
   margin: var(--helix-space-none);
   text-align: center;
 }

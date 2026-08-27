@@ -1,0 +1,27 @@
+/* **One hook, both axes, three strips.** `--heatmap-cell-size` is what to reach
+   for where a cell is square and only its scale is in question, which is most of
+   the time; `--heatmap-cell-width` and `--heatmap-cell-height` override it one
+   axis at a time, and `hours.css` is the case for that.
+
+   The strip is measured rather than told, so a size set here is the whole of it:
+   nothing restates the number as a `min-cell` attribute, and the count each
+   strip publishes is still the count it drew. Set the size without the
+   measurement and the smallest of these would have overflowed its box by three
+   times, silently. */
+.small {
+  --heatmap-cell-size: 0.5rem;
+}
+
+.medium {
+  --heatmap-cell-size: 0.875rem;
+}
+
+.large {
+  --heatmap-cell-size: 1.25rem;
+}
+
+.label {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+}

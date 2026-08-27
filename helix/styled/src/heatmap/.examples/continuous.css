@@ -1,0 +1,22 @@
+/* **No gap and no rounding, which is one decision rather than two.** A grid of
+   tiles and a continuous field are different pictures: tiles say each reading is
+   its own thing and are right for a calendar, where a day is a unit; a field
+   says the readings are samples of something that never stopped, which is what
+   an hour of load is. Taking the gap out and leaving the corners rounded gets
+   neither, because rounded corners with nothing between them leave a lattice of
+   little holes where four cells meet.
+
+   The strip publishes `data-spaced` when it measures a gap, so the hover ring
+   moves inside the cell here rather than sitting in a space that no longer
+   exists.
+
+   The first threshold is zero rather than one, which is the other half of the
+   same picture: a value under the lowest bound is deliberately left toneless,
+   because a day with no commits in it is a day nothing happened on, and here
+   nothing ever stops, so a load of zero is a reading and painting it as a hole
+   would put gaps in a field that has none. */
+.field {
+  --heatmap-gap: 0;
+  --heatmap-cell-radius: 0;
+  --heatmap-cell-size: 1.125rem;
+}

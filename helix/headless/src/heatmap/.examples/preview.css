@@ -1,0 +1,142 @@
+/* What the headless tier asks a consumer to write for Heatmap.
+ *
+ * Deliberately skeletal: a diagram of what has to be styled, not a theme to
+ * copy. No token, because `headless` does not depend on `helix/styles` and a
+ * consumer taking that tier has none to reach for.
+ *
+ * **Grays, and only grays.** A headless example is a diagram, and color in a
+ * diagram reads as meaning: a green cell says the day went well and a red one
+ * says it did not, neither of which this tier has an opinion about. A neutral
+ * ramp says nothing except which cell is heavier than which, which on a heatmap
+ * is the whole job.
+ *
+ * Named by role rather than numbered, because a number implies a scale somebody
+ * maintains and this is seven values in one file. Underscored, because they are
+ * declared and read in that same file and never leave it. Written through
+ * `light-dark()` with `color-scheme` declared, so the sandbox's dark mode gets a
+ * sheet that inverts rather than a pale card on a dark page.
+ *
+ * **This file is why the family had a baseline at all.** Heatmap was one of four
+ * of eighty-seven with no `preview.css`, and its picture was a blank page under a
+ * row of footer text: ninety cells, no size and no fill, so every one of them
+ * laid out as an empty inline box. A `<span>` with nothing in it is the one shape
+ * a missing sheet makes completely invisible rather than merely wrong.
+ */
+
+:root {
+  color-scheme: light dark;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+/* The tone names this example's table asks for, and the ramp a `tones` list
+   reaches. The base tier turns a tone name into a `--heatmap-tone-*` reference
+   and never resolves it, so a consumer answering in grays is the whole contract
+   working: five steps that differ by weight, and three categories that differ by
+   nothing else, since a diagram cannot mean "danger".
+
+   Written without the call spelled out, because `check:hooks` reads a stylesheet
+   whole: prose quoting the substitution counts as a reader, and this file is the
+   one place that answers rather than asks. */
+/* One column of the strip's own width, so the two labels under it bracket the
+   picture rather than the box: a thirty day strip 300 pixels across sat in a
+   592 pixel host, and "Today" floated 290 pixels past the last cell it was
+   naming. The strip is the widest child, so the track is the strip. */
+helix-headless-heatmap {
+  display: grid;
+  grid-template-columns: minmax(0, max-content);
+
+  --heatmap-tone-danger: var(--_gray-strong);
+  --heatmap-tone-success: var(--_gray-line);
+  --heatmap-tone-warning: var(--_gray-muted);
+  --heatmap-tone-1: var(--_gray-subtle);
+  --heatmap-tone-2: var(--_gray-fill);
+  --heatmap-tone-3: var(--_gray-line);
+  --heatmap-tone-4: var(--_gray-mark);
+  --heatmap-tone-5: var(--_gray-strong);
+}
+
+/* A cell has no size of its own: it is an empty `<span>`, so the grid's tracks
+   are the only thing that gives it one. Both axes, because a row of the strip is
+   a template row and a column of it is an implicit track, and an implicit track
+   left at `auto` stretches to fill whatever box the strip is in.
+
+   **8 and 2 are the base tier's own `min-cell` and `gap`**, and they are those
+   numbers because a sheet has to agree with the arithmetic that decides how many
+   cells there is room for. A consumer drawing a bigger cell than the one the
+   defaults describe gets a strip wider than its box, silently, and the count the
+   element publishes is wrong by the same ratio. This file is the smallest
+   demonstration of the contract: change one of these and change the attribute
+   beside it. */
+helix-headless-heatmap::part(strip) {
+  display: grid;
+  gap: 2px;
+  grid-auto-columns: 8px;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--_heatmap-rows, 1), 8px);
+  justify-content: start;
+  /* The mark the tooltip hangs off is placed against this box. */
+  position: relative;
+}
+
+/* The bubble a pointer summons, which this tier renders and does not place.
+   A point with no size for it to hang off, and an anchor that covers the strip
+   and takes no pointer events, so it cannot eat the hover that summoned it. */
+helix-headless-heatmap::part(mark) {
+  block-size: 0;
+  inline-size: 0;
+  position: absolute;
+}
+
+helix-headless-heatmap::part(tooltip-anchor) {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+helix-headless-heatmap::part(tooltip-cell) {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+helix-headless-heatmap::part(tooltip-label) {
+  color: var(--_gray-muted);
+  display: block;
+}
+
+/* No corner radius: rounding says how a thing should feel and that is not this
+   tier's to say. The ground under an untoned cell is, though, because a cell
+   with no fill is not a quiet day, it is a hole. */
+helix-headless-heatmap::part(cell) {
+  background-color: var(--heatmap-tone, var(--_gray-surface));
+  inline-size: 8px;
+}
+
+helix-headless-heatmap::part(footer) {
+  color: var(--_gray-muted);
+  display: grid;
+  font-size: 0.75rem;
+  gap: 0.5rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding-block-start: 0.5rem;
+}
+
+helix-headless-heatmap::part(summary) {
+  text-align: center;
+}
+
+helix-headless-heatmap::part(end) {
+  text-align: end;
+}
+
+helix-headless-heatmap::part(empty) {
+  color: var(--_gray-muted);
+  margin: 0;
+  text-align: center;
+}
